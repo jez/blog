@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Linux | Jake Zimmerman]]></title>
   <link href="http://blog.zimmerman.io/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-05-06T03:13:01-04:00</updated>
+  <updated>2014-05-06T04:20:05-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -18,7 +18,7 @@
     <link href="http://blog.zimmerman.io/blog/2014/05/06/adding-a-network-printer-to-a-linux-server/"/>
     <updated>2014-05-06T02:09:29-04:00</updated>
     <id>http://blog.zimmerman.io/blog/2014/05/06/adding-a-network-printer-to-a-linux-server</id>
-    <content type="html"><![CDATA[<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#58;&#x70;&#114;&#105;&#x6e;&#116;&#64;&#115;&#x63;&#111;&#x74;&#116;&#x79;&#108;&#x61;&#98;&#115;&#46;&#x6f;&#x72;&#x67;">&#x70;&#114;&#105;&#x6e;&#x74;&#64;&#115;&#99;&#111;&#116;&#116;&#x79;&#x6c;&#x61;&#98;&#x73;&#x2e;&#111;&#114;&#x67;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits in this area. In this post, I&rsquo;d like to talk about my most recent task: configuring our server to send jobs to a school-affiliated, network-attached printer using CUPS. <!-- more --><a href="#tldr">tl;dr</a></p>
+    <content type="html"><![CDATA[<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#109;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x70;&#x72;&#x69;&#x6e;&#116;&#64;&#115;&#x63;&#x6f;&#116;&#x74;&#121;&#108;&#x61;&#x62;&#115;&#46;&#111;&#x72;&#103;">&#112;&#114;&#105;&#110;&#116;&#64;&#x73;&#x63;&#x6f;&#116;&#116;&#121;&#x6c;&#x61;&#x62;&#115;&#46;&#x6f;&#x72;&#x67;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits in this area. In this post, I&rsquo;d like to talk about my most recent task: configuring our server to send jobs to a school-affiliated, network-attached printer using CUPS. <!-- more --><a href="#tldr">tl;dr</a></p>
 
 <h2>The Hard Way</h2>
 

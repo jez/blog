@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Shiny New Octopress Blog - Jake Zimmerman</title>
+  <title>GitHub Pages Custom Domains - Jake Zimmerman</title>
   <meta name="author" content="Jake Zimmerman">
 
   
-  <meta name="description" content="The below is a post I originally posted on my first (failed) blog. While that blog didn&rsquo;t work out quite right, I hope to keep many of the same &hellip;">
+  <meta name="description" content="If you&rsquo;ve never heard of GitHub Pages for web hosting, you should definitely check it out. (You basically get free hosting for any all static &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.zimmerman.io/blog/2014/05/06/shiny-new-octopress-blog">
+  <link rel="canonical" href="http://blog.zimmerman.io/blog/2014/05/06/github-pages-custom-domains">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Jake Zimmerman" type="application/atom+xml">
@@ -82,7 +82,7 @@
   
   <header>
     
-      <h1 class="entry-title">Shiny New Octopress Blog</h1>
+      <h1 class="entry-title">GitHub Pages Custom Domains</h1>
     
     
       <p class="meta">
@@ -98,45 +98,74 @@
   
 
 
-<time datetime="2014-05-06T01:41:14-04:00" pubdate data-updated="true">May 6<span>th</span>, 2014</time>
+<time datetime="2014-05-06T03:15:35-04:00" pubdate data-updated="true">May 6<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>The below is a post I originally posted on my first (failed) blog. While that blog didn&rsquo;t work out quite right, I hope to keep many of the same ideals at heart when continuing (and hopefully maintaining) this blog, so I decided I may as well repost it here.</p>
+<div class="entry-content"><p>If you&rsquo;ve never heard of <a href="https://pages.github.com/">GitHub Pages</a> for web hosting, you should definitely check it out. (You basically get free hosting for any all static or <a href="http://jekyllrb.com/">Jekyll</a> website with git-push-to-deploy). You can configure your site to be listed at a custom domain according to <a href="https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages">these</a> instructions, which are very thorough. I feel like it&rsquo;d help, though, to supplement this documentation with a fairly common example setup.</p>
 
 <!-- more -->
 
 
-<h2>README</h2>
+<h2>My setup</h2>
 
-<p>It is currently 2:14am on Wednesday, October 16, 2013. “Today,” (well really yesterday) at a ScottyLabs meeting (a student organization at Carnegie Mellon (CMU) that lies at the nexus of design and technology), my interest in the group showed through enough to the point where they entrusted a few low-level permissions to help out developing the various projects they’ve been working on (namely Print@ScottyLabs) right now. As is happening more often everyday, I am realizing just how much I have to learn: about technology, about college, about people, about everything.</p>
+<p>I have two sites which I want to host using the <code>zimmerman.io</code> domain name: my <a href="//blog.zimmerman.io">blog</a> and my <a href="//www.zimmerman.io">personal site</a>. I host my personal site at <a href="//www.zimmerman.io">www.zimmerman.io</a>, but you can also navigate to <a href="//zimmerman.io">zimmerman.io</a> and end up in the same places as before. It&rsquo;s served as a User Page <a href="https://www.github.com/Z1MM32M4N/z1mm32m4n.github.io">here</a>.</p>
 
-<p>But looking around (maybe I haven’t looked very far), I don’t see one central place where I can go to get help with all of this stuff. Obviously I can ask people if I really need it, the support structures are supposedly in place, but in my experience when you approach people for help on general topics, they just throw you back to the Internet and say, “Google it.”  While things certainly can be found on the Internet, for someone who just wants to be able to read about the answer without being overwhelmed by the details, it seems like there’s no good place to start.</p>
+<p>I host my blog at <a href="//blog.zimmerman.io">blog.zimmerman.io</a>, and it&rsquo;s served as a Project Page in <a href="https://www.github.com/Z1MM32M4N/blog/">this repo</a>.</p>
 
-<h2>What I Want</h2>
+<h2>What the instructions say</h2>
 
-<p>In this spirit of aggregating pieces of knowledge on the interwebs, I’d like to document my process of learning and researching. My goals in doing so are as follows.</p>
+<p>The instructions say a few things very clearly (yay, documentation!).</p>
 
-<h3>Personal Reference</h3>
+<p>First, if I want to use a custom subdomain (like what I&rsquo;m doing for my blog) to host a repo, I can add a <code>CNAME</code> record with my DNS provider that points to what is in my case <code>z1mm32m4n.github.io</code>. This was counterintuitive to me, because I thought at first that this would make my blog.zimmerman.io domain redirect to my personal site, but that&rsquo;s not how GitHub handles it. (They&rsquo;re smarter than that.)</p>
 
-<p>I want something to look back on if I can’t remember something. Say I’m wondering why in the world I even started this thing: I could look back at this post. What was that site I read that had some good stuff about networking? Oh yeah, there it is. Hey, I remember reading about something similar to what I need to do on this project a while back, I wonder if that site had anything that could help. Documentation is <em>vastly</em> underappreciated.</p>
+<p>At the same time, I need to put a file in the root of the blog&rsquo;s repo (in the <code>gh-pages</code> branch because it&rsquo;s a Project Page), called <code>CNAME</code> (<a href="https://github.com/Z1MM32M4N/blog/blob/gh-pages/CNAME">view source</a>) with the contents &lsquo;blog.zimmerman.io&rsquo;. After a little while, the DNS tables will update and everything here should work: I can now view my <em>blog</em> where I want it.</p>
 
-<h3>Metacognition</h3>
+<h2>What the instructions say, but not so clearly</h2>
 
-<p>Everyone says it’s good to think about the way you think. I spent a lot of time in high school contemplating the effects of information overload due to the Internet, and I’m sure that as I start down this process, it’s only going to get deeper. In writing down my thoughts like this, I’d like to get some sort of structure to my learning so that I can keep the floodgates at bay.</p>
+<p>The next bit gave me some trouble at first (probably just because I was being impatient while the DNS tables were updating). The end goal was to have the <code>www</code> subdomain host my site and have the <code>@</code> (the top-level or apex domain) redirect there. If you read carefully, the instructions say three things:</p>
 
-<h3>Public Roadmap</h3>
+<ol>
+<li> Make the <code>CNAME</code> file (<a href="https://github.com/Z1MM32M4N/z1mm32m4n.github.io/blob/master/CNAME">view source</a>) in my (User) Pages repository contain <code>www.zimmerman.io</code>. <strong>This</strong> is the domain at which I do want my site to be visible.</li>
+<li> Create a <code>CNAME</code> record with my DNS provider pointing to <code>z1mm32m4n.github.io</code>, as before with the <code>blog</code> subdomain.</li>
+<li> Make the <code>@</code> domain redirect to GitHub like normal, and let GitHub do some magic to handle the rest.</li>
+</ol>
 
-<p>If there are 300+ million people in America and 7+ billion people around the world, there statistically basically has to be someone just like me who’d like to have such a road map. If this is you, it’s my hope that these ramblings are useful.</p>
 
-<h2>Where to Next</h2>
+<p>This was a little confusing at first, because if I wanted the opposite direction (www.zimmerman.io to redirect to zimmerman.io), I would have still created a CNAME file, but it would have contained <code>zimmerman.io</code> and I would have created an <code>A</code> record with my DNS provider, not an actual CNAME. (I still did have to create both the <code>A</code> and <code>CNAME</code> in the end, but in this setup, the <code>A</code> record is referenced in the <code>CNAME</code> file, if that makes any sense.)</p>
 
-<p>So it’s getting pretty late and I’d like to get back to what I was learning about: MVC. (EDIT: It&rsquo;s still late, and it&rsquo;s even worst this time because I have exams this week&hellip; A+ Jake&hellip;) So hopefully, I’ll have time to keep developing this, whatever “this” is. I’ve been told that “There are only two hard things in Computer Science: cache invalidation, naming things, and off-by-one errors.” I have no idea what cache invalidation is (yet!), but the “naming things” bit is spot on.</p>
+<h2>Recap</h2>
 
-<p>So here goes nothing&hellip; I’m sure that in the very least it’ll be fun to look over these entries 5, 10, 20 years from now and think about how quickly things changed.</p>
+<h3>My CNAME Files</h3>
+
+<ul>
+<li> For www.zimmerman.io:
+
+<ul>
+<li> CNAME file contains <code>www.zimmerman.io</code></li>
+<li> CNAME file resides in <code>master</code> branch of User Pages repo for Z1MM32M4N</li>
+</ul>
+</li>
+<li> For blog.zimmerman.io
+
+<ul>
+<li> CNAME file contains <code>blog.zimmerman.io</code></li>
+<li> CNAME file resides in <code>gh-pages</code> branch of Project Pages repo for Z1MM32M4N/blog</li>
+</ul>
+</li>
+</ul>
+
+
+<h3>My DNS Config</h3>
+
+<p>Here&rsquo;s a screenshot of what my records look like with my DNS provider, in case this was still unclear.</p>
+
+<p><img src="/images/DNS-config.jpg"></p>
+
+<p>I&rsquo;m personally using <a href="https://www.gandi.net/">Gandi</a> for domain registration because they had the cheapest <code>.io</code> TLD registration, but their interface takes some getting used to. (It was certainly still worth the deal I got.)</p>
 
 <hr />
 
@@ -169,12 +198,12 @@ If you cared enough to read that far, you should consider following me on <a hre
   
 
 
-<time datetime="2014-05-06T01:41:14-04:00" pubdate data-updated="true">May 6<span>th</span>, 2014</time>
+<time datetime="2014-05-06T03:15:35-04:00" pubdate data-updated="true">May 6<span>th</span>, 2014</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/intro/'>intro</a>, <a class='category' href='/blog/categories/meta/'>meta</a>
+    <a class='category' href='/blog/categories/dns/'>dns</a>, <a class='category' href='/blog/categories/gandi/'>gandi</a>, <a class='category' href='/blog/categories/github/'>github</a>, <a class='category' href='/blog/categories/troubleshooting/'>troubleshooting</a>, <a class='category' href='/blog/categories/web-dev/'>web-dev</a>
   
 </span>
 
@@ -183,7 +212,7 @@ If you cared enough to read that far, you should consider following me on <a hre
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.zimmerman.io/blog/2014/05/06/shiny-new-octopress-blog/" data-via="Z1MM32M4N" data-counturl="http://blog.zimmerman.io/blog/2014/05/06/shiny-new-octopress-blog/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.zimmerman.io/blog/2014/05/06/github-pages-custom-domains/" data-via="Z1MM32M4N" data-counturl="http://blog.zimmerman.io/blog/2014/05/06/github-pages-custom-domains/" >Tweet</a>
   
   
   
@@ -194,8 +223,8 @@ If you cared enough to read that far, you should consider following me on <a hre
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2014/05/06/adding-a-network-printer-to-a-linux-server/" title="Previous Post: Adding a Network Printer to a Linux Server">&laquo; Adding a Network Printer to a Linux Server</a>
       
-        <a class="basic-alignment right" href="/blog/2014/05/06/adding-a-network-printer-to-a-linux-server/" title="Next Post: Adding a Network Printer to a Linux Server">Adding a Network Printer to a Linux Server &raquo;</a>
       
     </p>
   </footer>
@@ -280,8 +309,8 @@ If you cared enough to read that far, you should consider following me on <a hre
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.zimmerman.io/blog/2014/05/06/shiny-new-octopress-blog/';
-        var disqus_url = 'http://blog.zimmerman.io/blog/2014/05/06/shiny-new-octopress-blog/';
+        var disqus_identifier = 'http://blog.zimmerman.io/blog/2014/05/06/github-pages-custom-domains/';
+        var disqus_url = 'http://blog.zimmerman.io/blog/2014/05/06/github-pages-custom-domains/';
         var disqus_script = 'embed.js';
       
     (function () {
