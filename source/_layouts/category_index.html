@@ -1,25 +1,17 @@
 ---
-layout: default
+layout: page
+footer: false
 ---
-<div class="all-posts">
-  <div class="container">
-    <div class="row">
-      <div class="list-title col-md-offset-3 col-md-6">
-        <h4>Posts in {{ page.category }}</h4>
-      </div>
-    </div>
-  </div>
 
-  <div class="article-list">
-    <div class="container">
-      {% for post in site.categories[page.category] %}
-        {% assign content = post.content %}
-        <div class="row">
-          <div class="col-md-offset-3 col-md-6">
-            {% include article_listing.html %}
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
+<div id="blog-archives" class="category">
+{% for post in site.categories[page.category] %}
+{% capture this_year %}{{ post.date | date: "%Y" }}{% endcapture %}
+{% unless year == this_year %}
+  {% assign year = this_year %}
+  <h2>{{ year }}</h2>
+{% endunless %}
+<article>
+  {% include archive_post.html %}
+</article>
+{% endfor %}
 </div>
