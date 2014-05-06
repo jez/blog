@@ -3,10 +3,10 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Blog Archives - My Octopress Blog</title>
+	<title>My Octopress Blog</title>
     <meta name="author" content="Jake Zimmerman">
     
-	<meta name="description" content="">
+	<meta name="description" content="Search Results $('#search_results').tapir({ 'token': '', 'complete' : function() { document.getElementById('search_loading').style.display="none &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -78,7 +78,23 @@
 <div id="toload">
 <!-- begin toload --> 
     <div id="content" class="inner">
-        
+        <h1 class="entry-title"><center>Search Results</center></h1>
+<div id="search_loading" style="margin: 40px 0">
+    <center><img src="/images/loading.gif"></center>
+</div>
+
+<script type="text/javascript" src="/javascripts/jquery-tapir.js"></script>
+<div id="search_results" style="display:none">
+<br>
+</div>
+<script>
+         $('#search_results').tapir({
+             'token': '',
+             'complete' : function() { document.getElementById('search_loading').style.display="none"; }
+         });
+</script>
+
+
     </div>
     <footer id="footer">
     <div style="display:inline">
