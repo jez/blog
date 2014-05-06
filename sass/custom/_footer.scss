@@ -1,0 +1,68 @@
+$footer-construction: hsl(0.00, 0.00%, 6.27%);
+
+// Footer
+body > footer {
+  overflow: hidden;
+  p {
+    margin-bottom: 0;
+  }
+  @include border-bottom-radius(0px);
+  p span.theme-version {
+    float: right;
+    color: #9C9EA2;
+  }
+  @include single-box-shadow(#000, 1px, 3px, 5px)
+}
+
+section {
+  &.contruction-wrap {
+    height: 52px;
+    width:200px;
+    position: absolute;
+    right: 0;
+    top: 14px;
+  }
+  div.contruction {
+    height: 15px;
+    width: 200px;
+    position: relative;
+    margin-left: 105px;
+    background-color: hsl(39.59, 100.00%, 47.84%);
+    @include rotate(-45deg);
+    @include background-image(linear-gradient(
+      45deg,
+      $footer-construction 6.25%,
+      transparent 6.25%,
+      transparent 12.5%,
+      $footer-construction 12.5%,
+      $footer-construction 18.75%,
+      transparent 18.75%,
+      transparent 25%,
+      $footer-construction 25%,
+      $footer-construction 31.25%,
+      transparent 31.25%,
+      transparent 37.5%,
+      $footer-construction 37.5%,
+      $footer-construction 43.75%,
+      transparent 43.75%,
+      transparent 50%,
+      $footer-construction 50%,
+      $footer-construction 56.25%,
+      transparent 56.25%,
+      transparent 62.5%,
+      $footer-construction 62.5%,
+      $footer-construction 68.75%,
+      transparent 68.75%,
+      transparent 75%,
+      $footer-construction 75%,
+      $footer-construction 81.25%,
+      transparent 81.25%,
+      transparent 87.5%,
+      $footer-construction 87.5%,
+      $footer-construction 93.75%,
+      transparent 93.75%,
+      transparent 100%
+      ));
+    @include box-shadow(hsla(0, 0%, 100%, 0.2) 0px 1px 2px 1px inset, hsla(0, 0%, 0%, 0.2) 0px -1px 1px 1px inset);
+  }
+}

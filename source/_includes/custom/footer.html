@@ -1,4 +1,21 @@
-<p>
-  Copyright &copy; {{ site.time | date: "%Y" }} - {{ site.author }} -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
+<div class="col-md-1">
+  <a href="/"><h4>Home</h4></a>
+</div>
+
+<div class="col-md-2">
+  <div class="social-icon-list">
+    {% if site.twitter_user %}
+    <a href="https://twitter.com/{{site.twitter_user}}"><img src="/images/glyphicons_social_31_twitter.png"/></a>
+    {% endif %}
+
+    {% if site.github_user %}
+    <a href="https://github.com/{{site.github_user}}"><img src="/images/glyphicons_social_21_github.png"/></a>
+    {% endif %}
+
+    {% if site.email %}
+    <a href="mailto:{{site.email}}"><img src="/images/glyphicons_social_39_e-mail.png"/></a>
+    {% endif %}
+  </div>
+</div>
+
+{% include end_footer.html %}

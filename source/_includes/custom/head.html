@@ -1,3 +1,18 @@
-<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<!-- Facebook Open Graph
+     Facebook Debugger: https://developers.facebook.com/tools/debug -->
+{% if page.title %}<meta property="og:title" content="{{ page.title }}" /><meta itemprop="name" content="{{ page.title }}" />{% endif %}
+<meta property="og:type" content="article" />
+<meta property="og:url" content="{{ canonical }}" />
+<meta property="og:description" content="{{ description | strip_html | condense_spaces | truncate:150 }}" />
+{% if page.ogimage %}<meta property="og:image" content="{{ page.ogimage }}" /><meta itemprop="image" content="{{ page.ogimage }}" />{% endif %}
+<meta property="og:site_name" content="{{ site.url }}" />
+<meta property="article:author" content="https://plus.google.com/114787528537231301324">
+{% if page.date %}<meta property="article:published_time" content="{{ page.date }}" />{% endif %}
+{% capture category %}{% if page.categories %}{{ page.categories }}{% endif %}{% endcapture %}
+{% if page.categories %}<meta property="article:section" content="{{ page.categories }}" />{% endif %}
+<meta itemprop="description" content="{{ description | strip_html | condense_spaces | truncate:150 }}" />
+{% if page.keywords %}<meta name="keywords" content="{{ page.keywords }}" />{% for keyword in page.keywords %}<meta property="article:tag" content="{{ keyword | replace: ',', '' }}" />{% endfor %}{% endif %}
+<!-- Combine multiple fonts into one request -->
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic|Patua+One|Yanone+Kaffeesatz" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
