@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Github | Jake Zimmerman]]></title>
   <link href="http://blog.zimmerman.io/blog/categories/github/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-05-06T14:16:04-04:00</updated>
+  <updated>2014-05-06T22:06:11-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -18,14 +18,16 @@
     <link href="http://blog.zimmerman.io/blog/2014/05/06/github-pages-custom-domains/"/>
     <updated>2014-05-06T03:15:35-04:00</updated>
     <id>http://blog.zimmerman.io/blog/2014/05/06/github-pages-custom-domains</id>
-    <content type="html"><![CDATA[<p>If you&rsquo;ve never heard of <a href="https://pages.github.com/">GitHub Pages</a> for web hosting, you should definitely check it out. (You basically get free hosting for any all static or <a href="http://jekyllrb.com/">Jekyll</a> website with git-push-to-deploy). You can configure your site to be listed at a custom domain according to <a href="https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages">these</a> instructions, which are very thorough. I feel like it&rsquo;d help, though, to supplement this documentation with a fairly common example setup.</p>
+    <content type="html"><![CDATA[<p>I stumbled at first getting the DNS configured for my blog, because I&rsquo;ve got a slighty more complicated setup than normal. I decided to supplement the documentation <a href="https://pages.github.com/">GitHub Pages</a> gives by recounting my personal example and the setup that worked.</p>
 
 <!-- more -->
 
 
+<p>If you&rsquo;ve never heard of <a href="https://pages.github.com/">GitHub Pages</a> for web hosting, you should definitely check it out. You basically get free hosting for any static (i.e. plain HTML or <a href="http://jekyllrb.com/">Jekyll</a>-served) website with git-push-to-deploy. You can even configure your site to be listed at a custom domain according to <a href="https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages">these</a> instructions, which are pretty thorough. I feel like it&rsquo;d help, though, to supplement this documentation with a fairly common example setup.</p>
+
 <h2>My setup</h2>
 
-<p>I have two sites which I want to host using the <code>zimmerman.io</code> domain name: my <a href="//blog.zimmerman.io">blog</a> and my <a href="//www.zimmerman.io">personal site</a>. I host my personal site at <a href="//www.zimmerman.io">www.zimmerman.io</a>, but you can also navigate to <a href="//zimmerman.io">zimmerman.io</a> and end up in the same places as before. It&rsquo;s served as a User Page <a href="https://www.github.com/Z1MM32M4N/z1mm32m4n.github.io">here</a>.</p>
+<p>I have two sites which I want to host using the <code>zimmerman.io</code> domain name: my <a href="//blog.zimmerman.io">blog</a> and my <a href="//www.zimmerman.io">personal site</a>. I host my personal site at <a href="//www.zimmerman.io">www.zimmerman.io</a>, but you can also navigate to <a href="//zimmerman.io">zimmerman.io</a> and end up in the same places as before. It&rsquo;s served as a User Page from <a href="https://www.github.com/Z1MM32M4N/z1mm32m4n.github.io">this repo</a>.</p>
 
 <p>I host my blog at <a href="//blog.zimmerman.io">blog.zimmerman.io</a>, and it&rsquo;s served as a Project Page in <a href="https://www.github.com/Z1MM32M4N/blog/">this repo</a>.</p>
 
@@ -39,14 +41,16 @@
 
 <h2>What the instructions say, but not so clearly</h2>
 
-<p>The next bit gave me some trouble at first (probably just because I was being impatient while the DNS tables were updating). The end goal was to have the <code>www</code> subdomain host my site and have the <code>@</code> (the top-level or apex domain) redirect there. If you read carefully, the instructions say three things:</p>
+<p>The next bit gave me some trouble at first (probably just because I was being impatient while the DNS tables were updating). The end goal was to have the <code>www</code> subdomain host my site and have the <code>@</code> (top-level or apex) domain redirect there. If you read carefully, the instructions say to do three things:</p>
 
 <ol>
 <li> Make the <code>CNAME</code> file (<a href="https://github.com/Z1MM32M4N/z1mm32m4n.github.io/blob/master/CNAME">view source</a>) in my (User) Pages repository contain <code>www.zimmerman.io</code>. <strong>This</strong> is the domain at which I do want my site to be visible.</li>
-<li> Create a <code>CNAME</code> record with my DNS provider pointing to <code>z1mm32m4n.github.io</code>, as before with the <code>blog</code> subdomain.</li>
-<li> Make the <code>@</code> domain redirect to GitHub like normal, and let GitHub do some magic to handle the rest.</li>
+<li> Create a <code>CNAME</code> record with my DNS provider pointing to <code>z1mm32m4n.github.io</code> for the <code>www</code> subdomain. From a technical standpoint on the DNS provider&rsquo;s side of things, this is the same thing we did before with the <code>blog</code> subdomain.</li>
+<li> Create an <code>A</code> record pointing the <code>@</code> domain towards GitHub using the IP address they specify.</li>
 </ol>
 
+
+<p>This last step is where you have to have a little faith: nowhere is there an explicit file telling GitHub, &ldquo;If you get a request from zimmerman.io, send it to me!&rdquo; GitHub merely notices that there <strong>is</strong> a repo with a CNAME containing &lsquo;<strong>www</strong>.zimmerman.io&rsquo;, and so they say, &ldquo;Well, we may as well send this <strong>top level</strong> domain to the <strong>www</strong> domain referenced over here&hellip; I&rsquo;ve got nothing better to do.&rdquo;</p>
 
 <p>This was a little confusing at first, because if I wanted the opposite direction (www.zimmerman.io to redirect to zimmerman.io), I would have still created a CNAME file, but it would have contained <code>zimmerman.io</code> and I would have created an <code>A</code> record with my DNS provider, not an actual CNAME. (I still did have to create both the <code>A</code> and <code>CNAME</code> in the end, but in this setup, the <code>A</code> record is referenced in the <code>CNAME</code> file, if that makes any sense.)</p>
 
