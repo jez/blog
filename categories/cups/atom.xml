@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: CUPS | Jake Zimmerman]]></title>
+  <link href="http://blog.zimmerman.io/categories/cups/atom.xml" rel="self"/>
+  <link href="http://blog.zimmerman.io/"/>
+  <updated>2014-06-04T00:39:09-04:00</updated>
+  <id>http://blog.zimmerman.io/</id>
+  <author>
+    <name><![CDATA[Jake Zimmerman]]></name>
+    <email><![CDATA[jake@zimmerman.io]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Adding a Network Printer to a Linux Server]]></title>
+    <link href="http://blog.zimmerman.io/2014/05/06/adding-a-network-printer-to-a-linux-server/"/>
+    <updated>2014-05-06T02:09:29-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/05/06/adding-a-network-printer-to-a-linux-server</id>
+    <content type="html"><![CDATA[<p>It&rsquo;s one thing to plug in a CD, click through a few dialogs, and wait for the computer to chime at you saying that your printer has been installed. Unfortunately, this is not how server administration works. Here&rsquo;s my account of installing multiple network-attached printers on a Debian server.</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<h2>TL;DR</h2>
+
+<p>For those who only care about the solution: <a href="#tldr">TL;DR</a>.</p>
+
+<h2>The Hard Way</h2>
+
+<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#111;&#58;&#x70;&#114;&#x69;&#x6e;&#116;&#64;&#x73;&#x63;&#x6f;&#116;&#116;&#121;&#x6c;&#97;&#98;&#115;&#46;&#111;&#x72;&#x67;">&#112;&#x72;&#105;&#110;&#x74;&#x40;&#x73;&#x63;&#x6f;&#x74;&#x74;&#x79;&#x6c;&#x61;&#98;&#115;&#x2e;&#x6f;&#x72;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
+
+<p>Luckily, CMU (and arguably every college) is not terribly notable for keeping up-to-date information on it&rsquo;s website. This means that I got the &ldquo;wonderful&rdquo; opportunity to dig through CUPS documentation, sketchy printer manufacturer websites, and the depths of the Internet to finagle together a solution. Here&rsquo;s to hoping that you have a far more pleasurable experience. Without further ado, these are the steps I went through to get it done.</p>
+
+<h2>What Didn&rsquo;t Work</h2>
+
+<p>The Common Unix Printing System (CUPS) is a relatively new standard which is designed to improve over the rather haphazard methods used for printing in the past. It improves in a lot of ways and has a few neat features. One of these is a handy web interface which lets you interact with your configuration files, add printers, view the print queue, etc. through a beginner-friendly GUI, which described me perfectly when I started and still does now.</p>
+
+<p>By default, when <code>cupsd</code> (the CUPS daemon) starts up, it listens on <code>http://localhost:631</code> incoming HTTP requests. By default, external requests are refused. You can either enable these in a configuration file somewhere or <a href="http://ubuntuguide.org/wiki/Using_SSH_to_Port_Forward">tunnel your traffic</a> through an <code>ssh</code> proxy, &ldquo;tricking&rdquo; the server into thinking your requests are coming locally. Additionally, you must be either <code>root</code> or in the <code>lpadmin</code> group to access the administration parts of this web GUI.</p>
+
+<p>But for whatever reason, neither using the <code>root</code> username and password nor adding myself to the <code>lpadmin</code> group worked. I was incessantly blocked by the interface when I tried to give it my credentials. Defeated, I needed to find another way.</p>
+
+<p>I’m telling you this as a sort of justification for the super hacky solution that I came up with (but that works in the end, even if it’s non-standard). If you have any ideas on why this failed, I&rsquo;d love to hear them!</p>
+
+<h2>When in doubt, duct tape</h2>
+
+<p>The instructions to install CMU print drivers on Linux only work for environments with desktop environments installed. (You can read these instructions <a href="http://www.cmu.edu/computing/clusters/printing/how-to/linux/pers-cluster.html">here</a>). So, in keeping with the UNIX philosophy that everything’s a file, the solution I came up with was essentially to follow these instructions on a <strong>personal Linux box</strong>, then <strong>copy and modify</strong> the corresponding files to achieve the same effect on the server we need them to be on.</p>
+
+<p>It’s at this point that you’re probably wondering why I didn’t just do a little research and figure out how to make these modifications myself, or perhaps figure out where the files I needed were coming from. There are a couple of reasons. First, that takes a lot of time, I&rsquo;m lazy, and whatever I came up with didn&rsquo;t need to scale. Second, when you install a CUPS printer, you need a PostScript Printer Description (PPD) file to tell CUPS how the printer works. Despite my best efforts searching the web, I couldn’t find a central repository where these .ppd files were stored. However, most desktop environments have the ability to search <strong>somewhere mystical</strong> (read: you should tell me if you know) and download these .ppd files.</p>
+
+<p><a name="tldr"></a></p>
+
+<h2>Do you think I really care, just tell me how it works</h2>
+
+<p>The process is not too complicated. Go back to the <a href="http://www.cmu.edu/computing/clusters/printing/how-to/linux/pers-cluster.html">CMU instructions</a> to install a printer on a personal Linux machine. Following them should be fairly self explanatory. Say perhaps that you want to install the print drivers for the queue <code>andrew-color</code>. After following along and inserting “andrew-color” as the print queue where required, you’ll come up to a screen that asks you to name your printer. This name does not have to be the name of the queue, but I always make it that when I&rsquo;m working with the CMU printers. Either way, be sure to remember what you entered for this name (again, I’m using the name “andrew-color”).</p>
+
+<p>Also, part of the process should involve you specifying a PPD file. The easiest way to do this is to go to a printer that dispatches jobs from that queue and to get the make and model for it. In the case of andrew-color, the Wean printer is an HP Color LaserJet CP6015x. Using this information, we can use the Gnome/KDE/XFCE window, enter our make and model, and have it spit out the recommended PPD file to use (although it likely won&rsquo;t call as such).</p>
+
+<p>Now that everything is all installed, we can pluck the information we need. If you’re on a standard Linux install, your CUPS files will be in <code>/etc/cups</code>. The specific files that are of interest to us are <code>/etc/cups/printers.conf</code> and <code>/etc/cups/ppd/&lt;your-printer-name&gt;.ppd</code>, so my file is called <code>/etc/cups/ppd/andrew-color.ppd</code>. We need the entire .ppd file, and it will go into the corresponding directory on our server. As for <code>printers.conf</code>, we just need a specific entry. This file is a list of all the installed printers, each wrapped in <code>&lt;Printer your-printer-name&gt;&lt;/Printer&gt;</code> tags. Yank this text however you want from your local computer to the server, and add it to the corresponding <code>printers.conf</code> file. If your personal Linux machine made the <code>&lt;Printer&gt;&lt;/Printer&gt;</code> tags into <code>&lt;DefaultPrinter x&gt;&lt;/DefaultPrinter&gt;</code> tags, go ahead and change this to just <code>&lt;Printer x&gt;&lt;/Printer&gt;</code>. To recap, now I’ve got about 20 lines of additional configuration data added to the <code>printers.conf</code> file on my server, beginning with the line <code>&lt;Printer andrew-color&gt;</code> and ends with the line <code>&lt;/Printer&gt;</code>.</p>
+
+<p>For my installation, I have one more thing to do. Somewhere in the middle of this entry, there is a line which reads something like <code>Filter application/vnd.cups-postscript 0 hpps</code>. CUPS has a filtering functionality that lets you interact with the data before it gets printed, which you can read more about <a href="http://en.wikipedia.org/wiki/CUPS#Filtering_process">here</a>. We want to make sure that we use the <code>foomatic</code> filters (because that&rsquo;s how our server is configured), so we have to change the existing filters so that they read
+<del>
+Filter application/vnd.cups-raw 0 &ndash;
+Filter application/vnd.cups-postscript 100 foomatic-rip
+Filter application/vnd.cups-pdf 0 foomatic-rip
+</del>
+After all this, if you’ve copied the PPD file into the right folder (<code>/etc/cups/ppd/</code>), then you’re all set! Restart CUPS with <code>sudo /etc/init.d/cups restart</code> so that your changes take effect. You can print using <code>lp</code> and the <code>-d</code> flag to specify the print queue you want. Remember that we picked the name “andrew-color” for our print queue above, so a sample <code>lp</code> command would look like this:</p>
+
+<p><code>lp -t ‘My First Color Print Job’ -U jezimmer -d andrew-color /path/to/myfile.pdf</code></p>
+
+<p>Happy printing!</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135">
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I'd love to hear what you think about what I've managed to put together, so feel free to comment, tweet at me, or send me an email.
+ [t]: http://www.twitter.com/Z1MM32M4N/
+ [g]: http://www.github.com/Z1MM32M4N/
+ [h]: http://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
+  
+</feed>

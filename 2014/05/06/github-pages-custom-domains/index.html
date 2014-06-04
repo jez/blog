@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>GitHub Pages Custom Domains - Jake Zimmerman</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="A tech blog by Jake Zimmerman. Updates occaisonally with tips, tricks, and hacks that have helped me out.">
+
+<meta name="keywords" content="github dns web-dev gandi troubleshooting ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+  
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content"">
+  
+  <meta name="twitter:title" content="GitHub Pages Custom Domains">
+  <meta name="twitter:description" content="A tech blog by Jake Zimmerman. Updates occaisonally with tips, tricks, and hacks that have helped me out.">
+  <meta name="twitter:creator" content="@Z1MM32M4N">
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.zimmerman.io/2014/05/06/github-pages-custom-domains">
+<meta property="og:title" content="GitHub Pages Custom Domains">
+<meta property="og:description" content="A tech blog by Jake Zimmerman. Updates occaisonally with tips, tricks, and hacks that have helped me out.">
+
+  <meta property="og:image" content="">
+
+<meta property="og:site_name" content="Jake Zimmerman">
+
+<link rel="canonical" href="http://blog.zimmerman.io/2014/05/06/github-pages-custom-domains">
+<link href="/favicon.png" rel="icon">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/atom.xml" rel="alternate" title="Jake Zimmerman" type="application/atom+xml">
+
+<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"></script>
+
+
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+
+</head>
+
+<body id="post" >
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
+	<button class="dl-trigger">Open Menu</button>
+	<ul class="dl-menu">
+		<li><a href="/">Home</a></li>
+		<li>
+			<a href="#">About</a>
+			<ul class="dl-submenu">
+				<li>
+					<img src="/images/avatar-jake.jpg" alt="Jake Zimmerman photo" class="author-photo">
+					<h4>Jake Zimmerman</h4>
+					<p>Studying computer science at Carnegie Mellon. Working for the summer at Bloomberg L.P.</p>
+				</li>
+				<li><a href="//www.zimmerman.io">Learn More</a></li>
+				<li>
+					<a href="mailto:jake@zimmerman.io"><i class="fa fa-envelope"></i> Email</a>
+				</li>
+				<li>
+					<a href="http://twitter.com/Z1MM32M4N"><i class="fa fa-twitter"></i> Twitter</a>
+				</li>
+				<li>
+					<a href="http://plus.google.com/+JacobZimmerman0"><i class="fa fa-google-plus"></i> Google+</a>
+				</li>
+				<li>
+					<a href="http://github.com/Z1MM32M4N"><i class="fa fa-github"></i> GitHub</a>
+				</li>
+			</ul><!-- /.dl-submenu -->
+		</li>
+		<li>
+			<a href="#">Posts</a>
+			<ul class="dl-submenu">
+				<li><a href="/posts/">All Posts</a></li>
+				<li><a href="/categories/">All Categories</a></li>
+			</ul>
+		</li>
+		<li><a href="http://www.zimmerman.io">Portfolio</a></li>
+	</ul><!-- /.dl-menu -->
+</nav><!-- /.dl-menuwrapper -->
+
+
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <header class="header-title">
+      <div class="header-title-wrap">
+        
+          <h1 class="entry-title"><a href="/2014/05/06/github-pages-custom-domains/" rel="bookmark" title="GitHub Pages Custom Domains">GitHub Pages Custom Domains</a></h1>
+        
+        <h2>May 06, 2014</h2>
+      </div><!-- /.header-title-wrap -->
+    </header>
+    <div class="entry-content">
+      <p>I stumbled at first getting the DNS configured for my blog, because I&rsquo;ve got a slighty more complicated setup than normal. I decided to supplement the documentation <a href="https://pages.github.com/">GitHub Pages</a> gives by recounting my personal example and the setup that worked.</p>
+
+<!-- more -->
+
+
+<p>If you&rsquo;ve never heard of <a href="https://pages.github.com/">GitHub Pages</a> for web hosting, you should definitely check it out. You basically get free hosting for any static (i.e. plain HTML or <a href="http://jekyllrb.com/">Jekyll</a>-served) website with git-push-to-deploy. You can even configure your site to be listed at a custom domain according to <a href="https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages">these</a> instructions, which are pretty thorough. I feel like it&rsquo;d help, though, to supplement this documentation with a fairly common example setup.</p>
+
+<h2>My setup</h2>
+
+<p>I have two sites which I want to host using the <code>zimmerman.io</code> domain name: my <a href="//blog.zimmerman.io">blog</a> and my <a href="//www.zimmerman.io">personal site</a>. I host my personal site at <a href="//www.zimmerman.io">www.zimmerman.io</a>, but you can also navigate to <a href="//zimmerman.io">zimmerman.io</a> and end up in the same places as before. It&rsquo;s served as a User Page from <a href="https://www.github.com/Z1MM32M4N/z1mm32m4n.github.io">this repo</a>.</p>
+
+<p>I host my blog at <a href="//blog.zimmerman.io">blog.zimmerman.io</a>, and it&rsquo;s served as a Project Page in <a href="https://www.github.com/Z1MM32M4N/blog/">this repo</a>.</p>
+
+<h2>What the instructions say</h2>
+
+<p>The instructions say a few things very clearly (yay, documentation!).</p>
+
+<p>First, if I want to use a custom subdomain (like what I&rsquo;m doing for my blog) to host a repo, I can add a <code>CNAME</code> record with my DNS provider that points to what is in my case <code>z1mm32m4n.github.io</code>. This was counterintuitive to me, because I thought at first that this would make my blog.zimmerman.io domain redirect to my personal site, but that&rsquo;s not how GitHub handles it. (They&rsquo;re smarter than that.)</p>
+
+<p>At the same time, I need to put a file in the root of the blog&rsquo;s repo (in the <code>gh-pages</code> branch because it&rsquo;s a Project Page), called <code>CNAME</code> (<a href="https://github.com/Z1MM32M4N/blog/blob/gh-pages/CNAME">view source</a>) with the contents &lsquo;blog.zimmerman.io&rsquo;. After a little while, the DNS tables will update and everything here should work: I can now view my <em>blog</em> where I want it.</p>
+
+<h2>What the instructions say, but not so clearly</h2>
+
+<p>The next bit gave me some trouble at first (probably just because I was being impatient while the DNS tables were updating). The end goal was to have the <code>www</code> subdomain host my site and have the <code>@</code> (top-level or apex) domain redirect there. If you read carefully, the instructions say to do three things:</p>
+
+<ol>
+<li> Make the <code>CNAME</code> file (<a href="https://github.com/Z1MM32M4N/z1mm32m4n.github.io/blob/master/CNAME">view source</a>) in my (User) Pages repository contain <code>www.zimmerman.io</code>. <strong>This</strong> is the domain at which I do want my site to be visible.</li>
+<li> Create a <code>CNAME</code> record with my DNS provider pointing to <code>z1mm32m4n.github.io</code> for the <code>www</code> subdomain. From a technical standpoint on the DNS provider&rsquo;s side of things, this is the same thing we did before with the <code>blog</code> subdomain.</li>
+<li> Create an <code>A</code> record pointing the <code>@</code> domain towards GitHub using the IP address they specify.</li>
+</ol>
+
+
+<p>This last step is where you have to have a little faith: nowhere is there an explicit file telling GitHub, &ldquo;If you get a request from zimmerman.io, send it to me!&rdquo; GitHub merely notices that there <strong>is</strong> a repo with a CNAME containing &lsquo;<strong>www</strong>.zimmerman.io&rsquo;, and so they say, &ldquo;Well, we may as well send this <strong>top level</strong> domain to the <strong>www</strong> domain referenced over here&hellip; I&rsquo;ve got nothing better to do.&rdquo;</p>
+
+<p>This was a little confusing at first, because if I wanted the opposite direction (www.zimmerman.io to redirect to zimmerman.io), I would have still created a CNAME file, but it would have contained <code>zimmerman.io</code> and I would have created an <code>A</code> record with my DNS provider, not an actual CNAME. (I still did have to create both the <code>A</code> and <code>CNAME</code> in the end, but in this setup, the <code>A</code> record is referenced in the <code>CNAME</code> file, if that makes any sense.)</p>
+
+<h2>Recap</h2>
+
+<h3>My CNAME Files</h3>
+
+<ul>
+<li> For www.zimmerman.io:
+
+<ul>
+<li> CNAME file contains <code>www.zimmerman.io</code></li>
+<li> CNAME file resides in <code>master</code> branch of User Pages repo for Z1MM32M4N</li>
+</ul>
+</li>
+<li> For blog.zimmerman.io
+
+<ul>
+<li> CNAME file contains <code>blog.zimmerman.io</code></li>
+<li> CNAME file resides in <code>gh-pages</code> branch of Project Pages repo for Z1MM32M4N/blog</li>
+</ul>
+</li>
+</ul>
+
+
+<h3>My DNS Config</h3>
+
+<p>Here&rsquo;s a screenshot of what my records look like with my DNS provider, in case this was still unclear.</p>
+
+<p><img src="/images/DNS-config.jpg"></p>
+
+<p>I&rsquo;m personally using <a href="https://www.gandi.net/">Gandi</a> for domain registration because they had the cheapest <code>.io</code> TLD registration, but their interface takes some getting used to. (It was certainly still worth the deal I got.)</p>
+
+<hr />
+
+<br>
+
+
+<h3>Jake on the Web</h3>
+
+<p><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135">
+If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="/tags/#github" title="Pages tagged github" class="tag">github</a><a href="/tags/#dns" title="Pages tagged dns" class="tag">dns</a><a href="/tags/#web-dev" title="Pages tagged web-dev" class="tag">web-dev</a><a href="/tags/#gandi" title="Pages tagged gandi" class="tag">gandi</a><a href="/tags/#troubleshooting" title="Pages tagged troubleshooting" class="tag">troubleshooting</a></span>
+        <span><a href="/2014/05/06/github-pages-custom-domains/" rel="bookmark" title="GitHub Pages Custom Domains">GitHub Pages Custom Domains</a> was published on <span class="entry-date date published updated"><time datetime="2014-05-06T03:15:35-04:00">May 06, 2014</time></span></span>
+        
+        <span class="author vcard"><span class="fn"><a href="http://www.zimmerman.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
+        
+      </footer>
+    </div><!-- /.entry-content -->
+    
+      <div class="read-more">
+        
+          <div class="read-more-header">
+            <a href="/2014/05/06/adding-a-network-printer-to-a-linux-server/" class="btn">Read More</a>
+          </div><!-- /.read-more-header -->
+          <div class="read-more-content">
+            <h3><a href="/2014/05/06/adding-a-network-printer-to-a-linux-server/" title="Adding a Network Printer to a Linux Server">Adding a Network Printer to a Linux Server</a></h3>
+            <p>It&rsquo;s one thing to plug in a CD, click through a few dialogs, and wait for the computer to chime at you saying that your printer has &hellip;&hellip; <a href="/2014/05/06/adding-a-network-printer-to-a-linux-server/"> Continue reading</a></p>
+          </div><!-- /.read-more-content -->
+        
+        <div class="read-more-list">
+          
+            <div class="list-item">
+              <h4><a href="/2014/05/06/shiny-new-octopress-blog/" title="Shiny New Octopress Blog">Shiny New Octopress Blog</a></h4>
+              <span>Published on May 06, 2014</span>
+            </div><!-- /.list-item -->
+          
+        </div><!-- /.read-more-list -->
+      </div><!-- /.read-more -->
+    
+    <section id="disqus_thread"></section><!-- /#disqus_thread -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2014 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/Z1MM32M4N/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+
+	        
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<!--
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+-->
+<script src="/javascripts/scripts.min.js"></script>
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-50690546-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'jakez-blog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.zimmerman.io/2014/05/06/github-pages-custom-domains/';
+        var disqus_url = 'http://blog.zimmerman.io/2014/05/06/github-pages-custom-domains/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+	        
+
+</body>
+</html>

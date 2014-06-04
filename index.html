@@ -3,34 +3,294 @@
 <!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
 <!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+
 <head>
-  <meta charset="utf-8">
-  <title>Jake Zimmerman</title>
-  <meta name="author" content="Jake Zimmerman">
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>A Tech Blog by Jake Zimmerman - Jake Zimmerman</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="A tech blog by Jake Zimmerman. Updates occaisonally with tips, tricks, and hacks that have helped me out.">
+
+<meta name="keywords" content="Jekyll theme themes responsive blog modern tech hacks ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
 
   
-  <meta name="description" content="I stumbled at first getting the DNS configured for my blog, because I&rsquo;ve got a slighty more complicated setup than normal. I decided to &hellip;">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="threaded-blue-on-black-cropped.png"
   
+  <meta name="twitter:title" content="A Tech Blog by Jake Zimmerman">
+  <meta name="twitter:description" content="A tech blog by Jake Zimmerman. Updates occaisonally with tips, tricks, and hacks that have helped me out.">
+  <meta name="twitter:creator" content="@Z1MM32M4N">
 
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  
-  <link rel="canonical" href="http://blog.zimmerman.io">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="Jake Zimmerman" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.zimmerman.io">
+<meta property="og:title" content="A Tech Blog by Jake Zimmerman">
+<meta property="og:description" content="A tech blog by Jake Zimmerman. Updates occaisonally with tips, tricks, and hacks that have helped me out.">
+
+  <meta property="og:image" content="threaded-blue-on-black-cropped.png">
+
+<meta property="og:site_name" content="Jake Zimmerman">
+
+<link rel="canonical" href="http://blog.zimmerman.io">
+<link href="/favicon.png" rel="icon">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/atom.xml" rel="alternate" title="Jake Zimmerman" type="application/atom+xml">
+
+<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"></script>
+
+
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 
+
+</head>
+
+<body id="post-index" class="feature">
+  <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+  <nav id="dl-menu" class="dl-menuwrapper" role="navigation">
+	<button class="dl-trigger">Open Menu</button>
+	<ul class="dl-menu">
+		<li><a href="/">Home</a></li>
+		<li>
+			<a href="#">About</a>
+			<ul class="dl-submenu">
+				<li>
+					<img src="/images/avatar-jake.jpg" alt="Jake Zimmerman photo" class="author-photo">
+					<h4>Jake Zimmerman</h4>
+					<p>Studying computer science at Carnegie Mellon. Working for the summer at Bloomberg L.P.</p>
+				</li>
+				<li><a href="//www.zimmerman.io">Learn More</a></li>
+				<li>
+					<a href="mailto:jake@zimmerman.io"><i class="fa fa-envelope"></i> Email</a>
+				</li>
+				<li>
+					<a href="http://twitter.com/Z1MM32M4N"><i class="fa fa-twitter"></i> Twitter</a>
+				</li>
+				<li>
+					<a href="http://plus.google.com/+JacobZimmerman0"><i class="fa fa-google-plus"></i> Google+</a>
+				</li>
+				<li>
+					<a href="http://github.com/Z1MM32M4N"><i class="fa fa-github"></i> GitHub</a>
+				</li>
+			</ul><!-- /.dl-submenu -->
+		</li>
+		<li>
+			<a href="#">Posts</a>
+			<ul class="dl-submenu">
+				<li><a href="/posts/">All Posts</a></li>
+				<li><a href="/categories/">All Categories</a></li>
+			</ul>
+		</li>
+		<li><a href="http://www.zimmerman.io">Portfolio</a></li>
+	</ul><!-- /.dl-menu -->
+</nav><!-- /.dl-menuwrapper -->
+
+
+  <div class="entry-header">
+    
+    
+      <div class="entry-image">
+        <img src="/images/threaded-blue-on-black-cropped.png" alt="A Tech Blog by Jake Zimmerman">
+      </div><!-- /.entry-image -->
+    
+    <div class="header-title">
+      <div class="header-title-wrap">
+        <h1>Jake Zimmerman</h1>
+        <h2>a blog of nifty tricks and messy hacks</h2>
+      </div><!-- /.header-title-wrap -->
+    </div><!-- /.header-title -->
+  </div><!-- /.entry-header -->
+
+  <div id="main" role="main">
+    
+
+<article class="hentry">
   
+
+
+
+<header>
+  <div class="entry-meta">
+    <span class="entry-date date published updated">
+      <time datetime="2014-05-06T03:15:35-04:00">
+        <a href="/2014/05/06/github-pages-custom-domains/">May 06, 2014</a>
+      </time>
+    </span>
+    <span class="author vcard">
+      <span class="fn">
+        <a href="http://www.zimmerman.io" title="About Jake Zimmerman">Jake Zimmerman</a>
+      </span>
+    </span>
+    
+      &nbsp; &bull; &nbsp;<span class="entry-comments">
+        <a href="/2014/05/06/github-pages-custom-domains/#disqus_thread">Comment</a>
+      </span>
+    
+  </div><!-- /.entry-meta -->
+  
+    <h1 class="entry-title">
+      <a href="/2014/05/06/github-pages-custom-domains/" rel="bookmark" title="GitHub Pages Custom Domains" itemprop="url">GitHub Pages Custom Domains</a>
+    </h1>
+  
+</header>
+
+<div class="entry-content">
+  <p>I stumbled at first getting the DNS configured for my blog, because I&rsquo;ve got a slighty more complicated setup than normal. I decided to supplement the documentation <a href="https://pages.github.com/">GitHub Pages</a> gives by recounting my personal example and the setup that worked.</p>
+
+
+  
+  
+    <footer>
+      <a class="btn" rel="full-article" href="/2014/05/06/github-pages-custom-domains/">Continue reading &nbsp; <i class="fa fa-angle-double-right"></i></a>
+    </footer>
+  
+</div><!-- /.entry-content -->
+
+
+
+
+
+</article><!-- /.hentry -->
+
+<article class="hentry">
+  
+
+
+
+<header>
+  <div class="entry-meta">
+    <span class="entry-date date published updated">
+      <time datetime="2014-05-06T02:09:29-04:00">
+        <a href="/2014/05/06/adding-a-network-printer-to-a-linux-server/">May 06, 2014</a>
+      </time>
+    </span>
+    <span class="author vcard">
+      <span class="fn">
+        <a href="http://www.zimmerman.io" title="About Jake Zimmerman">Jake Zimmerman</a>
+      </span>
+    </span>
+    
+      &nbsp; &bull; &nbsp;<span class="entry-comments">
+        <a href="/2014/05/06/adding-a-network-printer-to-a-linux-server/#disqus_thread">Comment</a>
+      </span>
+    
+  </div><!-- /.entry-meta -->
+  
+    <h1 class="entry-title">
+      <a href="/2014/05/06/adding-a-network-printer-to-a-linux-server/" rel="bookmark" title="Adding a Network Printer to a Linux Server" itemprop="url">Adding a Network Printer to a Linux Server</a>
+    </h1>
+  
+</header>
+
+<div class="entry-content">
+  <p>It&rsquo;s one thing to plug in a CD, click through a few dialogs, and wait for the computer to chime at you saying that your printer has been installed. Unfortunately, this is not how server administration works. Here&rsquo;s my account of installing multiple network-attached printers on a Debian server.</p>
+
+
+  
+  
+    <footer>
+      <a class="btn" rel="full-article" href="/2014/05/06/adding-a-network-printer-to-a-linux-server/">Continue reading &nbsp; <i class="fa fa-angle-double-right"></i></a>
+    </footer>
+  
+</div><!-- /.entry-content -->
+
+
+
+
+
+</article><!-- /.hentry -->
+
+<article class="hentry">
+  
+
+
+
+<header>
+  <div class="entry-meta">
+    <span class="entry-date date published updated">
+      <time datetime="2014-05-06T01:41:14-04:00">
+        <a href="/2014/05/06/shiny-new-octopress-blog/">May 06, 2014</a>
+      </time>
+    </span>
+    <span class="author vcard">
+      <span class="fn">
+        <a href="http://www.zimmerman.io" title="About Jake Zimmerman">Jake Zimmerman</a>
+      </span>
+    </span>
+    
+      &nbsp; &bull; &nbsp;<span class="entry-comments">
+        <a href="/2014/05/06/shiny-new-octopress-blog/#disqus_thread">Comment</a>
+      </span>
+    
+  </div><!-- /.entry-meta -->
+  
+    <h1 class="entry-title">
+      <a href="/2014/05/06/shiny-new-octopress-blog/" rel="bookmark" title="Shiny New Octopress Blog" itemprop="url">Shiny New Octopress Blog</a>
+    </h1>
+  
+</header>
+
+<div class="entry-content">
+  <p>The below is a post I originally posted on my first (failed) blog. While that blog didn&rsquo;t work out quite right, I hope to keep many of the same ideals at heart when continuing (and hopefully maintaining) this blog, so I decided I may as well repost it here.</p>
+
+
+  
+  
+    <footer>
+      <a class="btn" rel="full-article" href="/2014/05/06/shiny-new-octopress-blog/">Continue reading &nbsp; <i class="fa fa-angle-double-right"></i></a>
+    </footer>
+  
+</div><!-- /.entry-content -->
+
+
+
+
+
+</article><!-- /.hentry -->
+
+
+<div class="pagination">
+  
+  <a href="/archives">Blog Archives</a>
+  
+</div><!-- /.pagination -->
+
+  </div><!-- /#main -->
+
+  <div class="footer-wrapper">
+    <footer role="contentinfo">
+      <span>&copy; 2014 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/Z1MM32M4N/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+
+    </footer>
+  </div><!-- /.footer-wrapper -->
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<!--
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+-->
+<script src="/javascripts/scripts.min.js"></script>
+
   <script type="text/javascript">
     var _gaq = _gaq || [];
     _gaq.push(['_setAccount', 'UA-50690546-1']);
@@ -44,277 +304,9 @@
   </script>
 
 
-</head>
 
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Jake Zimmerman</a></h1>
+          
   
-    <h2>a blog of nifty tricks and messy hacks</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss email">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-    <li><a href="jake@zimmerman.io" rel="subscribe-email" title="subscribe via email">Email</a></li>
-  
-</ul>
-  
-<form action="https://www.google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:blog.zimmerman.io" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/05/06/github-pages-custom-domains/">GitHub Pages Custom Domains</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-05-06T03:15:35-04:00" pubdate data-updated="true">May 6<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I stumbled at first getting the DNS configured for my blog, because I&rsquo;ve got a slighty more complicated setup than normal. I decided to supplement the documentation <a href="https://pages.github.com/">GitHub Pages</a> gives by recounting my personal example and the setup that worked.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/05/06/github-pages-custom-domains/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/05/06/adding-a-network-printer-to-a-linux-server/">Adding a Network Printer to a Linux Server</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-05-06T02:09:29-04:00" pubdate data-updated="true">May 6<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>It&rsquo;s one thing to plug in a CD, click through a few dialogs, and wait for the computer to chime at you saying that your printer has been installed. Unfortunately, this is not how server administration works. Here&rsquo;s my account of installing multiple network-attached printers on a Debian server.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/05/06/adding-a-network-printer-to-a-linux-server/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/05/06/shiny-new-octopress-blog/">Shiny New Octopress Blog</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-05-06T01:41:14-04:00" pubdate data-updated="true">May 6<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>The below is a post I originally posted on my first (failed) blog. While that blog didn&rsquo;t work out quite right, I hope to keep many of the same ideals at heart when continuing (and hopefully maintaining) this blog, so I decided I may as well repost it here.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/05/06/shiny-new-octopress-blog/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2014/05/06/github-pages-custom-domains/">GitHub Pages Custom Domains</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/05/06/adding-a-network-printer-to-a-linux-server/">Adding a Network Printer to a Linux Server</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/05/06/shiny-new-octopress-blog/">Shiny New Octopress Blog</a>
-      </li>
-    
-  </ul>
-</section>
-
-<section>
-  <h1>GitHub Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  
-  <a href="https://github.com/Z1MM32M4N">@Z1MM32M4N</a> on GitHub
-  
-  <script type="text/javascript">
-    $(document).ready(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'Z1MM32M4N',
-            count: 4,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
-</section>
-
-
-
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Jake Zimmerman -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
-</footer>
-  
-
-<script type="text/javascript">
-      var disqus_shortname = 'jakez-blog';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
-
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) {return;}
-  js = d.createElement(s); js.id = id; js.async = true;
-  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
-
-
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
 
 </body>
 </html>
