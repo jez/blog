@@ -1,28 +1,52 @@
-@mixin mask-image($img, $repeat: no-repeat){
-  @include experimental(mask-image, image-url($img), -webkit, -moz, -o, -ms);
-  @include experimental(mask-repeat, $repeat, -webkit, -moz, -o, -ms);
-  width: image-width($img);
-  height: image-height($img);
+// Selection
+// --------------------------------------------------
+::-moz-selection { 
+	background-color: lighten($base-color, 65%); 
+	color: $base-color; 
+	text-shadow: none; 
+}  	
+::selection { 
+	background-color: lighten($base-color, 65%); 
+	color: $base-color; 
+	text-shadow: none; 
 }
 
-@mixin shadow-box($border: #fff .5em solid, $shadow: rgba(#000, .15) 0 1px 4px, $border-radius: .3em) {
-  @include border-radius($border-radius);
-  @include box-shadow($shadow);
-  @include box-sizing(border-box);
-  border: $border;
+// Global Classes
+// --------------------------------------------------
+.wrap {
+	margin: 0 auto;
+}
+.all-caps {
+	text-transform: uppercase;
+}
+.pull-left {
+	float: left;
+}
+.pull-right {
+	float:right;
+}
+.unstyled-list {
+	list-style: none;
+	margin-left: 0;
+	padding-left: 0;
+	li {
+		list-style-type: none;
+	}
+}
+.inline-list {
+	list-style: none;
+	margin-left: 0;
+	padding-left: 0;
+	li {
+		list-style-type: none;
+		display: inline;
+	}
 }
 
-@mixin selection($bg, $color: inherit, $text-shadow: none){
-  * {
-    &::-moz-selection { background: $bg; color: $color; text-shadow: $text-shadow; }
-    &::-webkit-selection { background: $bg; color: $color; text-shadow: $text-shadow; }
-    &::selection { background: $bg; color: $color; text-shadow: $text-shadow; }
-  }
+// Well
+// --------------------------------------------------
+.well {
+  padding: 20px;
+  border: 1px solid $comp-color;
+  @include border-radius(4px);
 }
-
-@function text-color($color, $dark: dark, $light: light){
-  $text-color: ( (red($color)*299) + (green($color)*587) + (blue($color)*114) ) / 1000;
-  $text-color: if($text-color >= 150, $dark, $light);
-  @return $text-color;
-}
-

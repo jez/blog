@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Shiny New Octopress Blog"
+description: "All about what I hope to get out of this blog."
 date: 2014-05-06 01:41:14 -0400
 comments: true
 categories: [intro, meta]
@@ -14,8 +15,8 @@ It is currently 2:14am on Wednesday, October 16, 2013. “Today,” (well really
 
 But looking around (maybe I haven’t looked very far), I don’t see one central place where I can go to get help with all of this stuff, or at least the tech stuff. Obviously I can ask people if I really need it. The support structures are supposedly in place. In my experience, though, when you approach people for help on general topics, you get tossed back to the Internet as they say, “Google it.”  While things certainly can be found on the Internet, for someone who just wants to be able to read about the answer without being overwhelmed by the details, it seems like there’s __no good place to start__.
 
-[SL]: <//scottylabs.org>
-[print-SL]: <//print.scottylabs.org>
+[SL]: //scottylabs.org
+[print-SL]: //print.scottylabs.org
 
 ##What I Want
 In this spirit of aggregating pieces of knowledge on the interwebs, I’d like to document my process of learning and researching. Here are a few of my goals:

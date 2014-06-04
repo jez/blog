@@ -1,3 +1,55 @@
+{% comment%}
+For use in environments where the data for the particular article has been
+assigned to the `post` variable, as in when looping over `paginator.posts`
+or when the line `{% assign post = page %}`. This makes this usable in both
+the index page or a normal post page. 
+{% endcomment%}
+
+{% capture titlecased %}{% if site.titlecase %}{{ post.title | titlecase }}{% else %}{{ post.title }}{% endif %}{% endcapture %}
+
+<header>
+  <div class="entry-meta">
+    <span class="entry-date date published updated">
+      <time datetime="{{ post.date | date_to_xmlschema }}">
+        <a href="{{ root_url }}{{ post.url }}">{{ post.date | date: "%B %d, %Y" }}</a>
+      </time>
+    </span>
+    <span class="author vcard">
+      <span class="fn">
+        <a href="{{ site.about }}" title="About {{ site.author }}">{{ site.author }}</a>
+      </span>
+    </span>
+    {% if site.disqus_short_name and post.comments %}
+      &nbsp; &bull; &nbsp;<span class="entry-comments">
+        <a href="{{ root_url }}{{ post.url }}#disqus_thread">Comment</a>
+      </span>
+    {% endif %}
+  </div><!-- /.entry-meta -->
+  {% if post.external_url %}
+    <h1 class="entry-title">
+      <a href="{{ root_url }}{{ post.url }}" rel="bookmark" title="{{ titlecased }}"><i class="icon-double-angle-right"></i></a> 
+      <a href="{{ post.external_url }}">{{ titlecased }}</a>
+    </h1>
+  {% else %}
+    <h1 class="entry-title">
+      <a href="{{ root_url }}{{ post.url }}" rel="bookmark" title="{{ titlecased }}" itemprop="url">{{ titlecased }}</a>
+    </h1>
+  {% endif %}
+</header>
+
+<div class="entry-content">
+  {{ post.content | excerpt }}
+  {% capture excerpted %}{{ post.content | has_excerpt }}{% endcapture %}
+  {% if excerpted == 'true' %}
+    <footer>
+      <a class="btn" rel="full-article" href="{{ root_url }}{{ post.url }}">{{ site.excerpt_link }}</a>
+    </footer>
+  {% endif %}
+</div><!-- /.entry-content -->
+
+
+
+{% comment %}
 {% unless page.no_header %}
   <header>
     {% if index %}
@@ -27,3 +79,4 @@
 {% else %}
 <div class="entry-content">{{ content }}</div>
 {% endif %}
+{% endcomment %}

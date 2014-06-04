@@ -1,30 +1,76 @@
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>{% if page.title %}{% if site.titlecase %}{{ page.title | titlecase }}{% else %}{{ page.title }}{% endif %} - {% endif %}{{ site.title }}</title>
-  <meta name="author" content="{{ site.author }}">
+{% comment %}
+  Uses the following pieces of information:
 
-  {% capture description %}{% if page.description %}{{ page.description }}{% else %}{{ content | raw_content }}{% endif %}{% endcapture %}
-  <meta name="description" content="{{ description | strip_html | condense_spaces | truncate:150 }}">
-  {% if page.keywords %}<meta name="keywords" content="{{ page.keywords }}">{% endif %}
+  page.image.feature: Absolute URL of a feature (i.e. large) image
+    OR
+  page.image.thumb: Absolute URL of a thumbnail image
+    OR
+  site.logo: Absolute URL of a site-wide thumbnail image
 
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  page.title / site.title
+  page.description / site.description
 
-  {% capture canonical %}{{ site.url }}{% if site.permalink contains '.html' %}{{ page.url }}{% else %}{{ page.url | remove:'index.html' | strip_slash }}{% endif %}{% endcapture %}
-  <link rel="canonical" href="{{ canonical }}">
-  <link href="{{ root_url }}/favicon.png" rel="icon">
-  <link href="{{ root_url }}/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="{{ site.subscribe_rss }}" rel="alternate" title="{{site.title}}" type="application/atom+xml">
-  <script src="{{ root_url }}/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="{{ root_url }}/javascripts/octopress.js" type="text/javascript"></script>
-  {% include custom/head.html %}
-  {% include google_analytics.html %}
-</head>
+  site.twitter_user
+
+  page.keywords
+  site.keywords
+{% endcomment %}
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>{% if page.title %}{% if site.titlecase %}{{ page.title | titlecase }}{% else %}{{ page.title }}{% endif %} - {% endif %}{{ site.title }}</title>
+<meta name="author" content="{{ site.author }}">
+
+{% capture description %}{% if page.description %}{{ page.description }}{% elsif site.description %}{{ site.description }}{% else %}{{ content | raw_content }}{% endif %}{% endcapture %}
+{% capture canonical %}{{ site.url }}{% if site.permalink contains '.html' %}{{ page.url }}{% else %}{{ page.url | remove:'index.html' | strip_slash }}{% endif %}{% endcapture %}
+
+<meta name="description" content="{{ description | strip_html | condense_spaces | truncate:150 }}">
+{% capture site_keywords %}{{ site.keywords | join: ' '  }}{% endcapture %}
+<meta name="keywords" content="{{ page.categories | join: ' ' | append: ' ' | append: site_keywords }}">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+{% if site.twitter_user %}
+  {% if page.image.feature %}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{ page.image.feature }}"
+  {% else %}
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content"{% if page.image.thumb %}{{ page.image.thumb }}{% elsif site.logo %}{{ site.logo }}{% endif%}">
+  {% endif %}
+  <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title  }}{% endif %}">
+  <meta name="twitter:description" content="{{ description | strip_html | condense_spaces | truncate:150 }}">
+  <meta name="twitter:creator" content="@{{ site.twitter_user }}">
+{% endif %}
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="{{ canonical }}">
+<meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
+<meta property="og:description" content="{{ description | strip_html | condense_spaces | truncate:150 }}">
+{% if page.image.feature %}
+  <meta property="og:image" content="{{ page.image.feature }}">
+{% elsif page.image.thumb %}
+  <meta property="og:image" content="{{ page.image.thumb }}">
+{% else %}
+  <meta property="og:image" content="{{ site.logo }}">
+{% endif %}
+<meta property="og:site_name" content="{{ site.title }}">
+
+<link rel="canonical" href="{{ canonical }}">
+<link href="{{ root_url }}/favicon.png" rel="icon">
+<link href="{{ root_url }}/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="{{ site.subscribe_rss }}" rel="alternate" title="{{ site.title }}" type="application/atom+xml">
+
+<script src="{{ root_url }}/javascripts/vendor/modernizr-2.6.2.custom.min.js"></script>
+
+{% include background_image.html %}
+{% include custom/head.html %}
