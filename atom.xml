@@ -4,7 +4,7 @@
   <title><![CDATA[Jake Zimmerman]]></title>
   <link href="http://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-06-04T01:22:33-04:00</updated>
+  <updated>2014-06-05T00:35:43-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,64 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[HPSTR: An Octopress Theme]]></title>
+    <link href="http://blog.zimmerman.io/2014/06/04/hpstr-an-octopress-theme/"/>
+    <updated>2014-06-04T21:51:41-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/06/04/hpstr-an-octopress-theme</id>
+    <content type="html"><![CDATA[<p>In case you didn&rsquo;t notice, we&rsquo;re rocking a new theme: <a href="https://github.com/Z1MM32M4N/hpstr-theme">HPSTR for Octopress</a>! Ported from the <a href="https://github.com/mmistakes/hpstr-jekyll-theme">theme of the same name</a> for Jekyll, this theme has a bunch of cool new features that make the theme easier to use and more customizable.</p>
+
+<!-- more -->
+
+
+<p>Before I begin, I have to give a huge shout out to <a href="https://github.com/mmistakes/">mmistakes</a> for crafting such an impeccable set of stylesheets and Jekyll templates. I could talk this theme up all day, but I think that the results speak for themselves. Even more praiseworthy is that the entire source code is licensed under the GPL, enabling anyone to take the source and build upon it. And on that note, I&rsquo;d like to unveil what <em>I&rsquo;ve</em> built.</p>
+
+<h1>Ported to Octopress</h1>
+
+<p>The theme was originally implemented for a vanilla Jekyll blog. Personally, I find the automation tools provided by Octopress to be incredibly helpful, and I didn&rsquo;t want to give these up to be able to deploy this theme. As a result, I had to tweak a few things in order to get it to work with a standard Octopress installation.</p>
+
+<h2>Less to Sass</h2>
+
+<p>The HPSTR theme was originally built using Less to compile its stylesheets. Octopress uses Sass under Compass instead&mdash;a decision which I love: the rich library of plugins that Compass provides is ridiculous. Thus, this was the first step of the port.</p>
+
+<p>After a quick Google search I stumbled upon <a href="http://stackoverflow.com/questions/14970224/anyone-know-of-a-good-way-to-convert-from-less-to-sass">this question</a> on Stack Overflow, which surprisingly took care of the vast majority of the conversion, leveraging mere text replacement. From there, it was mostly a matter of slugging through the Less docs to find out what a particular function did, jumping over to the Compass/Sass docs to find a corresponding mixin, and repeating.</p>
+
+<h2>Sass to Compass</h2>
+
+<p>I didn&rsquo;t stop after I had the vanilla Sass working. One of Compass&rsquo;s coolest features is that you don&rsquo;t have to repeat yourself: there are mixins for seemingly everything, and when there aren&rsquo;t, there are 3<sup>rd</sup> party plugins. Thus, the next phase of the port was to see how much of the code I could reduce to compass mixins.</p>
+
+<p>For the most part, this stage affected CSS3 properties which need vendor prefixes, to include keyframe animations. The keyframe animations are particularly worthy of a mention because I found a handy plugin called <a href="https://github.com/ericam/compass-animation">compass-animation</a> to take care of them. It works as easily as any other Compass mixin, from installation to use.</p>
+
+<h2>Octopress Mannerisms</h2>
+
+<p>There are a few things that Octopress users can expect to be reasonably similar from one deployment to the next, and I wanted to ensure that as many of the features dually implemented by mmistakes and Octopress used the syntax or conformed to the style set forth by Octopress. A small example of this: the <code>page.link</code> and <code>page.external_url</code> properties. Defined by the old and new themes respectively, both accomplish a similar purpose. Each specifies that the main purpose of the post is to link to a different page. Not wanting to break the service for current Octopress users, I tried to convert as many of these subtleties.</p>
+
+<p>On top of this, I restructured a lot of the original code so that someone used to customizing an Octopress theme would feel more at home when checking out the source for this theme, even if some of the particulars were different. This applied mostly to the Sass directory structure, but also to the templates.</p>
+
+<h1>More Powerful Customization</h1>
+
+<p>One of the many ways Octopress adds value on top of Jekyll is the ease with which you can get a Jekyll blog up and running, and subsequently customize and tweak that theme. This was one area where I felt that the original Jekyll theme fell short. The original stylesheets had a somewhat decent set of variables (in <code>less/variables.less</code>) that would allow you to customize the colors and font faces, but the method for customizing the size of the font was wonky (larger values produced smaller fonts), and the various mixins employed to handle setting the sizes were confusing.</p>
+
+<p>To solve this, I added <em>loads</em> of new variables handling the font sizes and line heights on a per-component basis, while also providing a master switch to easily resize everything. My theme also differs here from the original in that it&rsquo;s default font size is slightly larger for normal paragraph text (the whole reason why I cared about customizing the font size in the first place!).</p>
+
+<h1>Like what you see?</h1>
+
+<p>This theme is in no way perfect, from the styles to the compatibility with the vast array of Octopress options. If my support for your favorite feature is lacking or absent altogether, patch it up and submit a pull request on <a href="https://github.com/Z1MM32M4N/hpstr-theme">GitHub</a>!</p>
+
+<p><strong>I&rsquo;d also love to hear about your installation process.</strong> If something didn&rsquo;t quite work out right when installing the theme from GitHub or everything went super smoothly, tell me on GitHub in an issue, on <a href="https://www.twitter.com/Z1MM32M4N">Twitter</a>, in the comments below, or in an <a href="mailto:jake@zimmerman.io">email</a>. Seriously!</p>
+
+<hr />
+
+<br>
+
+
+<h3>Jake on the Web</h3>
+
+<p><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135">
+If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[GitHub Pages Custom Domains]]></title>
@@ -114,7 +172,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h2>The Hard Way</h2>
 
-<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#109;&#x61;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x70;&#114;&#105;&#110;&#116;&#64;&#x73;&#x63;&#111;&#x74;&#x74;&#x79;&#x6c;&#97;&#x62;&#x73;&#46;&#111;&#x72;&#x67;">&#112;&#x72;&#x69;&#110;&#116;&#x40;&#x73;&#x63;&#x6f;&#x74;&#116;&#121;&#x6c;&#x61;&#98;&#x73;&#x2e;&#111;&#x72;&#x67;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
+<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#111;&#x3a;&#x70;&#x72;&#105;&#x6e;&#x74;&#x40;&#x73;&#x63;&#x6f;&#x74;&#x74;&#121;&#x6c;&#97;&#x62;&#x73;&#x2e;&#x6f;&#x72;&#103;">&#112;&#114;&#x69;&#x6e;&#116;&#64;&#x73;&#x63;&#x6f;&#116;&#116;&#121;&#x6c;&#x61;&#x62;&#115;&#46;&#111;&#x72;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
 
 <p>Luckily, CMU (and arguably every college) is not terribly notable for keeping up-to-date information on it&rsquo;s website. This means that I got the &ldquo;wonderful&rdquo; opportunity to dig through CUPS documentation, sketchy printer manufacturer websites, and the depths of the Internet to finagle together a solution. Here&rsquo;s to hoping that you have a far more pleasurable experience. Without further ado, these are the steps I went through to get it done.</p>
 
