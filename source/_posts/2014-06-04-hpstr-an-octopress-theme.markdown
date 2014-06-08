@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "HPSTR: An Octopress Theme"
+description: "All about porting and improving the HPSTR theme to Octopress."
 date: 2014-06-04 21:51:41 -0400
 comments: true
 categories: [web-dev, meta]

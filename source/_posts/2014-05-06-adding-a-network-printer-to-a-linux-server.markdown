@@ -5,6 +5,7 @@ description: "A walkthrough of how I installed a network-attached printer to a p
 date: 2014-05-06 02:09:29 -0400
 comments: true
 categories: [linux, print-sl, printing, CUPS]
+share: true
 ---
 
 It's one thing to plug in a CD, click through a few dialogs, and wait for the computer to chime at you saying that your printer has been installed. Unfortunately, this is not how server administration works. Here's my account of installing multiple network-attached printers on a Debian server.
