@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "HPSTR: An Octopress Theme"
-description: "All about porting and improving the HPSTR theme to Octopress."
+description: "All about porting the HPSTR Theme for Jekyll to Octopress, adding in cool new features along the way."
 date: 2014-06-04 21:51:41 -0400
 comments: true
 categories: [web-dev, meta]
