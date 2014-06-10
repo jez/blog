@@ -4,7 +4,7 @@ title: "Molokai: An iTerm2 Color Scheme"
 date: 2014-06-07 12:00:39 -0400
 comments: true
 categories: 
-description: "I've used tomasr vim color scheme molokai for a long time now. However, recently I decided that the default iTerm2 colors were a little lack luster, so I ported over the main colors into an iTerm2 theme."
+description: "I've used tomasr's vim color scheme 'molokai' for a long time now. Recently I decided that the default iTerm2 colors were a little lack luster, so I ported over the main colors from this theme into an iTerm2 theme."
 image:
   feature: /images/abstract-4.jpg
   credit: dargadgetz
@@ -12,7 +12,7 @@ image:
 share: true
 ---
 
-I've used [tomasr][tomasr]'s vim color scheme [molokai][molokai-vim] for a long time now. However, recently I decided that the default iTerm2 colors were a little lack luster, so I ported over the main colors into an iTerm2 theme.
+I've used [tomasr][tomasr]'s vim color scheme [molokai][molokai-vim] for a long time now. Recently I decided that the default iTerm2 colors were a little lack luster, so I ported over the main colors from this theme into an iTerm2 theme.
 
 <!-- more -->
 
