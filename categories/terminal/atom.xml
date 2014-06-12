@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Terminal | Jake Zimmerman]]></title>
+  <link href="http://blog.zimmerman.io/categories/terminal/atom.xml" rel="self"/>
+  <link href="http://blog.zimmerman.io/"/>
+  <updated>2014-06-11T23:47:19-04:00</updated>
+  <id>http://blog.zimmerman.io/</id>
+  <author>
+    <name><![CDATA[Jake Zimmerman]]></name>
+    <email><![CDATA[jake@zimmerman.io]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Update Your Software: It's the Law]]></title>
+    <link href="http://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law/"/>
+    <updated>2014-06-11T22:22:57-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law</id>
+    <content type="html"><![CDATA[<p>Okay, so maybe the government won&rsquo;t come after you for not updating. But they should. To guard off any present or future threats (be they from governments, security vulnerabilities, or something else in the cyber realm), I wrote a short bash snippet to check my system for outdated packages.</p>
+
+<!-- more -->
+
+
+<h2>Obligatory Existential/Meta Section</h2>
+
+<p>I don&rsquo;t quite know what prompted me to suddenly become interested in maintaining an up to date system. Maybe it was <a href="https://www.facebook.com/groups/cmuscs/permalink/727878180603546/">this post</a> of Arch Linux horror stories. Maybe it was the release of <a href="https://git.kernel.org/cgit/git/git.git/tree/Documentation/RelNotes/2.0.0.txt">git 2.0</a>, which introduces a lot of cool new features and deprecates a lot of others. Who knows, maybe it was influenced by Heartbleed and the <a href="https://www.openssl.org/news/secadv_20140605.txt">host</a> <a href="http://grahamcluley.com/2014/06/feedly-blackmail-ddos/">of other</a> <a href="http://blog.evernote.com/blog/2013/03/02/security-notice-service-wide-password-reset/">high-profile</a> security vulnerabilities and hacks that have sprung up lately. It&rsquo;s probably a combination of all of these. Let&rsquo;s move on.</p>
+
+<p>For the impatient among us, here&rsquo;s the code, which is also available <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42">here</a> and <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178">here</a> amongst all the code for <a href="https://github.com/Z1MM32M4N/dotfiles">all my dotfiles</a>.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Alert to Update <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42">https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42</a> </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;&amp;mdash;&amp;mdash;&amp;ndash; daily updates &amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">[</span> ! -e <span class="nv">$HOME</span>/.last_update <span class="o">]</span> &amp;amp;&amp;amp; touch <span class="nv">$HOME</span>/.last_update&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Initialize <span class="k">for </span>when we have no GNU date available&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;last_check<span class="o">=</span>0
+</span><span class='line'><span class="nv">time_now</span><span class="o">=</span>0&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Unix last <span class="nb">command </span>to check the log of logins, grab the most recent&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;last_check_string<span class="o">=</span>&lt;code&gt;ls -l <span class="nv">$HOME</span>/.last_update | awk <span class="s1">&#39;{print $6&quot; &quot;$7&quot; &quot;$8}&#39;</span>&lt;/code&gt;&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Darwin uses BSD, check <span class="k">for </span>gdate, <span class="k">else </span>use date&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> &lt;code&gt;uname&lt;/code&gt; <span class="o">=</span> &amp;ldquo;Darwin&amp;rdquo; &amp;amp;&amp;amp; -n &lt;code&gt;which gdate&lt;/code&gt; <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">last_login</span><span class="o">=</span>&lt;code&gt;gdate -d<span class="s2">&quot;$last_check_string&quot;</span> +%s&lt;/code&gt;
+</span><span class='line'>  <span class="nv">time_now</span><span class="o">=</span>&lt;code&gt;gdate +%s&lt;/code&gt;
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>  <span class="c"># Ensure this is GNU grep</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> -n &amp;ldquo;&lt;code&gt;date --version 2&amp;gt; /dev/null | grep GNU&lt;/code&gt;&amp;rdquo; <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;last_login<span class="o">=</span><span class="sb">`</span>date -d<span class="s2">&quot;$last_login_string&quot;</span> +%s<span class="sb">`</span>
+</span><span class='line'><span class="nv">time_now</span><span class="o">=</span><span class="sb">`</span>date +%s<span class="sb">`</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>
+</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;time_since_check<span class="o">=</span><span class="k">$((</span>time_now <span class="o">&amp;</span>ndash; last_login<span class="k">))</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> &amp;ldquo;<span class="nv">$time_since_check</span>&amp;rdquo; -ge 86400 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">echo</span> &amp;ldquo;<span class="nv">$cred</span><span class="o">==</span>&gt;<span class="nv">$cwhiteb</span> Your system is out of date!<span class="nv">$cnone</span>&amp;rdquo;
+</span><span class='line'>  <span class="nb">echo</span> &amp;lsquo;Run &lt;code&gt;update&lt;/code&gt; to bring it up to date.&amp;rsquo;
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Check for Updates <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178">https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178</a> </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;&amp;mdash;&amp;mdash;&amp;ndash; <span class="k">function</span> &amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;update<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  touch <span class="nv">$HOME</span>/.last_update&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># Mac updates</span>
+</span><span class='line'>  <span class="k">case</span> <span class="nv">$HOSTNAME</span> in&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;*Jacobs-MacBook-Air*<span class="o">)</span>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&amp;gt;$cwhiteb Updating Homebrew...$cnone&quot;</span>
+</span><span class='line'>  brew update
+</span><span class='line'>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&amp;gt;$cwhiteb Checking for outdated brew packages...$cnone&quot;</span>
+</span><span class='line'>  brew outdated --verbose
+</span><span class='line'>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&amp;gt;$cwhiteb Checking for outdated rbenv...$cnone&quot;</span>
+</span><span class='line'>  <span class="nb">cd</span> <span class="nv">$HOME</span>/.rbenv
+</span><span class='line'>  git fetch
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;`git describe --tags master`&quot;</span> !<span class="o">=</span> <span class="s2">&quot;`git describe --tags origin/master`&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;rbenv (`git describe --tags master`) is outdated (`git describe --tags origin/master`).&quot;</span>
+</span><span class='line'>    <span class="nb">echo</span> <span class="s2">&quot;To update, run: cd ~/.rbenv; git merge origin master &amp;amp;&amp;amp; cd -&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="k">  </span><span class="nb">cd</span> - 2&amp;gt;&amp;amp;1 &amp;gt; /dev/null
+</span><span class='line'>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&amp;gt;$cwhiteb Checking for outdated ruby gems...$cnone&quot;</span>
+</span><span class='line'>  gem outdated
+</span><span class='line'>  ;;
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">esac</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>You&rsquo;ll note the use of a touch file (created in line 2 of the first snippet if it doesn&rsquo;t already exist). If this file is 24 hours old, each time this code is run an alert will be printed. Since this code is running inside of my <code>.bash_profile</code>, that means that every time I open a terminal on a 24-hour-old system, I see the update message.</p>
+
+<p>Next, you&rsquo;ll note that I&rsquo;ve defined a function called <code>update</code> which is actually misnamed. This function merely checks for available updates instead of actually performing the updates, logging those packages, gems, and formulae it finds that are out of date. For my purposes, I only need to update brew, check for formulae updates, update rbenv, and check for gem updates. Obviously though, given that there is a way to programmatically check something for updates, plugging that code in here would check it as well. This means that this method is very easy to customize and extend for various needs.</p>
+
+<h2>Rant</h2>
+
+<p>I was planning on checking pip for updates as well, but pip is kind of not even good. To give you an idea, to check all the packages brew manages for updates, you type <code>brew outdated</code>, and it will list the formula name, current version number, and newest version number. Meanwhile, back in the land of pip, no such functionality exists (at least, simple functionality, and functionality that I could find. If you&rsquo;d like to correct me, be my guest!). I&rsquo;m sure that this script will grow as I come to manage more and more pieces of software on my system and others.</p>
+
+<p>If you have any questions about what I&rsquo;ve done here, or you catch some bugs, be sure to comment below or file an issue on GitHub! I&rsquo;d love to hear what you have to say.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I'd love to hear what you think about what I've managed to put together, so feel free to comment, tweet at me, or send me an email.
+ [t]: http://www.twitter.com/Z1MM32M4N/
+ [g]: http://www.github.com/Z1MM32M4N/
+ [h]: http://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Molokai: An iTerm2 Color Scheme]]></title>
+    <link href="http://blog.zimmerman.io/2014/06/07/molokai-an-iterm2-color-scheme/"/>
+    <updated>2014-06-07T12:00:39-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/06/07/molokai-an-iterm2-color-scheme</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve used <a href="https://github.com/tomasr">tomasr</a>&rsquo;s vim color scheme <a href="https://github.com/tomasr/molokai">molokai</a> for a long time now. Recently I decided that the default iTerm2 colors were a little lack luster, so I ported over the main colors from this theme into an iTerm2 theme.</p>
+
+<!-- more -->
+
+
+<h2><a href="https://github.com/mbadolato/iTerm2-Color-Schemes#molokai"><i class="fa fa-angle-double-right"></i> Installation</a></h2>
+
+<p>If you don&rsquo;t already have your iTerm2 colors configured or you&rsquo;re looking for a change, you should definitely check out <a href="https://github.com/mbadolato/iTerm2-Color-Schemes">iTerm2-Color-Schemes</a>, a GitHub repo by <a href="https://github.com/mbadolato">mbadolato</a> filled with tons of themes he&rsquo;s ported, collected, and been given.</p>
+
+<p>You can see and install the <a href="https://github.com/mbadolato/iTerm2-Color-Schemes#molokai">Molokai theme</a> there.</p>
+
+<h2>Screenshots</h2>
+
+<p>I don&rsquo;t have too many good screenshots of this theme that aren&rsquo;t vim because I&rsquo;m actually using <a href="https://github.com/seebi/dircolors-solarized">solarized</a> dircolors for colorizing the output of my <code>ls</code> and related commands. However, there are still plenty of tools I use which resort to default ANSI colors to colorize their output, like <code>git</code> and <code>brew</code>. You can see a <code>git log</code> command along side a table of all ANSI color combinations resulting from this theme (this table can be a bit overwhelming: it&rsquo;s best to just look at the first two columns to get an idea of what the colors really look like).</p>
+
+<p><a href="/images/molokai.png"><img src="/images/molokai.png"></a></p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I'd love to hear what you think about what I've managed to put together, so feel free to comment, tweet at me, or send me an email.
+ [t]: http://www.twitter.com/Z1MM32M4N/
+ [g]: http://www.github.com/Z1MM32M4N/
+ [h]: http://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
+  
+</feed>
