@@ -4,7 +4,7 @@ title: "Adding a Network Printer to a Linux Server"
 description: "A walkthrough of how I installed a network-attached printer to a production printing server."
 date: 2014-05-06 02:09:29 -0400
 comments: true
-categories: [linux, print-sl, printing, CUPS]
+categories: [linux, unix, print-sl, printing, CUPS]
 share: true
 ---
 
