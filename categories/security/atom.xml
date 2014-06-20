@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Security | Jake Zimmerman]]></title>
+  <link href="http://blog.zimmerman.io/categories/security/atom.xml" rel="self"/>
+  <link href="http://blog.zimmerman.io/"/>
+  <updated>2014-06-20T01:03:43-04:00</updated>
+  <id>http://blog.zimmerman.io/</id>
+  <author>
+    <name><![CDATA[Jake Zimmerman]]></name>
+    <email><![CDATA[jake@zimmerman.io]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Running a VPS: Log 0]]></title>
+    <link href="http://blog.zimmerman.io/2014/06/19/running-a-vps-log-0/"/>
+    <updated>2014-06-19T21:45:29-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/06/19/running-a-vps-log-0</id>
+    <content type="html"><![CDATA[<p>Since last Christmas, I&rsquo;ve had a raspberry pi running as a server at my home back in Wisconsin. I had tons of plans for this little guy, but I quickly discovered that he was going to be a bit <em>too</em> little for most of them. Thus, I am now the proud sysadmin of my own virtual private server.</p>
+
+<!-- more -->
+
+
+<h2>Hosting</h2>
+
+<p>Because at this point in my life I&rsquo;m moving around too much to host my own server somewhere, I decided to contract this part out. I didn&rsquo;t look around too much at VPS providers, but I eventually settled in on DigitalOcean, because it was both recommended at the CClub talk and the most cost-effective of the all the providers I checked. For $10 per month I get a 1-core processor, 1GB of RAM, 30GB of SSD storage, and 2TB of network data transfer. More than enough for a casual VPS.</p>
+
+<h2><a href="http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers">Safety First</a></h2>
+
+<p>Especially in light of recent security and privacy breeches, the first thing to do on any server is to lock it down. For that, I followed <a href="http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers">these instructions</a>, with a few modifications.</p>
+
+<p>The post goes over setting up a few simple daemons and setup commands that can be completed in 5 minutes if you&rsquo;ve done this before or half an hour if you want to stop and read up on all the protocols as you go. While I won&rsquo;t reiterate the steps, the list includes setting up the root and an additional sudo user, installing <a href="http://www.fail2ban.org/wiki/index.php/Main_Page">fail2ban</a> for combating brute-force login attempts, setting up ssh logins, setting up a firewall with <a href="https://wiki.ubuntu.com/UncomplicatedFirewall">Uncomplicated Firewall</a>, and a few other sanity checks.</p>
+
+<h2>Personalization</h2>
+
+<p>At this point, the server was safe, but I still couldn&rsquo;t call it &ldquo;mine.&rdquo; My .bash_profile, .vimrc, and all my other configuration scripts were missing. Fortunately, I had prepared for this moment, and getting everything in working order was incredibly easy. Because there&rsquo;s so much to talk about, I&rsquo;ll be [writing about it] in another post, but in the meantime, I&rsquo;m using a program called <a href="https://github.com/thoughtbot/rcm">rcm</a> that turns <a href="https://github.com/Z1MM32M4N/dotfiles">GitHub</a> into the perfect place to store configuration scripts.</p>
+
+<p>I also spent a long time pondering the consequences of <a href="http://xkcd.com/910/">this comic</a>. Eventually I settled on the name of my favorite Pokemon: Metagross. So without further ado, I&rsquo;d like to introduce my shiny new login message:</p>
+
+<center>
+<a href="/images/metagross-motd.png"><img src="/images/metagross-motd.png"></a>
+</center>
+
+
+<h2>Onwards</h2>
+
+<p>So there we are! I&rsquo;ve got a bunch of things in the works and even more things planned, so it should be a nice, long-running summer project.</p>
+
+<hr />
+
+<h3>For the Curious</h3>
+
+<p>While I didn&rsquo;t end up using my raspberry pi very extensively, I did manage to get a few things out of it. For one, it gave me my first experiences using Arch Linux. Admittedly, I didn&rsquo;t get the full experience as it came essentially pre-loaded with it, but it was an experience nonetheless. At some point, once I&rsquo;ve settled into living in one place for more than a few months, I plan on building a desktop and running Arch for the lulz.</p>
+
+<p>Also, and this part is still the biggest reason why I keep it up, is that I can run the No-IP Dynamic Update Client as a daemon to keep tabs on the public IP address for my house back in Wisconsin. This lets me do cool things, like ssh into my raspi from anywhere, administer my family&rsquo;s wireless router when it breaks, and potentially log into one of their computers if I needed to (although whenever I do remote into their computer&rsquo;s, I almost always use the Chrome Remote Desktop Client because it&rsquo;s incredibly easy to use but still entirely full-featured).</p>
+]]></content>
+  </entry>
+  
+</feed>

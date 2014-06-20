@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Github | Jake Zimmerman]]></title>
   <link href="http://blog.zimmerman.io/categories/github/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-06-11T23:47:19-04:00</updated>
+  <updated>2014-06-20T01:03:43-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,91 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Running a VPS: Log 1]]></title>
+    <link href="http://blog.zimmerman.io/2014/06/19/running-a-vps-log-1/"/>
+    <updated>2014-06-19T23:10:51-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/06/19/running-a-vps-log-1</id>
+    <content type="html"><![CDATA[<h1>Managing Dotfiles Across Machines</h1>
+
+<p>You could say I&rsquo;m a bit of a geek when it comes to configuring my terminal environment; this obsession has led me to concoct ever-elaborate setup scripts and configuration files. On top of this, between my laptop&rsquo;s multiple boot environments, the servers I use for school, work, and ScottyLabs, and now <a href="/2014/06/19/running-a-vps-log-0">metagross</a>, keeping my configuration files in sync is a must. I handle it swiftly using a combination of git and rcm.</p>
+
+<!-- more -->
+
+
+<h2>My Scripts</h2>
+
+<p>I&rsquo;ve put a decent amount of time into my dotfiles. I like to think they&rsquo;re pretty good. That being said, I&rsquo;m not about to go over every piece of them, because that would bore even me. I might come back to these pieces in a series on getting started with the terminal (aimed at incoming CS freshmen and other up-and-coming hackers), but for now, a link will suffice.</p>
+
+<h4><a href="https://github.com/Z1MM32M4N/dotfiles/">Z1MM32M4N/dotfiles</a></h4>
+
+<h2>rcm + git</h2>
+
+<p>rcm, short for rc file (as in .bash<b>rc</b>, .vim<b>rc</b>) management, is a tool that manages symlinks between dotfiles in one directory and your home directory. This is cool because, once all your config files contained in one folder, they can be tracked with git for version control without having to put your entire <code>$HOME</code> directory inside a git repo.</p>
+
+<p>On a single machine, rcm works like this. You have one directory (usually <code>~/.dotfiles</code>, but configurable to any directory) which stores all the config files. In here, all files which are meant to be tracked and symlinked do <em>not</em> include the prefixed &lsquo;<code>.</code>&rsquo;; instead, it is added as part of the linking process. After installation, which is easily handled through the brew formula, the .deb, or the Makefile, there are a couple of new tools available.</p>
+
+<p>The first worth mentioning is <code>man 7 rcm</code>, which documents what was just installed. Taking a glance at this page, we see that rcm is actually a suite of tools: <code>lsrc</code>, <code>mkrc</code>, <code>rcdn</code>, and <code>rcup</code>. While all these tools are useful, the most important is <code>rcup</code>. After collecting all your dotfiles into <code>~/.dotfiles</code>, simply executing <code>rcup</code> symlinks all the necessary files to their appropriate locations.</p>
+
+<p>From here, you get all the benefits of git, like pushing to GitHub, collaborating with others, lightweight branching, and syncing files easily even when your workflow is distributed across many servers.</p>
+
+<h2>Caveats</h2>
+
+<p>To be fair, I don&rsquo;t use <code>rcm</code> in the way I think it&rsquo;s creators imagined it would be used. Specifically, the software includes certain provisions to designate which files should affect various machines using a tag system. While it could possibly work, in my mind it&rsquo;s much more tedious than what I&rsquo;ve come up with.</p>
+
+<p>Succinctly, the issue is this: when cloning a repo and running <code>rcup</code> for the first time, you can&rsquo;t easily say &ldquo;this is my VPS, it&rsquo;s running Debian GNU/Linux, has these system binaries installed, and therefore should start up using these methods and scripts&rdquo;. For this, we&rsquo;re on our own.</p>
+
+<h2>Installation</h2>
+
+<p>The solution I came up with regarding a multiple-environment workflow deals with handling all the necessary machine-dependent configuration within my dotfiles <em>themselves</em>. That way I can minimize code reuse and have everything in one convenient file. As a result, <a href="https://github.com/Z1MM32M4N/dotfiles/tree/master/bash_profile">my bash_profile</a> is a bit lengthy at about 300 lines, and it has three large case statements, but I make all this up through deployment. Deployment is <strong>incredibly</strong> swift. Again, You can take a look at the file to see how it works, but when I had finished <a href="/2014/06/19/running-a-vps-log-1">locking down my server</a>, these are the only configuration commands I had to run:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Installing rcm and dotfiles </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;install rcm using deb and dpkg&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="nv">$ </span>wget &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;https://thoughtbot.github.io/rcm/debs/rcm_1.2.3-1_all.deb&quot;</span>&gt;https://thoughtbot.github.io/rcm/debs/rcm_1.2.3-1_all.deb&lt;/a&gt;
+</span><span class='line'><span class="nv">$ </span>sudo dpkg -i rcm_1.2.3-1_all.deb&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;clone dotfiles down, into the ~/.dotfiles directory&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="nv">$ </span>git clone &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;https://github.com/Z1MM32M4N/dotfiles&quot;</span>&gt;https://github.com/Z1MM32M4N/dotfiles&lt;/a&gt; ~/.dotfiles&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;make the symlinks&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="nv">$ </span>rcup
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Voilà! After that, I had my sick bash prompt, my <a href="/2014/06/11/update-your-software-its-the-law/">snazzy update function</a>, my delightful vim colorscheme, solarized dir colors&mdash;the list goes on and on.</p>
+
+<p>Sure, it&rsquo;s taken a bit of effort to get the point where I can run these commands and have it Just Work, but doing that work once means that from now on, whenever I sit down at a new work computer, a new VPS, a new laptop, or some other workstation, I&rsquo;m only a few commands away from my favorite settings.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I'd love to hear what you think about what I've managed to put together, so feel free to comment, tweet at me, or send me an email.
+ [t]: http://www.twitter.com/Z1MM32M4N/
+ [g]: http://www.github.com/Z1MM32M4N/
+ [h]: http://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[GitHub Pages Custom Domains]]></title>
