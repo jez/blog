@@ -20,8 +20,8 @@ This page will just serve as a list of links to various posts grouped by project
 ## Running a VPS
 Inspired in part by the [Computer Club talk](http://www.club.cc.cmu.edu/talks/vps.html) and in part by my inability to do anything quickly on a raspberry pi, I recently decided to rent out a VPS from DigitalOcean. Read on for notes and ramblings about what I'm using it for.
 
-- [Running a VPS: Log 0 - Initial Setup](/2014/06/16/running-a-vps-log-0/)
-- [Running a VPS: Log 1 - Managing Dotfiles Across Machines](/2014/06/16/running-a-vps-log-1/)
+- [Running a VPS: Log 0 - Initial Setup](/2014/06/19/running-a-vps-log-0/)
+- [Running a VPS: Log 1 - Managing Dotfiles Across Machines](/2014/06/19/running-a-vps-log-1/)
 
 ## JavaScript Adventures
 Over at ScottyLabs, we're planning some super awesome talks and labs to teach web development during the upcoming semester, so I've been hard at work compiling and writing some awesome JavaScript demos, resources, and projects.
