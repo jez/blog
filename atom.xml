@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Jake Zimmerman]]></title>
+  <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-06-20T01:14:14-04:00</updated>
+  <updated>2014-06-21T16:37:24-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -205,19 +205,19 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h2>The Backstory</h2>
 
-<p>You might have only clicked on this link thinking, &ldquo;Hold up, shouldn&rsquo;t that read &lsquo;no one&rsquo; instead of &lsquo;everyone&rsquo;?&rdquo; For you folks, I have only this quote:</p>
+<p>Before I begin, I should mention that any views I express here are entirely my own. Now, I recently began working for the summer at Bloomberg L.P., where for the first few days we sit through a few talks and do a few labs that introduce us to the technologies we&rsquo;ll be using throughout the summer. JavaScript was one of these languages, and I found that a quote on the first slide is all too correct:</p>
 
-<blockquote><p>&ldquo;God I love JavaScript.&rdquo;</p>
+<blockquote><p>&ldquo;JavaScript is both the most popular and unpopular programming language.&rdquo;</p>
 
-<p>&mdash; Tom Shen</p></blockquote>
+<p>&mdash; Doug Crockford</p></blockquote>
 
-<p>Of course, he quickly followed that up with some complaint about how he had to dig through someone else&rsquo;s JavaScript project to debug an issue with an <code>===</code> that should have been an <code>==</code>. (Yes, in this case, this is right. See <a href="https://github.com/mikeal/request/pull/932/files">here</a> for what was going wrong.)</p>
+<p>From there, as you might imagine, the reactions from a predominantly C++ oriented audience towards JavaScript&rsquo;s quirks were pretty amusing. There are some significant differences between these two languages, and if you&rsquo;re not careful, they can get annoying quite quickly.</p>
 
 <h2>Links</h2>
 
 <h3><a href="https://github.com/airbnb/javascript">airbnb/javascript</a></h3>
 
-<p>Okay, so maybe JavaScript has it&rsquo;s quirks, but it&rsquo;s still a vastly powerful language, if used well. For any aspiring JavaScript developer, I would highly recommend looking over Airbnb&rsquo;s JavaScript best practices. Even if you think you&rsquo;ve got the language down, I&rsquo;m confident you&rsquo;ll uncover something useful.</p>
+<p>JavaScript might have it&rsquo;s quirks, but it&rsquo;s still a vastly powerful language, especially if used well. For any aspiring JavaScript developer, I would highly recommend looking over Airbnb&rsquo;s JavaScript best practices. Even if you think you&rsquo;ve got the language down, I&rsquo;m confident you&rsquo;ll uncover something useful.</p>
 
 <h3><a href="https://www.destroyallsoftware.com/talks/the-birth-and-death-of-javascript">The Birth and Death of JavaScript</a></h3>
 
@@ -586,7 +586,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h2>The Hard Way</h2>
 
-<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#109;&#97;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#x70;&#x72;&#x69;&#110;&#x74;&#64;&#115;&#99;&#x6f;&#116;&#x74;&#x79;&#x6c;&#x61;&#98;&#115;&#x2e;&#111;&#x72;&#103;">&#112;&#114;&#x69;&#x6e;&#116;&#64;&#x73;&#x63;&#x6f;&#x74;&#116;&#121;&#108;&#97;&#98;&#115;&#46;&#x6f;&#114;&#x67;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
+<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#58;&#112;&#114;&#x69;&#110;&#116;&#x40;&#115;&#x63;&#111;&#x74;&#x74;&#121;&#108;&#97;&#98;&#115;&#46;&#x6f;&#x72;&#103;">&#112;&#x72;&#105;&#x6e;&#x74;&#64;&#x73;&#99;&#x6f;&#116;&#116;&#121;&#108;&#x61;&#98;&#115;&#x2e;&#x6f;&#x72;&#x67;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
 
 <p>Luckily, CMU (and arguably every college) is not terribly notable for keeping up-to-date information on it&rsquo;s website. This means that I got the &ldquo;wonderful&rdquo; opportunity to dig through CUPS documentation, sketchy printer manufacturer websites, and the depths of the Internet to finagle together a solution. Here&rsquo;s to hoping that you have a far more pleasurable experience. Without further ado, these are the steps I went through to get it done.</p>
 
