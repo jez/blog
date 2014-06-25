@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Backups | Bits, Bytes, and Words]]></title>
+  <link href="http://blog.zimmerman.io/categories/backups/atom.xml" rel="self"/>
+  <link href="http://blog.zimmerman.io/"/>
+  <updated>2014-06-24T23:49:02-04:00</updated>
+  <id>http://blog.zimmerman.io/</id>
+  <author>
+    <name><![CDATA[Jake Zimmerman]]></name>
+    <email><![CDATA[jake@zimmerman.io]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Running a VPS: Log 2]]></title>
+    <link href="http://blog.zimmerman.io/2014/06/24/running-a-vps-log-2/"/>
+    <updated>2014-06-24T23:11:14-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/06/24/running-a-vps-log-2</id>
+    <content type="html"><![CDATA[<h1>Seriously: Back It Up</h1>
+
+<p>I don&rsquo;t have the best track record with configuring servers. I&rsquo;ve certainly brought down a ScottyLabs server or two before, but sometimes there&rsquo;s no avoiding that in the sake of learning. At times like these, you&rsquo;ve just gotta reboot and try again. With DigitalOcean&rsquo;s auto-backups though, this process is incredibly easy.</p>
+
+<!-- more -->
+
+
+<h2>EncFS Troubles</h2>
+
+<p>As part of my eventual goal of hosting my own mail, I tried following <a href="sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">this post</a> to set up a mail server on my VPS. Unfortunately, I never even made it out the gates. The first step is to install and set up EncFS for letting you mount encrypted filesystems, which the tutorial was planning on using to store email securely. Unfortunately, after following the steps listed to a T, my poor VPS whined and complained about being misconfigured.</p>
+
+<p>My first attempt to do something cool on this new VPS was a dud. All I had to show for it was a muddled, no-longer-pristine VPS with some packages and libraries that simply didn&rsquo;t work. If I were to continue with the tutorial by skipping this step, I would have never known whether the cause of any future issue was something misconfigured at this step.</p>
+
+<h2>The Day is Saved</h2>
+
+<p>But then I remembered: DigitalOcean is automatically backing up my droplet! After logging into the web interface, all I had to do was click a button and my whole system was reset to the way it looked 24 hours prior. It was <em>actually that easy</em>.</p>
+
+<p>Thus, for anyone getting started with a new server, whether it be on DigitalOcean or any other service (even a box you have running in your room), I cannot stress enough the value of automatic&mdash;or at least regular&mdash;backups. Not only is this a good idea to preserve data in the event of an outage, but it lends a seemingly unbounded ability to mess around and tinker.</p>
+
+<p>What this means is that you get all the fun of learning cool, new Linux-y things, but without ever having to worry about whether you&rsquo;ll break the whole system. Sure, this mindset isn&rsquo;t necessarily the best to adopt for a production machine, but for my circumstances, all I want is free reign to experiment and break things to my heart&rsquo;s content.</p>
+
+<h2>Back to Square One</h2>
+
+<p>With my first attempt at installing a mail server foiled, I think for my next attempt I&rsquo;ll try a different path. Instead of installing and configuring everything more or less manually (I really wanted to do this for the experience of it all, learning the nitty-gritty of how it works), this time around I think I&rsquo;m going to give <a href="https://github.com/al3x/sovereign">sovereign</a> a try. I&rsquo;ve heard good things, and it is in fact based on the original tutorial I had found, so it&rsquo;s looking pretty promising as of yet.</p>
+
+<p>Whatever happens though, I&rsquo;m feeling pretty good about the fact that I can turn things around with a single click.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I'd love to hear what you think about what I've managed to put together, so feel free to comment, tweet at me, or send me an email.
+ [t]: http://www.twitter.com/Z1MM32M4N/
+ [g]: http://www.github.com/Z1MM32M4N/
+ [h]: http://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
+  
+</feed>
