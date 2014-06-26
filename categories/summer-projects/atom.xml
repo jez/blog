@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Summer Projects | Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/categories/summer-projects/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-06-25T00:19:50-04:00</updated>
+  <updated>2014-06-25T22:10:38-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -29,7 +29,9 @@
 
 <p>As part of my eventual goal of hosting my own mail, I tried following <a href="//sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">this post</a> to set up a mail server on my VPS. Unfortunately, I never even made it out the gates. The first step is to install and set up EncFS for letting you mount encrypted filesystems, which the tutorial was planning on using to store email securely. Unfortunately, after following the steps listed to a T, my poor VPS whined and complained about being misconfigured.</p>
 
-<p>My first attempt to do something cool on this new VPS was a dud. All I had to show for it was a muddled, no-longer-pristine VPS with some packages and libraries that simply didn&rsquo;t work. If I were to continue with the tutorial by skipping this step, I would have never known whether the cause of any future issue was something misconfigured at this step.</p>
+<p><strong>Edit</strong>: After doing a little more research, I found that the root of my issue wasn&rsquo;t something I had been doing. Apparently, you have to <a href="https://www.digitalocean.com/community/tutorials/how-to-update-a-digitalocean-server-s-kernel-using-the-control-panel">manually update the kernel</a> through the DigitalOcean web console. You can read more about it on this <a href="https://github.com/al3x/sovereign/issues/147#issuecomment-43849647">GitHub issue</a>.</p>
+
+<p>Regardless, my first attempt to do something cool on this new VPS was a dud. All I had to show for it was a muddled, no-longer-pristine VPS with some packages and libraries that simply didn&rsquo;t work. If I were to continue with the tutorial by skipping this step, I would have never known whether the cause of any future issue was something misconfigured at this step.</p>
 
 <h2>The Day is Saved</h2>
 
