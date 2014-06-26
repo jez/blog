@@ -19,7 +19,9 @@ I don't have the best track record with configuring servers. I've certainly brou
 ## EncFS Troubles
 As part of my eventual goal of hosting my own mail, I tried following [this post](//sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/) to set up a mail server on my VPS. Unfortunately, I never even made it out the gates. The first step is to install and set up EncFS for letting you mount encrypted filesystems, which the tutorial was planning on using to store email securely. Unfortunately, after following the steps listed to a T, my poor VPS whined and complained about being misconfigured.
 
-My first attempt to do something cool on this new VPS was a dud. All I had to show for it was a muddled, no-longer-pristine VPS with some packages and libraries that simply didn't work. If I were to continue with the tutorial by skipping this step, I would have never known whether the cause of any future issue was something misconfigured at this step.
+__Edit__: After doing a little more research, I found that the root of my issue wasn't something I had been doing. Apparently, you have to [manually update the kernel](https://www.digitalocean.com/community/tutorials/how-to-update-a-digitalocean-server-s-kernel-using-the-control-panel) through the DigitalOcean web console. You can read more about it on this [GitHub issue](https://github.com/al3x/sovereign/issues/147#issuecomment-43849647).
+
+Regardless, my first attempt to do something cool on this new VPS was a dud. All I had to show for it was a muddled, no-longer-pristine VPS with some packages and libraries that simply didn't work. If I were to continue with the tutorial by skipping this step, I would have never known whether the cause of any future issue was something misconfigured at this step.
 
 ## The Day is Saved
 But then I remembered: DigitalOcean is automatically backing up my droplet! After logging into the web interface, all I had to do was click a button and my whole system was reset to the way it looked 24 hours prior. It was _actually that easy_.
