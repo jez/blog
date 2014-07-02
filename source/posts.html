@@ -4,7 +4,7 @@ permalink: /posts/
 title: All Posts
 description: "An archive of posts."
 image:
-  feature: /images/threaded-blue-on-black-cropped.png
+  feature: /images/threaded-blue-on-black-cropped.jpg
 ---
 
 {% for post in site.posts %}
@@ -17,9 +17,9 @@ image:
       <ul>
     {% endif %}
 
-        <li class="entry-title"><a href="{{ root_url }}{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></li>
-
+        <a href="{{ root_url }}{{ post.url }}" title="{{ post.title }}"><li class="entry-title">{{ post.title }}</li></a>
     {% if forloop.last %}
+      <div class="clear-both"></div>
       </ul>
     </article>
     {% else %}
