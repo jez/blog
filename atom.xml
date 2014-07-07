@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-06-25T22:10:38-04:00</updated>
+  <updated>2014-07-07T01:54:11-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,328 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Running a VPS: Log 4]]></title>
+    <link href="http://blog.zimmerman.io/2014/07/07/running-a-vps-log-4/"/>
+    <updated>2014-07-07T01:08:00-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/07/07/running-a-vps-log-4</id>
+    <content type="html"><![CDATA[<h1>Debugging a Broken Mail Server</h1>
+
+<p>Whereas the tutorial I&rsquo;m following to setup this mail server initially promised a working setup in more or less two hours, it&rsquo;s nearing two weeks for me and I&rsquo;ve still got plenty of issues. In this log, I&rsquo;ll discuss some of the tools, log files, and online resources which I&rsquo;ve found helpful, as well as give a description of my problem as I best understand it.</p>
+
+<!-- more -->
+
+
+<h3><code>telnet</code></h3>
+
+<p>As I mentioned in my <a href="http://blog.zimmerman.io/2014/07/04/running-a-vps-log-3">last log</a>, I&rsquo;ve been using three basic tools to connect to and test my mail server. While a graphical client might have a few tools for debugging a faulty connection&mdash;Mail.app&rsquo;s <a href="http://support.apple.com/kb/PH14945">Connection Doctor</a> comes to mind&mdash;they don&rsquo;t usually afford full control to the debugger.</p>
+
+<p>This is where some truly powerful command line tools come into play, the first of which is <code>telnet</code>. Telnet opens up a text-based communication channel between you and a server; once connected, you can ask the server anything. SMTP is the broken part of my server, so I&rsquo;ll focus exclusively on examples dealing with connecting on SMTP ports. That being said, these tools are meant to be general purpose and should work for any type of service or port you can think of which exposes a textual interface.</p>
+
+<p>On a working mail server, we should be able to have the following dialog with the server:</p>
+
+<figure class='code'><figcaption><span>telnet </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ telnet mail.zimmerman.io 25
+</span><span class='line'>  Trying 107.170.7.111...
+</span><span class='line'>  Connected to metagross.zimmerman.io.
+</span><span class='line'>  Escape character is '^]'.
+</span><span class='line'>  220 ************************************
+</span><span class='line'>> EHLO [206.71.229.162]
+</span><span class='line'>  250-metagross
+</span><span class='line'>  250-PIPELINING
+</span><span class='line'>  250-SIZE 10240000
+</span><span class='line'>  250-VRFY
+</span><span class='line'>  250-ETRN
+</span><span class='line'>  250-XXXXXXXA
+</span><span class='line'>  250-ENHANCEDSTATUSCODES
+</span><span class='line'>  250-8BITMIME
+</span><span class='line'>  250-STARTTLS
+</span><span class='line'>  250 DSN
+</span><span class='line'>></span></code></pre></td></tr></table></div></figure>
+
+
+<p>A few notes:</p>
+
+<ul>
+<li>The first two characters of each line follow this legend:
+
+<ul>
+<li><code>$</code> indicates a line entered at the bash REPL</li>
+<li><code>&gt;</code> indicates a line entered and sent to the server</li>
+<li>all other lines are responses from the server</li>
+</ul>
+</li>
+<li><code>telnet</code> by default takes two arguments: a domain/IP address, and a port number.</li>
+<li><code>EHLO</code> is an SMTP command asking the server to identify itself and list which subset of commands it will respond to.</li>
+</ul>
+
+
+<p>From here, we can use commands like <code>MAIL from: &lt;address&gt;</code>, <code>RCPT to: &lt;address&gt;</code>, and <code>DATA</code> to send an email, using only plain text SMTP commands. Pretty powerful. There are also commands to initiate an encrypted connection (using <code>STARTTLS</code>), authenticate a user (using <code>AUTH</code>), and <a href="http://www.port25.com/how-to-check-an-smtp-connection-with-a-manual-telnet-session-2/">more</a>.</p>
+
+<p>Earlier I said that one thing we can discern from the server&rsquo;s <code>EHLO</code> response is what types of commands it will respond to. I also mentioned that this particular dialog would occur with a <em>working</em> mail server. Sneak peak of a problem I&rsquo;m having: I can&rsquo;t get <code>250-STARTTLS</code> to appear in my server&rsquo;s response. We&rsquo;ll come back to this.</p>
+
+<h3>OpenSSL&rsquo;s &nbsp; <code>s_client</code></h3>
+
+<p>The second command line utility that is useful in debugging a mail server, especially those where SSL/TLS encryption is involved, is provided by OpenSSL. OpenSSL exposes a variety of commands, one of which, <code>s_client</code>, aids with establishing an encrypted connection between you and a server.</p>
+
+<p>The syntax of the command looks like this:</p>
+
+<figure class='code'><figcaption><span>s_client </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ openssl s_client -connect &lt;host>:&lt;port> [options]</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This client becomes particularly important, because one Postfix option I&rsquo;ve specified in the file <code>/etc/postfix/main.cf</code> is <code>smtpd_tls_auth_only = yes</code>. What this means is that Postfix won&rsquo;t send the line <code>250-AUTH PLAIN LOGIN</code> unless we&rsquo;re running on a secure connection. Merely using <code>telnet</code> to connect on port 25 will not initiate a secure connection.</p>
+
+<p>There are a couple of ways we can use <code>s_client</code> to start off this encryption. The first way is to use port 465 to connect using sSMTP: <code>$ openssl s_client -connect mail.zimmerman.io:465</code>. We could also connect to port 25 and then immediately initiate an encrypted connection by issuing the STARTTLS command: <code>$ openssl s_client mail.zimmerman:25 -starttls smtp</code>. Either way, we get an encrypted connection to our server, and now the line <code>250-AUTH PLAIN LOGIN</code> line will appear in the server&rsquo;s <code>EHLO</code> response. We can continue sending SMTP commands just as with <code>telnet</code>.</p>
+
+<h2>The Problems Set In</h2>
+
+<p>If there&rsquo;s one thing I&rsquo;ve learned about mail servers, it&rsquo;s that they&rsquo;re hard. Like, they&rsquo;re really hard.</p>
+
+<p>The problems first set in when I tried to test my setup with Mail.app. For whatever reason, no combination of settings would let me send mail through my server. I opened the logs located at <code>/var/log/syslog</code> and <code>/var/log/mail.log</code> to see if I could discern what was going on, but nothing showed up. After a bit of Googling, I found some information on how to use the above tools and started to diagnose my problem.</p>
+
+<p>After using them for a little bit, I had the following diagnostic list of things I could and could not do:</p>
+
+<ul>
+<li>I could connect to port 25 using <code>telnet</code> (<code>telnet mail.zimmerman.io 25</code>)&hellip;
+
+<ul>
+<li>&hellip; but neither <code>STARTTLS</code> nor <code>AUTH</code> appeared in the <code>EHLO</code> response, so I couldn&rsquo;t send emails.</li>
+</ul>
+</li>
+<li>I could not connect to port 465 nor port 587 using neither <code>telnet</code> nor <code>s_client</code>
+
+<ul>
+<li><code>telnet</code> simply aborted telling me that my connection had been refused, whereas <code>openssl</code> at least gave me an error number: <code>connect:errno=61</code></li>
+</ul>
+</li>
+</ul>
+
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/smtp-connection-refused-1.png"><img src="http://blog.zimmerman.io/images/smtp-connection-refused-1.png"></a></p>
+
+<ul>
+<li>I could connect to port 25 using <code>telnet</code> <strong>from my server</strong> (<code>telnet localhost 25</code> after ssh&#8217;ing)
+
+<ul>
+<li>This meant that I could send emails, because I had set <code>permit_mynetworks</code> as one of the values under <code>smtpd_recipient_restrictions</code> (i.e., you don&rsquo;t have to authenticate if you&rsquo;ve already ssh&#8217;ed in)</li>
+</ul>
+</li>
+<li>I could connect to port 25 using <code>s_client</code> and initiate a STARTTLS command <strong>from my server</strong>
+
+<ul>
+<li>This was unnecessary, because the server would already accept my request to send emails to foreign recipients (because <code>permit_mynetworks</code> was enabled)</li>
+</ul>
+</li>
+<li>I could still not connect to ports 465 or 587.
+
+<ul>
+<li>I got &ldquo;connection refused&rdquo; errors again, but this time the <code>openssl</code> error number was 111.</li>
+</ul>
+</li>
+</ul>
+
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/smtp-connection-refused-2.png"><img src="http://blog.zimmerman.io/images/smtp-connection-refused-2.png"></a></p>
+
+<h2>Potential Fixes</h2>
+
+<p>I have a few ideas on why my server won&rsquo;t let me in. I know for sure that it&rsquo;s not a firewall issue; I have all the requisite ports (25/465/587 and 143/993) open.</p>
+
+<figure class='code'><figcaption><span>ufw Firewall Settings </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ufw status
+</span><span class='line'>Status: active
+</span><span class='line'>
+</span><span class='line'>To                         Action      From
+</span><span class='line'>--                         ------      ----
+</span><span class='line'>53                         ALLOW       Anywhere
+</span><span class='line'>22/tcp                     ALLOW       Anywhere
+</span><span class='line'>7                          ALLOW       Anywhere
+</span><span class='line'>25/tcp                     ALLOW       Anywhere
+</span><span class='line'>143                        ALLOW       Anywhere
+</span><span class='line'>465/tcp                    ALLOW       Anywhere
+</span><span class='line'>993                        ALLOW       Anywhere
+</span><span class='line'>587/tcp                    ALLOW       Anywhere
+</span><span class='line'>53                         ALLOW       Anywhere (v6)
+</span><span class='line'>22/tcp                     ALLOW       Anywhere (v6)
+</span><span class='line'>7                          ALLOW       Anywhere (v6)
+</span><span class='line'>25/tcp                     ALLOW       Anywhere (v6)
+</span><span class='line'>143                        ALLOW       Anywhere (v6)
+</span><span class='line'>465/tcp                    ALLOW       Anywhere (v6)
+</span><span class='line'>993                        ALLOW       Anywhere (v6)
+</span><span class='line'>587/tcp                    ALLOW       Anywhere (v6)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It could be an issue with my certificates. Because I&rsquo;m cheap and didn&rsquo;t want to pay excessive amounts of money for a fun summer experiment, I decided to self-sign my SSL certificates. (This means that while my traffic will be encrypted, people who try to connect to my server can&rsquo;t necessarily trust that I am who I say I am. It&rsquo;s the same reason why we have notaries to verify our signatures.) I&rsquo;m skeptical that this could be the reason, though, because nothing was showing up in the logs. If it had been a certificate error, it would have almost certainly shown up in the logs at some point.</p>
+
+<p>Every error message that I got said the same thing: connection refused. But it only said connection refused on ports 465 and 587, ports that are expecting to receive communication over an encrypted channel. This means one of two things: my firewall is blocking the connection, which I&rsquo;ve already ruled out, or some other middle-man is kicking me out before we even get to Postfix, where something would show up in the logs.</p>
+
+<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.</p>
+
+<br>
+
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/mail-dns-1.png"><img src="http://blog.zimmerman.io/images/mail-dns-1.png"></a></p>
+
+<br>
+
+
+<p>I think that the confusion is in the multiple uses of the <code>@</code> domain. Taking a scrutinous look at the differences between my setup and the <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">tutorial</a> I&rsquo;ve been working out of, the one glaring difference is that his mail is set up on a subdomain whereas I wanted my mail to be set up on the apex domain. I thought that I made the necessary changes to my setup to get this to work, but now I&rsquo;m not so sure.</p>
+
+<p>It&rsquo;s also quite possible that I&rsquo;m completely off the mark with this diagnosis. The world of mail servers is a murky place; certainly one that I don&rsquo;t understand that well after only two weeks. But it has been a very rewarding experience so far, and I&rsquo;d like to see if I can&rsquo;t fix this issue.</p>
+
+<hr />
+
+<br>
+
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Running a VPS: Log 3]]></title>
+    <link href="http://blog.zimmerman.io/2014/07/04/running-a-vps-log-3/"/>
+    <updated>2014-07-04T14:11:14-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/07/04/running-a-vps-log-3</id>
+    <content type="html"><![CDATA[<h1>A Mail Server that Works&hellip; Kind of.</h1>
+
+<p>After some initial troubles, I finally managed to get basic send and receive functionality  working on my mail server, using EncFS, Dovecot, and Postfix. That being said, it&rsquo;s <em>far</em> from a perfect system, and it needs a good deal more TLC to get it working at a level that&rsquo;s on par with a more &ldquo;professional&rdquo; email service provider. This post details some fixes that I&rsquo;ve implemented so far, as well as the functionality that I&rsquo;ve managed to get working.</p>
+
+<!-- more -->
+
+
+<h2>EncFS Troubles Revisited</h2>
+
+<p>I mentioned in my <a href="http://blog.zimmerman.io/2014/06/24/running-a-vps-log-2">last log</a> that I had somehow managed to botch my first mail server-related endeavor: installing EncFS, a program for creating encrypted file systems. The way it&rsquo;s supposed to work is depicted below:</p>
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/encfs.svg"><img src="http://blog.zimmerman.io/images/encfs.svg"></a></p>
+
+<p>Emails originating elsewhere are transfered over the internet to my server according to the DNS settings we&rsquo;ve put in place. These emails need to be stored somewhere upon their receipt; ideally, somewhere encrypted. Thus, the goal is to set up an encrypted file system in user space, such that each incoming email is first stored in <code>/decrypted-mail/</code>, and then is automatically encrypted and stored in <code>/encrypted-mail/</code>. (<strong>Note</strong>: this is not quite how the encryption process works. For more information, you should check out the <a href="https://wiki.archlinux.org/index.php/EncFS">Arch Wiki</a> page on EncFS.)</p>
+
+<p>There are some disadvantages to this type of encryption, most notably that it leaks information about the file system itself. However, as was mentioned in the comments on the <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">tutorial I&rsquo;m working from</a>, &ldquo;if the host/harddisk is given to authorities they cannot decrypt it and thus cannot access your e-mails,&rdquo; which is good enough for me.</p>
+
+<h3>Upgrading the Kernel</h3>
+
+<p>After following the instructions from the tutorial perfectly, <em>and</em> repeating them after having restored from a clean backup, EncFS refused to work. Luckily, I found this <a href="https://github.com/al3x/sovereign/issues/147#issuecomment-43849647">GitHub issue</a> detailing the source of the problem as well as a simple fix for it.</p>
+
+<p>Apparently, my issue was that DigitalOcean doesn&rsquo;t initialize freshly created Debian 7 droplets with the most recent kernel. Unfortunately libfuse, a library used by EncFS to create and manage the encrypted file system, was expecting a more up-to-date kernel version.</p>
+
+<p>Upgrading my kernel version was just a few steps, though. I had to run</p>
+
+<figure class='code'><figcaption><span>Upgrade Kernel </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo apt-get update
+</span><span class='line'><span class="nv">$ </span>sudp apt-get upgrade
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>to update the list of downloaded kernels, then</p>
+
+<figure class='code'><figcaption><span>Restart </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo shutdown -h now
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>to tell the server to shutdown and power off. Next up is to switch over the kernel version on the <a href="https://www.digitalocean.com/community/tutorials/how-to-update-a-digitalocean-server-s-kernel-using-the-control-panel">DigitalOcean control panel</a>. All in all, nothing too difficult: the hardest part was that I never expected my problem to have anything to do with DigitalOcean.</p>
+
+<h2>Postfix &amp; Dovecot</h2>
+
+<p>With EncFS finally up and running, I moved on to getting the basic send and receive functionality implemented. For the most part, this process was straight-forward, and is outlined (albeit very scarcely) <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">here</a>.</p>
+
+<p>Then suddenly, the tutorial proclaimed, &ldquo;At this point, it should basically work. You should be able to send and receive mail.&rdquo; I was pretty surprised: I had no idea how to actually go about testing my setup! It simply did not list any way of doing this. It turns out, there are basically three ways to establish a connection with the mail server; I&rsquo;ll discuss the first here, and the others in a [future post][/2014/06/24/running-a-vps-log-4] on troubleshooting problems with my setup.</p>
+
+<h3>Mail Client</h3>
+
+<p>For the true hackers who don&rsquo;t make mistakes and set up their systems perfectly on their first try, simply launching a desktop or mobile mail client and configuring a few account settings, should be enough. Since I&rsquo;m developing on a Mac and was too lazy to install a fancier, potentially more feature-rich client, I&rsquo;m using Mail.app.</p>
+
+<p>A series of dialogs should drive the process of setting up a new user account. My Mail.app setup is shown below.</p>
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/imap-settings.png"><img src="http://blog.zimmerman.io/images/imap-settings.png"></a></p>
+
+<p>IMAP on my setup works fine, so I&rsquo;ll give some pointers about setting it up correctly:</p>
+
+<ul>
+<li><strong>Email Address</strong> or <strong>Username</strong>: Fields that ask for this information should always include a full email address&mdash;in my case <code>jake@zimmerman.io</code>. This is because our MySQL server is configured to store the full address, so Dovecot needs a full address to use to for IMAP authentication.</li>
+<li><strong>Password</strong>: This is the password coupled with the email address referenced above, which was SHA512-hashed and stored in the database.</li>
+<li><strong>Incoming</strong> or <strong>IMAP Mail Server</strong>: Whatever is in this field needs to eventually resolve to the IP address of our IMAP server. Simply putting the server&rsquo;s IP address directly into this field will suffice. To be more sophisticated though, we&rsquo;ll want to configure this field with a domain name and let our client resolve it, as this is more robust. There are a few ways this can be done; to give a quick overview, you can either set up
+
+<ul>
+<li>a CNAME record which resolves to the mail server&rsquo;s IP.</li>
+<li>an MX record on the <code>@</code> or apex domain which resolves to the mail server&rsquo;s IP. (This is the option depicted in the screenshot above).</li>
+<li>an A record which resolves directly to the mail server&rsquo;s IP.</li>
+</ul>
+</li>
+<li><strong>Port</strong>: 993. We&rsquo;ve configured our server to use SSL to connect over IMAPS, which runs by default over port 993. Be sure to check &ldquo;Use SSL&rdquo; if such an option is available.</li>
+</ul>
+
+
+<p>As far as SMTP goes, this is where my setup starts breaking. I&rsquo;ll come back to why exactly it&rsquo;s failing in more detail <a href="http://blog.zimmerman.io/2014/07/05/running-a-vps-log-4">here</a>, but for now, know that I had to change the line <code>smtpd_tls_auth_only = yes</code> in <code>/etc/postfix/main.cf</code> to <code>... = no</code>, to even get things to work. With this line enabled, credentials are sent over the wire in plain text. Sadly, crypto is hard, and this is the only thing that I have done to manage to get it working.</p>
+
+<p>At this point I could connect to the server &ldquo;zimmerman.io&rdquo; on port 25 using my email with the <em>same</em> password from above. As a side note, this form of authentication is pretty nifty. If you noticed, we&rsquo;re using the same password on IMAP with Dovecot and on SMTP with Postfix. Using the SASL protocol, Postfix can pass on the user&rsquo;s credentials to Dovecot, which then uses its connection to the database to confirm or deny the request for authentication. For a simple, one-user setup, this is a rather elegant solution.</p>
+
+<h2>Debugging a Broken Mail Server</h2>
+
+<p>With SSL authentication turned off, I was able to get Mail.app to send and receive emails. Additionally, I could do the same using the third-party Android client myMail. For whatever reason, the default Android client wouldn&rsquo;t even accept my IMAP login, whereas myMail was smart enough to log me after only asking for my email and password.</p>
+
+<p>Ideally, I&rsquo;d like to have a setup where my password isn&rsquo;t being sent in a format anyone can read. To debug some of these close-to-the-system settings, there are a bunch of <a href="http://blog.zimmerman.io/2014/07/05/running-a-vps-log-4">command line tools</a> which help to inspect exactly what&rsquo;s going wrong with the system.</p>
+
+<hr />
+
+<br>
+
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Running a VPS: Log 2]]></title>
@@ -54,7 +376,7 @@
 
 <h3>Jake on the Web</h3>
 
-<p><a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 ]]></content>
   </entry>
@@ -130,7 +452,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h3>Jake on the Web</h3>
 
-<p><a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 ]]></content>
   </entry>
@@ -162,7 +484,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 <p>I also spent a long time pondering the consequences of <a href="http://xkcd.com/910/">this comic</a>. Eventually I settled on the name of my favorite Pokemon: Metagross. So without further ado, I&rsquo;d like to introduce my shiny new login message:</p>
 
 <center>
-<a href="http://blog.zimmerman.io/images/metagross-motd.png"><img src="http://blog.zimmerman.io/images/metagross-motd.png"></a>
+<a class="image-link" href="http://blog.zimmerman.io/images/metagross-motd.png"><img src="http://blog.zimmerman.io/images/metagross-motd.png"></a>
 </center>
 
 
@@ -201,6 +523,9 @@ If you cared enough to read that far, you should consider following me on <a hre
 <ul>
 <li><a href="http://blog.zimmerman.io/2014/06/19/running-a-vps-log-0/">Running a VPS: Log 0 &ndash; Initial Setup</a></li>
 <li><a href="http://blog.zimmerman.io/2014/06/19/running-a-vps-log-1/">Running a VPS: Log 1 &ndash; Managing Dotfiles Across Machines</a></li>
+<li><a href="http://blog.zimmerman.io/2014/06/24/running-a-vps-log-2/">Running a VPS: Log 2 &ndash; Seriously: Back It Up</a></li>
+<li><a href="http://blog.zimmerman.io/2014/07/04/running-a-vps-log-3/">Running a VPS: Log 3 &ndash; A Mail Server that Works… Kind of.</a></li>
+<li><a href="http://blog.zimmerman.io/2014/07/07/running-a-vps-log-4/">Running a VPS: Log 4 &ndash; Debugging a Broken Mail Server</a></li>
 </ul>
 
 
@@ -234,7 +559,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h3>Jake on the Web</h3>
 
-<p><a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 ]]></content>
   </entry>
@@ -280,7 +605,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h3>Jake on the Web</h3>
 
-<p><a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 ]]></content>
   </entry>
@@ -434,7 +759,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h3>Jake on the Web</h3>
 
-<p><a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 ]]></content>
   </entry>
@@ -459,7 +784,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <p>I don&rsquo;t have too many good screenshots of this theme that aren&rsquo;t vim because I&rsquo;m actually using <a href="https://github.com/seebi/dircolors-solarized">solarized</a> dircolors for colorizing the output of my <code>ls</code> and related commands. However, there are still plenty of tools I use which resort to default ANSI colors to colorize their output, like <code>git</code> and <code>brew</code>. You can see a <code>git log</code> command along side a table of all ANSI color combinations resulting from this theme (this table can be a bit overwhelming: it&rsquo;s best to just look at the first two columns to get an idea of what the colors really look like).</p>
 
-<p><a href="http://blog.zimmerman.io/images/molokai.png"><img src="http://blog.zimmerman.io/images/molokai.png"></a></p>
+<p><a class="image-link" href="http://blog.zimmerman.io/images/molokai.png"><img src="http://blog.zimmerman.io/images/molokai.png"></a></p>
 
 <hr />
 
@@ -468,7 +793,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h3>Jake on the Web</h3>
 
-<p><a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 ]]></content>
   </entry>
@@ -526,7 +851,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h3>Jake on the Web</h3>
 
-<p><a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 ]]></content>
   </entry>
@@ -598,7 +923,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <p>Here&rsquo;s a screenshot of what my records look like with my DNS provider, in case this was still unclear.</p>
 
-<p><a href="http://blog.zimmerman.io/images/DNS-config.jpg"><img src="http://blog.zimmerman.io/images/DNS-config.jpg"></a></p>
+<p><a class="image-link" href="http://blog.zimmerman.io/images/DNS-config.jpg"><img src="http://blog.zimmerman.io/images/DNS-config.jpg"></a></p>
 
 <p>I&rsquo;m personally using <a href="https://www.gandi.net/">Gandi</a> for domain registration because they had the cheapest <code>.io</code> TLD registration, but their interface takes some getting used to. (It was certainly still worth the deal I got.)</p>
 
@@ -609,7 +934,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h3>Jake on the Web</h3>
 
-<p><a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 ]]></content>
   </entry>
@@ -632,7 +957,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h2>The Hard Way</h2>
 
-<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x70;&#x72;&#x69;&#110;&#116;&#64;&#x73;&#x63;&#x6f;&#116;&#x74;&#x79;&#108;&#x61;&#98;&#115;&#46;&#x6f;&#x72;&#x67;">&#112;&#114;&#105;&#x6e;&#x74;&#x40;&#115;&#99;&#111;&#x74;&#x74;&#121;&#x6c;&#97;&#98;&#x73;&#x2e;&#111;&#114;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
+<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#x6f;&#x3a;&#x70;&#114;&#105;&#110;&#x74;&#64;&#115;&#x63;&#x6f;&#x74;&#116;&#121;&#108;&#x61;&#x62;&#115;&#x2e;&#111;&#114;&#x67;">&#x70;&#114;&#105;&#110;&#116;&#x40;&#115;&#99;&#111;&#x74;&#x74;&#x79;&#x6c;&#x61;&#x62;&#x73;&#46;&#x6f;&#114;&#x67;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
 
 <p>Luckily, CMU (and arguably every college) is not terribly notable for keeping up-to-date information on it&rsquo;s website. This means that I got the &ldquo;wonderful&rdquo; opportunity to dig through CUPS documentation, sketchy printer manufacturer websites, and the depths of the Internet to finagle together a solution. Here&rsquo;s to hoping that you have a far more pleasurable experience. Without further ado, these are the steps I went through to get it done.</p>
 
@@ -681,7 +1006,7 @@ After all this, if you’ve copied the PPD file into the right folder (<code>/et
 
 <h3>Jake on the Web</h3>
 
-<p><a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 ]]></content>
   </entry>
@@ -731,7 +1056,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h3>Jake on the Web</h3>
 
-<p><a href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 ]]></content>
   </entry>
