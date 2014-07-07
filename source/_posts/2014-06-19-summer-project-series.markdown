@@ -22,6 +22,9 @@ Inspired in part by the [Computer Club talk](http://www.club.cc.cmu.edu/talks/vp
 
 - [Running a VPS: Log 0 - Initial Setup](/2014/06/19/running-a-vps-log-0/)
 - [Running a VPS: Log 1 - Managing Dotfiles Across Machines](/2014/06/19/running-a-vps-log-1/)
+- [Running a VPS: Log 2 - Seriously: Back It Up](/2014/06/24/running-a-vps-log-2/)
+- [Running a VPS: Log 3 - A Mail Server that Works… Kind of.](/2014/07/04/running-a-vps-log-3/)
+- [Running a VPS: Log 4 - Debugging a Broken Mail Server](/2014/07/07/running-a-vps-log-4/)
 
 ## JavaScript Adventures
 Over at ScottyLabs, we're planning some super awesome talks and labs to teach web development during the upcoming semester, so I've been hard at work compiling and writing some awesome JavaScript demos, resources, and projects.
