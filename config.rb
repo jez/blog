@@ -1,5 +1,4 @@
 require 'sass-globbing'
-require 'animation'
 
 
 # Require any additional compass plugins here.
