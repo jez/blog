@@ -25,11 +25,17 @@ Inspired in part by the [Computer Club talk](http://www.club.cc.cmu.edu/talks/vp
 - [Running a VPS: Log 2 - Seriously: Back It Up](/2014/06/24/running-a-vps-log-2/)
 - [Running a VPS: Log 3 - A Mail Server that Works… Kind of.](/2014/07/04/running-a-vps-log-3/)
 - [Running a VPS: Log 4 - Debugging a Broken Mail Server](/2014/07/07/running-a-vps-log-4/)
+- [Running a VPS: Log 5 - It's not you, it's me](/2014/07/07/running-a-vps-log-5/)
 
 ## JavaScript Adventures
 Over at ScottyLabs, we're planning some super awesome talks and labs to teach web development during the upcoming semester, so I've been hard at work compiling and writing some awesome JavaScript demos, resources, and projects.
 
 - [Why Everyone Loves JavaScript](/2014/06/16/why-everyone-loves-javascript/)
+
+Edit: Web Dev Weeks was a hit! If you had the chance to come to one of the talks, great! We'll be holding similar events later in the year, too. If you didn't make it, here's what you missed:
+
+- [Web Dev Weeks homepage](//scottylabs.org/webdevweeks/)
+- [My Frontend Development (JavaScript) workshop](//scottylabs.org/webdevweeks/frontend/)
 
 - - -
 ## Print@ScottyLabs
@@ -39,5 +45,7 @@ In the mean time, if mail servers, Python 3, and Django are your thing, you may 
 
 - __ [Python 3.4.1 and MIME Multipart Messages](https://docs.python.org/3/whatsnew/3.4.html#whatsnew-email-contentmanager) __
 - __ [Django 1.7 to include built-in schema migrations](https://docs.djangoproject.com/en/dev/releases/1.7/) __
+
+Edit: I've started Print 2.0, and it's moving slowly now that classes have started to pick up. I have done a bit of work on it though, and I'll be documenting it soon. Since it's no longer the summer, though, it won't be published under the Summer Project Series tag.
 
 {% include jake-on-the-web.markdown %}
