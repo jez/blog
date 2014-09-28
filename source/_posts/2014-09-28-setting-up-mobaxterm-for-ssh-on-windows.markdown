@@ -56,7 +56,7 @@ You can also choose a bunch of other settings for this session. Feel free to per
 
 After that, click "OK" and your session will appear in the panel on the left under "Saved sessions".
 
-## Cool MobaXterm features
+## Cool MobaXterm Features
 This section lists a few features that MobaXterm does better than other SSH options like PuTTY.
 
 First, MobaXterm has tabs and splits, which make managing your connections to a remote server much more enjoyable.
