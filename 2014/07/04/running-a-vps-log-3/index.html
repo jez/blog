@@ -188,7 +188,7 @@
 <p>IMAP on my setup works fine, so I&rsquo;ll give some pointers about setting it up correctly:</p>
 
 <ul>
-<li><strong>Email Address</strong> or <strong>Username</strong>: Fields that ask for this information should always include a full email address&mdash;in my case <code>jake@zimmerman.io</code>. This is because our MySQL server is configured to store the full address, so Dovecot needs a full address to use to for IMAP authentication.</li>
+<li><strong>Email Address</strong> or <strong>Username</strong>: Fields that ask for this information should always include a full email address&ndash;in my case <code>jake@zimmerman.io</code>. This is because our MySQL server is configured to store the full address, so Dovecot needs a full address to use to for IMAP authentication.</li>
 <li><strong>Password</strong>: This is the password coupled with the email address referenced above, which was SHA512-hashed and stored in the database.</li>
 <li><strong>Incoming</strong> or <strong>IMAP Mail Server</strong>: Whatever is in this field needs to eventually resolve to the IP address of our IMAP server. Simply putting the server&rsquo;s IP address directly into this field will suffice. To be more sophisticated though, we&rsquo;ll want to configure this field with a domain name and let our client resolve it, as this is more robust. There are a few ways this can be done; to give a quick overview, you can either set up
 
@@ -214,8 +214,7 @@
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -240,23 +239,23 @@ If you cared enough to read that far, you should consider following me on <a hre
       <div class="read-more">
         
           <div class="read-more-header">
-            <a href="/2014/07/10/running-a-vps-log-5/" class="btn">Read More</a>
+            <a href="/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/" class="btn">Read More</a>
           </div><!-- /.read-more-header -->
           <div class="read-more-content">
-            <h3><a href="/2014/07/10/running-a-vps-log-5/" title="Running a VPS: Log 5">Running a VPS: Log 5</a></h3>
-            <p>It's not you, it's me. <a href="/2014/07/10/running-a-vps-log-5/"> Continue reading</a></p>
+            <h3><a href="/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/" title="Setting up MobaXterm for SSH on Windows">Setting up MobaXterm for SSH on Windows</a></h3>
+            <p>How to set up MobaXterm and why you should <a href="/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/"> Continue reading</a></p>
           </div><!-- /.read-more-content -->
         
         <div class="read-more-list">
           
             <div class="list-item">
-              <h4><a href="/2014/07/07/running-a-vps-log-4/" title="Running a VPS: Log 4">Running a VPS: Log 4</a></h4>
-              <span>Published on July 07, 2014</span>
+              <h4><a href="/2014/07/10/running-a-vps-log-5/" title="Running a VPS: Log 5">Running a VPS: Log 5</a></h4>
+              <span>Published on July 10, 2014</span>
             </div><!-- /.list-item -->
           
             <div class="list-item">
-              <h4><a href="/2014/06/24/running-a-vps-log-2/" title="Running a VPS: Log 2">Running a VPS: Log 2</a></h4>
-              <span>Published on June 24, 2014</span>
+              <h4><a href="/2014/07/07/running-a-vps-log-4/" title="Running a VPS: Log 4">Running a VPS: Log 4</a></h4>
+              <span>Published on July 07, 2014</span>
             </div><!-- /.list-item -->
           
         </div><!-- /.read-more-list -->
@@ -277,26 +276,9 @@ If you cared enough to read that far, you should consider following me on <a hre
 	        
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<!--
 <script src="/javascripts/octopress.js" type="text/javascript"></script>
--->
 <script src="/javascripts/scripts.min.js"></script>
-<!-- RESET THE NET -->
-<script src="//fightforthefuture.github.io/reset-the-net-widget/widget/rtn.js" async></script>
-<!--
-<script type="text/javascript">
-   window._idl = {};
-   _idl.variant = "modal";
-   _idl.campaign = "reset-the-net";
-   (function() {
-     var idl = document.createElement('script');
-     idl.type = 'text/javascript';
-     idl.async = true;
-     idl.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'members.internetdefenseleague.org/include/?url= ' + (_idl.url || '') + '&campaign=' + (_idl.campaign || '') + '&variant=' + (_idl.variant || 'modal');
-     document.getElementsByTagName('body')[0].appendChild(idl);
-   })();
-</script>
--->
+&#8211;>
 
   <script type="text/javascript">
     var _gaq = _gaq || [];

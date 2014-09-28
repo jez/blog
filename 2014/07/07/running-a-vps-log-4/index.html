@@ -137,7 +137,7 @@
 
 <h3><code>telnet</code></h3>
 
-<p>As I mentioned in my <a href="/2014/07/04/running-a-vps-log-3">last log</a>, I&rsquo;ve been using three basic tools to connect to and test my mail server. While a graphical client might have a few tools for debugging a faulty connection&mdash;Mail.app&rsquo;s <a href="http://support.apple.com/kb/PH14945">Connection Doctor</a> comes to mind&mdash;they don&rsquo;t usually afford full control to the debugger.</p>
+<p>As I mentioned in my <a href="/2014/07/04/running-a-vps-log-3">last log</a>, I&rsquo;ve been using three basic tools to connect to and test my mail server. While a graphical client might have a few tools for debugging a faulty connection&ndash;Mail.app&rsquo;s <a href="http://support.apple.com/kb/PH14945">Connection Doctor</a> comes to mind&ndash;they don&rsquo;t usually afford full control to the debugger.</p>
 
 <p>This is where some truly powerful command line tools come into play, the first of which is <code>telnet</code>. Telnet opens up a text-based communication channel between you and a server; once connected, you can ask the server anything. SMTP is the broken part of my server, so I&rsquo;ll focus exclusively on examples dealing with connecting on SMTP ports. That being said, these tools are meant to be general purpose and should work for any type of service or port you can think of which exposes a textual interface.</p>
 
@@ -318,24 +318,19 @@
 
 <p>Every error message that I got said the same thing: connection refused. But it only said connection refused on ports 465 and 587, ports that are expecting to receive communication over an encrypted channel. This means one of two things: my firewall is blocking the connection, which I&rsquo;ve already ruled out, or some other middle-man is kicking me out before we even get to Postfix, where something would show up in the logs.</p>
 
-<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.</p>
-
-<br>
-
+<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.
+<br></p>
 
 <p><a class="image-link" href="/images/mail-dns-1.png"><img src="/images/mail-dns-1.png"></a></p>
 
-<br>
-
-
-<p>I think that the confusion is in the multiple uses of the <code>@</code> domain. Taking a scrutinous look at the differences between my setup and the <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">tutorial</a> I&rsquo;ve been working out of, the one glaring difference is that his mail is set up on a subdomain whereas I wanted my mail to be set up on the apex domain. I thought that I made the necessary changes to my setup to get this to work, but now I&rsquo;m not so sure.</p>
+<p><br>
+I think that the confusion is in the multiple uses of the <code>@</code> domain. Taking a scrutinous look at the differences between my setup and the <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">tutorial</a> I&rsquo;ve been working out of, the one glaring difference is that his mail is set up on a subdomain whereas I wanted my mail to be set up on the apex domain. I thought that I made the necessary changes to my setup to get this to work, but now I&rsquo;m not so sure.</p>
 
 <p>It&rsquo;s also quite possible that I&rsquo;m completely off the mark with this diagnosis. The world of mail servers is a murky place; certainly one that I don&rsquo;t understand that well after only two weeks. But it has been a very rewarding experience so far, and I&rsquo;d like to see if I can&rsquo;t fix this issue.</p>
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -360,23 +355,23 @@ If you cared enough to read that far, you should consider following me on <a hre
       <div class="read-more">
         
           <div class="read-more-header">
-            <a href="/2014/07/10/running-a-vps-log-5/" class="btn">Read More</a>
+            <a href="/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/" class="btn">Read More</a>
           </div><!-- /.read-more-header -->
           <div class="read-more-content">
-            <h3><a href="/2014/07/10/running-a-vps-log-5/" title="Running a VPS: Log 5">Running a VPS: Log 5</a></h3>
-            <p>It's not you, it's me. <a href="/2014/07/10/running-a-vps-log-5/"> Continue reading</a></p>
+            <h3><a href="/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/" title="Setting up MobaXterm for SSH on Windows">Setting up MobaXterm for SSH on Windows</a></h3>
+            <p>How to set up MobaXterm and why you should <a href="/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/"> Continue reading</a></p>
           </div><!-- /.read-more-content -->
         
         <div class="read-more-list">
           
             <div class="list-item">
-              <h4><a href="/2014/07/04/running-a-vps-log-3/" title="Running a VPS: Log 3">Running a VPS: Log 3</a></h4>
-              <span>Published on July 04, 2014</span>
+              <h4><a href="/2014/07/10/running-a-vps-log-5/" title="Running a VPS: Log 5">Running a VPS: Log 5</a></h4>
+              <span>Published on July 10, 2014</span>
             </div><!-- /.list-item -->
           
             <div class="list-item">
-              <h4><a href="/2014/06/24/running-a-vps-log-2/" title="Running a VPS: Log 2">Running a VPS: Log 2</a></h4>
-              <span>Published on June 24, 2014</span>
+              <h4><a href="/2014/07/04/running-a-vps-log-3/" title="Running a VPS: Log 3">Running a VPS: Log 3</a></h4>
+              <span>Published on July 04, 2014</span>
             </div><!-- /.list-item -->
           
         </div><!-- /.read-more-list -->
@@ -397,26 +392,9 @@ If you cared enough to read that far, you should consider following me on <a hre
 	        
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<!--
 <script src="/javascripts/octopress.js" type="text/javascript"></script>
--->
 <script src="/javascripts/scripts.min.js"></script>
-<!-- RESET THE NET -->
-<script src="//fightforthefuture.github.io/reset-the-net-widget/widget/rtn.js" async></script>
-<!--
-<script type="text/javascript">
-   window._idl = {};
-   _idl.variant = "modal";
-   _idl.campaign = "reset-the-net";
-   (function() {
-     var idl = document.createElement('script');
-     idl.type = 'text/javascript';
-     idl.async = true;
-     idl.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'members.internetdefenseleague.org/include/?url= ' + (_idl.url || '') + '&campaign=' + (_idl.campaign || '') + '&variant=' + (_idl.variant || 'modal');
-     document.getElementsByTagName('body')[0].appendChild(idl);
-   })();
-</script>
--->
+&#8211;>
 
   <script type="text/javascript">
     var _gaq = _gaq || [];

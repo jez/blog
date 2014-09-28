@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mail | Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/categories/mail/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-08-06T21:02:44-04:00</updated>
+  <updated>2014-09-28T17:57:35-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -47,16 +47,13 @@ can happen to you.<br></p>
 
 <p>I initially thought this project would take 3 days, perhaps a week tops, given that the original title of the tutorial was <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">&ldquo;NSA-Proof Your Email <strong>in 2 Hours</strong>&rdquo;</a>. Somehow, this endeavor has managed to encompass fully two and a half weeks. I&rsquo;m not saying that I&rsquo;ve been working exclusively on this project for that time, and I&rsquo;ve certainly been learning a great deal, but I can feel the marginal returns diminishing as time marches ever forward. As much as I hate to admit it, <strong>the summer is already half-way over</strong> for CMU students, and there are still so many technologies, projects, and gadgets that I want to sink my teeth into.</p>
 
-<p>Another remark about &ldquo;being a sysadmin&rdquo;: it&rsquo;s stressful! I would be working on fixing something while ssh'ed in to my droplet, and I could see the stream of spammers and attackers trying to get through on random ports. While I had the appropriate firewall protections in place, it&rsquo;s thoughts like these that making falling asleep harder: &ldquo;What if I&rsquo;ve missed something? What if my system is critically vulnerable? How long do I have before everything comes crashing down?&rdquo; Stress culture aside, this is not a weight I want to shoulder regularly.</p>
+<p>Another remark about &ldquo;being a sysadmin&rdquo;: it&rsquo;s stressful! I would be working on fixing something while ssh&#8217;ed in to my droplet, and I could see the stream of spammers and attackers trying to get through on random ports. While I had the appropriate firewall protections in place, it&rsquo;s thoughts like these that making falling asleep harder: &ldquo;What if I&rsquo;ve missed something? What if my system is critically vulnerable? How long do I have before everything comes crashing down?&rdquo; Stress culture aside, this is not a weight I want to shoulder regularly.</p>
 
 <h2>Do you think we can still be friends?</h2>
 
-<p>Ultimately, I had to make the choice to put this project on the back burner. That does not mean, however, that its flame has been snuffed entirely. This project has been incredibly rewarding, and I&rsquo;m still crazy-determined to get this system working. I mentioned before how &ldquo;privately rewarding&rdquo; it can be to serve one&rsquo;s own mail&mdash;I&rsquo;ve as of yet only had a taste of this goal, and I will return one day to reap it&rsquo;s full rewards. When this day will be, though, I&rsquo;m not sure.</p>
+<p>Ultimately, I had to make the choice to put this project on the back burner. That does not mean, however, that its flame has been snuffed entirely. This project has been incredibly rewarding, and I&rsquo;m still crazy-determined to get this system working. I mentioned before how &ldquo;privately rewarding&rdquo; it can be to serve one&rsquo;s own mail&ndash;I&rsquo;ve as of yet only had a taste of this goal, and I will return one day to reap it&rsquo;s full rewards. When this day will be, though, I&rsquo;m not sure.</p>
 
-<br>
-
-
-
+<p><br></p>
 
 <div style="text-align: right;"><h4>Farewell.</h4></div>
 
@@ -69,7 +66,7 @@ can happen to you.<br></p>
 <br>
 ### Jake on the Web
 <a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I'd love to hear what you think about what I've managed to put together, so feel free to comment, tweet at me, or send me an email.
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
  [t]: http://www.twitter.com/Z1MM32M4N/
  [g]: http://www.github.com/Z1MM32M4N/
  [h]: http://www.zimmerman.io/
@@ -91,13 +88,13 @@ If you cared enough to read that far, you should consider following me on [Twitt
 
 <h3><code>telnet</code></h3>
 
-<p>As I mentioned in my <a href="/2014/07/04/running-a-vps-log-3">last log</a>, I&rsquo;ve been using three basic tools to connect to and test my mail server. While a graphical client might have a few tools for debugging a faulty connection&mdash;Mail.app&rsquo;s <a href="http://support.apple.com/kb/PH14945">Connection Doctor</a> comes to mind&mdash;they don&rsquo;t usually afford full control to the debugger.</p>
+<p>As I mentioned in my <a href="/2014/07/04/running-a-vps-log-3">last log</a>, I&rsquo;ve been using three basic tools to connect to and test my mail server. While a graphical client might have a few tools for debugging a faulty connection&ndash;Mail.app&rsquo;s <a href="http://support.apple.com/kb/PH14945">Connection Doctor</a> comes to mind&ndash;they don&rsquo;t usually afford full control to the debugger.</p>
 
 <p>This is where some truly powerful command line tools come into play, the first of which is <code>telnet</code>. Telnet opens up a text-based communication channel between you and a server; once connected, you can ask the server anything. SMTP is the broken part of my server, so I&rsquo;ll focus exclusively on examples dealing with connecting on SMTP ports. That being said, these tools are meant to be general purpose and should work for any type of service or port you can think of which exposes a textual interface.</p>
 
 <p>On a working mail server, we should be able to have the following dialog with the server:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>telnet </span></figcaption>
+<p><figure class='code'><figcaption><span>telnet </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -135,7 +132,7 @@ If you cared enough to read that far, you should consider following me on [Twitt
 </span><span class='line'>  250-STARTTLS
 </span><span class='line'>  250 DSN&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p></blockquote>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></p></blockquote>
 
 <p>A few notes:</p>
 
@@ -163,9 +160,9 @@ If you cared enough to read that far, you should consider following me on [Twitt
 
 <p>The syntax of the command looks like this:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>s_client </span></figcaption>
+<p><figure class='code'><figcaption><span>s_client </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ openssl s_client -connect &lt;host>:&lt;port> [options]</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ openssl s_client -connect &lt;host>:&lt;port> [options]</span></code></pre></td></tr></table></div></figure></p>
 
 <p>This client becomes particularly important, because one Postfix option I&rsquo;ve specified in the file <code>/etc/postfix/main.cf</code> is <code>smtpd_tls_auth_only = yes</code>. What this means is that Postfix won&rsquo;t send the line <code>250-AUTH PLAIN LOGIN</code> unless we&rsquo;re running on a secure connection. Merely using <code>telnet</code> to connect on port 25 will not initiate a secure connection.</p>
 
@@ -198,10 +195,10 @@ If you cared enough to read that far, you should consider following me on [Twitt
 <p><a class="image-link" href="/images/smtp-connection-refused-1.png"><img src="/images/smtp-connection-refused-1.png"></a></p>
 
 <ul>
-<li>I could connect to port 25 using <code>telnet</code> <strong>from my server</strong> (<code>telnet localhost 25</code> after ssh'ing)
+<li>I could connect to port 25 using <code>telnet</code> <strong>from my server</strong> (<code>telnet localhost 25</code> after ssh&#8217;ing)
 
 <ul>
-<li>This meant that I could send emails, because I had set <code>permit_mynetworks</code> as one of the values under <code>smtpd_recipient_restrictions</code> (i.e., you don&rsquo;t have to authenticate if you&rsquo;ve already ssh'ed in)</li>
+<li>This meant that I could send emails, because I had set <code>permit_mynetworks</code> as one of the values under <code>smtpd_recipient_restrictions</code> (i.e., you don&rsquo;t have to authenticate if you&rsquo;ve already ssh&#8217;ed in)</li>
 </ul>
 </li>
 <li>I could connect to port 25 using <code>s_client</code> and initiate a STARTTLS command <strong>from my server</strong>
@@ -225,7 +222,7 @@ If you cared enough to read that far, you should consider following me on [Twitt
 
 <p>I have a few ideas on why my server won&rsquo;t let me in. I know for sure that it&rsquo;s not a firewall issue; I have all the requisite ports (25/465/587 and 143/993) open.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>ufw Firewall Settings </span></figcaption>
+<p><figure class='code'><figcaption><span>ufw Firewall Settings </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -271,23 +268,19 @@ If you cared enough to read that far, you should consider following me on [Twitt
 </span><span class='line'>143                        ALLOW       Anywhere (v6)
 </span><span class='line'>465/tcp                    ALLOW       Anywhere (v6)
 </span><span class='line'>993                        ALLOW       Anywhere (v6)
-</span><span class='line'>587/tcp                    ALLOW       Anywhere (v6)</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'>587/tcp                    ALLOW       Anywhere (v6)</span></code></pre></td></tr></table></div></figure></p>
 
 <p>It could be an issue with my certificates. Because I&rsquo;m cheap and didn&rsquo;t want to pay excessive amounts of money for a fun summer experiment, I decided to self-sign my SSL certificates. (This means that while my traffic will be encrypted, people who try to connect to my server can&rsquo;t necessarily trust that I am who I say I am. It&rsquo;s the same reason why we have notaries to verify our signatures.) I&rsquo;m skeptical that this could be the reason, though, because nothing was showing up in the logs. If it had been a certificate error, it would have almost certainly shown up in the logs at some point.</p>
 
 <p>Every error message that I got said the same thing: connection refused. But it only said connection refused on ports 465 and 587, ports that are expecting to receive communication over an encrypted channel. This means one of two things: my firewall is blocking the connection, which I&rsquo;ve already ruled out, or some other middle-man is kicking me out before we even get to Postfix, where something would show up in the logs.</p>
 
-<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.</p>
-
-<br>
-
+<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.
+<br></p>
 
 <p><a class="image-link" href="/images/mail-dns-1.png"><img src="/images/mail-dns-1.png"></a></p>
 
-<br>
-
-
-<p>I think that the confusion is in the multiple uses of the <code>@</code> domain. Taking a scrutinous look at the differences between my setup and the <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">tutorial</a> I&rsquo;ve been working out of, the one glaring difference is that his mail is set up on a subdomain whereas I wanted my mail to be set up on the apex domain. I thought that I made the necessary changes to my setup to get this to work, but now I&rsquo;m not so sure.</p>
+<p><br>
+I think that the confusion is in the multiple uses of the <code>@</code> domain. Taking a scrutinous look at the differences between my setup and the <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">tutorial</a> I&rsquo;ve been working out of, the one glaring difference is that his mail is set up on a subdomain whereas I wanted my mail to be set up on the apex domain. I thought that I made the necessary changes to my setup to get this to work, but now I&rsquo;m not so sure.</p>
 
 <p>It&rsquo;s also quite possible that I&rsquo;m completely off the mark with this diagnosis. The world of mail servers is a murky place; certainly one that I don&rsquo;t understand that well after only two weeks. But it has been a very rewarding experience so far, and I&rsquo;d like to see if I can&rsquo;t fix this issue.</p>
 
@@ -295,7 +288,7 @@ If you cared enough to read that far, you should consider following me on [Twitt
 <br>
 ### Jake on the Web
 <a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I'd love to hear what you think about what I've managed to put together, so feel free to comment, tweet at me, or send me an email.
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
  [t]: http://www.twitter.com/Z1MM32M4N/
  [g]: http://www.github.com/Z1MM32M4N/
  [h]: http://www.zimmerman.io/
@@ -332,17 +325,17 @@ If you cared enough to read that far, you should consider following me on [Twitt
 <p>Apparently, my issue was that DigitalOcean doesn&rsquo;t initialize freshly created Debian 7 droplets with the most recent kernel. Unfortunately libfuse, a library used by EncFS to create and manage the encrypted file system, was expecting a more up-to-date kernel version.</p>
 
 <p>Upgrading my kernel version was just a few steps, though. I had to run
-<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Upgrade Kernel </span></figcaption>
+<figure class='code'><figcaption><span>Upgrade Kernel </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo apt-get update
 </span><span class='line'><span class="nv">$ </span>sudp apt-get upgrade
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+</span></code></pre></td></tr></table></div></figure>
 to update the list of downloaded kernels, then
-<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Restart </span></figcaption>
+<figure class='code'><figcaption><span>Restart </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo shutdown -h now
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+</span></code></pre></td></tr></table></div></figure>
 to tell the server to shutdown and power off. Next up is to switch over the kernel version on the <a href="https://www.digitalocean.com/community/tutorials/how-to-update-a-digitalocean-server-s-kernel-using-the-control-panel">DigitalOcean control panel</a>. All in all, nothing too difficult: the hardest part was that I never expected my problem to have anything to do with DigitalOcean.</p>
 
 <h2>Postfix &amp; Dovecot</h2>
@@ -362,7 +355,7 @@ to tell the server to shutdown and power off. Next up is to switch over the kern
 <p>IMAP on my setup works fine, so I&rsquo;ll give some pointers about setting it up correctly:</p>
 
 <ul>
-<li><strong>Email Address</strong> or <strong>Username</strong>: Fields that ask for this information should always include a full email address&mdash;in my case <code>jake@zimmerman.io</code>. This is because our MySQL server is configured to store the full address, so Dovecot needs a full address to use to for IMAP authentication.</li>
+<li><strong>Email Address</strong> or <strong>Username</strong>: Fields that ask for this information should always include a full email address&ndash;in my case <code>jake@zimmerman.io</code>. This is because our MySQL server is configured to store the full address, so Dovecot needs a full address to use to for IMAP authentication.</li>
 <li><strong>Password</strong>: This is the password coupled with the email address referenced above, which was SHA512-hashed and stored in the database.</li>
 <li><strong>Incoming</strong> or <strong>IMAP Mail Server</strong>: Whatever is in this field needs to eventually resolve to the IP address of our IMAP server. Simply putting the server&rsquo;s IP address directly into this field will suffice. To be more sophisticated though, we&rsquo;ll want to configure this field with a domain name and let our client resolve it, as this is more robust. There are a few ways this can be done; to give a quick overview, you can either set up
 
@@ -390,7 +383,7 @@ to tell the server to shutdown and power off. Next up is to switch over the kern
 <br>
 ### Jake on the Web
 <a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I'd love to hear what you think about what I've managed to put together, so feel free to comment, tweet at me, or send me an email.
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
  [t]: http://www.twitter.com/Z1MM32M4N/
  [g]: http://www.github.com/Z1MM32M4N/
  [h]: http://www.zimmerman.io/

@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-08-06T21:02:44-04:00</updated>
+  <updated>2014-09-28T17:57:35-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,94 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Setting Up MobaXterm for SSH on Windows]]></title>
+    <link href="http://blog.zimmerman.io/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/"/>
+    <updated>2014-09-28T14:11:05-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows</id>
+    <content type="html"><![CDATA[<p>For an optimal SSH experience, your best best is to use Linux or Mac OS X. However, if you&rsquo;re dead-set on using Windows, MobaXterm has the best overall experience. This post guides you through setting it up and outlines some of its coolest features.</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<h2>Download and Install</h2>
+
+<p>The download and installation procedure for MobaXterm is pretty standard.</p>
+
+<h3>1. Navigate to MobaXterm&rsquo;s Site</h3>
+
+<p>You&rsquo;ll want to download the Home Edition, so find its link on the download page, or just go <a href="http://mobaxterm.mobatek.net/download-home-edition.html">here</a>. You&rsquo;ll see two options: one to install as a system-wide application (labelled &ldquo;installer&rdquo;), and one for installing to a flash drive (labelled &ldquo;portable edition&rdquo;). Unless you&rsquo;d really like to install to a flash drive, click the former and run the file once it&rsquo;s downloaded.</p>
+
+<h3>2. Install</h3>
+
+<p>I had trouble running the installer when I first downloaded it; Windows complained that the app was from an unrecognized publisher, so I had to click &ldquo;More info&rdquo; and then &ldquo;Run anyway&rdquo; to get the installer to run (this was on Windows 8, the process might be different if you run into this issue).</p>
+
+<p>Installing MobaXterm is simple. Just click through all the menus; no special setup is required here.</p>
+
+<h3>3. Configure Your SSH Session</h3>
+
+<p>When you first log in, you&rsquo;ll see a prompt where you can directly SSH as you would on a normal terminal.</p>
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/mobaxterm-ssh.png"><img src="http://blog.zimmerman.io/images/mobaxterm-ssh.png" title="SSH Prompt" ></a></p>
+
+<p>If you type <code>ssh &lt;andrewid&gt;@unix.andrew.cmu.edu</code>, it will prompt you for your CMU password and then log you in. The program will also ask if you want to save your password. In the free version, it doesn&rsquo;t allow you to encrypt your stored passwords with a master password, so they&rsquo;re stored in the clear (this means anyone can read these if they got control of your computer). With this in mind, it&rsquo;s not a good idea to allow it to save your password, but I suppose no one&rsquo;s stopping you.</p>
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/mobaxterm-password.png"><img src="http://blog.zimmerman.io/images/mobaxterm-password.png" title="Save Password Prompt" ></a></p>
+
+<p>This process of typing out your username and hostname every time you want to SSH can get annoying, though. MobaXterm allows you to save sessions so that you can easily log in without typing <code>ssh &lt;andrewid&gt;@unix.andrew.cmu.edu</code> each time.</p>
+
+<p>To create a new session, click the &ldquo;Session&rdquo; button in the top left.</p>
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/mobaxterm-new-session.png"><img src="http://blog.zimmerman.io/images/mobaxterm-new-session.png" title="New Session" ></a></p>
+
+<p>Then you&rsquo;ll see a screen that allows you to enter the settings for that session.</p>
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/mobaxterm-configure-session.png"><img src="http://blog.zimmerman.io/images/mobaxterm-configure-session.png" title="Configure New Session" ></a></p>
+
+<p>The fields and values you&rsquo;ll need to populate are:</p>
+
+<ul>
+<li><strong>Remote host</strong>: <code>unix.andrew.cmu.edu</code></li>
+<li><strong>Specify username</strong>: check the box, then <code>&lt;Your-AndrewID&gt;</code></li>
+<li><strong>Port</strong>: 22</li>
+</ul>
+
+
+<p>You can also choose a bunch of other settings for this session. Feel free to peruse them and see if there&rsquo;s something you want to change (note that these settings will only be used when you use this session to log in). You might want to change the &ldquo;Session name&rdquo; to something more concise.</p>
+
+<p>After that, click &ldquo;OK&rdquo; and your session will appear in the panel on the left under &ldquo;Saved sessions&rdquo;.</p>
+
+<h3>4. Cool MobaXterm features</h3>
+
+<p>This section lists a few features that MobaXterm does better than other SSH options like PuTTY.</p>
+
+<p>First, MobaXterm has tabs and splits, which make managing your connections to a remote server much more enjoyable.</p>
+
+<p>MobaXterm also has more sophisticated color options. Granted, it&rsquo;s still not as good as most Linux or Mac OS X terminal emulators. Out of the box, the colors are more pleasant than the default PuTTY color scheme. There are also 4 other pre-installed colors schemes, including <a href="http://ethanschoonover.com/solarized">Solarized Light and Solarized Dark</a>.</p>
+
+<p>I can&rsquo;t emphasize enough how much of a different having a &ldquo;pretty&rdquo; terminal is. Given the amount of time you&rsquo;ll be spending in your terminal, being able to read its text is a must. Also check out the rest of the settings. There will very likely be a few things you&rsquo;d like to tweak that make the interface make more sense to you, which in turn will make you less frustrated when trying to get work done.</p>
+
+<p>MobaXterm comes with a built in SCP client. This means you can transfer files between your remote server (like Andrew Unix) and your personal computer with the simplicity of a graphical, click and drag interface if you prefer. This is an alternative to WinSCP that&rsquo;s built into MobaXterm.</p>
+
+<p>It also has a built in X server, which means that you can start programs on the remote host that have graphical displays. For example, this is useful if you have an assignment that requires you to write a program that manipulates images and view the results.</p>
+
+<h2>Shameless Plug</h2>
+
+<p>While all these features are great, ssh is a program that was meant to be used on Unix-based systems. I personally switched from Windows + Ubuntu to Mac OS X before coming to college, and it was one of the best decisions I made. If Mac OS X is a bit much for you, though, I strongly encourage you to install Linux, using either a VM or a dual-boot configuration. Doing programming and development work in a Linux environment makes nearly every task simpler than trying to do it on Windows.</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Running a VPS: Log 5]]></title>
@@ -51,12 +139,9 @@ can happen to you.<br></p>
 
 <h2>Do you think we can still be friends?</h2>
 
-<p>Ultimately, I had to make the choice to put this project on the back burner. That does not mean, however, that its flame has been snuffed entirely. This project has been incredibly rewarding, and I&rsquo;m still crazy-determined to get this system working. I mentioned before how &ldquo;privately rewarding&rdquo; it can be to serve one&rsquo;s own mail&mdash;I&rsquo;ve as of yet only had a taste of this goal, and I will return one day to reap it&rsquo;s full rewards. When this day will be, though, I&rsquo;m not sure.</p>
+<p>Ultimately, I had to make the choice to put this project on the back burner. That does not mean, however, that its flame has been snuffed entirely. This project has been incredibly rewarding, and I&rsquo;m still crazy-determined to get this system working. I mentioned before how &ldquo;privately rewarding&rdquo; it can be to serve one&rsquo;s own mail&ndash;I&rsquo;ve as of yet only had a taste of this goal, and I will return one day to reap it&rsquo;s full rewards. When this day will be, though, I&rsquo;m not sure.</p>
 
-<br>
-
-
-
+<p><br></p>
 
 <div style="text-align: right;"><h4>Farewell.</h4></div>
 
@@ -67,8 +152,7 @@ can happen to you.<br></p>
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -91,7 +175,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h3><code>telnet</code></h3>
 
-<p>As I mentioned in my <a href="http://blog.zimmerman.io/2014/07/04/running-a-vps-log-3">last log</a>, I&rsquo;ve been using three basic tools to connect to and test my mail server. While a graphical client might have a few tools for debugging a faulty connection&mdash;Mail.app&rsquo;s <a href="http://support.apple.com/kb/PH14945">Connection Doctor</a> comes to mind&mdash;they don&rsquo;t usually afford full control to the debugger.</p>
+<p>As I mentioned in my <a href="http://blog.zimmerman.io/2014/07/04/running-a-vps-log-3">last log</a>, I&rsquo;ve been using three basic tools to connect to and test my mail server. While a graphical client might have a few tools for debugging a faulty connection&ndash;Mail.app&rsquo;s <a href="http://support.apple.com/kb/PH14945">Connection Doctor</a> comes to mind&ndash;they don&rsquo;t usually afford full control to the debugger.</p>
 
 <p>This is where some truly powerful command line tools come into play, the first of which is <code>telnet</code>. Telnet opens up a text-based communication channel between you and a server; once connected, you can ask the server anything. SMTP is the broken part of my server, so I&rsquo;ll focus exclusively on examples dealing with connecting on SMTP ports. That being said, these tools are meant to be general purpose and should work for any type of service or port you can think of which exposes a textual interface.</p>
 
@@ -272,24 +356,19 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <p>Every error message that I got said the same thing: connection refused. But it only said connection refused on ports 465 and 587, ports that are expecting to receive communication over an encrypted channel. This means one of two things: my firewall is blocking the connection, which I&rsquo;ve already ruled out, or some other middle-man is kicking me out before we even get to Postfix, where something would show up in the logs.</p>
 
-<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.</p>
-
-<br>
-
+<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.
+<br></p>
 
 <p><a class="image-link" href="http://blog.zimmerman.io/images/mail-dns-1.png"><img src="http://blog.zimmerman.io/images/mail-dns-1.png"></a></p>
 
-<br>
-
-
-<p>I think that the confusion is in the multiple uses of the <code>@</code> domain. Taking a scrutinous look at the differences between my setup and the <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">tutorial</a> I&rsquo;ve been working out of, the one glaring difference is that his mail is set up on a subdomain whereas I wanted my mail to be set up on the apex domain. I thought that I made the necessary changes to my setup to get this to work, but now I&rsquo;m not so sure.</p>
+<p><br>
+I think that the confusion is in the multiple uses of the <code>@</code> domain. Taking a scrutinous look at the differences between my setup and the <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">tutorial</a> I&rsquo;ve been working out of, the one glaring difference is that his mail is set up on a subdomain whereas I wanted my mail to be set up on the apex domain. I thought that I made the necessary changes to my setup to get this to work, but now I&rsquo;m not so sure.</p>
 
 <p>It&rsquo;s also quite possible that I&rsquo;m completely off the mark with this diagnosis. The world of mail servers is a murky place; certainly one that I don&rsquo;t understand that well after only two weeks. But it has been a very rewarding experience so far, and I&rsquo;d like to see if I can&rsquo;t fix this issue.</p>
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -363,7 +442,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 <p>IMAP on my setup works fine, so I&rsquo;ll give some pointers about setting it up correctly:</p>
 
 <ul>
-<li><strong>Email Address</strong> or <strong>Username</strong>: Fields that ask for this information should always include a full email address&mdash;in my case <code>jake@zimmerman.io</code>. This is because our MySQL server is configured to store the full address, so Dovecot needs a full address to use to for IMAP authentication.</li>
+<li><strong>Email Address</strong> or <strong>Username</strong>: Fields that ask for this information should always include a full email address&ndash;in my case <code>jake@zimmerman.io</code>. This is because our MySQL server is configured to store the full address, so Dovecot needs a full address to use to for IMAP authentication.</li>
 <li><strong>Password</strong>: This is the password coupled with the email address referenced above, which was SHA512-hashed and stored in the database.</li>
 <li><strong>Incoming</strong> or <strong>IMAP Mail Server</strong>: Whatever is in this field needs to eventually resolve to the IP address of our IMAP server. Simply putting the server&rsquo;s IP address directly into this field will suffice. To be more sophisticated though, we&rsquo;ll want to configure this field with a domain name and let our client resolve it, as this is more robust. There are a few ways this can be done; to give a quick overview, you can either set up
 
@@ -389,8 +468,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -423,7 +501,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <p>But then I remembered: DigitalOcean is automatically backing up my droplet! After logging into the web interface, all I had to do was click a button and my whole system was reset to the way it looked 24 hours prior. It was <em>actually that easy</em>.</p>
 
-<p>Thus, for anyone getting started with a new server, whether it be on DigitalOcean or any other service (even a box you have running in your room), I cannot stress enough the value of automatic&mdash;or at least regular&mdash;backups. Not only is this a good idea to preserve data in the event of an outage, but it lends a seemingly unbounded ability to mess around and tinker.</p>
+<p>Thus, for anyone getting started with a new server, whether it be on DigitalOcean or any other service (even a box you have running in your room), I cannot stress enough the value of automatic&ndash;or at least regular&ndash;backups. Not only is this a good idea to preserve data in the event of an outage, but it lends a seemingly unbounded ability to mess around and tinker.</p>
 
 <p>What this means is that you get all the fun of learning cool, new Linux-y things, but without ever having to worry about whether you&rsquo;ll break the whole system. Sure, this mindset isn&rsquo;t necessarily the best to adopt for a production machine, but for my circumstances, all I want is free reign to experiment and break things to my heart&rsquo;s content.</p>
 
@@ -435,8 +513,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -505,14 +582,13 @@ If you cared enough to read that far, you should consider following me on <a hre
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Voilà! After that, I had my sick bash prompt, my <a href="http://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law/">snazzy update function</a>, my delightful vim colorscheme, solarized dir colors&mdash;the list goes on and on.</p>
+<p>Voilà! After that, I had my sick bash prompt, my <a href="http://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law/">snazzy update function</a>, my delightful vim colorscheme, solarized dir colors&ndash;the list goes on and on.</p>
 
 <p>Sure, it&rsquo;s taken a bit of effort to get the point where I can run these commands and have it Just Work, but doing that work once means that from now on, whenever I sit down at a new work computer, a new VPS, a new laptop, or some other workstation, I&rsquo;m only a few commands away from my favorite settings.</p>
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -585,11 +661,11 @@ If you cared enough to read that far, you should consider following me on <a hre
 <p>Inspired in part by the <a href="http://www.club.cc.cmu.edu/talks/vps.html">Computer Club talk</a> and in part by my inability to do anything quickly on a raspberry pi, I recently decided to rent out a VPS from DigitalOcean. Read on for notes and ramblings about what I&rsquo;m using it for.</p>
 
 <ul>
-<li><a href="http://blog.zimmerman.io/2014/06/19/running-a-vps-log-0/">Running a VPS: Log 0 &ndash; Initial Setup</a></li>
-<li><a href="http://blog.zimmerman.io/2014/06/19/running-a-vps-log-1/">Running a VPS: Log 1 &ndash; Managing Dotfiles Across Machines</a></li>
-<li><a href="http://blog.zimmerman.io/2014/06/24/running-a-vps-log-2/">Running a VPS: Log 2 &ndash; Seriously: Back It Up</a></li>
-<li><a href="http://blog.zimmerman.io/2014/07/04/running-a-vps-log-3/">Running a VPS: Log 3 &ndash; A Mail Server that Works… Kind of.</a></li>
-<li><a href="http://blog.zimmerman.io/2014/07/07/running-a-vps-log-4/">Running a VPS: Log 4 &ndash; Debugging a Broken Mail Server</a></li>
+<li><a href="http://blog.zimmerman.io/2014/06/19/running-a-vps-log-0/">Running a VPS: Log 0 - Initial Setup</a></li>
+<li><a href="http://blog.zimmerman.io/2014/06/19/running-a-vps-log-1/">Running a VPS: Log 1 - Managing Dotfiles Across Machines</a></li>
+<li><a href="http://blog.zimmerman.io/2014/06/24/running-a-vps-log-2/">Running a VPS: Log 2 - Seriously: Back It Up</a></li>
+<li><a href="http://blog.zimmerman.io/2014/07/04/running-a-vps-log-3/">Running a VPS: Log 3 - A Mail Server that Works… Kind of.</a></li>
+<li><a href="http://blog.zimmerman.io/2014/07/07/running-a-vps-log-4/">Running a VPS: Log 4 - Debugging a Broken Mail Server</a></li>
 </ul>
 
 
@@ -618,8 +694,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -644,7 +719,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <blockquote><p>&ldquo;JavaScript is both the most popular and unpopular programming language.&rdquo;</p>
 
-<p>&mdash; Doug Crockford</p></blockquote>
+<p>&ndash; Doug Crockford</p></blockquote>
 
 <p>From there, as you might imagine, the reactions from a predominantly C++ oriented audience towards JavaScript&rsquo;s quirks were pretty amusing. There are some significant differences between these two languages, and if you&rsquo;re not careful, they can get annoying quite quickly.</p>
 
@@ -664,8 +739,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -818,8 +892,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -852,8 +925,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -880,7 +952,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h2>Less to Sass</h2>
 
-<p>The HPSTR theme was originally built using Less to compile its stylesheets. Octopress uses Sass under Compass instead&mdash;a decision which I love: the rich library of plugins that Compass provides is ridiculous. Thus, this was the first step of the port.</p>
+<p>The HPSTR theme was originally built using Less to compile its stylesheets. Octopress uses Sass under Compass instead&ndash;a decision which I love: the rich library of plugins that Compass provides is ridiculous. Thus, this was the first step of the port.</p>
 
 <p>After a quick Google search I stumbled upon <a href="http://stackoverflow.com/questions/14970224/anyone-know-of-a-good-way-to-convert-from-less-to-sass">this question</a> on Stack Overflow, which surprisingly took care of the vast majority of the conversion, leveraging mere text replacement. From there, it was mostly a matter of slugging through the Less docs to find out what a particular function did, jumping over to the Compass/Sass docs to find a corresponding mixin, and repeating.</p>
 
@@ -910,8 +982,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -993,8 +1064,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -1021,7 +1091,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h2>The Hard Way</h2>
 
-<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#109;&#x61;&#x69;&#x6c;&#116;&#x6f;&#58;&#112;&#114;&#x69;&#x6e;&#x74;&#64;&#115;&#99;&#111;&#116;&#116;&#x79;&#x6c;&#x61;&#98;&#x73;&#x2e;&#111;&#114;&#x67;">&#112;&#x72;&#x69;&#x6e;&#116;&#64;&#115;&#x63;&#x6f;&#116;&#x74;&#x79;&#108;&#x61;&#x62;&#115;&#x2e;&#x6f;&#114;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
+<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#x6f;&#58;&#112;&#114;&#x69;&#x6e;&#x74;&#x40;&#115;&#99;&#111;&#116;&#116;&#121;&#108;&#x61;&#x62;&#115;&#x2e;&#x6f;&#x72;&#x67;">&#112;&#x72;&#105;&#110;&#116;&#x40;&#x73;&#99;&#x6f;&#116;&#116;&#x79;&#x6c;&#97;&#98;&#115;&#x2e;&#x6f;&#x72;&#x67;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
 
 <p>Luckily, CMU (and arguably every college) is not terribly notable for keeping up-to-date information on it&rsquo;s website. This means that I got the &ldquo;wonderful&rdquo; opportunity to dig through CUPS documentation, sketchy printer manufacturer websites, and the depths of the Internet to finagle together a solution. Here&rsquo;s to hoping that you have a far more pleasurable experience. Without further ado, these are the steps I went through to get it done.</p>
 
@@ -1052,11 +1122,11 @@ If you cared enough to read that far, you should consider following me on <a hre
 <p>Now that everything is all installed, we can pluck the information we need. If you’re on a standard Linux install, your CUPS files will be in <code>/etc/cups</code>. The specific files that are of interest to us are <code>/etc/cups/printers.conf</code> and <code>/etc/cups/ppd/&lt;your-printer-name&gt;.ppd</code>, so my file is called <code>/etc/cups/ppd/andrew-color.ppd</code>. We need the entire .ppd file, and it will go into the corresponding directory on our server. As for <code>printers.conf</code>, we just need a specific entry. This file is a list of all the installed printers, each wrapped in <code>&lt;Printer your-printer-name&gt;&lt;/Printer&gt;</code> tags. Yank this text however you want from your local computer to the server, and add it to the corresponding <code>printers.conf</code> file. If your personal Linux machine made the <code>&lt;Printer&gt;&lt;/Printer&gt;</code> tags into <code>&lt;DefaultPrinter x&gt;&lt;/DefaultPrinter&gt;</code> tags, go ahead and change this to just <code>&lt;Printer x&gt;&lt;/Printer&gt;</code>. To recap, now I’ve got about 20 lines of additional configuration data added to the <code>printers.conf</code> file on my server, beginning with the line <code>&lt;Printer andrew-color&gt;</code> and ends with the line <code>&lt;/Printer&gt;</code>.</p>
 
 <p>For my installation, I have one more thing to do. Somewhere in the middle of this entry, there is a line which reads something like <code>Filter application/vnd.cups-postscript 0 hpps</code>. CUPS has a filtering functionality that lets you interact with the data before it gets printed, which you can read more about <a href="http://en.wikipedia.org/wiki/CUPS#Filtering_process">here</a>. We want to make sure that we use the <code>foomatic</code> filters (because that&rsquo;s how our server is configured), so we have to change the existing filters so that they read
-<del>
-Filter application/vnd.cups-raw 0 &ndash;
+~~~
+Filter application/vnd.cups-raw 0 -
 Filter application/vnd.cups-postscript 100 foomatic-rip
 Filter application/vnd.cups-pdf 0 foomatic-rip
-</del>
+~~~
 After all this, if you’ve copied the PPD file into the right folder (<code>/etc/cups/ppd/</code>), then you’re all set! Restart CUPS with <code>sudo /etc/init.d/cups restart</code> so that your changes take effect. You can print using <code>lp</code> and the <code>-d</code> flag to specify the print queue you want. Remember that we picked the name “andrew-color” for our print queue above, so a sample <code>lp</code> command would look like this:</p>
 
 <p><code>lp -t ‘My First Color Print Job’ -U jezimmer -d andrew-color /path/to/myfile.pdf</code></p>
@@ -1065,8 +1135,7 @@ After all this, if you’ve copied the PPD file into the right folder (<code>/et
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 
@@ -1115,8 +1184,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <hr />
 
-<br>
-
+<p><br></p>
 
 <h3>Jake on the Web</h3>
 

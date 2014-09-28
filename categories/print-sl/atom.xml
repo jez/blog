@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Print-sl | Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/categories/print-sl/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-08-06T21:02:44-04:00</updated>
+  <updated>2014-09-28T17:57:35-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -32,11 +32,11 @@
 <p>Inspired in part by the <a href="http://www.club.cc.cmu.edu/talks/vps.html">Computer Club talk</a> and in part by my inability to do anything quickly on a raspberry pi, I recently decided to rent out a VPS from DigitalOcean. Read on for notes and ramblings about what I&rsquo;m using it for.</p>
 
 <ul>
-<li><a href="/2014/06/19/running-a-vps-log-0/">Running a VPS: Log 0 &ndash; Initial Setup</a></li>
-<li><a href="/2014/06/19/running-a-vps-log-1/">Running a VPS: Log 1 &ndash; Managing Dotfiles Across Machines</a></li>
-<li><a href="/2014/06/24/running-a-vps-log-2/">Running a VPS: Log 2 &ndash; Seriously: Back It Up</a></li>
-<li><a href="/2014/07/04/running-a-vps-log-3/">Running a VPS: Log 3 &ndash; A Mail Server that Works… Kind of.</a></li>
-<li><a href="/2014/07/07/running-a-vps-log-4/">Running a VPS: Log 4 &ndash; Debugging a Broken Mail Server</a></li>
+<li><a href="/2014/06/19/running-a-vps-log-0/">Running a VPS: Log 0 - Initial Setup</a></li>
+<li><a href="/2014/06/19/running-a-vps-log-1/">Running a VPS: Log 1 - Managing Dotfiles Across Machines</a></li>
+<li><a href="/2014/06/24/running-a-vps-log-2/">Running a VPS: Log 2 - Seriously: Back It Up</a></li>
+<li><a href="/2014/07/04/running-a-vps-log-3/">Running a VPS: Log 3 - A Mail Server that Works… Kind of.</a></li>
+<li><a href="/2014/07/07/running-a-vps-log-4/">Running a VPS: Log 4 - Debugging a Broken Mail Server</a></li>
 </ul>
 
 
@@ -67,7 +67,7 @@
 <br>
 ### Jake on the Web
 <a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I'd love to hear what you think about what I've managed to put together, so feel free to comment, tweet at me, or send me an email.
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
  [t]: http://www.twitter.com/Z1MM32M4N/
  [g]: http://www.github.com/Z1MM32M4N/
  [h]: http://www.zimmerman.io/
@@ -93,7 +93,7 @@ If you cared enough to read that far, you should consider following me on [Twitt
 
 <h2>The Hard Way</h2>
 
-<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#97;&#x69;&#108;&#116;&#x6f;&#x3a;&#112;&#x72;&#x69;&#110;&#116;&#64;&#115;&#x63;&#111;&#116;&#x74;&#121;&#108;&#x61;&#98;&#x73;&#46;&#x6f;&#x72;&#103;">&#112;&#x72;&#105;&#x6e;&#116;&#64;&#115;&#99;&#111;&#x74;&#x74;&#121;&#108;&#x61;&#x62;&#115;&#x2e;&#x6f;&#x72;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
+<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#109;&#x61;&#x69;&#108;&#x74;&#x6f;&#58;&#112;&#114;&#105;&#110;&#x74;&#x40;&#x73;&#99;&#x6f;&#116;&#116;&#121;&#x6c;&#x61;&#x62;&#x73;&#x2e;&#111;&#x72;&#103;">&#112;&#114;&#105;&#x6e;&#116;&#x40;&#115;&#99;&#111;&#x74;&#116;&#x79;&#108;&#97;&#x62;&#x73;&#x2e;&#x6f;&#x72;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
 
 <p>Luckily, CMU (and arguably every college) is not terribly notable for keeping up-to-date information on it&rsquo;s website. This means that I got the &ldquo;wonderful&rdquo; opportunity to dig through CUPS documentation, sketchy printer manufacturer websites, and the depths of the Internet to finagle together a solution. Here&rsquo;s to hoping that you have a far more pleasurable experience. Without further ado, these are the steps I went through to get it done.</p>
 
@@ -124,11 +124,11 @@ If you cared enough to read that far, you should consider following me on [Twitt
 <p>Now that everything is all installed, we can pluck the information we need. If you’re on a standard Linux install, your CUPS files will be in <code>/etc/cups</code>. The specific files that are of interest to us are <code>/etc/cups/printers.conf</code> and <code>/etc/cups/ppd/&lt;your-printer-name&gt;.ppd</code>, so my file is called <code>/etc/cups/ppd/andrew-color.ppd</code>. We need the entire .ppd file, and it will go into the corresponding directory on our server. As for <code>printers.conf</code>, we just need a specific entry. This file is a list of all the installed printers, each wrapped in <code>&lt;Printer your-printer-name&gt;&lt;/Printer&gt;</code> tags. Yank this text however you want from your local computer to the server, and add it to the corresponding <code>printers.conf</code> file. If your personal Linux machine made the <code>&lt;Printer&gt;&lt;/Printer&gt;</code> tags into <code>&lt;DefaultPrinter x&gt;&lt;/DefaultPrinter&gt;</code> tags, go ahead and change this to just <code>&lt;Printer x&gt;&lt;/Printer&gt;</code>. To recap, now I’ve got about 20 lines of additional configuration data added to the <code>printers.conf</code> file on my server, beginning with the line <code>&lt;Printer andrew-color&gt;</code> and ends with the line <code>&lt;/Printer&gt;</code>.</p>
 
 <p>For my installation, I have one more thing to do. Somewhere in the middle of this entry, there is a line which reads something like <code>Filter application/vnd.cups-postscript 0 hpps</code>. CUPS has a filtering functionality that lets you interact with the data before it gets printed, which you can read more about <a href="http://en.wikipedia.org/wiki/CUPS#Filtering_process">here</a>. We want to make sure that we use the <code>foomatic</code> filters (because that&rsquo;s how our server is configured), so we have to change the existing filters so that they read
-<del>
-Filter application/vnd.cups-raw 0 &ndash;
+~~~
+Filter application/vnd.cups-raw 0 -
 Filter application/vnd.cups-postscript 100 foomatic-rip
 Filter application/vnd.cups-pdf 0 foomatic-rip
-</del>
+~~~
 After all this, if you’ve copied the PPD file into the right folder (<code>/etc/cups/ppd/</code>), then you’re all set! Restart CUPS with <code>sudo /etc/init.d/cups restart</code> so that your changes take effect. You can print using <code>lp</code> and the <code>-d</code> flag to specify the print queue you want. Remember that we picked the name “andrew-color” for our print queue above, so a sample <code>lp</code> command would look like this:</p>
 
 <p><code>lp -t ‘My First Color Print Job’ -U jezimmer -d andrew-color /path/to/myfile.pdf</code></p>
@@ -139,7 +139,7 @@ After all this, if you’ve copied the PPD file into the right folder (<code>/et
 <br>
 ### Jake on the Web
 <a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I'd love to hear what you think about what I've managed to put together, so feel free to comment, tweet at me, or send me an email.
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
  [t]: http://www.twitter.com/Z1MM32M4N/
  [g]: http://www.github.com/Z1MM32M4N/
  [h]: http://www.zimmerman.io/
