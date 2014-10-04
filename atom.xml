@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-09-28T18:08:05-04:00</updated>
+  <updated>2014-10-04T06:15:51-04:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,112 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[My LaTeX Homework Template]]></title>
+    <link href="http://blog.zimmerman.io/2014/10/04/my-latex-homework-template/"/>
+    <updated>2014-10-04T02:03:27-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/10/04/my-latex-homework-template</id>
+    <content type="html"><![CDATA[<p>Writing a LaTeX document from scratch for every assignment is tedious. Especially for homework assignments, a lot of the structure is repetitive. Read on to learn about the homework template I&rsquo;ve adapted for use in all my technical classes.</p>
+
+<!-- more -->
+
+
+<h2>Background</h2>
+
+<p>I&rsquo;ve been using LaTeX for assignments in college for over a year now, and from the get-go I loved it; It&rsquo;s a powerful way to transform plain text (which is editable in Vim!) into beautiful documents. In fact, I use LaTeX + Vim or Google Docs exclusively&ndash;no Microsoft Office. People often don&rsquo;t understand why I prefer this combination, claiming that LaTeX is time consuming and tedious. But with a good template and some Vim-foo, editing LaTeX is a breeze. In a later post, I&rsquo;ll elaborate how I use Vim + Unix as an IDE for LaTeX. For now, though, let&rsquo;s take a look at my template!</p>
+
+<h2><a href="https://github.com/Z1MM32M4N/latex-hw-template">The Template</a></h2>
+
+<p>For those who like to learn by doing, I invite you to <strong><a href="https://github.com/Z1MM32M4N/latex-hw-template">jump over to GitHub</a></strong> where you can see the source, download the template, and start tinkering. The source isn&rsquo;t that long, and it comes with tons of examples to get you going.</p>
+
+<p>The rest of this post goes into some fancy use cases for how to get the best out of this template. If you don&rsquo;t read it now, check it out later if you want to take advantage of it&rsquo;s more powerful features. You can also leave comments here asking how something works, and issues on GitHub if something&rsquo;s broken.</p>
+
+<h2>Screenshot</h2>
+
+<p>Here&rsquo;s a quick overview of what the theme looks like. You&rsquo;ll have to use your imagination a bit: this outline is more of a list of examples. I&rsquo;d show you how nice one of my actual homeworks looks, but then I&rsquo;d be giving out my homework!</p>
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/latex-template-screenshot.png"><img src="http://blog.zimmerman.io/images/latex-template-screenshot.png"></a></p>
+
+<h2>Usage</h2>
+
+<p>My main use case for LaTeX is (unsurprisingly) to typeset homeworks for math and CS classes. In these classes, the questions are either numbered or have specific names, and they ask for your name, lecture, recitation section, student ID, email address, etc. It turns out that there are some pretty simple ways of modularizing each of these desired features.</p>
+
+<h3>Personal Info</h3>
+
+<p>To solve the issue of entering personal information, the template defines a bunch of commands at the top of the file that enumerate all the fields you&rsquo;ll likely want to include on your homework.</p>
+
+<figure class='code'><figcaption><span>Personal Information </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='latex'><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\myname</span><span class="nb">}{</span>Jacob Zimmerman<span class="nb">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\myemail</span><span class="nb">}{</span>jezimmer<span class="nb">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\myhwtype</span><span class="nb">}{</span>Homework<span class="nb">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\myhwnum</span><span class="nb">}{</span>0<span class="nb">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\myclass</span><span class="nb">}{</span>12-345<span class="nb">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\mylecture</span><span class="nb">}{</span>0<span class="nb">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\mysection</span><span class="nb">}{</span>Z<span class="nb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p><strong>This is where forking comes in particularly handy</strong>. You&rsquo;d like to be able to define your own defaults and push them somewhere, but you also want to be able to update the template as new changes become available. If you fork the repo, you can both have a repository where you can include your own changes as well as pull any updates as they become available. (If you&rsquo;re new to forks, you should definitely <a href="https://help.github.com/articles/fork-a-repo/">check them out</a>).</p>
+
+<h3>Questions</h3>
+
+<p>Whenever I have an assignment to do, the questions generally come down to one of two forms: named or numbered questions. As such, there are two environments in the template that let you easily create a space to put your answers for each type of question. These are named <code>namedquestion</code> and <code>numedquestion</code> (<strong>not</strong> <code>numberedquestion</code>).</p>
+
+<p><strong>The <code>namedquestion</code> environment</strong> takes one required argument: the name! This environment is handy any time the questions don&rsquo;t have numbers attached to them, or if the ordering of the questions doesn&rsquo;t conform nicely to a sequential numbering.</p>
+
+<p><strong>The <code>numedquestion</code> environment</strong> takes no arguments, but that doesn&rsquo;t mean you can&rsquo;t configure it. By default, <code>numedquestions</code> begin counting at 1 and go up sequentially from there. To change this, you manually set the contents of the <code>questionCounter</code> counter. Using</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='latex'><span class='line'><span class="k">\setcounter</span><span class="nb">{</span>questionCounter<span class="nb">}{</span>-1<span class="nb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Before the first question will start the numbering at 0. You can use this pattern (set the <code>questionCounter</code> to one less than the next question) to arbitrarily skip around with your numbering. There&rsquo;s an example of this in the source.</p>
+
+<p>There are also times when you&rsquo;d like numbered questions to be of the form &ldquo;X.y&rdquo;, where &ldquo;X&rdquo; is the section number that the question comes from, and &ldquo;y&rdquo; is the number of the question within that section. The template tracks the value of &ldquo;X&rdquo; in <code>\writtensection</code>. By default, the template sets this to 0, which causes the section number to be omitted. If you manually set <code>\writtensection</code> to a non-zero value, this number will be prepended to all questions. When you do this, the value of &ldquo;y&rdquo; is determined by <code>questionCounter</code>.</p>
+
+<p>Similar to what we could do with <code>questionCounter</code>, you can manually turn on the section counter for certain questions by including something like</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='latex'><span class='line'><span class="k">\renewcommand</span><span class="nb">{</span><span class="k">\writtensection</span><span class="nb">}{</span>X<span class="nb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>in front of that particular question. Use <code>\renewcommand{\writtensection}{0}</code> after that question if you&rsquo;d like to turn it back off.</p>
+
+<h3>Question Parts</h3>
+
+<p>All in all, these two environments will take care of 90% of what you need to do in your homework. Sometimes, though, questions have multiple parts. To handle this, there are two environments, <code>alphaparts</code> and <code>arabicparts</code>, that take care of alphabetic and numeric question parts, respectively.</p>
+
+<p>The uses of these environments are pretty straightforward and have no real special cases. Each environment wraps around the <code>enumerate</code> environment. This means you can just use a normal <code>\item</code> to indicate a specific part of the question.</p>
+
+<h3>Induction Proofs</h3>
+
+<p>There&rsquo;s one more thing that I&rsquo;d like to mention here. Different people have different ways of typesetting induction proofs, with varying degrees of success. Personally, I like the <code>description</code> environment for outlining the base case, induction hypothesis, and inductive step of the proof. It works well for basically every induction proof, and looks nice and clean.</p>
+
+<h2>Feedback</h2>
+
+<p>Be sure to let me know how you like this template! It works for me, but obviously I&rsquo;m only using it for a small number of things on exactly one system. If something doesn&rsquo;t seem to work, or if you&rsquo;d like to see a particular feature implemented, comment or create a GitHub issue to let me know!</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Setting Up MobaXterm for SSH on Windows]]></title>
@@ -1102,7 +1208,7 @@ If you cared enough to read that far, you should consider following me on <a hre
 
 <h2>The Hard Way</h2>
 
-<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#97;&#105;&#108;&#116;&#x6f;&#x3a;&#x70;&#x72;&#105;&#110;&#116;&#64;&#115;&#99;&#111;&#x74;&#116;&#121;&#x6c;&#97;&#x62;&#115;&#x2e;&#111;&#x72;&#x67;">&#x70;&#x72;&#105;&#x6e;&#116;&#64;&#x73;&#x63;&#111;&#x74;&#116;&#121;&#108;&#97;&#98;&#115;&#46;&#111;&#114;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
+<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#112;&#x72;&#x69;&#110;&#116;&#x40;&#115;&#x63;&#111;&#x74;&#116;&#121;&#108;&#x61;&#98;&#x73;&#46;&#111;&#x72;&#103;">&#112;&#x72;&#x69;&#x6e;&#x74;&#x40;&#115;&#99;&#111;&#x74;&#116;&#121;&#x6c;&#x61;&#98;&#x73;&#46;&#x6f;&#114;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
 
 <p>Luckily, CMU (and arguably every college) is not terribly notable for keeping up-to-date information on it&rsquo;s website. This means that I got the &ldquo;wonderful&rdquo; opportunity to dig through CUPS documentation, sketchy printer manufacturer websites, and the depths of the Internet to finagle together a solution. Here&rsquo;s to hoping that you have a far more pleasurable experience. Without further ado, these are the steps I went through to get it done.</p>
 
