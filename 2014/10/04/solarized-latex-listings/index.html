@@ -10,15 +10,15 @@
 <meta charset="utf-8">
 <meta http-equiv="cleartype" content="on">
 
-<title>Why Everyone Loves JavaScript - Bits, Bytes, and Words</title>
+<title>Solarized LaTeX Listings - Bits, Bytes, and Words</title>
 <meta name="author" content="Jake Zimmerman">
 
 
 
 
-<meta name="description" content="If you don't love JavaScript, you're probably using it wrong. Luckily, some smart people on the interwebs know how to use it right.">
+<meta name="description" content="A tech blog by Jake Zimmerman. Updates occaisonally with tips, tricks, hacks, and personal projects.">
 
-<meta name="keywords" content="best-practices javascript scottylabs webdev ">
+<meta name="keywords" content="latex solarized ">
 
 
 <!-- http://t.co/dKP3o1e -->
@@ -30,25 +30,25 @@
 
   
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="/images/abstract-3.jpg"
+    <meta name="twitter:image" content="/images/abstract-7.jpg"
   
-  <meta name="twitter:title" content="Why Everyone Loves JavaScript">
-  <meta name="twitter:description" content="If you don't love JavaScript, you're probably using it wrong. Luckily, some smart people on the interwebs know how to use it right.">
+  <meta name="twitter:title" content="Solarized LaTeX Listings">
+  <meta name="twitter:description" content="A tech blog by Jake Zimmerman. Updates occaisonally with tips, tricks, hacks, and personal projects.">
   <meta name="twitter:creator" content="@Z1MM32M4N">
 
 
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:url" content="http://blog.zimmerman.io/2014/06/16/why-everyone-loves-javascript">
-<meta property="og:title" content="Why Everyone Loves JavaScript">
-<meta property="og:description" content="If you don't love JavaScript, you're probably using it wrong. Luckily, some smart people on the interwebs know how to use it right.">
+<meta property="og:url" content="http://blog.zimmerman.io/2014/10/04/solarized-latex-listings">
+<meta property="og:title" content="Solarized LaTeX Listings">
+<meta property="og:description" content="A tech blog by Jake Zimmerman. Updates occaisonally with tips, tricks, hacks, and personal projects.">
 
-  <meta property="og:image" content="/images/abstract-3.jpg">
+  <meta property="og:image" content="/images/abstract-7.jpg">
 
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="http://blog.zimmerman.io/2014/06/16/why-everyone-loves-javascript">
+<link rel="canonical" href="http://blog.zimmerman.io/2014/10/04/solarized-latex-listings">
 <link href="/favicon.png" rel="icon">
 <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
@@ -112,7 +112,7 @@
 <div class="entry-header">
   <div class="image-credit">Image source: <a href="http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/">dargadgetz</a></div><!-- /.image-credit -->
   <div class="entry-image">
-    <img src="/images/abstract-3.jpg" alt="Why Everyone Loves JavaScript">
+    <img src="/images/abstract-7.jpg" alt="Solarized LaTeX Listings">
   </div><!-- /.entry-image -->
 </div><!-- /.entry-header -->
 
@@ -122,40 +122,26 @@
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title"><a href="https://github.com/airbnb/javascript/blob/master/README.md">Why Everyone Loves JavaScript</a></h1>
+          <h1 class="entry-title"><a href="/2014/10/04/solarized-latex-listings/" rel="bookmark" title="Solarized LaTeX Listings">Solarized LaTeX Listings</a></h1>
         
-        <h2>June 16, 2014</h2>
+        <h2>October 04, 2014</h2>
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <p>Airbnb has put together a stellar list of simple ways to make your JavaScript more maintainable and manageable. From comments and whitespace, to hoisting and type casting, this list covers nearly everything you should know when developing a JavaScript app.</p>
+      <p>Out of the box, LaTeX listings are pretty bad. With a bit of work, you can ascribe some colors to the code, but you&rsquo;re still stuck with choosing a theme. Given that I recently just switched to the Solarized colorscheme in Vim and iTerm2, I made a LaTeX package that styles code listings with the predefined Solarized light colors.</p>
 
 <!-- more -->
 
 
-<h2>The Backstory</h2>
+<h2><a href="https://github.com/Z1MM32M4N/latex-solarized">Source</a></h2>
 
-<p>Before I begin, I should mention that any views I express here are entirely my own. Now, I recently began working for the summer at Bloomberg L.P., where for the first few days we sit through a few talks and do a few labs that introduce us to the technologies we&rsquo;ll be using throughout the summer. JavaScript was one of these languages, and I found that a quote on the first slide is all too correct:</p>
+<p>The source for this theme is on GitHub, and the README has pretty good documentation. Here&rsquo;s an example of the final result:</p>
 
-<blockquote><p>&ldquo;JavaScript is both the most popular and unpopular programming language.&rdquo;</p>
+<p><a class="image-link" href="/images/solarized-light-screenshot.png"><img src="/images/solarized-light-screenshot.png"></a></p>
 
-<p>&ndash; Doug Crockford</p></blockquote>
+<p>After you install them in the right place, you can include <code>\usepackage{solarized-light}</code> to turn source code listings light (as in above), <code>\usepackage{solarized-dark}</code> to have listings styled with the dark Solarized theme, and just <code>\usepackage{solarized}</code> to have access to the raw Solarized color codes (see the source for their names).</p>
 
-<p>From there, as you might imagine, the reactions from a predominantly C++ oriented audience towards JavaScript&rsquo;s quirks were pretty amusing. There are some significant differences between these two languages, and if you&rsquo;re not careful, they can get annoying quite quickly.</p>
-
-<h2>Links</h2>
-
-<h3><a href="https://github.com/airbnb/javascript">airbnb/javascript</a></h3>
-
-<p>JavaScript might have it&rsquo;s quirks, but it&rsquo;s still a vastly powerful language, especially if used well. For any aspiring JavaScript developer, I would highly recommend looking over Airbnb&rsquo;s JavaScript best practices. Even if you think you&rsquo;ve got the language down, I&rsquo;m confident you&rsquo;ll uncover something useful.</p>
-
-<h3><a href="https://www.destroyallsoftware.com/talks/the-birth-and-death-of-javascript">The Birth and Death of JavaScript</a></h3>
-
-<p>While you&rsquo;re here, check out this video for an incredibly humorous and satisfyingly accurate discussion of JavaScript, from birth to death.</p>
-
-<h3><a href="https://www.destroyallsoftware.com/talks/wat">Wat</a></h3>
-
-<p>Aaand while we&rsquo;re posting humorous JavaScript videos, I&rsquo;ve gotta throw this one into the mix.</p>
+<p>Once you&rsquo;ve done this, you just have to include your code in your LaTeX file using the <code>listings</code> packages. You might want to check out <a href="http://en.wikibooks.org/wiki/LaTeX/Source_Code_Listings">the LaTeX wiki</a> for more information on how to get started quickly with code listings, or <a href="http://mirror.hmc.edu/ctan/macros/latex/contrib/listings/listings.pdf">the official documentation</a> for a more comprehensive reference.</p>
 
 <hr />
 
@@ -167,15 +153,15 @@
 If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
 
       <footer class="entry-meta">
-        <span class="entry-tags"><a href="/categories/#best-practices" title="Pages tagged best-practices" class="tag">best-practices</a><a href="/categories/#javascript" title="Pages tagged javascript" class="tag">javascript</a><a href="/categories/#scottylabs" title="Pages tagged scottylabs" class="tag">scottylabs</a><a href="/categories/#webdev" title="Pages tagged webdev" class="tag">webdev</a></span>
-        <span><a href="/2014/06/16/why-everyone-loves-javascript/" rel="bookmark" title="Why Everyone Loves JavaScript">Why Everyone Loves JavaScript</a> was published on <span class="entry-date date published updated"><time datetime="2014-06-16T00:39:52-04:00">June 16, 2014</time></span></span>
+        <span class="entry-tags"><a href="/categories/#latex" title="Pages tagged latex" class="tag">latex</a><a href="/categories/#solarized" title="Pages tagged solarized" class="tag">solarized</a></span>
+        <span><a href="/2014/10/04/solarized-latex-listings/" rel="bookmark" title="Solarized LaTeX Listings">Solarized LaTeX Listings</a> was published on <span class="entry-date date published updated"><time datetime="2014-10-04T06:35:05-04:00">October 04, 2014</time></span></span>
         
         <span class="author vcard"><span class="fn"><a href="http://www.zimmerman.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
         <div class="social-share">
           <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2014/06/16/why-everyone-loves-javascript/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2014/06/16/why-everyone-loves-javascript/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url=/2014/06/16/why-everyone-loves-javascript/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2014/10/04/solarized-latex-listings/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2014/10/04/solarized-latex-listings/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+            <li class="googleplus"><a href="https://plus.google.com/share?url=/2014/10/04/solarized-latex-listings/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
           </ul>
         </div><!-- /.social-share -->
       </footer>
@@ -184,23 +170,23 @@ If you cared enough to read that far, you should consider following me on <a hre
       <div class="read-more">
         
           <div class="read-more-header">
-            <a href="/2014/10/04/solarized-latex-listings/" class="btn">Read More</a>
+            <a href="/2014/10/04/a-latex-homework-template/" class="btn">Read More</a>
           </div><!-- /.read-more-header -->
           <div class="read-more-content">
-            <h3><a href="/2014/10/04/solarized-latex-listings/" title="Solarized LaTeX Listings">Solarized LaTeX Listings</a></h3>
-            <p>Out of the box, LaTeX listings are pretty bad. With a bit of work, you can ascribe some colors to the code, but you&#8217;re still stuck with &hellip;&hellip; <a href="/2014/10/04/solarized-latex-listings/"> Continue reading</a></p>
+            <h3><a href="/2014/10/04/a-latex-homework-template/" title="A LaTeX Homework Template">A LaTeX Homework Template</a></h3>
+            <p>All about what template I use for LaTeX on homework assignments. <a href="/2014/10/04/a-latex-homework-template/"> Continue reading</a></p>
           </div><!-- /.read-more-content -->
         
         <div class="read-more-list">
           
             <div class="list-item">
-              <h4><a href="/2014/10/04/a-latex-homework-template/" title="A LaTeX Homework Template">A LaTeX Homework Template</a></h4>
-              <span>Published on October 04, 2014</span>
+              <h4><a href="/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/" title="Setting up MobaXterm for SSH on Windows">Setting up MobaXterm for SSH on Windows</a></h4>
+              <span>Published on September 28, 2014</span>
             </div><!-- /.list-item -->
           
             <div class="list-item">
-              <h4><a href="/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/" title="Setting up MobaXterm for SSH on Windows">Setting up MobaXterm for SSH on Windows</a></h4>
-              <span>Published on September 28, 2014</span>
+              <h4><a href="/2014/07/10/running-a-vps-log-5/" title="Running a VPS: Log 5">Running a VPS: Log 5</a></h4>
+              <span>Published on July 10, 2014</span>
             </div><!-- /.list-item -->
           
         </div><!-- /.read-more-list -->
@@ -245,8 +231,8 @@ If you cared enough to read that far, you should consider following me on <a hre
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.zimmerman.io/2014/06/16/why-everyone-loves-javascript/';
-        var disqus_url = 'http://blog.zimmerman.io/2014/06/16/why-everyone-loves-javascript/';
+        var disqus_identifier = 'http://blog.zimmerman.io/2014/10/04/solarized-latex-listings/';
+        var disqus_url = 'http://blog.zimmerman.io/2014/10/04/solarized-latex-listings/';
         var disqus_script = 'embed.js';
       
     (function () {
