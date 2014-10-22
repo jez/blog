@@ -80,6 +80,9 @@ In our template, if the user is logged in, we'll show their AndrewID (`user.user
 
 __Note__: if you plan on using multiple forms of authentication (like Facebook or GitHub) in this app, be sure to check out the python social auth example for how they generate their home page such that no URLs need to be hard coded. For our purposes, though, if there's only one URL it will be fine to just write it out.
 
+### Demo
+
+<iframe width="420" height="315" src="//www.youtube.com/embed/GYRUvTvTSJE" frameborder="0" allowfullscreen></iframe>
 
 ### Going Forward
 
