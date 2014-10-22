@@ -18,7 +18,7 @@ Using `python-social-auth` and Django, I've found a very straightfoward way of a
 
 ## Background
 
-Finally! I've alluded many times to blogging about some of the things I'm learning from my experiences rewriting Print@ScottyLabs. After a summer of putting it off and half a semester more of dawdling, I've finally managed to lay some solid groundwork.
+Finally! I've alluded many times to blogging about some of the things I'm learning from my experiences rewriting [Print@ScottyLabs][print]. After a summer of putting it off and half a semester more of dawdling, I've finally managed to lay some solid groundwork.
 
 One of the features that we plan on adding to Print 2.0 is a web interface. For people familiar with the way Print works currently, you interact with the service entirely through email. This leads to a clunky user experience and a lot of weird bugs and edge cases. With a web interface, we hope to streamline the process of account management and printing documents.
 
@@ -91,6 +91,7 @@ As always, let me know if you have any questions or if by following these steps 
 
 {% include jake-on-the-web.markdown %}
 
+[print]: http://print.scottylabs.org/
 [weblogin]: https://login.cmu.edu
 [hd-param]: https://developers.google.com/accounts/docs/OAuth2Login#hd-param
 [extra-args]: https://python-social-auth.readthedocs.org/en/latest/configuration/settings.html#extra-arguments-on0auth-processes
