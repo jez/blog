@@ -135,7 +135,7 @@
 
 <h2>Background</h2>
 
-<p>Finally! I&rsquo;ve alluded many times to blogging about some of the things I&rsquo;m learning from my experiences rewriting Print@ScottyLabs. After a summer of putting it off and half a semester more of dawdling, I&rsquo;ve finally managed to lay some solid groundwork.</p>
+<p>Finally! I&rsquo;ve alluded many times to blogging about some of the things I&rsquo;m learning from my experiences rewriting <a href="http://print.scottylabs.org/">Print@ScottyLabs</a>. After a summer of putting it off and half a semester more of dawdling, I&rsquo;ve finally managed to lay some solid groundwork.</p>
 
 <p>One of the features that we plan on adding to Print 2.0 is a web interface. For people familiar with the way Print works currently, you interact with the service entirely through email. This leads to a clunky user experience and a lot of weird bugs and edge cases. With a web interface, we hope to streamline the process of account management and printing documents.</p>
 
@@ -151,7 +151,7 @@
 
 <p>My first thought was to &ldquo;use Shibboleth.&rdquo; I put this in quotes because I didn&rsquo;t exactly know what that meant at the time. What I was looking for was a simple OAuth2 API (like what Google or Facebook provide) that I could much just drop into my app with no other configuration required on the deployment machine. Shibboleth does not offer this solution.</p>
 
-<p>Luckily, Google&rsquo;s OAuth2 API has a feature that allowed me to do exactly what I wanted. Thanks to a couple of resourceful members of the CMU Computer Science Facebook group (Carlos Diaz-Padron and Aurther Lee), I found out about a barely-documented parameter that you can pass in on the auth URL to restrict Google OAuth2 logins to a <a href="https://developers.google.com/accounts/docs/OAuth2Login#hd-param">specific hosted domain</a>. Since all CMU Andrew accounts are Google Apps accounts (as of Fall 2013), we can ask Google to restrict logins to the <code>'andrew.cmu.edu'</code> hosted domain. From here on, the only trick is to get whatever client library you&rsquo;re using to handle authentication to pass this parameter with a value of <code>'andrew.cmu.edu'</code> along to Google. The rest of this post describes a bare-bones way of doing this using Django.</p>
+<p>Luckily, Google&rsquo;s OAuth2 API has a feature that allowed me to do exactly what I wanted. Thanks to a couple of resourceful members of the CMU Computer Science Facebook group (Carlos Diaz-Padron and Arthur Lee), I found out about a barely-documented parameter that you can pass in on the auth URL to restrict Google OAuth2 logins to a <a href="https://developers.google.com/accounts/docs/OAuth2Login#hd-param">specific hosted domain</a>. Since all CMU Andrew accounts are Google Apps accounts (as of Fall 2013), we can ask Google to restrict logins to the <code>'andrew.cmu.edu'</code> hosted domain. From here on, the only trick is to get whatever client library you&rsquo;re using to handle authentication to pass this parameter with a value of <code>'andrew.cmu.edu'</code> along to Google. The rest of this post describes a bare-bones way of doing this using Django.</p>
 
 <h2>Implementing Authentication</h2>
 
@@ -207,6 +207,11 @@
 <p>In our template, if the user is logged in, we&rsquo;ll show their AndrewID (<code>user.username</code>), or else we&rsquo;ll hardcode the link to the Google OAuth2 authentication backend.</p>
 
 <p><strong>Note</strong>: if you plan on using multiple forms of authentication (like Facebook or GitHub) in this app, be sure to check out the python social auth example for how they generate their home page such that no URLs need to be hard coded. For our purposes, though, if there&rsquo;s only one URL it will be fine to just write it out.</p>
+
+<h3>Demo</h3>
+
+<iframe width="420" height="315" src="//www.youtube.com/embed/GYRUvTvTSJE" frameborder="0" allowfullscreen></iframe>
+
 
 <h3>Going Forward</h3>
 
