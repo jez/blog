@@ -1,0 +1,105 @@
+---
+layout: post
+title: "Using Multiple Git Remotes"
+date: 2014-11-01 18:12:35 -0400
+comments: true
+categories: [git]
+description: "Walk through some examples where using multiple git remotes makes collaborating easier."
+image:
+  feature: /images/abstract-1.jpg
+  credit: dargadgetz
+  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
+share: true
+---
+
+Quite often when using git, you only need to use one remote: `origin`. All your pushes and pulls communicate with this one host. However, there are many occasions when using multiple Git remotes is incredibly handy.
+
+<!-- more -->
+
+## Quick Overview: Remotes
+
+If you haven't already, I strongly recommend that you check out these two Git resources:
+
+- [__Learn Git Branching__][learnGitBranching], an interactive walkthrough of some powerful Git features
+- [__A Hacker's Guide to Git__][hacker], an explanation of Git by "taking a peek under the hood" 
+
+In this article, I'll only be talking about remotes. Remotes are basically "mirrors" of a branch that you have locally, but on a different computer.
+
+## Scenario: Working with Code in 15-150
+
+At CMU, the class 15-150 distributes its starter code in a beautiful way: using Git! This opens up a number of things we can take advantage of, but there's one thing in particular we can do using multiple git remotes.
+
+In 15-150, the code is distribute in a read-only Git repo. If we want a place where we can push and pull our changes, we'll need to create our own _bare repo_ (a repo that's used just for pushing and pulling). You'll note that I said push _and pull_. The reason why I want to be able to pull is because I want to have 2 clones of this repo: one on the CMU Andrew Unix servers (where the 15-150 code is hosted), and one on my laptop, where there's no network latency to edit files in Vim. 
+
+To achieve this setup, the first thing we'll do is set up the bare repo. The best place to put a bare repo is on a server so that you can always access your code. So from Andrew, I'll run the commands:
+
+```bash Initialize the Bare Repo
+# (unix.andrew.cmu.edu)
+#
+# change into a new, private directory so that no one can read my homework
+$ mkdir -p ~/private/gitrepos/15150
+$ cd ~/private/gitrepos/15150
+$ git init --bare
+```
+
+This creates a bare repo which I can clone in two different ways: one for if I'm on Andrew, one if I'm on my laptop.
+
+```bash Clone New Remote
+# (unix.andrew.cmu.edu)
+#
+# Clone over Unix file path to new folder ~/private/15150
+$ git clone ~/private/gitrepos/15150 ~/private/15150
+
+# (my laptop)
+#
+# Clone over ssh (using ssh alias)
+$ git clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150
+# -- or --
+# Clone over ssh (without ssh alias)
+$ git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150
+```
+
+After I run these commands, I'll get a command that warns me that I've just cloned an empty repo, which we have. To throw in a few graphics, our setup looks like this right now:
+
+{% img /images/multiple-remotes-1.svg %}
+
+I'm representing bare repos as clouds and clones of those repos as squares, with arrows representing whether code can flow from one place to the next. As you can see, to send code back and forth between Andrew and my laptop, I can just push in one place and pull in the other.
+
+Up until now though, we haven't even interacted with the 15-150 handout repo. The last piece involves setting this up.
+
+```bash Add Handout Remote
+# Add the 15-150 handout remote so we can get starter code, etc.
+# (unix.andrew.cmu.edu)
+#
+# A command name for the second remote is "upstream", though you could also
+# call this remote "handout" if that would be easier to keep straight
+$ cd ~/private/15150
+$ git remote add upstream /afs/andrew/course/15/150/handout
+
+# (my laptop)
+#
+# Add remote over ssh with alias
+$ git remote add upstream ssh://andrew:/afs/andrew/course/15/150/handout
+# -- or --
+# Add remote over ssh without alias
+$ git remote add upstream ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/course/15/150/handout
+```
+
+Once we run those two lines, our setup looks like this:
+
+{% img /images/multiple-remotes-2.svg %}
+
+After this, we're able to run `git pull upstream master` to get the 15-150 starter code as it's released. I find this model particularly useful for all my classes, even the ones that don't distribute their code using Git. Having code both on Andrew and on my local machine is a generally handy configuration, and using Git to push the code around to the right places makes my workflow simple. 
+
+As always, let me know if something was unclear or incorrect in the comments!
+
+## More Applications
+
+There are plenty other applications of using multiple remotes with Git. Perhaps the most common is to use them with the [__GitHub forking model__][forking], which is useful when collaborating on a software development project with others. You can use multiple remotes to do things like resolve merge conflicts in pull requests and to keep your fork up to date with the original repo.
+
+{% include jake-on-the-web.markdown %}
+
+
+[learnGitBranching]: http://pcottle.github.io/learnGitBranching/
+[hacker]: https://wildlyinaccurate.com/a-hackers-guide-to-git
+[forking]: https://help.github.com/articles/fork-a-repo/
