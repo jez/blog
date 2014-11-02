@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Git | Bits, Bytes, and Words]]></title>
+  <link href="http://blog.zimmerman.io/categories/git/atom.xml" rel="self"/>
+  <link href="http://blog.zimmerman.io/"/>
+  <updated>2014-11-01T22:43:05-04:00</updated>
+  <id>http://blog.zimmerman.io/</id>
+  <author>
+    <name><![CDATA[Jake Zimmerman]]></name>
+    <email><![CDATA[jake@zimmerman.io]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using Multiple Git Remotes]]></title>
+    <link href="http://blog.zimmerman.io/2014/11/01/using-more-than-one-git-remote/"/>
+    <updated>2014-11-01T18:12:35-04:00</updated>
+    <id>http://blog.zimmerman.io/2014/11/01/using-more-than-one-git-remote</id>
+    <content type="html"><![CDATA[<p>Quite often when using git, you only need to use one remote: <code>origin</code>. All your pushes and pulls communicate with this one host. However, there are many occasions when using multiple Git remotes is incredibly handy.</p>
+
+<!-- more -->
+
+
+<h2>Quick Overview: Remotes</h2>
+
+<p>If you haven&rsquo;t already, I strongly recommend that you check out these two Git resources:</p>
+
+<ul>
+<li><a href="http://pcottle.github.io/learnGitBranching/"><strong>Learn Git Branching</strong></a>, an interactive walkthrough of some powerful Git features</li>
+<li><a href="https://wildlyinaccurate.com/a-hackers-guide-to-git"><strong>A Hacker&rsquo;s Guide to Git</strong></a>, an explanation of Git by &ldquo;taking a peek under the hood&rdquo;</li>
+</ul>
+
+
+<p>In this article, I&rsquo;ll only be talking about remotes. Remotes are basically &ldquo;mirrors&rdquo; of a branch that you have locally, but on a different computer.</p>
+
+<h2>Scenario: Working with Code in 15-150</h2>
+
+<p>At CMU, the class 15-150 distributes its starter code in a beautiful way: using Git! This opens up a number of things we can take advantage of, but there&rsquo;s one thing in particular we can do using multiple git remotes.</p>
+
+<p>In 15-150, the code is distribute in a read-only Git repo. If we want a place where we can push and pull our changes, we&rsquo;ll need to create our own <em>bare repo</em> (a repo that&rsquo;s used just for pushing and pulling). You&rsquo;ll note that I said push <em>and pull</em>. The reason why I want to be able to pull is because I want to have 2 clones of this repo: one on the CMU Andrew Unix servers (where the 15-150 code is hosted), and one on my laptop, where there&rsquo;s no network latency to edit files in Vim.</p>
+
+<p>To achieve this setup, the first thing we&rsquo;ll do is set up the bare repo. The best place to put a bare repo is on a server so that you can always access your code. So from Andrew, I&rsquo;ll run the commands:</p>
+
+<pre><code class="bash Initialize the Bare Repo"># (unix.andrew.cmu.edu)
+#
+# change into a new, private directory so that no one can read my homework
+$ mkdir -p ~/private/gitrepos/15150
+$ cd ~/private/gitrepos/15150
+$ git init --bare
+</code></pre>
+
+<p>This creates a bare repo which I can clone in two different ways: one for if I&rsquo;m on Andrew, one if I&rsquo;m on my laptop.</p>
+
+<pre><code class="bash Clone New Remote"># (unix.andrew.cmu.edu)
+#
+# Clone over Unix file path to new folder ~/private/15150
+$ git clone ~/private/gitrepos/15150 ~/private/15150
+
+# (my laptop)
+#
+# Clone over ssh (using ssh alias)
+$ git clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150
+# -- or --
+# Clone over ssh (without ssh alias)
+$ git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150
+</code></pre>
+
+<p>After I run these commands, I&rsquo;ll get a command that warns me that I&rsquo;ve just cloned an empty repo, which we have. To throw in a few graphics, our setup looks like this right now:</p>
+
+<p><a class="image-link" href="/images/multiple-remotes-1.svg"><img src="/images/multiple-remotes-1.svg"></a></p>
+
+<p>I&rsquo;m representing bare repos as clouds and clones of those repos as squares, with arrows representing whether code can flow from one place to the next. As you can see, to send code back and forth between Andrew and my laptop, I can just push in one place and pull in the other.</p>
+
+<p>Up until now though, we haven&rsquo;t even interacted with the 15-150 handout repo. The last piece involves setting this up.</p>
+
+<pre><code class="bash Add Handout Remote"># Add the 15-150 handout remote so we can get starter code, etc.
+# (unix.andrew.cmu.edu)
+#
+# A command name for the second remote is "upstream", though you could also
+# call this remote "handout" if that would be easier to keep straight
+$ cd ~/private/15150
+$ git remote add upstream /afs/andrew/course/15/150/handout
+
+# (my laptop)
+#
+# Add remote over ssh with alias
+$ git remote add upstream ssh://andrew:/afs/andrew/course/15/150/handout
+# -- or --
+# Add remote over ssh without alias
+$ git remote add upstream ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/course/15/150/handout
+</code></pre>
+
+<p>Once we run those two lines, our setup looks like this:</p>
+
+<p><a class="image-link" href="/images/multiple-remotes-2.svg"><img src="/images/multiple-remotes-2.svg"></a></p>
+
+<p>After this, we&rsquo;re able to run <code>git pull upstream master</code> to get the 15-150 starter code as it&rsquo;s released. I find this model particularly useful for all my classes, even the ones that don&rsquo;t distribute their code using Git. Having code both on Andrew and on my local machine is a generally handy configuration, and using Git to push the code around to the right places makes my workflow simple.</p>
+
+<p>As always, let me know if something was unclear or incorrect in the comments!</p>
+
+<h2>More Applications</h2>
+
+<p>There are plenty other applications of using multiple remotes with Git. Perhaps the most common is to use them with the <a href="https://help.github.com/articles/fork-a-repo/"><strong>GitHub forking model</strong></a>, which is useful when collaborating on a software development project with others. You can use multiple remotes to do things like resolve merge conflicts in pull requests and to keep your fork up to date with the original repo.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
+ [t]: http://www.twitter.com/Z1MM32M4N/
+ [g]: http://www.github.com/Z1MM32M4N/
+ [h]: http://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
+  
+</feed>

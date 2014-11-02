@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Using Multiple Git Remotes - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="Walk through some examples where using multiple git remotes makes collaborating easier.">
+
+<meta name="keywords" content="git ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+  
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="/images/abstract-1.jpg"
+  
+  <meta name="twitter:title" content="Using Multiple Git Remotes">
+  <meta name="twitter:description" content="Walk through some examples where using multiple git remotes makes collaborating easier.">
+  <meta name="twitter:creator" content="@Z1MM32M4N">
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.zimmerman.io/2014/11/01/using-more-than-one-git-remote">
+<meta property="og:title" content="Using Multiple Git Remotes">
+<meta property="og:description" content="Walk through some examples where using multiple git remotes makes collaborating easier.">
+
+  <meta property="og:image" content="/images/abstract-1.jpg">
+
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="http://blog.zimmerman.io/2014/11/01/using-more-than-one-git-remote">
+<link href="/favicon.png" rel="icon">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+<script>Modernizr || document.write('<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
+
+
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+
+</head>
+
+<body id="post" class="feature">
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
+	<button class="dl-trigger">Open Menu</button>
+	<ul class="dl-menu">
+		<li><a href="/">Home</a></li>
+		<li>
+			<a href="#">About</a>
+			<ul class="dl-submenu">
+				<li>
+					<img src="/images/avatar-jake.jpg" alt="Jake Zimmerman photo" class="author-photo">
+					<h4>Jake Zimmerman</h4>
+					<p>Studying computer science at Carnegie Mellon. Working for the summer at Bloomberg L.P.</p>
+				</li>
+				<li><a href="//www.zimmerman.io">Learn More</a></li>
+				<li>
+					<a href="mailto:jake@zimmerman.io"><i class="fa fa-envelope"></i> Email</a>
+				</li>
+				<li>
+					<a href="http://twitter.com/Z1MM32M4N"><i class="fa fa-twitter"></i> Twitter</a>
+				</li>
+				<li>
+					<a href="http://plus.google.com/+JacobZimmerman0"><i class="fa fa-google-plus"></i> Google+</a>
+				</li>
+				<li>
+					<a href="http://github.com/Z1MM32M4N"><i class="fa fa-github"></i> GitHub</a>
+				</li>
+			</ul><!-- /.dl-submenu -->
+		</li>
+		<li>
+			<a href="#">Posts</a>
+			<ul class="dl-submenu">
+				<li><a href="/posts/">All Posts</a></li>
+				<li><a href="/categories/">All Categories</a></li>
+			</ul>
+		</li>
+		<li><a href="http://www.zimmerman.io">Portfolio</a></li>
+	</ul><!-- /.dl-menu -->
+</nav><!-- /.dl-menuwrapper -->
+
+
+
+<div class="entry-header">
+  <div class="image-credit">Image source: <a href="http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/">dargadgetz</a></div><!-- /.image-credit -->
+  <div class="entry-image">
+    <img src="/images/abstract-1.jpg" alt="Using Multiple Git Remotes">
+  </div><!-- /.entry-image -->
+</div><!-- /.entry-header -->
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <header class="header-title">
+      <div class="header-title-wrap">
+        
+          <h1 class="entry-title"><a href="/2014/11/01/using-more-than-one-git-remote/" rel="bookmark" title="Using Multiple Git Remotes">Using Multiple Git Remotes</a></h1>
+        
+        <h2>November 01, 2014</h2>
+      </div><!-- /.header-title-wrap -->
+    </header>
+    <div class="entry-content">
+      <p>Quite often when using git, you only need to use one remote: <code>origin</code>. All your pushes and pulls communicate with this one host. However, there are many occasions when using multiple Git remotes is incredibly handy.</p>
+
+<!-- more -->
+
+
+<h2>Quick Overview: Remotes</h2>
+
+<p>If you haven&rsquo;t already, I strongly recommend that you check out these two Git resources:</p>
+
+<ul>
+<li><a href="http://pcottle.github.io/learnGitBranching/"><strong>Learn Git Branching</strong></a>, an interactive walkthrough of some powerful Git features</li>
+<li><a href="https://wildlyinaccurate.com/a-hackers-guide-to-git"><strong>A Hacker&rsquo;s Guide to Git</strong></a>, an explanation of Git by &ldquo;taking a peek under the hood&rdquo;</li>
+</ul>
+
+
+<p>In this article, I&rsquo;ll only be talking about remotes. Remotes are basically &ldquo;mirrors&rdquo; of a branch that you have locally, but on a different computer.</p>
+
+<h2>Scenario: Working with Code in 15-150</h2>
+
+<p>At CMU, the class 15-150 distributes its starter code in a beautiful way: using Git! This opens up a number of things we can take advantage of, but there&rsquo;s one thing in particular we can do using multiple git remotes.</p>
+
+<p>In 15-150, the code is distribute in a read-only Git repo. If we want a place where we can push and pull our changes, we&rsquo;ll need to create our own <em>bare repo</em> (a repo that&rsquo;s used just for pushing and pulling). You&rsquo;ll note that I said push <em>and pull</em>. The reason why I want to be able to pull is because I want to have 2 clones of this repo: one on the CMU Andrew Unix servers (where the 15-150 code is hosted), and one on my laptop, where there&rsquo;s no network latency to edit files in Vim.</p>
+
+<p>To achieve this setup, the first thing we&rsquo;ll do is set up the bare repo. The best place to put a bare repo is on a server so that you can always access your code. So from Andrew, I&rsquo;ll run the commands:</p>
+
+<figure class='code'><figcaption><span>Initialize the Bare Repo</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># (unix.andrew.cmu.edu)</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># change into a new, private directory so that no one can read my homework</span>
+</span><span class='line'><span class="nv">$ </span>mkdir -p ~/private/gitrepos/15150
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd</span> ~/private/gitrepos/15150
+</span><span class='line'><span class="nv">$ </span>git init --bare
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This creates a bare repo which I can clone in two different ways: one for if I&rsquo;m on Andrew, one if I&rsquo;m on my laptop.</p>
+
+<figure class='code'><figcaption><span>Clone New Remote</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># (unix.andrew.cmu.edu)</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># Clone over Unix file path to new folder ~/private/15150</span>
+</span><span class='line'><span class="nv">$ </span>git clone ~/private/gitrepos/15150 ~/private/15150
+</span><span class='line'>
+</span><span class='line'><span class="c"># (my laptop)</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># Clone over ssh (using ssh alias)</span>
+</span><span class='line'><span class="nv">$ </span>git clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150
+</span><span class='line'><span class="c"># -- or --</span>
+</span><span class='line'><span class="c"># Clone over ssh (without ssh alias)</span>
+</span><span class='line'><span class="nv">$ </span>git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After I run these commands, I&rsquo;ll get a command that warns me that I&rsquo;ve just cloned an empty repo, which we have. To throw in a few graphics, our setup looks like this right now:</p>
+
+<p><a class="image-link" href="/images/multiple-remotes-1.svg"><img src="/images/multiple-remotes-1.svg"></a></p>
+
+<p>I&rsquo;m representing bare repos as clouds and clones of those repos as squares, with arrows representing whether code can flow from one place to the next. As you can see, to send code back and forth between Andrew and my laptop, I can just push in one place and pull in the other.</p>
+
+<p>Up until now though, we haven&rsquo;t even interacted with the 15-150 handout repo. The last piece involves setting this up.</p>
+
+<figure class='code'><figcaption><span>Add Handout Remote</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Add the 15-150 handout remote so we can get starter code, etc.</span>
+</span><span class='line'><span class="c"># (unix.andrew.cmu.edu)</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># A command name for the second remote is &quot;upstream&quot;, though you could also</span>
+</span><span class='line'><span class="c"># call this remote &quot;handout&quot; if that would be easier to keep straight</span>
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd</span> ~/private/15150
+</span><span class='line'><span class="nv">$ </span>git remote add upstream /afs/andrew/course/15/150/handout
+</span><span class='line'>
+</span><span class='line'><span class="c"># (my laptop)</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># Add remote over ssh with alias</span>
+</span><span class='line'><span class="nv">$ </span>git remote add upstream ssh://andrew:/afs/andrew/course/15/150/handout
+</span><span class='line'><span class="c"># -- or --</span>
+</span><span class='line'><span class="c"># Add remote over ssh without alias</span>
+</span><span class='line'><span class="nv">$ </span>git remote add upstream ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/course/15/150/handout
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once we run those two lines, our setup looks like this:</p>
+
+<p><a class="image-link" href="/images/multiple-remotes-2.svg"><img src="/images/multiple-remotes-2.svg"></a></p>
+
+<p>After this, we&rsquo;re able to run <code>git pull upstream master</code> to get the 15-150 starter code as it&rsquo;s released. I find this model particularly useful for all my classes, even the ones that don&rsquo;t distribute their code using Git. Having code both on Andrew and on my local machine is a generally handy configuration, and using Git to push the code around to the right places makes my workflow simple.</p>
+
+<p>As always, let me know if something was unclear or incorrect in the comments!</p>
+
+<h2>More Applications</h2>
+
+<p>There are plenty other applications of using multiple remotes with Git. Perhaps the most common is to use them with the <a href="https://help.github.com/articles/fork-a-repo/"><strong>GitHub forking model</strong></a>, which is useful when collaborating on a software development project with others. You can use multiple remotes to do things like resolve merge conflicts in pull requests and to keep your fork up to date with the original repo.</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="/categories/#git" title="Pages tagged git" class="tag">git</a></span>
+        <span><a href="/2014/11/01/using-more-than-one-git-remote/" rel="bookmark" title="Using Multiple Git Remotes">Using Multiple Git Remotes</a> was published on <span class="entry-date date published updated"><time datetime="2014-11-01T18:12:35-04:00">November 01, 2014</time></span></span>
+        
+        <span class="author vcard"><span class="fn"><a href="http://www.zimmerman.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
+        <div class="social-share">
+          <ul class="socialcount socialcount-small inline-list">
+            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2014/11/01/using-more-than-one-git-remote/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2014/11/01/using-more-than-one-git-remote/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+            <li class="googleplus"><a href="https://plus.google.com/share?url=/2014/11/01/using-more-than-one-git-remote/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+          </ul>
+        </div><!-- /.social-share -->
+      </footer>
+    </div><!-- /.entry-content -->
+    
+      <div class="read-more">
+        
+          <div class="read-more-header">
+            <a href="/2014/10/20/using-google-apps-for-cmu-authentication/" class="btn">Read More</a>
+          </div><!-- /.read-more-header -->
+          <div class="read-more-content">
+            <h3><a href="/2014/10/20/using-google-apps-for-cmu-authentication/" title="Using Google OAuth2 for CMU Authentication">Using Google OAuth2 for CMU Authentication</a></h3>
+            <p>Using python-social-auth and Django, I&#8217;ve been able to use login.cmu.edu to sign in CMU students by AndrewID. <a href="/2014/10/20/using-google-apps-for-cmu-authentication/"> Continue reading</a></p>
+          </div><!-- /.read-more-content -->
+        
+        <div class="read-more-list">
+          
+            <div class="list-item">
+              <h4><a href="/2014/10/06/offline-latex-development/" title="Offline LaTeX Development">Offline LaTeX Development</a></h4>
+              <span>Published on October 06, 2014</span>
+            </div><!-- /.list-item -->
+          
+            <div class="list-item">
+              <h4><a href="/2014/10/04/solarized-latex-listings/" title="Solarized LaTeX Listings">Solarized LaTeX Listings</a></h4>
+              <span>Published on October 04, 2014</span>
+            </div><!-- /.list-item -->
+          
+        </div><!-- /.read-more-list -->
+      </div><!-- /.read-more -->
+    
+    <section id="disqus_thread"></section><!-- /#disqus_thread -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2014 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/Z1MM32M4N/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+
+	        
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+<script src="/javascripts/scripts.min.js"></script>
+&#8211;>
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-50690546-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'jakez-blog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.zimmerman.io/2014/11/01/using-more-than-one-git-remote/';
+        var disqus_url = 'http://blog.zimmerman.io/2014/11/01/using-more-than-one-git-remote/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+	        
+
+</body>
+</html>
