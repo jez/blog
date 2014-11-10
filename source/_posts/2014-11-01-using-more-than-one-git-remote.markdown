@@ -4,7 +4,7 @@ title: "Using Multiple Git Remotes"
 date: 2014-11-01 18:12:35 -0400
 comments: true
 categories: [git]
-description: "Walk through some examples where using multiple git remotes makes collaborating easier."
+description: "An overview of how multiple Git remotes can be used to synchronize code distributed in a read-only Git repo"
 image:
   feature: /images/abstract-1.jpg
   credit: dargadgetz
