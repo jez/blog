@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>The Joys of the Craft - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="An exceprt from Frederick P. Brooks's book The Mythical Man Month on the joys of programming.">
+
+<meta name="keywords" content="best-practices books ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+  
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="/images/abstract-6.jpg"
+  
+  <meta name="twitter:title" content="The Joys of the Craft">
+  <meta name="twitter:description" content="An exceprt from Frederick P. Brooks's book The Mythical Man Month on the joys of programming.">
+  <meta name="twitter:creator" content="@Z1MM32M4N">
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.zimmerman.io/2014/12/13/the-mythical-man-month">
+<meta property="og:title" content="The Joys of the Craft">
+<meta property="og:description" content="An exceprt from Frederick P. Brooks's book The Mythical Man Month on the joys of programming.">
+
+  <meta property="og:image" content="/images/abstract-6.jpg">
+
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="http://blog.zimmerman.io/2014/12/13/the-mythical-man-month">
+<link href="/favicon.png" rel="icon">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+<script>Modernizr || document.write('<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
+
+
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+
+</head>
+
+<body id="post" class="feature">
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
+	<button class="dl-trigger">Open Menu</button>
+	<ul class="dl-menu">
+		<li><a href="/">Home</a></li>
+		<li>
+			<a href="#">About</a>
+			<ul class="dl-submenu">
+				<li>
+					<img src="/images/avatar-jake.jpg" alt="Jake Zimmerman photo" class="author-photo">
+					<h4>Jake Zimmerman</h4>
+					<p>Studying computer science at Carnegie Mellon. Working for the summer at Bloomberg L.P.</p>
+				</li>
+				<li><a href="//www.zimmerman.io">Learn More</a></li>
+				<li>
+					<a href="mailto:jake@zimmerman.io"><i class="fa fa-envelope"></i> Email</a>
+				</li>
+				<li>
+					<a href="http://twitter.com/Z1MM32M4N"><i class="fa fa-twitter"></i> Twitter</a>
+				</li>
+				<li>
+					<a href="http://plus.google.com/+JacobZimmerman0"><i class="fa fa-google-plus"></i> Google+</a>
+				</li>
+				<li>
+					<a href="http://github.com/Z1MM32M4N"><i class="fa fa-github"></i> GitHub</a>
+				</li>
+			</ul><!-- /.dl-submenu -->
+		</li>
+		<li>
+			<a href="#">Posts</a>
+			<ul class="dl-submenu">
+				<li><a href="/posts/">All Posts</a></li>
+				<li><a href="/categories/">All Categories</a></li>
+			</ul>
+		</li>
+		<li><a href="http://www.zimmerman.io">Portfolio</a></li>
+	</ul><!-- /.dl-menu -->
+</nav><!-- /.dl-menuwrapper -->
+
+
+
+<div class="entry-header">
+  <div class="image-credit">Image source: <a href="http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/">dargadgetz</a></div><!-- /.image-credit -->
+  <div class="entry-image">
+    <img src="/images/abstract-6.jpg" alt="The Joys of the Craft">
+  </div><!-- /.entry-image -->
+</div><!-- /.entry-header -->
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <header class="header-title">
+      <div class="header-title-wrap">
+        
+          <h1 class="entry-title"><a href="/2014/12/13/the-mythical-man-month/" rel="bookmark" title="The Joys of the Craft">The Joys of the Craft</a></h1>
+        
+        <h2>December 13, 2014</h2>
+      </div><!-- /.header-title-wrap -->
+    </header>
+    <div class="entry-content">
+      <p>A while ago, I was given the book <em>The Mythical Man-Month</em>, by Frederick P. Brooks, Jr. I finally have some time to sit down and read it, and I&rsquo;m loving it. In the first chapter, this quote on &ldquo;the joys of the craft&rdquo; (i.e., programming) struck me as particularly on point:</p>
+
+<!-- more -->
+
+
+<blockquote><h3>The Joys of the Craft</h3>
+
+<p>Why is programming fun? What delights may its practitioner expect as his reward?</p>
+
+<p>First is the sheer joy of making things. As the child delights in his mud pie, so the adult enjoys building things, especially things of his own design. I think this delight must be an image of God&rsquo;s delight in making things, a delight shown in the distinctness and newness of each leaf and each snowflake.</p>
+
+<p>Second is the pleasure of making things that are useful to other people. Deep within, we want others to use our work and to find it helpful. In this respect the programming system is not essentially different from the child&rsquo;s first clay pencil holder &ldquo;for Daddy&rsquo;s office.&rdquo;</p>
+
+<p>Third is the fascination of fashioning complex puzzle-like objects of interlocking moving parts and watching them work in subtle cycles, playing out the consequences of principles built in from the beginning. The programmed computer has all the fascination of the pinball machine or the jukebox mechanism, carried to the ultimate.</p>
+
+<p>Fourth is the joy of always learning, which springs from the nonrepearing nature of the task. In one way or another the problem is ever new, and its solver learns something: sometimes practical, sometimes theoretical, and sometimes both.</p>
+
+<p>Finally, there is the delight of working in such a tractable medium. The programmer, like the poet, works only slightly removed from pure thought-stuff. He builds his castles in the air, from air, creating by exertion of the imagination. Few media of creation are so flexible, so easy to polish and rework, so readily capable of realizing grand conceptual structures. (As we shall see later, this very tractability has its own problems.)</p>
+
+<p>Yet the program construct, unlike the poet&rsquo;s words, is real in the sense that it moves and works, producing visible outputs separate from the construct itself. It prints results, draws pictures, produces sounds, moves arms. The magic of myth and legend has come true in our time. One types the correct incantation on a keyboard, and a display screen comes to life, showing things that never were nor could be.</p>
+
+<p>Programming then is fun because it gratifies creative longings built deep within us and delights sensibilities we have in common with all men.</p>
+
+<p>&ndash; &ldquo;The Tar Pit&rdquo;, <em>The Mythical Man-Month</em>, Frederick P. Brooks Jr.</p></blockquote>
+
+<p>Brooks of course follows this up with &ldquo;The Woes of the Craft&rdquo;, which is equally on point. I&rsquo;m only a few pages in, but I already feel like, respectfully, I&rsquo;ve learned more than I did in all of Tech Comm ([15-221][techcomm]). I would absolutely recommend it to anyone considering pursing software engineering!</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="/categories/#best-practices" title="Pages tagged best-practices" class="tag">best-practices</a><a href="/categories/#books" title="Pages tagged books" class="tag">books</a></span>
+        <span><a href="/2014/12/13/the-mythical-man-month/" rel="bookmark" title="The Joys of the Craft">The Joys of the Craft</a> was published on <span class="entry-date date published updated"><time datetime="2014-12-13T19:52:09-06:00">December 13, 2014</time></span></span>
+        
+        <span class="author vcard"><span class="fn"><a href="http://www.zimmerman.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
+        <div class="social-share">
+          <ul class="socialcount socialcount-small inline-list">
+            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2014/12/13/the-mythical-man-month/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2014/12/13/the-mythical-man-month/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+            <li class="googleplus"><a href="https://plus.google.com/share?url=/2014/12/13/the-mythical-man-month/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+          </ul>
+        </div><!-- /.social-share -->
+      </footer>
+    </div><!-- /.entry-content -->
+    
+      <div class="read-more">
+        
+          <div class="read-more-header">
+            <a href="/2014/11/01/using-more-than-one-git-remote/" class="btn">Read More</a>
+          </div><!-- /.read-more-header -->
+          <div class="read-more-content">
+            <h3><a href="/2014/11/01/using-more-than-one-git-remote/" title="Using Multiple Git Remotes">Using Multiple Git Remotes</a></h3>
+            <p>An overview of how multiple Git remotes can be used to synchronize code distributed in a read-only Git repo <a href="/2014/11/01/using-more-than-one-git-remote/"> Continue reading</a></p>
+          </div><!-- /.read-more-content -->
+        
+        <div class="read-more-list">
+          
+            <div class="list-item">
+              <h4><a href="/2014/10/20/using-google-apps-for-cmu-authentication/" title="Using Google OAuth2 for CMU Authentication">Using Google OAuth2 for CMU Authentication</a></h4>
+              <span>Published on October 20, 2014</span>
+            </div><!-- /.list-item -->
+          
+            <div class="list-item">
+              <h4><a href="/2014/10/06/offline-latex-development/" title="Offline LaTeX Development">Offline LaTeX Development</a></h4>
+              <span>Published on October 06, 2014</span>
+            </div><!-- /.list-item -->
+          
+        </div><!-- /.read-more-list -->
+      </div><!-- /.read-more -->
+    
+    <section id="disqus_thread"></section><!-- /#disqus_thread -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2014 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/Z1MM32M4N/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+
+	        
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+<script src="/javascripts/scripts.min.js"></script>
+&#8211;>
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-50690546-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'jakez-blog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.zimmerman.io/2014/12/13/the-mythical-man-month/';
+        var disqus_url = 'http://blog.zimmerman.io/2014/12/13/the-mythical-man-month/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+	        
+
+</body>
+</html>
