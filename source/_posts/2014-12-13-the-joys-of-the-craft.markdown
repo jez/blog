@@ -39,3 +39,4 @@ Brooks of course follows this up with "The Woes of the Craft", which is equally 
 
 {% include jake-on-the-web.markdown %}
 
+[techcomm]: https://enr-apps.as.cmu.edu/open/SOC/SOCServlet/courseDetails?COURSE=15221&SEMESTER=F14
