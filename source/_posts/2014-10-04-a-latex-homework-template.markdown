@@ -30,7 +30,7 @@ The rest of this post goes into some fancy use cases for how to get the best out
 
 Here's a quick overview of what the theme looks like. You'll have to use your imagination a bit: this outline is more of a list of examples. I'd show you how nice one of my actual homeworks looks, but then I'd be giving out my homework!
 
-{% img /images/latex-template-screenshot.png %}
+{% img https://raw.githubusercontent.com/Z1MM32M4N/latex-hw-template/master/screenshot.png %}
 
 ## Usage
 
