@@ -4,7 +4,7 @@ title: "GitHub Pages Custom Domains"
 description: "A walkthrough of how I set up GitHub Pages with my domain name registrar."
 date: 2014-05-06 03:15:35 -0400
 comments: true
-categories: [github, dns, web-dev, gandi, troubleshooting]
+categories: [github, dns, webdev, gandi, troubleshooting]
 share: true
 ---
 
