@@ -20,7 +20,7 @@ HTML and CSS can be frustrating when first starting out. Despite all you try, no
 
 ## Positioning Content
 
-When something doesn't align correctly on the page, a natural phrase to Google is "make div align right" or "move div up." In other media where content is positioned absolutely, like when using text boxes in Microsoft Word, these might be the right queries. With HTML & CSS, though, they're off point.
+When something doesn't align correctly on the page, a natural phrase to Google is "make div align right" or "move div up." In other media where content is positioned absolutely, like when using text boxes in Microsoft Word, these might be the right queries. With HTML & CSS, though, they're off point. Don't get me wrong, there's definitely a time for `position: absolute`, but if this comes up when you're trying to make grids you're likely on the wrong path.
 
 In HTML, the page is drawn from top to bottom, left to right. This means that your page ends up being aligned how words in a book are. Once the first word has taken up a certain amount of space, the next word starts filling up the space after it. The trick then, is knowing _how much_ space the first item takes up, and how to resize it appropriately so that the second item "falls into place."
 
