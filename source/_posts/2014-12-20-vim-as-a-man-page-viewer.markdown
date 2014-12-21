@@ -48,13 +48,13 @@ also syntax highlighted appropriately.
 vman vim
 ```
 
-![vim(1)][vim.1]
+{% img /images/vim.1.png %}
 
 ```bash Example 2
 vman 3 printf
 ```
 
-![printf(3)][printf.3]
+{% img /images/printf.3.png %}
 
 ### All the benefits of Vim
 
