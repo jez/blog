@@ -8,6 +8,7 @@ description: "A LaTeX \\documentclass for typesetting homework assignments."
 image:
   feature: /images/homework-class.png
 share: true
+published: false
 ---
 
 There are LaTeX document classes for typesetting books, articles, exams, presentations, and more. Now, there's one for homework assignments, too.
