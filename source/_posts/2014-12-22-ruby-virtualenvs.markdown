@@ -1,21 +1,23 @@
 ---
 layout: post
-title: "Updated uninstall_gems command"
-date: 2014-12-21 00:48:26 -0600
+title: "Ruby Virtualenvs"
+date: 'Mon Dec 22 12:52:40 CST 2014'
 comments: true
 categories: [ruby, python]
 description: >
-  I updated some bugs in a script that I love to uninstall Ruby gems.
+  After some research, I found a much better solution to the problem of
+  sandboxing Ruby gems.
 image:
   feature: /images/abstract-5.jpg
   credit: dargadgetz
   creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
 share: true
-published: false
 ---
 
 A while back I found a command that removes all Ruby gems installed on a system
 when you're using rbenv. It worked great, so I decided to build on top of it.
+After a bit of research, I found a much better solution to the problem of
+sandboxing Ruby Gems.
 
 <!-- more -->
 
@@ -41,7 +43,7 @@ and restores the value of the old `.ruby_version` file once it's done.
 The new script is available [as a fork of the original Gist][gist] and also as
 a part of of [my personal bin folder][bin].
 
-## The Underlying Problem
+## The Underlying Problem: Virtualenv's in Ruby
 
 After a bit of reflection, I realized I should be trying to solve the underlying
 problem: different projects had different dependencies, and gems from one
@@ -52,7 +54,35 @@ files make this a non-issue.
 After looking into a similar Ruby solution, I came up with [this blog
 post][venv-ruby] outlining how you can do the exact same thing using virtualenvs
 but with Ruby gems! You should definitely check it out if you're in the same
-boat.
+boat. Add these lines to your virtualenv's `postactivate` script:
+
+```python $VIRTUAL_ENV/bin/postactivate
+export OLD_GEMHOME="$GEM_HOME"
+export GEM_HOME="$VIRTUAL_ENV/gems"
+
+export OLD_GEM_PATH="$GEM_PATH"
+export GEM_PATH=""
+
+export OLD_PATH="$PATH"
+export PATH="$PATH:$GEM_HOME/bin"
+```
+
+And then add this complementary section to your `postdeactivate` script:
+
+```python $VIRTUAL_ENV/bin/postactivate
+export GEM_HOME="$OLD_BLOG_GEM_HOME"
+unset OLD_GEM_HOME
+
+export GEM_PATH="$OLD_BLOG_GEM_PATH"
+unset OLD_GEM_PATH
+
+export PATH="$OLD_BLOG_PATH"
+unset OLD_PATH
+```
+
+Now, whenever you install gems, they'll install to the folder
+`$VIRTUAL_ENV/gems/` instead of the system's location, so no gems bleed into
+another project!
 
 {% include jake-on-the-web.markdown %}
 
