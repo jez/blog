@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-12-21T05:08:22-06:00</updated>
+  <updated>2014-12-22T13:20:56-06:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,109 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby Virtualenvs]]></title>
+    <link href="http://blog.zimmerman.io/2014/12/22/ruby-virtualenvs/"/>
+    <updated>2014-12-22T12:52:40-06:00</updated>
+    <id>http://blog.zimmerman.io/2014/12/22/ruby-virtualenvs</id>
+    <content type="html"><![CDATA[<p>A while back I found a command that removes all Ruby gems installed on a system
+when you&rsquo;re using rbenv. It worked great, so I decided to build on top of it.
+After a bit of research, I found a much better solution to the problem of
+sandboxing Ruby Gems.</p>
+
+<!-- more -->
+
+
+<h2>Ugh, Ruby&hellip;</h2>
+
+<p>If you&rsquo;re anything like me, you can never do anything right on the first try
+using Ruby. On one of these occasions, I got tired of trying to fix it. I
+wanted to destroy everything and start over. That&rsquo;s when I found Ian Vaughan&rsquo;s
+<a href="https://gist.github.com/IanVaughan/2902499">script</a> that magically removes all gems. I was delighted to see that it
+worked perfectly on the first try, and went about the rest of my business.</p>
+
+<h2>Modifications</h2>
+
+<p>There were two ways, though, that what this script&rsquo;s functionality differed
+from what I wanted it to do: it always removed <strong>all</strong> the gems, and it left
+behind a <code>.ruby_version</code> file after it was used, clobbering any file that might
+have been there before.</p>
+
+<p>In my updated script, you can specify a list of ruby versions as arguments, and
+it will only gems from those versions instead of all of them.  Also, it saves
+and restores the value of the old <code>.ruby_version</code> file once it&rsquo;s done.</p>
+
+<p>The new script is available <a href="https://gist.github.com/Z1MM32M4N/cc2ba08062c6183a489c">as a fork of the original Gist</a> and also as
+a part of of <a href="https://github.com/Z1MM32M4N/bin/blob/master/uninstall_gems">my personal bin folder</a>.</p>
+
+<h2>The Underlying Problem: Virtualenv&rsquo;s in Ruby</h2>
+
+<p>After a bit of reflection, I realized I should be trying to solve the underlying
+problem: different projects had different dependencies, and gems from one
+project were bleeding into gems from another. If you&rsquo;re a Python developer, you
+don&rsquo;t have this issue: <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">virtualenvwrapper</a>, <code>pip</code> and <code>requirements.txt</code>
+files make this a non-issue.</p>
+
+<p>After looking into a similar Ruby solution, I came up with <a href="http://honza.ca/2011/06/install-ruby-gems-into-virtualenv">this blog
+post</a> outlining how you can do the exact same thing using virtualenvs
+but with Ruby gems! You should definitely check it out if you&rsquo;re in the same
+boat. Add these lines to your virtualenv&rsquo;s <code>postactivate</code> script:</p>
+
+<figure class='code'><figcaption><span>$VIRTUAL_ENV/bin/postactivate</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">export</span> <span class="n">OLD_GEMHOME</span><span class="o">=</span><span class="s">&quot;$GEM_HOME&quot;</span>
+</span><span class='line'><span class="n">export</span> <span class="n">GEM_HOME</span><span class="o">=</span><span class="s">&quot;$VIRTUAL_ENV/gems&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">export</span> <span class="n">OLD_GEM_PATH</span><span class="o">=</span><span class="s">&quot;$GEM_PATH&quot;</span>
+</span><span class='line'><span class="n">export</span> <span class="n">GEM_PATH</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">export</span> <span class="n">OLD_PATH</span><span class="o">=</span><span class="s">&quot;$PATH&quot;</span>
+</span><span class='line'><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s">&quot;$PATH:$GEM_HOME/bin&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And then add this complementary section to your <code>postdeactivate</code> script:</p>
+
+<figure class='code'><figcaption><span>$VIRTUAL_ENV/bin/postactivate</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">export</span> <span class="n">GEM_HOME</span><span class="o">=</span><span class="s">&quot;$OLD_BLOG_GEM_HOME&quot;</span>
+</span><span class='line'><span class="n">unset</span> <span class="n">OLD_GEM_HOME</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">export</span> <span class="n">GEM_PATH</span><span class="o">=</span><span class="s">&quot;$OLD_BLOG_GEM_PATH&quot;</span>
+</span><span class='line'><span class="n">unset</span> <span class="n">OLD_GEM_PATH</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s">&quot;$OLD_BLOG_PATH&quot;</span>
+</span><span class='line'><span class="n">unset</span> <span class="n">OLD_PATH</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, whenever you install gems, they&rsquo;ll install to the folder
+<code>$VIRTUAL_ENV/gems/</code> instead of the system&rsquo;s location, so no gems bleed into
+another project!</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Vim as a Man Page Viewer]]></title>
@@ -1677,88 +1780,6 @@ If you cared enough to read that far, you should consider following me on <a hre
 <p>This theme is in no way perfect, from the styles to the compatibility with the vast array of Octopress options. If my support for your favorite feature is lacking or absent altogether, patch it up and submit a pull request on <a href="https://github.com/Z1MM32M4N/hpstr-theme">GitHub</a>!</p>
 
 <p><strong>I&rsquo;d also love to hear about your installation process.</strong> If something didn&rsquo;t quite work out right when installing the theme from GitHub or everything went super smoothly, tell me on GitHub in an issue, on <a href="https://www.twitter.com/Z1MM32M4N">Twitter</a>, in the comments below, or in an <a href="mailto:jake@zimmerman.io">email</a>. Seriously!</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[GitHub Pages Custom Domains]]></title>
-    <link href="http://blog.zimmerman.io/2014/05/06/github-pages-custom-domains/"/>
-    <updated>2014-05-06T02:15:35-05:00</updated>
-    <id>http://blog.zimmerman.io/2014/05/06/github-pages-custom-domains</id>
-    <content type="html"><![CDATA[<p>I stumbled at first getting the DNS configured for my blog, because I&rsquo;ve got a slighty more complicated setup than normal. I decided to supplement the documentation <a href="https://pages.github.com/">GitHub Pages</a> gives by recounting my personal example and the setup that worked.</p>
-
-<!-- more -->
-
-
-<p>If you&rsquo;ve never heard of <a href="https://pages.github.com/">GitHub Pages</a> for web hosting, you should definitely check it out. You basically get free hosting for any static (i.e. plain HTML or <a href="http://jekyllrb.com/">Jekyll</a>-served) website with git-push-to-deploy. You can even configure your site to be listed at a custom domain according to <a href="https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages">these</a> instructions, which are pretty thorough. I feel like it&rsquo;d help, though, to supplement this documentation with a fairly common example setup.</p>
-
-<h2>My setup</h2>
-
-<p>I have two sites which I want to host using the <code>zimmerman.io</code> domain name: my <a href="//blog.zimmerman.io">blog</a> and my <a href="//www.zimmerman.io">personal site</a>. I host my personal site at <a href="//www.zimmerman.io">www.zimmerman.io</a>, but you can also navigate to <a href="//zimmerman.io">zimmerman.io</a> and end up in the same places as before. It&rsquo;s served as a User Page from <a href="https://www.github.com/Z1MM32M4N/z1mm32m4n.github.io">this repo</a>.</p>
-
-<p>I host my blog at <a href="//blog.zimmerman.io">blog.zimmerman.io</a>, and it&rsquo;s served as a Project Page in <a href="https://www.github.com/Z1MM32M4N/blog/">this repo</a>.</p>
-
-<h2>What the instructions say</h2>
-
-<p>The instructions say a few things very clearly (yay, documentation!).</p>
-
-<p>First, if I want to use a custom subdomain (like what I&rsquo;m doing for my blog) to host a repo, I can add a <code>CNAME</code> record with my DNS provider that points to what is in my case <code>z1mm32m4n.github.io</code>. This was counterintuitive to me, because I thought at first that this would make my blog.zimmerman.io domain redirect to my personal site, but that&rsquo;s not how GitHub handles it. (They&rsquo;re smarter than that.)</p>
-
-<p>At the same time, I need to put a file in the root of the blog&rsquo;s repo (in the <code>gh-pages</code> branch because it&rsquo;s a Project Page), called <code>CNAME</code> (<a href="https://github.com/Z1MM32M4N/blog/blob/gh-pages/CNAME">view source</a>) with the contents &lsquo;blog.zimmerman.io&rsquo;. After a little while, the DNS tables will update and everything here should work: I can now view my <em>blog</em> where I want it.</p>
-
-<h2>What the instructions say, but not so clearly</h2>
-
-<p>The next bit gave me some trouble at first (probably just because I was being impatient while the DNS tables were updating). The end goal was to have the <code>www</code> subdomain host my site and have the <code>@</code> (top-level or apex) domain redirect there. If you read carefully, the instructions say to do three things:</p>
-
-<ol>
-<li> Make the <code>CNAME</code> file (<a href="https://github.com/Z1MM32M4N/z1mm32m4n.github.io/blob/master/CNAME">view source</a>) in my (User) Pages repository contain <code>www.zimmerman.io</code>. <strong>This</strong> is the domain at which I do want my site to be visible.</li>
-<li> Create a <code>CNAME</code> record with my DNS provider pointing to <code>z1mm32m4n.github.io</code> for the <code>www</code> subdomain. From a technical standpoint on the DNS provider&rsquo;s side of things, this is the same thing we did before with the <code>blog</code> subdomain.</li>
-<li> Create an <code>A</code> record pointing the <code>@</code> domain towards GitHub using the IP address they specify.</li>
-</ol>
-
-
-<p>This last step is where you have to have a little faith: nowhere is there an explicit file telling GitHub, &ldquo;If you get a request from zimmerman.io, send it to me!&rdquo; GitHub merely notices that there <strong>is</strong> a repo with a CNAME containing &lsquo;<strong>www</strong>.zimmerman.io&rsquo;, and so they say, &ldquo;Well, we may as well send this <strong>top level</strong> domain to the <strong>www</strong> domain referenced over here&hellip; I&rsquo;ve got nothing better to do.&rdquo;</p>
-
-<p>This was a little confusing at first, because if I wanted the opposite direction (www.zimmerman.io to redirect to zimmerman.io), I would have still created a CNAME file, but it would have contained <code>zimmerman.io</code> and I would have created an <code>A</code> record with my DNS provider, not an actual CNAME. (I still did have to create both the <code>A</code> and <code>CNAME</code> in the end, but in this setup, the <code>A</code> record is referenced in the <code>CNAME</code> file, if that makes any sense.)</p>
-
-<h2>Recap</h2>
-
-<h3>My CNAME Files</h3>
-
-<ul>
-<li> For www.zimmerman.io:
-
-<ul>
-<li> CNAME file contains <code>www.zimmerman.io</code></li>
-<li> CNAME file resides in <code>master</code> branch of User Pages repo for Z1MM32M4N</li>
-</ul>
-</li>
-<li> For blog.zimmerman.io
-
-<ul>
-<li> CNAME file contains <code>blog.zimmerman.io</code></li>
-<li> CNAME file resides in <code>gh-pages</code> branch of Project Pages repo for Z1MM32M4N/blog</li>
-</ul>
-</li>
-</ul>
-
-
-<h3>My DNS Config</h3>
-
-<p>Here&rsquo;s a screenshot of what my records look like with my DNS provider, in case this was still unclear.</p>
-
-<p><a class="image-link" href="http://blog.zimmerman.io/images/DNS-config.jpg"><img src="http://blog.zimmerman.io/images/DNS-config.jpg"></a></p>
-
-<p>I&rsquo;m personally using <a href="https://www.gandi.net/">Gandi</a> for domain registration because they had the cheapest <code>.io</code> TLD registration, but their interface takes some getting used to. (It was certainly still worth the deal I got.)</p>
 
 <hr />
 
