@@ -16,25 +16,25 @@ share: true
 
 A while back I found a command that removes all Ruby gems installed on a system
 when you're using rbenv. It worked great, so I decided to build on top of it.
-After a bit of research, I found a much better solution to the problem of
-sandboxing Ruby Gems.
+After a bit of research, I found a much better solution to the root of my
+problems: sandboxing Ruby gems.
 
 <!-- more -->
 
 ## Ugh, Ruby...
 
 If you're anything like me, you can never do anything right on the first try
-using Ruby. On one of these occasions, I got tired of trying to fix it. I
-wanted to destroy everything and start over. That's when I found Ian Vaughan's
-[script][iv] that magically removes all gems. I was delighted to see that it
-worked perfectly on the first try, and went about the rest of my business.
+using Ruby. At one point, I found myself needing a script to just nuke
+everything and start over... That's when I found Ian Vaughan's [script][iv] that
+magically removes all gems. I was delighted to see that it worked perfectly on
+the first try, and went about the rest of my business.
 
 ## Modifications
 
-There were two ways, though, that what this script's functionality differed
-from what I wanted it to do: it always removed __all__ the gems, and it left
-behind a `.ruby_version` file after it was used, clobbering any file that might
-have been there before.
+There were two ways though in which this script's functionality differed from
+what I wanted it to do: it always removed __all__ gems, and it left behind a
+`.ruby_version` file after it was used, clobbering any file that might have been
+there before.
 
 In my updated script, you can specify a list of ruby versions as arguments, and
 it will only gems from those versions instead of all of them.  Also, it saves
@@ -48,13 +48,14 @@ a part of of [my personal bin folder][bin].
 After a bit of reflection, I realized I should be trying to solve the underlying
 problem: different projects had different dependencies, and gems from one
 project were bleeding into gems from another. If you're a Python developer, you
-don't have this issue: [virtualenvwrapper][venv], `pip` and `requirements.txt`
+don't have this issue: [virtualenvwrapper][venv], `pip`, and `requirements.txt`
 files make this a non-issue.
 
-After looking into a similar Ruby solution, I came up with [this blog
-post][venv-ruby] outlining how you can do the exact same thing using virtualenvs
-but with Ruby gems! You should definitely check it out if you're in the same
-boat. Add these lines to your virtualenv's `postactivate` script:
+After looking into if there existed a similar Ruby solution, I came up with
+[this blog post][venv-ruby] outlining how you can do the exact same thing using
+virtualenvs but with Ruby gems! Once again, it needed a little bit of
+modification so that everything works again as you'd expect when you
+`deactivate`. Add these lines to your virtualenv's `postactivate` script:
 
 ```python $VIRTUAL_ENV/bin/postactivate
 export OLD_GEMHOME="$GEM_HOME"
