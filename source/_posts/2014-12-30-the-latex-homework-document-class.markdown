@@ -1,14 +1,13 @@
 ---
 layout: post
 title: "The LaTeX homework Document Class"
-date: 2014-12-21 03:15:03 -0600
+date: 2014-12-30 17:00:00 -0600
 comments: true
 categories: [latex]
 description: "A LaTeX \\documentclass for typesetting homework assignments."
 image:
   feature: /images/homework-class.png
 share: true
-published: false
 ---
 
 There are LaTeX document classes for typesetting books, articles, exams, presentations, and more. Now, there's one for homework assignments, too.

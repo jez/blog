@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Intro to Columns in HTML"
-date: 2014-12-21 04:59:13 -0600
+date: 2014-12-24 17:00:00 -0600
 comments: true
 categories: [html, webdev, best-practices]
 description: >
@@ -11,7 +11,6 @@ image:
   credit: Wikimedia Commons
   creditlink: http://upload.wikimedia.org/wikipedia/commons/5/5d/Lincoln_memorial_columns.jpg
 share: true
-published: false
 ---
 
 HTML and CSS can be frustrating when first starting out. Despite all you try, nothing is in the right place. I've advised more than a few friends on how to figure out this mystery and I've noticed a pattern: people don't realize they should be using a grid.
@@ -145,6 +144,15 @@ You already know that you can use `.class` and `#id` to select items based on th
 ```
 
 You can combine this with a nice padding (`padding: 50px` should do the trick) on the `.column`, and you've got yourself a vertical divider!
+
+## Update
+
+After writing this post, I discovered a couple articles talking about the new
+`flexbox` feature. From what I can tell, it looks promising in terms of ease of
+use and browser compatibility. That being said, many common CSS frameworks still
+use `float: left`, so the content presented here is still good information to
+know. If you're having trouble getting floats to work, though, maybe you should
+look into `flexbox` instead!
 
 
 {% include jake-on-the-web.markdown %}

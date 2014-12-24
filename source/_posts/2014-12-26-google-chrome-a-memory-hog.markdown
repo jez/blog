@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Google Chrome: A Memory Hog"
-date: 2014-12-24 17:00:00 -0600
+date: 2014-12-26 17:00:00 -0600
 comments: true
 categories: [unix, bash]
 description: A bash oneliner to determine how much memory Chrome is using.

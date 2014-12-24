@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Offline LaTeX Development - Part 2"
-date: 2014-12-21 01:40:24 -0600
+date: 2014-12-28 17:00:00 -0600
 comments: true
 categories: [latex, terminal, vim, osx]
 description: >
@@ -10,7 +10,6 @@ description: >
 image:
   feature: /images/latex-amethyst.png
 share: true
-published: false
 ---
 
 I've already written about how I develop LaTeX offline in Vim using GNU Make. Recently, though, I found a tool that implements another feature that GUI editors had to themselves: splitting panes.
