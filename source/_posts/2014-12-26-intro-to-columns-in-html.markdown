@@ -34,7 +34,7 @@ Disregarding some special cases, _every HTML element_ falls into one of these tw
 | `div` | `span`   |
 | `h1`  | `a`      |
 | `p`   | `strong` |
-| `ul`  | `image`  |
+| `ul`  | `em`  |
 | `li`  | `br`     |
 | `pre` | `button` |
 
