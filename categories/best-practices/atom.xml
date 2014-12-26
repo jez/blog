@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Best-practices | Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/categories/best-practices/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-12-22T15:47:23-06:00</updated>
+  <updated>2014-12-26T12:45:17-06:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,210 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Intro to Columns in HTML]]></title>
+    <link href="http://blog.zimmerman.io/2014/12/26/intro-to-columns-in-html/"/>
+    <updated>2014-12-26T12:00:00-06:00</updated>
+    <id>http://blog.zimmerman.io/2014/12/26/intro-to-columns-in-html</id>
+    <content type="html"><![CDATA[<p>HTML and CSS can be frustrating when first starting out. Despite all you try, nothing is in the right place. I&rsquo;ve advised more than a few friends on how to figure out this mystery and I&rsquo;ve noticed a pattern: people don&rsquo;t realize they should be using a grid.</p>
+
+<!-- more -->
+
+
+<h2>Positioning Content</h2>
+
+<p>When something doesn&rsquo;t align correctly on the page, a natural phrase to Google is &ldquo;make div align right&rdquo; or &ldquo;move div up.&rdquo; In other media where content is positioned absolutely, like when using text boxes in Microsoft Word, these might be the right queries. With HTML &amp; CSS, though, they&rsquo;re off point. Don&rsquo;t get me wrong, there&rsquo;s definitely a time for <code>position: absolute</code>, but if this comes up when you&rsquo;re trying to make grids you&rsquo;re likely on the wrong path.</p>
+
+<p>In HTML, the page is drawn from top to bottom, left to right. This means that your page ends up being aligned how words in a book are. Once the first word has taken up a certain amount of space, the next word starts filling up the space after it. The trick then, is knowing <em>how much</em> space the first item takes up, and how to resize it appropriately so that the second item &ldquo;falls into place.&rdquo;</p>
+
+<h2>Blocks and Inline Elements</h2>
+
+<p>The easiest way to explain block and inline elements is to continue our book analogy. Block elements are like titles and headings&mdash;they take up the entire page width, spanning from the left border to the right border. That&rsquo;s why if you put two headings as close as possible to each other, they&rsquo;ll still each have their own lines. There&rsquo;s no &ldquo;room&rdquo; for it to be any other way! Meanwhile, inline elements are like individual words. Where one word stops, the next one begins. A word takes up no more space than is required to size it compactly.</p>
+
+<p>Disregarding some special cases, <em>every HTML element</em> falls into one of these two categories. Below are some examples of block elements and inline elements:</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;"> Block </th>
+<th style="text-align:center;"> Inline   </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;"> <code>div</code> </td>
+<td style="text-align:center;"> <code>span</code>   </td>
+</tr>
+<tr>
+<td style="text-align:center;"> <code>h1</code>  </td>
+<td style="text-align:center;"> <code>a</code>      </td>
+</tr>
+<tr>
+<td style="text-align:center;"> <code>p</code>   </td>
+<td style="text-align:center;"> <code>strong</code> </td>
+</tr>
+<tr>
+<td style="text-align:center;"> <code>ul</code>  </td>
+<td style="text-align:center;"> <code>image</code>  </td>
+</tr>
+<tr>
+<td style="text-align:center;"> <code>li</code>  </td>
+<td style="text-align:center;"> <code>br</code>     </td>
+</tr>
+<tr>
+<td style="text-align:center;"> <code>pre</code> </td>
+<td style="text-align:center;"> <code>button</code> </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>We know that we need to use a div to house our columns. The problem is, divs are a block elements, so they&rsquo;ll span the whole width of the page. Luckily, there&rsquo;s a relatively simple (though non-intuitive) fix to get our divs to line up.</p>
+
+<h2>Floating Content</h2>
+
+<p>Let&rsquo;s take a look at what we&rsquo;ve got so far. We want to have two columns, so our HTML is going to look like this:</p>
+
+<p>&#8220;`html HTML for two columns</p>
+
+<div class="row">
+  <div class="left column">
+    <!-- Your left content here -->
+  </div>
+  <div class="right column">
+    <!-- Your right content here -->
+  </div>
+</div>
+
+
+<pre><code>
+Straightforward enough. Knowing what we know about block elements, what if we just set the width of the columns to 50%?
+</code></pre>
+
+<p>.column {
+  /<em> arbitrary value for this example </em>/
+  height: 300px;</p>
+
+<p>  width: 50%;
+}</p>
+
+<p>/<em> so we can tell them appart </em>/
+.left { background: red; }
+.right { background: blue; }
+&#8220;`</p>
+
+<p><a href="http://codepen.io/Z1MM32M4N/pen/qENvdx?editors=110">Let&rsquo;s try it out and see what happens</a></p>
+
+<p>Uh oh, it looks like our columns aren&rsquo;t next to each other! In fact, it looks suspciously like something we mentioned earlier: if two page headings are as close together as possible, they&rsquo;ll still be placed on their own lines. We can verify that this is the case by using the <a href="https://developer.chrome.com/devtools">Chrome dev tools</a>. Inspecting the red div, we see the culprit:</p>
+
+<p><a class="image-link" href="/images/left-column-margin.png"><img src="/images/left-column-margin.png"></a></p>
+
+<p>For those familiar with the Chrome dev tools, that yellow-orange box is Chrome&rsquo;s attempt to show us the invisible <em>margin</em> present on our div. Since divs are block elements, by default there&rsquo;s enough margin on the div to make it fill up the whole width of the page.</p>
+
+<p>The solution, if you saw from the CodePen, is to add the property <code>float: left</code> to the columns. This essentially instructs the browser not to add that extra margin: instead of being positioned absolutely between the two sides of the screen, it should float to one side and forget about the other. This leaves room for the second column to file into place next to it.</p>
+
+<p>Go <a href="http://codepen.io/Z1MM32M4N/pen/qENvdx?editors=110">back to the pen</a> and uncomment the relevant line. <a href="http://codepen.io/Z1MM32M4N/pen/XJKGdg?editors=110">Observe</a> that we&rsquo;ve accomplished exactly what we wanted to.</p>
+
+<h2>Going Forward</h2>
+
+<p>Cool, this solves the problem of having two columns! What&rsquo;s next?</p>
+
+<ul>
+<li>How would we make three columns? Four columns? Twelve columns?</li>
+<li>Once we have multiple columns, how can we skip columns? (<strong>Hint</strong>: just because we have a column doesn&rsquo;t mean we have to put something in it)</li>
+<li>We can add multiple rows by duplicating the outer &ldquo;row&rdquo; div.
+
+<ul>
+<li>What if we want two 33%-width columns in the first row, but one 33%-width column in the second row? (This is actually a good one to work through. You might want to look into the <code>clear: both</code> CSS property)</li>
+</ul>
+</li>
+<li>The <code>border-left</code> and <code>border-right</code> CSS properties allow us to add a border to a div. We can even use <em>fancy CSS queries</em> (see below) to only add a border in between columns. But if we add a border, the columns overflow onto their own rows! Can you fix this?
+
+<ul>
+<li><strong>Warning</strong>: this one is the hardest. You will want to look into <code>box-sizing: border-box</code> and the &ldquo;CSS box model&rdquo;</li>
+</ul>
+</li>
+</ul>
+
+
+<p>Services like <a href="http://codepen.io/">CodePen</a> and <a href="http://jsfiddle.net/">JSFiddle</a> are excellent tools for trying out little experiments like this. I encourage you to actually tinker around with the <a href="http://codepen.io/Z1MM32M4N/pen/XJKGdg?editors=110">starter code from before</a> to see how you can answer all of these small questions.</p>
+
+<p>As it turns out, HTML/CSS grids are a very heavily studied point of design. So much so, that people build entire <em>CSS frameworks</em> around providing the building blocks to make grids easily. Here&rsquo;s a list:</p>
+
+<ul>
+<li><a href="http://getbootstrap.com/">Bootstrap</a></li>
+<li><a href="http://foundation.zurb.com/">Foundation</a></li>
+<li><a href="http://semantic-ui.com/">Semantic UI</a></li>
+<li><a href="http://unsemantic.com/">Unsemantic</a></li>
+</ul>
+
+
+<p>Bootstrap is by far the most common (once you see it, you&rsquo;ll start to realize how many sites look incredibly similar). However, many people misuse Bootstrap their first time around. <a href="http://www.helloerik.com/the-subtle-magic-behind-why-the-bootstrap-3-grid-works">This article</a> demystifies and documents how and why the Bootstrap 3 grid works.</p>
+
+<p>Even once you&rsquo;re an HTML and CSS master, it can still be frustrating. (Actually, I&rsquo;d believe it if the experts were the most frustrated!). I love answering question and trying to explain things, so if you need some help working through the exercises above or you&rsquo;re working on a personal project, I&rsquo;d love to see if I can help out! Protip: put your code on GitHub or somewhere else that&rsquo;s easily accessible so that it&rsquo;s easy to share changes quickly.</p>
+
+<h2>Appendix</h2>
+
+<p>I mentioned an example about &ldquo;fancy CSS queries&rdquo; above. This is certainly advanced territory, but it&rsquo;s something that I get asked a lot by beginners so here goes.</p>
+
+<p>Basically, the problem is that you only want vertical line separators in between columns, not on the edges. In ASCII art:</p>
+
+<pre><code class="plain Beautiful ASCII Art Diagram">
+        |        |
+  col1  |  col2  | col 3
+        |        |
+
+        ^        ^
+        | these. |
+</code></pre>
+
+<p>(Thank you, thank you, I know my drawings are beautiful XD).</p>
+
+<p>You already know that you can use <code>.class</code> and <code>#id</code> to select items based on their classes and IDs. But there are <a href="http://code.tutsplus.com/tutorials/the-30-css-selectors-you-must-memorize--net-16048">tons more query selectors</a> you can use! I&rsquo;ll use one to accomplish what we want with the vertical dividers:</p>
+
+<pre><code class="css Super Fancy CSS Selectors">.column {
+  height: 300px;
+  /* Try uncommenting me! */
+  float: left;
+  width: 50%;
+  /* this kind of solves the "overflow" exersise I posted above YOLO */
+  box-sizing: border-box;
+}
+
+/* marvel at the fanciness! */
+.column:not(:last-child) {
+  border-right: 5px solid black;
+}
+
+.left { background: red; }
+.right { background: blue; }
+</code></pre>
+
+<p>You can combine this with a nice padding (<code>padding: 50px</code> should do the trick) on the <code>.column</code>, and you&rsquo;ve got yourself a vertical divider!</p>
+
+<h2>Update</h2>
+
+<p>After writing this post, I discovered a couple articles talking about the new
+<code>flexbox</code> feature. From what I can tell, it looks promising in terms of ease of
+use and browser compatibility. That being said, many common CSS frameworks still
+use <code>float: left</code>, so the content presented here is still good information to
+know. If you&rsquo;re having trouble getting floats to work, though, maybe you should
+look into <code>flexbox</code> instead!</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&#8217;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.
+ [g]: http://www.github.com/Z1MM32M4N/
+ [h]: http://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The Joys of the Craft]]></title>
@@ -49,8 +253,10 @@
 <br>
 ### Jake on the Web
 <a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
- [t]: http://www.twitter.com/Z1MM32M4N/
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&#8217;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.
  [g]: http://www.github.com/Z1MM32M4N/
  [h]: http://www.zimmerman.io/
 </p>
@@ -95,8 +301,10 @@ If you cared enough to read that far, you should consider following me on [Twitt
 <br>
 ### Jake on the Web
 <a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
- [t]: http://www.twitter.com/Z1MM32M4N/
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&#8217;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.
  [g]: http://www.github.com/Z1MM32M4N/
  [h]: http://www.zimmerman.io/
 </p>
@@ -180,8 +388,10 @@ If you cared enough to read that far, you should consider following me on [Twitt
 <br>
 ### Jake on the Web
 <a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
- [t]: http://www.twitter.com/Z1MM32M4N/
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&#8217;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.
  [g]: http://www.github.com/Z1MM32M4N/
  [h]: http://www.zimmerman.io/
 </p>
@@ -226,184 +436,10 @@ If you cared enough to read that far, you should consider following me on [Twitt
 <br>
 ### Jake on the Web
 <a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
- [t]: http://www.twitter.com/Z1MM32M4N/
- [g]: http://www.github.com/Z1MM32M4N/
- [h]: http://www.zimmerman.io/
-</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Update Your Software: It's the Law]]></title>
-    <link href="http://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law/"/>
-    <updated>2014-06-11T21:22:57-05:00</updated>
-    <id>http://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law</id>
-    <content type="html"><![CDATA[<p>Okay, so maybe the government won&rsquo;t come after you for not updating. But they should. To guard off any present or future threats (be they from governments, security vulnerabilities, or something else in the cyber realm), I wrote a short bash snippet to check my system for outdated packages.</p>
-
-<!-- more -->
-
-
-<h2>Obligatory Existential/Meta Section</h2>
-
-<p>I don&rsquo;t quite know what prompted me to suddenly become interested in maintaining an up to date system. Maybe it was <a href="https://www.facebook.com/groups/cmuscs/permalink/727878180603546/">this post</a> of Arch Linux horror stories. Maybe it was the release of <a href="https://git.kernel.org/cgit/git/git.git/tree/Documentation/RelNotes/2.0.0.txt">git 2.0</a>, which introduces a lot of cool new features and deprecates a lot of others. Who knows, maybe it was influenced by Heartbleed and the <a href="https://www.openssl.org/news/secadv_20140605.txt">host</a> <a href="http://grahamcluley.com/2014/06/feedly-blackmail-ddos/">of other</a> <a href="http://blog.evernote.com/blog/2013/03/02/security-notice-service-wide-password-reset/">high-profile</a> security vulnerabilities and hacks that have sprung up lately. It&rsquo;s probably a combination of all of these. Let&rsquo;s move on.</p>
-
-<p>For the impatient among us, here&rsquo;s the code, which is also available <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42">here</a> and <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178">here</a> amongst all the code for <a href="https://github.com/Z1MM32M4N/dotfiles">all my dotfiles</a>.</p>
-
-<p><figure class='code'><figcaption><span>Alert to Update <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42">https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42</a> </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;<span class="p">&amp;</span>mdash<span class="p">;&amp;</span>ndash<span class="p">;</span> daily updates <span class="p">&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>ndash<span class="p">;</span>&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">[</span> ! -e <span class="nv">$HOME</span>/.last_update <span class="o">]</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> touch <span class="nv">$HOME</span>/.last_update&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Initialize <span class="k">for</span> when we have no GNU date available&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;last_check<span class="o">=</span>0
-</span><span class='line'><span class="nv">time_now</span><span class="o">=</span>0&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Unix last <span class="nb">command </span>to check the log of logins, grab the most recent&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;last_check_string<span class="o">=</span>&lt;code&gt;ls -l <span class="nv">$HOME</span>/.last_update <span class="p">|</span> awk <span class="s1">&#39;{print $6&quot; &quot;$7&quot; &quot;$8}&#39;</span>&lt;/code&gt;&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Darwin uses BSD, check <span class="k">for</span> gdate, <span class="k">else</span> use date&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> &lt;code&gt;uname&lt;/code&gt; <span class="o">=</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Darwin<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> -n &lt;code&gt;which gdate&lt;/code&gt; <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
-</span><span class='line'>  <span class="nv">last_login</span><span class="o">=</span>&lt;code&gt;gdate -d<span class="s2">&quot;$last_check_string&quot;</span> +%s&lt;/code&gt;
-</span><span class='line'>  <span class="nv">time_now</span><span class="o">=</span>&lt;code&gt;gdate +%s&lt;/code&gt;
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'>  <span class="c"># Ensure this is GNU grep</span>
-</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> -n <span class="p">&amp;</span>ldquo<span class="p">;</span>&lt;code&gt;date --version 2<span class="p">&amp;</span>gt<span class="p">;</span> /dev/null <span class="p">|</span> grep GNU&lt;/code&gt;<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-</span><span class='line'>    <span class="nv">last_login</span><span class="o">=</span>&lt;code&gt;date -d<span class="s2">&quot;$last_login_string&quot;</span> +%s&lt;/code&gt;
-</span><span class='line'>    <span class="nv">time_now</span><span class="o">=</span>&lt;code&gt;date +%s&lt;/code&gt;
-</span><span class='line'>  <span class="k">fi</span>
-</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;time_since_check<span class="o">=</span><span class="k">$((</span>time_now <span class="o">-</span> last_login<span class="k">))</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$time_since_check</span><span class="p">&amp;</span>rdquo<span class="p">;</span> -ge <span class="m">86400</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-</span><span class='line'>  <span class="nb">echo</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$cred</span><span class="o">==</span>&gt;<span class="nv">$cwhiteb</span> Your system is out of date!<span class="nv">$cnone</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
-</span><span class='line'>  <span class="nb">echo</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>Run &lt;code&gt;update&lt;/code&gt; to bring it up to date.<span class="p">&amp;</span>rsquo<span class="p">;</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p><figure class='code'><figcaption><span>Check for Updates <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178">https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178</a> </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;<span class="p">&amp;</span>mdash<span class="p">;&amp;</span>ndash<span class="p">;</span> <span class="k">function</span> <span class="p">&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;</span>-&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;update<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  touch <span class="nv">$HOME</span>/.last_update&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="c"># Mac updates</span>
-</span><span class='line'>  <span class="k">case</span> <span class="nv">$HOSTNAME</span> in
-</span><span class='line'>    &lt;em&gt;Jacobs-MacBook-Air&lt;/em&gt;<span class="o">)</span>
-</span><span class='line'>      <span class="nb">echo</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$cblueb</span><span class="o">==</span>&gt;<span class="nv">$cwhiteb</span> Updating Homebrew<span class="p">&amp;</span>hellip<span class="p">;</span><span class="nv">$cnone</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
-</span><span class='line'>      brew update&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;  <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&amp;gt;$cwhiteb Checking for outdated brew packages...$cnone&quot;</span>
-</span><span class='line'>  brew outdated --verbose
-</span><span class='line'>
-</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&amp;gt;$cwhiteb Checking for outdated rbenv...$cnone&quot;</span>
-</span><span class='line'>  <span class="nb">cd</span> <span class="nv">$HOME</span>/.rbenv
-</span><span class='line'>  git fetch
-</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;`git describe --tags master`&quot;</span> !<span class="o">=</span> <span class="s2">&quot;`git describe --tags origin/master`&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-</span><span class='line'>    <span class="nb">echo</span> <span class="s2">&quot;rbenv (`git describe --tags master`) is outdated (`git describe --tags origin/master`).&quot;</span>
-</span><span class='line'>    <span class="nb">echo</span> <span class="s2">&quot;To update, run: cd ~/.rbenv; git merge origin master &amp;amp;&amp;amp; cd -&quot;</span>
-</span><span class='line'>  <span class="k">fi</span>
-</span><span class='line'>  <span class="nb">cd</span> - 2<span class="p">&amp;</span>gt<span class="p">;&amp;</span>amp<span class="p">;</span><span class="m">1</span> <span class="p">&amp;</span>gt<span class="p">;</span> /dev/null
-</span><span class='line'>
-</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&amp;gt;$cwhiteb Checking for outdated ruby gems...$cnone&quot;</span>
-</span><span class='line'>  gem outdated
-</span><span class='line'>  <span class="p">;;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="k">esac</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<p>You&rsquo;ll note the use of a touch file (created in line 2 of the first snippet if it doesn&rsquo;t already exist). If this file is 24 hours old, each time this code is run an alert will be printed. Since this code is running inside of my <code>.bash_profile</code>, that means that every time I open a terminal on a 24-hour-old system, I see the update message.</p>
-
-<p>Next, you&rsquo;ll note that I&rsquo;ve defined a function called <code>update</code> which is actually misnamed. This function merely checks for available updates instead of actually performing the updates, logging those packages, gems, and formulae it finds that are out of date. For my purposes, I only need to update brew, check for formulae updates, update rbenv, and check for gem updates. Obviously though, given that there is a way to programmatically check something for updates, plugging that code in here would check it as well. This means that this method is very easy to customize and extend for various needs.</p>
-
-<h2>Rant</h2>
-
-<p>I was planning on checking pip for updates as well, but pip is kind of not even good. To give you an idea, to check all the packages brew manages for updates, you type <code>brew outdated</code>, and it will list the formula name, current version number, and newest version number. Meanwhile, back in the land of pip, no such functionality exists (at least, simple functionality, and functionality that I could find. If you&rsquo;d like to correct me, be my guest!). I&rsquo;m sure that this script will grow as I come to manage more and more pieces of software on my system and others.</p>
-
-<p>If you have any questions about what I&rsquo;ve done here, or you catch some bugs, be sure to comment below or file an issue on GitHub! I&rsquo;d love to hear what you have to say.</p>
-
-<p>- - - - -
-<br>
-### Jake on the Web
-<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on [Twitter][t], checking out my tinkerings on [GitHub][g], or paying a visit to [my homepage][h]. I&#8217;d love to hear what you think about what I&#8217;ve managed to put together, so feel free to comment, tweet at me, or send me an email.
- [t]: http://www.twitter.com/Z1MM32M4N/
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&#8217;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.
  [g]: http://www.github.com/Z1MM32M4N/
  [h]: http://www.zimmerman.io/
 </p>

@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-12-22T15:47:23-06:00</updated>
+  <updated>2014-12-26T12:45:17-06:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,250 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Intro to Columns in HTML]]></title>
+    <link href="http://blog.zimmerman.io/2014/12/26/intro-to-columns-in-html/"/>
+    <updated>2014-12-26T12:00:00-06:00</updated>
+    <id>http://blog.zimmerman.io/2014/12/26/intro-to-columns-in-html</id>
+    <content type="html"><![CDATA[<p>HTML and CSS can be frustrating when first starting out. Despite all you try, nothing is in the right place. I&rsquo;ve advised more than a few friends on how to figure out this mystery and I&rsquo;ve noticed a pattern: people don&rsquo;t realize they should be using a grid.</p>
+
+<!-- more -->
+
+
+<h2>Positioning Content</h2>
+
+<p>When something doesn&rsquo;t align correctly on the page, a natural phrase to Google is &ldquo;make div align right&rdquo; or &ldquo;move div up.&rdquo; In other media where content is positioned absolutely, like when using text boxes in Microsoft Word, these might be the right queries. With HTML &amp; CSS, though, they&rsquo;re off point. Don&rsquo;t get me wrong, there&rsquo;s definitely a time for <code>position: absolute</code>, but if this comes up when you&rsquo;re trying to make grids you&rsquo;re likely on the wrong path.</p>
+
+<p>In HTML, the page is drawn from top to bottom, left to right. This means that your page ends up being aligned how words in a book are. Once the first word has taken up a certain amount of space, the next word starts filling up the space after it. The trick then, is knowing <em>how much</em> space the first item takes up, and how to resize it appropriately so that the second item &ldquo;falls into place.&rdquo;</p>
+
+<h2>Blocks and Inline Elements</h2>
+
+<p>The easiest way to explain block and inline elements is to continue our book analogy. Block elements are like titles and headings&mdash;they take up the entire page width, spanning from the left border to the right border. That&rsquo;s why if you put two headings as close as possible to each other, they&rsquo;ll still each have their own lines. There&rsquo;s no &ldquo;room&rdquo; for it to be any other way! Meanwhile, inline elements are like individual words. Where one word stops, the next one begins. A word takes up no more space than is required to size it compactly.</p>
+
+<p>Disregarding some special cases, <em>every HTML element</em> falls into one of these two categories. Below are some examples of block elements and inline elements:</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;"> Block </th>
+<th style="text-align:center;"> Inline   </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;"> <code>div</code> </td>
+<td style="text-align:center;"> <code>span</code>   </td>
+</tr>
+<tr>
+<td style="text-align:center;"> <code>h1</code>  </td>
+<td style="text-align:center;"> <code>a</code>      </td>
+</tr>
+<tr>
+<td style="text-align:center;"> <code>p</code>   </td>
+<td style="text-align:center;"> <code>strong</code> </td>
+</tr>
+<tr>
+<td style="text-align:center;"> <code>ul</code>  </td>
+<td style="text-align:center;"> <code>image</code>  </td>
+</tr>
+<tr>
+<td style="text-align:center;"> <code>li</code>  </td>
+<td style="text-align:center;"> <code>br</code>     </td>
+</tr>
+<tr>
+<td style="text-align:center;"> <code>pre</code> </td>
+<td style="text-align:center;"> <code>button</code> </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>We know that we need to use a div to house our columns. The problem is, divs are a block elements, so they&rsquo;ll span the whole width of the page. Luckily, there&rsquo;s a relatively simple (though non-intuitive) fix to get our divs to line up.</p>
+
+<h2>Floating Content</h2>
+
+<p>Let&rsquo;s take a look at what we&rsquo;ve got so far. We want to have two columns, so our HTML is going to look like this:</p>
+
+<figure class='code'><figcaption><span>HTML for two columns</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;row&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;left column&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="c">&lt;!-- Your left content here --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;right column&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="c">&lt;!-- Your right content here --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Straightforward enough. Knowing what we know about block elements, what if we just set the width of the columns to 50%?</p>
+
+<figure class='code'><figcaption><span>Half-width columns</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c">/* arbitrary value for this example */</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">50%</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">/* so we can tell them appart */</span>
+</span><span class='line'><span class="nc">.left</span> <span class="p">{</span> <span class="k">background</span><span class="o">:</span> <span class="nb">red</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.right</span> <span class="p">{</span> <span class="k">background</span><span class="o">:</span> <span class="nb">blue</span><span class="p">;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://codepen.io/Z1MM32M4N/pen/qENvdx?editors=110">Let&rsquo;s try it out and see what happens</a></p>
+
+<p>Uh oh, it looks like our columns aren&rsquo;t next to each other! In fact, it looks suspciously like something we mentioned earlier: if two page headings are as close together as possible, they&rsquo;ll still be placed on their own lines. We can verify that this is the case by using the <a href="https://developer.chrome.com/devtools">Chrome dev tools</a>. Inspecting the red div, we see the culprit:</p>
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/left-column-margin.png"><img src="http://blog.zimmerman.io/images/left-column-margin.png"></a></p>
+
+<p>For those familiar with the Chrome dev tools, that yellow-orange box is Chrome&rsquo;s attempt to show us the invisible <em>margin</em> present on our div. Since divs are block elements, by default there&rsquo;s enough margin on the div to make it fill up the whole width of the page.</p>
+
+<p>The solution, if you saw from the CodePen, is to add the property <code>float: left</code> to the columns. This essentially instructs the browser not to add that extra margin: instead of being positioned absolutely between the two sides of the screen, it should float to one side and forget about the other. This leaves room for the second column to file into place next to it.</p>
+
+<p>Go <a href="http://codepen.io/Z1MM32M4N/pen/qENvdx?editors=110">back to the pen</a> and uncomment the relevant line. <a href="http://codepen.io/Z1MM32M4N/pen/XJKGdg?editors=110">Observe</a> that we&rsquo;ve accomplished exactly what we wanted to.</p>
+
+<h2>Going Forward</h2>
+
+<p>Cool, this solves the problem of having two columns! What&rsquo;s next?</p>
+
+<ul>
+<li>How would we make three columns? Four columns? Twelve columns?</li>
+<li>Once we have multiple columns, how can we skip columns? (<strong>Hint</strong>: just because we have a column doesn&rsquo;t mean we have to put something in it)</li>
+<li>We can add multiple rows by duplicating the outer &ldquo;row&rdquo; div.
+
+<ul>
+<li>What if we want two 33%-width columns in the first row, but one 33%-width column in the second row? (This is actually a good one to work through. You might want to look into the <code>clear: both</code> CSS property)</li>
+</ul>
+</li>
+<li>The <code>border-left</code> and <code>border-right</code> CSS properties allow us to add a border to a div. We can even use <em>fancy CSS queries</em> (see below) to only add a border in between columns. But if we add a border, the columns overflow onto their own rows! Can you fix this?
+
+<ul>
+<li><strong>Warning</strong>: this one is the hardest. You will want to look into <code>box-sizing: border-box</code> and the &ldquo;CSS box model&rdquo;</li>
+</ul>
+</li>
+</ul>
+
+
+<p>Services like <a href="http://codepen.io/">CodePen</a> and <a href="http://jsfiddle.net/">JSFiddle</a> are excellent tools for trying out little experiments like this. I encourage you to actually tinker around with the <a href="http://codepen.io/Z1MM32M4N/pen/XJKGdg?editors=110">starter code from before</a> to see how you can answer all of these small questions.</p>
+
+<p>As it turns out, HTML/CSS grids are a very heavily studied point of design. So much so, that people build entire <em>CSS frameworks</em> around providing the building blocks to make grids easily. Here&rsquo;s a list:</p>
+
+<ul>
+<li><a href="http://getbootstrap.com/">Bootstrap</a></li>
+<li><a href="http://foundation.zurb.com/">Foundation</a></li>
+<li><a href="http://semantic-ui.com/">Semantic UI</a></li>
+<li><a href="http://unsemantic.com/">Unsemantic</a></li>
+</ul>
+
+
+<p>Bootstrap is by far the most common (once you see it, you&rsquo;ll start to realize how many sites look incredibly similar). However, many people misuse Bootstrap their first time around. <a href="http://www.helloerik.com/the-subtle-magic-behind-why-the-bootstrap-3-grid-works">This article</a> demystifies and documents how and why the Bootstrap 3 grid works.</p>
+
+<p>Even once you&rsquo;re an HTML and CSS master, it can still be frustrating. (Actually, I&rsquo;d believe it if the experts were the most frustrated!). I love answering question and trying to explain things, so if you need some help working through the exercises above or you&rsquo;re working on a personal project, I&rsquo;d love to see if I can help out! Protip: put your code on GitHub or somewhere else that&rsquo;s easily accessible so that it&rsquo;s easy to share changes quickly.</p>
+
+<h2>Appendix</h2>
+
+<p>I mentioned an example about &ldquo;fancy CSS queries&rdquo; above. This is certainly advanced territory, but it&rsquo;s something that I get asked a lot by beginners so here goes.</p>
+
+<p>Basically, the problem is that you only want vertical line separators in between columns, not on the edges. In ASCII art:</p>
+
+<figure class='code'><figcaption><span>Beautiful ASCII Art Diagram</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>        |        |
+</span><span class='line'>  col1  |  col2  | col 3
+</span><span class='line'>        |        |
+</span><span class='line'>
+</span><span class='line'>        ^        ^
+</span><span class='line'>        | these. |</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(Thank you, thank you, I know my drawings are beautiful XD).</p>
+
+<p>You already know that you can use <code>.class</code> and <code>#id</code> to select items based on their classes and IDs. But there are <a href="http://code.tutsplus.com/tutorials/the-30-css-selectors-you-must-memorize--net-16048">tons more query selectors</a> you can use! I&rsquo;ll use one to accomplish what we want with the vertical dividers:</p>
+
+<figure class='code'><figcaption><span>Super Fancy CSS Selectors</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="c">/* Try uncommenting me! */</span>
+</span><span class='line'>  <span class="k">float</span><span class="o">:</span> <span class="k">left</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">50%</span><span class="p">;</span>
+</span><span class='line'>  <span class="c">/* this kind of solves the &quot;overflow&quot; exersise I posted above YOLO */</span>
+</span><span class='line'>  <span class="n">box</span><span class="o">-</span><span class="n">sizing</span><span class="o">:</span> <span class="k">border</span><span class="o">-</span><span class="n">box</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">/* marvel at the fanciness! */</span>
+</span><span class='line'><span class="nc">.column</span><span class="nd">:not</span><span class="o">(</span><span class="nd">:last-child</span><span class="o">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">border-right</span><span class="o">:</span> <span class="m">5px</span> <span class="k">solid</span> <span class="nb">black</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.left</span> <span class="p">{</span> <span class="k">background</span><span class="o">:</span> <span class="nb">red</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.right</span> <span class="p">{</span> <span class="k">background</span><span class="o">:</span> <span class="nb">blue</span><span class="p">;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can combine this with a nice padding (<code>padding: 50px</code> should do the trick) on the <code>.column</code>, and you&rsquo;ve got yourself a vertical divider!</p>
+
+<h2>Update</h2>
+
+<p>After writing this post, I discovered a couple articles talking about the new
+<code>flexbox</code> feature. From what I can tell, it looks promising in terms of ease of
+use and browser compatibility. That being said, many common CSS frameworks still
+use <code>float: left</code>, so the content presented here is still good information to
+know. If you&rsquo;re having trouble getting floats to work, though, maybe you should
+look into <code>flexbox</code> instead!</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Ruby Virtualenvs]]></title>
@@ -113,7 +357,10 @@ another project!</p>
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -203,7 +450,10 @@ XD</p>
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -246,7 +496,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -384,7 +637,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -493,7 +749,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -663,7 +922,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -694,7 +956,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -800,7 +1065,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -888,7 +1156,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -948,7 +1219,10 @@ can happen to you.<br></p>
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1164,7 +1438,10 @@ I think that the confusion is in the multiple uses of the <code>@</code> domain.
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1264,7 +1541,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1309,7 +1589,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1384,7 +1667,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1501,7 +1787,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1546,7 +1835,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1699,7 +1991,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1732,64 +2027,10 @@ If you cared enough to read that far, you should consider following me on <a hre
 <h3>Jake on the Web</h3>
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[HPSTR: An Octopress Theme]]></title>
-    <link href="http://blog.zimmerman.io/2014/06/04/hpstr-an-octopress-theme/"/>
-    <updated>2014-06-04T20:51:41-05:00</updated>
-    <id>http://blog.zimmerman.io/2014/06/04/hpstr-an-octopress-theme</id>
-    <content type="html"><![CDATA[<p>In case you didn&rsquo;t notice, we&rsquo;re rocking a new theme: <a href="https://github.com/Z1MM32M4N/hpstr-theme">HPSTR for Octopress</a>! Ported from the <a href="https://github.com/mmistakes/hpstr-jekyll-theme">theme of the same name</a> for Jekyll, this theme has a bunch of cool new features that make the theme easier to use and more customizable.</p>
-
-<!-- more -->
-
-
-<p>Before I begin, I have to give a huge shout out to <a href="https://github.com/mmistakes/">mmistakes</a> for crafting such an impeccable set of stylesheets and Jekyll templates. I could talk this theme up all day, but I think that the results speak for themselves. Even more praiseworthy is that the entire source code is licensed under the GPL, enabling anyone to take the source and build upon it. And on that note, I&rsquo;d like to unveil what <em>I&rsquo;ve</em> built.</p>
-
-<h1>Ported to Octopress</h1>
-
-<p>The theme was originally implemented for a vanilla Jekyll blog. Personally, I find the automation tools provided by Octopress to be incredibly helpful, and I didn&rsquo;t want to give these up to be able to deploy this theme. As a result, I had to tweak a few things in order to get it to work with a standard Octopress installation.</p>
-
-<h2>Less to Sass</h2>
-
-<p>The HPSTR theme was originally built using Less to compile its stylesheets. Octopress uses Sass under Compass instead&ndash;a decision which I love: the rich library of plugins that Compass provides is ridiculous. Thus, this was the first step of the port.</p>
-
-<p>After a quick Google search I stumbled upon <a href="http://stackoverflow.com/questions/14970224/anyone-know-of-a-good-way-to-convert-from-less-to-sass">this question</a> on Stack Overflow, which surprisingly took care of the vast majority of the conversion, leveraging mere text replacement. From there, it was mostly a matter of slugging through the Less docs to find out what a particular function did, jumping over to the Compass/Sass docs to find a corresponding mixin, and repeating.</p>
-
-<h2>Sass to Compass</h2>
-
-<p>I didn&rsquo;t stop after I had the vanilla Sass working. One of Compass&rsquo;s coolest features is that you don&rsquo;t have to repeat yourself: there are mixins for seemingly everything, and when there aren&rsquo;t, there are 3<sup>rd</sup> party plugins. Thus, the next phase of the port was to see how much of the code I could reduce to compass mixins.</p>
-
-<p>For the most part, this stage affected CSS3 properties which need vendor prefixes, to include keyframe animations. The keyframe animations are particularly worthy of a mention because I found a handy plugin called <a href="https://github.com/ericam/compass-animation">compass-animation</a> to take care of them. It works as easily as any other Compass mixin, from installation to use.</p>
-
-<h2>Octopress Mannerisms</h2>
-
-<p>There are a few things that Octopress users can expect to be reasonably similar from one deployment to the next, and I wanted to ensure that as many of the features dually implemented by mmistakes and Octopress used the syntax or conformed to the style set forth by Octopress. A small example of this: the <code>page.link</code> and <code>page.external_url</code> properties. Defined by the old and new themes respectively, both accomplish a similar purpose. Each specifies that the main purpose of the post is to link to a different page. Not wanting to break the service for current Octopress users, I tried to convert as many of these subtleties.</p>
-
-<p>On top of this, I restructured a lot of the original code so that someone used to customizing an Octopress theme would feel more at home when checking out the source for this theme, even if some of the particulars were different. This applied mostly to the Sass directory structure, but also to the templates.</p>
-
-<h1>More Powerful Customization</h1>
-
-<p>One of the many ways Octopress adds value on top of Jekyll is the ease with which you can get a Jekyll blog up and running, and subsequently customize and tweak that theme. This was one area where I felt that the original Jekyll theme fell short. The original stylesheets had a somewhat decent set of variables (in <code>less/variables.less</code>) that would allow you to customize the colors and font faces, but the method for customizing the size of the font was wonky (larger values produced smaller fonts), and the various mixins employed to handle setting the sizes were confusing.</p>
-
-<p>To solve this, I added <em>loads</em> of new variables handling the font sizes and line heights on a per-component basis, while also providing a master switch to easily resize everything. My theme also differs here from the original in that it&rsquo;s default font size is slightly larger for normal paragraph text (the whole reason why I cared about customizing the font size in the first place!).</p>
-
-<h1>Like what you see?</h1>
-
-<p>This theme is in no way perfect, from the styles to the compatibility with the vast array of Octopress options. If my support for your favorite feature is lacking or absent altogether, patch it up and submit a pull request on <a href="https://github.com/Z1MM32M4N/hpstr-theme">GitHub</a>!</p>
-
-<p><strong>I&rsquo;d also love to hear about your installation process.</strong> If something didn&rsquo;t quite work out right when installing the theme from GitHub or everything went super smoothly, tell me on GitHub in an issue, on <a href="https://www.twitter.com/Z1MM32M4N">Twitter</a>, in the comments below, or in an <a href="mailto:jake@zimmerman.io">email</a>. Seriously!</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on <a href="http://www.twitter.com/Z1MM32M4N/">Twitter</a>, checking out my tinkerings on <a href="http://www.github.com/Z1MM32M4N/">GitHub</a>, or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. I&rsquo;d love to hear what you think about what I&rsquo;ve managed to put together, so feel free to comment, tweet at me, or send me an email.</p>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I&rsquo;d love to hearing
+what people think, so feel free to comment, open an issue, or send me an email.</p>
 ]]></content>
   </entry>
   
