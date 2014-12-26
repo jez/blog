@@ -93,6 +93,8 @@ Cool, this solves the problem of having two columns! What's next?
 - The `border-left` and `border-right` CSS properties allow us to add a border to a div. We can even use _fancy CSS queries_ (see below) to only add a border in between columns. But if we add a border, the columns overflow onto their own rows! Can you fix this?
     - __Warning__: this one is the hardest. You will want to look into `box-sizing: border-box` and the "CSS box model"
 
+Services like [CodePen][codepen] and [JSFiddle][jsfiddle] are excellent tools for trying out little experiments like this. I encourage you to actually tinker around with the [starter code from before][pen2] to see how you can answer all of these small questions.
+
 As it turns out, HTML/CSS grids are a very heavily studied point of design. So much so, that people build entire _CSS frameworks_ around providing the building blocks to make grids easily. Here's a list:
 
 - [Bootstrap][bootstrap]
@@ -160,6 +162,8 @@ look into `flexbox` instead!
 [pen1]: http://codepen.io/Z1MM32M4N/pen/qENvdx?editors=110
 [pen2]: http://codepen.io/Z1MM32M4N/pen/XJKGdg?editors=110
 [chromedev]: https://developer.chrome.com/devtools
+[codepen]: http://codepen.io/
+[jsfiddle]: http://jsfiddle.net/
 
 [bootstrap]: http://getbootstrap.com/
 [foundation]: http://foundation.zurb.com/
