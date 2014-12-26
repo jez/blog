@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The LaTeX homework Document Class"
-date: 2014-12-30 17:00:00 -0600
+date: 2014-01-05 17:00:00 -0600
 comments: true
 categories: [latex]
 description: "A LaTeX \\documentclass for typesetting homework assignments."

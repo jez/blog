@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Intro to Columns in HTML"
-date: 2014-12-24 17:00:00 -0600
+date: 2014-12-26 12:00:00 -0600
 comments: true
 categories: [html, webdev, best-practices]
 description: >
