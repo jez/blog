@@ -71,13 +71,13 @@ export PATH="$PATH:$GEM_HOME/bin"
 And then add this complementary section to your `postdeactivate` script:
 
 ```python $VIRTUAL_ENV/bin/postactivate
-export GEM_HOME="$OLD_BLOG_GEM_HOME"
+export GEM_HOME="$OLD_GEM_HOME"
 unset OLD_GEM_HOME
 
-export GEM_PATH="$OLD_BLOG_GEM_PATH"
+export GEM_PATH="$OLD_GEM_PATH"
 unset OLD_GEM_PATH
 
-export PATH="$OLD_BLOG_PATH"
+export PATH="$OLD_PATH"
 unset OLD_PATH
 ```
 
