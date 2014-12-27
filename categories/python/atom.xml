@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/categories/python/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-12-27T12:12:04-06:00</updated>
+  <updated>2014-12-27T15:57:53-06:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -74,13 +74,13 @@ export PATH="$PATH:$GEM_HOME/bin"
 
 <p>And then add this complementary section to your <code>postdeactivate</code> script:</p>
 
-<pre><code class="python $VIRTUAL_ENV/bin/postactivate">export GEM_HOME="$OLD_BLOG_GEM_HOME"
+<pre><code class="python $VIRTUAL_ENV/bin/postactivate">export GEM_HOME="$OLD_GEM_HOME"
 unset OLD_GEM_HOME
 
-export GEM_PATH="$OLD_BLOG_GEM_PATH"
+export GEM_PATH="$OLD_GEM_PATH"
 unset OLD_GEM_PATH
 
-export PATH="$OLD_BLOG_PATH"
+export PATH="$OLD_PATH"
 unset OLD_PATH
 </code></pre>
 
