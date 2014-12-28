@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Terminal | Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/categories/terminal/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-12-27T15:57:53-06:00</updated>
+  <updated>2014-12-27T19:57:31-06:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -14,77 +14,79 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Running a VPS: Log 1]]></title>
-    <link href="http://blog.zimmerman.io/2014/06/19/running-a-vps-log-1/"/>
-    <updated>2014-06-19T22:10:51-05:00</updated>
-    <id>http://blog.zimmerman.io/2014/06/19/running-a-vps-log-1</id>
-    <content type="html"><![CDATA[<h1>Managing Dotfiles Across Machines</h1>
-
-<p>You could say I&rsquo;m a bit of a geek when it comes to configuring my terminal environment; this obsession has led me to concoct ever-elaborate setup scripts and configuration files. On top of this, between my laptop&rsquo;s multiple boot environments, the servers I use for school, work, and ScottyLabs, and now <a href="/2014/06/19/running-a-vps-log-0">metagross</a>, keeping my configuration files in sync is a must. I handle it swiftly using a combination of git and rcm.</p>
+    <title type="html"><![CDATA[Setting Up MobaXterm for SSH on Windows]]></title>
+    <link href="http://blog.zimmerman.io/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/"/>
+    <updated>2014-09-28T13:11:05-05:00</updated>
+    <id>http://blog.zimmerman.io/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows</id>
+    <content type="html"><![CDATA[<p>For an optimal SSH experience, your best best is to use Linux or Mac OS X. However, if you&rsquo;re dead-set on using Windows, MobaXterm has the best overall experience. This post guides you through setting it up and outlines some of its coolest features.</p>
 
 <!-- more -->
 
 
-<h2>My Scripts</h2>
+<h2>Download and Install</h2>
 
-<p>I&rsquo;ve put a decent amount of time into my dotfiles. I like to think they&rsquo;re pretty good. That being said, I&rsquo;m not about to go over every piece of them, because that would bore even me. I might come back to these pieces in a series on getting started with the terminal (aimed at incoming CS freshmen and other up-and-coming hackers), but for now, a link will suffice.</p>
+<p>The download and installation procedure for MobaXterm is pretty standard.</p>
 
-<h4><a href="https://github.com/Z1MM32M4N/dotfiles/">Z1MM32M4N/dotfiles</a></h4>
+<h3>1. Navigate to MobaXterm&rsquo;s Site</h3>
 
-<h2>rcm + git</h2>
+<p>You&rsquo;ll want to download the Home Edition, so find its link on the download page, or just go <a href="http://mobaxterm.mobatek.net/download-home-edition.html">here</a>. You&rsquo;ll see two options: one to install as a system-wide application (labelled &ldquo;installer&rdquo;), and one for installing to a flash drive (labelled &ldquo;portable edition&rdquo;). Unless you&rsquo;d really like to install to a flash drive, click the former and run the file once it&rsquo;s downloaded.</p>
 
-<p>rcm, short for rc file (as in .bash<b>rc</b>, .vim<b>rc</b>) management, is a tool that manages symlinks between dotfiles in one directory and your home directory. This is cool because, once all your config files contained in one folder, they can be tracked with git for version control without having to put your entire <code>$HOME</code> directory inside a git repo.</p>
+<h3>2. Install</h3>
 
-<p>On a single machine, rcm works like this. You have one directory (usually <code>~/.dotfiles</code>, but configurable to any directory) which stores all the config files. In here, all files which are meant to be tracked and symlinked do <em>not</em> include the prefixed &lsquo;<code>.</code>&rsquo;; instead, it is added as part of the linking process. After installation, which is easily handled through the brew formula, the .deb, or the Makefile, there are a couple of new tools available.</p>
+<p>I had trouble running the installer when I first downloaded it; Windows complained that the app was from an unrecognized publisher, so I had to click &ldquo;More info&rdquo; and then &ldquo;Run anyway&rdquo; to get the installer to run (this was on Windows 8, the process might be different if you run into this issue).</p>
 
-<p>The first worth mentioning is <code>man 7 rcm</code>, which documents what was just installed. Taking a glance at this page, we see that rcm is actually a suite of tools: <code>lsrc</code>, <code>mkrc</code>, <code>rcdn</code>, and <code>rcup</code>. While all these tools are useful, the most important is <code>rcup</code>. After collecting all your dotfiles into <code>~/.dotfiles</code>, simply executing <code>rcup</code> symlinks all the necessary files to their appropriate locations.</p>
+<p>Installing MobaXterm is simple. Just click through all the menus; no special setup is required here.</p>
 
-<p>From here, you get all the benefits of git, like pushing to GitHub, collaborating with others, lightweight branching, and syncing files easily even when your workflow is distributed across many servers.</p>
+<h3>3. Configure Your SSH Session</h3>
 
-<h2>Caveats</h2>
+<p>When you first log in, you&rsquo;ll see a prompt where you can directly SSH as you would on a normal terminal.</p>
 
-<p>To be fair, I don&rsquo;t use <code>rcm</code> in the way I think it&rsquo;s creators imagined it would be used. Specifically, the software includes certain provisions to designate which files should affect various machines using a tag system. While it could possibly work, in my mind it&rsquo;s much more tedious than what I&rsquo;ve come up with.</p>
+<p><a class="image-link" href="/images/mobaxterm-ssh.png"><img src="/images/mobaxterm-ssh.png" title="SSH Prompt" ></a></p>
 
-<p>Succinctly, the issue is this: when cloning a repo and running <code>rcup</code> for the first time, you can&rsquo;t easily say &ldquo;this is my VPS, it&rsquo;s running Debian GNU/Linux, has these system binaries installed, and therefore should start up using these methods and scripts&rdquo;. For this, we&rsquo;re on our own.</p>
+<p>If you type <code>ssh &lt;andrewid&gt;@unix.andrew.cmu.edu</code>, it will prompt you for your CMU password and then log you in. The program will also ask if you want to save your password. In the free version, it doesn&rsquo;t allow you to encrypt your stored passwords with a master password, so they&rsquo;re stored in the clear (this means anyone can read these if they got control of your computer). With this in mind, it&rsquo;s not a good idea to allow it to save your password, but I suppose no one&rsquo;s stopping you.</p>
 
-<h2>Installation</h2>
+<p><a class="image-link" href="/images/mobaxterm-password.png"><img src="/images/mobaxterm-password.png" title="Save Password Prompt" ></a></p>
 
-<p>The solution I came up with regarding a multiple-environment workflow deals with handling all the necessary machine-dependent configuration within my dotfiles <em>themselves</em>. That way I can minimize code reuse and have everything in one convenient file. As a result, <a href="https://github.com/Z1MM32M4N/dotfiles/tree/master/bash_profile">my bash_profile</a> is a bit lengthy at about 300 lines, and it has three large case statements, but I make all this up through deployment. Deployment is <strong>incredibly</strong> swift. Again, You can take a look at the file to see how it works, but when I had finished <a href="/2014/06/19/running-a-vps-log-1">locking down my server</a>, these are the only configuration commands I had to run:</p>
+<p>This process of typing out your username and hostname every time you want to SSH can get annoying, though. MobaXterm allows you to save sessions so that you can easily log in without typing <code>ssh &lt;andrewid&gt;@unix.andrew.cmu.edu</code> each time.</p>
 
-<p><figure class='code'><figcaption><span>Installing rcm and dotfiles </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;install rcm using deb and dpkg&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="nv">$ </span>wget &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;https://thoughtbot.github.io/rcm/debs/rcm_1.2.3-1_all.deb&quot;</span>&gt;https://thoughtbot.github.io/rcm/debs/rcm_1.2.3-1_all.deb&lt;/a&gt;
-</span><span class='line'><span class="nv">$ </span>sudo dpkg -i rcm_1.2.3-1_all.deb&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;clone dotfiles down, into the ~/.dotfiles directory&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="nv">$ </span>git clone &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;https://github.com/Z1MM32M4N/dotfiles&quot;</span>&gt;https://github.com/Z1MM32M4N/dotfiles&lt;/a&gt; ~/.dotfiles&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;make the symlinks&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="nv">$ </span>rcup
-</span></code></pre></td></tr></table></div></figure></p>
+<p>To create a new session, click the &ldquo;Session&rdquo; button in the top left.</p>
 
-<p>Voilà! After that, I had my sick bash prompt, my <a href="/2014/06/11/update-your-software-its-the-law/">snazzy update function</a>, my delightful vim colorscheme, solarized dir colors&ndash;the list goes on and on.</p>
+<p><a class="image-link" href="/images/mobaxterm-new-session.png"><img src="/images/mobaxterm-new-session.png" title="New Session" ></a></p>
 
-<p>Sure, it&rsquo;s taken a bit of effort to get the point where I can run these commands and have it Just Work, but doing that work once means that from now on, whenever I sit down at a new work computer, a new VPS, a new laptop, or some other workstation, I&rsquo;m only a few commands away from my favorite settings.</p>
+<p>Then you&rsquo;ll see a screen that allows you to enter the settings for that session.</p>
+
+<p><a class="image-link" href="/images/mobaxterm-configure-session.png"><img src="/images/mobaxterm-configure-session.png" title="Configure New Session" ></a></p>
+
+<p>The fields and values you&rsquo;ll need to populate are:</p>
+
+<ul>
+<li><strong>Remote host</strong>: <code>unix.andrew.cmu.edu</code></li>
+<li><strong>Specify username</strong>: check the box, then <code>&lt;Your-AndrewID&gt;</code></li>
+<li><strong>Port</strong>: 22</li>
+</ul>
+
+
+<p>You can also choose a bunch of other settings for this session. Feel free to peruse them and see if there&rsquo;s something you want to change (note that these settings will only be used when you use this session to log in). You might want to change the &ldquo;Session name&rdquo; to something more concise.</p>
+
+<p>After that, click &ldquo;OK&rdquo; and your session will appear in the panel on the left under &ldquo;Saved sessions&rdquo;.</p>
+
+<h2>Cool MobaXterm Features</h2>
+
+<p>This section lists a few features that MobaXterm does better than other SSH options like PuTTY.</p>
+
+<p>First, MobaXterm has tabs and splits, which make managing your connections to a remote server much more enjoyable.</p>
+
+<p>MobaXterm also has more sophisticated color options. Granted, it&rsquo;s still not as good as most Linux or Mac OS X terminal emulators. Out of the box, the colors are more pleasant than the default PuTTY color scheme. There are also 4 other pre-installed colors schemes, including <a href="http://ethanschoonover.com/solarized">Solarized Light and Solarized Dark</a>.</p>
+
+<p>I can&rsquo;t emphasize enough how much of a different having a &ldquo;pretty&rdquo; terminal is. Given the amount of time you&rsquo;ll be spending in your terminal, being able to read its text is a must. Also check out the rest of the settings. There will very likely be a few things you&rsquo;d like to tweak that make the interface make more sense to you, which in turn will make you less frustrated when trying to get work done.</p>
+
+<p>MobaXterm comes with a built in SCP client. This means you can transfer files between your remote server (like Andrew Unix) and your personal computer with the simplicity of a graphical, click and drag interface if you prefer. This is an alternative to WinSCP that&rsquo;s built into MobaXterm.</p>
+
+<p>It also has a built in X server, which means that you can start programs on the remote host that have graphical displays. For example, this is useful if you have an assignment that requires you to write a program that manipulates images and view the results.</p>
+
+<h2>Shameless Plug</h2>
+
+<p>While all these features are great, ssh is a program that was meant to be used on Unix-based systems. I personally switched from Windows + Ubuntu to Mac OS X before coming to college, and it was one of the best decisions I made. If Mac OS X is a bit much for you, though, I strongly encourage you to install Linux, using either a VM or a dual-boot configuration. Doing programming and development work in a Linux environment makes nearly every task simpler than trying to do it on Windows.</p>
 
 <p>- - - - -
 <br>

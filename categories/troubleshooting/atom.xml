@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Troubleshooting | Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/categories/troubleshooting/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-12-27T15:57:53-06:00</updated>
+  <updated>2014-12-27T19:57:31-06:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,228 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Running a VPS, Log 4: Debugging a Broken Mail Server]]></title>
+    <link href="http://blog.zimmerman.io/2014/07/07/running-a-vps-log-4/"/>
+    <updated>2014-07-07T00:08:00-05:00</updated>
+    <id>http://blog.zimmerman.io/2014/07/07/running-a-vps-log-4</id>
+    <content type="html"><![CDATA[<p>Whereas the tutorial I&rsquo;m following to setup this mail server initially promised a working setup in more or less two hours, it&rsquo;s nearing two weeks for me and I&rsquo;ve still got plenty of issues. In this log, I&rsquo;ll discuss some of the tools, log files, and online resources which I&rsquo;ve found helpful, as well as give a description of my problem as I best understand it.</p>
+
+<!-- more -->
+
+
+<h3><code>telnet</code></h3>
+
+<p>As I mentioned in my <a href="/2014/07/04/running-a-vps-log-3">last log</a>, I&rsquo;ve been using three basic tools to connect to and test my mail server. While a graphical client might have a few tools for debugging a faulty connection&ndash;Mail.app&rsquo;s <a href="http://support.apple.com/kb/PH14945">Connection Doctor</a> comes to mind&ndash;they don&rsquo;t usually afford full control to the debugger.</p>
+
+<p>This is where some truly powerful command line tools come into play, the first of which is <code>telnet</code>. Telnet opens up a text-based communication channel between you and a server; once connected, you can ask the server anything. SMTP is the broken part of my server, so I&rsquo;ll focus exclusively on examples dealing with connecting on SMTP ports. That being said, these tools are meant to be general purpose and should work for any type of service or port you can think of which exposes a textual interface.</p>
+
+<p>On a working mail server, we should be able to have the following dialog with the server:</p>
+
+<p><figure class='code'><figcaption><span>telnet </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ telnet mail.zimmerman.io 25
+</span><span class='line'>  Trying 107.170.7.111&hellip;
+</span><span class='line'>  Connected to metagross.zimmerman.io.
+</span><span class='line'>  Escape character is &lsquo;^]&rsquo;.
+</span><span class='line'>  220 ************************************&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;blockquote>&lt;p>EHLO [206.71.229.162]
+</span><span class='line'>  250-metagross
+</span><span class='line'>  250-PIPELINING
+</span><span class='line'>  250-SIZE 10240000
+</span><span class='line'>  250-VRFY
+</span><span class='line'>  250-ETRN
+</span><span class='line'>  250-XXXXXXXA
+</span><span class='line'>  250-ENHANCEDSTATUSCODES
+</span><span class='line'>  250-8BITMIME
+</span><span class='line'>  250-STARTTLS
+</span><span class='line'>  250 DSN&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></p></blockquote>
+
+<p>A few notes:</p>
+
+<ul>
+<li>The first two characters of each line follow this legend:
+
+<ul>
+<li><code>$</code> indicates a line entered at the bash REPL</li>
+<li><code>&gt;</code> indicates a line entered and sent to the server</li>
+<li>all other lines are responses from the server</li>
+</ul>
+</li>
+<li><code>telnet</code> by default takes two arguments: a domain/IP address, and a port number.</li>
+<li><code>EHLO</code> is an SMTP command asking the server to identify itself and list which subset of commands it will respond to.</li>
+</ul>
+
+
+<p>From here, we can use commands like <code>MAIL from: &lt;address&gt;</code>, <code>RCPT to: &lt;address&gt;</code>, and <code>DATA</code> to send an email, using only plain text SMTP commands. Pretty powerful. There are also commands to initiate an encrypted connection (using <code>STARTTLS</code>), authenticate a user (using <code>AUTH</code>), and <a href="http://www.port25.com/how-to-check-an-smtp-connection-with-a-manual-telnet-session-2/">more</a>.</p>
+
+<p>Earlier I said that one thing we can discern from the server&rsquo;s <code>EHLO</code> response is what types of commands it will respond to. I also mentioned that this particular dialog would occur with a <em>working</em> mail server. Sneak peak of a problem I&rsquo;m having: I can&rsquo;t get <code>250-STARTTLS</code> to appear in my server&rsquo;s response. We&rsquo;ll come back to this.</p>
+
+<h3>OpenSSL&rsquo;s &nbsp; <code>s_client</code></h3>
+
+<p>The second command line utility that is useful in debugging a mail server, especially those where SSL/TLS encryption is involved, is provided by OpenSSL. OpenSSL exposes a variety of commands, one of which, <code>s_client</code>, aids with establishing an encrypted connection between you and a server.</p>
+
+<p>The syntax of the command looks like this:</p>
+
+<p><figure class='code'><figcaption><span>s_client </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ openssl s_client -connect &lt;host>:&lt;port> [options]</span></code></pre></td></tr></table></div></figure></p>
+
+<p>This client becomes particularly important, because one Postfix option I&rsquo;ve specified in the file <code>/etc/postfix/main.cf</code> is <code>smtpd_tls_auth_only = yes</code>. What this means is that Postfix won&rsquo;t send the line <code>250-AUTH PLAIN LOGIN</code> unless we&rsquo;re running on a secure connection. Merely using <code>telnet</code> to connect on port 25 will not initiate a secure connection.</p>
+
+<p>There are a couple of ways we can use <code>s_client</code> to start off this encryption. The first way is to use port 465 to connect using sSMTP: <code>$ openssl s_client -connect mail.zimmerman.io:465</code>. We could also connect to port 25 and then immediately initiate an encrypted connection by issuing the STARTTLS command: <code>$ openssl s_client mail.zimmerman:25 -starttls smtp</code>. Either way, we get an encrypted connection to our server, and now the line <code>250-AUTH PLAIN LOGIN</code> line will appear in the server&rsquo;s <code>EHLO</code> response. We can continue sending SMTP commands just as with <code>telnet</code>.</p>
+
+<h2>The Problems Set In</h2>
+
+<p>If there&rsquo;s one thing I&rsquo;ve learned about mail servers, it&rsquo;s that they&rsquo;re hard. Like, they&rsquo;re really hard.</p>
+
+<p>The problems first set in when I tried to test my setup with Mail.app. For whatever reason, no combination of settings would let me send mail through my server. I opened the logs located at <code>/var/log/syslog</code> and <code>/var/log/mail.log</code> to see if I could discern what was going on, but nothing showed up. After a bit of Googling, I found some information on how to use the above tools and started to diagnose my problem.</p>
+
+<p>After using them for a little bit, I had the following diagnostic list of things I could and could not do:</p>
+
+<ul>
+<li>I could connect to port 25 using <code>telnet</code> (<code>telnet mail.zimmerman.io 25</code>)&hellip;
+
+<ul>
+<li>&hellip; but neither <code>STARTTLS</code> nor <code>AUTH</code> appeared in the <code>EHLO</code> response, so I couldn&rsquo;t send emails.</li>
+</ul>
+</li>
+<li>I could not connect to port 465 nor port 587 using neither <code>telnet</code> nor <code>s_client</code>
+
+<ul>
+<li><code>telnet</code> simply aborted telling me that my connection had been refused, whereas <code>openssl</code> at least gave me an error number: <code>connect:errno=61</code></li>
+</ul>
+</li>
+</ul>
+
+
+<p><a class="image-link" href="/images/smtp-connection-refused-1.png"><img src="/images/smtp-connection-refused-1.png"></a></p>
+
+<ul>
+<li>I could connect to port 25 using <code>telnet</code> <strong>from my server</strong> (<code>telnet localhost 25</code> after ssh&#8217;ing)
+
+<ul>
+<li>This meant that I could send emails, because I had set <code>permit_mynetworks</code> as one of the values under <code>smtpd_recipient_restrictions</code> (i.e., you don&rsquo;t have to authenticate if you&rsquo;ve already ssh&#8217;ed in)</li>
+</ul>
+</li>
+<li>I could connect to port 25 using <code>s_client</code> and initiate a STARTTLS command <strong>from my server</strong>
+
+<ul>
+<li>This was unnecessary, because the server would already accept my request to send emails to foreign recipients (because <code>permit_mynetworks</code> was enabled)</li>
+</ul>
+</li>
+<li>I could still not connect to ports 465 or 587.
+
+<ul>
+<li>I got &ldquo;connection refused&rdquo; errors again, but this time the <code>openssl</code> error number was 111.</li>
+</ul>
+</li>
+</ul>
+
+
+<p><a class="image-link" href="/images/smtp-connection-refused-2.png"><img src="/images/smtp-connection-refused-2.png"></a></p>
+
+<h2>Potential Fixes</h2>
+
+<p>I have a few ideas on why my server won&rsquo;t let me in. I know for sure that it&rsquo;s not a firewall issue; I have all the requisite ports (25/465/587 and 143/993) open.</p>
+
+<p><figure class='code'><figcaption><span>ufw Firewall Settings </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ufw status
+</span><span class='line'>Status: active&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>To                         Action      From&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;hr />
+</span><span class='line'>
+</span><span class='line'>&lt;p>53                         ALLOW       Anywhere
+</span><span class='line'>22/tcp                     ALLOW       Anywhere
+</span><span class='line'>7                          ALLOW       Anywhere
+</span><span class='line'>25/tcp                     ALLOW       Anywhere
+</span><span class='line'>143                        ALLOW       Anywhere
+</span><span class='line'>465/tcp                    ALLOW       Anywhere
+</span><span class='line'>993                        ALLOW       Anywhere
+</span><span class='line'>587/tcp                    ALLOW       Anywhere
+</span><span class='line'>53                         ALLOW       Anywhere (v6)
+</span><span class='line'>22/tcp                     ALLOW       Anywhere (v6)
+</span><span class='line'>7                          ALLOW       Anywhere (v6)
+</span><span class='line'>25/tcp                     ALLOW       Anywhere (v6)
+</span><span class='line'>143                        ALLOW       Anywhere (v6)
+</span><span class='line'>465/tcp                    ALLOW       Anywhere (v6)
+</span><span class='line'>993                        ALLOW       Anywhere (v6)
+</span><span class='line'>587/tcp                    ALLOW       Anywhere (v6)</span></code></pre></td></tr></table></div></figure></p>
+
+<p>It could be an issue with my certificates. Because I&rsquo;m cheap and didn&rsquo;t want to pay excessive amounts of money for a fun summer experiment, I decided to self-sign my SSL certificates. (This means that while my traffic will be encrypted, people who try to connect to my server can&rsquo;t necessarily trust that I am who I say I am. It&rsquo;s the same reason why we have notaries to verify our signatures.) I&rsquo;m skeptical that this could be the reason, though, because nothing was showing up in the logs. If it had been a certificate error, it would have almost certainly shown up in the logs at some point.</p>
+
+<p>Every error message that I got said the same thing: connection refused. But it only said connection refused on ports 465 and 587, ports that are expecting to receive communication over an encrypted channel. This means one of two things: my firewall is blocking the connection, which I&rsquo;ve already ruled out, or some other middle-man is kicking me out before we even get to Postfix, where something would show up in the logs.</p>
+
+<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.
+<br></p>
+
+<p><a class="image-link" href="/images/mail-dns-1.png"><img src="/images/mail-dns-1.png"></a></p>
+
+<p><br>
+I think that the confusion is in the multiple uses of the <code>@</code> domain. Taking a scrutinous look at the differences between my setup and the <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">tutorial</a> I&rsquo;ve been working out of, the one glaring difference is that his mail is set up on a subdomain whereas I wanted my mail to be set up on the apex domain. I thought that I made the necessary changes to my setup to get this to work, but now I&rsquo;m not so sure.</p>
+
+<p>It&rsquo;s also quite possible that I&rsquo;m completely off the mark with this diagnosis. The world of mail servers is a murky place; certainly one that I don&rsquo;t understand that well after only two weeks. But it has been a very rewarding experience so far, and I&rsquo;d like to see if I can&rsquo;t fix this issue.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.
+ [g]: http://www.github.com/Z1MM32M4N/
+ [h]: http://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[GitHub Pages Custom Domains]]></title>
