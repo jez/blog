@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "Running a VPS: Log 0"
+title: "Running a VPS, Log 0: Getting Set Up"
 date: 2014-06-19 21:45:29 -0400
 comments: true
-categories: [linux, vps, summer projects, security, intro]
+categories: [linux, summer projects, security]
 description: My VPS setup, from provider to deployment to inital setup.
 image:
   feature: /images/blue-ring.png

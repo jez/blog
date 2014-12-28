@@ -3,7 +3,7 @@ layout: post
 title: "Using Google OAuth2 for CMU Authentication"
 date: 2014-10-20 06:11:37 -0400
 comments: true
-categories: [django,print-sl,google-oauth2]
+categories: [django, webdev]
 description: "Using python-social-auth and Django, I've been able to use login.cmu.edu to sign in CMU students by AndrewID."
 image:
   feature: /images/abstract-11.jpg

@@ -1,16 +1,15 @@
 ---
 layout: post
-title: "Running a VPS: Log 5"
+title: "Running a VPS, Log 5: It's Not You, It's Me"
 date: 2014-07-10 16:48:43 -0400
 comments: true
-categories: [summer projects, vps, mail]
+categories: [summer projects, mail]
 description: It's not you, it's me.
 image:
   feature: /images/blue-ring.png
 share: true
 ---
 
-# It's not you, it's me
 It is with great sadness that I announce today that I am breaking up with my mail server. At least for a little while, that is. Let's say we're "taking a break" to "see other people."
 
 <!-- more -->
@@ -24,6 +23,7 @@ It is with great sadness that I announce today that I am breaking up with my mai
 > Dr. Seuss
 
 ## Don't get me wrong, we've had a great run
+
 I've learned so much from this foray into system administration and mail servers. I've written about some of these experiences, and yet many more will go unwritten. I've learned to persevere, to persist, and to have patience. I've learned to dig deeper, to follow the clues, and to ask for help.
 
 If asked whether I would do it all again, I would say yes in a heartbeat. Even knowing what I know now, I'm sure that I would screw everything up all over again. Even still, this whole experience has given me the opportunity to plunge into a whole new sphere of discovery, affording me such immense and immersive exposure that would be too much to turn down given a second chance. 
@@ -33,11 +33,13 @@ If asked whether I would recommend it to a friend, I would flinch for a second, 
 That being said, few projects lend such a sense of belonging in a community, such a sense of having begun a "rite of passage," as hosting your own mail. For one thing, __it's hard__. Trying to mangle to your will the archaic technologies involved in serving mail bend is perhaps one of the most complicated and intensive feats which can be contained under the category of personal VPS projects. More than that, being able to say, "This mail is mine, for me, and only me," is an incredibly rewarding yet private experience. It's something no one can take away, something no one can intrude upon.
 
 ## But I'm just not ready for this kind of commitment
+
 I initially thought this project would take 3 days, perhaps a week tops, given that the original title of the tutorial was ["NSA-Proof Your Email __in 2 Hours__"][nsa]. Somehow, this endeavor has managed to encompass fully two and a half weeks. I'm not saying that I've been working exclusively on this project for that time, and I've certainly been learning a great deal, but I can feel the marginal returns diminishing as time marches ever forward. As much as I hate to admit it, __the summer is already half-way over__ for CMU students, and there are still so many technologies, projects, and gadgets that I want to sink my teeth into.
 
 Another remark about "being a sysadmin": it's stressful! I would be working on fixing something while ssh'ed in to my droplet, and I could see the stream of spammers and attackers trying to get through on random ports. While I had the appropriate firewall protections in place, it's thoughts like these that making falling asleep harder: "What if I've missed something? What if my system is critically vulnerable? How long do I have before everything comes crashing down?" Stress culture aside, this is not a weight I want to shoulder regularly.
 
 ## Do you think we can still be friends?
+
 Ultimately, I had to make the choice to put this project on the back burner. That does not mean, however, that its flame has been snuffed entirely. This project has been incredibly rewarding, and I'm still crazy-determined to get this system working. I mentioned before how "privately rewarding" it can be to serve one's own mail--I've as of yet only had a taste of this goal, and I will return one day to reap it's full rewards. When this day will be, though, I'm not sure.
 
 <br>

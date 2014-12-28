@@ -1,29 +1,28 @@
 ---
 layout: post
-title: "Running a VPS: Log 1"
+title: "Running a VPS, Log 1: Managing Dotfiles Across Machines"
 date: 2014-06-19 23:10:51 -0400
 comments: true
-categories: [unix, terminal, github, best-practices, summer projects, vps, rcm]
+categories: [git, best practices, summer projects, dotfiles]
 description: An overview of how I use rcm and git to seamlessly manage my dotfiles and configuration scripts across 10+ remote servers.
 image:
   feature: /images/blue-ring.png
 share: true
 ---
 
-# Managing Dotfiles Across Machines
 You could say I'm a bit of a geek when it comes to configuring my terminal environment; this obsession has led me to concoct ever-elaborate setup scripts and configuration files. On top of this, between my laptop's multiple boot environments, the servers I use for school, work, and ScottyLabs, and now [metagross](/2014/06/19/running-a-vps-log-0), keeping my configuration files in sync is a must. I handle it swiftly using a combination of git and rcm.
 
 <!-- more -->
 
 ## My Scripts
-I've put a decent amount of time into my dotfiles. I like to think they're pretty good. That being said, I'm not about to go over every piece of them, because that would bore even me. I might come back to these pieces in a series on getting started with the terminal (aimed at incoming CS freshmen and other up-and-coming hackers), but for now, a link will suffice. 
- 
+I've put a decent amount of time into my dotfiles. I like to think they're pretty good. That being said, I'm not about to go over every piece of them, because that would bore even me. I might come back to these pieces in a series on getting started with the terminal (aimed at incoming CS freshmen and other up-and-coming hackers), but for now, a link will suffice.
+
 #### [Z1MM32M4N/dotfiles](https://github.com/Z1MM32M4N/dotfiles/)
 
 ## rcm + git
-rcm, short for rc file (as in .bash<b>rc</b>, .vim<b>rc</b>) management, is a tool that manages symlinks between dotfiles in one directory and your home directory. This is cool because, once all your config files contained in one folder, they can be tracked with git for version control without having to put your entire `$HOME` directory inside a git repo. 
+rcm, short for rc file (as in .bash<b>rc</b>, .vim<b>rc</b>) management, is a tool that manages symlinks between dotfiles in one directory and your home directory. This is cool because, once all your config files contained in one folder, they can be tracked with git for version control without having to put your entire `$HOME` directory inside a git repo.
 
-On a single machine, rcm works like this. You have one directory (usually `~/.dotfiles`, but configurable to any directory) which stores all the config files. In here, all files which are meant to be tracked and symlinked do _not_ include the prefixed '`.`'; instead, it is added as part of the linking process. After installation, which is easily handled through the brew formula, the .deb, or the Makefile, there are a couple of new tools available. 
+On a single machine, rcm works like this. You have one directory (usually `~/.dotfiles`, but configurable to any directory) which stores all the config files. In here, all files which are meant to be tracked and symlinked do _not_ include the prefixed '`.`'; instead, it is added as part of the linking process. After installation, which is easily handled through the brew formula, the .deb, or the Makefile, there are a couple of new tools available.
 
 The first worth mentioning is `man 7 rcm`, which documents what was just installed. Taking a glance at this page, we see that rcm is actually a suite of tools: `lsrc`, `mkrc`, `rcdn`, and `rcup`. While all these tools are useful, the most important is `rcup`. After collecting all your dotfiles into `~/.dotfiles`, simply executing `rcup` symlinks all the necessary files to their appropriate locations.
 

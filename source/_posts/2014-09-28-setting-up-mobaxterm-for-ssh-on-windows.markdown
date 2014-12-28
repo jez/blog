@@ -3,7 +3,7 @@ layout: post
 title: "Setting up MobaXterm for SSH on Windows"
 date: 2014-09-28 14:11:05 -0400
 comments: true
-categories: []
+categories: [terminal]
 description: "How to set up MobaXterm and why you should"
 image:
   feature: /images/abstract-3.jpg
@@ -14,7 +14,7 @@ share: true
 
 For an optimal SSH experience, your best best is to use Linux or Mac OS X. However, if you're dead-set on using Windows, MobaXterm has the best overall experience. This post guides you through setting it up and outlines some of its coolest features.
 
-<!-- more --> 
+<!-- more -->
 
 ## Download and Install
 The download and installation procedure for MobaXterm is pretty standard.
@@ -28,7 +28,7 @@ I had trouble running the installer when I first downloaded it; Windows complain
 Installing MobaXterm is simple. Just click through all the menus; no special setup is required here.
 
 ### 3. Configure Your SSH Session
-When you first log in, you'll see a prompt where you can directly SSH as you would on a normal terminal. 
+When you first log in, you'll see a prompt where you can directly SSH as you would on a normal terminal.
 
 {% img /images/mobaxterm-ssh.png SSH Prompt %}
 

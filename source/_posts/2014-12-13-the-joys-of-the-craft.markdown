@@ -3,7 +3,7 @@ layout: post
 title: "The Joys of the Craft"
 date: 2014-12-13 19:52:09 -0600
 comments: true
-categories: [best-practices, books]
+categories: [best practices, books]
 description: "An exceprt from Frederick P. Brooks's book The Mythical Man-Month on the joys of programming."
 image:
   feature: /images/abstract-6.jpg

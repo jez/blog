@@ -3,7 +3,7 @@ layout: post
 title: "Update Your Software: It's the Law"
 date: 2014-06-11 22:22:57 -0400
 comments: true
-categories: [terminal, unix, best-practices]
+categories: [terminal, unix, best practices]
 description: I wrote a short bash snippet to check my command line software for updates and alert me once a day.
 image:
   feature: /images/abstract-6.jpg

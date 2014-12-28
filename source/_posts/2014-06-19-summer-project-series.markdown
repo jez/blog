@@ -3,7 +3,7 @@ layout: post
 title: "Summer Project Series"
 date: 2014-06-19 20:16:18 -0400
 comments: true
-categories: [linux, unix, vps, summer projects, scottylabs, javascript, print-sl]
+categories: [summer projects]
 description: After spending most of the beginning of the summer moving around, riding trains, and starting a new job, it'finally time to start working on some cool projects.
 image:
   feature: /images/printed-circuits-blur.jpg

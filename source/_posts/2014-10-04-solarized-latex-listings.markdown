@@ -3,8 +3,8 @@ layout: post
 title: "Solarized LaTeX Listings"
 date: 2014-10-04 06:35:05 -0400
 comments: true
-categories: [LaTeX, solarized]
-description: 
+categories: [LaTeX, design]
+description: I wrote a LaTeX package for styling code listings with Solarized.
 image:
   feature: /images/abstract-7.jpg
   credit: dargadgetz

@@ -4,7 +4,7 @@ title: "Why Everyone Loves JavaScript"
 date: 2014-06-16 00:39:52 -0400
 comments: true
 external_url: https://github.com/airbnb/javascript/blob/master/README.md
-categories: [webdev, javascript, best-practices, scottylabs]
+categories: [webdev, javascript, best practices, scottylabs]
 description: If you don't love JavaScript, you're probably using it wrong. Luckily, some smart people on the interwebs know how to use it right.
 image:
   feature: /images/abstract-3.jpg

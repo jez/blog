@@ -3,7 +3,7 @@ layout: post
 title: "Intro to Columns in HTML"
 date: 2014-12-26 12:00:00 -0600
 comments: true
-categories: [html, webdev, best-practices]
+categories: [html, webdev, best practices]
 description: >
   A simple introduction to columns and designing with a grid in HTML & CSS.
 image:
