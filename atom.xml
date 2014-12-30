@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-12-28T22:14:57-06:00</updated>
+  <updated>2014-12-29T20:55:05-06:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,150 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Google Chrome: A Memory Hog]]></title>
+    <link href="http://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog/"/>
+    <updated>2014-12-29T17:00:00-06:00</updated>
+    <id>http://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog</id>
+    <content type="html"><![CDATA[<p>Whenever, someone complains about a slow computer, the first thing I check is
+how many Chrome tabs they have open. Chrome hogs memory like no other. For
+users, this means Chrome is snappy and responsive, but oftentimes it comes at
+the expense of crowding out other programs. To get an idea of how much memory
+Chrome is really using, I wrote a quick bash oneliner.</p>
+
+<!-- more -->
+
+
+<h2>Why does Chrome Hog Memory?</h2>
+
+<p><a href="http://mobile.extremetech.com/latest/221392-iframe-irony-adblock-plus-is-probably-the-reason-firefox-and-chrome-are-such-memory-hogs">An article posted to Hacker News</a> recently brought some light to
+the question of why Chrome and Firefox suck up so much memory: Adblock Plus. The
+general idea is that the excessive use of iframes in most websites today ramps
+up the amount of processing that Adblock Plus has to do, driving memory usage
+through the roof. For more specifics, check out the rest of of the article.</p>
+
+<h2>The Oneliner</h2>
+
+<p>For the impatient, here&rsquo;s the code. It uses standard Unix tools:</p>
+
+<figure class='code'><figcaption><span>Chrome Memory Usage</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Pretty isn&rsquo;t it? If you want to save this as an alias for handy use, add this
+line to your ~/.bashrc (or appropriate configuration file):</p>
+
+<figure class='code'><figcaption><span>Add as an alias</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">alias </span><span class="nv">chromemem</span><span class="o">=</span><span class="s2">&quot;ps -ev | grep -i chrome | awk &#39;{print \$12}&#39; | awk &#39;{for(i=1;i&lt;=NF;i++)s+=\$i}END{print s}&#39;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It outputs a percentage. Here&rsquo;s the alias in action:</p>
+
+<figure class='code'><figcaption><span>Usage</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>chromemem
+</span><span class='line'>60
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Explanation</h2>
+
+<p>There&rsquo;s a lot of good stuff going on here, so let&rsquo;s take it step-by-step.</p>
+
+<p>First, we&rsquo;ll need a program that tells us memory usage. I&rsquo;m sure there are many,
+but I&rsquo;m familiar with <code>ps</code>. After checking out the man page for a few options, I
+came up with <code>ps -ev</code>, to show all information about all processes. Maybe
+wasteful, but it works.</p>
+
+<figure class='code'><figcaption><span>ps -ev</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev
+</span><span class='line'>  PID STAT      TIME  SL  RE PAGEIN      VSZ    RSS   LIM     TSIZ  %CPU %MEM COMMAND
+</span><span class='line'> <span class="m">3473</span> S      0:54.92   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3579092</span> <span class="m">301244</span>     -        <span class="m">0</span>   6.7  7.2 /Applications/Google C
+</span><span class='line'>  <span class="m">365</span> S      3:03.17   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3920732</span> <span class="m">206808</span>     -        <span class="m">0</span>   0.3  4.9 /Applications/Google C
+</span><span class='line'>  <span class="m">983</span> S      1:29.23   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3560272</span> <span class="m">193860</span>     -        <span class="m">0</span>   0.1  4.6 /Applications/Google C
+</span><span class='line'>  <span class="m">395</span> S      0:13.11   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">2824936</span> <span class="m">141644</span>     -        <span class="m">0</span>   0.0  3.4 /Applications/Google C
+</span><span class='line'>  <span class="m">422</span> S      0:27.22   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3345796</span> <span class="m">130796</span>     -        <span class="m">0</span>   0.0  3.1 /Applications/Google C
+</span><span class='line'>  ...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Notice that there&rsquo;s a convenient column describing memory usage as a percentage
+of total available memory, as well as what command is being run in that
+process. Let&rsquo;s make sure that we&rsquo;re looking at only the processes running
+some sort of Chrome service before totaling up the memory. We can find these
+lines with <code>ps -ev | grep -i chrome</code> (the -i means case-insensitive). Due to the
+way I clipped the previous sample output, nothing changes in the first five
+lines, but rest assured: we&rsquo;re only looking at Chrome processes now.</p>
+
+<p>Now it&rsquo;s time to get rid of all the other nonsense that we included with <code>ps
+-ev</code>. Luckily, there&rsquo;s a handy tool called <code>awk</code> that makes parsing text by
+column easy. If we want to print the 12th column (which just so happens to
+contain the memory consumption!) we can do <code>awk '{print $12}'</code>:</p>
+
+<figure class='code'><figcaption><span>ps -ev | grep -i chrome | awk &#8216;{print $12}&#8217;</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span>
+</span><span class='line'>7.2
+</span><span class='line'>5.1
+</span><span class='line'>4.6
+</span><span class='line'>3.4
+</span><span class='line'>3.2
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally, I found myself needing a way to add up a column of numbers. A quick
+Google search led me to <a href="http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers">this StackOverflow question</a>, and I picked the
+<code>awk</code> solution because I knew I could just pipe the input to awk (as opposed to
+having to do weird hacks to get it to work with a bash for loop):</p>
+
+<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -emv <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span>
+</span><span class='line'>60.4
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Of course, you could change the last <code>awk</code> command to print out something
+fancier like</p>
+
+<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -emv <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print &quot;Chrome is using &quot;s&quot;% of total memory.&quot;}&#39;</span>
+</span><span class='line'>Chrome is using 60.4% of total memory.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There you have it! Bash oneliners save the day yet again.</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Intro to Columns in HTML]]></title>
@@ -1971,42 +2115,6 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 <p>I was planning on checking pip for updates as well, but pip is kind of not even good. To give you an idea, to check all the packages brew manages for updates, you type <code>brew outdated</code>, and it will list the formula name, current version number, and newest version number. Meanwhile, back in the land of pip, no such functionality exists (at least, simple functionality, and functionality that I could find. If you&rsquo;d like to correct me, be my guest!). I&rsquo;m sure that this script will grow as I come to manage more and more pieces of software on my system and others.</p>
 
 <p>If you have any questions about what I&rsquo;ve done here, or you catch some bugs, be sure to comment below or file an issue on GitHub! I&rsquo;d love to hear what you have to say.</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Molokai: An iTerm2 Color Scheme]]></title>
-    <link href="http://blog.zimmerman.io/2014/06/07/molokai-an-iterm2-color-scheme/"/>
-    <updated>2014-06-07T11:00:39-05:00</updated>
-    <id>http://blog.zimmerman.io/2014/06/07/molokai-an-iterm2-color-scheme</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve used <a href="https://github.com/tomasr">tomasr</a>&rsquo;s vim color scheme <a href="https://github.com/tomasr/molokai">molokai</a> for a long time now. Recently I decided that the default iTerm2 colors were a little lack luster, so I ported over the main colors from this theme into an iTerm2 theme.</p>
-
-<!-- more -->
-
-
-<h2><a href="https://github.com/mbadolato/iTerm2-Color-Schemes#molokai"><i class="fa fa-angle-double-right"></i> Installation</a></h2>
-
-<p>If you don&rsquo;t already have your iTerm2 colors configured or you&rsquo;re looking for a change, you should definitely check out <a href="https://github.com/mbadolato/iTerm2-Color-Schemes">iTerm2-Color-Schemes</a>, a GitHub repo by <a href="https://github.com/mbadolato">mbadolato</a> filled with tons of themes he&rsquo;s ported, collected, and been given.</p>
-
-<p>You can see and install the <a href="https://github.com/mbadolato/iTerm2-Color-Schemes#molokai">Molokai theme</a> there.</p>
-
-<h2>Screenshots</h2>
-
-<p>I don&rsquo;t have too many good screenshots of this theme that aren&rsquo;t vim because I&rsquo;m actually using <a href="https://github.com/seebi/dircolors-solarized">solarized</a> dircolors for colorizing the output of my <code>ls</code> and related commands. However, there are still plenty of tools I use which resort to default ANSI colors to colorize their output, like <code>git</code> and <code>brew</code>. You can see a <code>git log</code> command along side a table of all ANSI color combinations resulting from this theme (this table can be a bit overwhelming: it&rsquo;s best to just look at the first two columns to get an idea of what the colors really look like).</p>
-
-<p><a class="image-link" href="http://blog.zimmerman.io/images/molokai.png"><img src="http://blog.zimmerman.io/images/molokai.png"></a></p>
 
 <hr />
 

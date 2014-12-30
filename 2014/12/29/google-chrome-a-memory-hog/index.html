@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Google Chrome: A Memory Hog - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="A bash oneliner to determine how much memory Chrome is using.">
+
+<meta name="keywords" content="bash unix ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+  
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="/images/chrome-wide.jpg"
+  
+  <meta name="twitter:title" content="Google Chrome: A Memory Hog">
+  <meta name="twitter:description" content="A bash oneliner to determine how much memory Chrome is using.">
+  <meta name="twitter:creator" content="@Z1MM32M4N">
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog">
+<meta property="og:title" content="Google Chrome: A Memory Hog">
+<meta property="og:description" content="A bash oneliner to determine how much memory Chrome is using.">
+
+  <meta property="og:image" content="/images/chrome-wide.jpg">
+
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="http://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog">
+<link href="/favicon.png" rel="icon">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+<script>Modernizr || document.write('<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
+
+
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+
+</head>
+
+<body id="post" class="feature">
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
+	<button class="dl-trigger">Open Menu</button>
+	<ul class="dl-menu">
+		<li><a href="/">Home</a></li>
+		<li>
+			<a href="#">About</a>
+			<ul class="dl-submenu">
+				<li>
+					<img src="/images/avatar-jake.jpg" alt="Jake Zimmerman photo" class="author-photo">
+					<h4>Jake Zimmerman</h4>
+					<p>Studying computer science at Carnegie Mellon. Working at Dropbox. Previously at Bloomberg L.P.</p>
+				</li>
+				<li><a href="//www.zimmerman.io">Learn More</a></li>
+				<li>
+					<a href="mailto:jake@zimmerman.io"><i class="fa fa-envelope"></i> Email</a>
+				</li>
+				<li>
+					<a href="http://twitter.com/Z1MM32M4N"><i class="fa fa-twitter"></i> Twitter</a>
+				</li>
+				<li>
+					<a href="http://plus.google.com/+JacobZimmerman0"><i class="fa fa-google-plus"></i> Google+</a>
+				</li>
+				<li>
+					<a href="http://github.com/Z1MM32M4N"><i class="fa fa-github"></i> GitHub</a>
+				</li>
+			</ul><!-- /.dl-submenu -->
+		</li>
+		<li>
+			<a href="#">Posts</a>
+			<ul class="dl-submenu">
+				<li><a href="/posts/">All Posts</a></li>
+				<li><a href="/categories/">All Categories</a></li>
+			</ul>
+		</li>
+		<li><a href="http://www.zimmerman.io">Portfolio</a></li>
+	</ul><!-- /.dl-menu -->
+</nav><!-- /.dl-menuwrapper -->
+
+
+
+<div class="entry-header">
+  <div class="image-credit">Image source: Google</div><!-- /.image-credit -->
+  <div class="entry-image">
+    <img src="/images/chrome-wide.jpg" alt="Google Chrome: A Memory Hog">
+  </div><!-- /.entry-image -->
+</div><!-- /.entry-header -->
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <header class="header-title">
+      <div class="header-title-wrap">
+        
+          <h1 class="entry-title"><a href="/2014/12/29/google-chrome-a-memory-hog/" rel="bookmark" title="Google Chrome: A Memory Hog">Google Chrome: A Memory Hog</a></h1>
+        
+        <h2>December 29, 2014</h2>
+      </div><!-- /.header-title-wrap -->
+    </header>
+    <div class="entry-content">
+      <p>Whenever, someone complains about a slow computer, the first thing I check is
+how many Chrome tabs they have open. Chrome hogs memory like no other. For
+users, this means Chrome is snappy and responsive, but oftentimes it comes at
+the expense of crowding out other programs. To get an idea of how much memory
+Chrome is really using, I wrote a quick bash oneliner.</p>
+
+<!-- more -->
+
+
+<h2>Why does Chrome Hog Memory?</h2>
+
+<p><a href="http://mobile.extremetech.com/latest/221392-iframe-irony-adblock-plus-is-probably-the-reason-firefox-and-chrome-are-such-memory-hogs">An article posted to Hacker News</a> recently brought some light to
+the question of why Chrome and Firefox suck up so much memory: Adblock Plus. The
+general idea is that the excessive use of iframes in most websites today ramps
+up the amount of processing that Adblock Plus has to do, driving memory usage
+through the roof. For more specifics, check out the rest of of the article.</p>
+
+<h2>The Oneliner</h2>
+
+<p>For the impatient, here&rsquo;s the code. It uses standard Unix tools:</p>
+
+<figure class='code'><figcaption><span>Chrome Memory Usage</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Pretty isn&rsquo;t it? If you want to save this as an alias for handy use, add this
+line to your ~/.bashrc (or appropriate configuration file):</p>
+
+<figure class='code'><figcaption><span>Add as an alias</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">alias </span><span class="nv">chromemem</span><span class="o">=</span><span class="s2">&quot;ps -ev | grep -i chrome | awk &#39;{print \$12}&#39; | awk &#39;{for(i=1;i&lt;=NF;i++)s+=\$i}END{print s}&#39;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It outputs a percentage. Here&rsquo;s the alias in action:</p>
+
+<figure class='code'><figcaption><span>Usage</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>chromemem
+</span><span class='line'>60
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Explanation</h2>
+
+<p>There&rsquo;s a lot of good stuff going on here, so let&rsquo;s take it step-by-step.</p>
+
+<p>First, we&rsquo;ll need a program that tells us memory usage. I&rsquo;m sure there are many,
+but I&rsquo;m familiar with <code>ps</code>. After checking out the man page for a few options, I
+came up with <code>ps -ev</code>, to show all information about all processes. Maybe
+wasteful, but it works.</p>
+
+<figure class='code'><figcaption><span>ps -ev</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev
+</span><span class='line'>  PID STAT      TIME  SL  RE PAGEIN      VSZ    RSS   LIM     TSIZ  %CPU %MEM COMMAND
+</span><span class='line'> <span class="m">3473</span> S      0:54.92   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3579092</span> <span class="m">301244</span>     -        <span class="m">0</span>   6.7  7.2 /Applications/Google C
+</span><span class='line'>  <span class="m">365</span> S      3:03.17   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3920732</span> <span class="m">206808</span>     -        <span class="m">0</span>   0.3  4.9 /Applications/Google C
+</span><span class='line'>  <span class="m">983</span> S      1:29.23   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3560272</span> <span class="m">193860</span>     -        <span class="m">0</span>   0.1  4.6 /Applications/Google C
+</span><span class='line'>  <span class="m">395</span> S      0:13.11   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">2824936</span> <span class="m">141644</span>     -        <span class="m">0</span>   0.0  3.4 /Applications/Google C
+</span><span class='line'>  <span class="m">422</span> S      0:27.22   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3345796</span> <span class="m">130796</span>     -        <span class="m">0</span>   0.0  3.1 /Applications/Google C
+</span><span class='line'>  ...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Notice that there&rsquo;s a convenient column describing memory usage as a percentage
+of total available memory, as well as what command is being run in that
+process. Let&rsquo;s make sure that we&rsquo;re looking at only the processes running
+some sort of Chrome service before totaling up the memory. We can find these
+lines with <code>ps -ev | grep -i chrome</code> (the -i means case-insensitive). Due to the
+way I clipped the previous sample output, nothing changes in the first five
+lines, but rest assured: we&rsquo;re only looking at Chrome processes now.</p>
+
+<p>Now it&rsquo;s time to get rid of all the other nonsense that we included with <code>ps
+-ev</code>. Luckily, there&rsquo;s a handy tool called <code>awk</code> that makes parsing text by
+column easy. If we want to print the 12th column (which just so happens to
+contain the memory consumption!) we can do <code>awk '{print $12}'</code>:</p>
+
+<figure class='code'><figcaption><span>ps -ev | grep -i chrome | awk &#8216;{print $12}&#8217;</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span>
+</span><span class='line'>7.2
+</span><span class='line'>5.1
+</span><span class='line'>4.6
+</span><span class='line'>3.4
+</span><span class='line'>3.2
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally, I found myself needing a way to add up a column of numbers. A quick
+Google search led me to <a href="http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers">this StackOverflow question</a>, and I picked the
+<code>awk</code> solution because I knew I could just pipe the input to awk (as opposed to
+having to do weird hacks to get it to work with a bash for loop):</p>
+
+<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -emv <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span>
+</span><span class='line'>60.4
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Of course, you could change the last <code>awk</code> command to print out something
+fancier like</p>
+
+<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -emv <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print &quot;Chrome is using &quot;s&quot;% of total memory.&quot;}&#39;</span>
+</span><span class='line'>Chrome is using 60.4% of total memory.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There you have it! Bash oneliners save the day yet again.</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.</p>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="/categories/#bash" title="Pages tagged bash" class="tag">bash</a><a href="/categories/#unix" title="Pages tagged unix" class="tag">unix</a></span>
+        <span><a href="/2014/12/29/google-chrome-a-memory-hog/" rel="bookmark" title="Google Chrome: A Memory Hog">Google Chrome: A Memory Hog</a> was published on <span class="entry-date date published updated"><time datetime="2014-12-29T17:00:00-06:00">December 29, 2014</time></span></span>
+        
+        <span class="author vcard"><span class="fn"><a href="http://www.zimmerman.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
+        <div class="social-share">
+          <ul class="socialcount socialcount-small inline-list">
+            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2014/12/29/google-chrome-a-memory-hog/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2014/12/29/google-chrome-a-memory-hog/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+            <li class="googleplus"><a href="https://plus.google.com/share?url=/2014/12/29/google-chrome-a-memory-hog/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+          </ul>
+        </div><!-- /.social-share -->
+      </footer>
+    </div><!-- /.entry-content -->
+    
+      <div class="read-more">
+        
+          <div class="read-more-header">
+            <a href="/2014/12/26/intro-to-columns-in-html/" class="btn">Read More</a>
+          </div><!-- /.read-more-header -->
+          <div class="read-more-content">
+            <h3><a href="/2014/12/26/intro-to-columns-in-html/" title="Intro to Columns in HTML">Intro to Columns in HTML</a></h3>
+            <p>A simple introduction to columns and designing with a grid in HTML & CSS.
+ <a href="/2014/12/26/intro-to-columns-in-html/"> Continue reading</a></p>
+          </div><!-- /.read-more-content -->
+        
+        <div class="read-more-list">
+          
+            <div class="list-item">
+              <h4><a href="/2014/12/22/ruby-virtualenvs/" title="Ruby Virtualenvs">Ruby Virtualenvs</a></h4>
+              <span>Published on December 22, 2014</span>
+            </div><!-- /.list-item -->
+          
+            <div class="list-item">
+              <h4><a href="/2014/12/20/vim-as-a-man-page-viewer/" title="Vim as a Man Page Viewer">Vim as a Man Page Viewer</a></h4>
+              <span>Published on December 20, 2014</span>
+            </div><!-- /.list-item -->
+          
+        </div><!-- /.read-more-list -->
+      </div><!-- /.read-more -->
+    
+    <section id="disqus_thread"></section><!-- /#disqus_thread -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2014 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/Z1MM32M4N/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+
+	        
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+<script src="/javascripts/scripts.min.js"></script>
+&#8211;>
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-50690546-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'jakez-blog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog/';
+        var disqus_url = 'http://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+	        
+
+</body>
+</html>

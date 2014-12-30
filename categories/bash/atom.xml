@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Bash | Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/categories/bash/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-12-28T22:14:57-06:00</updated>
+  <updated>2014-12-29T20:55:05-06:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,120 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Google Chrome: A Memory Hog]]></title>
+    <link href="http://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog/"/>
+    <updated>2014-12-29T17:00:00-06:00</updated>
+    <id>http://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog</id>
+    <content type="html"><![CDATA[<p>Whenever, someone complains about a slow computer, the first thing I check is
+how many Chrome tabs they have open. Chrome hogs memory like no other. For
+users, this means Chrome is snappy and responsive, but oftentimes it comes at
+the expense of crowding out other programs. To get an idea of how much memory
+Chrome is really using, I wrote a quick bash oneliner.</p>
+
+<!-- more -->
+
+
+<h2>Why does Chrome Hog Memory?</h2>
+
+<p><a href="http://mobile.extremetech.com/latest/221392-iframe-irony-adblock-plus-is-probably-the-reason-firefox-and-chrome-are-such-memory-hogs">An article posted to Hacker News</a> recently brought some light to
+the question of why Chrome and Firefox suck up so much memory: Adblock Plus. The
+general idea is that the excessive use of iframes in most websites today ramps
+up the amount of processing that Adblock Plus has to do, driving memory usage
+through the roof. For more specifics, check out the rest of of the article.</p>
+
+<h2>The Oneliner</h2>
+
+<p>For the impatient, here&rsquo;s the code. It uses standard Unix tools:</p>
+
+<pre><code class="bash Chrome Memory Usage">$ ps -ev | grep -i chrome | awk '{print $12}' | awk '{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}'
+</code></pre>
+
+<p>Pretty isn&rsquo;t it? If you want to save this as an alias for handy use, add this
+line to your ~/.bashrc (or appropriate configuration file):</p>
+
+<pre><code class="bash Add as an alias">alias chromemem="ps -ev | grep -i chrome | awk '{print \$12}' | awk '{for(i=1;i&lt;=NF;i++)s+=\$i}END{print s}'"
+</code></pre>
+
+<p>It outputs a percentage. Here&rsquo;s the alias in action:</p>
+
+<pre><code class="bash Usage">$ chromemem
+60
+</code></pre>
+
+<h2>Explanation</h2>
+
+<p>There&rsquo;s a lot of good stuff going on here, so let&rsquo;s take it step-by-step.</p>
+
+<p>First, we&rsquo;ll need a program that tells us memory usage. I&rsquo;m sure there are many,
+but I&rsquo;m familiar with <code>ps</code>. After checking out the man page for a few options, I
+came up with <code>ps -ev</code>, to show all information about all processes. Maybe
+wasteful, but it works.</p>
+
+<pre><code class="bash ps -ev">$ ps -ev
+  PID STAT      TIME  SL  RE PAGEIN      VSZ    RSS   LIM     TSIZ  %CPU %MEM COMMAND
+ 3473 S      0:54.92   0   0      0  3579092 301244     -        0   6.7  7.2 /Applications/Google C
+  365 S      3:03.17   0   0      0  3920732 206808     -        0   0.3  4.9 /Applications/Google C
+  983 S      1:29.23   0   0      0  3560272 193860     -        0   0.1  4.6 /Applications/Google C
+  395 S      0:13.11   0   0      0  2824936 141644     -        0   0.0  3.4 /Applications/Google C
+  422 S      0:27.22   0   0      0  3345796 130796     -        0   0.0  3.1 /Applications/Google C
+  ...
+</code></pre>
+
+<p>Notice that there&rsquo;s a convenient column describing memory usage as a percentage
+of total available memory, as well as what command is being run in that
+process. Let&rsquo;s make sure that we&rsquo;re looking at only the processes running
+some sort of Chrome service before totaling up the memory. We can find these
+lines with <code>ps -ev | grep -i chrome</code> (the -i means case-insensitive). Due to the
+way I clipped the previous sample output, nothing changes in the first five
+lines, but rest assured: we&rsquo;re only looking at Chrome processes now.</p>
+
+<p>Now it&rsquo;s time to get rid of all the other nonsense that we included with <code>ps
+-ev</code>. Luckily, there&rsquo;s a handy tool called <code>awk</code> that makes parsing text by
+column easy. If we want to print the 12th column (which just so happens to
+contain the memory consumption!) we can do <code>awk '{print $12}'</code>:</p>
+
+<pre><code class="bash ps -ev | grep -i chrome | awk '{print $12}'">$ ps -ev | grep -i chrome | awk '{print $12}'
+7.2
+5.1
+4.6
+3.4
+3.2
+...
+</code></pre>
+
+<p>Finally, I found myself needing a way to add up a column of numbers. A quick
+Google search led me to <a href="http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers">this StackOverflow question</a>, and I picked the
+<code>awk</code> solution because I knew I could just pipe the input to awk (as opposed to
+having to do weird hacks to get it to work with a bash for loop):</p>
+
+<pre><code class="bash Final Solution">$ ps -emv | grep -i chrome | awk '{print $12}' | awk '{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}'
+60.4
+</code></pre>
+
+<p>Of course, you could change the last <code>awk</code> command to print out something
+fancier like</p>
+
+<pre><code class="bash Final Solution">$ ps -emv | grep -i chrome | awk '{print $12}' | awk '{for(i=1;i&lt;=NF;i++)s+=$i}END{print "Chrome is using "s"% of total memory."}'
+Chrome is using 60.4% of total memory.
+</code></pre>
+
+<p>There you have it! Bash oneliners save the day yet again.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.
+ [g]: http://www.github.com/Z1MM32M4N/
+ [h]: http://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Vim as a Man Page Viewer]]></title>
