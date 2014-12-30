@@ -11,13 +11,21 @@ image:
 share: true
 ---
 
-Whenever, someone complains about a slow computer, the first thing I check is
+Whenever someone complains about a slow computer, the first thing I check is
 how many Chrome tabs they have open. Chrome hogs memory like no other. For
 users, this means Chrome is snappy and responsive, but oftentimes it comes at
 the expense of crowding out other programs. To get an idea of how much memory
 Chrome is really using, I wrote a quick bash oneliner.
 
 <!-- more -->
+
+## Why does Chrome Hog Memory?
+
+[An article posted to Hacker News][iframe-irony] recently brought some light to
+the question of why Chrome and Firefox suck up so much memory: Adblock Plus. The
+general idea is that the excessive use of iframes in most websites today ramps
+up the amount of processing that Adblock Plus has to do, driving memory usage
+through the roof. For more specifics, check out the rest of of the article.
 
 ## The Oneliner
 
@@ -27,8 +35,8 @@ For the impatient, here's the code. It uses standard Unix tools:
 $ ps -ev | grep -i chrome | awk '{print $12}' | awk '{for(i=1;i<=NF;i++)s+=$i}END{print s}'
 ```
 
-If you want to save this as an alias for handy use, add this line to your
-~/.bashrc (or appropriate configuration file):
+Pretty isn't it? If you want to save this as an alias for handy use, add this
+line to your ~/.bashrc (or appropriate configuration file):
 
 ```bash Add as an alias
 alias chromemem="ps -ev | grep -i chrome | awk '{print \$12}' | awk '{for(i=1;i<=NF;i++)s+=\$i}END{print s}'"
@@ -41,13 +49,9 @@ $ chromemem
 60
 ```
 
-I've never seen this number fall below 50%, even right after starting up the
-computer and launching Chrome.
-
 ## Explanation
 
-There's a lot of good stuff going on here, so I figured I'd give an explanation
-of how this works. Let's take it step-by-step.
+There's a lot of good stuff going on here, so let's take it step-by-step.
 
 First, we'll need a program that tells us memory usage. I'm sure there are many,
 but I'm familiar with `ps`. After checking out the man page for a few options, I
@@ -110,4 +114,6 @@ There you have it! Bash oneliners save the day yet again.
 
 {% include jake-on-the-web.markdown %}
 
+[iframe-irony]: http://mobile.extremetech.com/latest/221392-iframe-irony-adblock-plus-is-probably-the-reason-firefox-and-chrome-are-such-memory-hogs
 [sum]: http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers
+
