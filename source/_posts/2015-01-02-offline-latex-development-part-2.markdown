@@ -12,7 +12,9 @@ image:
 share: true
 ---
 
-I've already written about how I develop LaTeX offline in Vim using GNU Make. Recently, though, I found a tool that implements another feature that GUI editors had to themselves: splitting panes.
+I've already written about how I develop LaTeX offline in Vim using GNU Make.
+Recently, though, I found a tool that implements another feature that GUI
+editors had to themselves: splitting panes.
 
 <!-- more -->
 
