@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="http://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="http://blog.zimmerman.io/"/>
-  <updated>2014-12-29T21:03:26-06:00</updated>
+  <updated>2015-01-02T19:21:41-06:00</updated>
   <id>http://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Offline LaTeX Development - Part 2]]></title>
+    <link href="http://blog.zimmerman.io/2015/01/02/offline-latex-development-part-2/"/>
+    <updated>2015-01-02T17:00:00-06:00</updated>
+    <id>http://blog.zimmerman.io/2015/01/02/offline-latex-development-part-2</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve already written about how I develop LaTeX offline in Vim using GNU Make. Recently, though, I found a tool that implements another feature that GUI editors had to themselves: splitting panes.</p>
+
+<!-- more -->
+
+
+<h2><a href="http://blog.zimmerman.io/2014/10/06/offline-latex-development/">Offline LaTeX Development</a></h2>
+
+<p>If you missed it, check out my previous post here before reading on. There&rsquo;s a
+lot of handy stuff there!</p>
+
+<h2>Split Panes</h2>
+
+<p>Out of the box, tools like ShareLaTeX and TeXShop feature split pane editing:
+you can have your LaTeX on one half of the screen and the PDF on the other.
+Previously, I justified not having this feature with the reasoning that the
+<code>:WV</code> binding immediately opened up the PDF and the windows switched.</p>
+
+<p>However, I read about a tool called <a href="http://ianyh.com/amethyst/">Amethyst</a> on Hacker News the
+other day and immediately realized it&rsquo;s potential for improving my LaTeX setup.
+Amethyst is a tool that strives to be a tiling window manager like xmonad for OS
+X. At times it falls short of this goal, but for the most part it works really
+well. Just open up two apps, like MacVim and Preview, and it&rsquo;ll show them
+side-by-side with no added effort. There are also plenty of keybindings to
+manipulate the window arrangements.</p>
+
+<p>Here&rsquo;s a screenshot of what the new setup looks like:</p>
+
+<p><a class="image-link" href="http://blog.zimmerman.io/images/latex-amethyst.png"><img src="http://blog.zimmerman.io/images/latex-amethyst.png"></a></p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Google Chrome: A Memory Hog]]></title>
@@ -1959,162 +2007,6 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 <h3><a href="https://www.destroyallsoftware.com/talks/wat">Wat</a></h3>
 
 <p>Aaand while we&rsquo;re posting humorous JavaScript videos, I&rsquo;ve gotta throw this one into the mix.</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="http://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="http://www.zimmerman.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Update Your Software: It's the Law]]></title>
-    <link href="http://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law/"/>
-    <updated>2014-06-11T21:22:57-05:00</updated>
-    <id>http://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law</id>
-    <content type="html"><![CDATA[<p>Okay, so maybe the government won&rsquo;t come after you for not updating. But they should. To guard off any present or future threats (be they from governments, security vulnerabilities, or something else in the cyber realm), I wrote a short bash snippet to check my system for outdated packages.</p>
-
-<!-- more -->
-
-
-<h2>Obligatory Existential/Meta Section</h2>
-
-<p>I don&rsquo;t quite know what prompted me to suddenly become interested in maintaining an up to date system. Maybe it was <a href="https://www.facebook.com/groups/cmuscs/permalink/727878180603546/">this post</a> of Arch Linux horror stories. Maybe it was the release of <a href="https://git.kernel.org/cgit/git/git.git/tree/Documentation/RelNotes/2.0.0.txt">git 2.0</a>, which introduces a lot of cool new features and deprecates a lot of others. Who knows, maybe it was influenced by Heartbleed and the <a href="https://www.openssl.org/news/secadv_20140605.txt">host</a> <a href="http://grahamcluley.com/2014/06/feedly-blackmail-ddos/">of other</a> <a href="http://blog.evernote.com/blog/2013/03/02/security-notice-service-wide-password-reset/">high-profile</a> security vulnerabilities and hacks that have sprung up lately. It&rsquo;s probably a combination of all of these. Let&rsquo;s move on.</p>
-
-<p>For the impatient among us, here&rsquo;s the code, which is also available <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42">here</a> and <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178">here</a> amongst all the code for <a href="https://github.com/Z1MM32M4N/dotfiles">all my dotfiles</a>.</p>
-
-<figure class='code'><figcaption><span>Alert to Update</span><a href='https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># ----- daily updates --------------------------------------------------------</span>
-</span><span class='line'><span class="o">[</span> ! -e <span class="nv">$HOME</span>/.last_update <span class="o">]</span> <span class="o">&amp;&amp;</span> touch <span class="nv">$HOME</span>/.last_update
-</span><span class='line'><span class="c"># Initialize for when we have no GNU date available</span>
-</span><span class='line'><span class="nv">last_check</span><span class="o">=</span>0
-</span><span class='line'><span class="nv">time_now</span><span class="o">=</span>0
-</span><span class='line'>
-</span><span class='line'><span class="c"># Unix last command to check the log of logins, grab the most recent</span>
-</span><span class='line'><span class="nv">last_check_string</span><span class="o">=</span><span class="sb">`</span>ls -l <span class="nv">$HOME</span>/.last_update | awk <span class="s1">&#39;{print $6&quot; &quot;$7&quot; &quot;$8}&#39;</span><span class="sb">`</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Darwin uses BSD, check for gdate, else use date</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="sb">`</span>uname<span class="sb">`</span> <span class="o">=</span> <span class="s2">&quot;Darwin&quot;</span> <span class="o">&amp;&amp;</span> -n <span class="sb">`</span>which gdate<span class="sb">`</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nv">last_login</span><span class="o">=</span><span class="sb">`</span>gdate -d<span class="s2">&quot;$last_check_string&quot;</span> +%s<span class="sb">`</span>
-</span><span class='line'>  <span class="nv">time_now</span><span class="o">=</span><span class="sb">`</span>gdate +%s<span class="sb">`</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'>  <span class="c"># Ensure this is GNU grep</span>
-</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;`date --version 2&gt; /dev/null | grep GNU`&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nv">last_login</span><span class="o">=</span><span class="sb">`</span>date -d<span class="s2">&quot;$last_login_string&quot;</span> +%s<span class="sb">`</span>
-</span><span class='line'>    <span class="nv">time_now</span><span class="o">=</span><span class="sb">`</span>date +%s<span class="sb">`</span>
-</span><span class='line'>  <span class="k">fi</span>
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">time_since_check</span><span class="o">=</span><span class="k">$((</span>time_now <span class="o">-</span> last_login<span class="k">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$time_since_check&quot;</span> -ge 86400 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">echo</span> <span class="s2">&quot;$cred==&gt;$cwhiteb Your system is out of date!$cnone&quot;</span>
-</span><span class='line'>  <span class="nb">echo</span> <span class="s1">&#39;Run `update` to bring it up to date.&#39;</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>Check for Updates</span><a href='https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># ----- function -------------------------------------------------------------</span>
-</span><span class='line'>update<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  touch <span class="nv">$HOME</span>/.last_update
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># Mac updates</span>
-</span><span class='line'>  <span class="k">case</span> <span class="nv">$HOSTNAME</span> in
-</span><span class='line'>    *Jacobs-MacBook-Air*<span class="o">)</span>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Updating Homebrew...$cnone&quot;</span>
-</span><span class='line'>      brew update
-</span><span class='line'>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Checking for outdated brew packages...$cnone&quot;</span>
-</span><span class='line'>      brew outdated --verbose
-</span><span class='line'>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Checking for outdated rbenv...$cnone&quot;</span>
-</span><span class='line'>      <span class="nb">cd</span> <span class="nv">$HOME</span>/.rbenv
-</span><span class='line'>      git fetch
-</span><span class='line'>      <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;`git describe --tags master`&quot;</span> !<span class="o">=</span> <span class="s2">&quot;`git describe --tags origin/master`&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">        </span><span class="nb">echo</span> <span class="s2">&quot;rbenv (`git describe --tags master`) is outdated (`git describe --tags origin/master`).&quot;</span>
-</span><span class='line'>        <span class="nb">echo</span> <span class="s2">&quot;To update, run: cd ~/.rbenv; git merge origin master &amp;&amp; cd -&quot;</span>
-</span><span class='line'>      <span class="k">fi</span>
-</span><span class='line'><span class="k">      </span><span class="nb">cd</span> - 2&gt;&amp;1 &gt; /dev/null
-</span><span class='line'>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Checking for outdated ruby gems...$cnone&quot;</span>
-</span><span class='line'>      gem outdated
-</span><span class='line'>      ;;
-</span><span class='line'>  <span class="k">esac</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You&rsquo;ll note the use of a touch file (created in line 2 of the first snippet if it doesn&rsquo;t already exist). If this file is 24 hours old, each time this code is run an alert will be printed. Since this code is running inside of my <code>.bash_profile</code>, that means that every time I open a terminal on a 24-hour-old system, I see the update message.</p>
-
-<p>Next, you&rsquo;ll note that I&rsquo;ve defined a function called <code>update</code> which is actually misnamed. This function merely checks for available updates instead of actually performing the updates, logging those packages, gems, and formulae it finds that are out of date. For my purposes, I only need to update brew, check for formulae updates, update rbenv, and check for gem updates. Obviously though, given that there is a way to programmatically check something for updates, plugging that code in here would check it as well. This means that this method is very easy to customize and extend for various needs.</p>
-
-<h2>Rant</h2>
-
-<p>I was planning on checking pip for updates as well, but pip is kind of not even good. To give you an idea, to check all the packages brew manages for updates, you type <code>brew outdated</code>, and it will list the formula name, current version number, and newest version number. Meanwhile, back in the land of pip, no such functionality exists (at least, simple functionality, and functionality that I could find. If you&rsquo;d like to correct me, be my guest!). I&rsquo;m sure that this script will grow as I come to manage more and more pieces of software on my system and others.</p>
-
-<p>If you have any questions about what I&rsquo;ve done here, or you catch some bugs, be sure to comment below or file an issue on GitHub! I&rsquo;d love to hear what you have to say.</p>
 
 <hr />
 

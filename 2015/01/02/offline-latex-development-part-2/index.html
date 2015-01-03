@@ -10,15 +10,16 @@
 <meta charset="utf-8">
 <meta http-equiv="cleartype" content="on">
 
-<title>The Joys of the Craft - Bits, Bytes, and Words</title>
+<title>Offline LaTeX Development - Part 2 - Bits, Bytes, and Words</title>
 <meta name="author" content="Jake Zimmerman">
 
 
 
 
-<meta name="description" content="An exceprt from Frederick P. Brooks's book The Mythical Man-Month on the joys of programming.">
+<meta name="description" content="LaTeX development with Vim and the command line, now featuring split-pane windows!
+">
 
-<meta name="keywords" content="best practices books ">
+<meta name="keywords" content="latex osx terminal vim ">
 
 
 <!-- http://t.co/dKP3o1e -->
@@ -30,25 +31,27 @@
 
   
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="/images/abstract-6.jpg"
+    <meta name="twitter:image" content="/images/latex-amethyst.png"
   
-  <meta name="twitter:title" content="The Joys of the Craft">
-  <meta name="twitter:description" content="An exceprt from Frederick P. Brooks's book The Mythical Man-Month on the joys of programming.">
+  <meta name="twitter:title" content="Offline LaTeX Development - Part 2">
+  <meta name="twitter:description" content="LaTeX development with Vim and the command line, now featuring split-pane windows!
+">
   <meta name="twitter:creator" content="@Z1MM32M4N">
 
 
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:url" content="http://blog.zimmerman.io/2014/12/13/the-joys-of-the-craft">
-<meta property="og:title" content="The Joys of the Craft">
-<meta property="og:description" content="An exceprt from Frederick P. Brooks's book The Mythical Man-Month on the joys of programming.">
+<meta property="og:url" content="http://blog.zimmerman.io/2015/01/02/offline-latex-development-part-2">
+<meta property="og:title" content="Offline LaTeX Development - Part 2">
+<meta property="og:description" content="LaTeX development with Vim and the command line, now featuring split-pane windows!
+">
 
-  <meta property="og:image" content="/images/abstract-6.jpg">
+  <meta property="og:image" content="/images/latex-amethyst.png">
 
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="http://blog.zimmerman.io/2014/12/13/the-joys-of-the-craft">
+<link rel="canonical" href="http://blog.zimmerman.io/2015/01/02/offline-latex-development-part-2">
 <link href="/favicon.png" rel="icon">
 <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
@@ -110,9 +113,9 @@
 
 
 <div class="entry-header">
-  <div class="image-credit">Image source: <a href="http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/">dargadgetz</a></div><!-- /.image-credit -->
+  
   <div class="entry-image">
-    <img src="/images/abstract-6.jpg" alt="The Joys of the Craft">
+    <img src="/images/latex-amethyst.png" alt="Offline LaTeX Development - Part 2">
   </div><!-- /.entry-image -->
 </div><!-- /.entry-header -->
 
@@ -122,38 +125,40 @@
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title"><a href="/2014/12/13/the-joys-of-the-craft/" rel="bookmark" title="The Joys of the Craft">The Joys of the Craft</a></h1>
+          <h1 class="entry-title"><a href="/2015/01/02/offline-latex-development-part-2/" rel="bookmark" title="Offline LaTeX Development - Part 2">Offline LaTeX Development - Part 2</a></h1>
         
-        <h2>December 13, 2014</h2>
+        <h2>January 02, 2015</h2>
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <p>A while ago, I was given the book <em>The Mythical Man-Month</em>, by Frederick P. Brooks, Jr. I finally have some time to sit down and read it, and I&rsquo;m loving it. In the first chapter, this quote on &ldquo;the joys of the craft&rdquo; (i.e., programming) struck me as particularly on point:</p>
+      <p>I&rsquo;ve already written about how I develop LaTeX offline in Vim using GNU Make. Recently, though, I found a tool that implements another feature that GUI editors had to themselves: splitting panes.</p>
 
 <!-- more -->
 
 
-<blockquote><h3>The Joys of the Craft</h3>
+<h2><a href="/2014/10/06/offline-latex-development/">Offline LaTeX Development</a></h2>
 
-<p>Why is programming fun? What delights may its practitioner expect as his reward?</p>
+<p>If you missed it, check out my previous post here before reading on. There&rsquo;s a
+lot of handy stuff there!</p>
 
-<p>First is the sheer joy of making things. As the child delights in his mud pie, so the adult enjoys building things, especially things of his own design. I think this delight must be an image of God&rsquo;s delight in making things, a delight shown in the distinctness and newness of each leaf and each snowflake.</p>
+<h2>Split Panes</h2>
 
-<p>Second is the pleasure of making things that are useful to other people. Deep within, we want others to use our work and to find it helpful. In this respect the programming system is not essentially different from the child&rsquo;s first clay pencil holder &ldquo;for Daddy&rsquo;s office.&rdquo;</p>
+<p>Out of the box, tools like ShareLaTeX and TeXShop feature split pane editing:
+you can have your LaTeX on one half of the screen and the PDF on the other.
+Previously, I justified not having this feature with the reasoning that the
+<code>:WV</code> binding immediately opened up the PDF and the windows switched.</p>
 
-<p>Third is the fascination of fashioning complex puzzle-like objects of interlocking moving parts and watching them work in subtle cycles, playing out the consequences of principles built in from the beginning. The programmed computer has all the fascination of the pinball machine or the jukebox mechanism, carried to the ultimate.</p>
+<p>However, I read about a tool called <a href="http://ianyh.com/amethyst/">Amethyst</a> on Hacker News the
+other day and immediately realized it&rsquo;s potential for improving my LaTeX setup.
+Amethyst is a tool that strives to be a tiling window manager like xmonad for OS
+X. At times it falls short of this goal, but for the most part it works really
+well. Just open up two apps, like MacVim and Preview, and it&rsquo;ll show them
+side-by-side with no added effort. There are also plenty of keybindings to
+manipulate the window arrangements.</p>
 
-<p>Fourth is the joy of always learning, which springs from the nonrepearing nature of the task. In one way or another the problem is ever new, and its solver learns something: sometimes practical, sometimes theoretical, and sometimes both.</p>
+<p>Here&rsquo;s a screenshot of what the new setup looks like:</p>
 
-<p>Finally, there is the delight of working in such a tractable medium. The programmer, like the poet, works only slightly removed from pure thought-stuff. He builds his castles in the air, from air, creating by exertion of the imagination. Few media of creation are so flexible, so easy to polish and rework, so readily capable of realizing grand conceptual structures. (As we shall see later, this very tractability has its own problems.)</p>
-
-<p>Yet the program construct, unlike the poet&rsquo;s words, is real in the sense that it moves and works, producing visible outputs separate from the construct itself. It prints results, draws pictures, produces sounds, moves arms. The magic of myth and legend has come true in our time. One types the correct incantation on a keyboard, and a display screen comes to life, showing things that never were nor could be.</p>
-
-<p>Programming then is fun because it gratifies creative longings built deep within us and delights sensibilities we have in common with all men.</p>
-
-<p>&ndash; &ldquo;The Tar Pit&rdquo;, <em>The Mythical Man-Month</em>, Frederick P. Brooks Jr.</p></blockquote>
-
-<p>Brooks of course follows this up with &ldquo;The Woes of the Craft&rdquo;, which is equally on point. I&rsquo;m only a few pages in, but I already feel like, respectfully, I&rsquo;ve learned more than I did in all of Tech Comm (<a href="https://enr-apps.as.cmu.edu/open/SOC/SOCServlet/courseDetails?COURSE=15221&amp;SEMESTER=F14">15-221</a>). I would absolutely recommend it to anyone considering pursing software engineering!</p>
+<p><a class="image-link" href="/images/latex-amethyst.png"><img src="/images/latex-amethyst.png"></a></p>
 
 <hr />
 
@@ -168,15 +173,15 @@ my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.</p>
 
       <footer class="entry-meta">
-        <span class="entry-tags"><a href="/categories/#best practices" title="Pages tagged best practices" class="tag">best practices</a><a href="/categories/#books" title="Pages tagged books" class="tag">books</a></span>
-        <span><a href="/2014/12/13/the-joys-of-the-craft/" rel="bookmark" title="The Joys of the Craft">The Joys of the Craft</a> was published on <span class="entry-date date published updated"><time datetime="2014-12-13T19:52:09-06:00">December 13, 2014</time></span></span>
+        <span class="entry-tags"><a href="/categories/#latex" title="Pages tagged latex" class="tag">latex</a><a href="/categories/#osx" title="Pages tagged osx" class="tag">osx</a><a href="/categories/#terminal" title="Pages tagged terminal" class="tag">terminal</a><a href="/categories/#vim" title="Pages tagged vim" class="tag">vim</a></span>
+        <span><a href="/2015/01/02/offline-latex-development-part-2/" rel="bookmark" title="Offline LaTeX Development - Part 2">Offline LaTeX Development - Part 2</a> was published on <span class="entry-date date published updated"><time datetime="2015-01-02T17:00:00-06:00">January 02, 2015</time></span></span>
         
         <span class="author vcard"><span class="fn"><a href="http://www.zimmerman.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
         <div class="social-share">
           <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2014/12/13/the-joys-of-the-craft/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2014/12/13/the-joys-of-the-craft/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url=/2014/12/13/the-joys-of-the-craft/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2015/01/02/offline-latex-development-part-2/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2015/01/02/offline-latex-development-part-2/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+            <li class="googleplus"><a href="https://plus.google.com/share?url=/2015/01/02/offline-latex-development-part-2/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
           </ul>
         </div><!-- /.social-share -->
       </footer>
@@ -185,24 +190,23 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
       <div class="read-more">
         
           <div class="read-more-header">
-            <a href="/2015/01/02/offline-latex-development-part-2/" class="btn">Read More</a>
+            <a href="/2014/12/29/google-chrome-a-memory-hog/" class="btn">Read More</a>
           </div><!-- /.read-more-header -->
           <div class="read-more-content">
-            <h3><a href="/2015/01/02/offline-latex-development-part-2/" title="Offline LaTeX Development - Part 2">Offline LaTeX Development - Part 2</a></h3>
-            <p>LaTeX development with Vim and the command line, now featuring split-pane windows!
- <a href="/2015/01/02/offline-latex-development-part-2/"> Continue reading</a></p>
+            <h3><a href="/2014/12/29/google-chrome-a-memory-hog/" title="Google Chrome: A Memory Hog">Google Chrome: A Memory Hog</a></h3>
+            <p>A bash oneliner to determine how much memory Chrome is using. <a href="/2014/12/29/google-chrome-a-memory-hog/"> Continue reading</a></p>
           </div><!-- /.read-more-content -->
         
         <div class="read-more-list">
           
             <div class="list-item">
-              <h4><a href="/2014/12/29/google-chrome-a-memory-hog/" title="Google Chrome: A Memory Hog">Google Chrome: A Memory Hog</a></h4>
-              <span>Published on December 29, 2014</span>
+              <h4><a href="/2014/12/26/intro-to-columns-in-html/" title="Intro to Columns in HTML">Intro to Columns in HTML</a></h4>
+              <span>Published on December 26, 2014</span>
             </div><!-- /.list-item -->
           
             <div class="list-item">
-              <h4><a href="/2014/12/26/intro-to-columns-in-html/" title="Intro to Columns in HTML">Intro to Columns in HTML</a></h4>
-              <span>Published on December 26, 2014</span>
+              <h4><a href="/2014/12/22/ruby-virtualenvs/" title="Ruby Virtualenvs">Ruby Virtualenvs</a></h4>
+              <span>Published on December 22, 2014</span>
             </div><!-- /.list-item -->
           
         </div><!-- /.read-more-list -->
@@ -247,8 +251,8 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.zimmerman.io/2014/12/13/the-joys-of-the-craft/';
-        var disqus_url = 'http://blog.zimmerman.io/2014/12/13/the-joys-of-the-craft/';
+        var disqus_identifier = 'http://blog.zimmerman.io/2015/01/02/offline-latex-development-part-2/';
+        var disqus_url = 'http://blog.zimmerman.io/2015/01/02/offline-latex-development-part-2/';
         var disqus_script = 'embed.js';
       
     (function () {
