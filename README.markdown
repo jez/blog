@@ -1,12 +1,12 @@
 # An Octopress Blog by Jake Zimmerman
-For the source of the blog, you're in the right place: the master branch. 
+For the source of the blog, you're in the right place: the master branch.
 
 For the compiled HTML, check the `gh-pages` branch of this repo.
 
-To view the blog live, check [here](http://blog.zimmerman.io).
+To view the blog live, check [here](https://blog.zimmerman.io).
 
 ## What is Octopress?
-Octopress is a "blogging framework for hackers." For more information, check out their [site][octoweb] or their [code][octocode]
+Octopress is a "blogging framework for hackers." For more information, check out their [site][octoweb] or their [code][octocode].
 [octoweb]: <//octopress.org>
 [octocode]: <https://github.com/imathis/octopress>
 

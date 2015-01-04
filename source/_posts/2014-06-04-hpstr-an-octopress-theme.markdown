@@ -22,12 +22,12 @@ Before I begin, I have to give a huge shout out to [mmistakes][mmistakes] for cr
 The theme was originally implemented for a vanilla Jekyll blog. Personally, I find the automation tools provided by Octopress to be incredibly helpful, and I didn't want to give these up to be able to deploy this theme. As a result, I had to tweak a few things in order to get it to work with a standard Octopress installation.
 
 ## Less to Sass
-The HPSTR theme was originally built using Less to compile its stylesheets. Octopress uses Sass under Compass instead--a decision which I love: the rich library of plugins that Compass provides is ridiculous. Thus, this was the first step of the port. 
+The HPSTR theme was originally built using Less to compile its stylesheets. Octopress uses Sass under Compass instead--a decision which I love: the rich library of plugins that Compass provides is ridiculous. Thus, this was the first step of the port.
 
-After a quick Google search I stumbled upon [this question][less-to-sass] on Stack Overflow, which surprisingly took care of the vast majority of the conversion, leveraging mere text replacement. From there, it was mostly a matter of slugging through the Less docs to find out what a particular function did, jumping over to the Compass/Sass docs to find a corresponding mixin, and repeating. 
+After a quick Google search I stumbled upon [this question][less-to-sass] on Stack Overflow, which surprisingly took care of the vast majority of the conversion, leveraging mere text replacement. From there, it was mostly a matter of slugging through the Less docs to find out what a particular function did, jumping over to the Compass/Sass docs to find a corresponding mixin, and repeating.
 
 ## Sass to Compass
-I didn't stop after I had the vanilla Sass working. One of Compass's coolest features is that you don't have to repeat yourself: there are mixins for seemingly everything, and when there aren't, there are 3<sup>rd</sup> party plugins. Thus, the next phase of the port was to see how much of the code I could reduce to compass mixins. 
+I didn't stop after I had the vanilla Sass working. One of Compass's coolest features is that you don't have to repeat yourself: there are mixins for seemingly everything, and when there aren't, there are 3<sup>rd</sup> party plugins. Thus, the next phase of the port was to see how much of the code I could reduce to compass mixins.
 
 For the most part, this stage affected CSS3 properties which need vendor prefixes, to include keyframe animations. The keyframe animations are particularly worthy of a mention because I found a handy plugin called [compass-animation][compass-animation] to take care of them. It works as easily as any other Compass mixin, from installation to use.
 
@@ -39,17 +39,17 @@ On top of this, I restructured a lot of the original code so that someone used t
 # More Powerful Customization
 One of the many ways Octopress adds value on top of Jekyll is the ease with which you can get a Jekyll blog up and running, and subsequently customize and tweak that theme. This was one area where I felt that the original Jekyll theme fell short. The original stylesheets had a somewhat decent set of variables (in `less/variables.less`) that would allow you to customize the colors and font faces, but the method for customizing the size of the font was wonky (larger values produced smaller fonts), and the various mixins employed to handle setting the sizes were confusing.
 
-To solve this, I added _loads_ of new variables handling the font sizes and line heights on a per-component basis, while also providing a master switch to easily resize everything. My theme also differs here from the original in that it's default font size is slightly larger for normal paragraph text (the whole reason why I cared about customizing the font size in the first place!). 
+To solve this, I added _loads_ of new variables handling the font sizes and line heights on a per-component basis, while also providing a master switch to easily resize everything. My theme also differs here from the original in that it's default font size is slightly larger for normal paragraph text (the whole reason why I cared about customizing the font size in the first place!).
 
 # Like what you see?
-This theme is in no way perfect, from the styles to the compatibility with the vast array of Octopress options. If my support for your favorite feature is lacking or absent altogether, patch it up and submit a pull request on [GitHub][hpstr-source]! 
+This theme is in no way perfect, from the styles to the compatibility with the vast array of Octopress options. If my support for your favorite feature is lacking or absent altogether, patch it up and submit a pull request on [GitHub][hpstr-source]!
 
 __I'd also love to hear about your installation process.__ If something didn't quite work out right when installing the theme from GitHub or everything went super smoothly, tell me on GitHub in an issue, on [Twitter][twitter], in the comments below, or in an [email][email]. Seriously!
 
 [hpstr-source]: https://github.com/Z1MM32M4N/hpstr-theme
 [hpstr-jekyll]: https://github.com/mmistakes/hpstr-jekyll-theme
 [mmistakes]: https://github.com/mmistakes/
-[less-to-sass]: http://stackoverflow.com/questions/14970224/anyone-know-of-a-good-way-to-convert-from-less-to-sass
+[less-to-sass]: https://stackoverflow.com/questions/14970224/anyone-know-of-a-good-way-to-convert-from-less-to-sass
 [compass-animation]: https://github.com/ericam/compass-animation
 [twitter]: https://www.twitter.com/Z1MM32M4N
 [email]: mailto:jake@zimmerman.io

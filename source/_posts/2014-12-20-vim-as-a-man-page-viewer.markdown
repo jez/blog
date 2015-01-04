@@ -8,7 +8,7 @@ description: >
   Use vim as a man page viewer to get better syntax highlighting, scroll
   quickly with a mouse, tabs, and more.
 image:
-  feature: http://blog.zimmerman.io/images/printf.3.png
+  feature: /images/printf.3.png
 share: true
 ---
 
