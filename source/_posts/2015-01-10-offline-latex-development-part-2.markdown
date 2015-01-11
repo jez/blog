@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Offline LaTeX Development - Part 2"
-date: 2015-01-05 17:00:00 -0600
+date: 2015-01-10 17:00:00 -0600
 comments: true
 categories: [latex, terminal, vim, osx]
 description: >
@@ -28,7 +28,8 @@ lot of handy stuff there!
 Out of the box, tools like ShareLaTeX and TeXShop feature split pane editing:
 you can have your LaTeX on one half of the screen and the PDF on the other.
 Previously, I justified not having this feature with the reasoning that the
-`:WV` binding immediately opened up the PDF and the windows switched.
+`:WV` binding (something I explained [here][part1]) immediately opened up the
+PDF and the windows switched.
 
 However, I read about a tool called [Amethyst][amethyst] on Hacker News the
 other day and immediately realized it's potential for improving my LaTeX setup.
@@ -42,7 +43,12 @@ Here's a screenshot of what the new setup looks like:
 
 {% img /images/latex-amethyst.png %}
 
+After looking into it a little more, it looks like there are other OS X tools
+for spitting the screen into two panes, like [BetterTouchTool][btt], though I
+haven't actually tried any of them out.
+
 {% include jake-on-the-web.markdown %}
 
 [part1]: /2014/10/06/offline-latex-development/
 [amethyst]: http://ianyh.com/amethyst/
+[btt]: http://www.bettertouchtool.net/
