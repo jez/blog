@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-01-03T22:04:45-06:00</updated>
+  <updated>2015-01-10T22:27:29-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -14,9 +14,303 @@
 
   
   <entry>
+    <title type="html"><![CDATA[The LaTeX Homework Document Class]]></title>
+    <link href="https://blog.zimmerman.io/2015/01/10/the-latex-homework-document-class/"/>
+    <updated>2015-01-10T18:00:00-05:00</updated>
+    <id>https://blog.zimmerman.io/2015/01/10/the-latex-homework-document-class</id>
+    <content type="html"><![CDATA[<p>There are LaTeX document classes for typesetting books, articles, exams,
+presentations, and more. Now, there&rsquo;s one for homework assignments, too.</p>
+
+<!-- more -->
+
+
+<h2><a href="https://github.com/Z1MM32M4N/latex-homework-class">Source</a></h2>
+
+<p>Check out and download the source <a href="https://github.com/Z1MM32M4N/latex-homework-class">on GitHub</a>.</p>
+
+<h2>What</h2>
+
+<p>This is a LaTeX document class. That means you use it with
+<code>\documentclass{homework}</code> at the top of the document. It provides a document
+layout and some helper commands that make working with questions easy.</p>
+
+<h2>Installation</h2>
+
+<p>Certainly the easiest way to start using this template is to copy the .cls file
+to your computer in the same directory as your LaTeX project directory.</p>
+
+<p>A better way to install this template is to fork <a href="https://github.com/Z1MM32M4N/latex-homework-class">the above
+repository</a> and then clone that fork to a particular folder on your
+computer:</p>
+
+<figure class='code'><figcaption><span>Install</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/&lt;your-username&gt;/latex-hw-template
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then, whenever you need to use the template, you can copy the template wherever.
+Also, if there are ever any updates, you can simply run</p>
+
+<figure class='code'><figcaption><span>Update</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>git pull
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>to update the template.</p>
+
+<h3>Preferred Installation</h3>
+
+<p>The <em>best</em> way to install this file is to <a href="https://github.com/Z1MM32M4N/latex-solarized#installation">follow the instructions
+here</a>, keeping in mind that you&rsquo;re trying to install a <code>.cls</code> file
+instead of three <code>.sty</code> files.</p>
+
+<h2>Usage</h2>
+
+<p>See the <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> file for an exhaustive list of usage
+examples. There are also comments explaining features for which there are no
+examples given.</p>
+
+<p>The result is the following:</p>
+
+<p><a class="image-link" href="https://blog.zimmerman.io/images/homework-class.png"><img src="https://blog.zimmerman.io/images/homework-class.png"></a></p>
+
+<p>The class file also has a bunch of helper <code>\usepackage</code>s that you might want to
+take a look at in <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.cls">homework.cls</a>.</p>
+
+<p>For your convenience, the file <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/template.tex">template.tex</a> is a nearly-empty
+LaTeX file that contains the bare essentials to get started using the homework
+class.</p>
+
+<h3><code>\question</code></h3>
+
+<p>To start a question, just type <code>\question</code>. It will add the text &ldquo;Question #&rdquo;
+with a line underneath to the document. If you&rsquo;d like to change &ldquo;Question&rdquo; to
+something else, use</p>
+
+<figure class='code'><figcaption><span>Change the Question Type</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\renewcommand</span><span class="nb">{</span><span class="k">\questiontype</span><span class="nb">}{</span>Whatever You Want<span class="nb">}</span>
+</span><span class='line'><span class="c">% Now questions will be titled &quot;Whatever You Want #&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Similarly, if you ever need to skip numbers, you can do</p>
+
+<figure class='code'><figcaption><span>Non-contiguous Question Numbers</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\setcounter</span><span class="nb">{</span><span class="k">\questionCounter</span><span class="nb">}{</span>&lt;target number - 1&gt;<span class="nb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So, to skip to the 10th question, <code>&lt;target number - 1&gt;</code> = 9.</p>
+
+<p>See <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
+
+<h3><code>\question*</code></h3>
+
+<p>Some classes like to give their homework questions fancy names. If this is the
+case, you can use <code>\question*{The Question's Name}</code> to make a named question.</p>
+
+<p>See <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
+
+<h3>Question Parts</h3>
+
+<p>Another common thing on homework assignments is to have multi-part questions. To
+deal with these, use the form</p>
+
+<figure class='code'><figcaption><span>Lettered Question Parts</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>alphaparts<span class="nb">}</span>
+</span><span class='line'>  <span class="k">\questionpart</span>
+</span><span class='line'>    This will be part (a).
+</span><span class='line'>  <span class="k">\questionpart</span>
+</span><span class='line'>    This will be part (b).
+</span><span class='line'><span class="k">\end</span><span class="nb">{</span>alphaparts<span class="nb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>or</p>
+
+<figure class='code'><figcaption><span>Numbered Question Parts</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>arabicparts<span class="nb">}</span>
+</span><span class='line'>  <span class="k">\questionpart</span>
+</span><span class='line'>    This will be part x.1.
+</span><span class='line'>  <span class="k">\questionpart</span>
+</span><span class='line'>    This will be part x.2.
+</span><span class='line'><span class="k">\end</span><span class="nb">{</span>arabicparts<span class="nb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>See <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
+
+<h3>Induction Proofs</h3>
+
+<p>In math classes, induction proofs come up a lot, and they almost always have the
+same form: base case, induction hypothesis, and induction step.</p>
+
+<figure class='code'><figcaption><span>Induction Environment</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>induction<span class="nb">}</span>
+</span><span class='line'>  <span class="k">\basecase</span>
+</span><span class='line'>    This is my fancy base case.
+</span><span class='line'>  <span class="k">\indhyp</span>
+</span><span class='line'>    Assume some claim.
+</span><span class='line'>  <span class="k">\indstep</span>
+</span><span class='line'>    Finish off the proof
+</span><span class='line'><span class="k">\end</span><span class="nb">{</span>induction<span class="nb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Markdown</h2>
+
+<p>One of my favorite features of this document class is that it redefines the
+<code>\section</code> macros. This means you can use tools like Markdown, which have a
+concise syntax, together with a tool like <a href="http://johnmacfarlane.net/pandoc/"><code>pandoc</code></a> to convert Markdown
+into LaTeX. As an example, consider that we have the Markdown:</p>
+
+<figure class='code'><figcaption><span>my-homework.md</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#
+</span><span class='line'>
+</span><span class='line'>This is my first answer.
+</span><span class='line'>
+</span><span class='line'>#
+</span><span class='line'>
+</span><span class='line'>This is my next answer.
+</span><span class='line'>
+</span><span class='line'>$$a^2 + b^2 = c^2$$</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running <code>pandoc -f markdown -t latex my-homework.md</code> will output</p>
+
+<figure class='code'><figcaption><span>Convert markdown to LaTeX</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="c">% $ pandoc -f markdown -t latex my-homework.md</span>
+</span><span class='line'><span class="k">\section</span><span class="nb">{}</span><span class="k">\label</span><span class="nb">{</span>section<span class="nb">}</span>
+</span><span class='line'>
+</span><span class='line'>This is my first answer.
+</span><span class='line'>
+</span><span class='line'><span class="k">\section</span><span class="nb">{}</span><span class="k">\label</span><span class="nb">{</span>section-1<span class="nb">}</span>
+</span><span class='line'>
+</span><span class='line'>This is my next answer.
+</span><span class='line'>
+</span><span class='line'><span class="sb">\[</span><span class="nb">a^</span><span class="m">2</span><span class="nb"> </span><span class="o">+</span><span class="nb"> b^</span><span class="m">2</span><span class="nb"> </span><span class="o">=</span><span class="nb"> c^</span><span class="m">2</span><span class="s">\]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And since <code>\section</code> is the same thing as \question, we&rsquo;re golden, and this
+compiles as we&rsquo;d want it to. Throw it into the blank
+<a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/template.tex">template.tex</a> file included in the repo, and you&rsquo;ve got yourself
+a typeset homework.</p>
+
+<h2>More</h2>
+
+<p>I&rsquo;ve make a lot of other LaTeX-related posts. Be sure to <a href="https://blog.zimmerman.io/categories#latex">check them out</a>
+as well! My hope is that you find something that makes developing LaTeX just
+that much easier.</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="https://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="https://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Offline LaTeX Development - Part 2]]></title>
+    <link href="https://blog.zimmerman.io/2015/01/10/offline-latex-development-part-2/"/>
+    <updated>2015-01-10T17:00:00-05:00</updated>
+    <id>https://blog.zimmerman.io/2015/01/10/offline-latex-development-part-2</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve already written about how I develop LaTeX offline in Vim using GNU Make.
+Recently, though, I found a tool that implements another feature that GUI
+editors had to themselves: splitting panes.</p>
+
+<!-- more -->
+
+
+<h2><a href="https://blog.zimmerman.io/2014/10/06/offline-latex-development/">Offline LaTeX Development</a></h2>
+
+<p>If you missed it, check out my previous post here before reading on. There&rsquo;s a
+lot of handy stuff there!</p>
+
+<h2>Split Panes</h2>
+
+<p>Out of the box, tools like ShareLaTeX and TeXShop feature split pane editing:
+you can have your LaTeX on one half of the screen and the PDF on the other.
+Previously, I justified not having this feature with the reasoning that the
+<code>:WV</code> binding (something I explained <a href="https://blog.zimmerman.io/2014/10/06/offline-latex-development/">here</a>) immediately opened up the
+PDF and the windows switched.</p>
+
+<p>However, I read about a tool called <a href="http://ianyh.com/amethyst/">Amethyst</a> on Hacker News the
+other day and immediately realized it&rsquo;s potential for improving my LaTeX setup.
+Amethyst is a tool that strives to be a tiling window manager like xmonad for OS
+X. At times it falls short of this goal, but for the most part it works really
+well. Just open up two apps, like MacVim and Preview, and it&rsquo;ll show them
+side-by-side with no added effort. There are also plenty of keybindings to
+manipulate the window arrangements.</p>
+
+<p>Here&rsquo;s a screenshot of what the new setup looks like:</p>
+
+<p><a class="image-link" href="https://blog.zimmerman.io/images/latex-amethyst.png"><img src="https://blog.zimmerman.io/images/latex-amethyst.png"></a></p>
+
+<p>After looking into it a little more, it looks like there are other OS X tools
+for spitting the screen into two panes, like <a href="http://www.bettertouchtool.net/">BetterTouchTool</a>, though I
+haven&rsquo;t actually tried any of them out.</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="https://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="https://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Google Chrome: A Memory Hog]]></title>
     <link href="https://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog/"/>
-    <updated>2014-12-29T17:00:00-06:00</updated>
+    <updated>2014-12-29T18:00:00-05:00</updated>
     <id>https://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog</id>
     <content type="html"><![CDATA[<p>Whenever someone complains about a slow computer, the first thing I check is
 how many Chrome tabs they have open. Chrome hogs memory like no other. For
@@ -160,7 +454,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Intro to Columns in HTML]]></title>
     <link href="https://blog.zimmerman.io/2014/12/26/intro-to-columns-in-html/"/>
-    <updated>2014-12-26T12:00:00-06:00</updated>
+    <updated>2014-12-26T13:00:00-05:00</updated>
     <id>https://blog.zimmerman.io/2014/12/26/intro-to-columns-in-html</id>
     <content type="html"><![CDATA[<p>HTML and CSS can be frustrating when first starting out. Despite all you try, nothing is in the right place. I&rsquo;ve advised more than a few friends on how to figure out this mystery and I&rsquo;ve noticed a pattern: people don&rsquo;t realize they should be using a grid.</p>
 
@@ -404,7 +698,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Ruby Virtualenvs]]></title>
     <link href="https://blog.zimmerman.io/2014/12/22/ruby-virtualenvs/"/>
-    <updated>2014-12-22T12:52:40-06:00</updated>
+    <updated>2014-12-22T13:52:40-05:00</updated>
     <id>https://blog.zimmerman.io/2014/12/22/ruby-virtualenvs</id>
     <content type="html"><![CDATA[<p>A while back I found a command that removes all Ruby gems installed on a system
 when you&rsquo;re using rbenv. It worked great, so I decided to build on top of it.
@@ -511,7 +805,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Vim as a Man Page Viewer]]></title>
     <link href="https://blog.zimmerman.io/2014/12/20/vim-as-a-man-page-viewer/"/>
-    <updated>2014-12-20T20:17:46-06:00</updated>
+    <updated>2014-12-20T21:17:46-05:00</updated>
     <id>https://blog.zimmerman.io/2014/12/20/vim-as-a-man-page-viewer</id>
     <content type="html"><![CDATA[<p>Man pages are an essential part of every developer&rsquo;s workflow. Unfortunately,
 the default system pager <code>less</code> isn&rsquo;t the best interface. That&rsquo;s why I wrote a
@@ -604,7 +898,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[The Joys of the Craft]]></title>
     <link href="https://blog.zimmerman.io/2014/12/13/the-joys-of-the-craft/"/>
-    <updated>2014-12-13T19:52:09-06:00</updated>
+    <updated>2014-12-13T20:52:09-05:00</updated>
     <id>https://blog.zimmerman.io/2014/12/13/the-joys-of-the-craft</id>
     <content type="html"><![CDATA[<p>A while ago, I was given the book <em>The Mythical Man-Month</em>, by Frederick P. Brooks, Jr. I finally have some time to sit down and read it, and I&rsquo;m loving it. In the first chapter, this quote on &ldquo;the joys of the craft&rdquo; (i.e., programming) struck me as particularly on point:</p>
 
@@ -650,7 +944,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Using Multiple Git Remotes]]></title>
     <link href="https://blog.zimmerman.io/2014/11/01/using-more-than-one-git-remote/"/>
-    <updated>2014-11-01T17:12:35-05:00</updated>
+    <updated>2014-11-01T18:12:35-04:00</updated>
     <id>https://blog.zimmerman.io/2014/11/01/using-more-than-one-git-remote</id>
     <content type="html"><![CDATA[<p>Quite often when using git, you only need to use one remote: <code>origin</code>. All your pushes and pulls communicate with this one host. However, there are many occasions when using multiple Git remotes is incredibly handy.</p>
 
@@ -791,7 +1085,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Using Google OAuth2 for CMU Authentication]]></title>
     <link href="https://blog.zimmerman.io/2014/10/20/using-google-apps-for-cmu-authentication/"/>
-    <updated>2014-10-20T05:11:37-05:00</updated>
+    <updated>2014-10-20T06:11:37-04:00</updated>
     <id>https://blog.zimmerman.io/2014/10/20/using-google-apps-for-cmu-authentication</id>
     <content type="html"><![CDATA[<p>Using <code>python-social-auth</code> and Django, I&rsquo;ve found a very straightfoward way of adding authentication to apps designed for CMU students. Given that all Andrew accounts are now Google Apps @ CMU accounts, we can take advantage of the widely used Google OAuth2 libraries to authenticate users, but just restrict sign-ins to the <code>andrew.cmu.edu</code> &ldquo;hosted domain.&rdquo;</p>
 
@@ -903,7 +1197,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Offline LaTeX Development]]></title>
     <link href="https://blog.zimmerman.io/2014/10/06/offline-latex-development/"/>
-    <updated>2014-10-06T17:00:00-05:00</updated>
+    <updated>2014-10-06T18:00:00-04:00</updated>
     <id>https://blog.zimmerman.io/2014/10/06/offline-latex-development</id>
     <content type="html"><![CDATA[<p>While online clients like ShareLaTeX or writeLaTeX are popular for getting started with LaTeX quickly, developing LaTeX locally with Vim and the command line is my preferred LaTeX workflow. In this post, I&rsquo;ll describe the changes I&rsquo;ve made that make working with LaTeX on the command line a seamless experience.</p>
 
@@ -1076,7 +1370,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Solarized LaTeX Listings]]></title>
     <link href="https://blog.zimmerman.io/2014/10/04/solarized-latex-listings/"/>
-    <updated>2014-10-04T05:35:05-05:00</updated>
+    <updated>2014-10-04T06:35:05-04:00</updated>
     <id>https://blog.zimmerman.io/2014/10/04/solarized-latex-listings</id>
     <content type="html"><![CDATA[<p>Out of the box, LaTeX listings are pretty bad. With a bit of work, you can ascribe some colors to the code, but you&rsquo;re still stuck with choosing a theme. Given that I recently just switched to the Solarized colorscheme in Vim and iTerm2, I made a LaTeX package that styles code listings with the predefined Solarized light colors.</p>
 
@@ -1110,7 +1404,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[A LaTeX Homework Template]]></title>
     <link href="https://blog.zimmerman.io/2014/10/04/a-latex-homework-template/"/>
-    <updated>2014-10-04T01:03:27-05:00</updated>
+    <updated>2014-10-04T02:03:27-04:00</updated>
     <id>https://blog.zimmerman.io/2014/10/04/a-latex-homework-template</id>
     <content type="html"><![CDATA[<p>Writing a LaTeX document from scratch for every assignment is tedious. Especially for homework assignments, a lot of the structure is repetitive. Read on to learn about the homework template I&rsquo;ve adapted for use in all my technical classes.</p>
 
@@ -1219,7 +1513,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Setting Up MobaXterm for SSH on Windows]]></title>
     <link href="https://blog.zimmerman.io/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/"/>
-    <updated>2014-09-28T13:11:05-05:00</updated>
+    <updated>2014-09-28T14:11:05-04:00</updated>
     <id>https://blog.zimmerman.io/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows</id>
     <content type="html"><![CDATA[<p>For an optimal SSH experience, your best best is to use Linux or Mac OS X. However, if you&rsquo;re dead-set on using Windows, MobaXterm has the best overall experience. This post guides you through setting it up and outlines some of its coolest features.</p>
 
@@ -1308,7 +1602,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 5: It's Not You, It's Me]]></title>
     <link href="https://blog.zimmerman.io/2014/07/10/running-a-vps-log-5/"/>
-    <updated>2014-07-10T15:48:43-05:00</updated>
+    <updated>2014-07-10T16:48:43-04:00</updated>
     <id>https://blog.zimmerman.io/2014/07/10/running-a-vps-log-5</id>
     <content type="html"><![CDATA[<p>It is with great sadness that I announce today that I am breaking up with my mail server. At least for a little while, that is. Let&rsquo;s say we&rsquo;re &ldquo;taking a break&rdquo; to &ldquo;see other people.&rdquo;</p>
 
@@ -1369,7 +1663,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 4: Debugging a Broken Mail Server]]></title>
     <link href="https://blog.zimmerman.io/2014/07/07/running-a-vps-log-4/"/>
-    <updated>2014-07-07T00:08:00-05:00</updated>
+    <updated>2014-07-07T01:08:00-04:00</updated>
     <id>https://blog.zimmerman.io/2014/07/07/running-a-vps-log-4</id>
     <content type="html"><![CDATA[<p>Whereas the tutorial I&rsquo;m following to setup this mail server initially promised a working setup in more or less two hours, it&rsquo;s nearing two weeks for me and I&rsquo;ve still got plenty of issues. In this log, I&rsquo;ll discuss some of the tools, log files, and online resources which I&rsquo;ve found helpful, as well as give a description of my problem as I best understand it.</p>
 
@@ -1586,7 +1880,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 3: A Mail Server That Works... Kind Of.]]></title>
     <link href="https://blog.zimmerman.io/2014/07/04/running-a-vps-log-3/"/>
-    <updated>2014-07-04T13:11:14-05:00</updated>
+    <updated>2014-07-04T14:11:14-04:00</updated>
     <id>https://blog.zimmerman.io/2014/07/04/running-a-vps-log-3</id>
     <content type="html"><![CDATA[<p>After some initial troubles, I finally managed to get basic send and receive functionality  working on my mail server, using EncFS, Dovecot, and Postfix. That being said, it&rsquo;s <em>far</em> from a perfect system, and it needs a good deal more TLC to get it working at a level that&rsquo;s on par with a more &ldquo;professional&rdquo; email service provider. This post details some fixes that I&rsquo;ve implemented so far, as well as the functionality that I&rsquo;ve managed to get working.</p>
 
@@ -1687,7 +1981,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 2: Seriously, Back It Up]]></title>
     <link href="https://blog.zimmerman.io/2014/06/24/running-a-vps-log-2/"/>
-    <updated>2014-06-24T22:11:14-05:00</updated>
+    <updated>2014-06-24T23:11:14-04:00</updated>
     <id>https://blog.zimmerman.io/2014/06/24/running-a-vps-log-2</id>
     <content type="html"><![CDATA[<p>I don&rsquo;t have the best track record with configuring servers. I&rsquo;ve certainly brought down a ScottyLabs server or two before, but sometimes there&rsquo;s no avoiding that in the sake of learning. At times like these, you&rsquo;ve just gotta reboot and try again. With DigitalOcean&rsquo;s auto-backups though, this process is incredibly easy.</p>
 
@@ -1733,7 +2027,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 1: Managing Dotfiles Across Machines]]></title>
     <link href="https://blog.zimmerman.io/2014/06/19/running-a-vps-log-1/"/>
-    <updated>2014-06-19T22:10:51-05:00</updated>
+    <updated>2014-06-19T23:10:51-04:00</updated>
     <id>https://blog.zimmerman.io/2014/06/19/running-a-vps-log-1</id>
     <content type="html"><![CDATA[<p>You could say I&rsquo;m a bit of a geek when it comes to configuring my terminal environment; this obsession has led me to concoct ever-elaborate setup scripts and configuration files. On top of this, between my laptop&rsquo;s multiple boot environments, the servers I use for school, work, and ScottyLabs, and now <a href="https://blog.zimmerman.io/2014/06/19/running-a-vps-log-0">metagross</a>, keeping my configuration files in sync is a must. I handle it swiftly using a combination of git and rcm.</p>
 
@@ -1809,7 +2103,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 0: Getting Set Up]]></title>
     <link href="https://blog.zimmerman.io/2014/06/19/running-a-vps-log-0/"/>
-    <updated>2014-06-19T20:45:29-05:00</updated>
+    <updated>2014-06-19T21:45:29-04:00</updated>
     <id>https://blog.zimmerman.io/2014/06/19/running-a-vps-log-0</id>
     <content type="html"><![CDATA[<p>Since last Christmas, I&rsquo;ve had a raspberry pi running as a server at my home back in Wisconsin. I had tons of plans for this little guy, but I quickly discovered that he was going to be a bit <em>too</em> little for most of them. Thus, I am now the proud sysadmin of my own virtual private server.</p>
 
@@ -1854,7 +2148,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Summer Project Series]]></title>
     <link href="https://blog.zimmerman.io/2014/06/19/summer-project-series/"/>
-    <updated>2014-06-19T19:16:18-05:00</updated>
+    <updated>2014-06-19T20:16:18-04:00</updated>
     <id>https://blog.zimmerman.io/2014/06/19/summer-project-series</id>
     <content type="html"><![CDATA[<p>After spending most of the beginning of the summer flying, driving, moving, moving again, riding trains, riding different trains, and starting a new job, it&rsquo;s finally time to start working on some cool side projects.</p>
 
@@ -1911,210 +2205,6 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 
 
 <p>Edit: I&rsquo;ve started Print 2.0, and it&rsquo;s moving slowly now that classes have started to pick up. I have done a bit of work on it though, and I&rsquo;ll be documenting it soon. Since it&rsquo;s no longer the summer, though, it won&rsquo;t be published under the Summer Project Series tag.</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="https://www.zimmerman.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Why Everyone Loves JavaScript]]></title>
-    <link href="https://blog.zimmerman.io/2014/06/15/why-everyone-loves-javascript/"/>
-    <updated>2014-06-15T23:39:52-05:00</updated>
-    <id>https://blog.zimmerman.io/2014/06/15/why-everyone-loves-javascript</id>
-    <content type="html"><![CDATA[<p>Airbnb has put together a stellar list of simple ways to make your JavaScript more maintainable and manageable. From comments and whitespace, to hoisting and type casting, this list covers nearly everything you should know when developing a JavaScript app.</p>
-
-<!-- more -->
-
-
-<h2>The Backstory</h2>
-
-<p>Before I begin, I should mention that any views I express here are entirely my own. Now, I recently began working for the summer at Bloomberg L.P., where for the first few days we sit through a few talks and do a few labs that introduce us to the technologies we&rsquo;ll be using throughout the summer. JavaScript was one of these languages, and I found that a quote on the first slide is all too correct:</p>
-
-<blockquote><p>&ldquo;JavaScript is both the most popular and unpopular programming language.&rdquo;</p>
-
-<p>&ndash; Doug Crockford</p></blockquote>
-
-<p>From there, as you might imagine, the reactions from a predominantly C++ oriented audience towards JavaScript&rsquo;s quirks were pretty amusing. There are some significant differences between these two languages, and if you&rsquo;re not careful, they can get annoying quite quickly.</p>
-
-<h2>Links</h2>
-
-<h3><a href="https://github.com/airbnb/javascript">airbnb/javascript</a></h3>
-
-<p>JavaScript might have it&rsquo;s quirks, but it&rsquo;s still a vastly powerful language, especially if used well. For any aspiring JavaScript developer, I would highly recommend looking over Airbnb&rsquo;s JavaScript best practices. Even if you think you&rsquo;ve got the language down, I&rsquo;m confident you&rsquo;ll uncover something useful.</p>
-
-<h3><a href="https://www.destroyallsoftware.com/talks/the-birth-and-death-of-javascript">The Birth and Death of JavaScript</a></h3>
-
-<p>While you&rsquo;re here, check out this video for an incredibly humorous and satisfyingly accurate discussion of JavaScript, from birth to death.</p>
-
-<h3><a href="https://www.destroyallsoftware.com/talks/wat">Wat</a></h3>
-
-<p>Aaand while we&rsquo;re posting humorous JavaScript videos, I&rsquo;ve gotta throw this one into the mix.</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="https://www.zimmerman.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Update Your Software: It's the Law]]></title>
-    <link href="https://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law/"/>
-    <updated>2014-06-11T21:22:57-05:00</updated>
-    <id>https://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law</id>
-    <content type="html"><![CDATA[<p>Okay, so maybe the government won&rsquo;t come after you for not updating. But they should. To guard off any present or future threats (be they from governments, security vulnerabilities, or something else in the cyber realm), I wrote a short bash snippet to check my system for outdated packages.</p>
-
-<!-- more -->
-
-
-<h2>Obligatory Existential/Meta Section</h2>
-
-<p>I don&rsquo;t quite know what prompted me to suddenly become interested in maintaining an up to date system. Maybe it was <a href="https://www.facebook.com/groups/cmuscs/permalink/727878180603546/">this post</a> of Arch Linux horror stories. Maybe it was the release of <a href="https://git.kernel.org/cgit/git/git.git/tree/Documentation/RelNotes/2.0.0.txt">git 2.0</a>, which introduces a lot of cool new features and deprecates a lot of others. Who knows, maybe it was influenced by Heartbleed and the <a href="https://www.openssl.org/news/secadv_20140605.txt">host</a> <a href="http://grahamcluley.com/2014/06/feedly-blackmail-ddos/">of other</a> <a href="http://blog.evernote.com/blog/2013/03/02/security-notice-service-wide-password-reset/">high-profile</a> security vulnerabilities and hacks that have sprung up lately. It&rsquo;s probably a combination of all of these. Let&rsquo;s move on.</p>
-
-<p>For the impatient among us, here&rsquo;s the code, which is also available <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42">here</a> and <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178">here</a> amongst all the code for <a href="https://github.com/Z1MM32M4N/dotfiles">all my dotfiles</a>.</p>
-
-<figure class='code'><figcaption><span>Alert to Update</span><a href='https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># ----- daily updates --------------------------------------------------------</span>
-</span><span class='line'><span class="o">[</span> ! -e <span class="nv">$HOME</span>/.last_update <span class="o">]</span> <span class="o">&amp;&amp;</span> touch <span class="nv">$HOME</span>/.last_update
-</span><span class='line'><span class="c"># Initialize for when we have no GNU date available</span>
-</span><span class='line'><span class="nv">last_check</span><span class="o">=</span>0
-</span><span class='line'><span class="nv">time_now</span><span class="o">=</span>0
-</span><span class='line'>
-</span><span class='line'><span class="c"># Unix last command to check the log of logins, grab the most recent</span>
-</span><span class='line'><span class="nv">last_check_string</span><span class="o">=</span><span class="sb">`</span>ls -l <span class="nv">$HOME</span>/.last_update | awk <span class="s1">&#39;{print $6&quot; &quot;$7&quot; &quot;$8}&#39;</span><span class="sb">`</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Darwin uses BSD, check for gdate, else use date</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="sb">`</span>uname<span class="sb">`</span> <span class="o">=</span> <span class="s2">&quot;Darwin&quot;</span> <span class="o">&amp;&amp;</span> -n <span class="sb">`</span>which gdate<span class="sb">`</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nv">last_login</span><span class="o">=</span><span class="sb">`</span>gdate -d<span class="s2">&quot;$last_check_string&quot;</span> +%s<span class="sb">`</span>
-</span><span class='line'>  <span class="nv">time_now</span><span class="o">=</span><span class="sb">`</span>gdate +%s<span class="sb">`</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'>  <span class="c"># Ensure this is GNU grep</span>
-</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;`date --version 2&gt; /dev/null | grep GNU`&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nv">last_login</span><span class="o">=</span><span class="sb">`</span>date -d<span class="s2">&quot;$last_login_string&quot;</span> +%s<span class="sb">`</span>
-</span><span class='line'>    <span class="nv">time_now</span><span class="o">=</span><span class="sb">`</span>date +%s<span class="sb">`</span>
-</span><span class='line'>  <span class="k">fi</span>
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">time_since_check</span><span class="o">=</span><span class="k">$((</span>time_now <span class="o">-</span> last_login<span class="k">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$time_since_check&quot;</span> -ge 86400 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">echo</span> <span class="s2">&quot;$cred==&gt;$cwhiteb Your system is out of date!$cnone&quot;</span>
-</span><span class='line'>  <span class="nb">echo</span> <span class="s1">&#39;Run `update` to bring it up to date.&#39;</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>Check for Updates</span><a href='https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># ----- function -------------------------------------------------------------</span>
-</span><span class='line'>update<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  touch <span class="nv">$HOME</span>/.last_update
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># Mac updates</span>
-</span><span class='line'>  <span class="k">case</span> <span class="nv">$HOSTNAME</span> in
-</span><span class='line'>    *Jacobs-MacBook-Air*<span class="o">)</span>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Updating Homebrew...$cnone&quot;</span>
-</span><span class='line'>      brew update
-</span><span class='line'>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Checking for outdated brew packages...$cnone&quot;</span>
-</span><span class='line'>      brew outdated --verbose
-</span><span class='line'>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Checking for outdated rbenv...$cnone&quot;</span>
-</span><span class='line'>      <span class="nb">cd</span> <span class="nv">$HOME</span>/.rbenv
-</span><span class='line'>      git fetch
-</span><span class='line'>      <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;`git describe --tags master`&quot;</span> !<span class="o">=</span> <span class="s2">&quot;`git describe --tags origin/master`&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">        </span><span class="nb">echo</span> <span class="s2">&quot;rbenv (`git describe --tags master`) is outdated (`git describe --tags origin/master`).&quot;</span>
-</span><span class='line'>        <span class="nb">echo</span> <span class="s2">&quot;To update, run: cd ~/.rbenv; git merge origin master &amp;&amp; cd -&quot;</span>
-</span><span class='line'>      <span class="k">fi</span>
-</span><span class='line'><span class="k">      </span><span class="nb">cd</span> - 2&gt;&amp;1 &gt; /dev/null
-</span><span class='line'>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Checking for outdated ruby gems...$cnone&quot;</span>
-</span><span class='line'>      gem outdated
-</span><span class='line'>      ;;
-</span><span class='line'>  <span class="k">esac</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You&rsquo;ll note the use of a touch file (created in line 2 of the first snippet if it doesn&rsquo;t already exist). If this file is 24 hours old, each time this code is run an alert will be printed. Since this code is running inside of my <code>.bash_profile</code>, that means that every time I open a terminal on a 24-hour-old system, I see the update message.</p>
-
-<p>Next, you&rsquo;ll note that I&rsquo;ve defined a function called <code>update</code> which is actually misnamed. This function merely checks for available updates instead of actually performing the updates, logging those packages, gems, and formulae it finds that are out of date. For my purposes, I only need to update brew, check for formulae updates, update rbenv, and check for gem updates. Obviously though, given that there is a way to programmatically check something for updates, plugging that code in here would check it as well. This means that this method is very easy to customize and extend for various needs.</p>
-
-<h2>Rant</h2>
-
-<p>I was planning on checking pip for updates as well, but pip is kind of not even good. To give you an idea, to check all the packages brew manages for updates, you type <code>brew outdated</code>, and it will list the formula name, current version number, and newest version number. Meanwhile, back in the land of pip, no such functionality exists (at least, simple functionality, and functionality that I could find. If you&rsquo;d like to correct me, be my guest!). I&rsquo;m sure that this script will grow as I come to manage more and more pieces of software on my system and others.</p>
-
-<p>If you have any questions about what I&rsquo;ve done here, or you catch some bugs, be sure to comment below or file an issue on GitHub! I&rsquo;d love to hear what you have to say.</p>
 
 <hr />
 

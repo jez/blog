@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Latex | Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/categories/latex/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-01-03T22:04:45-06:00</updated>
+  <updated>2015-01-10T22:27:29-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -14,9 +14,251 @@
 
   
   <entry>
+    <title type="html"><![CDATA[The LaTeX Homework Document Class]]></title>
+    <link href="https://blog.zimmerman.io/2015/01/10/the-latex-homework-document-class/"/>
+    <updated>2015-01-10T18:00:00-05:00</updated>
+    <id>https://blog.zimmerman.io/2015/01/10/the-latex-homework-document-class</id>
+    <content type="html"><![CDATA[<p>There are LaTeX document classes for typesetting books, articles, exams,
+presentations, and more. Now, there&rsquo;s one for homework assignments, too.</p>
+
+<!-- more -->
+
+
+<h2><a href="https://github.com/Z1MM32M4N/latex-homework-class">Source</a></h2>
+
+<p>Check out and download the source <a href="https://github.com/Z1MM32M4N/latex-homework-class">on GitHub</a>.</p>
+
+<h2>What</h2>
+
+<p>This is a LaTeX document class. That means you use it with
+<code>\documentclass{homework}</code> at the top of the document. It provides a document
+layout and some helper commands that make working with questions easy.</p>
+
+<h2>Installation</h2>
+
+<p>Certainly the easiest way to start using this template is to copy the .cls file
+to your computer in the same directory as your LaTeX project directory.</p>
+
+<p>A better way to install this template is to fork <a href="https://github.com/Z1MM32M4N/latex-homework-class">the above
+repository</a> and then clone that fork to a particular folder on your
+computer:</p>
+
+<pre><code class="bash Install">git clone https://github.com/&lt;your-username&gt;/latex-hw-template
+</code></pre>
+
+<p>Then, whenever you need to use the template, you can copy the template wherever.
+Also, if there are ever any updates, you can simply run</p>
+
+<pre><code class="bash Update">git pull
+</code></pre>
+
+<p>to update the template.</p>
+
+<h3>Preferred Installation</h3>
+
+<p>The <em>best</em> way to install this file is to <a href="https://github.com/Z1MM32M4N/latex-solarized#installation">follow the instructions
+here</a>, keeping in mind that you&rsquo;re trying to install a <code>.cls</code> file
+instead of three <code>.sty</code> files.</p>
+
+<h2>Usage</h2>
+
+<p>See the <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> file for an exhaustive list of usage
+examples. There are also comments explaining features for which there are no
+examples given.</p>
+
+<p>The result is the following:</p>
+
+<p><a class="image-link" href="/images/homework-class.png"><img src="/images/homework-class.png"></a></p>
+
+<p>The class file also has a bunch of helper <code>\usepackage</code>s that you might want to
+take a look at in <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.cls">homework.cls</a>.</p>
+
+<p>For your convenience, the file <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/template.tex">template.tex</a> is a nearly-empty
+LaTeX file that contains the bare essentials to get started using the homework
+class.</p>
+
+<h3><code>\question</code></h3>
+
+<p>To start a question, just type <code>\question</code>. It will add the text &ldquo;Question #&rdquo;
+with a line underneath to the document. If you&rsquo;d like to change &ldquo;Question&rdquo; to
+something else, use</p>
+
+<pre><code class="tex Change the Question Type">\renewcommand{\questiontype}{Whatever You Want}
+% Now questions will be titled "Whatever You Want #"
+</code></pre>
+
+<p>Similarly, if you ever need to skip numbers, you can do</p>
+
+<pre><code class="tex Non-contiguous Question Numbers">\setcounter{\questionCounter}{&lt;target number - 1&gt;}
+</code></pre>
+
+<p>So, to skip to the 10th question, <code>&lt;target number - 1&gt;</code> = 9.</p>
+
+<p>See <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
+
+<h3><code>\question*</code></h3>
+
+<p>Some classes like to give their homework questions fancy names. If this is the
+case, you can use <code>\question*{The Question's Name}</code> to make a named question.</p>
+
+<p>See <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
+
+<h3>Question Parts</h3>
+
+<p>Another common thing on homework assignments is to have multi-part questions. To
+deal with these, use the form</p>
+
+<pre><code class="tex Lettered Question Parts">\begin{alphaparts}
+  \questionpart
+    This will be part (a).
+  \questionpart
+    This will be part (b).
+\end{alphaparts}
+</code></pre>
+
+<p>or
+<code>tex Numbered Question Parts
+\begin{arabicparts}
+  \questionpart
+    This will be part x.1.
+  \questionpart
+    This will be part x.2.
+\end{arabicparts}
+</code></p>
+
+<p>See <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
+
+<h3>Induction Proofs</h3>
+
+<p>In math classes, induction proofs come up a lot, and they almost always have the
+same form: base case, induction hypothesis, and induction step.</p>
+
+<pre><code class="tex Induction Environment">\begin{induction}
+  \basecase
+    This is my fancy base case.
+  \indhyp
+    Assume some claim.
+  \indstep
+    Finish off the proof
+\end{induction}
+</code></pre>
+
+<h2>Markdown</h2>
+
+<p>One of my favorite features of this document class is that it redefines the
+<code>\section</code> macros. This means you can use tools like Markdown, which have a
+concise syntax, together with a tool like <a href="http://johnmacfarlane.net/pandoc/"><code>pandoc</code></a> to convert Markdown
+into LaTeX. As an example, consider that we have the Markdown:</p>
+
+<pre><code class="plain my-homework.md">#
+
+This is my first answer.
+
+#
+
+This is my next answer.
+
+$$a^2 + b^2 = c^2$$
+</code></pre>
+
+<p>Running <code>pandoc -f markdown -t latex my-homework.md</code> will output</p>
+
+<pre><code class="tex Convert markdown to LaTeX">% $ pandoc -f markdown -t latex my-homework.md
+\section{}\label{section}
+
+This is my first answer.
+
+\section{}\label{section-1}
+
+This is my next answer.
+
+\[a^2 + b^2 = c^2\]
+</code></pre>
+
+<p>And since <code>\section</code> is the same thing as \question, we&rsquo;re golden, and this
+compiles as we&rsquo;d want it to. Throw it into the blank
+<a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/template.tex">template.tex</a> file included in the repo, and you&rsquo;ve got yourself
+a typeset homework.</p>
+
+<h2>More</h2>
+
+<p>I&rsquo;ve make a lot of other LaTeX-related posts. Be sure to <a href="/categories#latex">check them out</a>
+as well! My hope is that you find something that makes developing LaTeX just
+that much easier.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.
+ [g]: https://www.github.com/Z1MM32M4N/
+ [h]: https://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Offline LaTeX Development - Part 2]]></title>
+    <link href="https://blog.zimmerman.io/2015/01/10/offline-latex-development-part-2/"/>
+    <updated>2015-01-10T17:00:00-05:00</updated>
+    <id>https://blog.zimmerman.io/2015/01/10/offline-latex-development-part-2</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve already written about how I develop LaTeX offline in Vim using GNU Make.
+Recently, though, I found a tool that implements another feature that GUI
+editors had to themselves: splitting panes.</p>
+
+<!-- more -->
+
+
+<h2><a href="/2014/10/06/offline-latex-development/">Offline LaTeX Development</a></h2>
+
+<p>If you missed it, check out my previous post here before reading on. There&rsquo;s a
+lot of handy stuff there!</p>
+
+<h2>Split Panes</h2>
+
+<p>Out of the box, tools like ShareLaTeX and TeXShop feature split pane editing:
+you can have your LaTeX on one half of the screen and the PDF on the other.
+Previously, I justified not having this feature with the reasoning that the
+<code>:WV</code> binding (something I explained <a href="/2014/10/06/offline-latex-development/">here</a>) immediately opened up the
+PDF and the windows switched.</p>
+
+<p>However, I read about a tool called <a href="http://ianyh.com/amethyst/">Amethyst</a> on Hacker News the
+other day and immediately realized it&rsquo;s potential for improving my LaTeX setup.
+Amethyst is a tool that strives to be a tiling window manager like xmonad for OS
+X. At times it falls short of this goal, but for the most part it works really
+well. Just open up two apps, like MacVim and Preview, and it&rsquo;ll show them
+side-by-side with no added effort. There are also plenty of keybindings to
+manipulate the window arrangements.</p>
+
+<p>Here&rsquo;s a screenshot of what the new setup looks like:</p>
+
+<p><a class="image-link" href="/images/latex-amethyst.png"><img src="/images/latex-amethyst.png"></a></p>
+
+<p>After looking into it a little more, it looks like there are other OS X tools
+for spitting the screen into two panes, like <a href="http://www.bettertouchtool.net/">BetterTouchTool</a>, though I
+haven&rsquo;t actually tried any of them out.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.
+ [g]: https://www.github.com/Z1MM32M4N/
+ [h]: https://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Offline LaTeX Development]]></title>
     <link href="https://blog.zimmerman.io/2014/10/06/offline-latex-development/"/>
-    <updated>2014-10-06T17:00:00-05:00</updated>
+    <updated>2014-10-06T18:00:00-04:00</updated>
     <id>https://blog.zimmerman.io/2014/10/06/offline-latex-development</id>
     <content type="html"><![CDATA[<p>While online clients like ShareLaTeX or writeLaTeX are popular for getting started with LaTeX quickly, developing LaTeX locally with Vim and the command line is my preferred LaTeX workflow. In this post, I&rsquo;ll describe the changes I&rsquo;ve made that make working with LaTeX on the command line a seamless experience.</p>
 
@@ -152,7 +394,7 @@ people think, so feel free to comment, open an issue, or send me an email.
   <entry>
     <title type="html"><![CDATA[Solarized LaTeX Listings]]></title>
     <link href="https://blog.zimmerman.io/2014/10/04/solarized-latex-listings/"/>
-    <updated>2014-10-04T05:35:05-05:00</updated>
+    <updated>2014-10-04T06:35:05-04:00</updated>
     <id>https://blog.zimmerman.io/2014/10/04/solarized-latex-listings</id>
     <content type="html"><![CDATA[<p>Out of the box, LaTeX listings are pretty bad. With a bit of work, you can ascribe some colors to the code, but you&rsquo;re still stuck with choosing a theme. Given that I recently just switched to the Solarized colorscheme in Vim and iTerm2, I made a LaTeX package that styles code listings with the predefined Solarized light colors.</p>
 
@@ -186,7 +428,7 @@ people think, so feel free to comment, open an issue, or send me an email.
   <entry>
     <title type="html"><![CDATA[A LaTeX Homework Template]]></title>
     <link href="https://blog.zimmerman.io/2014/10/04/a-latex-homework-template/"/>
-    <updated>2014-10-04T01:03:27-05:00</updated>
+    <updated>2014-10-04T02:03:27-04:00</updated>
     <id>https://blog.zimmerman.io/2014/10/04/a-latex-homework-template</id>
     <content type="html"><![CDATA[<p>Writing a LaTeX document from scratch for every assignment is tedious. Especially for homework assignments, a lot of the structure is repetitive. Read on to learn about the homework template I&rsquo;ve adapted for use in all my technical classes.</p>
 
@@ -263,168 +505,6 @@ people think, so feel free to comment, open an issue, or send me an email.
 <h2>Feedback</h2>
 
 <p>Be sure to let me know how you like this template! It works for me, but obviously I&rsquo;m only using it for a small number of things on exactly one system. If something doesn&rsquo;t seem to work, or if you&rsquo;d like to see a particular feature implemented, comment or create a GitHub issue to let me know!</p>
-
-<p>- - - - -
-<br>
-### Jake on the Web
-<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.
- [g]: https://www.github.com/Z1MM32M4N/
- [h]: https://www.zimmerman.io/
-</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[The LaTeX Homework Document Class]]></title>
-    <link href="https://blog.zimmerman.io/2014/01/05/the-latex-homework-document-class/"/>
-    <updated>2014-01-05T17:00:00-06:00</updated>
-    <id>https://blog.zimmerman.io/2014/01/05/the-latex-homework-document-class</id>
-    <content type="html"><![CDATA[<p>There are LaTeX document classes for typesetting books, articles, exams, presentations, and more. Now, there&rsquo;s one for homework assignments, too.</p>
-
-<!-- more -->
-
-
-<h2><a href="https://github.com/Z1MM32M4N/latex-homework-class">Source</a></h2>
-
-<p>Check out and download the source <a href="https://github.com/Z1MM32M4N/latex-homework-class">on GitHub</a>.</p>
-
-<h2>What</h2>
-
-<p>This is a LaTeX document class. That means you use it with <code>\documentclass{homework}</code> at the top of the document. It provides a document layout and some helper commands that make working with questions easy.</p>
-
-<h2>Installation</h2>
-
-<p>Certainly the easiest way to start using this template is to copy the .cls file to your computer in the same directory as your LaTeX project directory.</p>
-
-<p>A better way to install this template is to fork <a href="https://github.com/Z1MM32M4N/latex-homework-class">the above repository</a> and then clone that fork to a particular folder on your computer:</p>
-
-<pre><code class="bash Install">git clone https://github.com/&lt;your-username&gt;/latex-hw-template
-</code></pre>
-
-<p>Then, whenever you need to use the template, you can copy the template wherever. Also, if there are ever any updates, you can simply run</p>
-
-<pre><code class="bash Update">git pull
-</code></pre>
-
-<p>to update the template.</p>
-
-<h3>Preferred Installation</h3>
-
-<p>The <em>best</em> way to install this file is to <a href="https://github.com/Z1MM32M4N/latex-solarized#installation">follow the instructions here</a>, keeping in mind that you&rsquo;re trying to install a <code>.cls</code> file instead of three <code>.sty</code> files.</p>
-
-<h2>Usage</h2>
-
-<p>See the <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> file for an exhaustive list of usage examples. There are also comments explaining features for which there are no examples given.</p>
-
-<p>The result is the following:</p>
-
-<p><a class="image-link" href="/images/homework-class.png"><img src="/images/homework-class.png"></a></p>
-
-<p>The class file also has a bunch of helper <code>\usepackage</code>s that you might want to take a look at in <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.cls">homework.cls</a>.</p>
-
-<p>For your convenience, the file <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/template.tex">template.tex</a> is a nearly-empty
-LaTeX file that contains the bare essentials to get started using the homework
-class.</p>
-
-<h3><code>\question</code></h3>
-
-<p>To start a question, just type <code>\question</code>. It will add the text &ldquo;Question #&rdquo; with a line underneath to the document. If you&rsquo;d like to change &ldquo;Question&rdquo; to something else, use</p>
-
-<pre><code class="tex Change the Question Type">\renewcommand{\questiontype}{Whatever You Want}
-% Now questions will be titled "Whatever You Want #"
-</code></pre>
-
-<p>Similarly, if you ever need to skip numbers, you can do</p>
-
-<pre><code class="tex Non-contiguous Question Numbers">\setcounter{\questionCounter}{&lt;target number - 1&gt;}
-</code></pre>
-
-<p>So, to skip to the 10th question, <code>&lt;target number - 1&gt;</code> = 9.</p>
-
-<p>See <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
-
-<h3><code>\question*</code></h3>
-
-<p>Some classes like to give their homework questions fancy names. If this is the case, you can use <code>\question*{The Question's Name}</code> to make a named question.</p>
-
-<p>See <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
-
-<h3>Question Parts</h3>
-
-<p>Another common thing on homework assignments is to have multi-part questions. To deal with these, use the form</p>
-
-<pre><code class="tex Lettered Question Parts">\begin{alphaparts}
-  \questionpart
-    This will be part (a).
-  \questionpart
-    This will be part (b).
-\end{alphaparts}
-</code></pre>
-
-<p>or
-<code>tex Numbered Question Parts
-\begin{arabicparts}
-  \questionpart
-    This will be part x.1.
-  \questionpart
-    This will be part x.2.
-\end{arabicparts}
-</code></p>
-
-<p>See <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
-
-<h3>Induction Proofs</h3>
-
-<p>In math classes, induction proofs come up a lot, and they almost always have the same form: base case, induction hypothesis, and induction step.</p>
-
-<pre><code class="tex Induction Environment">\begin{induction}
-  \basecase
-    This is my fancy base case.
-  \indhyp
-    Assume some claim.
-  \indstep
-    Finish off the proof
-\end{induction}
-</code></pre>
-
-<h2>Markdown</h2>
-
-<p>One of my favorite features of this document class is that it redefines the <code>\section</code> macros. This means you can use tools like Markdown, which have a concise syntax, together with a tool like <a href="http://johnmacfarlane.net/pandoc/"><code>pandoc</code></a> to convert Markdown into LaTeX. As an example, consider that we have the Markdown:</p>
-
-<pre><code class="plain my-homework.md">#
-
-This is my first answer.
-
-#
-
-This is my next answer.
-
-$$a^2 + b^2 = c^2$$
-</code></pre>
-
-<p>Running <code>pandoc -f markdown -t latex my-homework.md</code> will output</p>
-
-<pre><code class="tex Convert markdown to LaTeX">% $ pandoc -f markdown -t latex my-homework.md
-\section{}\label{section}
-
-This is my first answer.
-
-\section{}\label{section-1}
-
-This is my next answer.
-
-\[a^2 + b^2 = c^2\]
-</code></pre>
-
-<p>And since <code>\section</code> is the same thing as \question, we&rsquo;re golden, and this compiles as we&rsquo;d want it to. Throw it into the blank <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/template.tex">template.tex</a> file included in the repo, and you&rsquo;ve got yourself a typeset homework.</p>
-
-<h2>More</h2>
-
-<p>I&rsquo;ve make a lot of other LaTeX-related posts. Be sure to <a href="/categories#latex">check them out</a> as well! My hope is that you find something that makes developing LaTeX just that much easier.</p>
 
 <p>- - - - -
 <br>

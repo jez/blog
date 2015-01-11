@@ -40,7 +40,7 @@
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.zimmerman.io/2014/01/05/the-latex-homework-document-class">
+<meta property="og:url" content="https://blog.zimmerman.io/2015/01/10/the-latex-homework-document-class">
 <meta property="og:title" content="The LaTeX homework Document Class">
 <meta property="og:description" content="A LaTeX \documentclass for typesetting homework assignments.">
 
@@ -48,7 +48,7 @@
 
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.zimmerman.io/2014/01/05/the-latex-homework-document-class">
+<link rel="canonical" href="https://blog.zimmerman.io/2015/01/10/the-latex-homework-document-class">
 <link href="/favicon.png" rel="icon">
 <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
@@ -122,13 +122,14 @@
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title"><a href="/2014/01/05/the-latex-homework-document-class/" rel="bookmark" title="The LaTeX homework Document Class">The LaTeX homework Document Class</a></h1>
+          <h1 class="entry-title"><a href="/2015/01/10/the-latex-homework-document-class/" rel="bookmark" title="The LaTeX homework Document Class">The LaTeX homework Document Class</a></h1>
         
-        <h2>January 05, 2014</h2>
+        <h2>January 10, 2015</h2>
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <p>There are LaTeX document classes for typesetting books, articles, exams, presentations, and more. Now, there&rsquo;s one for homework assignments, too.</p>
+      <p>There are LaTeX document classes for typesetting books, articles, exams,
+presentations, and more. Now, there&rsquo;s one for homework assignments, too.</p>
 
 <!-- more -->
 
@@ -139,20 +140,26 @@
 
 <h2>What</h2>
 
-<p>This is a LaTeX document class. That means you use it with <code>\documentclass{homework}</code> at the top of the document. It provides a document layout and some helper commands that make working with questions easy.</p>
+<p>This is a LaTeX document class. That means you use it with
+<code>\documentclass{homework}</code> at the top of the document. It provides a document
+layout and some helper commands that make working with questions easy.</p>
 
 <h2>Installation</h2>
 
-<p>Certainly the easiest way to start using this template is to copy the .cls file to your computer in the same directory as your LaTeX project directory.</p>
+<p>Certainly the easiest way to start using this template is to copy the .cls file
+to your computer in the same directory as your LaTeX project directory.</p>
 
-<p>A better way to install this template is to fork <a href="https://github.com/Z1MM32M4N/latex-homework-class">the above repository</a> and then clone that fork to a particular folder on your computer:</p>
+<p>A better way to install this template is to fork <a href="https://github.com/Z1MM32M4N/latex-homework-class">the above
+repository</a> and then clone that fork to a particular folder on your
+computer:</p>
 
 <figure class='code'><figcaption><span>Install</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/&lt;your-username&gt;/latex-hw-template
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Then, whenever you need to use the template, you can copy the template wherever. Also, if there are ever any updates, you can simply run</p>
+<p>Then, whenever you need to use the template, you can copy the template wherever.
+Also, if there are ever any updates, you can simply run</p>
 
 <figure class='code'><figcaption><span>Update</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'>git pull
@@ -163,17 +170,22 @@
 
 <h3>Preferred Installation</h3>
 
-<p>The <em>best</em> way to install this file is to <a href="https://github.com/Z1MM32M4N/latex-solarized#installation">follow the instructions here</a>, keeping in mind that you&rsquo;re trying to install a <code>.cls</code> file instead of three <code>.sty</code> files.</p>
+<p>The <em>best</em> way to install this file is to <a href="https://github.com/Z1MM32M4N/latex-solarized#installation">follow the instructions
+here</a>, keeping in mind that you&rsquo;re trying to install a <code>.cls</code> file
+instead of three <code>.sty</code> files.</p>
 
 <h2>Usage</h2>
 
-<p>See the <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> file for an exhaustive list of usage examples. There are also comments explaining features for which there are no examples given.</p>
+<p>See the <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> file for an exhaustive list of usage
+examples. There are also comments explaining features for which there are no
+examples given.</p>
 
 <p>The result is the following:</p>
 
 <p><a class="image-link" href="/images/homework-class.png"><img src="/images/homework-class.png"></a></p>
 
-<p>The class file also has a bunch of helper <code>\usepackage</code>s that you might want to take a look at in <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.cls">homework.cls</a>.</p>
+<p>The class file also has a bunch of helper <code>\usepackage</code>s that you might want to
+take a look at in <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.cls">homework.cls</a>.</p>
 
 <p>For your convenience, the file <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/template.tex">template.tex</a> is a nearly-empty
 LaTeX file that contains the bare essentials to get started using the homework
@@ -181,7 +193,9 @@ class.</p>
 
 <h3><code>\question</code></h3>
 
-<p>To start a question, just type <code>\question</code>. It will add the text &ldquo;Question #&rdquo; with a line underneath to the document. If you&rsquo;d like to change &ldquo;Question&rdquo; to something else, use</p>
+<p>To start a question, just type <code>\question</code>. It will add the text &ldquo;Question #&rdquo;
+with a line underneath to the document. If you&rsquo;d like to change &ldquo;Question&rdquo; to
+something else, use</p>
 
 <figure class='code'><figcaption><span>Change the Question Type</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -203,13 +217,15 @@ class.</p>
 
 <h3><code>\question*</code></h3>
 
-<p>Some classes like to give their homework questions fancy names. If this is the case, you can use <code>\question*{The Question's Name}</code> to make a named question.</p>
+<p>Some classes like to give their homework questions fancy names. If this is the
+case, you can use <code>\question*{The Question's Name}</code> to make a named question.</p>
 
 <p>See <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
 
 <h3>Question Parts</h3>
 
-<p>Another common thing on homework assignments is to have multi-part questions. To deal with these, use the form</p>
+<p>Another common thing on homework assignments is to have multi-part questions. To
+deal with these, use the form</p>
 
 <figure class='code'><figcaption><span>Lettered Question Parts</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -247,7 +263,8 @@ class.</p>
 
 <h3>Induction Proofs</h3>
 
-<p>In math classes, induction proofs come up a lot, and they almost always have the same form: base case, induction hypothesis, and induction step.</p>
+<p>In math classes, induction proofs come up a lot, and they almost always have the
+same form: base case, induction hypothesis, and induction step.</p>
 
 <figure class='code'><figcaption><span>Induction Environment</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -270,7 +287,10 @@ class.</p>
 
 <h2>Markdown</h2>
 
-<p>One of my favorite features of this document class is that it redefines the <code>\section</code> macros. This means you can use tools like Markdown, which have a concise syntax, together with a tool like <a href="http://johnmacfarlane.net/pandoc/"><code>pandoc</code></a> to convert Markdown into LaTeX. As an example, consider that we have the Markdown:</p>
+<p>One of my favorite features of this document class is that it redefines the
+<code>\section</code> macros. This means you can use tools like Markdown, which have a
+concise syntax, together with a tool like <a href="http://johnmacfarlane.net/pandoc/"><code>pandoc</code></a> to convert Markdown
+into LaTeX. As an example, consider that we have the Markdown:</p>
 
 <figure class='code'><figcaption><span>my-homework.md</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -317,11 +337,16 @@ class.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>And since <code>\section</code> is the same thing as \question, we&rsquo;re golden, and this compiles as we&rsquo;d want it to. Throw it into the blank <a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/template.tex">template.tex</a> file included in the repo, and you&rsquo;ve got yourself a typeset homework.</p>
+<p>And since <code>\section</code> is the same thing as \question, we&rsquo;re golden, and this
+compiles as we&rsquo;d want it to. Throw it into the blank
+<a href="https://github.com/Z1MM32M4N/latex-homework-class/blob/master/template.tex">template.tex</a> file included in the repo, and you&rsquo;ve got yourself
+a typeset homework.</p>
 
 <h2>More</h2>
 
-<p>I&rsquo;ve make a lot of other LaTeX-related posts. Be sure to <a href="/categories#latex">check them out</a> as well! My hope is that you find something that makes developing LaTeX just that much easier.</p>
+<p>I&rsquo;ve make a lot of other LaTeX-related posts. Be sure to <a href="/categories#latex">check them out</a>
+as well! My hope is that you find something that makes developing LaTeX just
+that much easier.</p>
 
 <hr />
 
@@ -337,14 +362,14 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 
       <footer class="entry-meta">
         <span class="entry-tags"><a href="/categories/#latex" title="Pages tagged latex" class="tag">latex</a></span>
-        <span><a href="/2014/01/05/the-latex-homework-document-class/" rel="bookmark" title="The LaTeX homework Document Class">The LaTeX homework Document Class</a> was published on <span class="entry-date date published updated"><time datetime="2014-01-05T17:00:00-06:00">January 05, 2014</time></span></span>
+        <span><a href="/2015/01/10/the-latex-homework-document-class/" rel="bookmark" title="The LaTeX homework Document Class">The LaTeX homework Document Class</a> was published on <span class="entry-date date published updated"><time datetime="2015-01-10T18:00:00-05:00">January 10, 2015</time></span></span>
         
         <span class="author vcard"><span class="fn"><a href="https://www.zimmerman.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
         <div class="social-share">
           <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2014/01/05/the-latex-homework-document-class/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2014/01/05/the-latex-homework-document-class/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url=/2014/01/05/the-latex-homework-document-class/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2015/01/10/the-latex-homework-document-class/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2015/01/10/the-latex-homework-document-class/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+            <li class="googleplus"><a href="https://plus.google.com/share?url=/2015/01/10/the-latex-homework-document-class/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
           </ul>
         </div><!-- /.social-share -->
       </footer>
@@ -353,23 +378,24 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
       <div class="read-more">
         
           <div class="read-more-header">
-            <a href="/2014/12/29/google-chrome-a-memory-hog/" class="btn">Read More</a>
+            <a href="/2015/01/10/offline-latex-development-part-2/" class="btn">Read More</a>
           </div><!-- /.read-more-header -->
           <div class="read-more-content">
-            <h3><a href="/2014/12/29/google-chrome-a-memory-hog/" title="Google Chrome: A Memory Hog">Google Chrome: A Memory Hog</a></h3>
-            <p>A bash oneliner to determine how much memory Chrome is using. <a href="/2014/12/29/google-chrome-a-memory-hog/"> Continue reading</a></p>
+            <h3><a href="/2015/01/10/offline-latex-development-part-2/" title="Offline LaTeX Development - Part 2">Offline LaTeX Development - Part 2</a></h3>
+            <p>LaTeX development with Vim and the command line, now featuring split-pane windows!
+ <a href="/2015/01/10/offline-latex-development-part-2/"> Continue reading</a></p>
           </div><!-- /.read-more-content -->
         
         <div class="read-more-list">
           
             <div class="list-item">
-              <h4><a href="/2014/12/26/intro-to-columns-in-html/" title="Intro to Columns in HTML">Intro to Columns in HTML</a></h4>
-              <span>Published on December 26, 2014</span>
+              <h4><a href="/2014/12/29/google-chrome-a-memory-hog/" title="Google Chrome: A Memory Hog">Google Chrome: A Memory Hog</a></h4>
+              <span>Published on December 29, 2014</span>
             </div><!-- /.list-item -->
           
             <div class="list-item">
-              <h4><a href="/2014/12/22/ruby-virtualenvs/" title="Ruby Virtualenvs">Ruby Virtualenvs</a></h4>
-              <span>Published on December 22, 2014</span>
+              <h4><a href="/2014/12/26/intro-to-columns-in-html/" title="Intro to Columns in HTML">Intro to Columns in HTML</a></h4>
+              <span>Published on December 26, 2014</span>
             </div><!-- /.list-item -->
           
         </div><!-- /.read-more-list -->
@@ -414,8 +440,8 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'https://blog.zimmerman.io/2014/01/05/the-latex-homework-document-class/';
-        var disqus_url = 'https://blog.zimmerman.io/2014/01/05/the-latex-homework-document-class/';
+        var disqus_identifier = 'https://blog.zimmerman.io/2015/01/10/the-latex-homework-document-class/';
+        var disqus_url = 'https://blog.zimmerman.io/2015/01/10/the-latex-homework-document-class/';
         var disqus_script = 'embed.js';
       
     (function () {
