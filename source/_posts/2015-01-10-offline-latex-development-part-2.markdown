@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Offline LaTeX Development - Part 2"
-date: 2015-01-10 17:00:00 -0600
+date: 2015-01-10 16:00:00 -0600
 comments: true
 categories: [latex, terminal, vim, osx]
 description: >
