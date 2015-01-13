@@ -21,7 +21,7 @@ Quite often when using git, you only need to use one remote: `origin`. All your 
 If you haven't already, I strongly recommend that you check out these two Git resources:
 
 - [__Learn Git Branching__][learnGitBranching], an interactive walkthrough of some powerful Git features
-- [__A Hacker's Guide to Git__][hacker], an explanation of Git by "taking a peek under the hood" 
+- [__A Hacker's Guide to Git__][hacker], an explanation of Git by "taking a peek under the hood"
 
 In this article, I'll only be talking about remotes. Remotes are basically "mirrors" of a branch that you have locally, but on a different computer.
 
@@ -29,7 +29,7 @@ In this article, I'll only be talking about remotes. Remotes are basically "mirr
 
 At CMU, the class 15-150 distributes its starter code in a beautiful way: using Git! This opens up a number of things we can take advantage of, but there's one thing in particular we can do using multiple git remotes.
 
-In 15-150, the code is distribute in a read-only Git repo. If we want a place where we can push and pull our changes, we'll need to create our own _bare repo_ (a repo that's used just for pushing and pulling). You'll note that I said push _and pull_. The reason why I want to be able to pull is because I want to have 2 clones of this repo: one on the CMU Andrew Unix servers (where the 15-150 code is hosted), and one on my laptop, where there's no network latency to edit files in Vim. 
+In 15-150, the code is distribute in a read-only Git repo. If we want a place where we can push and pull our changes, we'll need to create our own _bare repo_ (a repo that's used just for pushing and pulling). You'll note that I said push _and pull_. The reason why I want to be able to pull is because I want to have 2 clones of this repo: one on the CMU Andrew Unix servers (where the 15-150 code is hosted), and one on my laptop, where there's no network latency to edit files in Vim.
 
 To achieve this setup, the first thing we'll do is set up the bare repo. The best place to put a bare repo is on a server so that you can always access your code. So from Andrew, I'll run the commands:
 
@@ -52,10 +52,11 @@ $ git clone ~/private/gitrepos/15150 ~/private/15150
 
 # (my laptop)
 #
-# Clone over ssh (using ssh alias)
+# Clone over ssh (using ssh alias, i.e., if you use `ssh andrew`)
 $ git clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150
 # -- or --
-# Clone over ssh (without ssh alias)
+# Clone over ssh (without ssh alias,
+#            i.e., if you use `ssh jezimmer@unix.andrew.cmu.edu`)
 $ git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150
 ```
 
@@ -71,7 +72,7 @@ Up until now though, we haven't even interacted with the 15-150 handout repo. Th
 # Add the 15-150 handout remote so we can get starter code, etc.
 # (unix.andrew.cmu.edu)
 #
-# A command name for the second remote is "upstream", though you could also
+# A common name for the second remote is "upstream", though you could also
 # call this remote "handout" if that would be easier to keep straight
 $ cd ~/private/15150
 $ git remote add upstream /afs/andrew/course/15/150/handout
@@ -85,11 +86,12 @@ $ git remote add upstream ssh://andrew:/afs/andrew/course/15/150/handout
 $ git remote add upstream ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/course/15/150/handout
 ```
 
-Once we run those two lines, our setup looks like this:
+Once we run those two lines, our setup looks like this, where arrows point in
+the direction data can flow:
 
 {% img /images/multiple-remotes-2.svg %}
 
-After this, we're able to run `git pull upstream master` to get the 15-150 starter code as it's released. I find this model particularly useful for all my classes, even the ones that don't distribute their code using Git. Having code both on Andrew and on my local machine is a generally handy configuration, and using Git to push the code around to the right places makes my workflow simple. 
+After this, we're able to run `git pull upstream master` to get the 15-150 starter code as it's released. I find this model particularly useful for all my classes, even the ones that don't distribute their code using Git. Having code both on Andrew and on my local machine is a generally handy configuration, and using Git to push the code around to the right places makes my workflow simple.
 
 As always, let me know if something was unclear or incorrect in the comments!
 
