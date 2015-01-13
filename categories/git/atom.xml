@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Git | Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/categories/git/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-01-10T22:27:29-05:00</updated>
+  <updated>2015-01-12T19:17:21-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -60,10 +60,11 @@ $ git clone ~/private/gitrepos/15150 ~/private/15150
 
 # (my laptop)
 #
-# Clone over ssh (using ssh alias)
+# Clone over ssh (using ssh alias, i.e., if you use `ssh andrew`)
 $ git clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150
 # -- or --
-# Clone over ssh (without ssh alias)
+# Clone over ssh (without ssh alias,
+#            i.e., if you use `ssh jezimmer@unix.andrew.cmu.edu`)
 $ git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150
 </code></pre>
 
@@ -78,7 +79,7 @@ $ git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/
 <pre><code class="bash Add Handout Remote"># Add the 15-150 handout remote so we can get starter code, etc.
 # (unix.andrew.cmu.edu)
 #
-# A command name for the second remote is "upstream", though you could also
+# A common name for the second remote is "upstream", though you could also
 # call this remote "handout" if that would be easier to keep straight
 $ cd ~/private/15150
 $ git remote add upstream /afs/andrew/course/15/150/handout
@@ -92,7 +93,8 @@ $ git remote add upstream ssh://andrew:/afs/andrew/course/15/150/handout
 $ git remote add upstream ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/course/15/150/handout
 </code></pre>
 
-<p>Once we run those two lines, our setup looks like this:</p>
+<p>Once we run those two lines, our setup looks like this, where arrows point in
+the direction data can flow:</p>
 
 <p><a class="image-link" href="/images/multiple-remotes-2.svg"><img src="/images/multiple-remotes-2.svg"></a></p>
 

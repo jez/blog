@@ -182,6 +182,7 @@
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
+<span class='line-number'>13</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># (unix.andrew.cmu.edu)</span>
 </span><span class='line'><span class="c">#</span>
 </span><span class='line'><span class="c"># Clone over Unix file path to new folder ~/private/15150</span>
@@ -189,10 +190,11 @@
 </span><span class='line'>
 </span><span class='line'><span class="c"># (my laptop)</span>
 </span><span class='line'><span class="c">#</span>
-</span><span class='line'><span class="c"># Clone over ssh (using ssh alias)</span>
+</span><span class='line'><span class="c"># Clone over ssh (using ssh alias, i.e., if you use `ssh andrew`)</span>
 </span><span class='line'><span class="nv">$ </span>git clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150
 </span><span class='line'><span class="c"># -- or --</span>
-</span><span class='line'><span class="c"># Clone over ssh (without ssh alias)</span>
+</span><span class='line'><span class="c"># Clone over ssh (without ssh alias,</span>
+</span><span class='line'><span class="c">#            i.e., if you use `ssh jezimmer@unix.andrew.cmu.edu`)</span>
 </span><span class='line'><span class="nv">$ </span>git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150
 </span></code></pre></td></tr></table></div></figure>
 
@@ -223,7 +225,7 @@
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Add the 15-150 handout remote so we can get starter code, etc.</span>
 </span><span class='line'><span class="c"># (unix.andrew.cmu.edu)</span>
 </span><span class='line'><span class="c">#</span>
-</span><span class='line'><span class="c"># A command name for the second remote is &quot;upstream&quot;, though you could also</span>
+</span><span class='line'><span class="c"># A common name for the second remote is &quot;upstream&quot;, though you could also</span>
 </span><span class='line'><span class="c"># call this remote &quot;handout&quot; if that would be easier to keep straight</span>
 </span><span class='line'><span class="nv">$ </span><span class="nb">cd</span> ~/private/15150
 </span><span class='line'><span class="nv">$ </span>git remote add upstream /afs/andrew/course/15/150/handout
@@ -238,7 +240,8 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Once we run those two lines, our setup looks like this:</p>
+<p>Once we run those two lines, our setup looks like this, where arrows point in
+the direction data can flow:</p>
 
 <p><a class="image-link" href="/images/multiple-remotes-2.svg"><img src="/images/multiple-remotes-2.svg"></a></p>
 
