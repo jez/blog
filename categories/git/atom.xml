@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Git | Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/categories/git/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-01-12T19:17:21-05:00</updated>
+  <updated>2015-01-16T22:57:51-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,158 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Mastering Git Log for Collaboration]]></title>
+    <link href="https://blog.zimmerman.io/2015/01/16/mastering-git-log-for-collaboration/"/>
+    <updated>2015-01-16T20:57:01-05:00</updated>
+    <id>https://blog.zimmerman.io/2015/01/16/mastering-git-log-for-collaboration</id>
+    <content type="html"><![CDATA[<p>Git is an incredibly powerful platform for collaboration. The ability to create
+light-weight branches as well as push to and pull from multiple remote repos is
+the foundation of this power. Learning to harness the <code>git log</code> command will
+help with visualizing all the information that supports these features, refining
+and invigorating your current workflows.</p>
+
+<!-- more -->
+
+
+<h2>Learn Git Branching</h2>
+
+<p>Obviously, to take full advantage of the collaborative features of Git, you
+first have to learn how to use Git branching. There&rsquo;s an <a href="http://pcottle.github.io/learnGitBranching/">excellent interactive
+tutorial</a> that instructs by converting the Git commands you
+run into fancy web animations. If you have a basic understanding of Git but have
+always wanted to learn about some of its more powerful features, this is the
+best tutorial out there. For a taste of how it works, there&rsquo;s also a
+<a href="http://pcottle.github.io/learnGitBranching/?demo">non-interactive demo</a> that features the animations which make this
+tutorial so well-designed.</p>
+
+<p>After I ran through this tutorial, I felt for the first time like I <em>really</em>
+knew Git. Unfortunately, being a visual learner, I struggled when trying to
+apply the same abstractions to actual git repositories. Shortly thereafter, I
+discovered that the <code>git log</code> command actually has features to replicate many of
+the same visualizations, but from right within the terminal!</p>
+
+<h2><code>git log</code></h2>
+
+<p>The following is a set of shell aliases that let you run <code>git log</code> with a
+lengthy set of flags culminating in some pretty awesome Git logs. I&rsquo;m going to
+leave a discussion of what the individual flags do to the man pages and just
+skip straight to the good part. Feel free to copy and paste these into your
+<code>~/.bashrc</code>, <code>~/.zshrc</code>, or similar file.</p>
+
+<pre><code class="bash pretty git log aliases"># pretty Git log
+alias gl='git log --graph --pretty="%C(bold green)%h%Creset%C(auto)%d%Creset %s"'
+
+# pretty Git log, all references
+alias gll='gl --all'
+
+# pretty Git log, show authors
+alias gla='git log --graph --pretty="%C(bold green)%h%Creset %C(yellow)%an%Creset%C(auto)%d%Creset %s"'
+
+# pretty Git log, all references, show authors
+alias glla='gla --all'
+</code></pre>
+
+<p>As you can see, there are four aliases, and each does something a little
+different. The first, <code>gl</code>, just shows the graph for the current branch. <code>gll</code>
+shows the graph for <em>all</em> branches, including those which may have diverged from
+the current branch. Then there&rsquo;s a variation on each of these, <code>gla</code> and
+<code>glla</code>, which add author information to the logs produced by their
+companion.</p>
+
+<p>On top of it all, I&rsquo;ve customized the colors to work especially nicely if you&rsquo;re
+using the <a href="ethanschoonover.com/solarized">Solarized</a> color scheme in your terminal. If you don&rsquo;t do
+anything but copy the above aliases, the only thing that will look different
+from the screenshots below is the text between the parentheses, which will
+instead all be the same color. To color these the same as below, add this text to
+the end of your <code>~/.gitconfig</code> file:</p>
+
+<pre><code class="plain Global Git configuration settings">[color "decorate"]
+  head = bold white
+  branch = bold magenta
+  remotebranch = blue
+  tag = bold red
+</code></pre>
+
+<p>Of course, feel free to tinker with these colors to your liking.</p>
+
+<h2>Screenshots</h2>
+
+<p>Here are an abundant number of screenshots showing what the commands look like
+for the <a href="https://github.com/ScottyLabs/tartanhacks">TartanHacks website</a> and the <a href="https://github.com/autolab/Autolab">Autolab Project</a>.</p>
+
+<h3>gl</h3>
+
+<p><a class="image-link" href="/images/gl-tartanhacks.png"><img src="/images/gl-tartanhacks.png"></a></p>
+
+<p>Even when just using <code>gl</code>, you&rsquo;ll be able to see all branches that lie further
+down on the tree. For example, from the <code>add_gitignore</code> branch we can see the
+<code>origin/gh-pages</code> branch because it&rsquo;s along the same path in history.</p>
+
+<h3>gll</h3>
+
+<p><a class="image-link" href="/images/gll-tartanhacks.png"><img src="/images/gll-tartanhacks.png"></a></p>
+
+<p>Here we see that multiple branches have diverged from <code>origin/gh-pages</code>; both
+<code>add_gitignore</code> and <code>fix_seo_and_readability</code> share <code>origin/gh-pages</code> as a
+common ancestor, but neither have anything in common with the other, which is
+why <code>fix_seo_and_readability</code> only showed up once we used <code>gll</code>.</p>
+
+<h3>gla</h3>
+
+<p><a class="image-link" href="/images/gla-tartanhacks.png"><img src="/images/gla-tartanhacks.png"></a></p>
+
+<p>Same as <code>gl</code> above, but with author information!</p>
+
+<h3>glla</h3>
+
+<p><a class="image-link" href="/images/glla-tartanhacks.png"><img src="/images/glla-tartanhacks.png"></a></p>
+
+<p>Same as <code>gll</code> above, but again with author information!</p>
+
+<hr />
+
+<p>Here are the same four examples, but for the <a href="https://github.com/autolab/Autolab">Autolab</a> repo. It&rsquo;s a
+little more involved because more people are working on it simultaneously. For
+projects like this, which have several open pull requests and feature branches,
+these aliases really shine.</p>
+
+<h3>gl</h3>
+
+<p><a class="image-link" href="/images/gl-autolab.png"><img src="/images/gl-autolab.png"></a></p>
+
+<h3>gll</h3>
+
+<p><a class="image-link" href="/images/gll-autolab.png"><img src="/images/gll-autolab.png"></a></p>
+
+<h3>gla</h3>
+
+<p><a class="image-link" href="/images/gla-autolab.png"><img src="/images/gla-autolab.png"></a></p>
+
+<h3>glla</h3>
+
+<p><a class="image-link" href="/images/glla-autolab.png"><img src="/images/glla-autolab.png"></a></p>
+
+<h2>Dotfiles</h2>
+
+<p>If you&rsquo;re hungry for more handy Git aliases or just some general ways to beef up
+your terminal experience, you can find these four aliases and more in the
+<a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/zshrc">zshrc</a> in my <a href="https://github.com/Z1MM32M4N/dotfiles">dotfiles repository</a> on GitHub.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.
+ [g]: https://www.github.com/Z1MM32M4N/
+ [h]: https://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Multiple Git Remotes]]></title>
