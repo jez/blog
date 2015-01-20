@@ -112,8 +112,22 @@ Chrome is using 60.4% of total memory.
 
 There you have it! Bash oneliners save the day yet again.
 
+## Update
+
+After writing this article, I stopped using Ad Block Plus, and I noticed a
+significant drop in Chrome's memory usage. Obviously, though, that came at the
+cost of not blocking ads! Also, from time to time I would encounter a site that
+seemed sluggish, presumably because of all the ads attempting to be loaded. My
+simple solution to this was just to disable JavaScript on that page (I use an
+extension called Quick JavaScript Switcher), but this wasn't an automated
+solution.
+
+Then I discovered [μBlock][ublock], an "efficient blocker for Chromium and
+Firefox." The fancy graphs on it's homepage convinced me to give it a shot, and
+from what I can tell so far it's responsive and effective.
+
 {% include jake-on-the-web.markdown %}
 
 [iframe-irony]: http://mobile.extremetech.com/latest/221392-iframe-irony-adblock-plus-is-probably-the-reason-firefox-and-chrome-are-such-memory-hogs
 [sum]: http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers
-
+[ublock]: https://github.com/gorhill/uBlock
