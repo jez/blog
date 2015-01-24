@@ -147,6 +147,31 @@ If you're hungry for more handy Git aliases or just some general ways to beef up
 your terminal experience, you can find these four aliases and more in the
 [zshrc][zshrc] in my [dotfiles repository][dotfiles] on GitHub.
 
+## Update
+
+After testing out these aliases on various environments, I discovered that one
+of the features I was using in the pretty format (the one that colors remotes
+and branches, `%C(auto)`) is not available in older versions of Git. These are
+the revised versions of the above aliases that I use on older machines:
+
+```bash Compatible Git log aliases
+# pretty Git log
+alias gl='git log --graph --pretty="%C(bold green)%h%Creset%C(blue)%d%Creset %s"'
+
+# pretty Git log, all references
+alias gll='gl --all'
+
+# pretty Git log, show authors
+alias gla='git log --graph --pretty="%C(bold green)%h%Creset %C(yellow)%an%Creset%C(blue)%d%Creset %s"'
+
+# pretty Git log, all references, show authors
+alias glla='gla --all'
+```
+
+The only real difference is that all the remotes, branches, and tags are blue,
+instead of being configurable in you `~/.gitconfig` file.
+
+
 
 {% include jake-on-the-web.markdown %}
 
