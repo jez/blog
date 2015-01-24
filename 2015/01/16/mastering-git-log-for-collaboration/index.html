@@ -281,6 +281,41 @@ these aliases really shine.</p>
 your terminal experience, you can find these four aliases and more in the
 <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/zshrc">zshrc</a> in my <a href="https://github.com/Z1MM32M4N/dotfiles">dotfiles repository</a> on GitHub.</p>
 
+<h2>Update</h2>
+
+<p>After testing out these aliases on various environments, I discovered that one
+of the features I was using in the pretty format (the one that colors remotes
+and branches, <code>%C(auto)</code>) is not available in older versions of Git. These are
+the revised versions of the above aliases that I use on older machines:</p>
+
+<figure class='code'><figcaption><span>Compatible Git log aliases</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">gl</span><span class="o">=</span><span class="s1">&#39;git log --graph --pretty=&quot;%C(bold green)%h%Creset%C(blue)%d%Creset %s&quot;&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># pretty Git log, all references</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">gll</span><span class="o">=</span><span class="s1">&#39;gl --all&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># pretty Git log, show authors</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">gla</span><span class="o">=</span><span class="s1">&#39;git log --graph --pretty=&quot;%C(bold green)%h%Creset %C(yellow)%an%Creset%C(blue)%d%Creset %s&quot;&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># pretty Git log, all references, show authors</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">glla</span><span class="o">=</span><span class="s1">&#39;gla --all&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The only real difference is that all the remotes, branches, and tags are blue,
+instead of being configurable in you <code>~/.gitconfig</code> file.</p>
+
 <hr />
 
 <p><br></p>

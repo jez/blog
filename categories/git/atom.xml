@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Git | Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/categories/git/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-01-20T13:09:21-05:00</updated>
+  <updated>2015-01-24T16:05:38-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -150,6 +150,29 @@ these aliases really shine.</p>
 <p>If you&rsquo;re hungry for more handy Git aliases or just some general ways to beef up
 your terminal experience, you can find these four aliases and more in the
 <a href="https://github.com/Z1MM32M4N/dotfiles/blob/master/zshrc">zshrc</a> in my <a href="https://github.com/Z1MM32M4N/dotfiles">dotfiles repository</a> on GitHub.</p>
+
+<h2>Update</h2>
+
+<p>After testing out these aliases on various environments, I discovered that one
+of the features I was using in the pretty format (the one that colors remotes
+and branches, <code>%C(auto)</code>) is not available in older versions of Git. These are
+the revised versions of the above aliases that I use on older machines:</p>
+
+<pre><code class="bash Compatible Git log aliases"># pretty Git log
+alias gl='git log --graph --pretty="%C(bold green)%h%Creset%C(blue)%d%Creset %s"'
+
+# pretty Git log, all references
+alias gll='gl --all'
+
+# pretty Git log, show authors
+alias gla='git log --graph --pretty="%C(bold green)%h%Creset %C(yellow)%an%Creset%C(blue)%d%Creset %s"'
+
+# pretty Git log, all references, show authors
+alias glla='gla --all'
+</code></pre>
+
+<p>The only real difference is that all the remotes, branches, and tags are blue,
+instead of being configurable in you <code>~/.gitconfig</code> file.</p>
 
 <p>- - - - -
 <br>
