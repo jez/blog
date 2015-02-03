@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Django | Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/categories/django/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-01-24T16:05:38-05:00</updated>
+  <updated>2015-02-02T20:31:42-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -45,7 +45,7 @@
 
 <h2>Implementing Authentication</h2>
 
-<p>The following is a pretty long-winded explanation of my personal struggles with this. If you&rsquo;d really just like to learn by example and by making your own mistakes, check out the <a href="https://github.com/Z1MM32M4N/google-apps-cmu-login/">code on GitHub</a>. I also found the <a href="https://github.com/omab/python-social-auth/tree/master/examples/"><code>python-social-auth</code> examples</a> very helpful. In the spirit of <a href="http://www.gitorial.com/">gitorial</a>, the commits are structured logically to give you a sense of how the app came together as I wrote it. In fact, I&rsquo;ve even <a href="http://www.gitorial.com/#/Z1MM32M4N/25536683">made a gitorial</a> for this repo!</p>
+<p>The following is a pretty long-winded explanation of my personal struggles with this. If you&rsquo;d really just like to learn by example and by making your own mistakes, check out the <a href="https://github.com/jez/google-apps-cmu-login/">code on GitHub</a>. I also found the <a href="https://github.com/omab/python-social-auth/tree/master/examples/"><code>python-social-auth</code> examples</a> very helpful. In the spirit of <a href="http://www.gitorial.com/">gitorial</a>, the commits are structured logically to give you a sense of how the app came together as I wrote it. In fact, I&rsquo;ve even <a href="http://www.gitorial.com/#/jez/25536683">made a gitorial</a> for this repo!</p>
 
 <h3>Python Social Auth</h3>
 
@@ -70,7 +70,7 @@
 
 <p>So in my case, I added the following line to my <code>settings.py</code>:</p>
 
-<pre><code class="python settings.py https://github.com/Z1MM32M4N/google-apps-cmu-login/blob/master/config/settings.py#L66">SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {'hd' : 'andrew.cmu.edu'}
+<pre><code class="python settings.py https://github.com/jez/google-apps-cmu-login/blob/master/config/settings.py#L66">SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {'hd' : 'andrew.cmu.edu'}
 </code></pre>
 
 <p>Phew. That&rsquo;s a long variable name. But Jake, how did you come up with <code>GOOGLE_OAUTH2</code> for the backend name? There&rsquo;s really no good answer to this, because I haven&rsquo;t been able to find a web-readable list of all the names in one place. The way this name is generated is by taking the <code>name</code> property of the particular backend you&rsquo;re using (in my case, <code>social.backends.google.GoogleOAuth2</code> has <code>name = 'google-oauth2'</code>, which I found by looking at the source), replacing all hyphens with underscores and making everything capital.</p>
@@ -81,7 +81,7 @@
 
 <p>First, we&rsquo;ll get all our URLs in place. For Django, all the URLs dealing with logging in are already defined; we just have to include them:</p>
 
-<pre><code class="python config/urls.py https://github.com/Z1MM32M4N/google-apps-cmu-login/blob/master/config/urls.py#L10">    ...
+<pre><code class="python config/urls.py https://github.com/jez/google-apps-cmu-login/blob/master/config/urls.py#L10">    ...
     url(r'', include('social.apps.django_app.urls', namespace='social')),
     ...
 </code></pre>
@@ -113,7 +113,7 @@ If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
- [g]: https://www.github.com/Z1MM32M4N/
+ [g]: https://www.github.com/jez/
  [h]: https://www.zimmerman.io/
 </p>
 ]]></content>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Webdev | Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/categories/webdev/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-01-24T16:05:38-05:00</updated>
+  <updated>2015-02-02T20:31:42-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -211,7 +211,7 @@ If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
- [g]: https://www.github.com/Z1MM32M4N/
+ [g]: https://www.github.com/jez/
  [h]: https://www.zimmerman.io/
 </p>
 ]]></content>
@@ -249,7 +249,7 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <h2>Implementing Authentication</h2>
 
-<p>The following is a pretty long-winded explanation of my personal struggles with this. If you&rsquo;d really just like to learn by example and by making your own mistakes, check out the <a href="https://github.com/Z1MM32M4N/google-apps-cmu-login/">code on GitHub</a>. I also found the <a href="https://github.com/omab/python-social-auth/tree/master/examples/"><code>python-social-auth</code> examples</a> very helpful. In the spirit of <a href="http://www.gitorial.com/">gitorial</a>, the commits are structured logically to give you a sense of how the app came together as I wrote it. In fact, I&rsquo;ve even <a href="http://www.gitorial.com/#/Z1MM32M4N/25536683">made a gitorial</a> for this repo!</p>
+<p>The following is a pretty long-winded explanation of my personal struggles with this. If you&rsquo;d really just like to learn by example and by making your own mistakes, check out the <a href="https://github.com/jez/google-apps-cmu-login/">code on GitHub</a>. I also found the <a href="https://github.com/omab/python-social-auth/tree/master/examples/"><code>python-social-auth</code> examples</a> very helpful. In the spirit of <a href="http://www.gitorial.com/">gitorial</a>, the commits are structured logically to give you a sense of how the app came together as I wrote it. In fact, I&rsquo;ve even <a href="http://www.gitorial.com/#/jez/25536683">made a gitorial</a> for this repo!</p>
 
 <h3>Python Social Auth</h3>
 
@@ -274,7 +274,7 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <p>So in my case, I added the following line to my <code>settings.py</code>:</p>
 
-<pre><code class="python settings.py https://github.com/Z1MM32M4N/google-apps-cmu-login/blob/master/config/settings.py#L66">SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {'hd' : 'andrew.cmu.edu'}
+<pre><code class="python settings.py https://github.com/jez/google-apps-cmu-login/blob/master/config/settings.py#L66">SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {'hd' : 'andrew.cmu.edu'}
 </code></pre>
 
 <p>Phew. That&rsquo;s a long variable name. But Jake, how did you come up with <code>GOOGLE_OAUTH2</code> for the backend name? There&rsquo;s really no good answer to this, because I haven&rsquo;t been able to find a web-readable list of all the names in one place. The way this name is generated is by taking the <code>name</code> property of the particular backend you&rsquo;re using (in my case, <code>social.backends.google.GoogleOAuth2</code> has <code>name = 'google-oauth2'</code>, which I found by looking at the source), replacing all hyphens with underscores and making everything capital.</p>
@@ -285,7 +285,7 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <p>First, we&rsquo;ll get all our URLs in place. For Django, all the URLs dealing with logging in are already defined; we just have to include them:</p>
 
-<pre><code class="python config/urls.py https://github.com/Z1MM32M4N/google-apps-cmu-login/blob/master/config/urls.py#L10">    ...
+<pre><code class="python config/urls.py https://github.com/jez/google-apps-cmu-login/blob/master/config/urls.py#L10">    ...
     url(r'', include('social.apps.django_app.urls', namespace='social')),
     ...
 </code></pre>
@@ -317,7 +317,7 @@ If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
- [g]: https://www.github.com/Z1MM32M4N/
+ [g]: https://www.github.com/jez/
  [h]: https://www.zimmerman.io/
 </p>
 ]]></content>
@@ -365,7 +365,7 @@ If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
- [g]: https://www.github.com/Z1MM32M4N/
+ [g]: https://www.github.com/jez/
  [h]: https://www.zimmerman.io/
 </p>
 ]]></content>
@@ -376,7 +376,7 @@ people think, so feel free to comment, open an issue, or send me an email.
     <link href="https://blog.zimmerman.io/2014/06/04/hpstr-an-octopress-theme/"/>
     <updated>2014-06-04T21:51:41-04:00</updated>
     <id>https://blog.zimmerman.io/2014/06/04/hpstr-an-octopress-theme</id>
-    <content type="html"><![CDATA[<p>In case you didn&rsquo;t notice, we&rsquo;re rocking a new theme: <a href="https://github.com/Z1MM32M4N/hpstr-theme">HPSTR for Octopress</a>! Ported from the <a href="https://github.com/mmistakes/hpstr-jekyll-theme">theme of the same name</a> for Jekyll, this theme has a bunch of cool new features that make the theme easier to use and more customizable.</p>
+    <content type="html"><![CDATA[<p>In case you didn&rsquo;t notice, we&rsquo;re rocking a new theme: <a href="https://github.com/jez/hpstr-theme">HPSTR for Octopress</a>! Ported from the <a href="https://github.com/mmistakes/hpstr-jekyll-theme">theme of the same name</a> for Jekyll, this theme has a bunch of cool new features that make the theme easier to use and more customizable.</p>
 
 <!-- more -->
 
@@ -413,7 +413,7 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <h1>Like what you see?</h1>
 
-<p>This theme is in no way perfect, from the styles to the compatibility with the vast array of Octopress options. If my support for your favorite feature is lacking or absent altogether, patch it up and submit a pull request on <a href="https://github.com/Z1MM32M4N/hpstr-theme">GitHub</a>!</p>
+<p>This theme is in no way perfect, from the styles to the compatibility with the vast array of Octopress options. If my support for your favorite feature is lacking or absent altogether, patch it up and submit a pull request on <a href="https://github.com/jez/hpstr-theme">GitHub</a>!</p>
 
 <p><strong>I&rsquo;d also love to hear about your installation process.</strong> If something didn&rsquo;t quite work out right when installing the theme from GitHub or everything went super smoothly, tell me on GitHub in an issue, on <a href="https://www.twitter.com/Z1MM32M4N">Twitter</a>, in the comments below, or in an <a href="mailto:jake@zimmerman.io">email</a>. Seriously!</p>
 
@@ -425,7 +425,7 @@ If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
- [g]: https://www.github.com/Z1MM32M4N/
+ [g]: https://www.github.com/jez/
  [h]: https://www.zimmerman.io/
 </p>
 ]]></content>
@@ -445,9 +445,9 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <h2>My setup</h2>
 
-<p>I have two sites which I want to host using the <code>zimmerman.io</code> domain name: my <a href="//blog.zimmerman.io">blog</a> and my <a href="//www.zimmerman.io">personal site</a>. I host my personal site at <a href="//www.zimmerman.io">www.zimmerman.io</a>, but you can also navigate to <a href="//zimmerman.io">zimmerman.io</a> and end up in the same places as before. It&rsquo;s served as a User Page from <a href="https://www.github.com/Z1MM32M4N/z1mm32m4n.github.io">this repo</a>.</p>
+<p>I have two sites which I want to host using the <code>zimmerman.io</code> domain name: my <a href="//blog.zimmerman.io">blog</a> and my <a href="//www.zimmerman.io">personal site</a>. I host my personal site at <a href="//www.zimmerman.io">www.zimmerman.io</a>, but you can also navigate to <a href="//zimmerman.io">zimmerman.io</a> and end up in the same places as before. It&rsquo;s served as a User Page from <a href="https://www.github.com/jez/jez.github.io">this repo</a>.</p>
 
-<p>I host my blog at <a href="//blog.zimmerman.io">blog.zimmerman.io</a>, and it&rsquo;s served as a Project Page in <a href="https://www.github.com/Z1MM32M4N/blog/">this repo</a>.</p>
+<p>I host my blog at <a href="//blog.zimmerman.io">blog.zimmerman.io</a>, and it&rsquo;s served as a Project Page in <a href="https://www.github.com/jez/blog/">this repo</a>.</p>
 
 <h2>What the instructions say</h2>
 
@@ -455,14 +455,14 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <p>First, if I want to use a custom subdomain (like what I&rsquo;m doing for my blog) to host a repo, I can add a <code>CNAME</code> record with my DNS provider that points to what is in my case <code>z1mm32m4n.github.io</code>. This was counterintuitive to me, because I thought at first that this would make my blog.zimmerman.io domain redirect to my personal site, but that&rsquo;s not how GitHub handles it. (They&rsquo;re smarter than that.)</p>
 
-<p>At the same time, I need to put a file in the root of the blog&rsquo;s repo (in the <code>gh-pages</code> branch because it&rsquo;s a Project Page), called <code>CNAME</code> (<a href="https://github.com/Z1MM32M4N/blog/blob/gh-pages/CNAME">view source</a>) with the contents &lsquo;blog.zimmerman.io&rsquo;. After a little while, the DNS tables will update and everything here should work: I can now view my <em>blog</em> where I want it.</p>
+<p>At the same time, I need to put a file in the root of the blog&rsquo;s repo (in the <code>gh-pages</code> branch because it&rsquo;s a Project Page), called <code>CNAME</code> (<a href="https://github.com/jez/blog/blob/gh-pages/CNAME">view source</a>) with the contents &lsquo;blog.zimmerman.io&rsquo;. After a little while, the DNS tables will update and everything here should work: I can now view my <em>blog</em> where I want it.</p>
 
 <h2>What the instructions say, but not so clearly</h2>
 
 <p>The next bit gave me some trouble at first (probably just because I was being impatient while the DNS tables were updating). The end goal was to have the <code>www</code> subdomain host my site and have the <code>@</code> (top-level or apex) domain redirect there. If you read carefully, the instructions say to do three things:</p>
 
 <ol>
-<li> Make the <code>CNAME</code> file (<a href="https://github.com/Z1MM32M4N/z1mm32m4n.github.io/blob/master/CNAME">view source</a>) in my (User) Pages repository contain <code>www.zimmerman.io</code>. <strong>This</strong> is the domain at which I do want my site to be visible.</li>
+<li> Make the <code>CNAME</code> file (<a href="https://github.com/jez/jez.github.io/blob/master/CNAME">view source</a>) in my (User) Pages repository contain <code>www.zimmerman.io</code>. <strong>This</strong> is the domain at which I do want my site to be visible.</li>
 <li> Create a <code>CNAME</code> record with my DNS provider pointing to <code>z1mm32m4n.github.io</code> for the <code>www</code> subdomain. From a technical standpoint on the DNS provider&rsquo;s side of things, this is the same thing we did before with the <code>blog</code> subdomain.</li>
 <li> Create an <code>A</code> record pointing the <code>@</code> domain towards GitHub using the IP address they specify.</li>
 </ol>
@@ -481,14 +481,14 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <ul>
 <li> CNAME file contains <code>www.zimmerman.io</code></li>
-<li> CNAME file resides in <code>master</code> branch of User Pages repo for Z1MM32M4N</li>
+<li> CNAME file resides in <code>master</code> branch of User Pages repo for jez</li>
 </ul>
 </li>
 <li> For blog.zimmerman.io
 
 <ul>
 <li> CNAME file contains <code>blog.zimmerman.io</code></li>
-<li> CNAME file resides in <code>gh-pages</code> branch of Project Pages repo for Z1MM32M4N/blog</li>
+<li> CNAME file resides in <code>gh-pages</code> branch of Project Pages repo for jez/blog</li>
 </ul>
 </li>
 </ul>
@@ -510,7 +510,7 @@ If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
- [g]: https://www.github.com/Z1MM32M4N/
+ [g]: https://www.github.com/jez/
  [h]: https://www.zimmerman.io/
 </p>
 ]]></content>

@@ -92,7 +92,7 @@
 					<a href="https://plus.google.com/+JacobZimmerman0"><i class="fa fa-google-plus"></i> Google+</a>
 				</li>
 				<li>
-					<a href="https://github.com/Z1MM32M4N"><i class="fa fa-github"></i> GitHub</a>
+					<a href="https://github.com/jez"><i class="fa fa-github"></i> GitHub</a>
 				</li>
 			</ul><!-- /.dl-submenu -->
 		</li>
@@ -155,7 +155,7 @@
 
 <h2>Implementing Authentication</h2>
 
-<p>The following is a pretty long-winded explanation of my personal struggles with this. If you&rsquo;d really just like to learn by example and by making your own mistakes, check out the <a href="https://github.com/Z1MM32M4N/google-apps-cmu-login/">code on GitHub</a>. I also found the <a href="https://github.com/omab/python-social-auth/tree/master/examples/"><code>python-social-auth</code> examples</a> very helpful. In the spirit of <a href="http://www.gitorial.com/">gitorial</a>, the commits are structured logically to give you a sense of how the app came together as I wrote it. In fact, I&rsquo;ve even <a href="http://www.gitorial.com/#/Z1MM32M4N/25536683">made a gitorial</a> for this repo!</p>
+<p>The following is a pretty long-winded explanation of my personal struggles with this. If you&rsquo;d really just like to learn by example and by making your own mistakes, check out the <a href="https://github.com/jez/google-apps-cmu-login/">code on GitHub</a>. I also found the <a href="https://github.com/omab/python-social-auth/tree/master/examples/"><code>python-social-auth</code> examples</a> very helpful. In the spirit of <a href="http://www.gitorial.com/">gitorial</a>, the commits are structured logically to give you a sense of how the app came together as I wrote it. In fact, I&rsquo;ve even <a href="http://www.gitorial.com/#/jez/25536683">made a gitorial</a> for this repo!</p>
 
 <h3>Python Social Auth</h3>
 
@@ -180,7 +180,7 @@
 
 <p>So in my case, I added the following line to my <code>settings.py</code>:</p>
 
-<figure class='code'><figcaption><span>settings.py</span><a href='https://github.com/Z1MM32M4N/google-apps-cmu-login/blob/master/config/settings.py#L66'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>settings.py</span><a href='https://github.com/jez/google-apps-cmu-login/blob/master/config/settings.py#L66'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;hd&#39;</span> <span class="p">:</span> <span class="s">&#39;andrew.cmu.edu&#39;</span><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -193,7 +193,7 @@
 
 <p>First, we&rsquo;ll get all our URLs in place. For Django, all the URLs dealing with logging in are already defined; we just have to include them:</p>
 
-<figure class='code'><figcaption><span>config/urls.py</span><a href='https://github.com/Z1MM32M4N/google-apps-cmu-login/blob/master/config/urls.py#L10'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>config/urls.py</span><a href='https://github.com/jez/google-apps-cmu-login/blob/master/config/urls.py#L10'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 </pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">...</span>
@@ -229,7 +229,7 @@
 
 <p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/Z1MM32M4N/">GitHub</a> or paying a visit to <a href="https://www.zimmerman.io/">my homepage</a>. If this post was about one of
+<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://www.zimmerman.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.</p>
 
@@ -280,7 +280,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 
 <div class="footer-wrapper">
   <footer role="contentinfo">
-    <span>&copy; 2015 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/Z1MM32M4N/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+    <span>&copy; 2015 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
 
   </footer>
 </div><!-- /.footer-wrapper -->
