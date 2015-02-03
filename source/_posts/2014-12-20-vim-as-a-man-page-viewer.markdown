@@ -85,7 +85,7 @@ XD
 
 {% include jake-on-the-web.markdown %}
 
-[vman-github]: https://github.com/Z1MM32M4N/vim-superman
+[vman-github]: https://github.com/jez/vim-superman
 
 [vim.1]: /images/vim.1.png
 [printf.3]: /images/printf.3.png
@@ -93,4 +93,4 @@ XD
 [vim-colors-solarized]: https://github.com/altercation/vim-colors-solarized
 [vim-airline]: https://github.com/bling/vim-airline
 
-[dotfiles]: https://github.com/Z1MM32M4N/dotfiles
+[dotfiles]: https://github.com/jez/dotfiles

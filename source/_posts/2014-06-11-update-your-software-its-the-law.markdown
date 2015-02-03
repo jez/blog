@@ -21,7 +21,7 @@ I don't quite know what prompted me to suddenly become interested in maintaining
 
 For the impatient among us, here's the code, which is also available [here][snippet1] and [here][snippet2] amongst all the code for [all my dotfiles][dotfiles].
 
-{% codeblock lang:bash Alert to Update https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42 %}
+{% codeblock lang:bash Alert to Update https://github.com/jez/dotfiles/blob/master/bash_profile#L16-L42 %}
 # ----- daily updates --------------------------------------------------------
 [ ! -e $HOME/.last_update ] && touch $HOME/.last_update
 # Initialize for when we have no GNU date available
@@ -51,7 +51,7 @@ if [ "$time_since_check" -ge 86400 ]; then
 fi
 {% endcodeblock %}
 
-{% codeblock lang:bash Check for Updates https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178 %}
+{% codeblock lang:bash Check for Updates https://github.com/jez/dotfiles/blob/master/bash_profile#L153-L178 %}
 # ----- function -------------------------------------------------------------
 update() {
   touch $HOME/.last_update
@@ -97,7 +97,7 @@ If you have any questions about what I've done here, or you catch some bugs, be 
 [openssl]: https://www.openssl.org/news/secadv_20140605.txt
 [feedly]: http://grahamcluley.com/2014/06/feedly-blackmail-ddos/
 [evernote]: http://blog.evernote.com/blog/2013/03/02/security-notice-service-wide-password-reset/
-[snippet1]: https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L16-L42
-[snippet2]: https://github.com/Z1MM32M4N/dotfiles/blob/master/bash_profile#L153-L178
-[dotfiles]: https://github.com/Z1MM32M4N/dotfiles
+[snippet1]: https://github.com/jez/dotfiles/blob/master/bash_profile#L16-L42
+[snippet2]: https://github.com/jez/dotfiles/blob/master/bash_profile#L153-L178
+[dotfiles]: https://github.com/jez/dotfiles
 

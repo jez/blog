@@ -46,7 +46,7 @@ This theme is in no way perfect, from the styles to the compatibility with the v
 
 __I'd also love to hear about your installation process.__ If something didn't quite work out right when installing the theme from GitHub or everything went super smoothly, tell me on GitHub in an issue, on [Twitter][twitter], in the comments below, or in an [email][email]. Seriously!
 
-[hpstr-source]: https://github.com/Z1MM32M4N/hpstr-theme
+[hpstr-source]: https://github.com/jez/hpstr-theme
 [hpstr-jekyll]: https://github.com/mmistakes/hpstr-jekyll-theme
 [mmistakes]: https://github.com/mmistakes/
 [less-to-sass]: https://stackoverflow.com/questions/14970224/anyone-know-of-a-good-way-to-convert-from-less-to-sass

@@ -17,7 +17,7 @@ You could say I'm a bit of a geek when it comes to configuring my terminal envir
 ## My Scripts
 I've put a decent amount of time into my dotfiles. I like to think they're pretty good. That being said, I'm not about to go over every piece of them, because that would bore even me. I might come back to these pieces in a series on getting started with the terminal (aimed at incoming CS freshmen and other up-and-coming hackers), but for now, a link will suffice.
 
-#### [Z1MM32M4N/dotfiles](https://github.com/Z1MM32M4N/dotfiles/)
+#### [jez/dotfiles](https://github.com/jez/dotfiles/)
 
 ## rcm + git
 rcm, short for rc file (as in .bash<b>rc</b>, .vim<b>rc</b>) management, is a tool that manages symlinks between dotfiles in one directory and your home directory. This is cool because, once all your config files contained in one folder, they can be tracked with git for version control without having to put your entire `$HOME` directory inside a git repo.
@@ -34,7 +34,7 @@ To be fair, I don't use `rcm` in the way I think it's creators imagined it would
 Succinctly, the issue is this: when cloning a repo and running `rcup` for the first time, you can't easily say "this is my VPS, it's running Debian GNU/Linux, has these system binaries installed, and therefore should start up using these methods and scripts". For this, we're on our own.
 
 ## Installation
-The solution I came up with regarding a multiple-environment workflow deals with handling all the necessary machine-dependent configuration within my dotfiles _themselves_. That way I can minimize code reuse and have everything in one convenient file. As a result, [my bash_profile](https://github.com/Z1MM32M4N/dotfiles/tree/master/bash_profile) is a bit lengthy at about 300 lines, and it has three large case statements, but I make all this up through deployment. Deployment is __incredibly__ swift. Again, You can take a look at the file to see how it works, but when I had finished [locking down my server](/2014/06/19/running-a-vps-log-1), these are the only configuration commands I had to run:
+The solution I came up with regarding a multiple-environment workflow deals with handling all the necessary machine-dependent configuration within my dotfiles _themselves_. That way I can minimize code reuse and have everything in one convenient file. As a result, [my bash_profile](https://github.com/jez/dotfiles/tree/master/bash_profile) is a bit lengthy at about 300 lines, and it has three large case statements, but I make all this up through deployment. Deployment is __incredibly__ swift. Again, You can take a look at the file to see how it works, but when I had finished [locking down my server](/2014/06/19/running-a-vps-log-1), these are the only configuration commands I had to run:
 
 {% codeblock lang:bash Installing rcm and dotfiles %}
 # install rcm using deb and dpkg
@@ -42,7 +42,7 @@ $ wget https://thoughtbot.github.io/rcm/debs/rcm_1.2.3-1_all.deb
 $ sudo dpkg -i rcm_1.2.3-1_all.deb
 
 # clone dotfiles down, into the ~/.dotfiles directory
-$ git clone https://github.com/Z1MM32M4N/dotfiles ~/.dotfiles
+$ git clone https://github.com/jez/dotfiles ~/.dotfiles
 
 # make the symlinks
 $ rcup

@@ -181,5 +181,5 @@ instead of being configurable in you `~/.gitconfig` file.
 [solarized]: ethanschoonover.com/solarized
 [tartanhacks]: https://github.com/ScottyLabs/tartanhacks
 [autolab]: https://github.com/autolab/Autolab
-[zshrc]: https://github.com/Z1MM32M4N/dotfiles/blob/master/zshrc
-[dotfiles]: https://github.com/Z1MM32M4N/dotfiles
+[zshrc]: https://github.com/jez/dotfiles/blob/master/zshrc
+[dotfiles]: https://github.com/jez/dotfiles

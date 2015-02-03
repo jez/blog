@@ -53,7 +53,7 @@ $ pdflatex <myfile>.tex
 
 And you'll get a file called `<myfile>.pdf` in the current directory, plus some intermediate files. We can go one step further and put a bunch of useful build targets into a Makefile and use it to build our PDF:
 
-```make LaTeX Makefile https://gist.github.com/Z1MM32M4N/b248a409d19c9f1c94cd
+```make LaTeX Makefile https://gist.github.com/jez/b248a409d19c9f1c94cd
 # NOTE: Change "written" to the name of your TeX file with no extension
 TARGET=written
 

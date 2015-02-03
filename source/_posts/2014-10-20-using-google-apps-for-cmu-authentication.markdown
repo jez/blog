@@ -56,7 +56,7 @@ I'm not sure what the difference between using the second and third variables ar
 
 So in my case, I added the following line to my `settings.py`:
 
-```python settings.py https://github.com/Z1MM32M4N/google-apps-cmu-login/blob/master/config/settings.py#L66
+```python settings.py https://github.com/jez/google-apps-cmu-login/blob/master/config/settings.py#L66
 SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {'hd' : 'andrew.cmu.edu'}
 ```
 
@@ -68,7 +68,7 @@ Now you should plenty of background knowledge to make sense of the Django app on
 
 First, we'll get all our URLs in place. For Django, all the URLs dealing with logging in are already defined; we just have to include them:
 
-```python config/urls.py https://github.com/Z1MM32M4N/google-apps-cmu-login/blob/master/config/urls.py#L10
+```python config/urls.py https://github.com/jez/google-apps-cmu-login/blob/master/config/urls.py#L10
     ...
     url(r'', include('social.apps.django_app.urls', namespace='social')),
     ...
@@ -98,8 +98,8 @@ As always, let me know if you have any questions or if by following these steps 
 [weblogin]: https://login.cmu.edu
 [hd-param]: https://developers.google.com/accounts/docs/OAuth2Login#hd-param
 [extra-args]: https://python-social-auth.readthedocs.org/en/latest/configuration/settings.html#extra-arguments-on0auth-processes
-[gappscmu]: https://github.com/Z1MM32M4N/google-apps-cmu-login/
+[gappscmu]: https://github.com/jez/google-apps-cmu-login/
 [psa-examples]: https://github.com/omab/python-social-auth/tree/master/examples/
 [gitorial]: http://www.gitorial.com/
-[gapps-gitorial]: http://www.gitorial.com/#/Z1MM32M4N/25536683
+[gapps-gitorial]: http://www.gitorial.com/#/jez/25536683
 [auth-user]: https://docs.djangoproject.com/en/dev/topics/auth/customizing/

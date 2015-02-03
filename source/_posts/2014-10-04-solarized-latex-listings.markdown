@@ -28,6 +28,6 @@ Once you've done this, you just have to include your code in your LaTeX file usi
 
 {% include jake-on-the-web.markdown %}
 
-[source]: https://github.com/Z1MM32M4N/latex-solarized
+[source]: https://github.com/jez/latex-solarized
 [listings]: http://en.wikibooks.org/wiki/LaTeX/Source_Code_Listings
 [docs]: http://mirror.hmc.edu/ctan/macros/latex/contrib/listings/listings.pdf

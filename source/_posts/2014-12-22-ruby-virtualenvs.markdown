@@ -88,7 +88,7 @@ another project!
 {% include jake-on-the-web.markdown %}
 
 [iv]: https://gist.github.com/IanVaughan/2902499
-[gist]: https://gist.github.com/Z1MM32M4N/cc2ba08062c6183a489c
-[bin]: https://github.com/Z1MM32M4N/bin/blob/master/uninstall_gems
+[gist]: https://gist.github.com/jez/cc2ba08062c6183a489c
+[bin]: https://github.com/jez/bin/blob/master/uninstall_gems
 [venv]: http://virtualenvwrapper.readthedocs.org/en/latest/
 [venv-ruby]: http://honza.ca/2011/06/install-ruby-gems-into-virtualenv

@@ -53,7 +53,7 @@ The _best_ way to install this file is to [follow the instructions
 here][install], keeping in mind that you're trying to install a `.cls` file
 instead of three `.sty` files.
 
-[install]: https://github.com/Z1MM32M4N/latex-solarized#installation
+[install]: https://github.com/jez/latex-solarized#installation
 
 ## Usage
 
@@ -188,9 +188,9 @@ that much easier.
 
 {% include jake-on-the-web.markdown %}
 
-[homework]: https://github.com/Z1MM32M4N/latex-homework-class
-[homework.cls]: https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.cls
-[homework.tex]: https://github.com/Z1MM32M4N/latex-homework-class/blob/master/homework.tex
-[template.tex]: https://github.com/Z1MM32M4N/latex-homework-class/blob/master/template.tex
+[homework]: https://github.com/jez/latex-homework-class
+[homework.cls]: https://github.com/jez/latex-homework-class/blob/master/homework.cls
+[homework.tex]: https://github.com/jez/latex-homework-class/blob/master/homework.tex
+[template.tex]: https://github.com/jez/latex-homework-class/blob/master/template.tex
 [pandoc]: http://johnmacfarlane.net/pandoc/
 [latex]: /categories#latex
