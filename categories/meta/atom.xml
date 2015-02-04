@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Meta | Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/categories/meta/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-02-02T20:31:42-05:00</updated>
+  <updated>2015-02-03T21:58:43-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[New GitHub Username]]></title>
+    <link href="https://blog.zimmerman.io/2015/02/03/new-github-username/"/>
+    <updated>2015-02-03T04:01:04-05:00</updated>
+    <id>https://blog.zimmerman.io/2015/02/03/new-github-username</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve changed my GitHub username from Z1MM32M4N to jez (hopefully it&rsquo;ll be a
+little easier to type now!). Make sure you update any remote URLs for repos of
+mine that you&rsquo;ve cloned.</p>
+
+<!-- more -->
+
+
+<h2>Updating your Git remotes</h2>
+
+<p>If you&rsquo;ve cloned one of my repositories, you can update it&rsquo;s URL by running</p>
+
+<pre><code class="bash">$ git remote -v
+</code></pre>
+
+<p>to check the current remote URL, which should look something like
+<code>https://github.com/Z1MM32M4N/&lt;repo name&gt;</code>. Then, you can run</p>
+
+<pre><code class="bash">$ git remote set-url origin https://github.com/jez/&lt;repo name&gt;
+</code></pre>
+
+<p>to actually change the URL.</p>
+
+<p>Because of the way that GitHub handles username changes, you should be able to
+continue using the current URLs at least for the time being, but any time you
+pull you&rsquo;ll get a message from GitHub asking to update the remote URLs.</p>
+
+<p>I tried to update all links referencing Z1MM32M4N to use the new username, but
+I&rsquo;m sure I&rsquo;ve missed a few. If you find a &ldquo;broken&rdquo; link, shoot me a message
+letting me know!</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.
+ [g]: https://www.github.com/jez/
+ [h]: https://www.zimmerman.io/
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[HPSTR: An Octopress Theme]]></title>
