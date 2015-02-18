@@ -65,7 +65,7 @@ export OLD_GEM_PATH="$GEM_PATH"
 export GEM_PATH=""
 
 export OLD_PATH="$PATH"
-export PATH="$PATH:$GEM_HOME/bin"
+export PATH="$GEM_HOME/bin:$PATH"
 ```
 
 And then add this complementary section to your `postdeactivate` script:
