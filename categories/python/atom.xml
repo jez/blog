@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/categories/python/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-02-03T21:58:43-05:00</updated>
+  <updated>2015-03-01T13:29:09-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -69,7 +69,7 @@ export OLD_GEM_PATH="$GEM_PATH"
 export GEM_PATH=""
 
 export OLD_PATH="$PATH"
-export PATH="$PATH:$GEM_HOME/bin"
+export PATH="$GEM_HOME/bin:$PATH"
 </code></pre>
 
 <p>And then add this complementary section to your <code>postdeactivate</code> script:</p>
@@ -87,6 +87,53 @@ unset OLD_PATH
 <p>Now, whenever you install gems, they&rsquo;ll install to the folder
 <code>$VIRTUAL_ENV/gems/</code> instead of the system&rsquo;s location, so no gems bleed into
 another project!</p>
+
+<h2>One Step Further</h2>
+
+<p>Bringing up this web page, copying those snippets, and pasting them in the two
+necessary files every time is a bit tedious. To automate this process, we can
+tap into virtualenvwrapper&rsquo;s configurability using hooks. Drop the following
+snippet into <code>$WORKON_HOME/postmkvirtualenv</code>:</p>
+
+<pre><code class="python $WORKON_HOME/postmkvirtualenv"># Initialize virtualenv postactivate script to set environment vars
+cat &lt;&lt; EOF &gt;&gt; $VIRTUAL_ENV/bin/postactivate
+
+# -- added by postmkvirtualenv ---------
+export OLD_GEMHOME="\$GEM_HOME"
+export GEM_HOME="\$VIRTUAL_ENV/gems"
+
+export OLD_GEM_PATH="\$GEM_PATH"
+export GEM_PATH=""
+
+export OLD_PATH="\$PATH"
+export PATH="\$PATH:\$GEM_HOME/bin"
+# -------------------------------------
+EOF
+
+# Initialize virtualenv postdeactivate to unset environment vars
+cat &lt;&lt; EOF &gt;&gt; $VIRTUAL_ENV/bin/postdeactivate
+
+# -- added by postmkvirtualenv ---------
+export GEM_HOME="\$OLD_GEM_HOME"
+unset OLD_GEM_HOME
+
+export GEM_PATH="\$OLD_GEM_PATH"
+unset OLD_GEM_PATH
+
+export PATH="\$OLD_PATH"
+unset OLD_PATH
+# -------------------------------------
+EOF
+</code></pre>
+
+<p>Now every time you create a new virtualenv, the appropriate configuration will
+be set up. Note that this means every normal Python project you create will have
+this configuration added (not just the Ruby projects), but that shouldn&rsquo;t matter
+because they interoperate nicely.</p>
+
+<p>Note: a side effect of this nice sandboxing is that you can normally run
+commands without prefixing them with <code>bundle exec ...</code>, which is actually really
+handy.</p>
 
 <p>- - - - -
 <br>
