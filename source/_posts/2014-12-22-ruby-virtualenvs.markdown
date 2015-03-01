@@ -85,6 +85,54 @@ Now, whenever you install gems, they'll install to the folder
 `$VIRTUAL_ENV/gems/` instead of the system's location, so no gems bleed into
 another project!
 
+## One Step Further
+
+Bringing up this web page, copying those snippets, and pasting them in the two
+necessary files every time is a bit tedious. To automate this process, we can
+tap into virtualenvwrapper's configurability using hooks. Drop the following
+snippet into `$WORKON_HOME/postmkvirtualenv`:
+
+```python $WORKON_HOME/postmkvirtualenv
+# Initialize virtualenv postactivate script to set environment vars
+cat << EOF >> $VIRTUAL_ENV/bin/postactivate
+
+# -- added by postmkvirtualenv ---------
+export OLD_GEMHOME="\$GEM_HOME"
+export GEM_HOME="\$VIRTUAL_ENV/gems"
+
+export OLD_GEM_PATH="\$GEM_PATH"
+export GEM_PATH=""
+
+export OLD_PATH="\$PATH"
+export PATH="\$PATH:\$GEM_HOME/bin"
+# -------------------------------------
+EOF
+
+# Initialize virtualenv postdeactivate to unset environment vars
+cat << EOF >> $VIRTUAL_ENV/bin/postdeactivate
+
+# -- added by postmkvirtualenv ---------
+export GEM_HOME="\$OLD_GEM_HOME"
+unset OLD_GEM_HOME
+
+export GEM_PATH="\$OLD_GEM_PATH"
+unset OLD_GEM_PATH
+
+export PATH="\$OLD_PATH"
+unset OLD_PATH
+# -------------------------------------
+EOF
+```
+
+Now every time you create a new virtualenv, the appropriate configuration will
+be set up. Note that this means every normal Python project you create will have
+this configuration added (not just the Ruby projects), but that shouldn't matter
+because they interoperate nicely.
+
+Note: a side effect of this nice sandboxing is that you can normally run
+commands without prefixing them with `bundle exec ...`, which is actually really
+handy.
+
 {% include jake-on-the-web.markdown %}
 
 [iv]: https://gist.github.com/IanVaughan/2902499
