@@ -223,74 +223,15 @@ another project!</p>
 
 <p>Bringing up this web page, copying those snippets, and pasting them in the two
 necessary files every time is a bit tedious. To automate this process, we can
-tap into virtualenvwrapper&rsquo;s configurability using hooks. Drop the following
-snippet into <code>$WORKON_HOME/postmkvirtualenv</code>:</p>
+tap into virtualenvwrapper&rsquo;s configurability using hooks. Instead of dropping
+those snippets into <code>$VIRTUAL_ENV/bin/post{,de}activate</code>, place them in
+<code>$VIRTUALENVWRAPPER_HOOK_DIR/post{,de}activate</code>.</p>
 
-<figure class='code'><figcaption><span>$WORKON_HOME/postmkvirtualenv</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># Initialize virtualenv postactivate script to set environment vars</span>
-</span><span class='line'><span class="n">cat</span> <span class="o">&lt;&lt;</span> <span class="n">EOF</span> <span class="o">&gt;&gt;</span> <span class="err">$</span><span class="n">VIRTUAL_ENV</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">postactivate</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># -- added by postmkvirtualenv ---------</span>
-</span><span class='line'><span class="n">export</span> <span class="n">OLD_GEMHOME</span><span class="o">=</span><span class="s">&quot;\$GEM_HOME&quot;</span>
-</span><span class='line'><span class="n">export</span> <span class="n">GEM_HOME</span><span class="o">=</span><span class="s">&quot;\$VIRTUAL_ENV/gems&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">export</span> <span class="n">OLD_GEM_PATH</span><span class="o">=</span><span class="s">&quot;\$GEM_PATH&quot;</span>
-</span><span class='line'><span class="n">export</span> <span class="n">GEM_PATH</span><span class="o">=</span><span class="s">&quot;&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">export</span> <span class="n">OLD_PATH</span><span class="o">=</span><span class="s">&quot;\$PATH&quot;</span>
-</span><span class='line'><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s">&quot;\$GEM_HOME/bin:\$PATH&quot;</span>
-</span><span class='line'><span class="c"># -------------------------------------</span>
-</span><span class='line'><span class="n">EOF</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Initialize virtualenv postdeactivate to unset environment vars</span>
-</span><span class='line'><span class="n">cat</span> <span class="o">&lt;&lt;</span> <span class="n">EOF</span> <span class="o">&gt;&gt;</span> <span class="err">$</span><span class="n">VIRTUAL_ENV</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">postdeactivate</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># -- added by postmkvirtualenv ---------</span>
-</span><span class='line'><span class="n">export</span> <span class="n">GEM_HOME</span><span class="o">=</span><span class="s">&quot;\$OLD_GEM_HOME&quot;</span>
-</span><span class='line'><span class="n">unset</span> <span class="n">OLD_GEM_HOME</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">export</span> <span class="n">GEM_PATH</span><span class="o">=</span><span class="s">&quot;\$OLD_GEM_PATH&quot;</span>
-</span><span class='line'><span class="n">unset</span> <span class="n">OLD_GEM_PATH</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s">&quot;\$OLD_PATH&quot;</span>
-</span><span class='line'><span class="n">unset</span> <span class="n">OLD_PATH</span>
-</span><span class='line'><span class="c"># -------------------------------------</span>
-</span><span class='line'><span class="n">EOF</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now every time you create a new virtualenv, the appropriate configuration will
-be set up. Note that this means every normal Python project you create will have
-this configuration added (not just the Ruby projects), but that shouldn&rsquo;t matter
-because they interoperate nicely.</p>
+<p>Now every time you <code>workon</code> a virtualenv, the appropriate configuration will
+be set up. Note that this means every normal Python project you use will have
+this Ruby configuration added (not just the Ruby projects), but that shouldn&rsquo;t
+matter because they interoperate nicely. If it&rsquo;s really an issue, you can stick
+with the per-virtualenv solution above.</p>
 
 <p>Note: a side effect of this nice sandboxing is that you can normally run
 commands without prefixing them with <code>bundle exec ...</code>, which is actually really
