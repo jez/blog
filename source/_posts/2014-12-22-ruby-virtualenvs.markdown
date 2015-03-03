@@ -89,45 +89,15 @@ another project!
 
 Bringing up this web page, copying those snippets, and pasting them in the two
 necessary files every time is a bit tedious. To automate this process, we can
-tap into virtualenvwrapper's configurability using hooks. Drop the following
-snippet into `$WORKON_HOME/postmkvirtualenv`:
+tap into virtualenvwrapper's configurability using hooks. Instead of dropping
+those snippets into `$VIRTUAL_ENV/bin/post{,de}activate`, place them in
+`$VIRTUALENVWRAPPER_HOOK_DIR/post{,de}activate`.
 
-```python $WORKON_HOME/postmkvirtualenv
-# Initialize virtualenv postactivate script to set environment vars
-cat << EOF >> $VIRTUAL_ENV/bin/postactivate
-
-# -- added by postmkvirtualenv ---------
-export OLD_GEMHOME="\$GEM_HOME"
-export GEM_HOME="\$VIRTUAL_ENV/gems"
-
-export OLD_GEM_PATH="\$GEM_PATH"
-export GEM_PATH=""
-
-export OLD_PATH="\$PATH"
-export PATH="\$GEM_HOME/bin:\$PATH"
-# -------------------------------------
-EOF
-
-# Initialize virtualenv postdeactivate to unset environment vars
-cat << EOF >> $VIRTUAL_ENV/bin/postdeactivate
-
-# -- added by postmkvirtualenv ---------
-export GEM_HOME="\$OLD_GEM_HOME"
-unset OLD_GEM_HOME
-
-export GEM_PATH="\$OLD_GEM_PATH"
-unset OLD_GEM_PATH
-
-export PATH="\$OLD_PATH"
-unset OLD_PATH
-# -------------------------------------
-EOF
-```
-
-Now every time you create a new virtualenv, the appropriate configuration will
-be set up. Note that this means every normal Python project you create will have
-this configuration added (not just the Ruby projects), but that shouldn't matter
-because they interoperate nicely.
+Now every time you `workon` a virtualenv, the appropriate configuration will
+be set up. Note that this means every normal Python project you use will have
+this Ruby configuration added (not just the Ruby projects), but that shouldn't
+matter because they interoperate nicely. If it's really an issue, you can stick
+with the per-virtualenv solution above.
 
 Note: a side effect of this nice sandboxing is that you can normally run
 commands without prefixing them with `bundle exec ...`, which is actually really
