@@ -104,7 +104,7 @@ export OLD_GEM_PATH="\$GEM_PATH"
 export GEM_PATH=""
 
 export OLD_PATH="\$PATH"
-export PATH="\$PATH:\$GEM_HOME/bin"
+export PATH="\$GEM_HOME/bin:\$PATH"
 # -------------------------------------
 EOF
 
