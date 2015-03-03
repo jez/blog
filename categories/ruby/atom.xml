@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/categories/ruby/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-03-01T13:29:09-05:00</updated>
+  <updated>2015-03-03T02:44:19-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Ruby Virtualenvs]]></title>
     <link href="https://blog.zimmerman.io/2014/12/22/ruby-virtualenvs/"/>
-    <updated>2014-12-22T13:52:40-05:00</updated>
+    <updated>2014-12-22T12:52:40-06:00</updated>
     <id>https://blog.zimmerman.io/2014/12/22/ruby-virtualenvs</id>
     <content type="html"><![CDATA[<p>A while back I found a command that removes all Ruby gems installed on a system
 when you&rsquo;re using rbenv. It worked great, so I decided to build on top of it.
@@ -106,7 +106,7 @@ export OLD_GEM_PATH="\$GEM_PATH"
 export GEM_PATH=""
 
 export OLD_PATH="\$PATH"
-export PATH="\$PATH:\$GEM_HOME/bin"
+export PATH="\$GEM_HOME/bin:\$PATH"
 # -------------------------------------
 EOF
 

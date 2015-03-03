@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Dns | Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/categories/dns/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-03-01T13:29:09-05:00</updated>
+  <updated>2015-03-03T02:44:19-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -44,9 +44,9 @@
 <p>The next bit gave me some trouble at first (probably just because I was being impatient while the DNS tables were updating). The end goal was to have the <code>www</code> subdomain host my site and have the <code>@</code> (top-level or apex) domain redirect there. If you read carefully, the instructions say to do three things:</p>
 
 <ol>
-<li> Make the <code>CNAME</code> file (<a href="https://github.com/jez/jez.github.io/blob/master/CNAME">view source</a>) in my (User) Pages repository contain <code>www.zimmerman.io</code>. <strong>This</strong> is the domain at which I do want my site to be visible.</li>
-<li> Create a <code>CNAME</code> record with my DNS provider pointing to <code>z1mm32m4n.github.io</code> for the <code>www</code> subdomain. From a technical standpoint on the DNS provider&rsquo;s side of things, this is the same thing we did before with the <code>blog</code> subdomain.</li>
-<li> Create an <code>A</code> record pointing the <code>@</code> domain towards GitHub using the IP address they specify.</li>
+<li>Make the <code>CNAME</code> file (<a href="https://github.com/jez/jez.github.io/blob/master/CNAME">view source</a>) in my (User) Pages repository contain <code>www.zimmerman.io</code>. <strong>This</strong> is the domain at which I do want my site to be visible.</li>
+<li>Create a <code>CNAME</code> record with my DNS provider pointing to <code>z1mm32m4n.github.io</code> for the <code>www</code> subdomain. From a technical standpoint on the DNS provider&rsquo;s side of things, this is the same thing we did before with the <code>blog</code> subdomain.</li>
+<li>Create an <code>A</code> record pointing the <code>@</code> domain towards GitHub using the IP address they specify.</li>
 </ol>
 
 

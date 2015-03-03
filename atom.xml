@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-03-01T13:29:09-05:00</updated>
+  <updated>2015-03-03T02:44:19-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,231 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Vim as an IDE]]></title>
+    <link href="https://blog.zimmerman.io/2015/03/03/vim-as-an-ide/"/>
+    <updated>2015-03-03T00:01:19-05:00</updated>
+    <id>https://blog.zimmerman.io/2015/03/03/vim-as-an-ide</id>
+    <content type="html"><![CDATA[<p>I took some screenshots to accompany my <a href="https://github.com/jez/vim-as-an-ide">Vim as an IDE</a> repo on GitHub.
+This is by no means a complete walkthrough! It&rsquo;s just a reference for those who
+are curious if they installed everything correctly. This is what my system looks
+like for me after each step.</p>
+
+<!-- more -->
+
+
+<h2>1. <a href="https://github.com/jez/vim-as-an-ide/commit/0673f0c">Create vimrc file</a></h2>
+
+<p>This is what Vim should look like immediately after opening it:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-01.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-01.png" alt="Vim as an IDE" /></a></p>
+
+<p>And right after adding the two lines:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-02.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-02.png" alt="Vim as an IDE" /></a></p>
+
+<h2>2. <a href="https://github.com/jez/vim-as-an-ide/commit/dff7da3">Add some general settings</a></h2>
+
+<p>After you add these settings, your <code>~/.vimrc</code> should look like this when opened
+in Vim:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-03_1.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-03_1.png" alt="Vim as an IDE" /></a></p>
+
+<h2>3. <a href="https://github.com/jez/vim-as-an-ide/commit/fc77b04">Enable the mouse</a></h2>
+
+<p>To enable the mouse, you&rsquo;ll have to figure out where the appropriate setting is
+in your terminal emulator. Here&rsquo;s a screenshot of where it is in iTerm2 on OS X.</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-03.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-03.png" alt="Vim as an IDE" /></a></p>
+
+<h2>4. <a href="https://github.com/jez/vim-as-an-ide/commit/1186be2">Set up Vundle boilerplate</a></h2>
+
+<p>If you add the changes introduced at this step before installing Vundle, you&rsquo;ll
+get an error that looks like this:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-04.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-04.png" alt="Vim as an IDE" /></a></p>
+
+<p>Otherwise, this should be the result of running <code>vim +PluginInstall</code> to install
+Vundle for the first time:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-05.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-05.png" alt="Vim as an IDE" /></a></p>
+
+<p>Remember, you can use <code>:qall</code> to quit Vim after installing plugins.</p>
+
+<h2>5. <a href="https://github.com/jez/vim-as-an-ide/commit/457f2e2">Make Vim look good</a></h2>
+
+<p>Your experience might diverge a little bit from these screenshots if you choose
+a different colorscheme because I&rsquo;ll assume you&rsquo;re setting everything up using
+Solarized Dark. If you&rsquo;re on a Mac and you&rsquo;ve imported the iTerm2 colorschemes,
+you should be able to find the Solarized Dark theme here:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-06.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-06.png" alt="Vim as an IDE" /></a></p>
+
+<p>Making that change should make Vim turn these colors:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-07.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-07.png" alt="Vim as an IDE" /></a></p>
+
+<p>Next up is changing your font to a Powerline patched font. If you downloaded and
+installed Menlo for Powerline correctly, you should be able to set it using this
+panel in the preferences:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-08.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-08.png" alt="Vim as an IDE" /></a></p>
+
+<p>Finally, running <code>vim +PluginInstall</code> to install the Solarized Vim colorscheme
+and vim-airline:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-09.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-09.png" alt="Vim as an IDE" /></a></p>
+
+<p>Here&rsquo;s what the Vim solarized plugind does to our <code>~/.vimrc</code>:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-10.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-10.png" alt="Vim as an IDE" /></a></p>
+
+<p>If you chose to install a Powerline patched font, you can let vim-airline use
+cooler arrows by uncommenting the line highlighted in this screenshot above, to
+make Vim look like this:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-11.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-11.png" alt="Vim as an IDE" /></a></p>
+
+<h2>6. <a href="https://github.com/jez/vim-as-an-ide/commit/b7ff90c">Plugins NERDTree and NERDTree Tabs</a></h2>
+
+<p>This will be the last time that I demonstrate running <code>vim +PluginInstall</code>,
+because they&rsquo;ll all basically look the same from here on out:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-12.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-12.png" alt="Vim as an IDE" /></a></p>
+
+<p>Once you&rsquo;ve installed NERDTree and NERDTree Tabs (and added the settings I
+listed for them), you should be able to type <code>\t</code> to bring up something that
+looks like this:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-13.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-13.png" alt="Vim as an IDE" /></a></p>
+
+<h2>7. <a href="https://github.com/jez/vim-as-an-ide/commit/144f979">Plugin Syntastic</a></h2>
+
+<p>Once you&rsquo;ve installed Syntastic, it should syntax highlight your errors by
+displaying little marks next to the offending lines:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-14.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-14.png" alt="Vim as an IDE" /></a></p>
+
+<p>You can see that we&rsquo;ve forgotten a semi-colon, and Syntastic is pointing that
+out for us.</p>
+
+<p>As I was making these screenshots, I realized that I forgot to include a setting
+in the right place. It&rsquo;s fine if you work through the whole workshop, but if you
+pick and choose things, namely if you don&rsquo;t follow the steps for <code>vim-gitgutter</code>
+eventually, you&rsquo;ll end up with this weird highlighting in the sign column. To
+disable this highlighting, you can either wait until the <code>vim-gitgutter</code> step
+(coming right up in 4 steps), or you can run this command (the one at the bottom
+of the screenshot):</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-15.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-15.png" alt="Vim as an IDE" /></a></p>
+
+<p>To make the change permanent, you&rsquo;ll have to add that line (<code>:hi clear
+SignColumn</code>) to your <code>~/.vimrc</code>.</p>
+
+<h2>8. <a href="https://github.com/jez/vim-as-an-ide/commit/fd2c49c">Plugins vim-easytags and tagbar</a></h2>
+
+<p>After this step, you should be able to bring up a split pane view that shows
+your functions, variables, and other identifiers by pressing <code>\b</code>:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-16.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-16.png" alt="Vim as an IDE" /></a></p>
+
+<p>If you enabled mouse reporting, you should be able to click on the things in the
+pane and jump to the appropriate place in the file. I&rsquo;d strongly recommend that
+you read the help for all the keybindings and actions you can use with it.</p>
+
+<h2>9. <a href="https://github.com/jez/vim-as-an-ide/commit/80db74f">Plugin ctrlp</a></h2>
+
+<p>When <code>CtrlP</code> is installed, you can press <code>Ctrl + P</code> to bring up a list of files.
+As you type, the list will be filtered to only those that &ldquo;fuzzy match&rdquo; what
+you&rsquo;ve typed in. As you can see, I typed in <code>mc</code>, which matched <code>vimrc.vim</code> and
+<code>main.c</code>:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-17.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-17.png" alt="Vim as an IDE" /></a></p>
+
+<h2>10. <a href="https://github.com/jez/vim-as-an-ide/commit/8d4223f">Plugin A.vim</a></h2>
+
+<p>This plugin introduces a number of commands that you can read in the
+documentation that enable opening &ldquo;alternate&rdquo; files, like C/C++ header files,
+really quickly. I&rsquo;ve run <code>:AV</code> here as an example of one of the commands it
+installs, which opens the alternate file in a vertical split pane.</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-18.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-18.png" alt="Vim as an IDE" /></a></p>
+
+<h2>11. <a href="https://github.com/jez/vim-as-an-ide/commit/1e5757e">Plugins vim-gitgutter and vim-fugitive</a></h2>
+
+<p><code>vim-gitgutter</code> is really handy: it shows you a <code>+</code>, <code>-</code>, or <code>~</code> next to lines
+that have been added, removed, or modified. This is good for both identifying
+the pieces of code that have changed while you&rsquo;re working on a file as well as
+reminding yourself that you have changes that need to be commited.</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-19.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-19.png" alt="Vim as an IDE" /></a></p>
+
+<p>Speaking of committing files, <code>vim-fugitive</code> lets you make Git commits from
+right within Vim. Simply run <code>:Gcommit</code> to bring up a split pane where you can
+craft your commit message:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-20.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-20.png" alt="Vim as an IDE" /></a></p>
+
+<p><code>vim-fugitive</code> can do much more than just make commits. Be sure to read the
+appropriate documentation to figure out what sorts of cool things you can do!</p>
+
+<h2>12. <a href="https://github.com/jez/vim-as-an-ide/commit/2fe0507">Plugin delimitMate</a></h2>
+
+<p>Finally, using <code>delimitMate</code> you should be able to type an opening delimiter and
+have the closing one be inserted automatically. Here&rsquo;s an example on
+parentheses:</p>
+
+<p><a href="https://blog.zimmerman.io/images/vim-as-an-ide/shot-21.png"><img src="https://blog.zimmerman.io/images/vim-as-an-ide/shot-21.png" alt="Vim as an IDE" /></a></p>
+
+<h2>13. <a href="https://github.com/jez/vim-as-an-ide/commit/b185e9f">Plugin vim-superman</a></h2>
+
+<p>Once you&rsquo;ve added the appropriate function to your shell initialization file
+(<code>~/.bashrc</code>, etc.), you should be able to run <code>vman &lt;command&gt;</code> to open man
+pages. Here&rsquo;s an example on <code>vman 3 printf</code>:</p>
+
+<p><a href="https://blog.zimmerman.io/images/printf.3.png"><img src="https://blog.zimmerman.io/images/printf.3.png" alt="Vim as an IDE" /></a></p>
+
+<h2>14. <a href="https://github.com/jez/vim-as-an-ide/commit/44f5225">Plugin vim-tmux-navigator</a></h2>
+
+<p>There&rsquo;s not much to show here, as this step is mostly just introducing
+keybindings. If you use <code>tmux</code>, make sure to copy the appropriate snippet into
+your <code>~/.tmux.conf</code> to be able to jump between tmux and Vim splits with no added
+effort.</p>
+
+<h2>15. <a href="https://github.com/jez/vim-as-an-ide/commit/5ba534e">Syntax plugins</a></h2>
+
+<p>No screenshots again. What syntax highlighting plugins you end up installing is
+largely up to you.</p>
+
+<h2>16. <a href="https://github.com/jez/vim-as-an-ide/commit/9089a95">Add all the extra plugins that I use</a></h2>
+
+<p>For these plugins, be sure to check the documentation. Most of them have
+screenshots that show what they look like when installed and configured
+correctly.</p>
+
+<h2>Wrap Up</h2>
+
+<p>That&rsquo;s it! I can only take you so far in making your Vim awesome. You have to
+take yourself the rest of the way by investing a little bit of effort into
+reading the documentation for the plugins you think could be useful to you so
+that you can fully utilize them. Be sure to comment on the commits with
+questions if you&rsquo;re stuck or are wondering why your setup doesn&rsquo;t look similar
+to one of the above!</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[New GitHub Username]]></title>
@@ -969,7 +1194,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Ruby Virtualenvs]]></title>
     <link href="https://blog.zimmerman.io/2014/12/22/ruby-virtualenvs/"/>
-    <updated>2014-12-22T13:52:40-05:00</updated>
+    <updated>2014-12-22T12:52:40-06:00</updated>
     <id>https://blog.zimmerman.io/2014/12/22/ruby-virtualenvs</id>
     <content type="html"><![CDATA[<p>A while back I found a command that removes all Ruby gems installed on a system
 when you&rsquo;re using rbenv. It worked great, so I decided to build on top of it.
@@ -1106,7 +1331,7 @@ snippet into <code>$WORKON_HOME/postmkvirtualenv</code>:</p>
 </span><span class='line'><span class="n">export</span> <span class="n">GEM_PATH</span><span class="o">=</span><span class="s">&quot;&quot;</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">export</span> <span class="n">OLD_PATH</span><span class="o">=</span><span class="s">&quot;\$PATH&quot;</span>
-</span><span class='line'><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s">&quot;\$PATH:\$GEM_HOME/bin&quot;</span>
+</span><span class='line'><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s">&quot;\$GEM_HOME/bin:\$PATH&quot;</span>
 </span><span class='line'><span class="c"># -------------------------------------</span>
 </span><span class='line'><span class="n">EOF</span>
 </span><span class='line'>
@@ -2360,82 +2585,6 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 <p>With my first attempt at installing a mail server foiled, I think for my next attempt I&rsquo;ll try a different path. Instead of installing and configuring everything more or less manually (I really wanted to do this for the experience of it all, learning the nitty-gritty of how it works), this time around I think I&rsquo;m going to give <a href="https://github.com/al3x/sovereign">sovereign</a> a try. I&rsquo;ve heard good things, and it is in fact based on the original tutorial I had found, so it&rsquo;s looking pretty promising as of yet.</p>
 
 <p>Whatever happens though, I&rsquo;m feeling pretty good about the fact that I can turn things around with a single click.</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://www.zimmerman.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Running a VPS, Log 1: Managing Dotfiles Across Machines]]></title>
-    <link href="https://blog.zimmerman.io/2014/06/19/running-a-vps-log-1/"/>
-    <updated>2014-06-19T23:10:51-04:00</updated>
-    <id>https://blog.zimmerman.io/2014/06/19/running-a-vps-log-1</id>
-    <content type="html"><![CDATA[<p>You could say I&rsquo;m a bit of a geek when it comes to configuring my terminal environment; this obsession has led me to concoct ever-elaborate setup scripts and configuration files. On top of this, between my laptop&rsquo;s multiple boot environments, the servers I use for school, work, and ScottyLabs, and now <a href="https://blog.zimmerman.io/2014/06/19/running-a-vps-log-0">metagross</a>, keeping my configuration files in sync is a must. I handle it swiftly using a combination of git and rcm.</p>
-
-<!-- more -->
-
-
-<h2>My Scripts</h2>
-
-<p>I&rsquo;ve put a decent amount of time into my dotfiles. I like to think they&rsquo;re pretty good. That being said, I&rsquo;m not about to go over every piece of them, because that would bore even me. I might come back to these pieces in a series on getting started with the terminal (aimed at incoming CS freshmen and other up-and-coming hackers), but for now, a link will suffice.</p>
-
-<h4><a href="https://github.com/jez/dotfiles/">jez/dotfiles</a></h4>
-
-<h2>rcm + git</h2>
-
-<p>rcm, short for rc file (as in .bash<b>rc</b>, .vim<b>rc</b>) management, is a tool that manages symlinks between dotfiles in one directory and your home directory. This is cool because, once all your config files contained in one folder, they can be tracked with git for version control without having to put your entire <code>$HOME</code> directory inside a git repo.</p>
-
-<p>On a single machine, rcm works like this. You have one directory (usually <code>~/.dotfiles</code>, but configurable to any directory) which stores all the config files. In here, all files which are meant to be tracked and symlinked do <em>not</em> include the prefixed &lsquo;<code>.</code>&rsquo;; instead, it is added as part of the linking process. After installation, which is easily handled through the brew formula, the .deb, or the Makefile, there are a couple of new tools available.</p>
-
-<p>The first worth mentioning is <code>man 7 rcm</code>, which documents what was just installed. Taking a glance at this page, we see that rcm is actually a suite of tools: <code>lsrc</code>, <code>mkrc</code>, <code>rcdn</code>, and <code>rcup</code>. While all these tools are useful, the most important is <code>rcup</code>. After collecting all your dotfiles into <code>~/.dotfiles</code>, simply executing <code>rcup</code> symlinks all the necessary files to their appropriate locations.</p>
-
-<p>From here, you get all the benefits of git, like pushing to GitHub, collaborating with others, lightweight branching, and syncing files easily even when your workflow is distributed across many servers.</p>
-
-<h2>Caveats</h2>
-
-<p>To be fair, I don&rsquo;t use <code>rcm</code> in the way I think it&rsquo;s creators imagined it would be used. Specifically, the software includes certain provisions to designate which files should affect various machines using a tag system. While it could possibly work, in my mind it&rsquo;s much more tedious than what I&rsquo;ve come up with.</p>
-
-<p>Succinctly, the issue is this: when cloning a repo and running <code>rcup</code> for the first time, you can&rsquo;t easily say &ldquo;this is my VPS, it&rsquo;s running Debian GNU/Linux, has these system binaries installed, and therefore should start up using these methods and scripts&rdquo;. For this, we&rsquo;re on our own.</p>
-
-<h2>Installation</h2>
-
-<p>The solution I came up with regarding a multiple-environment workflow deals with handling all the necessary machine-dependent configuration within my dotfiles <em>themselves</em>. That way I can minimize code reuse and have everything in one convenient file. As a result, <a href="https://github.com/jez/dotfiles/tree/master/bash_profile">my bash_profile</a> is a bit lengthy at about 300 lines, and it has three large case statements, but I make all this up through deployment. Deployment is <strong>incredibly</strong> swift. Again, You can take a look at the file to see how it works, but when I had finished <a href="https://blog.zimmerman.io/2014/06/19/running-a-vps-log-1">locking down my server</a>, these are the only configuration commands I had to run:</p>
-
-<figure class='code'><figcaption><span>Installing rcm and dotfiles </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># install rcm using deb and dpkg</span>
-</span><span class='line'><span class="nv">$ </span>wget https://thoughtbot.github.io/rcm/debs/rcm_1.2.3-1_all.deb
-</span><span class='line'><span class="nv">$ </span>sudo dpkg -i rcm_1.2.3-1_all.deb
-</span><span class='line'>
-</span><span class='line'><span class="c"># clone dotfiles down, into the ~/.dotfiles directory</span>
-</span><span class='line'><span class="nv">$ </span>git clone https://github.com/jez/dotfiles ~/.dotfiles
-</span><span class='line'>
-</span><span class='line'><span class="c"># make the symlinks</span>
-</span><span class='line'><span class="nv">$ </span>rcup
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Voilà! After that, I had my sick bash prompt, my <a href="https://blog.zimmerman.io/2014/06/11/update-your-software-its-the-law/">snazzy update function</a>, my delightful vim colorscheme, solarized dir colors&ndash;the list goes on and on.</p>
-
-<p>Sure, it&rsquo;s taken a bit of effort to get the point where I can run these commands and have it Just Work, but doing that work once means that from now on, whenever I sit down at a new work computer, a new VPS, a new laptop, or some other workstation, I&rsquo;m only a few commands away from my favorite settings.</p>
 
 <hr />
 
