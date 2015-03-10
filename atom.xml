@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.zimmerman.io/atom.xml" rel="self"/>
   <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-03-03T03:22:22-05:00</updated>
+  <updated>2015-03-10T00:17:32-05:00</updated>
   <id>https://blog.zimmerman.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -14,10 +14,193 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Getting Started With RCM]]></title>
+    <link href="https://blog.zimmerman.io/2015/03/09/getting-started-with-rcm/"/>
+    <updated>2015-03-09T18:30:39-05:00</updated>
+    <id>https://blog.zimmerman.io/2015/03/09/getting-started-with-rcm</id>
+    <content type="html"><![CDATA[<p>I recently rewrote most of my dotfiles to clean them up and in the process
+decided to take a renewed look at using <a href="https://robots.thoughtbot.com/rcm-for-rc-files-in-dotfiles-repos">rcm</a>&rsquo;s array of features to manage
+syncing my dotfiles across multiple servers and hosts.</p>
+
+<!-- more -->
+
+
+<h2>Installation and Usage</h2>
+
+<p>Thoughbot has written some excellent documentation for rcm, including a whole
+set of man pages and a <a href="https://robots.thoughtbot.com/rcm-for-rc-files-in-dotfiles-repos">nice blog post</a> that runs through its core
+features. As far as <a href="https://github.com/thoughtbot/rcm#installation">installation</a> goes, there&rsquo;s a package for just
+about every platform on top of the standard autotools, so you should have no
+problem getting up and running.</p>
+
+<p>Rather than just run through the same stuff, I&rsquo;m going to walk through some of
+the places where my experience varied from the examples given in the
+documentation.</p>
+
+<h2>Background</h2>
+
+<p>I&rsquo;ve already been using rcm for a while now, though my setup was a little
+non-standard as far as rcm installations go; instead of using the system built
+into rcm for managing host-specific configuration files, I had <a href="https://github.com/jez/dotfiles/blob/6beee7eb426a21102da174f65d1a706bedc28b57/zshrc#L135-L204">huge case
+statements</a> littering my config files. After starting to get a little
+traffic for <a href="https://github.com/jez/vim-as-an-ide">some of my other configuration work</a>, I decided it was time to
+make my config files something worth looking at.</p>
+
+<p>Thus, given the state of my old files, much of my effort this time around
+were spent refactoring my current setup to increase modularity and get it to
+integrate nicely with rcm. I think that this use case is a little
+under-documented and lacking in first-class support in the suite, so I&rsquo;ll talk
+about how I got around this later on. That being said, if you&rsquo;re coming from no
+dotfiles management software or are interested in trying out something new,
+you&rsquo;ll have a much smoother experience.</p>
+
+<h2>Goals</h2>
+
+<p>My two goals for the refactor that I mentioned above were to</p>
+
+<ul>
+<li>make everything modular, so that people could more easily pick and choose
+pieces from my dotfiles to include in theirs, and</li>
+<li>make it easy to swap around host-specific configurations.</li>
+</ul>
+
+
+<p>While the work required to achieve this setup was a bit hairy, maintaining it
+should be straightforward from now on.</p>
+
+<p>If you haven&rsquo;t taken a second to peruse some of the <a href="http://thoughtbot.github.io/rcm/rcm.7.html">documentation</a> yet,
+it probably wouldn&rsquo;t hurt to do so now. It&rsquo;s about to get technical.</p>
+
+<h2>Host-independent files</h2>
+
+<p>I started this time around with the host independent files, because they
+required no real refactoring. Linking these up was a simple matter of running
+commands that looked like</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc &lt;rc-file&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I ran this on files like my <code>.vimrc</code>, <code>.tmux.conf</code>, <code>.ackrc</code>, and other simple
+files. I also handled my <code>.vim/</code> folder in this step, but slightly differently.
+The default rcm behavior is to create symlinks when given a single file, and to
+recursively descend and create symlinks when given a folder. For folders like my
+<code>.vim/</code> folder, which can get pretty large pretty quickly, I used the <code>-S</code>
+option to force rcm to symlink the directory:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc -S .vim/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The first time I ran <code>mkrc</code>, it automatically created a folder called
+<code>~/.dotfiles</code>, which is where all my dotfiles files will live from now on. Then,
+every time <code>mkrc</code> is run, it moves the file into this folder and creates a
+symbolic link where it use to exist. I always thought this was a curious name
+for the program, &ldquo;make rc file&rdquo;, but really what I just mentioned is all there
+is to it: <code>mkrc</code> <em>moves</em> and <em>links</em> an rc file.</p>
+
+<p><a class="image-link" href="https://blog.zimmerman.io/images/mkrc-host-independent.png"><img src="https://blog.zimmerman.io/images/mkrc-host-independent.png"></a></p>
+
+<p>Above you can see the results of this first step on a couple files: my <code>.vimrc</code>
+and my <code>.vim/</code> folder. You can see that where there once were a file and a
+folder, there are now two symbolic links, which point to the moved files inside
+of my <code>.dotfiles/</code> directory.</p>
+
+<h2>Host-dependent files</h2>
+
+<p>Next up are obviously the host-dependent files, though we can split this
+category once more based on which need to be refactored.</p>
+
+<h3>Just Add Water</h3>
+
+<p>For my host-dependent
+files that didn&rsquo;t need to be refactored, like my <code>.ssh/config</code> and my
+<code>.gitconfig</code> (files which, by the way, I wasn&rsquo;t tracking at all before this
+rewrite), I just ran the following command:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc -o .gitconfig</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When I&rsquo;m on my Mac, this goes through the same move + link procedure described
+above, but it moves the file into the <code>~/.dotfiles/host-Jacobs-MacBook-Air/</code>
+subfolder.</p>
+
+<h3>Refactor and Profit</h3>
+
+<p>Finally, I dealt with the piece of my dotfiles that was sorely lacking a
+refactor: my <code>.zshrc</code>. For this, I took a cue from <a href="https://github.com/holman/dotfiles">Zach Holman&rsquo;s
+dotfiles</a> organization and broke up my zshrc into it&rsquo;s components, like
+<code>aliases.sh</code>, <code>colors.sh</code>, and more. Most important of these components was
+the <code>host.sh</code> file, which contained all the host-specific configurations that I
+was doing. Whenever I deploy my <code>.zshrc</code> on a new host now, rcm will put a
+<code>host.sh</code> file in a location where my <code>.zshrc</code> knows where to look, but the
+contents of that file change depending on the host. Getting the many <code>host.sh</code>
+files in place is where I think mkrc&rsquo;s power can be improved.</p>
+
+<p>The <code>mkrc -o</code> command takes an option that lets you specify a host explicitly
+(<code>-B &lt;hostname&gt;</code>) rather than calculating it with the <code>hostname</code> command, but it doesn&rsquo;t
+let you specify that you&rsquo;d just like to move the file, rather than move and link
+it. As such, when I was refactoring, I created a bunch of files:
+<code>host-Jacobs-MacBook-Air.sh</code>, <code>host-ghost.zimmerman.io.sh</code>, etc., creating one
+<code>host-&lt;something&gt;.sh</code> file for each host that I needed to deploy my dotfiles to.
+Then, for each of these files, I</p>
+
+<ul>
+<li>ran <code>mkrc -o -B &lt;hostname&gt; host-&lt;hostname&gt;.sh</code></li>
+<li>removed the link created by <code>mkrc</code> (I skipped this step the last time around,
+when I had just linked the correct <code>host.sh</code> file for the host I was working
+on)</li>
+<li>renamed the file that rcm created in the <code>.dotfiles/host-&lt;hostname&gt;/</code> folder
+to just <code>host.sh</code>.</li>
+</ul>
+
+
+<p>Since there were a bunch of different host-specific files in my case, this
+process was a little tedious. It&rsquo;d have been nice if there was an option to
+automate my use case, but I&rsquo;m not sure if it&rsquo;s common enough to warrant
+the additional complexity, especially considering it&rsquo;s a one-time cost.</p>
+
+<p>In any case, with all this in place, I had finally met my two goals: everything
+was modular, and host-specific configurations were clearly defined and easily
+deployable.</p>
+
+<h2>Up Next</h2>
+
+<p>If you&rsquo;re reading this and wondering where to go next, you could:</p>
+
+<ul>
+<li>take a dive into the rcm documentation to get started applying it to your own
+set of dotfiles</li>
+<li>browse my <a href="https://github.com/jez/dotfiles">new-and-improved dotfiles</a> repository on GitHub</li>
+<li>wait for an upcoming post where I point out some of the noteworthy things I&rsquo;ve
+added in my dotfiles</li>
+</ul>
+
+
+<p>If you&rsquo;re using rcm or trying to get started with it but are having issues, feel
+free to drop questions in the comments and I&rsquo;ll see if I can&rsquo;t help sort things
+out.</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://www.zimmerman.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Vim as an IDE]]></title>
-    <link href="https://blog.zimmerman.io/2015/03/03/vim-as-an-ide/"/>
-    <updated>2015-03-03T00:01:19-05:00</updated>
-    <id>https://blog.zimmerman.io/2015/03/03/vim-as-an-ide</id>
+    <link href="https://blog.zimmerman.io/2015/03/02/vim-as-an-ide/"/>
+    <updated>2015-03-02T23:01:19-06:00</updated>
+    <id>https://blog.zimmerman.io/2015/03/02/vim-as-an-ide</id>
     <content type="html"><![CDATA[<p>I took some screenshots to accompany my <a href="https://github.com/jez/vim-as-an-ide">Vim as an IDE</a> repo on GitHub.
 This is by no means a complete walkthrough! It&rsquo;s just a reference for those who
 are curious if they installed everything correctly. This is what my system looks
@@ -241,7 +424,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[New GitHub Username]]></title>
     <link href="https://blog.zimmerman.io/2015/02/03/new-github-username/"/>
-    <updated>2015-02-03T04:01:04-05:00</updated>
+    <updated>2015-02-03T03:01:04-06:00</updated>
     <id>https://blog.zimmerman.io/2015/02/03/new-github-username</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve changed my GitHub username from Z1MM32M4N to jez (hopefully it&rsquo;ll be a
 little easier to type now!). Make sure you update any remote URLs for repos of
@@ -294,7 +477,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Mastering Git Log for Collaboration]]></title>
     <link href="https://blog.zimmerman.io/2015/01/16/mastering-git-log-for-collaboration/"/>
-    <updated>2015-01-16T20:57:01-05:00</updated>
+    <updated>2015-01-16T19:57:01-06:00</updated>
     <id>https://blog.zimmerman.io/2015/01/16/mastering-git-log-for-collaboration</id>
     <content type="html"><![CDATA[<p>Git is an incredibly powerful platform for collaboration. The ability to create
 light-weight branches as well as push to and pull from multiple remote repos is
@@ -498,7 +681,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[The LaTeX Homework Document Class]]></title>
     <link href="https://blog.zimmerman.io/2015/01/10/the-latex-homework-document-class/"/>
-    <updated>2015-01-10T18:00:00-05:00</updated>
+    <updated>2015-01-10T17:00:00-06:00</updated>
     <id>https://blog.zimmerman.io/2015/01/10/the-latex-homework-document-class</id>
     <content type="html"><![CDATA[<p>There are LaTeX document classes for typesetting books, articles, exams,
 presentations, and more. Now, there&rsquo;s one for homework assignments, too.</p>
@@ -737,7 +920,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Offline LaTeX Development - Part 2]]></title>
     <link href="https://blog.zimmerman.io/2015/01/10/offline-latex-development-part-2/"/>
-    <updated>2015-01-10T17:00:00-05:00</updated>
+    <updated>2015-01-10T16:00:00-06:00</updated>
     <id>https://blog.zimmerman.io/2015/01/10/offline-latex-development-part-2</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve already written about how I develop LaTeX offline in Vim using GNU Make.
 Recently, though, I found a tool that implements another feature that GUI
@@ -792,7 +975,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Google Chrome: A Memory Hog]]></title>
     <link href="https://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog/"/>
-    <updated>2014-12-29T18:00:00-05:00</updated>
+    <updated>2014-12-29T17:00:00-06:00</updated>
     <id>https://blog.zimmerman.io/2014/12/29/google-chrome-a-memory-hog</id>
     <content type="html"><![CDATA[<p>Whenever someone complains about a slow computer, the first thing I check is
 how many Chrome tabs they have open. Chrome hogs memory like no other. For
@@ -950,7 +1133,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Intro to Columns in HTML]]></title>
     <link href="https://blog.zimmerman.io/2014/12/26/intro-to-columns-in-html/"/>
-    <updated>2014-12-26T13:00:00-05:00</updated>
+    <updated>2014-12-26T12:00:00-06:00</updated>
     <id>https://blog.zimmerman.io/2014/12/26/intro-to-columns-in-html</id>
     <content type="html"><![CDATA[<p>HTML and CSS can be frustrating when first starting out. Despite all you try, nothing is in the right place. I&rsquo;ve advised more than a few friends on how to figure out this mystery and I&rsquo;ve noticed a pattern: people don&rsquo;t realize they should be using a grid.</p>
 
@@ -1319,7 +1502,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Vim as a Man Page Viewer]]></title>
     <link href="https://blog.zimmerman.io/2014/12/20/vim-as-a-man-page-viewer/"/>
-    <updated>2014-12-20T21:17:46-05:00</updated>
+    <updated>2014-12-20T20:17:46-06:00</updated>
     <id>https://blog.zimmerman.io/2014/12/20/vim-as-a-man-page-viewer</id>
     <content type="html"><![CDATA[<p>Man pages are an essential part of every developer&rsquo;s workflow. Unfortunately,
 the default system pager <code>less</code> isn&rsquo;t the best interface. That&rsquo;s why I wrote a
@@ -1412,7 +1595,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[The Joys of the Craft]]></title>
     <link href="https://blog.zimmerman.io/2014/12/13/the-joys-of-the-craft/"/>
-    <updated>2014-12-13T20:52:09-05:00</updated>
+    <updated>2014-12-13T19:52:09-06:00</updated>
     <id>https://blog.zimmerman.io/2014/12/13/the-joys-of-the-craft</id>
     <content type="html"><![CDATA[<p>A while ago, I was given the book <em>The Mythical Man-Month</em>, by Frederick P. Brooks, Jr. I finally have some time to sit down and read it, and I&rsquo;m loving it. In the first chapter, this quote on &ldquo;the joys of the craft&rdquo; (i.e., programming) struck me as particularly on point:</p>
 
@@ -1458,7 +1641,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Using Multiple Git Remotes]]></title>
     <link href="https://blog.zimmerman.io/2014/11/01/using-more-than-one-git-remote/"/>
-    <updated>2014-11-01T18:12:35-04:00</updated>
+    <updated>2014-11-01T17:12:35-05:00</updated>
     <id>https://blog.zimmerman.io/2014/11/01/using-more-than-one-git-remote</id>
     <content type="html"><![CDATA[<p>Quite often when using git, you only need to use one remote: <code>origin</code>. All your pushes and pulls communicate with this one host. However, there are many occasions when using multiple Git remotes is incredibly handy.</p>
 
@@ -1602,7 +1785,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Using Google OAuth2 for CMU Authentication]]></title>
     <link href="https://blog.zimmerman.io/2014/10/20/using-google-apps-for-cmu-authentication/"/>
-    <updated>2014-10-20T06:11:37-04:00</updated>
+    <updated>2014-10-20T05:11:37-05:00</updated>
     <id>https://blog.zimmerman.io/2014/10/20/using-google-apps-for-cmu-authentication</id>
     <content type="html"><![CDATA[<p>Using <code>python-social-auth</code> and Django, I&rsquo;ve found a very straightfoward way of adding authentication to apps designed for CMU students. Given that all Andrew accounts are now Google Apps @ CMU accounts, we can take advantage of the widely used Google OAuth2 libraries to authenticate users, but just restrict sign-ins to the <code>andrew.cmu.edu</code> &ldquo;hosted domain.&rdquo;</p>
 
@@ -1714,7 +1897,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Offline LaTeX Development]]></title>
     <link href="https://blog.zimmerman.io/2014/10/06/offline-latex-development/"/>
-    <updated>2014-10-06T18:00:00-04:00</updated>
+    <updated>2014-10-06T17:00:00-05:00</updated>
     <id>https://blog.zimmerman.io/2014/10/06/offline-latex-development</id>
     <content type="html"><![CDATA[<p>While online clients like ShareLaTeX or writeLaTeX are popular for getting started with LaTeX quickly, developing LaTeX locally with Vim and the command line is my preferred LaTeX workflow. In this post, I&rsquo;ll describe the changes I&rsquo;ve made that make working with LaTeX on the command line a seamless experience.</p>
 
@@ -1887,7 +2070,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Solarized LaTeX Listings]]></title>
     <link href="https://blog.zimmerman.io/2014/10/04/solarized-latex-listings/"/>
-    <updated>2014-10-04T06:35:05-04:00</updated>
+    <updated>2014-10-04T05:35:05-05:00</updated>
     <id>https://blog.zimmerman.io/2014/10/04/solarized-latex-listings</id>
     <content type="html"><![CDATA[<p>Out of the box, LaTeX listings are pretty bad. With a bit of work, you can ascribe some colors to the code, but you&rsquo;re still stuck with choosing a theme. Given that I recently just switched to the Solarized colorscheme in Vim and iTerm2, I made a LaTeX package that styles code listings with the predefined Solarized light colors.</p>
 
@@ -1921,7 +2104,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[A LaTeX Homework Template]]></title>
     <link href="https://blog.zimmerman.io/2014/10/04/a-latex-homework-template/"/>
-    <updated>2014-10-04T02:03:27-04:00</updated>
+    <updated>2014-10-04T01:03:27-05:00</updated>
     <id>https://blog.zimmerman.io/2014/10/04/a-latex-homework-template</id>
     <content type="html"><![CDATA[<p>Writing a LaTeX document from scratch for every assignment is tedious. Especially for homework assignments, a lot of the structure is repetitive. Read on to learn about the homework template I&rsquo;ve adapted for use in all my technical classes.</p>
 
@@ -2030,7 +2213,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Setting Up MobaXterm for SSH on Windows]]></title>
     <link href="https://blog.zimmerman.io/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/"/>
-    <updated>2014-09-28T14:11:05-04:00</updated>
+    <updated>2014-09-28T13:11:05-05:00</updated>
     <id>https://blog.zimmerman.io/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows</id>
     <content type="html"><![CDATA[<p>For an optimal SSH experience, your best best is to use Linux or Mac OS X. However, if you&rsquo;re dead-set on using Windows, MobaXterm has the best overall experience. This post guides you through setting it up and outlines some of its coolest features.</p>
 
@@ -2119,7 +2302,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 5: It's Not You, It's Me]]></title>
     <link href="https://blog.zimmerman.io/2014/07/10/running-a-vps-log-5/"/>
-    <updated>2014-07-10T16:48:43-04:00</updated>
+    <updated>2014-07-10T15:48:43-05:00</updated>
     <id>https://blog.zimmerman.io/2014/07/10/running-a-vps-log-5</id>
     <content type="html"><![CDATA[<p>It is with great sadness that I announce today that I am breaking up with my mail server. At least for a little while, that is. Let&rsquo;s say we&rsquo;re &ldquo;taking a break&rdquo; to &ldquo;see other people.&rdquo;</p>
 
@@ -2180,7 +2363,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 4: Debugging a Broken Mail Server]]></title>
     <link href="https://blog.zimmerman.io/2014/07/07/running-a-vps-log-4/"/>
-    <updated>2014-07-07T01:08:00-04:00</updated>
+    <updated>2014-07-07T00:08:00-05:00</updated>
     <id>https://blog.zimmerman.io/2014/07/07/running-a-vps-log-4</id>
     <content type="html"><![CDATA[<p>Whereas the tutorial I&rsquo;m following to setup this mail server initially promised a working setup in more or less two hours, it&rsquo;s nearing two weeks for me and I&rsquo;ve still got plenty of issues. In this log, I&rsquo;ll discuss some of the tools, log files, and online resources which I&rsquo;ve found helpful, as well as give a description of my problem as I best understand it.</p>
 
@@ -2397,7 +2580,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 3: A Mail Server That Works... Kind Of.]]></title>
     <link href="https://blog.zimmerman.io/2014/07/04/running-a-vps-log-3/"/>
-    <updated>2014-07-04T14:11:14-04:00</updated>
+    <updated>2014-07-04T13:11:14-05:00</updated>
     <id>https://blog.zimmerman.io/2014/07/04/running-a-vps-log-3</id>
     <content type="html"><![CDATA[<p>After some initial troubles, I finally managed to get basic send and receive functionality  working on my mail server, using EncFS, Dovecot, and Postfix. That being said, it&rsquo;s <em>far</em> from a perfect system, and it needs a good deal more TLC to get it working at a level that&rsquo;s on par with a more &ldquo;professional&rdquo; email service provider. This post details some fixes that I&rsquo;ve implemented so far, as well as the functionality that I&rsquo;ve managed to get working.</p>
 
@@ -2480,52 +2663,6 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 <p>With SSL authentication turned off, I was able to get Mail.app to send and receive emails. Additionally, I could do the same using the third-party Android client myMail. For whatever reason, the default Android client wouldn&rsquo;t even accept my IMAP login, whereas myMail was smart enough to log me after only asking for my email and password.</p>
 
 <p>Ideally, I&rsquo;d like to have a setup where my password isn&rsquo;t being sent in a format anyone can read. To debug some of these close-to-the-system settings, there are a bunch of <a href="https://blog.zimmerman.io/2014/07/05/running-a-vps-log-4">command line tools</a> which help to inspect exactly what&rsquo;s going wrong with the system.</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://www.zimmerman.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Running a VPS, Log 2: Seriously, Back It Up]]></title>
-    <link href="https://blog.zimmerman.io/2014/06/24/running-a-vps-log-2/"/>
-    <updated>2014-06-24T23:11:14-04:00</updated>
-    <id>https://blog.zimmerman.io/2014/06/24/running-a-vps-log-2</id>
-    <content type="html"><![CDATA[<p>I don&rsquo;t have the best track record with configuring servers. I&rsquo;ve certainly brought down a ScottyLabs server or two before, but sometimes there&rsquo;s no avoiding that in the sake of learning. At times like these, you&rsquo;ve just gotta reboot and try again. With DigitalOcean&rsquo;s auto-backups though, this process is incredibly easy.</p>
-
-<!-- more -->
-
-
-<h2>EncFS Troubles</h2>
-
-<p>As part of my eventual goal of hosting my own mail, I tried following <a href="//sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">this post</a> to set up a mail server on my VPS. Unfortunately, I never even made it out the gates. The first step is to install and set up EncFS for letting you mount encrypted filesystems, which the tutorial was planning on using to store email securely. Unfortunately, after following the steps listed to a T, my poor VPS whined and complained about being misconfigured.</p>
-
-<p><strong>Edit</strong>: After doing a little more research, I found that the root of my issue wasn&rsquo;t something I had been doing. Apparently, you have to <a href="https://www.digitalocean.com/community/tutorials/how-to-update-a-digitalocean-server-s-kernel-using-the-control-panel">manually update the kernel</a> through the DigitalOcean web console. You can read more about it on this <a href="https://github.com/al3x/sovereign/issues/147#issuecomment-43849647">GitHub issue</a>.</p>
-
-<p>Regardless, my first attempt to do something cool on this new VPS was a dud. All I had to show for it was a muddled, no-longer-pristine VPS with some packages and libraries that simply didn&rsquo;t work. If I were to continue with the tutorial by skipping this step, I would have never known whether the cause of any future issue was something misconfigured at this step.</p>
-
-<h2>The Day is Saved</h2>
-
-<p>But then I remembered: DigitalOcean is automatically backing up my droplet! After logging into the web interface, all I had to do was click a button and my whole system was reset to the way it looked 24 hours prior. It was <em>actually that easy</em>.</p>
-
-<p>Thus, for anyone getting started with a new server, whether it be on DigitalOcean or any other service (even a box you have running in your room), I cannot stress enough the value of automatic&ndash;or at least regular&ndash;backups. Not only is this a good idea to preserve data in the event of an outage, but it lends a seemingly unbounded ability to mess around and tinker.</p>
-
-<p>What this means is that you get all the fun of learning cool, new Linux-y things, but without ever having to worry about whether you&rsquo;ll break the whole system. Sure, this mindset isn&rsquo;t necessarily the best to adopt for a production machine, but for my circumstances, all I want is free reign to experiment and break things to my heart&rsquo;s content.</p>
-
-<h2>Back to Square One</h2>
-
-<p>With my first attempt at installing a mail server foiled, I think for my next attempt I&rsquo;ll try a different path. Instead of installing and configuring everything more or less manually (I really wanted to do this for the experience of it all, learning the nitty-gritty of how it works), this time around I think I&rsquo;m going to give <a href="https://github.com/al3x/sovereign">sovereign</a> a try. I&rsquo;ve heard good things, and it is in fact based on the original tutorial I had found, so it&rsquo;s looking pretty promising as of yet.</p>
-
-<p>Whatever happens though, I&rsquo;m feeling pretty good about the fact that I can turn things around with a single click.</p>
 
 <hr />
 
