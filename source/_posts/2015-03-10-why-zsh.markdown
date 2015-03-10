@@ -1,0 +1,103 @@
+---
+layout: post
+title: "Why zsh?"
+date: 2015-03-10 11:58:37 -0500
+comments: true
+categories: [zsh]
+description: >
+  A short list of reasons why I switched to zsh from bash.
+image:
+  feature: /images/glowing-lines.png
+share: true
+---
+
+People often ask me for a list of reasons for why I switched to zsh. Back when I
+had first switched, I was hesitant to answer, because I was really still finding
+my way around. Now that I've been using it longer, I've managed to narrow it
+down to a few things zsh does that I like better.
+
+<!-- more -->
+
+## Syntax Highlighting
+
+In zsh, there's a [plugin that syntax highlights][zsh-syntax-highlighting] the
+current command line as you type. It's incredibly useful to receive instant
+feedback about whether command you're typing is valid. It's just the same as if
+you were writing a line of code in your favorite editor.
+
+{% img /images/zsh-syntax-highlighting.png %}
+
+The screenshot above features some of the things it highlights by default:
+
+- commands that exist (also aliases, functions, etc.) are changed to green
+- those that don't are changed to red
+- text corresponding to files and folders that exist are underlined
+- text that looks like a file was misspelled is changed to yellow
+- text that doesn't correspond to the name of a file nor that looks like a
+  misspelling for an existing file is left unchanged
+
+It also highlights strings, globs, and environment variables (if they're typed
+within strings).
+
+There's probably no technical limitation for why this couldn't be done in bash, but
+as of yet no one has done it.
+
+## Better Tab Completion
+
+In zsh, when you tab complete, the matches are listed below the current line,
+whereas in bash they're listed above it. For an example, check out the
+screenshot. I perform the same keystrokes in bash and zsh:
+
+```bash
+$ cd D<TAB>
+```
+
+{% img /images/zsh-tab-completion.png %}
+
+In bash, pressing TAB prints out the completions followed by a new line. In zsh,
+they're simple listed conveniently below the current line. If I continued to
+complete many things in that line or ran the command, zsh would overwrite the
+old completions, but bash would keep on printing additional lines, taking up
+precious screen space.
+
+## Better Completion Support
+
+When I used bash, I managed to have pretty wide support for tab completion in
+programs. I'm talking much more than just completing filenames. As such, I was
+pretty skeptical that there'd be much more that zsh could offer.
+
+While zsh's edge wasn't immediately apparent in this aspect, I'd like to declare
+it a winner now. I had to fight pretty hard to get my bash completions where
+they were. By comparison, zsh comes with so many more completions built in, and
+if you decide to use oh-my-zsh (a collection of zsh plugins) on top of zsh,
+adding new functionality is one line away.
+
+I now have things like environment variable completion, tmux completion, deep
+git command completion, and much more.
+
+
+## Great, how do I start?
+
+The first step is to change your shell to zsh: `chsh -s $(which zsh)`. Once
+you've done that, you'll need a `.zshrc` and `.zshenv`. If you're looking for a
+reference, you can see my [`misc.zsh`][misc] file in my [dotfiles][dotfiles]
+repo on GitHub, a file which eventually gets sourced in my [`.zshrc`][zshrc]. It
+contains most of everything that you need to get started using zsh on OS X. Keep
+in mind that it's somewhat opinionated (it heavily favors vim keybindings and
+uses oh-my-zsh among other things). You might also want to check out my
+[Noteworthy Dotfile Hacks][dotfile-hacks] post, where I talked about what I
+think are the most notable features I have in my dotfiles.
+
+
+[zsh-syntax-highlighting]: https://github.com/zsh-users/zsh-syntax-highlighting
+
+[misc]: https://github.com/jez/dotfiles/blob/master/util/misc.zsh
+[dotfiles]: https://github.com/jez/dotfiles
+[zshrc]: https://github.com/jez/dotfiles/blob/master/zshrc
+
+[dotfile-hacks]: /2015/03/10/noteworthy-dotfile-hacks/
+
+
+{% include jake-on-the-web.markdown %}
+
+
