@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Summer Projects | Bits, Bytes, and Words]]></title>
-  <link href="https://blog.zimmerman.io/categories/summer-projects/atom.xml" rel="self"/>
-  <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-03-10T13:46:54-05:00</updated>
-  <id>https://blog.zimmerman.io/</id>
+  <link href="https://blog.jez.io/categories/summer-projects/atom.xml" rel="self"/>
+  <link href="https://blog.jez.io/"/>
+  <updated>2015-03-14T01:29:55-05:00</updated>
+  <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
     <email><![CDATA[jake@zimmerman.io]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 5: It's Not You, It's Me]]></title>
-    <link href="https://blog.zimmerman.io/2014/07/10/running-a-vps-log-5/"/>
+    <link href="https://blog.jez.io/2014/07/10/running-a-vps-log-5/"/>
     <updated>2014-07-10T15:48:43-05:00</updated>
-    <id>https://blog.zimmerman.io/2014/07/10/running-a-vps-log-5</id>
+    <id>https://blog.jez.io/2014/07/10/running-a-vps-log-5</id>
     <content type="html"><![CDATA[<p>It is with great sadness that I announce today that I am breaking up with my mail server. At least for a little while, that is. Let&rsquo;s say we&rsquo;re &ldquo;taking a break&rdquo; to &ldquo;see other people.&rdquo;</p>
 
 <!-- more -->
@@ -69,16 +69,16 @@ If you cared enough to read that far, you should consider following me on
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
  [g]: https://www.github.com/jez/
- [h]: https://www.zimmerman.io/
+ [h]: https://jez.io/
 </p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 4: Debugging a Broken Mail Server]]></title>
-    <link href="https://blog.zimmerman.io/2014/07/07/running-a-vps-log-4/"/>
+    <link href="https://blog.jez.io/2014/07/07/running-a-vps-log-4/"/>
     <updated>2014-07-07T00:08:00-05:00</updated>
-    <id>https://blog.zimmerman.io/2014/07/07/running-a-vps-log-4</id>
+    <id>https://blog.jez.io/2014/07/07/running-a-vps-log-4</id>
     <content type="html"><![CDATA[<p>Whereas the tutorial I&rsquo;m following to setup this mail server initially promised a working setup in more or less two hours, it&rsquo;s nearing two weeks for me and I&rsquo;ve still got plenty of issues. In this log, I&rsquo;ll discuss some of the tools, log files, and online resources which I&rsquo;ve found helpful, as well as give a description of my problem as I best understand it.</p>
 
 <!-- more -->
@@ -272,7 +272,9 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <p>Every error message that I got said the same thing: connection refused. But it only said connection refused on ports 465 and 587, ports that are expecting to receive communication over an encrypted channel. This means one of two things: my firewall is blocking the connection, which I&rsquo;ve already ruled out, or some other middle-man is kicking me out before we even get to Postfix, where something would show up in the logs.</p>
 
-<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.
+<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.</p>
+
+<p><strong>UPDATE</strong>: After I wrote this post, I switched to the domain jez.io for all of my static site hosting. The links above should continue to work for a while, but at some point they might die.
 <br></p>
 
 <p><a class="image-link" href="/images/mail-dns-1.png"><img src="/images/mail-dns-1.png"></a></p>
@@ -291,16 +293,16 @@ If you cared enough to read that far, you should consider following me on
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
  [g]: https://www.github.com/jez/
- [h]: https://www.zimmerman.io/
+ [h]: https://jez.io/
 </p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 3: A Mail Server That Works... Kind Of.]]></title>
-    <link href="https://blog.zimmerman.io/2014/07/04/running-a-vps-log-3/"/>
+    <link href="https://blog.jez.io/2014/07/04/running-a-vps-log-3/"/>
     <updated>2014-07-04T13:11:14-05:00</updated>
-    <id>https://blog.zimmerman.io/2014/07/04/running-a-vps-log-3</id>
+    <id>https://blog.jez.io/2014/07/04/running-a-vps-log-3</id>
     <content type="html"><![CDATA[<p>After some initial troubles, I finally managed to get basic send and receive functionality  working on my mail server, using EncFS, Dovecot, and Postfix. That being said, it&rsquo;s <em>far</em> from a perfect system, and it needs a good deal more TLC to get it working at a level that&rsquo;s on par with a more &ldquo;professional&rdquo; email service provider. This post details some fixes that I&rsquo;ve implemented so far, as well as the functionality that I&rsquo;ve managed to get working.</p>
 
 <!-- more -->
@@ -386,16 +388,16 @@ If you cared enough to read that far, you should consider following me on
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
  [g]: https://www.github.com/jez/
- [h]: https://www.zimmerman.io/
+ [h]: https://jez.io/
 </p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 2: Seriously, Back It Up]]></title>
-    <link href="https://blog.zimmerman.io/2014/06/24/running-a-vps-log-2/"/>
+    <link href="https://blog.jez.io/2014/06/24/running-a-vps-log-2/"/>
     <updated>2014-06-24T22:11:14-05:00</updated>
-    <id>https://blog.zimmerman.io/2014/06/24/running-a-vps-log-2</id>
+    <id>https://blog.jez.io/2014/06/24/running-a-vps-log-2</id>
     <content type="html"><![CDATA[<p>I don&rsquo;t have the best track record with configuring servers. I&rsquo;ve certainly brought down a ScottyLabs server or two before, but sometimes there&rsquo;s no avoiding that in the sake of learning. At times like these, you&rsquo;ve just gotta reboot and try again. With DigitalOcean&rsquo;s auto-backups though, this process is incredibly easy.</p>
 
 <!-- more -->
@@ -432,16 +434,16 @@ If you cared enough to read that far, you should consider following me on
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
  [g]: https://www.github.com/jez/
- [h]: https://www.zimmerman.io/
+ [h]: https://jez.io/
 </p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 1: Managing Dotfiles Across Machines]]></title>
-    <link href="https://blog.zimmerman.io/2014/06/19/running-a-vps-log-1/"/>
+    <link href="https://blog.jez.io/2014/06/19/running-a-vps-log-1/"/>
     <updated>2014-06-19T22:10:51-05:00</updated>
-    <id>https://blog.zimmerman.io/2014/06/19/running-a-vps-log-1</id>
+    <id>https://blog.jez.io/2014/06/19/running-a-vps-log-1</id>
     <content type="html"><![CDATA[<p>You could say I&rsquo;m a bit of a geek when it comes to configuring my terminal environment; this obsession has led me to concoct ever-elaborate setup scripts and configuration files. On top of this, between my laptop&rsquo;s multiple boot environments, the servers I use for school, work, and ScottyLabs, and now <a href="/2014/06/19/running-a-vps-log-0">metagross</a>, keeping my configuration files in sync is a must. I handle it swiftly using a combination of git and rcm.</p>
 
 <!-- more -->
@@ -517,7 +519,7 @@ If you cared enough to read that far, you should consider following me on
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
  [g]: https://www.github.com/jez/
- [h]: https://www.zimmerman.io/
+ [h]: https://jez.io/
 </p>
 ]]></content>
   </entry>

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Troubleshooting | Bits, Bytes, and Words]]></title>
-  <link href="https://blog.zimmerman.io/categories/troubleshooting/atom.xml" rel="self"/>
-  <link href="https://blog.zimmerman.io/"/>
-  <updated>2015-03-10T13:46:54-05:00</updated>
-  <id>https://blog.zimmerman.io/</id>
+  <link href="https://blog.jez.io/categories/troubleshooting/atom.xml" rel="self"/>
+  <link href="https://blog.jez.io/"/>
+  <updated>2015-03-14T01:29:55-05:00</updated>
+  <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
     <email><![CDATA[jake@zimmerman.io]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 4: Debugging a Broken Mail Server]]></title>
-    <link href="https://blog.zimmerman.io/2014/07/07/running-a-vps-log-4/"/>
+    <link href="https://blog.jez.io/2014/07/07/running-a-vps-log-4/"/>
     <updated>2014-07-07T00:08:00-05:00</updated>
-    <id>https://blog.zimmerman.io/2014/07/07/running-a-vps-log-4</id>
+    <id>https://blog.jez.io/2014/07/07/running-a-vps-log-4</id>
     <content type="html"><![CDATA[<p>Whereas the tutorial I&rsquo;m following to setup this mail server initially promised a working setup in more or less two hours, it&rsquo;s nearing two weeks for me and I&rsquo;ve still got plenty of issues. In this log, I&rsquo;ll discuss some of the tools, log files, and online resources which I&rsquo;ve found helpful, as well as give a description of my problem as I best understand it.</p>
 
 <!-- more -->
@@ -211,7 +211,9 @@
 
 <p>Every error message that I got said the same thing: connection refused. But it only said connection refused on ports 465 and 587, ports that are expecting to receive communication over an encrypted channel. This means one of two things: my firewall is blocking the connection, which I&rsquo;ve already ruled out, or some other middle-man is kicking me out before we even get to Postfix, where something would show up in the logs.</p>
 
-<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.
+<p>I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my <code>@</code> domain pointing to the IP address for GitHub pages, because <a href="http://zimmerman.io">zimmerman.io</a> is where I am hosting my personal site. However, I have a CNAME redirect which points <code>mail.zimmerman.io</code> to <code>metagross.zimmerman.io</code>, which is an A record linking to my droplet&rsquo;s IP address. I also have an MX record set up on the <code>@</code> domain, so that all mail directed to &ldquo;@zimmerman.io&rdquo; is sent to <code>mail.zimmerman.io</code>.</p>
+
+<p><strong>UPDATE</strong>: After I wrote this post, I switched to the domain jez.io for all of my static site hosting. The links above should continue to work for a while, but at some point they might die.
 <br></p>
 
 <p><a class="image-link" href="/images/mail-dns-1.png"><img src="/images/mail-dns-1.png"></a></p>
@@ -230,28 +232,33 @@ If you cared enough to read that far, you should consider following me on
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
  [g]: https://www.github.com/jez/
- [h]: https://www.zimmerman.io/
+ [h]: https://jez.io/
 </p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[GitHub Pages Custom Domains]]></title>
-    <link href="https://blog.zimmerman.io/2014/05/06/github-pages-custom-domains/"/>
+    <link href="https://blog.jez.io/2014/05/06/github-pages-custom-domains/"/>
     <updated>2014-05-06T02:15:35-05:00</updated>
-    <id>https://blog.zimmerman.io/2014/05/06/github-pages-custom-domains</id>
+    <id>https://blog.jez.io/2014/05/06/github-pages-custom-domains</id>
     <content type="html"><![CDATA[<p>I stumbled at first getting the DNS configured for my blog, because I&rsquo;ve got a slighty more complicated setup than normal. I decided to supplement the documentation <a href="https://pages.github.com/">GitHub Pages</a> gives by recounting my personal example and the setup that worked.</p>
 
 <!-- more -->
+
+
+<p><strong>UPDATE</strong>: Since writing this post, I&rsquo;ve switched to the domain jez.io for all of my static site hosting. The circumstances of what I wanted to accomplish and the corresponding instructions are still accurate, but you can no longer visit the links referenced in the post for some context of the setup for what you&rsquo;re reading. As such, all links have been updated to point to the place where the resources now reside.</p>
+
+<hr>
 
 
 <p>If you&rsquo;ve never heard of <a href="https://pages.github.com/">GitHub Pages</a> for web hosting, you should definitely check it out. You basically get free hosting for any static (i.e. plain HTML or <a href="http://jekyllrb.com/">Jekyll</a>-served) website with git-push-to-deploy. You can even configure your site to be listed at a custom domain according to <a href="https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages">these</a> instructions, which are pretty thorough. I feel like it&rsquo;d help, though, to supplement this documentation with a fairly common example setup.</p>
 
 <h2>My setup</h2>
 
-<p>I have two sites which I want to host using the <code>zimmerman.io</code> domain name: my <a href="//blog.zimmerman.io">blog</a> and my <a href="//www.zimmerman.io">personal site</a>. I host my personal site at <a href="//www.zimmerman.io">www.zimmerman.io</a>, but you can also navigate to <a href="//zimmerman.io">zimmerman.io</a> and end up in the same places as before. It&rsquo;s served as a User Page from <a href="https://www.github.com/jez/jez.github.io">this repo</a>.</p>
+<p>I have two sites which I want to host using the <code>zimmerman.io</code> domain name: my <a href="//blog.jez.io">blog</a> and my <a href="//zimmerman.io">personal site</a>. I host my personal site at <a href="//zimmerman.io">www.zimmerman.io</a>, but you can also navigate to <a href="//jez.io">zimmerman.io</a> and end up in the same places as before. It&rsquo;s served as a User Page from <a href="https://www.github.com/jez/jez.github.io">this repo</a>.</p>
 
-<p>I host my blog at <a href="//blog.zimmerman.io">blog.zimmerman.io</a>, and it&rsquo;s served as a Project Page in <a href="https://www.github.com/jez/blog/">this repo</a>.</p>
+<p>I host my blog at <a href="//blog.jez.io">blog.zimmerman.io</a>, and it&rsquo;s served as a Project Page in <a href="https://www.github.com/jez/blog/">this repo</a>.</p>
 
 <h2>What the instructions say</h2>
 
@@ -315,7 +322,7 @@ If you cared enough to read that far, you should consider following me on
 my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.
  [g]: https://www.github.com/jez/
- [h]: https://www.zimmerman.io/
+ [h]: https://jez.io/
 </p>
 ]]></content>
   </entry>
