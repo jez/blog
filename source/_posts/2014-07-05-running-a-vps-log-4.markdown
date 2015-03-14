@@ -122,6 +122,8 @@ It could be an issue with my certificates. Because I'm cheap and didn't want to 
 Every error message that I got said the same thing: connection refused. But it only said connection refused on ports 465 and 587, ports that are expecting to receive communication over an encrypted channel. This means one of two things: my firewall is blocking the connection, which I've already ruled out, or some other middle-man is kicking me out before we even get to Postfix, where something would show up in the logs.
 
 I have a feeling that this could have something to do with the way my DNS is configured. As it stands, I have an A record on my `@` domain pointing to the IP address for GitHub pages, because [zimmerman.io](http://zimmerman.io) is where I am hosting my personal site. However, I have a CNAME redirect which points `mail.zimmerman.io` to `metagross.zimmerman.io`, which is an A record linking to my droplet's IP address. I also have an MX record set up on the `@` domain, so that all mail directed to "@zimmerman.io" is sent to `mail.zimmerman.io`.
+
+__UPDATE__: After I wrote this post, I switched to the domain jez.io for all of my static site hosting. The links above should continue to work for a while, but at some point they might die.
 <br>
 
 {% img /images/mail-dns-1.png %}

@@ -12,12 +12,16 @@ I stumbled at first getting the DNS configured for my blog, because I've got a s
 
 <!-- more -->
 
+__UPDATE__: Since writing this post, I've switched to the domain jez.io for all of my static site hosting. The circumstances of what I wanted to accomplish and the corresponding instructions are still accurate, but you can no longer visit the links referenced in the post for some context of the setup for what you're reading. As such, all links have been updated to point to the place where the resources now reside.
+
+<hr>
+
 If you've never heard of [GitHub Pages](https://pages.github.com/) for web hosting, you should definitely check it out. You basically get free hosting for any static (i.e. plain HTML or [Jekyll](http://jekyllrb.com/)-served) website with git-push-to-deploy. You can even configure your site to be listed at a custom domain according to [these](https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages) instructions, which are pretty thorough. I feel like it'd help, though, to supplement this documentation with a fairly common example setup.
 
 ## My setup
-I have two sites which I want to host using the `zimmerman.io` domain name: my [blog](//blog.zimmerman.io) and my [personal site](//www.zimmerman.io). I host my personal site at [www.zimmerman.io](//www.zimmerman.io), but you can also navigate to [zimmerman.io](//zimmerman.io) and end up in the same places as before. It's served as a User Page from [this repo](https://www.github.com/jez/jez.github.io).
+I have two sites which I want to host using the `zimmerman.io` domain name: my [blog](//blog.jez.io) and my [personal site](//zimmerman.io). I host my personal site at [www.zimmerman.io](//zimmerman.io), but you can also navigate to [zimmerman.io](//jez.io) and end up in the same places as before. It's served as a User Page from [this repo](https://www.github.com/jez/jez.github.io).
 
-I host my blog at [blog.zimmerman.io](//blog.zimmerman.io), and it's served as a Project Page in [this repo](https://www.github.com/jez/blog/).
+I host my blog at [blog.zimmerman.io](//blog.jez.io), and it's served as a Project Page in [this repo](https://www.github.com/jez/blog/).
 
 ## What the instructions say
 The instructions say a few things very clearly (yay, documentation!).
