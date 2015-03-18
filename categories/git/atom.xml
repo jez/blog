@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Git | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/git/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2015-03-18T03:20:01-04:00</updated>
+  <updated>2015-03-18T03:25:03-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -435,8 +435,10 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <pre><code class="bash Initialize the Bare Repo"># (unix.andrew.cmu.edu)
 #
-# change into a new, private directory so that no one can read my homework
+# `git clone --bare` is basically GitHub's "Fork" feature,
+# if you're familiar with that
 $ git clone --bare ~/private/gitrepos/15150
+# make sure you clone this into your private folder!
 </code></pre>
 
 <p>This creates a bare repo initialized with all the 15-150 content which I can clone in two different ways: one for if I&rsquo;m on Andrew, one if I&rsquo;m on my laptop.</p>
