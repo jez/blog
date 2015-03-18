@@ -50,6 +50,8 @@ This creates a bare repo initialized with all the 15-150 content which I can clo
 # Clone over Unix file path to new folder ~/private/15150
 $ git clone ~/private/gitrepos/15150 ~/private/15150
 
+# -- and/or --
+
 # (my laptop)
 #
 # Clone over ssh (using ssh alias, i.e., if you use `ssh andrew`)
@@ -76,6 +78,8 @@ The one thing missing from our picture is the original handout repo. How will we
 # call this remote "handout" if that would be easier to keep straight
 $ cd ~/private/15150
 $ git remote add upstream /afs/andrew/course/15/150/handout
+
+# -- and/or --
 
 # (my laptop)
 #
