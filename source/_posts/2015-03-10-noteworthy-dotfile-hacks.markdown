@@ -107,7 +107,7 @@ in yellow, highlights built-ins like `if` and `for` in orange, etc.
 I wrote a pretty robust script that reminds me to update my dotfiles and my
 system regularly. All it does is remind me to check for system updates once
 every 24 hours, but it works so well that I had updated my system `bash` version
-before I even read about Heartbleed!
+before I even read about Shell Shock!
 
 The relevant links are [here][auto-update] for the core script that I [source in
 my zshrc][update-zsh], and then the following host specific links:
