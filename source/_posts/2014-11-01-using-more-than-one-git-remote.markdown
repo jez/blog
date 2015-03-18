@@ -18,7 +18,7 @@ Quite often when using git, you only need to use one remote: `origin`. All your 
 
 ## Quick Overview: Remotes
 
-If you haven't already, I strongly recommend that you check out these two Git resources:
+If you haven't already, I strongly recommend that you check out these two Git resources in your free time:
 
 - [__Learn Git Branching__][learnGitBranching], an interactive walkthrough of some powerful Git features
 - [__A Hacker's Guide to Git__][hacker], an explanation of Git by "taking a peek under the hood"
@@ -36,13 +36,13 @@ To achieve this setup, the first thing we'll do is set up the bare repo. The bes
 ```bash Initialize the Bare Repo
 # (unix.andrew.cmu.edu)
 #
-# change into a new, private directory so that no one can read my homework
-$ mkdir -p ~/private/gitrepos/15150
-$ cd ~/private/gitrepos/15150
-$ git init --bare
+# `git clone --bare` is basically GitHub's "Fork" feature,
+# if you're familiar with that
+$ git clone --bare ~/private/gitrepos/15150
+# make sure you clone this into your private folder!
 ```
 
-This creates a bare repo which I can clone in two different ways: one for if I'm on Andrew, one if I'm on my laptop.
+This creates a bare repo initialized with all the 15-150 content which I can clone in two different ways: one for if I'm on Andrew, one if I'm on my laptop.
 
 ```bash Clone New Remote
 # (unix.andrew.cmu.edu)
@@ -60,13 +60,13 @@ $ git clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150
 $ git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150
 ```
 
-After I run these commands, I'll get a command that warns me that I've just cloned an empty repo, which we have. To throw in a few graphics, our setup looks like this right now:
+To throw in a few graphics, our setup looks like this right now:
 
 {% img /images/multiple-remotes-1.svg %}
 
 I'm representing bare repos as clouds and clones of those repos as squares, with arrows representing whether code can flow from one place to the next. As you can see, to send code back and forth between Andrew and my laptop, I can just push in one place and pull in the other.
 
-Up until now though, we haven't even interacted with the 15-150 handout repo. The last piece involves setting this up.
+The one thing missing from our picture is the original handout repo. How will we get updates as the homeworks are released? The last piece involves setting this up.
 
 ```bash Add Handout Remote
 # Add the 15-150 handout remote so we can get starter code, etc.
