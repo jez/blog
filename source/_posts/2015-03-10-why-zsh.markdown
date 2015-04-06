@@ -11,10 +11,10 @@ image:
 share: true
 ---
 
-People often ask me for a list of reasons for why I switched to zsh. Back when I
-had first switched, I was hesitant to answer, because I was really still finding
-my way around. Now that I've been using it longer, I've managed to narrow it
-down to a few things zsh does that I like better.
+People often ask me why I switched to zsh. Back when I had first switched, I was
+hesitant to answer because I was still finding my way around. Now that I've been
+using it, I've managed to distill down a few things zsh does well that sets it
+apart as my shell of choice.
 
 <!-- more -->
 
@@ -22,12 +22,14 @@ down to a few things zsh does that I like better.
 
 In zsh, there's a [plugin that syntax highlights][zsh-syntax-highlighting] the
 current command line as you type. It's incredibly useful to receive instant
-feedback about whether command you're typing is valid. It's just the same as if
-you were writing a line of code in your favorite editor.
+feedback about whether a command you're typing is valid. Turns running commands
+at the command line into nearly the same experience as typing code into your
+favorite text editor.
 
 {% img /images/zsh-syntax-highlighting.png %}
 
-The screenshot above features some of the things it highlights by default:
+The screenshot above features some of the syntax elements it highlights by
+default:
 
 - commands that exist (also aliases, functions, etc.) are changed to green
 - those that don't are changed to red
@@ -44,7 +46,7 @@ as of yet no one has done it.
 
 ## Better Tab Completion
 
-In zsh, when you tab complete, the matches are listed below the current line,
+In zsh when you tab complete, the matches are listed below the current line,
 whereas in bash they're listed above it. For an example, check out the
 screenshot. I perform the same keystrokes in bash and zsh:
 
@@ -55,7 +57,7 @@ $ cd D<TAB>
 {% img /images/zsh-tab-completion.png %}
 
 In bash, pressing TAB prints out the completions followed by a new line. In zsh,
-they're simple listed conveniently below the current line. If I continued to
+they're simply listed conveniently below the current line. If I continued to
 complete many things in that line or ran the command, zsh would overwrite the
 old completions, but bash would keep on printing additional lines, taking up
 precious screen space.
