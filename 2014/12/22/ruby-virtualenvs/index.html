@@ -194,9 +194,9 @@ modification so that everything works again as you&rsquo;d expect when you
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>And then add this complementary section to your <code>postdeactivate</code> script:</p>
+<p>And then add this complementary section to your <code>predeactivate</code> script:</p>
 
-<figure class='code'><figcaption><span>$VIRTUAL_ENV/bin/postactivate</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>$VIRTUAL_ENV/bin/predeactivate</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -224,8 +224,8 @@ another project!</p>
 <p>Bringing up this web page, copying those snippets, and pasting them in the two
 necessary files every time is a bit tedious. To automate this process, we can
 tap into virtualenvwrapper&rsquo;s configurability using hooks. Instead of dropping
-those snippets into <code>$VIRTUAL_ENV/bin/post{,de}activate</code>, place them in
-<code>$VIRTUALENVWRAPPER_HOOK_DIR/post{,de}activate</code>.</p>
+those snippets into <code>$VIRTUAL_ENV/bin/{post,prede}activate,</code>, place them in
+<code>$VIRTUALENVWRAPPER_HOOK_DIR/{post,prede}activate</code>.</p>
 
 <p>Now every time you <code>workon</code> a virtualenv, the appropriate configuration will
 be set up. Note that this means every normal Python project you use will have

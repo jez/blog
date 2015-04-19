@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/python/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2015-04-06T04:15:26-04:00</updated>
+  <updated>2015-04-19T16:03:16-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -72,9 +72,9 @@ export OLD_PATH="$PATH"
 export PATH="$GEM_HOME/bin:$PATH"
 </code></pre>
 
-<p>And then add this complementary section to your <code>postdeactivate</code> script:</p>
+<p>And then add this complementary section to your <code>predeactivate</code> script:</p>
 
-<pre><code class="python $VIRTUAL_ENV/bin/postactivate">export GEM_HOME="$OLD_GEM_HOME"
+<pre><code class="python $VIRTUAL_ENV/bin/predeactivate">export GEM_HOME="$OLD_GEM_HOME"
 unset OLD_GEM_HOME
 
 export GEM_PATH="$OLD_GEM_PATH"
@@ -93,8 +93,8 @@ another project!</p>
 <p>Bringing up this web page, copying those snippets, and pasting them in the two
 necessary files every time is a bit tedious. To automate this process, we can
 tap into virtualenvwrapper&rsquo;s configurability using hooks. Instead of dropping
-those snippets into <code>$VIRTUAL_ENV/bin/post{,de}activate</code>, place them in
-<code>$VIRTUALENVWRAPPER_HOOK_DIR/post{,de}activate</code>.</p>
+those snippets into <code>$VIRTUAL_ENV/bin/{post,prede}activate,</code>, place them in
+<code>$VIRTUALENVWRAPPER_HOOK_DIR/{post,prede}activate</code>.</p>
 
 <p>Now every time you <code>workon</code> a virtualenv, the appropriate configuration will
 be set up. Note that this means every normal Python project you use will have
