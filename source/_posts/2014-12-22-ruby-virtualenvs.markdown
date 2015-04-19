@@ -68,9 +68,9 @@ export OLD_PATH="$PATH"
 export PATH="$GEM_HOME/bin:$PATH"
 ```
 
-And then add this complementary section to your `postdeactivate` script:
+And then add this complementary section to your `predeactivate` script:
 
-```python $VIRTUAL_ENV/bin/postactivate
+```python $VIRTUAL_ENV/bin/predeactivate
 export GEM_HOME="$OLD_GEM_HOME"
 unset OLD_GEM_HOME
 
@@ -90,8 +90,8 @@ another project!
 Bringing up this web page, copying those snippets, and pasting them in the two
 necessary files every time is a bit tedious. To automate this process, we can
 tap into virtualenvwrapper's configurability using hooks. Instead of dropping
-those snippets into `$VIRTUAL_ENV/bin/post{,de}activate`, place them in
-`$VIRTUALENVWRAPPER_HOOK_DIR/post{,de}activate`.
+those snippets into `$VIRTUAL_ENV/bin/{post,prede}activate,`, place them in
+`$VIRTUALENVWRAPPER_HOOK_DIR/{post,prede}activate`.
 
 Now every time you `workon` a virtualenv, the appropriate configuration will
 be set up. Note that this means every normal Python project you use will have
