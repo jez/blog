@@ -10,16 +10,16 @@
 <meta charset="utf-8">
 <meta http-equiv="cleartype" content="on">
 
-<title>Offline LaTeX Development - Part 2 - Bits, Bytes, and Words</title>
+<title>Show Where a Python Package Is Used - Bits, Bytes, and Words</title>
 <meta name="author" content="Jake Zimmerman">
 
 
 
 
-<meta name="description" content="LaTeX development with Vim and the command line, now featuring split-pane windows!
+<meta name="description" content="'I wrote a simple bash script that lists which Python packages use a given package.'
 ">
 
-<meta name="keywords" content="latex osx terminal vim ">
+<meta name="keywords" content="bash python ">
 
 
 <!-- http://t.co/dKP3o1e -->
@@ -31,10 +31,10 @@
 
   
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="/images/latex-amethyst.png"
+    <meta name="twitter:image" content="/images/abstract-8.jpg"
   
-  <meta name="twitter:title" content="Offline LaTeX Development - Part 2">
-  <meta name="twitter:description" content="LaTeX development with Vim and the command line, now featuring split-pane windows!
+  <meta name="twitter:title" content="Show where a Python package is used">
+  <meta name="twitter:description" content="'I wrote a simple bash script that lists which Python packages use a given package.'
 ">
   <meta name="twitter:creator" content="@Z1MM32M4N">
 
@@ -42,16 +42,16 @@
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/2015/01/10/offline-latex-development-part-2">
-<meta property="og:title" content="Offline LaTeX Development - Part 2">
-<meta property="og:description" content="LaTeX development with Vim and the command line, now featuring split-pane windows!
+<meta property="og:url" content="https://blog.jez.io/2015/06/12/show-where-a-python-package-is-used">
+<meta property="og:title" content="Show where a Python package is used">
+<meta property="og:description" content="'I wrote a simple bash script that lists which Python packages use a given package.'
 ">
 
-  <meta property="og:image" content="/images/latex-amethyst.png">
+  <meta property="og:image" content="/images/abstract-8.jpg">
 
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/2015/01/10/offline-latex-development-part-2">
+<link rel="canonical" href="https://blog.jez.io/2015/06/12/show-where-a-python-package-is-used">
 <link href="/favicon.png" rel="icon">
 <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
@@ -113,9 +113,9 @@
 
 
 <div class="entry-header">
-  
+  <div class="image-credit">Image source: <a href="http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/">dargadgetz</a></div><!-- /.image-credit -->
   <div class="entry-image">
-    <img src="/images/latex-amethyst.png" alt="Offline LaTeX Development - Part 2">
+    <img src="/images/abstract-8.jpg" alt="Show where a Python package is used">
   </div><!-- /.entry-image -->
 </div><!-- /.entry-header -->
 
@@ -125,47 +125,87 @@
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title"><a href="/2015/01/10/offline-latex-development-part-2/" rel="bookmark" title="Offline LaTeX Development - Part 2">Offline LaTeX Development - Part 2</a></h1>
+          <h1 class="entry-title"><a href="/2015/06/12/show-where-a-python-package-is-used/" rel="bookmark" title="Show where a Python package is used">Show where a Python package is used</a></h1>
         
-        <h2>January 10, 2015</h2>
+        <h2>June 12, 2015</h2>
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <p>I&rsquo;ve already written about how I develop LaTeX offline in Vim using GNU Make.
-Recently, though, I found a tool that implements another feature that GUI
-editors had to themselves: splitting panes.</p>
+      <p>A while back I was doing some spring cleaning of my Python packages. I noticed
+that there were a bunch of packages that I couldn&rsquo;t recall installing. I wanted
+to know if I could safely remove them, so I wrote a simple bash script to tell
+me called <code>pip-uses</code>.</p>
 
 <!-- more -->
 
 
-<h2><a href="/2014/10/06/offline-latex-development/">Offline LaTeX Development</a></h2>
+<h2>Source</h2>
 
-<p>If you missed it, check out my previous post here before reading on. There&rsquo;s a
-lot of handy stuff there!</p>
+<p>Rather than post the source here and let it get more out of date every time I
+change it, you can find the source <a href="https://github.com/jez/bin/blob/master/pip-uses">on GitHub</a>. It&rsquo;s in my <a href="https://github.com/jez/bin">bin
+repository</a>, where I keep my notable helper scripts; feel free to
+poke around.</p>
 
-<h2>Split Panes</h2>
+<h2>Motivations</h2>
 
-<p>Out of the box, tools like ShareLaTeX and TeXShop feature split pane editing:
-you can have your LaTeX on one half of the screen and the PDF on the other.
-Previously, I justified not having this feature with the reasoning that the
-<code>:WV</code> binding (something I explained <a href="/2014/10/06/offline-latex-development/">here</a>) immediately opened up the
-PDF and the windows switched.</p>
+<p>I was primarily influenced by Homebrew&rsquo;s <code>brew uses</code> command. It does a nice job
+of giving you exactly the information you want, and I think the way the command
+is named makes sense.</p>
 
-<p>However, I read about a tool called <a href="http://ianyh.com/amethyst/">Amethyst</a> on Hacker News the
-other day and immediately realized it&rsquo;s potential for improving my LaTeX setup.
-Amethyst is a tool that strives to be a tiling window manager like xmonad for OS
-X. At times it falls short of this goal, but for the most part it works really
-well. Just open up two apps, like MacVim and Preview, and it&rsquo;ll show them
-side-by-side with no added effort. There are also plenty of keybindings to
-manipulate the window arrangements.</p>
+<figure class='code'><figcaption><span>Homebrew: brew uses</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew uses --installed pango
+</span><span class='line'>imagemagick</span></code></pre></td></tr></table></div></figure>
 
-<p>Here&rsquo;s a screenshot of what the new setup looks like:</p>
 
-<p><a class="image-link" href="/images/latex-amethyst.png"><img src="/images/latex-amethyst.png"></a></p>
+<p><code>pip-uses</code> gives you basically the experience:</p>
 
-<p>After looking into it a little more, it looks like there are other OS X tools
-for spitting the screen into two panes, like <a href="http://www.bettertouchtool.net/">BetterTouchTool</a>, though I
-haven&rsquo;t actually tried any of them out.</p>
+<figure class='code'><figcaption><span>Pip: pip-uses</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ pip-uses stevedore
+</span><span class='line'>virtualenvwrapper</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this example, the Python package <code>virtualenvwrapper</code> uses <code>stevedore</code>, just
+as <code>imagemagick</code> uses <code>pango</code>. Both commands can save you from accidentally
+removing a crucial dependency and answer the burning question, &ldquo;How in the world
+did this thing get installed?&rdquo;</p>
+
+<h2>Wish List</h2>
+
+<p>I&rsquo;m not doing much Python development these days, but if I had some spare time
+I&rsquo;d love for the script to also have these features:</p>
+
+<ul>
+<li>Recursive enumeration of dependencies
+
+<ul>
+<li>It&rsquo;d be nice if <code>pip-uses</code> kept recursively searching until it found no more
+dependencies. This way, it&rsquo;d be easy to see if you could safely uninstall a
+whole slew of packages that you&rsquo;re no longer using.</li>
+</ul>
+</li>
+<li>Operate on more than one package
+
+<ul>
+<li>I didn&rsquo;t need it at the time, so I didn&rsquo;t implement it, but it&rsquo;d be nice if
+the command took a variable amount of arguments and ran the same logic on
+all supplied packages.</li>
+</ul>
+</li>
+<li>Integrate with <code>pip</code>
+
+<ul>
+<li>Programs like <code>brew</code> and <code>pip</code> allow developers to add &ldquo;external commands&rdquo;
+by adding commands to the <code>PATH</code> that look like <code>brew-xyz</code> or <code>git-xyz</code>. I
+couldn&rsquo;t find if there was a special way to add external commands to <code>pip</code>.</li>
+</ul>
+</li>
+</ul>
+
+
+<p>If you find this script useful and end up implementing one of these feature or
+more on top of <code>pip-uses</code>, be sure to send me a Pull Request!</p>
 
 <hr />
 
@@ -180,15 +220,15 @@ my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.</p>
 
       <footer class="entry-meta">
-        <span class="entry-tags"><a href="/categories/#latex" title="Pages tagged latex" class="tag">latex</a><a href="/categories/#osx" title="Pages tagged osx" class="tag">osx</a><a href="/categories/#terminal" title="Pages tagged terminal" class="tag">terminal</a><a href="/categories/#vim" title="Pages tagged vim" class="tag">vim</a></span>
-        <span><a href="/2015/01/10/offline-latex-development-part-2/" rel="bookmark" title="Offline LaTeX Development - Part 2">Offline LaTeX Development - Part 2</a> was published on <span class="entry-date date published updated"><time datetime="2015-01-10T17:00:00-05:00">January 10, 2015</time></span></span>
+        <span class="entry-tags"><a href="/categories/#bash" title="Pages tagged bash" class="tag">bash</a><a href="/categories/#python" title="Pages tagged python" class="tag">python</a></span>
+        <span><a href="/2015/06/12/show-where-a-python-package-is-used/" rel="bookmark" title="Show where a Python package is used">Show where a Python package is used</a> was published on <span class="entry-date date published updated"><time datetime="2015-06-12T02:36:05-04:00">June 12, 2015</time></span></span>
         
         <span class="author vcard"><span class="fn"><a href="https://jez.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
         <div class="social-share">
           <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2015/01/10/offline-latex-development-part-2/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2015/01/10/offline-latex-development-part-2/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url=/2015/01/10/offline-latex-development-part-2/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2015/06/12/show-where-a-python-package-is-used/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2015/06/12/show-where-a-python-package-is-used/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+            <li class="googleplus"><a href="https://plus.google.com/share?url=/2015/06/12/show-where-a-python-package-is-used/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
           </ul>
         </div><!-- /.social-share -->
       </footer>
@@ -197,24 +237,24 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
       <div class="read-more">
         
           <div class="read-more-header">
-            <a href="/2015/06/12/show-where-a-python-package-is-used/" class="btn">Read More</a>
+            <a href="/2015/03/10/why-zsh/" class="btn">Read More</a>
           </div><!-- /.read-more-header -->
           <div class="read-more-content">
-            <h3><a href="/2015/06/12/show-where-a-python-package-is-used/" title="Show where a Python package is used">Show where a Python package is used</a></h3>
-            <p>&#8216;I wrote a simple bash script that lists which Python packages use a given package.&#8217;
- <a href="/2015/06/12/show-where-a-python-package-is-used/"> Continue reading</a></p>
+            <h3><a href="/2015/03/10/why-zsh/" title="Why zsh?">Why zsh?</a></h3>
+            <p>A short list of reasons why I switched to zsh from bash.
+ <a href="/2015/03/10/why-zsh/"> Continue reading</a></p>
           </div><!-- /.read-more-content -->
         
         <div class="read-more-list">
           
             <div class="list-item">
-              <h4><a href="/2015/03/10/why-zsh/" title="Why zsh?">Why zsh?</a></h4>
+              <h4><a href="/2015/03/10/noteworthy-dotfile-hacks/" title="Noteworthy Dotfile Hacks">Noteworthy Dotfile Hacks</a></h4>
               <span>Published on March 10, 2015</span>
             </div><!-- /.list-item -->
           
             <div class="list-item">
-              <h4><a href="/2015/03/10/noteworthy-dotfile-hacks/" title="Noteworthy Dotfile Hacks">Noteworthy Dotfile Hacks</a></h4>
-              <span>Published on March 10, 2015</span>
+              <h4><a href="/2015/03/09/getting-started-with-rcm/" title="Getting Started with RCM">Getting Started with RCM</a></h4>
+              <span>Published on March 09, 2015</span>
             </div><!-- /.list-item -->
           
         </div><!-- /.read-more-list -->
@@ -259,8 +299,8 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'https://blog.jez.io/2015/01/10/offline-latex-development-part-2/';
-        var disqus_url = 'https://blog.jez.io/2015/01/10/offline-latex-development-part-2/';
+        var disqus_identifier = 'https://blog.jez.io/2015/06/12/show-where-a-python-package-is-used/';
+        var disqus_url = 'https://blog.jez.io/2015/06/12/show-where-a-python-package-is-used/';
         var disqus_script = 'embed.js';
       
     (function () {

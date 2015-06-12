@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2015-05-24T03:29:47-04:00</updated>
+  <updated>2015-06-12T03:06:58-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,101 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Show Where a Python Package Is Used]]></title>
+    <link href="https://blog.jez.io/2015/06/12/show-where-a-python-package-is-used/"/>
+    <updated>2015-06-12T02:36:05-04:00</updated>
+    <id>https://blog.jez.io/2015/06/12/show-where-a-python-package-is-used</id>
+    <content type="html"><![CDATA[<p>A while back I was doing some spring cleaning of my Python packages. I noticed
+that there were a bunch of packages that I couldn&rsquo;t recall installing. I wanted
+to know if I could safely remove them, so I wrote a simple bash script to tell
+me called <code>pip-uses</code>.</p>
+
+<!-- more -->
+
+
+<h2>Source</h2>
+
+<p>Rather than post the source here and let it get more out of date every time I
+change it, you can find the source <a href="https://github.com/jez/bin/blob/master/pip-uses">on GitHub</a>. It&rsquo;s in my <a href="https://github.com/jez/bin">bin
+repository</a>, where I keep my notable helper scripts; feel free to
+poke around.</p>
+
+<h2>Motivations</h2>
+
+<p>I was primarily influenced by Homebrew&rsquo;s <code>brew uses</code> command. It does a nice job
+of giving you exactly the information you want, and I think the way the command
+is named makes sense.</p>
+
+<figure class='code'><figcaption><span>Homebrew: brew uses</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew uses --installed pango
+</span><span class='line'>imagemagick</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>pip-uses</code> gives you basically the experience:</p>
+
+<figure class='code'><figcaption><span>Pip: pip-uses</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ pip-uses stevedore
+</span><span class='line'>virtualenvwrapper</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this example, the Python package <code>virtualenvwrapper</code> uses <code>stevedore</code>, just
+as <code>imagemagick</code> uses <code>pango</code>. Both commands can save you from accidentally
+removing a crucial dependency and answer the burning question, &ldquo;How in the world
+did this thing get installed?&rdquo;</p>
+
+<h2>Wish List</h2>
+
+<p>I&rsquo;m not doing much Python development these days, but if I had some spare time
+I&rsquo;d love for the script to also have these features:</p>
+
+<ul>
+<li>Recursive enumeration of dependencies
+
+<ul>
+<li>It&rsquo;d be nice if <code>pip-uses</code> kept recursively searching until it found no more
+dependencies. This way, it&rsquo;d be easy to see if you could safely uninstall a
+whole slew of packages that you&rsquo;re no longer using.</li>
+</ul>
+</li>
+<li>Operate on more than one package
+
+<ul>
+<li>I didn&rsquo;t need it at the time, so I didn&rsquo;t implement it, but it&rsquo;d be nice if
+the command took a variable amount of arguments and ran the same logic on
+all supplied packages.</li>
+</ul>
+</li>
+<li>Integrate with <code>pip</code>
+
+<ul>
+<li>Programs like <code>brew</code> and <code>pip</code> allow developers to add &ldquo;external commands&rdquo;
+by adding commands to the <code>PATH</code> that look like <code>brew-xyz</code> or <code>git-xyz</code>. I
+couldn&rsquo;t find if there was a special way to add external commands to <code>pip</code>.</li>
+</ul>
+</li>
+</ul>
+
+
+<p>If you find this script useful and end up implementing one of these feature or
+more on top of <code>pip-uses</code>, be sure to send me a Pull Request!</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Why Zsh?]]></title>
@@ -2560,67 +2655,6 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 <h2>Shameless Plug</h2>
 
 <p>While all these features are great, ssh is a program that was meant to be used on Unix-based systems. I personally switched from Windows + Ubuntu to Mac OS X before coming to college, and it was one of the best decisions I made. If Mac OS X is a bit much for you, though, I strongly encourage you to install Linux, using either a VM or a dual-boot configuration. Doing programming and development work in a Linux environment makes nearly every task simpler than trying to do it on Windows.</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Running a VPS, Log 5: It's Not You, It's Me]]></title>
-    <link href="https://blog.jez.io/2014/07/10/running-a-vps-log-5/"/>
-    <updated>2014-07-10T16:48:43-04:00</updated>
-    <id>https://blog.jez.io/2014/07/10/running-a-vps-log-5</id>
-    <content type="html"><![CDATA[<p>It is with great sadness that I announce today that I am breaking up with my mail server. At least for a little while, that is. Let&rsquo;s say we&rsquo;re &ldquo;taking a break&rdquo; to &ldquo;see other people.&rdquo;</p>
-
-<!-- more -->
-
-
-<blockquote><p>I&rsquo;m sorry to say so<br>
-but, sadly, it&rsquo;s true<br>
-that Bang-ups<br>
-and Hang-ups<br>
-can happen to you.<br></p>
-
-<p>Dr. Seuss</p></blockquote>
-
-<h2>Don&rsquo;t get me wrong, we&rsquo;ve had a great run</h2>
-
-<p>I&rsquo;ve learned so much from this foray into system administration and mail servers. I&rsquo;ve written about some of these experiences, and yet many more will go unwritten. I&rsquo;ve learned to persevere, to persist, and to have patience. I&rsquo;ve learned to dig deeper, to follow the clues, and to ask for help.</p>
-
-<p>If asked whether I would do it all again, I would say yes in a heartbeat. Even knowing what I know now, I&rsquo;m sure that I would screw everything up all over again. Even still, this whole experience has given me the opportunity to plunge into a whole new sphere of discovery, affording me such immense and immersive exposure that would be too much to turn down given a second chance.</p>
-
-<p>If asked whether I would recommend it to a friend, I would flinch for a second, but undoubtedly answer yes in the end. Sure, there are gentler introductions to some of the sysadmin roles I assumed for this project, and there are certainly more glamorous projects for a beginner which yield immediate and visible results, results that can be shown off and shared.</p>
-
-<p>That being said, few projects lend such a sense of belonging in a community, such a sense of having begun a &ldquo;rite of passage,&rdquo; as hosting your own mail. For one thing, <strong>it&rsquo;s hard</strong>. Trying to mangle to your will the archaic technologies involved in serving mail bend is perhaps one of the most complicated and intensive feats which can be contained under the category of personal VPS projects. More than that, being able to say, &ldquo;This mail is mine, for me, and only me,&rdquo; is an incredibly rewarding yet private experience. It&rsquo;s something no one can take away, something no one can intrude upon.</p>
-
-<h2>But I&rsquo;m just not ready for this kind of commitment</h2>
-
-<p>I initially thought this project would take 3 days, perhaps a week tops, given that the original title of the tutorial was <a href="http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">&ldquo;NSA-Proof Your Email <strong>in 2 Hours</strong>&rdquo;</a>. Somehow, this endeavor has managed to encompass fully two and a half weeks. I&rsquo;m not saying that I&rsquo;ve been working exclusively on this project for that time, and I&rsquo;ve certainly been learning a great deal, but I can feel the marginal returns diminishing as time marches ever forward. As much as I hate to admit it, <strong>the summer is already half-way over</strong> for CMU students, and there are still so many technologies, projects, and gadgets that I want to sink my teeth into.</p>
-
-<p>Another remark about &ldquo;being a sysadmin&rdquo;: it&rsquo;s stressful! I would be working on fixing something while ssh&#8217;ed in to my droplet, and I could see the stream of spammers and attackers trying to get through on random ports. While I had the appropriate firewall protections in place, it&rsquo;s thoughts like these that making falling asleep harder: &ldquo;What if I&rsquo;ve missed something? What if my system is critically vulnerable? How long do I have before everything comes crashing down?&rdquo; Stress culture aside, this is not a weight I want to shoulder regularly.</p>
-
-<h2>Do you think we can still be friends?</h2>
-
-<p>Ultimately, I had to make the choice to put this project on the back burner. That does not mean, however, that its flame has been snuffed entirely. This project has been incredibly rewarding, and I&rsquo;m still crazy-determined to get this system working. I mentioned before how &ldquo;privately rewarding&rdquo; it can be to serve one&rsquo;s own mail&ndash;I&rsquo;ve as of yet only had a taste of this goal, and I will return one day to reap it&rsquo;s full rewards. When this day will be, though, I&rsquo;m not sure.</p>
-
-<p><br></p>
-
-<div style="text-align: right;"><h4>Farewell.</h4></div>
-
-
-<hr />
-
-<p>If you&rsquo;ve been following along this series and you&rsquo;ve tragically decided to follow a similar path as that which I have followed, feel free to chat me up about it! I&rsquo;d be more than happy to offer some support, or give you advice on some resources to look at. I can&rsquo;t say that I&rsquo;ll answer every question, else I would have a working system, but hopefully I have managed to scrounge up something to make your life easier. See below for ways to get in touch.</p>
 
 <hr />
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/python/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2015-05-24T03:29:47-04:00</updated>
+  <updated>2015-06-12T03:06:58-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,97 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Show Where a Python Package Is Used]]></title>
+    <link href="https://blog.jez.io/2015/06/12/show-where-a-python-package-is-used/"/>
+    <updated>2015-06-12T02:36:05-04:00</updated>
+    <id>https://blog.jez.io/2015/06/12/show-where-a-python-package-is-used</id>
+    <content type="html"><![CDATA[<p>A while back I was doing some spring cleaning of my Python packages. I noticed
+that there were a bunch of packages that I couldn&rsquo;t recall installing. I wanted
+to know if I could safely remove them, so I wrote a simple bash script to tell
+me called <code>pip-uses</code>.</p>
+
+<!-- more -->
+
+
+<h2>Source</h2>
+
+<p>Rather than post the source here and let it get more out of date every time I
+change it, you can find the source <a href="https://github.com/jez/bin/blob/master/pip-uses">on GitHub</a>. It&rsquo;s in my <a href="https://github.com/jez/bin">bin
+repository</a>, where I keep my notable helper scripts; feel free to
+poke around.</p>
+
+<h2>Motivations</h2>
+
+<p>I was primarily influenced by Homebrew&rsquo;s <code>brew uses</code> command. It does a nice job
+of giving you exactly the information you want, and I think the way the command
+is named makes sense.</p>
+
+<pre><code class="plain Homebrew: brew uses">$ brew uses --installed pango
+imagemagick
+</code></pre>
+
+<p><code>pip-uses</code> gives you basically the experience:</p>
+
+<pre><code class="plain Pip: pip-uses">$ pip-uses stevedore
+virtualenvwrapper
+</code></pre>
+
+<p>In this example, the Python package <code>virtualenvwrapper</code> uses <code>stevedore</code>, just
+as <code>imagemagick</code> uses <code>pango</code>. Both commands can save you from accidentally
+removing a crucial dependency and answer the burning question, &ldquo;How in the world
+did this thing get installed?&rdquo;</p>
+
+<h2>Wish List</h2>
+
+<p>I&rsquo;m not doing much Python development these days, but if I had some spare time
+I&rsquo;d love for the script to also have these features:</p>
+
+<ul>
+<li>Recursive enumeration of dependencies
+
+<ul>
+<li>It&rsquo;d be nice if <code>pip-uses</code> kept recursively searching until it found no more
+dependencies. This way, it&rsquo;d be easy to see if you could safely uninstall a
+whole slew of packages that you&rsquo;re no longer using.</li>
+</ul>
+</li>
+<li>Operate on more than one package
+
+<ul>
+<li>I didn&rsquo;t need it at the time, so I didn&rsquo;t implement it, but it&rsquo;d be nice if
+the command took a variable amount of arguments and ran the same logic on
+all supplied packages.</li>
+</ul>
+</li>
+<li>Integrate with <code>pip</code>
+
+<ul>
+<li>Programs like <code>brew</code> and <code>pip</code> allow developers to add &ldquo;external commands&rdquo;
+by adding commands to the <code>PATH</code> that look like <code>brew-xyz</code> or <code>git-xyz</code>. I
+couldn&rsquo;t find if there was a special way to add external commands to <code>pip</code>.</li>
+</ul>
+</li>
+</ul>
+
+
+<p>If you find this script useful and end up implementing one of these feature or
+more on top of <code>pip-uses</code>, be sure to send me a Pull Request!</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.
+ [g]: https://www.github.com/jez/
+ [h]: https://jez.io/
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Ruby Virtualenvs]]></title>
