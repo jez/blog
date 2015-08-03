@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Linux | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/linux/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2015-07-14T18:21:24-04:00</updated>
+  <updated>2015-08-03T03:25:14-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,62 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Leaking Free Disk Space]]></title>
+    <link href="https://blog.jez.io/2015/08/03/leaking-free-disk-space/"/>
+    <updated>2015-08-03T03:05:31-04:00</updated>
+    <id>https://blog.jez.io/2015/08/03/leaking-free-disk-space</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been watching a disk space leakage creep slowly upwards for months now;
+finally, I figured out where it was going!</p>
+
+<!-- more -->
+
+
+<p>Whenever I set up a VPS, I follow Brian Kennedy&rsquo;s excellent <a href="http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers">My First 5 Minutes
+On A Server; Or, Essential Security for Linux Servers</a>. It covers
+setting up a number of initial tools that make server administration much
+easier:
+- fail2ban, for blocking suspicious log in activity
+- setting up a non-root user
+- ufw, a simple firewall program
+- unattended-upgrades, which installs security upgrades periodically
+- logwatch, so you can read a digest of what&rsquo;s happened in your logs</p>
+
+<p>Ever since I set up my VPS, I&rsquo;d seen the disk space creep up in the daily
+logwatch digest. I had looked a few times and figured it must be related to some
+sort of misconfiguration of the Ruby app server I have running on it right now.</p>
+
+<p>Recently, it got up to more than half of my disk space gone. For a VPS that I
+used maybe twice a month, this was ridiculous. I investigated once more and
+finally came up with the culprit: <code>unattended-upgrades</code> wasn&rsquo;t autoremoving
+packages. I had gigabytes worth of packages that could be autoremoved.</p>
+
+<h2>Solution</h2>
+
+<p>There&rsquo;s a one-line config file fix. Add this to
+/etc/apt/apt.conf.d/50unattended-upgrades:</p>
+
+<pre><code class="plain /etc/apt/apt.conf.d/50unattended-upgrades">...
+// Do automatic removal of new unused dependencies after the upgrade
+// (equivalent to apt-get autoremove)
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+...
+</code></pre>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.
+ [g]: https://www.github.com/jez/
+ [h]: https://jez.io/
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Running a VPS, Log 0: Getting Set Up]]></title>
@@ -74,7 +130,7 @@
 
 <h2>The Hard Way</h2>
 
-<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#111;&#x3a;&#112;&#114;&#105;&#110;&#x74;&#64;&#x73;&#x63;&#x6f;&#116;&#116;&#x79;&#x6c;&#97;&#98;&#115;&#x2e;&#111;&#x72;&#103;">&#x70;&#x72;&#x69;&#x6e;&#x74;&#x40;&#115;&#99;&#x6f;&#x74;&#x74;&#x79;&#x6c;&#x61;&#x62;&#x73;&#x2e;&#x6f;&#114;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
+<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x70;&#x72;&#x69;&#110;&#116;&#64;&#x73;&#x63;&#111;&#x74;&#x74;&#x79;&#x6c;&#97;&#98;&#115;&#x2e;&#111;&#x72;&#x67;">&#112;&#x72;&#105;&#x6e;&#116;&#64;&#115;&#99;&#111;&#116;&#x74;&#x79;&#x6c;&#97;&#x62;&#115;&#x2e;&#111;&#x72;&#x67;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
 
 <p>Luckily, CMU (and arguably every college) is not terribly notable for keeping up-to-date information on it&rsquo;s website. This means that I got the &ldquo;wonderful&rdquo; opportunity to dig through CUPS documentation, sketchy printer manufacturer websites, and the depths of the Internet to finagle together a solution. Here&rsquo;s to hoping that you have a far more pleasurable experience. Without further ado, these are the steps I went through to get it done.</p>
 

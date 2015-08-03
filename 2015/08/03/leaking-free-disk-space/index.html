@@ -10,16 +10,16 @@
 <meta charset="utf-8">
 <meta http-equiv="cleartype" content="on">
 
-<title>Vim as a Man Page Viewer - Bits, Bytes, and Words</title>
+<title>Leaking Free Disk Space - Bits, Bytes, and Words</title>
 <meta name="author" content="Jake Zimmerman">
 
 
 
 
-<meta name="description" content="Use vim as a man page viewer to get better syntax highlighting, scroll quickly with a mouse, tabs, and more.
+<meta name="description" content="I finally tracked down a free disk space leakage that's been bothering me for months.
 ">
 
-<meta name="keywords" content="bash vim ">
+<meta name="keywords" content="linux ">
 
 
 <!-- http://t.co/dKP3o1e -->
@@ -31,10 +31,10 @@
 
   
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="/images/printf.3.png"
+    <meta name="twitter:image" content="/images/abstract-1.jpg"
   
-  <meta name="twitter:title" content="Vim as a Man Page Viewer">
-  <meta name="twitter:description" content="Use vim as a man page viewer to get better syntax highlighting, scroll quickly with a mouse, tabs, and more.
+  <meta name="twitter:title" content="Leaking Free Disk Space">
+  <meta name="twitter:description" content="I finally tracked down a free disk space leakage that's been bothering me for months.
 ">
   <meta name="twitter:creator" content="@Z1MM32M4N">
 
@@ -42,16 +42,16 @@
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer">
-<meta property="og:title" content="Vim as a Man Page Viewer">
-<meta property="og:description" content="Use vim as a man page viewer to get better syntax highlighting, scroll quickly with a mouse, tabs, and more.
+<meta property="og:url" content="https://blog.jez.io/2015/08/03/leaking-free-disk-space">
+<meta property="og:title" content="Leaking Free Disk Space">
+<meta property="og:description" content="I finally tracked down a free disk space leakage that's been bothering me for months.
 ">
 
-  <meta property="og:image" content="/images/printf.3.png">
+  <meta property="og:image" content="/images/abstract-1.jpg">
 
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer">
+<link rel="canonical" href="https://blog.jez.io/2015/08/03/leaking-free-disk-space">
 <link href="/favicon.png" rel="icon">
 <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
@@ -113,9 +113,9 @@
 
 
 <div class="entry-header">
-  
+  <div class="image-credit">Image source: <a href="http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/">dargadgetz</a></div><!-- /.image-credit -->
   <div class="entry-image">
-    <img src="/images/printf.3.png" alt="Vim as a Man Page Viewer">
+    <img src="/images/abstract-1.jpg" alt="Leaking Free Disk Space">
   </div><!-- /.entry-image -->
 </div><!-- /.entry-header -->
 
@@ -125,85 +125,53 @@
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title"><a href="/2014/12/20/vim-as-a-man-page-viewer/" rel="bookmark" title="Vim as a Man Page Viewer">Vim as a Man Page Viewer</a></h1>
+          <h1 class="entry-title"><a href="/2015/08/03/leaking-free-disk-space/" rel="bookmark" title="Leaking Free Disk Space">Leaking Free Disk Space</a></h1>
         
-        <h2>December 20, 2014</h2>
+        <h2>August 03, 2015</h2>
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <p>Man pages are an essential part of every developer&rsquo;s workflow. Unfortunately,
-the default system pager <code>less</code> isn&rsquo;t the best interface. That&rsquo;s why I wrote a
-Vim plugin and a short shell function to take care of opening man pages in Vim.</p>
+      <p>I&rsquo;ve been watching a disk space leakage creep slowly upwards for months now;
+finally, I figured out where it was going!</p>
 
 <!-- more -->
 
 
-<h2>The Plugin</h2>
+<p>Whenever I set up a VPS, I follow Brian Kennedy&rsquo;s excellent <a href="http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers">My First 5 Minutes
+On A Server; Or, Essential Security for Linux Servers</a>. It covers
+setting up a number of initial tools that make server administration much
+easier:
+- fail2ban, for blocking suspicious log in activity
+- setting up a non-root user
+- ufw, a simple firewall program
+- unattended-upgrades, which installs security upgrades periodically
+- logwatch, so you can read a digest of what&rsquo;s happened in your logs</p>
 
-<p>If you&rsquo;re eager to dive right into the source or to install the plugin, head on
-over to the <a href="https://github.com/jez/vim-superman">GitHub repository</a>. It&rsquo;s a whopping 32 SLOC, so feel
-free to peek under the hood.</p>
+<p>Ever since I set up my VPS, I&rsquo;d seen the disk space creep up in the daily
+logwatch digest. I had looked a few times and figured it must be related to some
+sort of misconfiguration of the Ruby app server I have running on it right now.</p>
 
-<h2>Why?</h2>
+<p>Recently, it got up to more than half of my disk space gone. For a VPS that I
+used maybe twice a month, this was ridiculous. I investigated once more and
+finally came up with the culprit: <code>unattended-upgrades</code> wasn&rsquo;t autoremoving
+packages. I had gigabytes worth of packages that could be autoremoved.</p>
 
-<p>You might be thinking, &ldquo;But Jake, <code>man</code> works just fine for me, why would I
-switch?&rdquo; I&rsquo;m glad you asked!</p>
+<h2>Solution</h2>
 
-<h3>Mouse Support</h3>
+<p>There&rsquo;s a one-line config file fix. Add this to
+/etc/apt/apt.conf.d/50unattended-upgrades:</p>
 
-<p>The first reason why I was interested in getting man pages to open in Vim was
-because I wanted to be able to scroll with the mouse. When I have to read man
-pages for a long time, usually as a part of some more all-encompasing bit of
-research, I find scrolling to be a much better interface for quickly perusing
-the content of a man page.</p>
+<figure class='code'><figcaption><span>/etc/apt/apt.conf.d/50unattended-upgrades</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>...
+</span><span class='line'>// Do automatic removal of new unused dependencies after the upgrade
+</span><span class='line'>// (equivalent to apt-get autoremove)
+</span><span class='line'>Unattended-Upgrade::Remove-Unused-Dependencies "true";
+</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
 
-<h3>Syntax Highlighting</h3>
-
-<p>As it turns out, man pages have a syntax to them, and Vim does a pretty
-excellent job at highlighting them. Rather than talk about it, here are some
-screenshots. Note how code samples (C system calls and library functions) are
-also syntax highlighted appropriately.</p>
-
-<figure class='code'><figcaption><span>Example 1</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>vman vim
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><a class="image-link" href="/images/vim.1.png"><img src="/images/vim.1.png"></a></p>
-
-<figure class='code'><figcaption><span>Example 2</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>vman <span class="m">3</span> <span class="nb">printf</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><a class="image-link" href="/images/printf.3.png"><img src="/images/printf.3.png"></a></p>
-
-<h3>All the benefits of Vim</h3>
-
-<p>While <code>less</code> makes a good effort to emulate certain Vim keybindings (or maybe
-it&rsquo;s the other way around, I don&rsquo;t know which came first), <code>less</code> certainly
-falls short of the full power of Vim.</p>
-
-<p>For example, once you&rsquo;ve opened a man page in Vim, you can open a new tab or
-split side-by-side with the man page. Especially if you&rsquo;re switching between Vim
-and the man page often, being able to open man pages in tabs or splits is
-invaluable.</p>
-
-<h2>Mine doesn&rsquo;t look like yours!</h2>
-
-<p>A couple of my other plugins are showing in the screenshots above. I&rsquo;m using the
-<a href="https://github.com/altercation/vim-colors-solarized">Solarized Dark color scheme</a>, the plugin
-<a href="https://github.com/bling/vim-airline">vim-airline</a> to take over the statuslines at the very top and
-bottom, and iTerm2 on Mac OS X 10.10.</p>
-
-<p>You can see my complete configuration <a href="https://github.com/jez/dotfiles">on GitHub</a>.</p>
-
-<h2>Feedback</h2>
-
-<p>As a matter of fact, this was my first Vim plugin! If you notice anything out of
-place, even if it&rsquo;s a small detail, I&rsquo;d love to hear it. Make no assumptions
-about the reasoning behind why certain decisions were made, because I have none
-XD</p>
 
 <hr />
 
@@ -218,15 +186,15 @@ my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.</p>
 
       <footer class="entry-meta">
-        <span class="entry-tags"><a href="/categories/#bash" title="Pages tagged bash" class="tag">bash</a><a href="/categories/#vim" title="Pages tagged vim" class="tag">vim</a></span>
-        <span><a href="/2014/12/20/vim-as-a-man-page-viewer/" rel="bookmark" title="Vim as a Man Page Viewer">Vim as a Man Page Viewer</a> was published on <span class="entry-date date published updated"><time datetime="2014-12-20T21:17:46-05:00">December 20, 2014</time></span></span>
+        <span class="entry-tags"><a href="/categories/#linux" title="Pages tagged linux" class="tag">linux</a></span>
+        <span><a href="/2015/08/03/leaking-free-disk-space/" rel="bookmark" title="Leaking Free Disk Space">Leaking Free Disk Space</a> was published on <span class="entry-date date published updated"><time datetime="2015-08-03T03:05:31-04:00">August 03, 2015</time></span></span>
         
         <span class="author vcard"><span class="fn"><a href="https://jez.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
         <div class="social-share">
           <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url=https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=https://blog.jez.io/2015/08/03/leaking-free-disk-space" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=https://blog.jez.io/2015/08/03/leaking-free-disk-space" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+            <li class="googleplus"><a href="https://plus.google.com/share?url=https://blog.jez.io/2015/08/03/leaking-free-disk-space" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
           </ul>
         </div><!-- /.social-share -->
       </footer>
@@ -235,23 +203,23 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
       <div class="read-more">
         
           <div class="read-more-header">
-            <a href="/2015/08/03/leaking-free-disk-space/" class="btn">Read More</a>
+            <a href="/2015/06/12/show-where-a-python-package-is-used/" class="btn">Read More</a>
           </div><!-- /.read-more-header -->
           <div class="read-more-content">
-            <h3><a href="/2015/08/03/leaking-free-disk-space/" title="Leaking Free Disk Space">Leaking Free Disk Space</a></h3>
-            <p>I finally tracked down a free disk space leakage that&#8217;s been bothering me for months.
- <a href="/2015/08/03/leaking-free-disk-space/"> Continue reading</a></p>
+            <h3><a href="/2015/06/12/show-where-a-python-package-is-used/" title="Show where a Python package is used">Show where a Python package is used</a></h3>
+            <p>&#8216;I wrote a simple bash script that lists which Python packages use a given package.&#8217;
+ <a href="/2015/06/12/show-where-a-python-package-is-used/"> Continue reading</a></p>
           </div><!-- /.read-more-content -->
         
         <div class="read-more-list">
           
             <div class="list-item">
-              <h4><a href="/2015/06/12/show-where-a-python-package-is-used/" title="Show where a Python package is used">Show where a Python package is used</a></h4>
-              <span>Published on June 12, 2015</span>
+              <h4><a href="/2015/03/10/why-zsh/" title="Why zsh?">Why zsh?</a></h4>
+              <span>Published on March 10, 2015</span>
             </div><!-- /.list-item -->
           
             <div class="list-item">
-              <h4><a href="/2015/03/10/why-zsh/" title="Why zsh?">Why zsh?</a></h4>
+              <h4><a href="/2015/03/10/noteworthy-dotfile-hacks/" title="Noteworthy Dotfile Hacks">Noteworthy Dotfile Hacks</a></h4>
               <span>Published on March 10, 2015</span>
             </div><!-- /.list-item -->
           
@@ -297,8 +265,8 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer/';
-        var disqus_url = 'https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer/';
+        var disqus_identifier = 'https://blog.jez.io/2015/08/03/leaking-free-disk-space/';
+        var disqus_url = 'https://blog.jez.io/2015/08/03/leaking-free-disk-space/';
         var disqus_script = 'embed.js';
       
     (function () {
