@@ -23,6 +23,7 @@ Whenever I set up a VPS, I follow Brian Kennedy's excellent [My First 5 Minutes
 On A Server; Or, Essential Security for Linux Servers][essential]. It covers
 setting up a number of initial tools that make server administration much
 easier:
+
 - fail2ban, for blocking suspicious log in activity
 - setting up a non-root user
 - ufw, a simple firewall program
