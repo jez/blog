@@ -259,7 +259,7 @@ I've entirely focused on the commands you can use to build, run, and manage your
 Docker app in this post. The rest is just a matter of getting your `Dockerfile`
 and `docker-compose.yml` to where you need them to be. For this, I'd recommend
 
-- the Docker documentation on [Docekrfile best practices][dockerfile], as well as
+- the Docker documentation on [Dockerfile best practices][dockerfile], as well as
 - [this walkthrough][sample-workflow] for Dockerizing a sample app (in Node.js, but
 the principles are generally applicable)
 
