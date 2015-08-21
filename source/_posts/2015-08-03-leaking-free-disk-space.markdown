@@ -52,7 +52,13 @@ Unattended-Upgrade::Remove-Unused-Dependencies "true";
 ...
 ```
 
+Update: It looks like a bug in unattented-upgrades is [preventing it from
+automatically removing header packages][bug]. For the time being you will have
+to either manually auto-remove these packages, or add `sudo apt-get autoremove
+-y` to your crontab.
+
 {% include jake-on-the-web.markdown %}
 
 
 [essential]: http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers
+[bug]: https://bugs.launchpad.net/ubuntu/+source/unattended-upgrades/+bug/1267059
