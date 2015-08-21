@@ -177,6 +177,11 @@ packages. I had gigabytes worth of packages that could be autoremoved.</p>
 </span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
 
 
+<p>Update: It looks like a bug in unattented-upgrades is <a href="https://bugs.launchpad.net/ubuntu/+source/unattended-upgrades/+bug/1267059">preventing it from
+automatically removing header packages</a>. For the time being you will have
+to either manually auto-remove these packages, or add <code>sudo apt-get autoremove
+-y</code> to your crontab.</p>
+
 <hr />
 
 <p><br></p>

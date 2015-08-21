@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2015-08-20T02:32:46-04:00</updated>
+  <updated>2015-08-20T21:28:30-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -63,6 +63,11 @@ packages. I had gigabytes worth of packages that could be autoremoved.</p>
 </span><span class='line'>Unattended-Upgrade::Remove-Unused-Dependencies "true";
 </span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
 
+
+<p>Update: It looks like a bug in unattented-upgrades is <a href="https://bugs.launchpad.net/ubuntu/+source/unattended-upgrades/+bug/1267059">preventing it from
+automatically removing header packages</a>. For the time being you will have
+to either manually auto-remove these packages, or add <code>sudo apt-get autoremove
+-y</code> to your crontab.</p>
 
 <hr />
 
