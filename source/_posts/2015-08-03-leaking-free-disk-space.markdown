@@ -57,6 +57,9 @@ automatically removing header packages][bug]. For the time being you will have
 to either manually auto-remove these packages, or add `sudo apt-get autoremove
 -y` to your crontab.
 
+Update: The bug has been addressed and closed. It now correctly removes header
+packages!
+
 {% include jake-on-the-web.markdown %}
 
 
