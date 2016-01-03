@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2015-12-29T00:43:28-05:00</updated>
+  <updated>2016-01-03T02:29:31-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,52 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Starter Zsh Setup]]></title>
+    <link href="https://blog.jez.io/2016/01/03/starter-zsh-setup/"/>
+    <updated>2016-01-03T00:14:16-05:00</updated>
+    <id>https://blog.jez.io/2016/01/03/starter-zsh-setup</id>
+    <content type="html"><![CDATA[<p>Zsh has given me so much mileage with respect to efficiency at the command line.
+Looking back I&rsquo;m a little sad I didn&rsquo;t switch to it sooner. One of the reasons
+why it took so long was that I didn&rsquo;t know where to start; with this in mind,
+I&rsquo;ve collected some of the zsh-specific bits of my dotfiles into one place to
+help people hit the ground running.</p>
+
+<!-- more -->
+
+
+<p>To cut to the chase, you can find my [starter zsh][zshrc] on GitHub. It contains
+information on how to get it into place as well comments explaining what each
+line does.</p>
+
+<p>Note it&rsquo;s an example <em>starter</em> zshrc. What I mean by this is that it&rsquo;s more of a
+skeleton zshrc. It&rsquo;s been crafted with the assumption that you&rsquo;re coming from
+bash and you already have some bash config that you&rsquo;re weary to part with. The
+content here aims to be minimally invasive, and since zsh is largely compatible
+with bash, the rest of your config should fit right in.</p>
+
+<h2>Going Further</h2>
+
+<p>I have even more zsh-specific and general configuration nuggets in my personal
+dotfiles, which are <a href="https://github.com/jez/dotfiles">also on GitHub</a>. I add to them nearly every day,
+and I&rsquo;m pretty fond of them if I do say so myself. You might want to read
+<a href="http://blog.jez.io/2015/03/10/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a> if you&rsquo;re looking for a quick overview of some
+snippets and features I&rsquo;ve collected into my dotfiles.</p>
+
+<hr />
+
+<p><br></p>
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Leaking Free Disk Space]]></title>
@@ -2832,40 +2878,6 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 
 
 <p>Do you have a LaTeX tip, a fancier Makefile, or a favorite vim plugin for LaTeX? Share it in the comments!</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Solarized LaTeX Listings]]></title>
-    <link href="https://blog.jez.io/2014/10/04/solarized-latex-listings/"/>
-    <updated>2014-10-04T06:35:05-04:00</updated>
-    <id>https://blog.jez.io/2014/10/04/solarized-latex-listings</id>
-    <content type="html"><![CDATA[<p>Out of the box, LaTeX listings are pretty bad. With a bit of work, you can ascribe some colors to the code, but you&rsquo;re still stuck with choosing a theme. Given that I recently just switched to the Solarized colorscheme in Vim and iTerm2, I made a LaTeX package that styles code listings with the predefined Solarized light colors.</p>
-
-<!-- more -->
-
-
-<h2><a href="https://github.com/jez/latex-solarized">Source</a></h2>
-
-<p>The source for this theme is on GitHub, and the README has pretty good documentation. Here&rsquo;s an example of the final result:</p>
-
-<p><a class="image-link" href="https://blog.jez.io/images/solarized-light-screenshot.png"><img src="https://blog.jez.io/images/solarized-light-screenshot.png"></a></p>
-
-<p>After you install them in the right place, you can include <code>\usepackage{solarized-light}</code> to turn source code listings light (as in above), <code>\usepackage{solarized-dark}</code> to have listings styled with the dark Solarized theme, and just <code>\usepackage{solarized}</code> to have access to the raw Solarized color codes (see the source for their names).</p>
-
-<p>Once you&rsquo;ve done this, you just have to include your code in your LaTeX file using the <code>listings</code> packages. You might want to check out <a href="http://en.wikibooks.org/wiki/LaTeX/Source_Code_Listings">the LaTeX wiki</a> for more information on how to get started quickly with code listings, or <a href="http://mirror.hmc.edu/ctan/macros/latex/contrib/listings/listings.pdf">the official documentation</a> for a more comprehensive reference.</p>
 
 <hr />
 

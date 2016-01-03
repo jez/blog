@@ -10,15 +10,15 @@
 <meta charset="utf-8">
 <meta http-equiv="cleartype" content="on">
 
-<title>Solarized LaTeX Listings - Bits, Bytes, and Words</title>
+<title>Starter Zsh Setup - Bits, Bytes, and Words</title>
 <meta name="author" content="Jake Zimmerman">
 
 
 
 
-<meta name="description" content="I wrote a LaTeX package for styling code listings with Solarized.">
+<meta name="description" content="Zsh has given me so much mileage with respect to efficiency at the command line. Looking back I'm a little sad I didn't switch to it sooner. One of &hellip;">
 
-<meta name="keywords" content="design latex ">
+<meta name="keywords" content="dotfiles zsh ">
 
 
 <!-- http://t.co/dKP3o1e -->
@@ -29,26 +29,26 @@
 <!-- Twitter Cards -->
 
   
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="/images/abstract-7.jpg"
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content"">
   
-  <meta name="twitter:title" content="Solarized LaTeX Listings">
-  <meta name="twitter:description" content="I wrote a LaTeX package for styling code listings with Solarized.">
+  <meta name="twitter:title" content="Starter Zsh Setup">
+  <meta name="twitter:description" content="Zsh has given me so much mileage with respect to efficiency at the command line. Looking back I'm a little sad I didn't switch to it sooner. One of &hellip;">
   <meta name="twitter:creator" content="@Z1MM32M4N">
 
 
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/2014/10/04/solarized-latex-listings">
-<meta property="og:title" content="Solarized LaTeX Listings">
-<meta property="og:description" content="I wrote a LaTeX package for styling code listings with Solarized.">
+<meta property="og:url" content="https://blog.jez.io/2016/01/03/starter-zsh-setup">
+<meta property="og:title" content="Starter Zsh Setup">
+<meta property="og:description" content="Zsh has given me so much mileage with respect to efficiency at the command line. Looking back I'm a little sad I didn't switch to it sooner. One of &hellip;">
 
-  <meta property="og:image" content="/images/abstract-7.jpg">
+  <meta property="og:image" content="">
 
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/2014/10/04/solarized-latex-listings">
+<link rel="canonical" href="https://blog.jez.io/2016/01/03/starter-zsh-setup">
 <link href="/favicon.png" rel="icon">
 <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
@@ -66,7 +66,7 @@
 
 </head>
 
-<body id="post" class="feature">
+<body id="post" >
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 <nav id="dl-menu" class="dl-menuwrapper" role="navigation">
@@ -109,39 +109,44 @@
 
 
 
-<div class="entry-header">
-  <div class="image-credit">Image source: <a href="http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/">dargadgetz</a></div><!-- /.image-credit -->
-  <div class="entry-image">
-    <img src="/images/abstract-7.jpg" alt="Solarized LaTeX Listings">
-  </div><!-- /.entry-image -->
-</div><!-- /.entry-header -->
-
 
 <div id="main" role="main">
   <article class="hentry">
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title"><a href="/2014/10/04/solarized-latex-listings/" rel="bookmark" title="Solarized LaTeX Listings">Solarized LaTeX Listings</a></h1>
+          <h1 class="entry-title"><a href="/2016/01/03/starter-zsh-setup/" rel="bookmark" title="Starter Zsh Setup">Starter Zsh Setup</a></h1>
         
-        <h2>October 04, 2014</h2>
+        <h2>January 03, 2016</h2>
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <p>Out of the box, LaTeX listings are pretty bad. With a bit of work, you can ascribe some colors to the code, but you&rsquo;re still stuck with choosing a theme. Given that I recently just switched to the Solarized colorscheme in Vim and iTerm2, I made a LaTeX package that styles code listings with the predefined Solarized light colors.</p>
+      <p>Zsh has given me so much mileage with respect to efficiency at the command line.
+Looking back I&rsquo;m a little sad I didn&rsquo;t switch to it sooner. One of the reasons
+why it took so long was that I didn&rsquo;t know where to start; with this in mind,
+I&rsquo;ve collected some of the zsh-specific bits of my dotfiles into one place to
+help people hit the ground running.</p>
 
 <!-- more -->
 
 
-<h2><a href="https://github.com/jez/latex-solarized">Source</a></h2>
+<p>To cut to the chase, you can find my [starter zsh][zshrc] on GitHub. It contains
+information on how to get it into place as well comments explaining what each
+line does.</p>
 
-<p>The source for this theme is on GitHub, and the README has pretty good documentation. Here&rsquo;s an example of the final result:</p>
+<p>Note it&rsquo;s an example <em>starter</em> zshrc. What I mean by this is that it&rsquo;s more of a
+skeleton zshrc. It&rsquo;s been crafted with the assumption that you&rsquo;re coming from
+bash and you already have some bash config that you&rsquo;re weary to part with. The
+content here aims to be minimally invasive, and since zsh is largely compatible
+with bash, the rest of your config should fit right in.</p>
 
-<p><a class="image-link" href="/images/solarized-light-screenshot.png"><img src="/images/solarized-light-screenshot.png"></a></p>
+<h2>Going Further</h2>
 
-<p>After you install them in the right place, you can include <code>\usepackage{solarized-light}</code> to turn source code listings light (as in above), <code>\usepackage{solarized-dark}</code> to have listings styled with the dark Solarized theme, and just <code>\usepackage{solarized}</code> to have access to the raw Solarized color codes (see the source for their names).</p>
-
-<p>Once you&rsquo;ve done this, you just have to include your code in your LaTeX file using the <code>listings</code> packages. You might want to check out <a href="http://en.wikibooks.org/wiki/LaTeX/Source_Code_Listings">the LaTeX wiki</a> for more information on how to get started quickly with code listings, or <a href="http://mirror.hmc.edu/ctan/macros/latex/contrib/listings/listings.pdf">the official documentation</a> for a more comprehensive reference.</p>
+<p>I have even more zsh-specific and general configuration nuggets in my personal
+dotfiles, which are <a href="https://github.com/jez/dotfiles">also on GitHub</a>. I add to them nearly every day,
+and I&rsquo;m pretty fond of them if I do say so myself. You might want to read
+<a href="http://blog.jez.io/2015/03/10/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a> if you&rsquo;re looking for a quick overview of some
+snippets and features I&rsquo;ve collected into my dotfiles.</p>
 
 <hr />
 
@@ -156,15 +161,15 @@ my open source projects, make sure to star it on GitHub! I love hearing what
 people think, so feel free to comment, open an issue, or send me an email.</p>
 
       <footer class="entry-meta">
-        <span class="entry-tags"><a href="/categories/#design" title="Pages tagged design" class="tag">design</a><a href="/categories/#latex" title="Pages tagged latex" class="tag">latex</a></span>
-        <span><a href="/2014/10/04/solarized-latex-listings/" rel="bookmark" title="Solarized LaTeX Listings">Solarized LaTeX Listings</a> was published on <span class="entry-date date published updated"><time datetime="2014-10-04T06:35:05-04:00">October 04, 2014</time></span></span>
+        <span class="entry-tags"><a href="/categories/#dotfiles" title="Pages tagged dotfiles" class="tag">dotfiles</a><a href="/categories/#zsh" title="Pages tagged zsh" class="tag">zsh</a></span>
+        <span><a href="/2016/01/03/starter-zsh-setup/" rel="bookmark" title="Starter Zsh Setup">Starter Zsh Setup</a> was published on <span class="entry-date date published updated"><time datetime="2016-01-03T00:14:16-05:00">January 03, 2016</time></span></span>
         
         <span class="author vcard"><span class="fn"><a href="https://jez.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
         <div class="social-share">
           <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=https://blog.jez.io/2014/10/04/solarized-latex-listings" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=https://blog.jez.io/2014/10/04/solarized-latex-listings" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url=https://blog.jez.io/2014/10/04/solarized-latex-listings" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=https://blog.jez.io/2016/01/03/starter-zsh-setup" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=https://blog.jez.io/2016/01/03/starter-zsh-setup" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+            <li class="googleplus"><a href="https://plus.google.com/share?url=https://blog.jez.io/2016/01/03/starter-zsh-setup" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
           </ul>
         </div><!-- /.social-share -->
       </footer>
@@ -173,24 +178,24 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
       <div class="read-more">
         
           <div class="read-more-header">
-            <a href="/2016/01/03/starter-zsh-setup/" class="btn">Read More</a>
+            <a href="/2015/08/03/leaking-free-disk-space/" class="btn">Read More</a>
           </div><!-- /.read-more-header -->
           <div class="read-more-content">
-            <h3><a href="/2016/01/03/starter-zsh-setup/" title="Starter Zsh Setup">Starter Zsh Setup</a></h3>
-            <p>Zsh has given me so much mileage with respect to efficiency at the command line. Looking back I&#8217;m a little sad I didn&#8217;t switch to it sooner. One of the reasons why it took so long was that I didn&#8217;t know where to start; with this in mind, I&#8217;ve collected some of the zsh-specific bits of my dotfiles into one place to help people hit the ground running.
- <a href="/2016/01/03/starter-zsh-setup/"> Continue reading</a></p>
+            <h3><a href="/2015/08/03/leaking-free-disk-space/" title="Leaking Free Disk Space">Leaking Free Disk Space</a></h3>
+            <p>I finally tracked down a free disk space leakage that&#8217;s been bothering me for months.
+ <a href="/2015/08/03/leaking-free-disk-space/"> Continue reading</a></p>
           </div><!-- /.read-more-content -->
         
         <div class="read-more-list">
           
             <div class="list-item">
-              <h4><a href="/2015/08/03/leaking-free-disk-space/" title="Leaking Free Disk Space">Leaking Free Disk Space</a></h4>
-              <span>Published on August 03, 2015</span>
+              <h4><a href="/2015/07/12/docker-tips-and-cheatsheet/" title="Docker Tips and Cheatsheet">Docker Tips and Cheatsheet</a></h4>
+              <span>Published on July 12, 2015</span>
             </div><!-- /.list-item -->
           
             <div class="list-item">
-              <h4><a href="/2015/07/12/docker-tips-and-cheatsheet/" title="Docker Tips and Cheatsheet">Docker Tips and Cheatsheet</a></h4>
-              <span>Published on July 12, 2015</span>
+              <h4><a href="/2015/06/12/show-where-a-python-package-is-used/" title="Show where a Python package is used">Show where a Python package is used</a></h4>
+              <span>Published on June 12, 2015</span>
             </div><!-- /.list-item -->
           
         </div><!-- /.read-more-list -->
@@ -235,8 +240,8 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'https://blog.jez.io/2014/10/04/solarized-latex-listings/';
-        var disqus_url = 'https://blog.jez.io/2014/10/04/solarized-latex-listings/';
+        var disqus_identifier = 'https://blog.jez.io/2016/01/03/starter-zsh-setup/';
+        var disqus_url = 'https://blog.jez.io/2016/01/03/starter-zsh-setup/';
         var disqus_script = 'embed.js';
       
     (function () {
