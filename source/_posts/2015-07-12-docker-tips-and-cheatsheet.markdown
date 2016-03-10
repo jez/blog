@@ -3,7 +3,7 @@ layout: post
 title: "Docker Tips and Cheatsheet"
 date: 2015-07-12 21:32:27 -0500
 comments: true
-categories: ['docker', 'best-practices']
+categories: ['docker', 'best practices']
 description: 'A list of commands I use (and keep forgetting) every time I use Docker.'
 image:
   feature: /images/abstract-6.jpg
