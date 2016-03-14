@@ -79,6 +79,33 @@ Look at that! We've,
 It's the little things, but they add up.
 
 
+## Enhancing the REPL
+
+Speaking of the little things, when using the SML REPL, you don't have access to
+all the usual command line niceties like command history and access to arrow
+keys for editing, let alone Vi-like keybindings. To get started, you'll have to
+change how you launch the SML/NJ REPL. In particular, we're going to preface our
+commands with `rlwrap`:
+
+```bash
+# instead of this...
+$ sml
+
+# use this:
+$ rlwrap
+```
+
+`rlwrap` stands for "readline wrap." Readline is a library that simply adds to a
+REPL program all the features mentioned above:
+
+- Command history tracking
+- Line editing with arrow keys
+- Configurability through the `~/.inputrc` file
+  - We can use this to get fancy features like Vi keybindings
+
+For more information, see [these lines][inputrc] of my inputrc, a small part of
+my [dotfiles repo][dotfiles] on GitHub.
+
 ## Setting Up Vim
 
 Programming is so much more enjoyable when you're not fighting your editor. For
@@ -237,3 +264,4 @@ repo][dotfiles] on GitHub.
 [pull-1719]: https://github.com/scrooloose/syntastic/pull/1719
 [vim-better-sml]: https://github.com/jez/vim-better-sml
 [dotfiles]: https://github.com/jez/dotfiles
+[inputrc]: https://github.com/jez/dotfiles/blob/ed8e531eebe43a8aef05fc4cb768157d03408cea/inputrc#L12-L14
