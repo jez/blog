@@ -92,7 +92,7 @@ commands with `rlwrap`:
 $ sml
 
 # use this:
-$ rlwrap
+$ rlwrap sml
 ```
 
 `rlwrap` stands for "readline wrap." Readline is a library that simply adds to a
