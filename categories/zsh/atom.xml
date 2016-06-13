@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Zsh | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/zsh/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2016-04-17T23:19:48-04:00</updated>
+  <updated>2016-06-12T22:43:27-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -224,16 +224,18 @@ colors thanks to <a href="https://github.com/jez/dotfiles/blob/0ca7dfb042e8d0e67
 
 <p>I talked about this <a href="/2015/01/16/mastering-git-log-for-collaboration/">in a previous post</a>, but I have some <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-Jacobs-MacBook-Air/gitconfig#L20-L24">special
 settings</a> in my global gitconfig for adding colored decoration to git
-log commands.</p>
+log commands. Here&rsquo;s a screenshot from that post:</p>
+
+<p><a class="image-link" href="/images/glla-tartanhacks.png"><img src="/images/glla-tartanhacks.png"></a></p>
 
 <h2><code>aklog cs.cmu.edu</code></h2>
 
-<p>For my friends at CMU, I have <code>aklog cs.cmu.edu</code> in <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-andrew/util/host.zshenv#L1">my
-~/.zshenv</a>, which gets run even when you log in interactively
-(like what happens when you <code>scp</code> something), so that I can copy files from my
-local machine to the SCS AFS space, which is useful for doing things like making
-handins. Note that the file linked to above is a host-specific file that only
-&ldquo;exists&rdquo; for me on Andrew machines. You can read more about my setup <a href="/2015/03/09/getting-started-with-rcm/">in my
+<p>For my friends at CMU, I have <code>aklog cs.cmu.edu</code> in <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-andrew/util/host.zshenv#L1">my ~/.zshenv</a>,
+which gets run even when you log in interactively (like what happens when you
+<code>scp</code> something), so that I can copy files from my local machine to the SCS AFS
+space, which is useful for doing things like making handins. Note that the file
+linked to above is a host-specific file that only &ldquo;exists&rdquo; for me on Andrew
+machines. You can read more about my setup <a href="/2015/03/09/getting-started-with-rcm/">in my
 previous post</a>.</p>
 
 <h2>zsh-syntax-highlighting</h2>
@@ -243,6 +245,12 @@ on the command line, similar to how the fish shell does it. It does various
 things, like coloring the command red or green based on whether it exists,
 underlines filenames that exist, highlights filenames that might be misspelled
 in yellow, highlights built-ins like <code>if</code> and <code>for</code> in orange, etc.</p>
+
+<p>Here are some examples from my setup:</p>
+
+<p><a class="image-link" href="/images/zsh-syntax-highlighting-for-loop.png"><img src="/images/zsh-syntax-highlighting-for-loop.png"></a></p>
+
+<p><a class="image-link" href="/images/zsh-syntax-highlighting.png"><img src="/images/zsh-syntax-highlighting.png"></a></p>
 
 <h2>Automatic Dotfile Updates</h2>
 
