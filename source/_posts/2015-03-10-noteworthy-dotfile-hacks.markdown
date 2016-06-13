@@ -74,22 +74,24 @@ colors thanks to [this file][dircolors] and [this snippet][gnubin] in my zshrc.
 
 I talked about this [in a previous post][glla], but I have some [special
 settings][decorate] in my global gitconfig for adding colored decoration to git
-log commands.
+log commands. Here's a screenshot from that post:
+
+{% img /images/glla-tartanhacks.png %}
 
 [glla]: /2015/01/16/mastering-git-log-for-collaboration/
 [decorate]: https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-Jacobs-MacBook-Air/gitconfig#L20-L24
 
 ## `aklog cs.cmu.edu`
 
-For my friends at CMU, I have `aklog cs.cmu.edu` in [my
-~/.zshenv][andrew-zshenv], which gets run even when you log in interactively
-(like what happens when you `scp` something), so that I can copy files from my
-local machine to the SCS AFS space, which is useful for doing things like making
-handins. Note that the file linked to above is a host-specific file that only
-"exists" for me on Andrew machines. You can read more about my setup [in my
+For my friends at CMU, I have `aklog cs.cmu.edu` in [my ~/.zshenv][cmu-zshenv],
+which gets run even when you log in interactively (like what happens when you
+`scp` something), so that I can copy files from my local machine to the SCS AFS
+space, which is useful for doing things like making handins. Note that the file
+linked to above is a host-specific file that only "exists" for me on Andrew
+machines. You can read more about my setup [in my
 previous post][modular].
 
-[andrew-zshenv]: https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-andrew/util/host.zshenv#L1
+[cmu-zshenv]: https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-andrew/util/host.zshenv#L1
 [modular]: /2015/03/09/getting-started-with-rcm/
 
 ## zsh-syntax-highlighting
@@ -99,6 +101,12 @@ on the command line, similar to how the fish shell does it. It does various
 things, like coloring the command red or green based on whether it exists,
 underlines filenames that exist, highlights filenames that might be misspelled
 in yellow, highlights built-ins like `if` and `for` in orange, etc.
+
+Here are some examples from my setup:
+
+{% img /images/zsh-syntax-highlighting-for-loop.png %}
+
+{% img /images/zsh-syntax-highlighting.png %}
 
 [zsh-syntax]: https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/util/misc.zsh#L79-L80
 
