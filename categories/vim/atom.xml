@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Vim | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/vim/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2016-08-03T00:01:13-04:00</updated>
+  <updated>2016-08-03T01:23:58-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,127 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Vim and Haskell in 2016 on OS X]]></title>
+    <link href="https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x/"/>
+    <updated>2016-08-03T00:04:08-04:00</updated>
+    <id>https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x</id>
+    <content type="html"><![CDATA[<p>Stephen Diehl&rsquo;s article <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> does a great
+job of outlining the quickest way to get a quality Haskell development
+experience. His post presumes Ubuntu; here we presume OS X.</p>
+
+<!-- more -->
+
+
+<p>This post wouldn&rsquo;t actually be necessary if it weren&rsquo;t for one thing: <a href="https://support.apple.com/en-us/HT204899">System
+Integrity Protection</a> in OS X El Capitan, also known as &ldquo;rootless&rdquo;
+mode. It affects Haskell&rsquo;s build and install step in a subtle (but solved) way,
+and the rest of the article will cover what to watch out for when installing on
+OS X.</p>
+
+<p>If you don&rsquo;t follow these instructions and you&rsquo;re on OS X El Capitan, you&rsquo;ll
+likely run into an issue that looks like <code>/usr/bin/ar: permission denied</code>. The
+Stack installation instructions call this out specifically:</p>
+
+<blockquote><p>If you are on OS X 10.11 (&ldquo;El Capitan&rdquo;) or later, GHC 7.8.4 is incompatible
+with System Integrity Protection (a.k.a. &ldquo;rootless&rdquo;). GHC 7.10.2 includes a
+fix, so this only affects users of GHC 7.8.4.</p></blockquote>
+
+<p>At the risk of spoiling the surprise, we&rsquo;re going to set up Stack while taking
+care to make sure that we get GHC >= 7.10. So let&rsquo;s do just that!</p>
+
+<h2>Environment Prep (optional)</h2>
+
+<p>Note that this step is optional and has nothing to do with OS X; I just wanted
+to point it out quickly.</p>
+
+<p>Under <a href="http://www.stephendiehl.com/posts/vim_2016.html#dev-environment">Dev Environment</a> on <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in
+2016</a>, Stephen Diehl writes:</p>
+
+<blockquote><p>Times have changed quite a bit, and the new preferred way of installing GHC in
+2016 is to forgo using the system package manager for installing ghc and use
+Stack to manage the path to the compiler executable and sandboxes.</p></blockquote>
+
+<p>Stack stores it&rsquo;s metadata in the <code>~/.stack</code> folder by default. If you&rsquo;re not a
+huge fan of things cluttering up your home folder, set the <code>STACK_ROOT</code> variable
+in you bashrc or zshrc:</p>
+
+<pre><code class="bash Set STACK_ROOT to avoid clutter">export XDG_DATA_HOME="$HOME/.local/share"
+
+# Have Haskell Stack use XDG Base Directory spec
+export STACK_ROOT="$XDG_DATA_HOME/stack"
+</code></pre>
+
+<p>Of course, the choice of location is up to you. In particular I&rsquo;ve chosen to
+adhere to the <a href="https://wiki.archlinux.org/index.php/XDG_Base_Directory_support">XDG Base Directory specification</a> here, which you may want
+to take a peek at if you&rsquo;re unfamiliar. That&rsquo;s why you see references to
+<code>XDG_DATA_HOME</code>.</p>
+
+<p>Make sure you restart your terminal to pick up the new variables before
+continuing.</p>
+
+<h2>Install Stack from Homebrew</h2>
+
+<p>If you&rsquo;re like me, you&rsquo;ll want to take a second to purge anything
+Haskell-related from previous botched setup attempts:</p>
+
+<pre><code class="bash Wipe the slate clean"># If you had GHC installed
+$ brew uninstall ghc
+
+# If you tried and failed at installing Stack already
+$ brew uninstall haskell-stack
+$ rm -r ~/.stack
+# If you happened to also set STACK_ROOT
+$ rm -r $STACK_ROOT
+</code></pre>
+
+<p>With that out of the way, we can actually get our hands on Stack. For OS X,
+we&rsquo;ll install through Homebrew:</p>
+
+<pre><code class="console Install Stack">$ brew install haskell-stack
+</code></pre>
+
+<h2>Configure Stack, avoiding &ldquo;rootless&rdquo; issues</h2>
+
+<p>Here&rsquo;s the trick. We need to run <code>stack setup</code> for the first time to let Stack
+configure itself. But remember: we want to make sure that Stack doesn&rsquo;t set
+itself up with version 7.8.4 of GHC. We can get around this by specifying an
+explicit resolver to the <code>stack</code> command (you can find more information on
+&ldquo;resolvers&rdquo; elsewhere):</p>
+
+<pre><code class="bash Side-step rootless issue in setup"># Change the resolver to the most up-to-date one. This is a hack to ensure that
+# get GHC version &gt; 7.8, because there's an issue with El Capitan's rootless
+# mode.
+stack --resolver=lts-6.10 setup
+</code></pre>
+
+<p>You&rsquo;ll notice we use the <code>--resolver=...</code> flag to force Stack to use a specific
+resolver. This post will be out of date as soon as it&rsquo;s written, so check
+<a href="https://www.stackage.org/snapshots">Stackage</a> to find the latest LTS snapshot.</p>
+
+<h2>Return to Vim and Haskell in 2016</h2>
+
+<p>That&rsquo;s it for the environment setup! Now you&rsquo;ll want to turn your attention to
+configuring Vim.</p>
+
+<p>The steps to set up Vim are platform independent, so now that we&rsquo;ve set up Stack
+correctly, you can head over to <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> to
+finish things out.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.
+ [g]: https://www.github.com/jez/
+ [h]: https://jez.io/
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[SML Dev Setup]]></title>
@@ -721,95 +842,6 @@ manipulate the window arrangements.</p>
 <p>After looking into it a little more, it looks like there are other OS X tools
 for spitting the screen into two panes, like <a href="http://www.bettertouchtool.net/">BetterTouchTool</a>, though I
 haven&rsquo;t actually tried any of them out.</p>
-
-<p>- - - - -
-<br>
-### Jake on the Web
-<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.
- [g]: https://www.github.com/jez/
- [h]: https://jez.io/
-</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Vim as a Man Page Viewer]]></title>
-    <link href="https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer/"/>
-    <updated>2014-12-20T21:17:46-05:00</updated>
-    <id>https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer</id>
-    <content type="html"><![CDATA[<p>Man pages are an essential part of every developer&rsquo;s workflow. Unfortunately,
-the default system pager <code>less</code> isn&rsquo;t the best interface. That&rsquo;s why I wrote a
-Vim plugin and a short shell function to take care of opening man pages in Vim.</p>
-
-<!-- more -->
-
-
-<h2>The Plugin</h2>
-
-<p>If you&rsquo;re eager to dive right into the source or to install the plugin, head on
-over to the <a href="https://github.com/jez/vim-superman">GitHub repository</a>. It&rsquo;s a whopping 32 SLOC, so feel
-free to peek under the hood.</p>
-
-<h2>Why?</h2>
-
-<p>You might be thinking, &ldquo;But Jake, <code>man</code> works just fine for me, why would I
-switch?&rdquo; I&rsquo;m glad you asked!</p>
-
-<h3>Mouse Support</h3>
-
-<p>The first reason why I was interested in getting man pages to open in Vim was
-because I wanted to be able to scroll with the mouse. When I have to read man
-pages for a long time, usually as a part of some more all-encompasing bit of
-research, I find scrolling to be a much better interface for quickly perusing
-the content of a man page.</p>
-
-<h3>Syntax Highlighting</h3>
-
-<p>As it turns out, man pages have a syntax to them, and Vim does a pretty
-excellent job at highlighting them. Rather than talk about it, here are some
-screenshots. Note how code samples (C system calls and library functions) are
-also syntax highlighted appropriately.</p>
-
-<pre><code class="bash Example 1">vman vim
-</code></pre>
-
-<p><a class="image-link" href="/images/vim.1.png"><img src="/images/vim.1.png"></a></p>
-
-<pre><code class="bash Example 2">vman 3 printf
-</code></pre>
-
-<p><a class="image-link" href="/images/printf.3.png"><img src="/images/printf.3.png"></a></p>
-
-<h3>All the benefits of Vim</h3>
-
-<p>While <code>less</code> makes a good effort to emulate certain Vim keybindings (or maybe
-it&rsquo;s the other way around, I don&rsquo;t know which came first), <code>less</code> certainly
-falls short of the full power of Vim.</p>
-
-<p>For example, once you&rsquo;ve opened a man page in Vim, you can open a new tab or
-split side-by-side with the man page. Especially if you&rsquo;re switching between Vim
-and the man page often, being able to open man pages in tabs or splits is
-invaluable.</p>
-
-<h2>Mine doesn&rsquo;t look like yours!</h2>
-
-<p>A couple of my other plugins are showing in the screenshots above. I&rsquo;m using the
-<a href="https://github.com/altercation/vim-colors-solarized">Solarized Dark color scheme</a>, the plugin
-<a href="https://github.com/bling/vim-airline">vim-airline</a> to take over the statuslines at the very top and
-bottom, and iTerm2 on Mac OS X 10.10.</p>
-
-<p>You can see my complete configuration <a href="https://github.com/jez/dotfiles">on GitHub</a>.</p>
-
-<h2>Feedback</h2>
-
-<p>As a matter of fact, this was my first Vim plugin! If you notice anything out of
-place, even if it&rsquo;s a small detail, I&rsquo;d love to hear it. Make no assumptions
-about the reasoning behind why certain decisions were made, because I have none
-XD</p>
 
 <p>- - - - -
 <br>
