@@ -2,16 +2,12 @@
 layout: post
 title: "Ruby Virtualenvs"
 date: 'Mon Dec 22 12:52:40 CST 2014'
-comments: true
+comments: false
 categories: [ruby, python]
 description: >
   After some research, I found a much better solution to the problem of
   sandboxing Ruby gems.
-image:
-  feature: /images/abstract-5.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 A while back I found a command that removes all Ruby gems installed on a system

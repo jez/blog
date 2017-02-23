@@ -3,9 +3,9 @@ layout: post
 title: "GitHub Pages Custom Domains"
 description: "A walkthrough of how I set up GitHub Pages with my domain name registrar."
 date: 2014-05-06 03:15:35 -0400
-comments: true
+comments: false
 categories: [dns, webdev, troubleshooting]
-share: true
+share: false
 ---
 
 I stumbled at first getting the DNS configured for my blog, because I've got a slighty more complicated setup than normal. I decided to supplement the documentation [GitHub Pages](https://pages.github.com/) gives by recounting my personal example and the setup that worked.

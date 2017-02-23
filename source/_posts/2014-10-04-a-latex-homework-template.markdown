@@ -2,14 +2,10 @@
 layout: post
 title: "A LaTeX Homework Template"
 date: 2014-10-04 02:03:27 -0400
-comments: true
+comments: false
 categories: [LaTeX]
 description: "All about what template I use for LaTeX on homework assignments."
-image:
-  feature: /images/abstract-7.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 Writing a LaTeX document from scratch for every assignment is tedious. Especially for homework assignments, a lot of the structure is repetitive. Read on to learn about the homework template I've adapted for use in all my technical classes.

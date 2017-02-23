@@ -2,14 +2,10 @@
 layout: post
 title: "Docker Tips and Cheatsheet"
 date: 2015-07-12 21:32:27 -0500
-comments: true
+comments: false
 categories: ['docker', 'best practices']
 description: 'A list of commands I use (and keep forgetting) every time I use Docker.'
-image:
-  feature: /images/abstract-6.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 I've been using Docker for a couple side projects lately, but only

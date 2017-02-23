@@ -2,14 +2,12 @@
 layout: post
 title: "Mastering git log for Collaboration"
 date: 2015-01-16 20:57:01 -0500
-comments: true
+comments: false
 categories: [git]
 description: >
   Mastering git log is probably the best way to collaborate effectively on a
   project that uses Git.
-image:
-  feature: /images/blue-lines.jpg
-share: true
+share: false
 ---
 
 Git is an incredibly powerful platform for collaboration. The ability to create

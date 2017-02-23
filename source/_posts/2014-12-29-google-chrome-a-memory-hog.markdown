@@ -2,13 +2,10 @@
 layout: post
 title: "Google Chrome: A Memory Hog"
 date: 2014-12-29 17:00:00 -0600
-comments: true
+comments: false
 categories: [unix, bash]
 description: A bash oneliner to determine how much memory Chrome is using.
-image:
-  feature: /images/chrome-wide.jpg
-  credit: Google
-share: true
+share: false
 ---
 
 Whenever someone complains about a slow computer, the first thing I check is

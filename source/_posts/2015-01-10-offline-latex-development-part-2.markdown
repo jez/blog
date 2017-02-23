@@ -2,14 +2,12 @@
 layout: post
 title: "Offline LaTeX Development - Part 2"
 date: 2015-01-10 16:00:00 -0600
-comments: true
+comments: false
 categories: [latex, terminal, vim, osx]
 description: >
   LaTeX development with Vim and the command line, now featuring split-pane
   windows!
-image:
-  feature: /images/latex-amethyst.png
-share: true
+share: false
 ---
 
 I've already written about how I develop LaTeX offline in Vim using GNU Make.

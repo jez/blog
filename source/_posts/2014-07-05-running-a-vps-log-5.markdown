@@ -2,12 +2,10 @@
 layout: post
 title: "Running a VPS, Log 5: It's Not You, It's Me"
 date: 2014-07-10 16:48:43 -0400
-comments: true
+comments: false
 categories: [summer projects, mail]
 description: It's not you, it's me.
-image:
-  feature: /images/blue-ring.png
-share: true
+share: false
 ---
 
 It is with great sadness that I announce today that I am breaking up with my mail server. At least for a little while, that is. Let's say we're "taking a break" to "see other people."

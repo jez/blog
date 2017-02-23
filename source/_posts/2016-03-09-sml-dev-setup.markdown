@@ -2,12 +2,12 @@
 layout: post
 title: "SML Dev Setup"
 date: 2016-03-09 20:06:15 -0600
-comments: true
+comments: false
 categories: ['best practices', 'vim', 'osx', 'terminal', 'sml']
 description: >
   Let's walk through a couple easy steps you can take to make developing SML
   feel more fluid, both in and out of your editor.
-share: true
+share: false
 ---
 
 When it comes right down to it, SML is a pretty great language. It's clear that

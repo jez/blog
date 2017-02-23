@@ -2,14 +2,10 @@
 layout: post
 title: "New GitHub Username"
 date: 2015-02-03 04:01:04 -0500
-comments: true
+comments: false
 categories: [meta, git]
 description: I've changed my GitHub username! Please update your remote urls.
-image:
-  feature: /images/abstract-5.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 I've changed my GitHub username from Z1MM32M4N to jez (hopefully it'll be a

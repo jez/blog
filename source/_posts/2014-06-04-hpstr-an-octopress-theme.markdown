@@ -3,13 +3,9 @@ layout: post
 title: "HPSTR: An Octopress Theme"
 description: "All about porting the HPSTR Theme for Jekyll to Octopress, adding in cool new features along the way."
 date: 2014-06-04 21:51:41 -0400
-comments: true
+comments: false
 categories: [webdev, meta]
-image:
-  feature: /images/abstract-1.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 In case you didn't notice, we're rocking a new theme: [HPSTR for Octopress][hpstr-source]! Ported from the [theme of the same name][hpstr-jekyll] for Jekyll, this theme has a bunch of cool new features that make the theme easier to use and more customizable.

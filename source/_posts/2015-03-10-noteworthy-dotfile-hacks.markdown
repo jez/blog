@@ -2,14 +2,12 @@
 layout: post
 title: "Noteworthy Dotfile Hacks"
 date: 2015-03-10 00:22:33 -0500
-comments: true
+comments: false
 categories: [dotfiles, zsh, git, vim, tmux]
 description: >
   Because it's much easier (for me at least) to read a blog post than read the
   code.
-image:
-  feature: /images/blue-ring.png
-share: true
+share: false
 ---
 
 There are some hidden gems in my dotfiles. This is a post to showcase them,

@@ -2,14 +2,12 @@
 layout: post
 title: "Getting Started with RCM"
 date: 2015-03-09 18:30:39 -0500
-comments: true
+comments: false
 categories: [dotfiles]
 description: >
   An overview of how I use the software suite rcm to manage my dotfiles across
   multiple machines.
-image:
-  feature: /images/blue-ring.png
-share: true
+share: false
 ---
 
 I recently rewrote most of my dotfiles to clean them up and in the process

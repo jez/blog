@@ -2,16 +2,12 @@
 layout: post
 title: "Show where a Python package is used"
 date: 2015-06-11 23:36:05 -0700
-comments: true
+comments: false
 categories: ['bash', 'python']
 description: >
   'I wrote a simple bash script that lists which Python packages use a given
   package.'
-image:
-  feature: /images/abstract-8.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 A while back I was doing some spring cleaning of my Python packages. I noticed

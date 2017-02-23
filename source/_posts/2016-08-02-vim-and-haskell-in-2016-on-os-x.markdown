@@ -2,13 +2,13 @@
 layout: post
 title: "Vim and Haskell in 2016 on OS X"
 date: 2016-08-02 21:04:08 -0700
-comments: true
+comments: false
 categories: ['best practices', 'osx', 'haskell', 'vim']
 description: >
   Stephen Diehl's article "Vim and Haskell in 2016" does a great job of
   outlining the quickest way to get a quality Haskell development experience.
   His post presumes Ubuntu; here we presume OS X.
-share: true
+share: false
 ---
 
 Stephen Diehl's article [Vim and Haskell in 2016][vim-and-haskell] does a great

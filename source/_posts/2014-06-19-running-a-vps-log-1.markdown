@@ -2,12 +2,10 @@
 layout: post
 title: "Running a VPS, Log 1: Managing Dotfiles Across Machines"
 date: 2014-06-19 23:10:51 -0400
-comments: true
+comments: false
 categories: [git, best practices, summer projects, dotfiles]
 description: An overview of how I use rcm and git to seamlessly manage my dotfiles and configuration scripts across 10+ remote servers.
-image:
-  feature: /images/blue-ring.png
-share: true
+share: false
 ---
 
 You could say I'm a bit of a geek when it comes to configuring my terminal environment; this obsession has led me to concoct ever-elaborate setup scripts and configuration files. On top of this, between my laptop's multiple boot environments, the servers I use for school, work, and ScottyLabs, and now [metagross](/2014/06/19/running-a-vps-log-0), keeping my configuration files in sync is a must. I handle it swiftly using a combination of git and rcm.

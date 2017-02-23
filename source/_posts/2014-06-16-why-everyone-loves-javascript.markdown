@@ -2,15 +2,11 @@
 layout: post
 title: "Why Everyone Loves JavaScript"
 date: 2014-06-16 00:39:52 -0400
-comments: true
+comments: false
 external_url: https://github.com/airbnb/javascript/blob/master/README.md
 categories: [webdev, javascript, best practices, scottylabs]
 description: If you don't love JavaScript, you're probably using it wrong. Luckily, some smart people on the interwebs know how to use it right.
-image:
-  feature: /images/abstract-3.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 Airbnb has put together a stellar list of simple ways to make your JavaScript more maintainable and manageable. From comments and whitespace, to hoisting and type casting, this list covers nearly everything you should know when developing a JavaScript app.

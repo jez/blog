@@ -2,14 +2,10 @@
 layout: post
 title: "Solarized LaTeX Listings"
 date: 2014-10-04 06:35:05 -0400
-comments: true
+comments: false
 categories: [LaTeX, design]
 description: I wrote a LaTeX package for styling code listings with Solarized.
-image:
-  feature: /images/abstract-7.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 Out of the box, LaTeX listings are pretty bad. With a bit of work, you can ascribe some colors to the code, but you're still stuck with choosing a theme. Given that I recently just switched to the Solarized colorscheme in Vim and iTerm2, I made a LaTeX package that styles code listings with the predefined Solarized light colors.

@@ -2,14 +2,10 @@
 layout: post
 title: "Using Multiple Git Remotes"
 date: 2014-11-01 18:12:35 -0400
-comments: true
+comments: false
 categories: [git]
 description: "An overview of how multiple Git remotes can be used to synchronize code distributed in a read-only Git repo"
-image:
-  feature: /images/abstract-1.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 Quite often when using git, you only need to use one remote: `origin`. All your pushes and pulls communicate with this one host. However, there are many occasions when using multiple Git remotes is incredibly handy.

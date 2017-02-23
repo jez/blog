@@ -2,7 +2,7 @@
 layout: post
 title: "Starter Zsh Setup"
 date: 2016-01-02 23:14:16 -0600
-comments: true
+comments: false
 categories: [dotfiles, zsh]
 description: >
   Zsh has given me so much mileage with respect to efficiency at the command
@@ -10,7 +10,7 @@ description: >
   reasons why it took so long was that I didn't know where to start; with this
   in mind, I've collected some of the zsh-specific bits of my dotfiles into one
   place to help people hit the ground running.
-share: true
+share: false
 ---
 
 Zsh has given me so much mileage with respect to efficiency at the command line.

@@ -2,14 +2,12 @@
 layout: post
 title: "Vim as a Man Page Viewer"
 date: 2014-12-20 20:17:46 -0600
-comments: true
+comments: false
 categories: [vim, bash]
 description: >
   Use vim as a man page viewer to get better syntax highlighting, scroll
   quickly with a mouse, tabs, and more.
-image:
-  feature: /images/printf.3.png
-share: true
+share: false
 ---
 
 Man pages are an essential part of every developer's workflow. Unfortunately,

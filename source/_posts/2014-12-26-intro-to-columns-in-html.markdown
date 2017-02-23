@@ -2,15 +2,11 @@
 layout: post
 title: "Intro to Columns in HTML"
 date: 2014-12-26 12:00:00 -0600
-comments: true
+comments: false
 categories: [html, webdev, best practices]
 description: >
   A simple introduction to columns and designing with a grid in HTML & CSS.
-image:
-  feature: /images/lincoln-memorial-columns.jpg
-  credit: Wikimedia Commons
-  creditlink: http://upload.wikimedia.org/wikipedia/commons/5/5d/Lincoln_memorial_columns.jpg
-share: true
+share: false
 ---
 
 HTML and CSS can be frustrating when first starting out. Despite all you try, nothing is in the right place. I've advised more than a few friends on how to figure out this mystery and I've noticed a pattern: people don't realize they should be using a grid.

@@ -2,16 +2,12 @@
 layout: post
 title: "Leaking Free Disk Space"
 date: 2015-08-03 00:05:31 -0700
-comments: true
+comments: false
 categories: ['linux']
 description: >
   I finally tracked down a free disk space leakage that's been bothering me for
   months.
-image:
-  feature: /images/abstract-1.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 I've been watching a disk space leakage creep slowly upwards for months now;

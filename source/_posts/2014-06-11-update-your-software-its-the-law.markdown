@@ -2,14 +2,10 @@
 layout: post
 title: "Update Your Software: It's the Law"
 date: 2014-06-11 22:22:57 -0400
-comments: true
+comments: false
 categories: [terminal, unix, best practices]
 description: I wrote a short bash snippet to check my command line software for updates and alert me once a day.
-image:
-  feature: /images/abstract-6.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 Okay, so maybe the government won't come after you for not updating. But they should. To guard off any present or future threats (be they from governments, security vulnerabilities, or something else in the cyber realm), I wrote a short bash snippet to check my system for outdated packages.

@@ -2,14 +2,10 @@
 layout: post
 title: "Offline LaTeX Development"
 date: 2014-10-06 18:00:00 -0400
-comments: true
+comments: false
 categories: [LaTeX, make, vim, unix]
 description: 
-image:
-  feature: /images/abstract-7.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 While online clients like ShareLaTeX or writeLaTeX are popular for getting started with LaTeX quickly, developing LaTeX locally with Vim and the command line is my preferred LaTeX workflow. In this post, I'll describe the changes I've made that make working with LaTeX on the command line a seamless experience. 

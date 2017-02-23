@@ -8,7 +8,8 @@ description: >
   outdated analogies and confusion due to technological progression. I think
   it's time to have a chat to answer some questions and move the discussion
   forwards.
-share: true
+comments: false
+share: false
 ---
 
 Discussions of encryption permeate tech and political news sites these days.

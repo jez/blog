@@ -2,16 +2,12 @@
 layout: post
 title: "Vim as an IDE"
 date: 2015-03-03 00:01:19 -0500
-comments: true
+comments: false
 categories: [vim]
 description: >
   Some screenshots and clarifications for my Vim as an IDE walkthrough on
   GitHub.
-image:
-  feature: /images/abstract-1.jpg
-  credit: dargadgetz
-  creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
-share: true
+share: false
 ---
 
 I took some screenshots to accompany my [Vim as an IDE][repo] repo on GitHub.
