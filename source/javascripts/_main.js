@@ -7,11 +7,6 @@ $(function() {
   });
 });
 
-// FitVids options
-$(function() {
-  $("article").fitVids();
-});
-
 $(".close-menu").click(function () {
   $(".menu").toggleClass("disabled");
   $(".links").toggleClass("enabled");
