@@ -29,15 +29,6 @@
 
 <!-- Twitter Cards -->
 
-  
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:image" content"">
-  
-  <meta name="twitter:title" content="SML Dev Setup">
-  <meta name="twitter:description" content="Let's walk through a couple easy steps you can take to make developing SML feel more fluid, both in and out of your editor.
-">
-  <meta name="twitter:creator" content="@Z1MM32M4N">
-
 
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
@@ -62,10 +53,6 @@
 
 
 
-<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
 
 </head>
 
@@ -73,41 +60,13 @@
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 <nav id="dl-menu" class="dl-menuwrapper" role="navigation">
-	<button class="dl-trigger">Open Menu</button>
-	<ul class="dl-menu">
-		<li><a href="/">Home</a></li>
-		<li>
-			<a href="#">About</a>
-			<ul class="dl-submenu">
-				<li>
-					<img src="/images/avatar-jake.jpg" alt="Jake Zimmerman photo" class="author-photo">
-					<h4>Jake Zimmerman</h4>
-					<p>Studying computer science at Carnegie Mellon. Working at Dropbox. Previously at Bloomberg L.P.</p>
-				</li>
-				<li><a href="//jez.io">Learn More</a></li>
-				<li>
-					<a href="mailto:jake@zimmerman.io"><i class="fa fa-envelope"></i> Email</a>
-				</li>
-				<li>
-					<a href="https://twitter.com/Z1MM32M4N"><i class="fa fa-twitter"></i> Twitter</a>
-				</li>
-				<li>
-					<a href="https://plus.google.com/+JacobZimmerman0"><i class="fa fa-google-plus"></i> Google+</a>
-				</li>
-				<li>
-					<a href="https://github.com/jez"><i class="fa fa-github"></i> GitHub</a>
-				</li>
-			</ul><!-- /.dl-submenu -->
-		</li>
-		<li>
-			<a href="#">Posts</a>
-			<ul class="dl-submenu">
-				<li><a href="/posts/">All Posts</a></li>
-				<li><a href="/categories/">All Categories</a></li>
-			</ul>
-		</li>
-		<li><a href="https://jez.io">Portfolio</a></li>
-	</ul><!-- /.dl-menu -->
+  <button class="dl-trigger">Open Menu</button>
+  <ul class="dl-menu">
+    <li><a href="/">Home</a></li>
+    <li><a href="/posts/">All Posts</a></li>
+    <li><a href="/categories/">Posts by Category</a></li>
+    <li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
+  </ul><!-- /.dl-menu -->
 </nav><!-- /.dl-menuwrapper -->
 
 
@@ -118,7 +77,7 @@
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title"><a href="/2016/03/09/sml-dev-setup/" rel="bookmark" title="SML Dev Setup">SML Dev Setup</a></h1>
+          <h1 class="entry-title">SML Dev Setup</h1>
         
         <h2>March 09, 2016</h2>
       </div><!-- /.header-title-wrap -->
@@ -148,18 +107,7 @@ packaged. Take the time to install a version of SML right now. At CMU, we use
 around with SML interactively. If you&rsquo;d like to play around with compiling and
 distributing programs written in SML, you might want to install <a href="http://www.mlton.org/">MLton</a>.</p>
 
-<figure class='code'><figcaption><span>Install SML from your package manager</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># SML/NJ on OS X</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># SML/NJ on OS X</span>
 </span><span class='line'>brew install smlnj
 </span><span class='line'><span class="c"># -- or --</span>
 </span><span class='line'><span class="c"># MLton on OS X</span>
@@ -217,12 +165,7 @@ keys for editing, let alone Vi-like keybindings. To get started, you&rsquo;ll ha
 change how you launch the SML/NJ REPL. In particular, we&rsquo;re going to preface our
 commands with <code>rlwrap</code>:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># instead of this...</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># instead of this...</span>
 </span><span class='line'><span class="nv">$ </span>sml
 </span><span class='line'>
 </span><span class='line'><span class="c"># use this:</span>
@@ -281,8 +224,7 @@ walkthrough, you can <a href="https://github.com/scrooloose/syntastic">visit the
 instructions. Go ahead and do this now, then try writing this in a file called
 <code>test.sml</code>:</p>
 
-<figure class='code'><figcaption><span>test.sml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">val</span> <span class="nv">foo</span> <span class="p">:</span> <span class="n">string</span> <span class="p">=</span> <span class="mi">42</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">val</span> <span class="nv">foo</span> <span class="p">:</span> <span class="n">string</span> <span class="p">=</span> <span class="mi">42</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -295,21 +237,7 @@ type checker. You can imagine how handy this is.</p>
 you can add at your discretion. At the very least, I&rsquo;d suggest adding these
 lines to your vimrc:</p>
 
-<figure class='code'><figcaption><span>.vimrc</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'>...
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'>...
 </span><span class='line'>
 </span><span class='line'>augroup mySyntastic
 </span><span class='line'><span class="c">  &quot; tell syntastic to always stick any detected errors into the location-list</span>
@@ -370,8 +298,7 @@ characters, not the end of the line).</p>
 
 <p>If you don&rsquo;t want Vim to do any of this wrapping, run this:</p>
 
-<figure class='code'><figcaption><span>Disable hard line wrapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">setlocal</span> <span class="nb">textwidth</span><span class="p">=</span><span class="m">0</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">setlocal</span> <span class="nb">textwidth</span><span class="p">=</span><span class="m">0</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -384,8 +311,7 @@ after plugin code is.</p>
 <p>Conversely, if you&rsquo;d like a little better idea when Vim&rsquo;s going to hard wrap
 your line, you can add this line to your vimrc:</p>
 
-<figure class='code'><figcaption><span>Show a color column</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">colorcolumn</span><span class="p">+=</span><span class="m">0</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">colorcolumn</span><span class="p">+=</span><span class="m">0</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -430,13 +356,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
         <span><a href="/2016/03/09/sml-dev-setup/" rel="bookmark" title="SML Dev Setup">SML Dev Setup</a> was published on <span class="entry-date date published updated"><time datetime="2016-03-09T21:06:15-05:00">March 09, 2016</time></span></span>
         
         <span class="author vcard"><span class="fn"><a href="https://jez.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
-        <div class="social-share">
-          <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=https://blog.jez.io/2016/03/09/sml-dev-setup" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=https://blog.jez.io/2016/03/09/sml-dev-setup" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url=https://blog.jez.io/2016/03/09/sml-dev-setup" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
-          </ul>
-        </div><!-- /.social-share -->
+        
       </footer>
     </div><!-- /.entry-content -->
     
@@ -466,57 +386,23 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
         </div><!-- /.read-more-list -->
       </div><!-- /.read-more -->
     
-    <section id="disqus_thread"></section><!-- /#disqus_thread -->
+    
   </article>
 </div><!-- /#main -->
 
 <div class="footer-wrapper">
   <footer role="contentinfo">
-    <span>&copy; 2016 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+    <span>&copy; 2017 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
 
   </footer>
 </div><!-- /.footer-wrapper -->
 
 
 	        
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="/javascripts/octopress.js" type="text/javascript"></script>
 <script src="/javascripts/scripts.min.js"></script>
 &#8211;>
-
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-50690546-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-
-
-<script type="text/javascript">
-      var disqus_shortname = 'jakez-blog';
-      
-        
-        // var disqus_developer = 1;
-        var disqus_identifier = 'https://blog.jez.io/2016/03/09/sml-dev-setup/';
-        var disqus_url = 'https://blog.jez.io/2016/03/09/sml-dev-setup/';
-        var disqus_script = 'embed.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
 	        
 
 </body>

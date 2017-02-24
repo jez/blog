@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Summer Projects | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/summer-projects/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2016-08-03T01:23:58-04:00</updated>
+  <updated>2017-02-23T19:29:16-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -93,26 +93,7 @@ people think, so feel free to comment, open an issue, or send me an email.
 <p>On a working mail server, we should be able to have the following dialog with the server:</p>
 
 <p><figure class='code'><figcaption><span>telnet </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ telnet mail.zimmerman.io 25
+<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ telnet mail.zimmerman.io 25
 </span><span class='line'>  Trying 107.170.7.111&hellip;
 </span><span class='line'>  Connected to metagross.zimmerman.io.
 </span><span class='line'>  Escape character is &lsquo;^]&rsquo;.
@@ -159,8 +140,7 @@ people think, so feel free to comment, open an issue, or send me an email.
 <p>The syntax of the command looks like this:</p>
 
 <p><figure class='code'><figcaption><span>s_client </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ openssl s_client -connect &lt;host>:&lt;port> [options]</span></code></pre></td></tr></table></div></figure></p>
+<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ openssl s_client -connect &lt;host>:&lt;port> [options]</span></code></pre></td></tr></table></div></figure></p>
 
 <p>This client becomes particularly important, because one Postfix option I&rsquo;ve specified in the file <code>/etc/postfix/main.cf</code> is <code>smtpd_tls_auth_only = yes</code>. What this means is that Postfix won&rsquo;t send the line <code>250-AUTH PLAIN LOGIN</code> unless we&rsquo;re running on a secure connection. Merely using <code>telnet</code> to connect on port 25 will not initiate a secure connection.</p>
 
@@ -221,30 +201,7 @@ people think, so feel free to comment, open an issue, or send me an email.
 <p>I have a few ideas on why my server won&rsquo;t let me in. I know for sure that it&rsquo;s not a firewall issue; I have all the requisite ports (25/465/587 and 143/993) open.</p>
 
 <p><figure class='code'><figcaption><span>ufw Firewall Settings </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ ufw status
+<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ ufw status
 </span><span class='line'>Status: active&lt;/p>
 </span><span class='line'>
 </span><span class='line'>&lt;p>To                         Action      From&lt;/p>
@@ -326,15 +283,12 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <p>Upgrading my kernel version was just a few steps, though. I had to run
 <figure class='code'><figcaption><span>Upgrade Kernel </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo apt-get update
+<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo apt-get update
 </span><span class='line'><span class="nv">$ </span>sudp apt-get upgrade
 </span></code></pre></td></tr></table></div></figure>
 to update the list of downloaded kernels, then
 <figure class='code'><figcaption><span>Restart </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo shutdown -h now
+<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo shutdown -h now
 </span></code></pre></td></tr></table></div></figure>
 to tell the server to shutdown and power off. Next up is to switch over the kernel version on the <a href="https://www.digitalocean.com/community/tutorials/how-to-update-a-digitalocean-server-s-kernel-using-the-control-panel">DigitalOcean control panel</a>. All in all, nothing too difficult: the hardest part was that I never expected my problem to have anything to do with DigitalOcean.</p>
 
@@ -476,21 +430,7 @@ people think, so feel free to comment, open an issue, or send me an email.
 <p>The solution I came up with regarding a multiple-environment workflow deals with handling all the necessary machine-dependent configuration within my dotfiles <em>themselves</em>. That way I can minimize code reuse and have everything in one convenient file. As a result, <a href="https://github.com/jez/dotfiles/tree/master/bash_profile">my bash_profile</a> is a bit lengthy at about 300 lines, and it has three large case statements, but I make all this up through deployment. Deployment is <strong>incredibly</strong> swift. Again, You can take a look at the file to see how it works, but when I had finished <a href="/2014/06/19/running-a-vps-log-1">locking down my server</a>, these are the only configuration commands I had to run:</p>
 
 <p><figure class='code'><figcaption><span>Installing rcm and dotfiles </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
+<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;install rcm using deb and dpkg&lt;/h1&gt;
 </span><span class='line'>

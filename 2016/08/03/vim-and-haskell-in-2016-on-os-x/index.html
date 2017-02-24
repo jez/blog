@@ -28,14 +28,6 @@
 
 <!-- Twitter Cards -->
 
-  
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:image" content"">
-  
-  <meta name="twitter:title" content="Vim and Haskell in 2016 on OS X">
-  <meta name="twitter:description" content="Stephen Diehl's article "Vim and Haskell in 2016" does a great job of outlining the quickest way to get a quality Haskell development experience. His &hellip;">
-  <meta name="twitter:creator" content="@Z1MM32M4N">
-
 
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
@@ -59,10 +51,6 @@
 
 
 
-<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
 
 </head>
 
@@ -70,41 +58,13 @@
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 <nav id="dl-menu" class="dl-menuwrapper" role="navigation">
-	<button class="dl-trigger">Open Menu</button>
-	<ul class="dl-menu">
-		<li><a href="/">Home</a></li>
-		<li>
-			<a href="#">About</a>
-			<ul class="dl-submenu">
-				<li>
-					<img src="/images/avatar-jake.jpg" alt="Jake Zimmerman photo" class="author-photo">
-					<h4>Jake Zimmerman</h4>
-					<p>Studying computer science at Carnegie Mellon. Working at Dropbox. Previously at Bloomberg L.P.</p>
-				</li>
-				<li><a href="//jez.io">Learn More</a></li>
-				<li>
-					<a href="mailto:jake@zimmerman.io"><i class="fa fa-envelope"></i> Email</a>
-				</li>
-				<li>
-					<a href="https://twitter.com/Z1MM32M4N"><i class="fa fa-twitter"></i> Twitter</a>
-				</li>
-				<li>
-					<a href="https://plus.google.com/+JacobZimmerman0"><i class="fa fa-google-plus"></i> Google+</a>
-				</li>
-				<li>
-					<a href="https://github.com/jez"><i class="fa fa-github"></i> GitHub</a>
-				</li>
-			</ul><!-- /.dl-submenu -->
-		</li>
-		<li>
-			<a href="#">Posts</a>
-			<ul class="dl-submenu">
-				<li><a href="/posts/">All Posts</a></li>
-				<li><a href="/categories/">All Categories</a></li>
-			</ul>
-		</li>
-		<li><a href="https://jez.io">Portfolio</a></li>
-	</ul><!-- /.dl-menu -->
+  <button class="dl-trigger">Open Menu</button>
+  <ul class="dl-menu">
+    <li><a href="/">Home</a></li>
+    <li><a href="/posts/">All Posts</a></li>
+    <li><a href="/categories/">Posts by Category</a></li>
+    <li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
+  </ul><!-- /.dl-menu -->
 </nav><!-- /.dl-menuwrapper -->
 
 
@@ -115,7 +75,7 @@
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title"><a href="/2016/08/03/vim-and-haskell-in-2016-on-os-x/" rel="bookmark" title="Vim and Haskell in 2016 on OS X">Vim and Haskell in 2016 on OS X</a></h1>
+          <h1 class="entry-title">Vim and Haskell in 2016 on OS X</h1>
         
         <h2>August 03, 2016</h2>
       </div><!-- /.header-title-wrap -->
@@ -161,11 +121,7 @@ Stack to manage the path to the compiler executable and sandboxes.</p></blockquo
 huge fan of things cluttering up your home folder, set the <code>STACK_ROOT</code> variable
 in you bashrc or zshrc:</p>
 
-<figure class='code'><figcaption><span>Set STACK_ROOT to avoid clutter</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">XDG_DATA_HOME</span><span class="o">=</span><span class="s2">&quot;$HOME/.local/share&quot;</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">XDG_DATA_HOME</span><span class="o">=</span><span class="s2">&quot;$HOME/.local/share&quot;</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># Have Haskell Stack use XDG Base Directory spec</span>
 </span><span class='line'><span class="nb">export </span><span class="nv">STACK_ROOT</span><span class="o">=</span><span class="s2">&quot;$XDG_DATA_HOME/stack&quot;</span>
@@ -185,15 +141,7 @@ continuing.</p>
 <p>If you&rsquo;re like me, you&rsquo;ll want to take a second to purge anything
 Haskell-related from previous botched setup attempts:</p>
 
-<figure class='code'><figcaption><span>Wipe the slate clean</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># If you had GHC installed</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># If you had GHC installed</span>
 </span><span class='line'><span class="nv">$ </span>brew uninstall ghc
 </span><span class='line'>
 </span><span class='line'><span class="c"># If you tried and failed at installing Stack already</span>
@@ -207,8 +155,7 @@ Haskell-related from previous botched setup attempts:</p>
 <p>With that out of the way, we can actually get our hands on Stack. For OS X,
 we&rsquo;ll install through Homebrew:</p>
 
-<figure class='code'><figcaption><span>Install Stack</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='console'><span class='line'><span class="gp">$</span> brew install haskell-stack
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='console'><span class='line'><span class="gp">$</span> brew install haskell-stack
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -220,11 +167,7 @@ itself up with version 7.8.4 of GHC. We can get around this by specifying an
 explicit resolver to the <code>stack</code> command (you can find more information on
 &ldquo;resolvers&rdquo; elsewhere):</p>
 
-<figure class='code'><figcaption><span>Side-step rootless issue in setup</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Change the resolver to the most up-to-date one. This is a hack to ensure that</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Change the resolver to the most up-to-date one. This is a hack to ensure that</span>
 </span><span class='line'><span class="c"># get GHC version &gt; 7.8, because there&#39;s an issue with El Capitan&#39;s rootless</span>
 </span><span class='line'><span class="c"># mode.</span>
 </span><span class='line'>stack --resolver<span class="o">=</span>lts-6.10 setup
@@ -261,13 +204,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
         <span><a href="/2016/08/03/vim-and-haskell-in-2016-on-os-x/" rel="bookmark" title="Vim and Haskell in 2016 on OS X">Vim and Haskell in 2016 on OS X</a> was published on <span class="entry-date date published updated"><time datetime="2016-08-03T00:04:08-04:00">August 03, 2016</time></span></span>
         
         <span class="author vcard"><span class="fn"><a href="https://jez.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
-        <div class="social-share">
-          <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url=https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
-          </ul>
-        </div><!-- /.social-share -->
+        
       </footer>
     </div><!-- /.entry-content -->
     
@@ -297,57 +234,23 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
         </div><!-- /.read-more-list -->
       </div><!-- /.read-more -->
     
-    <section id="disqus_thread"></section><!-- /#disqus_thread -->
+    
   </article>
 </div><!-- /#main -->
 
 <div class="footer-wrapper">
   <footer role="contentinfo">
-    <span>&copy; 2016 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+    <span>&copy; 2017 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
 
   </footer>
 </div><!-- /.footer-wrapper -->
 
 
 	        
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="/javascripts/octopress.js" type="text/javascript"></script>
 <script src="/javascripts/scripts.min.js"></script>
 &#8211;>
-
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-50690546-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-
-
-<script type="text/javascript">
-      var disqus_shortname = 'jakez-blog';
-      
-        
-        // var disqus_developer = 1;
-        var disqus_identifier = 'https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x/';
-        var disqus_url = 'https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x/';
-        var disqus_script = 'embed.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
 	        
 
 </body>

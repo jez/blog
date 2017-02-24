@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Troubleshooting | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/troubleshooting/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2016-08-03T01:23:58-04:00</updated>
+  <updated>2017-02-23T19:29:16-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -32,26 +32,7 @@
 <p>On a working mail server, we should be able to have the following dialog with the server:</p>
 
 <p><figure class='code'><figcaption><span>telnet </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ telnet mail.zimmerman.io 25
+<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ telnet mail.zimmerman.io 25
 </span><span class='line'>  Trying 107.170.7.111&hellip;
 </span><span class='line'>  Connected to metagross.zimmerman.io.
 </span><span class='line'>  Escape character is &lsquo;^]&rsquo;.
@@ -98,8 +79,7 @@
 <p>The syntax of the command looks like this:</p>
 
 <p><figure class='code'><figcaption><span>s_client </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ openssl s_client -connect &lt;host>:&lt;port> [options]</span></code></pre></td></tr></table></div></figure></p>
+<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ openssl s_client -connect &lt;host>:&lt;port> [options]</span></code></pre></td></tr></table></div></figure></p>
 
 <p>This client becomes particularly important, because one Postfix option I&rsquo;ve specified in the file <code>/etc/postfix/main.cf</code> is <code>smtpd_tls_auth_only = yes</code>. What this means is that Postfix won&rsquo;t send the line <code>250-AUTH PLAIN LOGIN</code> unless we&rsquo;re running on a secure connection. Merely using <code>telnet</code> to connect on port 25 will not initiate a secure connection.</p>
 
@@ -160,30 +140,7 @@
 <p>I have a few ideas on why my server won&rsquo;t let me in. I know for sure that it&rsquo;s not a firewall issue; I have all the requisite ports (25/465/587 and 143/993) open.</p>
 
 <p><figure class='code'><figcaption><span>ufw Firewall Settings </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ ufw status
+<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ ufw status
 </span><span class='line'>Status: active&lt;/p>
 </span><span class='line'>
 </span><span class='line'>&lt;p>To                         Action      From&lt;/p>

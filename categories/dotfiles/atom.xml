@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Dotfiles | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/dotfiles/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2016-08-03T01:23:58-04:00</updated>
+  <updated>2017-02-23T19:29:16-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -450,21 +450,7 @@ people think, so feel free to comment, open an issue, or send me an email.
 <p>The solution I came up with regarding a multiple-environment workflow deals with handling all the necessary machine-dependent configuration within my dotfiles <em>themselves</em>. That way I can minimize code reuse and have everything in one convenient file. As a result, <a href="https://github.com/jez/dotfiles/tree/master/bash_profile">my bash_profile</a> is a bit lengthy at about 300 lines, and it has three large case statements, but I make all this up through deployment. Deployment is <strong>incredibly</strong> swift. Again, You can take a look at the file to see how it works, but when I had finished <a href="/2014/06/19/running-a-vps-log-1">locking down my server</a>, these are the only configuration commands I had to run:</p>
 
 <p><figure class='code'><figcaption><span>Installing rcm and dotfiles </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
+<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;install rcm using deb and dpkg&lt;/h1&gt;
 </span><span class='line'>

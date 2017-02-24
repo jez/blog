@@ -28,14 +28,6 @@
 
 <!-- Twitter Cards -->
 
-  
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="/images/abstract-6.jpg"
-  
-  <meta name="twitter:title" content="Docker Tips and Cheatsheet">
-  <meta name="twitter:description" content="A list of commands I use (and keep forgetting) every time I use Docker.">
-  <meta name="twitter:creator" content="@Z1MM32M4N">
-
 
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
@@ -44,7 +36,7 @@
 <meta property="og:title" content="Docker Tips and Cheatsheet">
 <meta property="og:description" content="A list of commands I use (and keep forgetting) every time I use Docker.">
 
-  <meta property="og:image" content="/images/abstract-6.jpg">
+  <meta property="og:image" content="">
 
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
@@ -59,62 +51,23 @@
 
 
 
-<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
 
 </head>
 
-<body id="post" class="feature">
+<body id="post" >
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 <nav id="dl-menu" class="dl-menuwrapper" role="navigation">
-	<button class="dl-trigger">Open Menu</button>
-	<ul class="dl-menu">
-		<li><a href="/">Home</a></li>
-		<li>
-			<a href="#">About</a>
-			<ul class="dl-submenu">
-				<li>
-					<img src="/images/avatar-jake.jpg" alt="Jake Zimmerman photo" class="author-photo">
-					<h4>Jake Zimmerman</h4>
-					<p>Studying computer science at Carnegie Mellon. Working at Dropbox. Previously at Bloomberg L.P.</p>
-				</li>
-				<li><a href="//jez.io">Learn More</a></li>
-				<li>
-					<a href="mailto:jake@zimmerman.io"><i class="fa fa-envelope"></i> Email</a>
-				</li>
-				<li>
-					<a href="https://twitter.com/Z1MM32M4N"><i class="fa fa-twitter"></i> Twitter</a>
-				</li>
-				<li>
-					<a href="https://plus.google.com/+JacobZimmerman0"><i class="fa fa-google-plus"></i> Google+</a>
-				</li>
-				<li>
-					<a href="https://github.com/jez"><i class="fa fa-github"></i> GitHub</a>
-				</li>
-			</ul><!-- /.dl-submenu -->
-		</li>
-		<li>
-			<a href="#">Posts</a>
-			<ul class="dl-submenu">
-				<li><a href="/posts/">All Posts</a></li>
-				<li><a href="/categories/">All Categories</a></li>
-			</ul>
-		</li>
-		<li><a href="https://jez.io">Portfolio</a></li>
-	</ul><!-- /.dl-menu -->
+  <button class="dl-trigger">Open Menu</button>
+  <ul class="dl-menu">
+    <li><a href="/">Home</a></li>
+    <li><a href="/posts/">All Posts</a></li>
+    <li><a href="/categories/">Posts by Category</a></li>
+    <li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
+  </ul><!-- /.dl-menu -->
 </nav><!-- /.dl-menuwrapper -->
 
 
-
-<div class="entry-header">
-  <div class="image-credit">Image source: <a href="http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/">dargadgetz</a></div><!-- /.image-credit -->
-  <div class="entry-image">
-    <img src="/images/abstract-6.jpg" alt="Docker Tips and Cheatsheet">
-  </div><!-- /.entry-image -->
-</div><!-- /.entry-header -->
 
 
 <div id="main" role="main">
@@ -122,7 +75,7 @@
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title"><a href="/2015/07/12/docker-tips-and-cheatsheet/" rel="bookmark" title="Docker Tips and Cheatsheet">Docker Tips and Cheatsheet</a></h1>
+          <h1 class="entry-title">Docker Tips and Cheatsheet</h1>
         
         <h2>July 12, 2015</h2>
       </div><!-- /.header-title-wrap -->
@@ -154,30 +107,7 @@ commands through the rest of the post.</p>
 
 <p>Here&rsquo;s a quick cheatsheet:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Build your whole Docker Compose project...</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Build your whole Docker Compose project...</span>
 </span><span class='line'>docker-compose build
 </span><span class='line'><span class="c"># ...or just build one piece of it</span>
 </span><span class='line'>docker-compose build <span class="o">[</span>app<span class="p">|</span>db<span class="p">|</span>etc...<span class="o">]</span>
@@ -212,21 +142,14 @@ project.</p>
 <p>Docker Compose&rsquo;s biggest advantage is that it simplifies building your
 Dockerized app to just</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker-compose build
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>docker-compose build
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>Most apps, though, have a couple Docker Compose targets, like <code>db</code> and <code>app</code> in
 this sample <code>docker-compose.yml</code> file:</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">db</span><span class="p-Indicator">:</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">db</span><span class="p-Indicator">:</span>
 </span><span class='line'>  <span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">postgres</span>
 </span><span class='line'>  <span class="l-Scalar-Plain">...</span>
 </span><span class='line'><span class="l-Scalar-Plain">app</span><span class="p-Indicator">:</span>
@@ -237,8 +160,7 @@ this sample <code>docker-compose.yml</code> file:</p>
 
 <p>If all you&rsquo;ve done is made a simple change to <code>app</code>, you can get by with just</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose build app</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose build app</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -248,8 +170,7 @@ this sample <code>docker-compose.yml</code> file:</p>
 
 <p>To start a Docker Compose app once you&rsquo;ve built it&rsquo;s constituent images:</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose up -d</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose up -d</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -259,8 +180,7 @@ flag.</p>
 
 <p>To view the logs from your app&rsquo;s running containers:</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose logs</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose logs</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -269,8 +189,7 @@ in the <code>docker-compose.yml</code> file so you can keep things straight.</p>
 
 <p>To bring your app down (if you started it with <code>-d</code>, otherwise just use <code>^C</code>):</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose stop</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose stop</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -286,18 +205,14 @@ places Docker leaves junk behind.</p>
 Docker Compose, you can just run the following to get rid of any containers
 started by Docker Compose that have now stopped:</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose rm</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose rm</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>If you&rsquo;re not using Docker Compose, you&rsquo;ll have to find them and manually prune
 them:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># find all exited containers (docker ps ...),</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># find all exited containers (docker ps ...),</span>
 </span><span class='line'><span class="c"># and remove these containers (docker rm)</span>
 </span><span class='line'>docker rm <span class="k">$(</span>docker ps -a <span class="p">|</span> grep Exited <span class="p">|</span> awk <span class="s1">&#39;{print $1;}&#39;</span><span class="k">)</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -311,10 +226,7 @@ actually a &ldquo;feature&rdquo; of Docker: all images that you build are cached
 subsequently builds are instantaneous. However, when we&rsquo;re developing and
 generating new images frequently, previous image builds only take up space.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># find all un-tagged images (docker images ...),</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># find all un-tagged images (docker images ...),</span>
 </span><span class='line'><span class="c"># and remove these images (docker rmi)</span>
 </span><span class='line'>docker rmi <span class="k">$(</span>docker images -q --filter <span class="s2">&quot;dangling=true&quot;</span><span class="k">)</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -330,15 +242,7 @@ behind some state for managing that volume. Unfortunately (and infuriatingly),
 the Docker CLI doesn&rsquo;t offer a way to clean these up natively. Luckily, there&rsquo;s
 a super handy script online that uses the Docker Python API to handle it.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Install Python dependencies (do this only once)</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Install Python dependencies (do this only once)</span>
 </span><span class='line'>pip install docker-py
 </span><span class='line'>
 </span><span class='line'><span class="c"># Download the script</span>
@@ -353,8 +257,7 @@ a super handy script online that uses the Docker Python API to handle it.</p>
 they become dangling by using the following when your Docker Compose project
 uses volumes:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker-compose rm -v
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>docker-compose rm -v
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -382,20 +285,7 @@ roots</a>.</p>
 core app (i.e., I&rsquo;ve set up the <code>Dockerfile</code> and <code>docker-compose.yml</code> file), I
 basically just run</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>fig up -d
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>fig up -d
 </span><span class='line'>
 </span><span class='line'>fig logs
 </span><span class='line'><span class="c"># observe my project, fix what&#39;s wrong</span>
@@ -462,13 +352,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
         <span><a href="/2015/07/12/docker-tips-and-cheatsheet/" rel="bookmark" title="Docker Tips and Cheatsheet">Docker Tips and Cheatsheet</a> was published on <span class="entry-date date published updated"><time datetime="2015-07-12T22:32:27-04:00">July 12, 2015</time></span></span>
         
         <span class="author vcard"><span class="fn"><a href="https://jez.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
-        <div class="social-share">
-          <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=https://blog.jez.io/2015/07/12/docker-tips-and-cheatsheet" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=https://blog.jez.io/2015/07/12/docker-tips-and-cheatsheet" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url=https://blog.jez.io/2015/07/12/docker-tips-and-cheatsheet" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
-          </ul>
-        </div><!-- /.social-share -->
+        
       </footer>
     </div><!-- /.entry-content -->
     
@@ -498,57 +382,23 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
         </div><!-- /.read-more-list -->
       </div><!-- /.read-more -->
     
-    <section id="disqus_thread"></section><!-- /#disqus_thread -->
+    
   </article>
 </div><!-- /#main -->
 
 <div class="footer-wrapper">
   <footer role="contentinfo">
-    <span>&copy; 2016 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+    <span>&copy; 2017 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
 
   </footer>
 </div><!-- /.footer-wrapper -->
 
 
 	        
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="/javascripts/octopress.js" type="text/javascript"></script>
 <script src="/javascripts/scripts.min.js"></script>
 &#8211;>
-
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-50690546-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-
-
-<script type="text/javascript">
-      var disqus_shortname = 'jakez-blog';
-      
-        
-        // var disqus_developer = 1;
-        var disqus_identifier = 'https://blog.jez.io/2015/07/12/docker-tips-and-cheatsheet/';
-        var disqus_url = 'https://blog.jez.io/2015/07/12/docker-tips-and-cheatsheet/';
-        var disqus_script = 'embed.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
 	        
 
 </body>

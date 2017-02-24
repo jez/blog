@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2016-08-03T01:23:58-04:00</updated>
+  <updated>2017-02-23T19:29:16-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -58,11 +58,7 @@ Stack to manage the path to the compiler executable and sandboxes.</p></blockquo
 huge fan of things cluttering up your home folder, set the <code>STACK_ROOT</code> variable
 in you bashrc or zshrc:</p>
 
-<figure class='code'><figcaption><span>Set STACK_ROOT to avoid clutter</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">XDG_DATA_HOME</span><span class="o">=</span><span class="s2">&quot;$HOME/.local/share&quot;</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">XDG_DATA_HOME</span><span class="o">=</span><span class="s2">&quot;$HOME/.local/share&quot;</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># Have Haskell Stack use XDG Base Directory spec</span>
 </span><span class='line'><span class="nb">export </span><span class="nv">STACK_ROOT</span><span class="o">=</span><span class="s2">&quot;$XDG_DATA_HOME/stack&quot;</span>
@@ -82,15 +78,7 @@ continuing.</p>
 <p>If you&rsquo;re like me, you&rsquo;ll want to take a second to purge anything
 Haskell-related from previous botched setup attempts:</p>
 
-<figure class='code'><figcaption><span>Wipe the slate clean</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># If you had GHC installed</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># If you had GHC installed</span>
 </span><span class='line'><span class="nv">$ </span>brew uninstall ghc
 </span><span class='line'>
 </span><span class='line'><span class="c"># If you tried and failed at installing Stack already</span>
@@ -104,8 +92,7 @@ Haskell-related from previous botched setup attempts:</p>
 <p>With that out of the way, we can actually get our hands on Stack. For OS X,
 we&rsquo;ll install through Homebrew:</p>
 
-<figure class='code'><figcaption><span>Install Stack</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='console'><span class='line'><span class="gp">$</span> brew install haskell-stack
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='console'><span class='line'><span class="gp">$</span> brew install haskell-stack
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -117,11 +104,7 @@ itself up with version 7.8.4 of GHC. We can get around this by specifying an
 explicit resolver to the <code>stack</code> command (you can find more information on
 &ldquo;resolvers&rdquo; elsewhere):</p>
 
-<figure class='code'><figcaption><span>Side-step rootless issue in setup</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Change the resolver to the most up-to-date one. This is a hack to ensure that</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Change the resolver to the most up-to-date one. This is a hack to ensure that</span>
 </span><span class='line'><span class="c"># get GHC version &gt; 7.8, because there&#39;s an issue with El Capitan&#39;s rootless</span>
 </span><span class='line'><span class="c"># mode.</span>
 </span><span class='line'>stack --resolver<span class="o">=</span>lts-6.10 setup
@@ -474,18 +457,7 @@ packaged. Take the time to install a version of SML right now. At CMU, we use
 around with SML interactively. If you&rsquo;d like to play around with compiling and
 distributing programs written in SML, you might want to install <a href="http://www.mlton.org/">MLton</a>.</p>
 
-<figure class='code'><figcaption><span>Install SML from your package manager</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># SML/NJ on OS X</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># SML/NJ on OS X</span>
 </span><span class='line'>brew install smlnj
 </span><span class='line'><span class="c"># -- or --</span>
 </span><span class='line'><span class="c"># MLton on OS X</span>
@@ -543,12 +515,7 @@ keys for editing, let alone Vi-like keybindings. To get started, you&rsquo;ll ha
 change how you launch the SML/NJ REPL. In particular, we&rsquo;re going to preface our
 commands with <code>rlwrap</code>:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># instead of this...</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># instead of this...</span>
 </span><span class='line'><span class="nv">$ </span>sml
 </span><span class='line'>
 </span><span class='line'><span class="c"># use this:</span>
@@ -607,8 +574,7 @@ walkthrough, you can <a href="https://github.com/scrooloose/syntastic">visit the
 instructions. Go ahead and do this now, then try writing this in a file called
 <code>test.sml</code>:</p>
 
-<figure class='code'><figcaption><span>test.sml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">val</span> <span class="nv">foo</span> <span class="p">:</span> <span class="n">string</span> <span class="p">=</span> <span class="mi">42</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">val</span> <span class="nv">foo</span> <span class="p">:</span> <span class="n">string</span> <span class="p">=</span> <span class="mi">42</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -621,21 +587,7 @@ type checker. You can imagine how handy this is.</p>
 you can add at your discretion. At the very least, I&rsquo;d suggest adding these
 lines to your vimrc:</p>
 
-<figure class='code'><figcaption><span>.vimrc</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'>...
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'>...
 </span><span class='line'>
 </span><span class='line'>augroup mySyntastic
 </span><span class='line'><span class="c">  &quot; tell syntastic to always stick any detected errors into the location-list</span>
@@ -696,8 +648,7 @@ characters, not the end of the line).</p>
 
 <p>If you don&rsquo;t want Vim to do any of this wrapping, run this:</p>
 
-<figure class='code'><figcaption><span>Disable hard line wrapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">setlocal</span> <span class="nb">textwidth</span><span class="p">=</span><span class="m">0</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">setlocal</span> <span class="nb">textwidth</span><span class="p">=</span><span class="m">0</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -710,8 +661,7 @@ after plugin code is.</p>
 <p>Conversely, if you&rsquo;d like a little better idea when Vim&rsquo;s going to hard wrap
 your line, you can add this line to your vimrc:</p>
 
-<figure class='code'><figcaption><span>Show a color column</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">colorcolumn</span><span class="p">+=</span><span class="m">0</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">colorcolumn</span><span class="p">+=</span><span class="m">0</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -838,12 +788,7 @@ packages. I had gigabytes worth of packages that could be autoremoved.</p>
 <p>There&rsquo;s a one-line config file fix. Add this to
 /etc/apt/apt.conf.d/50unattended-upgrades:</p>
 
-<figure class='code'><figcaption><span>/etc/apt/apt.conf.d/50unattended-upgrades</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>...
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>...
 </span><span class='line'>// Do automatic removal of new unused dependencies after the upgrade
 </span><span class='line'>// (equivalent to apt-get autoremove)
 </span><span class='line'>Unattended-Upgrade::Remove-Unused-Dependencies "true";
@@ -903,30 +848,7 @@ commands through the rest of the post.</p>
 
 <p>Here&rsquo;s a quick cheatsheet:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Build your whole Docker Compose project...</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Build your whole Docker Compose project...</span>
 </span><span class='line'>docker-compose build
 </span><span class='line'><span class="c"># ...or just build one piece of it</span>
 </span><span class='line'>docker-compose build <span class="o">[</span>app<span class="p">|</span>db<span class="p">|</span>etc...<span class="o">]</span>
@@ -961,21 +883,14 @@ project.</p>
 <p>Docker Compose&rsquo;s biggest advantage is that it simplifies building your
 Dockerized app to just</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker-compose build
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>docker-compose build
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>Most apps, though, have a couple Docker Compose targets, like <code>db</code> and <code>app</code> in
 this sample <code>docker-compose.yml</code> file:</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">db</span><span class="p-Indicator">:</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">db</span><span class="p-Indicator">:</span>
 </span><span class='line'>  <span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">postgres</span>
 </span><span class='line'>  <span class="l-Scalar-Plain">...</span>
 </span><span class='line'><span class="l-Scalar-Plain">app</span><span class="p-Indicator">:</span>
@@ -986,8 +901,7 @@ this sample <code>docker-compose.yml</code> file:</p>
 
 <p>If all you&rsquo;ve done is made a simple change to <code>app</code>, you can get by with just</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose build app</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose build app</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -997,8 +911,7 @@ this sample <code>docker-compose.yml</code> file:</p>
 
 <p>To start a Docker Compose app once you&rsquo;ve built it&rsquo;s constituent images:</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose up -d</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose up -d</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -1008,8 +921,7 @@ flag.</p>
 
 <p>To view the logs from your app&rsquo;s running containers:</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose logs</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose logs</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -1018,8 +930,7 @@ in the <code>docker-compose.yml</code> file so you can keep things straight.</p>
 
 <p>To bring your app down (if you started it with <code>-d</code>, otherwise just use <code>^C</code>):</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose stop</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose stop</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -1035,18 +946,14 @@ places Docker leaves junk behind.</p>
 Docker Compose, you can just run the following to get rid of any containers
 started by Docker Compose that have now stopped:</p>
 
-<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose rm</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose rm</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>If you&rsquo;re not using Docker Compose, you&rsquo;ll have to find them and manually prune
 them:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># find all exited containers (docker ps ...),</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># find all exited containers (docker ps ...),</span>
 </span><span class='line'><span class="c"># and remove these containers (docker rm)</span>
 </span><span class='line'>docker rm <span class="k">$(</span>docker ps -a <span class="p">|</span> grep Exited <span class="p">|</span> awk <span class="s1">&#39;{print $1;}&#39;</span><span class="k">)</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -1060,10 +967,7 @@ actually a &ldquo;feature&rdquo; of Docker: all images that you build are cached
 subsequently builds are instantaneous. However, when we&rsquo;re developing and
 generating new images frequently, previous image builds only take up space.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># find all un-tagged images (docker images ...),</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># find all un-tagged images (docker images ...),</span>
 </span><span class='line'><span class="c"># and remove these images (docker rmi)</span>
 </span><span class='line'>docker rmi <span class="k">$(</span>docker images -q --filter <span class="s2">&quot;dangling=true&quot;</span><span class="k">)</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -1079,15 +983,7 @@ behind some state for managing that volume. Unfortunately (and infuriatingly),
 the Docker CLI doesn&rsquo;t offer a way to clean these up natively. Luckily, there&rsquo;s
 a super handy script online that uses the Docker Python API to handle it.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Install Python dependencies (do this only once)</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Install Python dependencies (do this only once)</span>
 </span><span class='line'>pip install docker-py
 </span><span class='line'>
 </span><span class='line'><span class="c"># Download the script</span>
@@ -1102,8 +998,7 @@ a super handy script online that uses the Docker Python API to handle it.</p>
 they become dangling by using the following when your Docker Compose project
 uses volumes:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker-compose rm -v
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>docker-compose rm -v
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -1131,20 +1026,7 @@ roots</a>.</p>
 core app (i.e., I&rsquo;ve set up the <code>Dockerfile</code> and <code>docker-compose.yml</code> file), I
 basically just run</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>fig up -d
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>fig up -d
 </span><span class='line'>
 </span><span class='line'>fig logs
 </span><span class='line'><span class="c"># observe my project, fix what&#39;s wrong</span>
@@ -1234,17 +1116,13 @@ poke around.</p>
 of giving you exactly the information you want, and I think the way the command
 is named makes sense.</p>
 
-<figure class='code'><figcaption><span>Homebrew: brew uses</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew uses --installed pango
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ brew uses --installed pango
 </span><span class='line'>imagemagick</span></code></pre></td></tr></table></div></figure>
 
 
 <p><code>pip-uses</code> gives you basically the experience:</p>
 
-<figure class='code'><figcaption><span>Pip: pip-uses</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ pip-uses stevedore
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ pip-uses stevedore
 </span><span class='line'>virtualenvwrapper</span></code></pre></td></tr></table></div></figure>
 
 
@@ -1351,8 +1229,7 @@ as of yet no one has done it.</p>
 whereas in bash they&rsquo;re listed above it. For an example, check out the
 screenshot. I perform the same keystrokes in bash and zsh:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span><span class="nb">cd </span>D&lt;TAB&gt;
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span><span class="nb">cd </span>D&lt;TAB&gt;
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -1643,8 +1520,7 @@ it probably wouldn&rsquo;t hurt to do so now. It&rsquo;s about to get technical.
 required no real refactoring. Linking these up was a simple matter of running
 commands that looked like</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc &lt;rc-file&gt;</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc &lt;rc-file&gt;</span></code></pre></td></tr></table></div></figure>
 
 
 <p>I ran this on files like my <code>.vimrc</code>, <code>.tmux.conf</code>, <code>.ackrc</code>, and other simple
@@ -1654,8 +1530,7 @@ recursively descend and create symlinks when given a folder. For folders like my
 <code>.vim/</code> folder, which can get pretty large pretty quickly, I used the <code>-S</code>
 option to force rcm to symlink the directory:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc -S .vim/</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc -S .vim/</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The first time I ran <code>mkrc</code>, it automatically created a folder called
@@ -1684,8 +1559,7 @@ files that didn&rsquo;t need to be refactored, like my <code>.ssh/config</code> 
 <code>.gitconfig</code> (files which, by the way, I wasn&rsquo;t tracking at all before this
 rewrite), I just ran the following command:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc -o .gitconfig</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc -o .gitconfig</span></code></pre></td></tr></table></div></figure>
 
 
 <p>When I&rsquo;m on my Mac, this goes through the same move + link procedure described
@@ -2003,16 +1877,14 @@ mine that you&rsquo;ve cloned.</p>
 
 <p>If you&rsquo;ve cloned one of my repositories, you can update it&rsquo;s URL by running</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git remote -v
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git remote -v
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>to check the current remote URL, which should look something like
 <code>https://github.com/Z1MM32M4N/&lt;repo name&gt;</code>. Then, you can run</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git remote <span class="nb">set</span>-url origin https://github.com/jez/&lt;repo name&gt;
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git remote <span class="nb">set</span>-url origin https://github.com/jez/&lt;repo name&gt;
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -2079,18 +1951,7 @@ leave a discussion of what the individual flags do to the man pages and just
 skip straight to the good part. Feel free to copy and paste these into your
 <code>~/.bashrc</code>, <code>~/.zshrc</code>, or similar file.</p>
 
-<figure class='code'><figcaption><span>pretty git log aliases</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
 </span><span class='line'><span class="nb">alias </span><span class="nv">gl</span><span class="o">=</span><span class="s1">&#39;git log --graph --pretty=&quot;%C(bold green)%h%Creset%C(auto)%d%Creset %s&quot;&#39;</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># pretty Git log, all references</span>
@@ -2118,12 +1979,7 @@ from the screenshots below is the text between the parentheses, which will
 instead all be the same color. To color these the same as below, add this text to
 the end of your <code>~/.gitconfig</code> file:</p>
 
-<figure class='code'><figcaption><span>Global Git configuration settings</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[color "decorate"]
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>[color "decorate"]
 </span><span class='line'>  head = bold white
 </span><span class='line'>  branch = bold magenta
 </span><span class='line'>  remotebranch = blue
@@ -2202,18 +2058,7 @@ of the features I was using in the pretty format (the one that colors remotes
 and branches, <code>%C(auto)</code>) is not available in older versions of Git. These are
 the revised versions of the above aliases that I use on older machines:</p>
 
-<figure class='code'><figcaption><span>Compatible Git log aliases</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
 </span><span class='line'><span class="nb">alias </span><span class="nv">gl</span><span class="o">=</span><span class="s1">&#39;git log --graph --pretty=&quot;%C(bold green)%h%Creset%C(blue)%d%Creset %s&quot;&#39;</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># pretty Git log, all references</span>
@@ -2274,16 +2119,14 @@ to your computer in the same directory as your LaTeX project directory.</p>
 repository</a> and then clone that fork to a particular folder on your
 computer:</p>
 
-<figure class='code'><figcaption><span>Install</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/&lt;your-username&gt;/latex-hw-template
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/&lt;your-username&gt;/latex-hw-template
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then, whenever you need to use the template, you can copy the template wherever.
 Also, if there are ever any updates, you can simply run</p>
 
-<figure class='code'><figcaption><span>Update</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>git pull
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git pull
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -2318,17 +2161,14 @@ class.</p>
 with a line underneath to the document. If you&rsquo;d like to change &ldquo;Question&rdquo; to
 something else, use</p>
 
-<figure class='code'><figcaption><span>Change the Question Type</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\renewcommand</span><span class="nb">{</span><span class="k">\questiontype</span><span class="nb">}{</span>Whatever You Want<span class="nb">}</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\renewcommand</span><span class="nb">{</span><span class="k">\questiontype</span><span class="nb">}{</span>Whatever You Want<span class="nb">}</span>
 </span><span class='line'><span class="c">% Now questions will be titled &quot;Whatever You Want #&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>Similarly, if you ever need to skip numbers, you can do</p>
 
-<figure class='code'><figcaption><span>Non-contiguous Question Numbers</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\setcounter</span><span class="nb">{</span><span class="k">\questionCounter</span><span class="nb">}{</span>&lt;target number - 1&gt;<span class="nb">}</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\setcounter</span><span class="nb">{</span><span class="k">\questionCounter</span><span class="nb">}{</span>&lt;target number - 1&gt;<span class="nb">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -2348,13 +2188,7 @@ case, you can use <code>\question*{The Question's Name}</code> to make a named q
 <p>Another common thing on homework assignments is to have multi-part questions. To
 deal with these, use the form</p>
 
-<figure class='code'><figcaption><span>Lettered Question Parts</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>alphaparts<span class="nb">}</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>alphaparts<span class="nb">}</span>
 </span><span class='line'>  <span class="k">\questionpart</span>
 </span><span class='line'>    This will be part (a).
 </span><span class='line'>  <span class="k">\questionpart</span>
@@ -2365,13 +2199,7 @@ deal with these, use the form</p>
 
 <p>or</p>
 
-<figure class='code'><figcaption><span>Numbered Question Parts</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>arabicparts<span class="nb">}</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>arabicparts<span class="nb">}</span>
 </span><span class='line'>  <span class="k">\questionpart</span>
 </span><span class='line'>    This will be part x.1.
 </span><span class='line'>  <span class="k">\questionpart</span>
@@ -2387,15 +2215,7 @@ deal with these, use the form</p>
 <p>In math classes, induction proofs come up a lot, and they almost always have the
 same form: base case, induction hypothesis, and induction step.</p>
 
-<figure class='code'><figcaption><span>Induction Environment</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>induction<span class="nb">}</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>induction<span class="nb">}</span>
 </span><span class='line'>  <span class="k">\basecase</span>
 </span><span class='line'>    This is my fancy base case.
 </span><span class='line'>  <span class="k">\indhyp</span>
@@ -2413,16 +2233,7 @@ same form: base case, induction hypothesis, and induction step.</p>
 concise syntax, together with a tool like <a href="http://johnmacfarlane.net/pandoc/"><code>pandoc</code></a> to convert Markdown
 into LaTeX. As an example, consider that we have the Markdown:</p>
 
-<figure class='code'><figcaption><span>my-homework.md</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>#
 </span><span class='line'>
 </span><span class='line'>This is my first answer.
 </span><span class='line'>
@@ -2435,17 +2246,7 @@ into LaTeX. As an example, consider that we have the Markdown:</p>
 
 <p>Running <code>pandoc -f markdown -t latex my-homework.md</code> will output</p>
 
-<figure class='code'><figcaption><span>Convert markdown to LaTeX</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="c">% $ pandoc -f markdown -t latex my-homework.md</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="c">% $ pandoc -f markdown -t latex my-homework.md</span>
 </span><span class='line'><span class="k">\section</span><span class="nb">{}</span><span class="k">\label</span><span class="nb">{</span>section<span class="nb">}</span>
 </span><span class='line'>
 </span><span class='line'>This is my first answer.
@@ -2564,24 +2365,20 @@ through the roof. For more specifics, check out the rest of of the article.</p>
 
 <p>For the impatient, here&rsquo;s the code. It uses standard Unix tools:</p>
 
-<figure class='code'><figcaption><span>Chrome Memory Usage</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>Pretty isn&rsquo;t it? If you want to save this as an alias for handy use, add this
 line to your ~/.bashrc (or appropriate configuration file):</p>
 
-<figure class='code'><figcaption><span>Add as an alias</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">alias </span><span class="nv">chromemem</span><span class="o">=</span><span class="s2">&quot;ps -ev | grep -i chrome | awk &#39;{print \$12}&#39; | awk &#39;{for(i=1;i&lt;=NF;i++)s+=\$i}END{print s}&#39;&quot;</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">alias </span><span class="nv">chromemem</span><span class="o">=</span><span class="s2">&quot;ps -ev | grep -i chrome | awk &#39;{print \$12}&#39; | awk &#39;{for(i=1;i&lt;=NF;i++)s+=\$i}END{print s}&#39;&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>It outputs a percentage. Here&rsquo;s the alias in action:</p>
 
-<figure class='code'><figcaption><span>Usage</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>chromemem
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>chromemem
 </span><span class='line'>60
 </span></code></pre></td></tr></table></div></figure>
 
@@ -2595,15 +2392,7 @@ but I&rsquo;m familiar with <code>ps</code>. After checking out the man page for
 came up with <code>ps -ev</code>, to show all information about all processes. Maybe
 wasteful, but it works.</p>
 
-<figure class='code'><figcaption><span>ps -ev</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev
 </span><span class='line'>  PID STAT      TIME  SL  RE PAGEIN      VSZ    RSS   LIM     TSIZ  %CPU %MEM COMMAND
 </span><span class='line'> <span class="m">3473</span> S      0:54.92   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3579092</span> <span class="m">301244</span>     -        <span class="m">0</span>   6.7  7.2 /Applications/Google C
 </span><span class='line'>  <span class="m">365</span> S      3:03.17   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3920732</span> <span class="m">206808</span>     -        <span class="m">0</span>   0.3  4.9 /Applications/Google C
@@ -2627,14 +2416,7 @@ lines, but rest assured: we&rsquo;re only looking at Chrome processes now.</p>
 column easy. If we want to print the 12th column (which just so happens to
 contain the memory consumption!) we can do <code>awk '{print $12}'</code>:</p>
 
-<figure class='code'><figcaption><span>ps -ev | grep -i chrome | awk &#8216;{print $12}&#8217;</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span>
 </span><span class='line'>7.2
 </span><span class='line'>5.1
 </span><span class='line'>4.6
@@ -2649,9 +2431,7 @@ Google search led me to <a href="http://stackoverflow.com/questions/2572495/read
 <code>awk</code> solution because I knew I could just pipe the input to awk (as opposed to
 having to do weird hacks to get it to work with a bash for loop):</p>
 
-<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -emv <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -emv <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span>
 </span><span class='line'>60.4
 </span></code></pre></td></tr></table></div></figure>
 
@@ -2659,9 +2439,7 @@ having to do weird hacks to get it to work with a bash for loop):</p>
 <p>Of course, you could change the last <code>awk</code> command to print out something
 fancier like</p>
 
-<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -emv <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print &quot;Chrome is using &quot;s&quot;% of total memory.&quot;}&#39;</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -emv <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print &quot;Chrome is using &quot;s&quot;% of total memory.&quot;}&#39;</span>
 </span><span class='line'>Chrome is using 60.4% of total memory.
 </span></code></pre></td></tr></table></div></figure>
 
@@ -2760,15 +2538,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 
 <p>Let&rsquo;s take a look at what we&rsquo;ve got so far. We want to have two columns, so our HTML is going to look like this:</p>
 
-<figure class='code'><figcaption><span>HTML for two columns</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;row&quot;</span><span class="nt">&gt;</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;row&quot;</span><span class="nt">&gt;</span>
 </span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;left column&quot;</span><span class="nt">&gt;</span>
 </span><span class='line'>    <span class="c">&lt;!-- Your left content here --&gt;</span>
 </span><span class='line'>  <span class="nt">&lt;/div&gt;</span>
@@ -2781,17 +2551,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 
 <p>Straightforward enough. Knowing what we know about block elements, what if we just set the width of the columns to 50%?</p>
 
-<figure class='code'><figcaption><span>Half-width columns</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
 </span><span class='line'>  <span class="c">/* arbitrary value for this example */</span>
 </span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
 </span><span class='line'>
@@ -2860,14 +2620,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 
 <p>Basically, the problem is that you only want vertical line separators in between columns, not on the edges. In ASCII art:</p>
 
-<figure class='code'><figcaption><span>Beautiful ASCII Art Diagram</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>
 </span><span class='line'>        |        |
 </span><span class='line'>  col1  |  col2  | col 3
 </span><span class='line'>        |        |
@@ -2880,23 +2633,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
 
 <p>You already know that you can use <code>.class</code> and <code>#id</code> to select items based on their classes and IDs. But there are <a href="http://code.tutsplus.com/tutorials/the-30-css-selectors-you-must-memorize--net-16048">tons more query selectors</a> you can use! I&rsquo;ll use one to accomplish what we want with the vertical dividers:</p>
 
-<figure class='code'><figcaption><span>Super Fancy CSS Selectors</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
 </span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
 </span><span class='line'>  <span class="c">/* Try uncommenting me! */</span>
 </span><span class='line'>  <span class="k">float</span><span class="o">:</span> <span class="k">left</span><span class="p">;</span>
@@ -2943,7 +2680,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
   <entry>
     <title type="html"><![CDATA[Ruby Virtualenvs]]></title>
     <link href="https://blog.jez.io/2014/12/22/ruby-virtualenvs/"/>
-    <updated>2014-12-22T13:52:40-05:00</updated>
+    <updated>2014-12-22T12:52:40-06:00</updated>
     <id>https://blog.jez.io/2014/12/22/ruby-virtualenvs</id>
     <content type="html"><![CDATA[<p>A while back I found a command that removes all Ruby gems installed on a system
 when you&rsquo;re using rbenv. It worked great, so I decided to build on top of it.
@@ -2989,15 +2726,7 @@ virtualenvs but with Ruby gems! Once again, it needed a little bit of
 modification so that everything works again as you&rsquo;d expect when you
 <code>deactivate</code>. Add these lines to your virtualenv&rsquo;s <code>postactivate</code> script:</p>
 
-<figure class='code'><figcaption><span>$VIRTUAL_ENV/bin/postactivate</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">export</span> <span class="n">OLD_GEMHOME</span><span class="o">=</span><span class="s">&quot;$GEM_HOME&quot;</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">export</span> <span class="n">OLD_GEMHOME</span><span class="o">=</span><span class="s">&quot;$GEM_HOME&quot;</span>
 </span><span class='line'><span class="n">export</span> <span class="n">GEM_HOME</span><span class="o">=</span><span class="s">&quot;$VIRTUAL_ENV/gems&quot;</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">export</span> <span class="n">OLD_GEM_PATH</span><span class="o">=</span><span class="s">&quot;$GEM_PATH&quot;</span>
@@ -3010,15 +2739,7 @@ modification so that everything works again as you&rsquo;d expect when you
 
 <p>And then add this complementary section to your <code>predeactivate</code> script:</p>
 
-<figure class='code'><figcaption><span>$VIRTUAL_ENV/bin/predeactivate</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">export</span> <span class="n">GEM_HOME</span><span class="o">=</span><span class="s">&quot;$OLD_GEM_HOME&quot;</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">export</span> <span class="n">GEM_HOME</span><span class="o">=</span><span class="s">&quot;$OLD_GEM_HOME&quot;</span>
 </span><span class='line'><span class="n">unset</span> <span class="n">OLD_GEM_HOME</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">export</span> <span class="n">GEM_PATH</span><span class="o">=</span><span class="s">&quot;$OLD_GEM_PATH&quot;</span>
@@ -3103,15 +2824,13 @@ excellent job at highlighting them. Rather than talk about it, here are some
 screenshots. Note how code samples (C system calls and library functions) are
 also syntax highlighted appropriately.</p>
 
-<figure class='code'><figcaption><span>Example 1</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>vman vim
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>vman vim
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p><a class="image-link" href="https://blog.jez.io/images/vim.1.png"><img src="https://blog.jez.io/images/vim.1.png"></a></p>
 
-<figure class='code'><figcaption><span>Example 2</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>vman <span class="m">3</span> <span class="nb">printf</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>vman <span class="m">3</span> <span class="nb">printf</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

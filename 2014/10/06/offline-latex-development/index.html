@@ -28,14 +28,6 @@
 
 <!-- Twitter Cards -->
 
-  
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="/images/abstract-7.jpg"
-  
-  <meta name="twitter:title" content="Offline LaTeX Development">
-  <meta name="twitter:description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
-  <meta name="twitter:creator" content="@Z1MM32M4N">
-
 
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
@@ -44,7 +36,7 @@
 <meta property="og:title" content="Offline LaTeX Development">
 <meta property="og:description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
 
-  <meta property="og:image" content="/images/abstract-7.jpg">
+  <meta property="og:image" content="">
 
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
@@ -59,62 +51,23 @@
 
 
 
-<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
 
 </head>
 
-<body id="post" class="feature">
+<body id="post" >
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 <nav id="dl-menu" class="dl-menuwrapper" role="navigation">
-	<button class="dl-trigger">Open Menu</button>
-	<ul class="dl-menu">
-		<li><a href="/">Home</a></li>
-		<li>
-			<a href="#">About</a>
-			<ul class="dl-submenu">
-				<li>
-					<img src="/images/avatar-jake.jpg" alt="Jake Zimmerman photo" class="author-photo">
-					<h4>Jake Zimmerman</h4>
-					<p>Studying computer science at Carnegie Mellon. Working at Dropbox. Previously at Bloomberg L.P.</p>
-				</li>
-				<li><a href="//jez.io">Learn More</a></li>
-				<li>
-					<a href="mailto:jake@zimmerman.io"><i class="fa fa-envelope"></i> Email</a>
-				</li>
-				<li>
-					<a href="https://twitter.com/Z1MM32M4N"><i class="fa fa-twitter"></i> Twitter</a>
-				</li>
-				<li>
-					<a href="https://plus.google.com/+JacobZimmerman0"><i class="fa fa-google-plus"></i> Google+</a>
-				</li>
-				<li>
-					<a href="https://github.com/jez"><i class="fa fa-github"></i> GitHub</a>
-				</li>
-			</ul><!-- /.dl-submenu -->
-		</li>
-		<li>
-			<a href="#">Posts</a>
-			<ul class="dl-submenu">
-				<li><a href="/posts/">All Posts</a></li>
-				<li><a href="/categories/">All Categories</a></li>
-			</ul>
-		</li>
-		<li><a href="https://jez.io">Portfolio</a></li>
-	</ul><!-- /.dl-menu -->
+  <button class="dl-trigger">Open Menu</button>
+  <ul class="dl-menu">
+    <li><a href="/">Home</a></li>
+    <li><a href="/posts/">All Posts</a></li>
+    <li><a href="/categories/">Posts by Category</a></li>
+    <li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
+  </ul><!-- /.dl-menu -->
 </nav><!-- /.dl-menuwrapper -->
 
 
-
-<div class="entry-header">
-  <div class="image-credit">Image source: <a href="http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/">dargadgetz</a></div><!-- /.image-credit -->
-  <div class="entry-image">
-    <img src="/images/abstract-7.jpg" alt="Offline LaTeX Development">
-  </div><!-- /.entry-image -->
-</div><!-- /.entry-header -->
 
 
 <div id="main" role="main">
@@ -122,7 +75,7 @@
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title"><a href="/2014/10/06/offline-latex-development/" rel="bookmark" title="Offline LaTeX Development">Offline LaTeX Development</a></h1>
+          <h1 class="entry-title">Offline LaTeX Development</h1>
         
         <h2>October 06, 2014</h2>
       </div><!-- /.header-title-wrap -->
@@ -145,13 +98,7 @@
 
 <p>To install LaTeX on a Mac, we&rsquo;ll be installing MacTeX, which includes the command line LaTeX utilities as well as a couple graphical clients for LaTeX development. You can try compiling from source, but as Homebrew points out when you try to <code>brew install linux</code>:</p>
 
-<figure class='code'><figcaption><span>brew install latex</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install latex
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install latex
 </span><span class='line'>Error: No available formula for latex
 </span><span class='line'>Installing TeX from source is weird and gross, requires a lot of patches,
 </span><span class='line'>and only builds 32-bit (and thus can't use Homebrew deps on Snow Leopard.)
@@ -169,40 +116,13 @@
 
 <p>Compiling LaTeX is pretty straightforward. To generate a PDF, all you have to do is run the command</p>
 
-<figure class='code'><figcaption><span>pdflatex</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>pdflatex &lt;myfile&gt;.tex
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>pdflatex &lt;myfile&gt;.tex
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>And you&rsquo;ll get a file called <code>&lt;myfile&gt;.pdf</code> in the current directory, plus some intermediate files. We can go one step further and put a bunch of useful build targets into a Makefile and use it to build our PDF:</p>
 
-<figure class='code'><figcaption><span>LaTeX Makefile</span><a href='https://gist.github.com/jez/b248a409d19c9f1c94cd'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='make'><span class='line'><span class="c"># NOTE: Change &quot;written&quot; to the name of your TeX file with no extension</span>
+<figure class='code'><figcaption><span>LaTeX Makefile</span><a href='https://gist.github.com/jez/b248a409d19c9f1c94cd'>link</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='make'><span class='line'><span class="c"># NOTE: Change &quot;written&quot; to the name of your TeX file with no extension</span>
 </span><span class='line'><span class="nv">TARGET</span><span class="o">=</span>written
 </span><span class='line'>
 </span><span class='line'><span class="nf">all</span><span class="o">:</span> <span class="k">$(</span><span class="nv">TARGET</span><span class="k">)</span>.<span class="n">pdf</span>
@@ -262,8 +182,7 @@
 
 <p>Taking this one step further, we can add a command to shorten this. If we add</p>
 
-<figure class='code'><figcaption><span>Save, Compile and View in Vim</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'>command WV <span class="k">w</span> <span class="p">|</span> <span class="k">make</span> <span class="k">view</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'>command WV <span class="k">w</span> <span class="p">|</span> <span class="k">make</span> <span class="k">view</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -299,13 +218,7 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
         <span><a href="/2014/10/06/offline-latex-development/" rel="bookmark" title="Offline LaTeX Development">Offline LaTeX Development</a> was published on <span class="entry-date date published updated"><time datetime="2014-10-06T18:00:00-04:00">October 06, 2014</time></span></span>
         
         <span class="author vcard"><span class="fn"><a href="https://jez.io" title="About Jake Zimmerman">Jake Zimmerman</a></span></span>
-        <div class="social-share">
-          <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=https://blog.jez.io/2014/10/06/offline-latex-development" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text=https://blog.jez.io/2014/10/06/offline-latex-development" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url=https://blog.jez.io/2014/10/06/offline-latex-development" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
-          </ul>
-        </div><!-- /.social-share -->
+        
       </footer>
     </div><!-- /.entry-content -->
     
@@ -335,57 +248,23 @@ people think, so feel free to comment, open an issue, or send me an email.</p>
         </div><!-- /.read-more-list -->
       </div><!-- /.read-more -->
     
-    <section id="disqus_thread"></section><!-- /#disqus_thread -->
+    
   </article>
 </div><!-- /#main -->
 
 <div class="footer-wrapper">
   <footer role="contentinfo">
-    <span>&copy; 2016 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+    <span>&copy; 2017 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
 
   </footer>
 </div><!-- /.footer-wrapper -->
 
 
 	        
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="/javascripts/octopress.js" type="text/javascript"></script>
 <script src="/javascripts/scripts.min.js"></script>
 &#8211;>
-
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-50690546-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-
-
-<script type="text/javascript">
-      var disqus_shortname = 'jakez-blog';
-      
-        
-        // var disqus_developer = 1;
-        var disqus_identifier = 'https://blog.jez.io/2014/10/06/offline-latex-development/';
-        var disqus_url = 'https://blog.jez.io/2014/10/06/offline-latex-development/';
-        var disqus_script = 'embed.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
 	        
 
 </body>
