@@ -9,6 +9,9 @@ the index page or a normal post page.
 
 <header>
   <div class="entry-meta">
+    {% if post.pinned %}
+    <span class="tag">Pinned</span>
+    {% endif %}
     <span class="entry-date date published updated">
       <time datetime="{{ post.date | date_to_xmlschema }}">
         <a href="{{ root_url }}{{ post.url }}">{{ post.date | date: "%B %d, %Y" }}</a>

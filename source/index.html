@@ -9,6 +9,17 @@ image:
 ---
 
 {% assign index = true %}
+
+{% unless paginator.previous_page %}
+  {% for post in site.pinned %}
+  <article class="hentry">
+    {% include article.html %}
+  </article><!-- /.hentry -->
+  {% endfor %}
+{% endunless %}
+
+<div class="pinned-divider"></div>
+
 {% for post in paginator.posts %}
 <article class="hentry">
   {% include article.html %}
