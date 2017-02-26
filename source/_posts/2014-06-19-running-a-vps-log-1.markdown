@@ -34,7 +34,7 @@ Succinctly, the issue is this: when cloning a repo and running `rcup` for the fi
 ## Installation
 The solution I came up with regarding a multiple-environment workflow deals with handling all the necessary machine-dependent configuration within my dotfiles _themselves_. That way I can minimize code reuse and have everything in one convenient file. As a result, [my bash_profile](https://github.com/jez/dotfiles/tree/master/bash_profile) is a bit lengthy at about 300 lines, and it has three large case statements, but I make all this up through deployment. Deployment is __incredibly__ swift. Again, You can take a look at the file to see how it works, but when I had finished [locking down my server](/2014/06/19/running-a-vps-log-1), these are the only configuration commands I had to run:
 
-{% codeblock lang:bash Installing rcm and dotfiles %}
+```bash Installing rcm and dotfiles
 # install rcm using deb and dpkg
 $ wget https://thoughtbot.github.io/rcm/debs/rcm_1.2.3-1_all.deb
 $ sudo dpkg -i rcm_1.2.3-1_all.deb
@@ -44,7 +44,7 @@ $ git clone https://github.com/jez/dotfiles ~/.dotfiles
 
 # make the symlinks
 $ rcup
-{% endcodeblock %}
+```
 
 Voilà! After that, I had my sick bash prompt, my [snazzy update function](/2014/06/11/update-your-software-its-the-law/), my delightful vim colorscheme, solarized dir colors--the list goes on and on.
 

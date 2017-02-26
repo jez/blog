@@ -29,14 +29,17 @@ After following the instructions from the tutorial perfectly, _and_ repeating th
 Apparently, my issue was that DigitalOcean doesn't initialize freshly created Debian 7 droplets with the most recent kernel. Unfortunately libfuse, a library used by EncFS to create and manage the encrypted file system, was expecting a more up-to-date kernel version.
 
 Upgrading my kernel version was just a few steps, though. I had to run
-{% codeblock lang:bash Upgrade Kernel %}
+
+```bash
 $ sudo apt-get update
 $ sudp apt-get upgrade
-{% endcodeblock %}
+```
+
 to update the list of downloaded kernels, then
-{% codeblock lang:bash Restart %}
+
+```bash
 $ sudo shutdown -h now
-{% endcodeblock %}
+```
 to tell the server to shutdown and power off. Next up is to switch over the kernel version on the [DigitalOcean control panel][solution]. All in all, nothing too difficult: the hardest part was that I never expected my problem to have anything to do with DigitalOcean.
 
 ## Postfix & Dovecot

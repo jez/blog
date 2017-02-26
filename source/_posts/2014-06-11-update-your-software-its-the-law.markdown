@@ -17,7 +17,7 @@ I don't quite know what prompted me to suddenly become interested in maintaining
 
 For the impatient among us, here's the code, which is also available [here][snippet1] and [here][snippet2] amongst all the code for [all my dotfiles][dotfiles].
 
-{% codeblock lang:bash Alert to Update https://github.com/jez/dotfiles/blob/master/bash_profile#L16-L42 %}
+```bash Remind to update
 # ----- daily updates --------------------------------------------------------
 [ ! -e $HOME/.last_update ] && touch $HOME/.last_update
 # Initialize for when we have no GNU date available
@@ -45,9 +45,9 @@ if [ "$time_since_check" -ge 86400 ]; then
   echo "$cred==>$cwhiteb Your system is out of date!$cnone"
   echo 'Run `update` to bring it up to date.'
 fi
-{% endcodeblock %}
+```
 
-{% codeblock lang:bash Check for Updates https://github.com/jez/dotfiles/blob/master/bash_profile#L153-L178 %}
+```bash Check for updates
 # ----- function -------------------------------------------------------------
 update() {
   touch $HOME/.last_update
@@ -75,7 +75,7 @@ update() {
       ;;
   esac
 }
-{% endcodeblock %}
+```
 
 You'll note the use of a touch file (created in line 2 of the first snippet if it doesn't already exist). If this file is 24 hours old, each time this code is run an alert will be printed. Since this code is running inside of my `.bash_profile`, that means that every time I open a terminal on a 24-hour-old system, I see the update message.
 

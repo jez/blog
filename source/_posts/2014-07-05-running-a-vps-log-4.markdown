@@ -19,7 +19,7 @@ This is where some truly powerful command line tools come into play, the first o
 
 On a working mail server, we should be able to have the following dialog with the server:
 
-{% codeblock telnet %}
+```plain telnet
 $ telnet mail.zimmerman.io 25
   Trying 107.170.7.111...
   Connected to metagross.zimmerman.io.
@@ -37,7 +37,7 @@ $ telnet mail.zimmerman.io 25
   250-STARTTLS
   250 DSN
 > 
-{% endcodeblock %}
+```
 
 A few notes: 
 
@@ -57,9 +57,9 @@ The second command line utility that is useful in debugging a mail server, espec
 
 The syntax of the command looks like this:
 
-{% codeblock s_client %}
+```
 $ openssl s_client -connect <host>:<port> [options]
-{% endcodeblock %}
+```
 
 This client becomes particularly important, because one Postfix option I've specified in the file `/etc/postfix/main.cf` is `smtpd_tls_auth_only = yes`. What this means is that Postfix won't send the line `250-AUTH PLAIN LOGIN` unless we're running on a secure connection. Merely using `telnet` to connect on port 25 will not initiate a secure connection.
 
@@ -91,7 +91,7 @@ After using them for a little bit, I had the following diagnostic list of things
 ## Potential Fixes
 I have a few ideas on why my server won't let me in. I know for sure that it's not a firewall issue; I have all the requisite ports (25/465/587 and 143/993) open.
 
-{% codeblock ufw Firewall Settings %}
+```plain ufw Firewall Settings
 $ ufw status
 Status: active
 
@@ -113,7 +113,7 @@ To                         Action      From
 465/tcp                    ALLOW       Anywhere (v6)
 993                        ALLOW       Anywhere (v6)
 587/tcp                    ALLOW       Anywhere (v6)
-{% endcodeblock %}
+```
 
 It could be an issue with my certificates. Because I'm cheap and didn't want to pay excessive amounts of money for a fun summer experiment, I decided to self-sign my SSL certificates. (This means that while my traffic will be encrypted, people who try to connect to my server can't necessarily trust that I am who I say I am. It's the same reason why we have notaries to verify our signatures.) I'm skeptical that this could be the reason, though, because nothing was showing up in the logs. If it had been a certificate error, it would have almost certainly shown up in the logs at some point.
 
