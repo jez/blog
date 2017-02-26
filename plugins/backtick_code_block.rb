@@ -18,11 +18,14 @@ module BacktickCodeBlock
         @caption = "<figcaption><span>#{$2}</span><a href='#{$3}'>#{$4 || 'link'}</a></figcaption>"
       elsif @options =~ LangCaption
         @lang = $1
-        if $2 == ''
+        unless $2.nil? or $2 == ''
           @caption = "<figcaption><span>#{$2}</span></figcaption>"
         else
           @caption = ''
         end
+      else
+        @lang = 'plain'
+        @caption = ''
       end
 
       if str.match(/\A( {4}|\t)/)
