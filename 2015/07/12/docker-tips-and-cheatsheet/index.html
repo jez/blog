@@ -110,7 +110,7 @@ commands through the rest of the post.</p>
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Build your whole Docker Compose project...</span>
 </span><span class='line'>docker-compose build
 </span><span class='line'><span class="c"># ...or just build one piece of it</span>
-</span><span class='line'>docker-compose build <span class="o">[</span>app<span class="p">|</span>db<span class="p">|</span>etc...<span class="o">]</span>
+</span><span class='line'>docker-compose build <span class="o">[</span>app|db|etc...]
 </span><span class='line'>
 </span><span class='line'><span class="c"># Start your Docker Compose project</span>
 </span><span class='line'>docker-compose up -d
@@ -120,17 +120,16 @@ commands through the rest of the post.</p>
 </span><span class='line'>docker-compose stop
 </span><span class='line'>
 </span><span class='line'><span class="c"># remove stopped containers</span>
-</span><span class='line'>docker rm <span class="k">$(</span>docker ps -a <span class="p">|</span> grep Exited <span class="p">|</span> awk <span class="s1">&#39;{print $1;}&#39;</span><span class="k">)</span>
+</span><span class='line'>docker rm <span class="k">$(</span>docker ps -a | grep Exited | awk <span class="s1">'{print $1;}'</span><span class="k">)</span>
 </span><span class='line'><span class="c"># or, to remove the stopped containers that were started by Docker Compose</span>
 </span><span class='line'>docker-compose rm
 </span><span class='line'><span class="c"># remove untagged images</span>
-</span><span class='line'>docker rmi <span class="k">$(</span>docker images -q --filter <span class="s2">&quot;dangling=true&quot;</span><span class="k">)</span>
+</span><span class='line'>docker rmi <span class="k">$(</span>docker images -q --filter <span class="s2">"dangling=true"</span><span class="k">)</span>
 </span><span class='line'><span class="c"># Clean up dangling volumes</span>
 </span><span class='line'><span class="c"># (see the post below for how to install the python script)</span>
 </span><span class='line'>sudo python docker_clean_vfs.py
-</span><span class='line'><span class="c"># Better yet, remove dangling volumes before they&#39;re created by using -v</span>
-</span><span class='line'>docker-composer rm -v
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="c"># Better yet, remove dangling volumes before they're created by using -v</span>
+</span><span class='line'>docker-composer rm -v</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Keep in mind that Docker Compose needs to always read your <code>docker-compose.yml</code>
@@ -142,26 +141,23 @@ project.</p>
 <p>Docker Compose&rsquo;s biggest advantage is that it simplifies building your
 Dockerized app to just</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>docker-compose build
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>docker-compose build</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Most apps, though, have a couple Docker Compose targets, like <code>db</code> and <code>app</code> in
 this sample <code>docker-compose.yml</code> file:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">db</span><span class="p-Indicator">:</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">postgres</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">...</span>
-</span><span class='line'><span class="l-Scalar-Plain">app</span><span class="p-Indicator">:</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">build</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">.</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">...</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>docker-compose.yml</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="na">db</span><span class="pi">:</span>
+</span><span class='line'>  <span class="na">image</span><span class="pi">:</span> <span class="s">postgres</span>
+</span><span class='line'>  <span class="s">...</span>
+</span><span class='line'><span class="na">app</span><span class="pi">:</span>
+</span><span class='line'>  <span class="na">build</span><span class="pi">:</span> <span class="s">.</span>
+</span><span class='line'>  <span class="s">...</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>If all you&rsquo;ve done is made a simple change to <code>app</code>, you can get by with just</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose build app</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>docker-compose build app</span></code></pre></td></tr></table></div></figure>
 
 
 <p>without having to rebuild all of <code>db</code> as well.</p>
@@ -170,8 +166,7 @@ this sample <code>docker-compose.yml</code> file:</p>
 
 <p>To start a Docker Compose app once you&rsquo;ve built it&rsquo;s constituent images:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose up -d</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>docker-compose up -d</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The <code>-d</code> flag is so that Docker Compose runs the command as a &ldquo;daemon&rdquo;, or in
@@ -180,8 +175,7 @@ flag.</p>
 
 <p>To view the logs from your app&rsquo;s running containers:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose logs</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>docker-compose logs</span></code></pre></td></tr></table></div></figure>
 
 
 <p>This will show all the logs output as one, prefixed with their name as specified
@@ -189,8 +183,7 @@ in the <code>docker-compose.yml</code> file so you can keep things straight.</p>
 
 <p>To bring your app down (if you started it with <code>-d</code>, otherwise just use <code>^C</code>):</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose stop</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>docker-compose stop</span></code></pre></td></tr></table></div></figure>
 
 
 <h2>Getting rid of what Docker left behind</h2>
@@ -205,8 +198,7 @@ places Docker leaves junk behind.</p>
 Docker Compose, you can just run the following to get rid of any containers
 started by Docker Compose that have now stopped:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">docker-compose rm</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>docker-compose rm</span></code></pre></td></tr></table></div></figure>
 
 
 <p>If you&rsquo;re not using Docker Compose, you&rsquo;ll have to find them and manually prune
@@ -214,8 +206,7 @@ them:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># find all exited containers (docker ps ...),</span>
 </span><span class='line'><span class="c"># and remove these containers (docker rm)</span>
-</span><span class='line'>docker rm <span class="k">$(</span>docker ps -a <span class="p">|</span> grep Exited <span class="p">|</span> awk <span class="s1">&#39;{print $1;}&#39;</span><span class="k">)</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>docker rm <span class="k">$(</span>docker ps -a | grep Exited | awk <span class="s1">'{print $1;}'</span><span class="k">)</span></span></code></pre></td></tr></table></div></figure>
 
 
 <h3>Un-tagged Docker images</h3>
@@ -226,10 +217,9 @@ actually a &ldquo;feature&rdquo; of Docker: all images that you build are cached
 subsequently builds are instantaneous. However, when we&rsquo;re developing and
 generating new images frequently, previous image builds only take up space.</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># find all un-tagged images (docker images ...),</span>
-</span><span class='line'><span class="c"># and remove these images (docker rmi)</span>
-</span><span class='line'>docker rmi <span class="k">$(</span>docker images -q --filter <span class="s2">&quot;dangling=true&quot;</span><span class="k">)</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'># find all un-tagged images (docker images ...),
+</span><span class='line'># and remove these images (docker rmi)
+</span><span class='line'>docker rmi $(docker images -q --filter "dangling=true")</span></code></pre></td></tr></table></div></figure>
 
 
 <p>You can always tag one of these images if you don&rsquo;t want it to get garbage
@@ -242,23 +232,21 @@ behind some state for managing that volume. Unfortunately (and infuriatingly),
 the Docker CLI doesn&rsquo;t offer a way to clean these up natively. Luckily, there&rsquo;s
 a super handy script online that uses the Docker Python API to handle it.</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Install Python dependencies (do this only once)</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'># Install Python dependencies (do this only once)
 </span><span class='line'>pip install docker-py
 </span><span class='line'>
-</span><span class='line'><span class="c"># Download the script</span>
+</span><span class='line'># Download the script
 </span><span class='line'>wget https://raw.githubusercontent.com/dummymael/dotfiles/1859a36/tools/docker_clean_vfs.py
 </span><span class='line'>
-</span><span class='line'><span class="c"># Run the script</span>
-</span><span class='line'>sudo python docker_clean_vfs.py
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'># Run the script
+</span><span class='line'>sudo python docker_clean_vfs.py</span></code></pre></td></tr></table></div></figure>
 
 
 <p>You can circumvent this madness if you make sure to remove your volumes before
 they become dangling by using the following when your Docker Compose project
 uses volumes:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>docker-compose rm -v
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>docker-compose rm -v</span></code></pre></td></tr></table></div></figure>
 
 
 <h2>General Docker Wisdom</h2>
@@ -285,20 +273,19 @@ roots</a>.</p>
 core app (i.e., I&rsquo;ve set up the <code>Dockerfile</code> and <code>docker-compose.yml</code> file), I
 basically just run</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>fig up -d
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>fig up -d
 </span><span class='line'>
 </span><span class='line'>fig logs
-</span><span class='line'><span class="c"># observe my project, fix what&#39;s wrong</span>
+</span><span class='line'># observe my project, fix what's wrong
 </span><span class='line'>^C &lt;-- quits the logs
-</span><span class='line'>fig stop <span class="o">&amp;&amp;</span> fig rm -v <span class="o">&amp;&amp;</span> fig build web <span class="o">&amp;&amp;</span> fig up -d
+</span><span class='line'>fig stop && fig rm -v && fig build web && fig up -d
 </span><span class='line'>
 </span><span class='line'>fig logs
-</span><span class='line'><span class="c"># observe my project, fix what&#39;s wrong</span>
+</span><span class='line'># observe my project, fix what's wrong
 </span><span class='line'>^C
-</span><span class='line'>fig stop <span class="o">&amp;&amp;</span> fig rm -v <span class="o">&amp;&amp;</span> fig build web <span class="o">&amp;&amp;</span> fig up -d
+</span><span class='line'>fig stop && fig rm -v && fig build web && fig up -d
 </span><span class='line'>
-</span><span class='line'>...
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
 
 
 <p>It helps to understand the difference between &ldquo;images&rdquo; and &ldquo;containers&rdquo;. There

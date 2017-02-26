@@ -94,13 +94,12 @@
 
 <p>On a working mail server, we should be able to have the following dialog with the server:</p>
 
-<figure class='code'><figcaption><span>telnet </span></figcaption>
-<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ telnet mail.zimmerman.io 25
+<figure class='code'><figcaption><span>telnet</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ telnet mail.zimmerman.io 25
 </span><span class='line'>  Trying 107.170.7.111...
 </span><span class='line'>  Connected to metagross.zimmerman.io.
 </span><span class='line'>  Escape character is '^]'.
 </span><span class='line'>  220 ************************************
-</span><span class='line'>> EHLO [206.71.229.162]
+</span><span class='line'>&gt; EHLO [206.71.229.162]
 </span><span class='line'>  250-metagross
 </span><span class='line'>  250-PIPELINING
 </span><span class='line'>  250-SIZE 10240000
@@ -111,7 +110,7 @@
 </span><span class='line'>  250-8BITMIME
 </span><span class='line'>  250-STARTTLS
 </span><span class='line'>  250 DSN
-</span><span class='line'>></span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>&gt; </span></code></pre></td></tr></table></div></figure>
 
 
 <p>A few notes:</p>
@@ -140,8 +139,7 @@
 
 <p>The syntax of the command looks like this:</p>
 
-<figure class='code'><figcaption><span>s_client </span></figcaption>
-<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ openssl s_client -connect &lt;host>:&lt;port> [options]</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ openssl s_client -connect &lt;host&gt;:&lt;port&gt; [options]</span></code></pre></td></tr></table></div></figure>
 
 
 <p>This client becomes particularly important, because one Postfix option I&rsquo;ve specified in the file <code>/etc/postfix/main.cf</code> is <code>smtpd_tls_auth_only = yes</code>. What this means is that Postfix won&rsquo;t send the line <code>250-AUTH PLAIN LOGIN</code> unless we&rsquo;re running on a secure connection. Merely using <code>telnet</code> to connect on port 25 will not initiate a secure connection.</p>
@@ -202,8 +200,7 @@
 
 <p>I have a few ideas on why my server won&rsquo;t let me in. I know for sure that it&rsquo;s not a firewall issue; I have all the requisite ports (25/465/587 and 143/993) open.</p>
 
-<figure class='code'><figcaption><span>ufw Firewall Settings </span></figcaption>
-<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ ufw status
+<figure class='code'><figcaption><span>ufw Firewall Settings</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ ufw status
 </span><span class='line'>Status: active
 </span><span class='line'>
 </span><span class='line'>To                         Action      From

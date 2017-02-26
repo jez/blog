@@ -112,17 +112,15 @@
 
 <p>The solution I came up with regarding a multiple-environment workflow deals with handling all the necessary machine-dependent configuration within my dotfiles <em>themselves</em>. That way I can minimize code reuse and have everything in one convenient file. As a result, <a href="https://github.com/jez/dotfiles/tree/master/bash_profile">my bash_profile</a> is a bit lengthy at about 300 lines, and it has three large case statements, but I make all this up through deployment. Deployment is <strong>incredibly</strong> swift. Again, You can take a look at the file to see how it works, but when I had finished <a href="/2014/06/19/running-a-vps-log-1">locking down my server</a>, these are the only configuration commands I had to run:</p>
 
-<figure class='code'><figcaption><span>Installing rcm and dotfiles </span></figcaption>
-<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># install rcm using deb and dpkg</span>
-</span><span class='line'><span class="nv">$ </span>wget https://thoughtbot.github.io/rcm/debs/rcm_1.2.3-1_all.deb
-</span><span class='line'><span class="nv">$ </span>sudo dpkg -i rcm_1.2.3-1_all.deb
+<figure class='code'><figcaption><span>Installing rcm and dotfiles</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># install rcm using deb and dpkg</span>
+</span><span class='line'><span class="gp">$ </span>wget https://thoughtbot.github.io/rcm/debs/rcm_1.2.3-1_all.deb
+</span><span class='line'><span class="gp">$ </span>sudo dpkg -i rcm_1.2.3-1_all.deb
 </span><span class='line'>
 </span><span class='line'><span class="c"># clone dotfiles down, into the ~/.dotfiles directory</span>
-</span><span class='line'><span class="nv">$ </span>git clone https://github.com/jez/dotfiles ~/.dotfiles
+</span><span class='line'><span class="gp">$ </span>git clone https://github.com/jez/dotfiles ~/.dotfiles
 </span><span class='line'>
 </span><span class='line'><span class="c"># make the symlinks</span>
-</span><span class='line'><span class="nv">$ </span>rcup
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="gp">$ </span>rcup</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Voilà! After that, I had my sick bash prompt, my <a href="/2014/06/11/update-your-software-its-the-law/">snazzy update function</a>, my delightful vim colorscheme, solarized dir colors&ndash;the list goes on and on.</p>

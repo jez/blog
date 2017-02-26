@@ -117,7 +117,7 @@ packages. I had gigabytes worth of packages that could be autoremoved.</p>
 <p>There&rsquo;s a one-line config file fix. Add this to
 /etc/apt/apt.conf.d/50unattended-upgrades:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>...
+<figure class='code'><figcaption><span>/etc/apt/apt.conf.d/50unattended-upgrades</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>...
 </span><span class='line'>// Do automatic removal of new unused dependencies after the upgrade
 </span><span class='line'>// (equivalent to apt-get autoremove)
 </span><span class='line'>Unattended-Upgrade::Remove-Unused-Dependencies "true";

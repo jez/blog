@@ -98,7 +98,7 @@
 
 <p>To install LaTeX on a Mac, we&rsquo;ll be installing MacTeX, which includes the command line LaTeX utilities as well as a couple graphical clients for LaTeX development. You can try compiling from source, but as Homebrew points out when you try to <code>brew install linux</code>:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install latex
+<figure class='code'><figcaption><span>brew install latex</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install latex
 </span><span class='line'>Error: No available formula for latex
 </span><span class='line'>Installing TeX from source is weird and gross, requires a lot of patches,
 </span><span class='line'>and only builds 32-bit (and thus can't use Homebrew deps on Snow Leopard.)
@@ -116,39 +116,37 @@
 
 <p>Compiling LaTeX is pretty straightforward. To generate a PDF, all you have to do is run the command</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>pdflatex &lt;myfile&gt;.tex
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>pdflatex</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>pdflatex &lt;myfile&gt;.tex</span></code></pre></td></tr></table></div></figure>
 
 
 <p>And you&rsquo;ll get a file called <code>&lt;myfile&gt;.pdf</code> in the current directory, plus some intermediate files. We can go one step further and put a bunch of useful build targets into a Makefile and use it to build our PDF:</p>
 
-<figure class='code'><figcaption><span>LaTeX Makefile</span><a href='https://gist.github.com/jez/b248a409d19c9f1c94cd'>link</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='make'><span class='line'><span class="c"># NOTE: Change &quot;written&quot; to the name of your TeX file with no extension</span>
-</span><span class='line'><span class="nv">TARGET</span><span class="o">=</span>written
+<figure class='code'><figcaption><span>LaTeX Makefile</span> <a href='https://gist.github.com/jez/b248a409d19c9f1c94cd'>(link)</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='make'><span class='line'><span class="c"># NOTE: Change "written" to the name of your TeX file with no extension
+</span><span class='line'></span><span class="nv">TARGET</span><span class="o">=</span>written
 </span><span class='line'>
-</span><span class='line'><span class="nf">all</span><span class="o">:</span> <span class="k">$(</span><span class="nv">TARGET</span><span class="k">)</span>.<span class="n">pdf</span>
+</span><span class='line'><span class="nl">all</span><span class="o">:</span> <span class="nf">$(TARGET).pdf</span>
 </span><span class='line'>
-</span><span class='line'><span class="c">## Generalized rule: how to build a .pdf from each .tex</span>
-</span><span class='line'><span class="nv">LATEXPDFS</span><span class="o">=</span><span class="k">$(</span>patsubst %.tex,%.pdf,<span class="k">$(</span>wildcard *.tex<span class="k">))</span>
-</span><span class='line'><span class="nf">$(LATEXPDFS)</span><span class="o">:</span> %.<span class="n">pdf</span>: %.<span class="n">tex</span>
-</span><span class='line'>  pdflatex -interaction nonstopmode <span class="k">$(</span>patsubst %.pdf,%.tex,<span class="nv">$@</span><span class="k">)</span>
+</span><span class='line'><span class="c">## Generalized rule: how to build a .pdf from each .tex
+</span><span class='line'></span><span class="nv">LATEXPDFS</span><span class="o">=</span><span class="err">$</span><span class="o">(</span>patsubst %.tex,%.pdf,<span class="err">$</span><span class="o">(</span>wildcard <span class="k">*</span>.tex<span class="o">))</span>
+</span><span class='line'><span class="nl">$(LATEXPDFS)</span><span class="o">:</span> <span class="nf">%.pdf: %.tex</span>
+</span><span class='line'>  <span class="err">pdflatex</span> <span class="err">-interaction</span> <span class="err">nonstopmode</span> <span class="err">$(patsubst</span> <span class="err">%.pdf,%.tex,$@)</span>
 </span><span class='line'>
-</span><span class='line'><span class="nf">clean</span><span class="o">:</span>
-</span><span class='line'>  rm *.aux *.log <span class="o">||</span> <span class="nb">true</span>
+</span><span class='line'><span class="nl">clean</span><span class="o">:</span>
+</span><span class='line'>  <span class="err">rm</span> <span class="err">*.aux</span> <span class="err">*.log</span> <span class="err">||</span> <span class="err">true</span>
 </span><span class='line'>
-</span><span class='line'><span class="nf">veryclean</span><span class="o">:</span> <span class="n">clean</span>
-</span><span class='line'>  rm <span class="k">$(</span>TARGET<span class="k">)</span>.pdf
+</span><span class='line'><span class="nl">veryclean</span><span class="o">:</span> <span class="nf">clean</span>
+</span><span class='line'>  <span class="err">rm</span> <span class="err">$(TARGET).pdf</span>
 </span><span class='line'>
-</span><span class='line'><span class="nf">view</span><span class="o">:</span> <span class="k">$(</span><span class="nv">TARGET</span><span class="k">)</span>.<span class="n">pdf</span>
-</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;Darwin&quot;</span> <span class="o">=</span> <span class="s2">&quot;$(shell uname)&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span> open <span class="k">$(</span>TARGET<span class="k">)</span>.pdf <span class="p">;</span> <span class="k">else</span> evince <span class="k">$(</span>TARGET<span class="k">)</span>.pdf <span class="p">;</span> <span class="k">fi</span>
+</span><span class='line'><span class="nl">view</span><span class="o">:</span> <span class="nf">$(TARGET).pdf</span>
+</span><span class='line'>  <span class="err">if</span> <span class="err">[</span> <span class="s2">"Darwin"</span> <span class="err">=</span> <span class="s2">"$(shell uname)"</span> <span class="err">];</span> <span class="err">then</span> <span class="err">open</span> <span class="err">$(TARGET).pdf</span> <span class="err">;</span> <span class="err">else</span> <span class="err">evince</span> <span class="err">$(TARGET).pdf</span> <span class="err">;</span> <span class="err">fi</span>
 </span><span class='line'>
-</span><span class='line'><span class="nf">submit</span><span class="o">:</span> <span class="k">$(</span><span class="nv">TARGET</span><span class="k">)</span>.<span class="n">pdf</span>
-</span><span class='line'>  cp <span class="k">$(</span>TARGET<span class="k">)</span>.pdf ../
+</span><span class='line'><span class="nl">submit</span><span class="o">:</span> <span class="nf">$(TARGET).pdf</span>
+</span><span class='line'>  <span class="err">cp</span> <span class="err">$(TARGET).pdf</span> <span class="err">../</span>
 </span><span class='line'>
-</span><span class='line'><span class="nf">print</span><span class="o">:</span> <span class="k">$(</span><span class="nv">TARGET</span><span class="k">)</span>.<span class="n">pdf</span>
-</span><span class='line'>  lpr <span class="k">$(</span>TARGET<span class="k">)</span>.pdf
+</span><span class='line'><span class="nl">print</span><span class="o">:</span> <span class="nf">$(TARGET).pdf</span>
+</span><span class='line'>  <span class="err">lpr</span> <span class="err">$(TARGET).pdf</span>
 </span><span class='line'>
-</span><span class='line'><span class="nf">.PHONY</span><span class="o">:</span> <span class="n">all</span> <span class="n">clean</span> <span class="n">veryclean</span> <span class="n">view</span> <span class="n">print</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">all clean veryclean view print</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>If you save this to a file called <code>Makefile</code> in the same directory as your LaTeX file, we can just run <code>make</code> instead of running <code>pdflatex &lt;myfile&gt;.tex</code>!</p>
@@ -182,8 +180,7 @@
 
 <p>Taking this one step further, we can add a command to shorten this. If we add</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'>command WV <span class="k">w</span> <span class="p">|</span> <span class="k">make</span> <span class="k">view</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Save, Compile and View in Vim</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'>command WV <span class="k">w</span> <span class="p">|</span> <span class="k">make</span> <span class="k">view</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>to our <code>.vimrc</code>, we&rsquo;ll only have to type <code>:WV</code> to save, compile, and view our PDF output.</p>
@@ -200,6 +197,11 @@
 
 
 <p>Do you have a LaTeX tip, a fancier Makefile, or a favorite vim plugin for LaTeX? Share it in the comments!</p>
+
+<h2><a href="/2015/01/10/offline-latex-development-part-2/">Part 2</a>!</h2>
+
+<p>Actually that&rsquo;s not it, there&rsquo;s more! I wrote a <a href="/2015/01/10/offline-latex-development-part-2/">Part 2</a> to this post, which you
+should definitely check out.</p>
 
 <hr />
 

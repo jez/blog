@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Digitalocean | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/digitalocean/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-02-23T19:29:16-05:00</updated>
+  <updated>2017-02-26T00:16:58-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -39,16 +39,18 @@
 
 <p>Apparently, my issue was that DigitalOcean doesn&rsquo;t initialize freshly created Debian 7 droplets with the most recent kernel. Unfortunately libfuse, a library used by EncFS to create and manage the encrypted file system, was expecting a more up-to-date kernel version.</p>
 
-<p>Upgrading my kernel version was just a few steps, though. I had to run
-<figure class='code'><figcaption><span>Upgrade Kernel </span></figcaption>
-<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo apt-get update
-</span><span class='line'><span class="nv">$ </span>sudp apt-get upgrade
-</span></code></pre></td></tr></table></div></figure>
-to update the list of downloaded kernels, then
-<figure class='code'><figcaption><span>Restart </span></figcaption>
-<div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo shutdown -h now
-</span></code></pre></td></tr></table></div></figure>
-to tell the server to shutdown and power off. Next up is to switch over the kernel version on the <a href="https://www.digitalocean.com/community/tutorials/how-to-update-a-digitalocean-server-s-kernel-using-the-control-panel">DigitalOcean control panel</a>. All in all, nothing too difficult: the hardest part was that I never expected my problem to have anything to do with DigitalOcean.</p>
+<p>Upgrading my kernel version was just a few steps, though. I had to run</p>
+
+<pre><code class="bash">$ sudo apt-get update
+$ sudp apt-get upgrade
+</code></pre>
+
+<p>to update the list of downloaded kernels, then</p>
+
+<pre><code class="bash">$ sudo shutdown -h now
+</code></pre>
+
+<p>to tell the server to shutdown and power off. Next up is to switch over the kernel version on the <a href="https://www.digitalocean.com/community/tutorials/how-to-update-a-digitalocean-server-s-kernel-using-the-control-panel">DigitalOcean control panel</a>. All in all, nothing too difficult: the hardest part was that I never expected my problem to have anything to do with DigitalOcean.</p>
 
 <h2>Postfix &amp; Dovecot</h2>
 

@@ -92,66 +92,64 @@
 
 <p>For the impatient among us, here&rsquo;s the code, which is also available <a href="https://github.com/jez/dotfiles/blob/master/bash_profile#L16-L42">here</a> and <a href="https://github.com/jez/dotfiles/blob/master/bash_profile#L153-L178">here</a> amongst all the code for <a href="https://github.com/jez/dotfiles">all my dotfiles</a>.</p>
 
-<figure class='code'><figcaption><span>Alert to Update</span><a href='https://github.com/jez/dotfiles/blob/master/bash_profile#L16-L42'>link</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># ----- daily updates --------------------------------------------------------</span>
+<figure class='code'><figcaption><span>Remind to update</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># ----- daily updates --------------------------------------------------------</span>
 </span><span class='line'><span class="o">[</span> ! -e <span class="nv">$HOME</span>/.last_update <span class="o">]</span> <span class="o">&amp;&amp;</span> touch <span class="nv">$HOME</span>/.last_update
 </span><span class='line'><span class="c"># Initialize for when we have no GNU date available</span>
 </span><span class='line'><span class="nv">last_check</span><span class="o">=</span>0
 </span><span class='line'><span class="nv">time_now</span><span class="o">=</span>0
 </span><span class='line'>
 </span><span class='line'><span class="c"># Unix last command to check the log of logins, grab the most recent</span>
-</span><span class='line'><span class="nv">last_check_string</span><span class="o">=</span><span class="sb">`</span>ls -l <span class="nv">$HOME</span>/.last_update | awk <span class="s1">&#39;{print $6&quot; &quot;$7&quot; &quot;$8}&#39;</span><span class="sb">`</span>
+</span><span class='line'><span class="nv">last_check_string</span><span class="o">=</span><span class="sb">`</span>ls -l <span class="nv">$HOME</span>/.last_update | awk <span class="s1">'{print $6" "$7" "$8}'</span><span class="sb">`</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># Darwin uses BSD, check for gdate, else use date</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="sb">`</span>uname<span class="sb">`</span> <span class="o">=</span> <span class="s2">&quot;Darwin&quot;</span> <span class="o">&amp;&amp;</span> -n <span class="sb">`</span>which gdate<span class="sb">`</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nv">last_login</span><span class="o">=</span><span class="sb">`</span>gdate -d<span class="s2">&quot;$last_check_string&quot;</span> +%s<span class="sb">`</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="sb">`</span>uname<span class="sb">`</span> <span class="o">=</span> <span class="s2">"Darwin"</span> <span class="o">&amp;&amp;</span> -n <span class="sb">`</span>which gdate<span class="sb">`</span> <span class="o">]]</span>; <span class="k">then
+</span><span class='line'>  </span><span class="nv">last_login</span><span class="o">=</span><span class="sb">`</span>gdate -d<span class="s2">"</span><span class="nv">$last_check_string</span><span class="s2">"</span> +%s<span class="sb">`</span>
 </span><span class='line'>  <span class="nv">time_now</span><span class="o">=</span><span class="sb">`</span>gdate +%s<span class="sb">`</span>
 </span><span class='line'><span class="k">else</span>
 </span><span class='line'>  <span class="c"># Ensure this is GNU grep</span>
-</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;`date --version 2&gt; /dev/null | grep GNU`&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nv">last_login</span><span class="o">=</span><span class="sb">`</span>date -d<span class="s2">&quot;$last_login_string&quot;</span> +%s<span class="sb">`</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> -n <span class="s2">"</span><span class="sb">`</span>date --version 2&gt; /dev/null | grep GNU<span class="sb">`</span><span class="s2">"</span> <span class="o">]</span>; <span class="k">then
+</span><span class='line'>    </span><span class="nv">last_login</span><span class="o">=</span><span class="sb">`</span>date -d<span class="s2">"</span><span class="nv">$last_login_string</span><span class="s2">"</span> +%s<span class="sb">`</span>
 </span><span class='line'>    <span class="nv">time_now</span><span class="o">=</span><span class="sb">`</span>date +%s<span class="sb">`</span>
-</span><span class='line'>  <span class="k">fi</span>
-</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>  <span class="k">fi
+</span><span class='line'>fi
 </span><span class='line'>
-</span><span class='line'><span class="nv">time_since_check</span><span class="o">=</span><span class="k">$((</span>time_now <span class="o">-</span> last_login<span class="k">))</span>
+</span><span class='line'></span><span class="nv">time_since_check</span><span class="o">=</span><span class="k">$((</span>time_now <span class="o">-</span> last_login<span class="k">))</span>
 </span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$time_since_check&quot;</span> -ge 86400 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">echo</span> <span class="s2">&quot;$cred==&gt;$cwhiteb Your system is out of date!$cnone&quot;</span>
-</span><span class='line'>  <span class="nb">echo</span> <span class="s1">&#39;Run `update` to bring it up to date.&#39;</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="nv">$time_since_check</span><span class="s2">"</span> -ge 86400 <span class="o">]</span>; <span class="k">then
+</span><span class='line'>  </span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$cred</span><span class="s2">==&gt;</span><span class="nv">$cwhiteb</span><span class="s2"> Your system is out of date!</span><span class="nv">$cnone</span><span class="s2">"</span>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s1">'Run `update` to bring it up to date.'</span>
+</span><span class='line'><span class="k">fi</span></span></code></pre></td></tr></table></div></figure>
 
 
 
 
-<figure class='code'><figcaption><span>Check for Updates</span><a href='https://github.com/jez/dotfiles/blob/master/bash_profile#L153-L178'>link</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># ----- function -------------------------------------------------------------</span>
+<figure class='code'><figcaption><span>Check for updates</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># ----- function -------------------------------------------------------------</span>
 </span><span class='line'>update<span class="o">()</span> <span class="o">{</span>
 </span><span class='line'>  touch <span class="nv">$HOME</span>/.last_update
 </span><span class='line'>
 </span><span class='line'>  <span class="c"># Mac updates</span>
-</span><span class='line'>  <span class="k">case</span> <span class="nv">$HOSTNAME</span> in
-</span><span class='line'>    *Jacobs-MacBook-Air*<span class="o">)</span>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Updating Homebrew...$cnone&quot;</span>
+</span><span class='line'>  <span class="k">case</span> <span class="nv">$HOSTNAME</span> <span class="k">in</span>
+</span><span class='line'>    <span class="k">*</span>Jacobs-MacBook-Air<span class="k">*</span><span class="p">)</span>
+</span><span class='line'>      <span class="nb">echo</span> <span class="s2">"</span><span class="nv">$cblueb</span><span class="s2">==&gt;</span><span class="nv">$cwhiteb</span><span class="s2"> Updating Homebrew...</span><span class="nv">$cnone</span><span class="s2">"</span>
 </span><span class='line'>      brew update
 </span><span class='line'>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Checking for outdated brew packages...$cnone&quot;</span>
+</span><span class='line'>      <span class="nb">echo</span> <span class="s2">"</span><span class="nv">$cblueb</span><span class="s2">==&gt;</span><span class="nv">$cwhiteb</span><span class="s2"> Checking for outdated brew packages...</span><span class="nv">$cnone</span><span class="s2">"</span>
 </span><span class='line'>      brew outdated --verbose
 </span><span class='line'>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Checking for outdated rbenv...$cnone&quot;</span>
+</span><span class='line'>      <span class="nb">echo</span> <span class="s2">"</span><span class="nv">$cblueb</span><span class="s2">==&gt;</span><span class="nv">$cwhiteb</span><span class="s2"> Checking for outdated rbenv...</span><span class="nv">$cnone</span><span class="s2">"</span>
 </span><span class='line'>      <span class="nb">cd</span> <span class="nv">$HOME</span>/.rbenv
 </span><span class='line'>      git fetch
-</span><span class='line'>      <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;`git describe --tags master`&quot;</span> !<span class="o">=</span> <span class="s2">&quot;`git describe --tags origin/master`&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">        </span><span class="nb">echo</span> <span class="s2">&quot;rbenv (`git describe --tags master`) is outdated (`git describe --tags origin/master`).&quot;</span>
-</span><span class='line'>        <span class="nb">echo</span> <span class="s2">&quot;To update, run: cd ~/.rbenv; git merge origin master &amp;&amp; cd -&quot;</span>
-</span><span class='line'>      <span class="k">fi</span>
-</span><span class='line'><span class="k">      </span><span class="nb">cd</span> - 2&gt;&amp;1 &gt; /dev/null
+</span><span class='line'>      <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="sb">`</span>git describe --tags master<span class="sb">`</span><span class="s2">"</span> !<span class="o">=</span> <span class="s2">"</span><span class="sb">`</span>git describe --tags origin/master<span class="sb">`</span><span class="s2">"</span> <span class="o">]</span>; <span class="k">then
+</span><span class='line'>        </span><span class="nb">echo</span> <span class="s2">"rbenv (</span><span class="sb">`</span>git describe --tags master<span class="sb">`</span><span class="s2">) is outdated (</span><span class="sb">`</span>git describe --tags origin/master<span class="sb">`</span><span class="s2">)."</span>
+</span><span class='line'>        <span class="nb">echo</span> <span class="s2">"To update, run: cd ~/.rbenv; git merge origin master &amp;&amp; cd -"</span>
+</span><span class='line'>      <span class="k">fi
+</span><span class='line'>      </span><span class="nb">cd</span> - 2&gt;&amp;1 &gt; /dev/null
 </span><span class='line'>
-</span><span class='line'>      <span class="nb">echo</span> <span class="s2">&quot;$cblueb==&gt;$cwhiteb Checking for outdated ruby gems...$cnone&quot;</span>
+</span><span class='line'>      <span class="nb">echo</span> <span class="s2">"</span><span class="nv">$cblueb</span><span class="s2">==&gt;</span><span class="nv">$cwhiteb</span><span class="s2"> Checking for outdated ruby gems...</span><span class="nv">$cnone</span><span class="s2">"</span>
 </span><span class='line'>      gem outdated
-</span><span class='line'>      ;;
+</span><span class='line'>      <span class="p">;;</span>
 </span><span class='line'>  <span class="k">esac</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="o">}</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>You&rsquo;ll note the use of a touch file (created in line 2 of the first snippet if it doesn&rsquo;t already exist). If this file is 24 hours old, each time this code is run an alert will be printed. Since this code is running inside of my <code>.bash_profile</code>, that means that every time I open a terminal on a 24-hour-old system, I see the update message.</p>

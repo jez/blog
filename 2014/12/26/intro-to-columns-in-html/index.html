@@ -142,30 +142,28 @@
 
 <p>Let&rsquo;s take a look at what we&rsquo;ve got so far. We want to have two columns, so our HTML is going to look like this:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;row&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;left column&quot;</span><span class="nt">&gt;</span>
+<figure class='code'><figcaption><span>HTML for two columns</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"row"</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"left column"</span><span class="nt">&gt;</span>
 </span><span class='line'>    <span class="c">&lt;!-- Your left content here --&gt;</span>
 </span><span class='line'>  <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;right column&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"right column"</span><span class="nt">&gt;</span>
 </span><span class='line'>    <span class="c">&lt;!-- Your right content here --&gt;</span>
 </span><span class='line'>  <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>Straightforward enough. Knowing what we know about block elements, what if we just set the width of the columns to 50%?</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
+<figure class='code'><figcaption><span>Half-width columns</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
 </span><span class='line'>  <span class="c">/* arbitrary value for this example */</span>
-</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="nl">height</span><span class="p">:</span> <span class="m">300px</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">50%</span><span class="p">;</span>
+</span><span class='line'>  <span class="nl">width</span><span class="p">:</span> <span class="m">50%</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="c">/* so we can tell them appart */</span>
-</span><span class='line'><span class="nc">.left</span> <span class="p">{</span> <span class="k">background</span><span class="o">:</span> <span class="nb">red</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.right</span> <span class="p">{</span> <span class="k">background</span><span class="o">:</span> <span class="nb">blue</span><span class="p">;</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="nc">.left</span> <span class="p">{</span> <span class="nl">background</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.right</span> <span class="p">{</span> <span class="nl">background</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span> <span class="p">}</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p><a href="http://codepen.io/Z1MM32M4N/pen/qENvdx?editors=110">Let&rsquo;s try it out and see what happens</a></p>
@@ -224,7 +222,7 @@
 
 <p>Basically, the problem is that you only want vertical line separators in between columns, not on the edges. In ASCII art:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>
+<figure class='code'><figcaption><span>Beautiful ASCII Art Diagram</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>
 </span><span class='line'>        |        |
 </span><span class='line'>  col1  |  col2  | col 3
 </span><span class='line'>        |        |
@@ -237,23 +235,22 @@
 
 <p>You already know that you can use <code>.class</code> and <code>#id</code> to select items based on their classes and IDs. But there are <a href="http://code.tutsplus.com/tutorials/the-30-css-selectors-you-must-memorize--net-16048">tons more query selectors</a> you can use! I&rsquo;ll use one to accomplish what we want with the vertical dividers:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+<figure class='code'><figcaption><span>Super Fancy CSS Selectors</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nl">height</span><span class="p">:</span> <span class="m">300px</span><span class="p">;</span>
 </span><span class='line'>  <span class="c">/* Try uncommenting me! */</span>
-</span><span class='line'>  <span class="k">float</span><span class="o">:</span> <span class="k">left</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">50%</span><span class="p">;</span>
-</span><span class='line'>  <span class="c">/* this kind of solves the &quot;overflow&quot; exersise I posted above YOLO */</span>
-</span><span class='line'>  <span class="n">box</span><span class="o">-</span><span class="n">sizing</span><span class="o">:</span> <span class="k">border</span><span class="o">-</span><span class="n">box</span><span class="p">;</span>
+</span><span class='line'>  <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
+</span><span class='line'>  <span class="nl">width</span><span class="p">:</span> <span class="m">50%</span><span class="p">;</span>
+</span><span class='line'>  <span class="c">/* this kind of solves the "overflow" exersise I posted above YOLO */</span>
+</span><span class='line'>  <span class="nl">box-sizing</span><span class="p">:</span> <span class="n">border-box</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="c">/* marvel at the fanciness! */</span>
 </span><span class='line'><span class="nc">.column</span><span class="nd">:not</span><span class="o">(</span><span class="nd">:last-child</span><span class="o">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">border-right</span><span class="o">:</span> <span class="m">5px</span> <span class="k">solid</span> <span class="nb">black</span><span class="p">;</span>
+</span><span class='line'>  <span class="nl">border-right</span><span class="p">:</span> <span class="m">5px</span> <span class="nb">solid</span> <span class="no">black</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'><span class="nc">.left</span> <span class="p">{</span> <span class="k">background</span><span class="o">:</span> <span class="nb">red</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.right</span> <span class="p">{</span> <span class="k">background</span><span class="o">:</span> <span class="nb">blue</span><span class="p">;</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="nc">.left</span> <span class="p">{</span> <span class="nl">background</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.right</span> <span class="p">{</span> <span class="nl">background</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span> <span class="p">}</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>You can combine this with a nice padding (<code>padding: 50px</code> should do the trick) on the <code>.column</code>, and you&rsquo;ve got yourself a vertical divider!</p>

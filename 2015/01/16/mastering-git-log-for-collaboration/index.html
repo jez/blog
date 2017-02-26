@@ -117,18 +117,17 @@ leave a discussion of what the individual flags do to the man pages and just
 skip straight to the good part. Feel free to copy and paste these into your
 <code>~/.bashrc</code>, <code>~/.zshrc</code>, or similar file.</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gl</span><span class="o">=</span><span class="s1">&#39;git log --graph --pretty=&quot;%C(bold green)%h%Creset%C(auto)%d%Creset %s&quot;&#39;</span>
+<figure class='code'><figcaption><span>pretty git log aliases</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">gl</span><span class="o">=</span><span class="s1">'git log --graph --pretty="%C(bold green)%h%Creset%C(auto)%d%Creset %s"'</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># pretty Git log, all references</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gll</span><span class="o">=</span><span class="s1">&#39;gl --all&#39;</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">gll</span><span class="o">=</span><span class="s1">'gl --all'</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># pretty Git log, show authors</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gla</span><span class="o">=</span><span class="s1">&#39;git log --graph --pretty=&quot;%C(bold green)%h%Creset %C(yellow)%an%Creset%C(auto)%d%Creset %s&quot;&#39;</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">gla</span><span class="o">=</span><span class="s1">'git log --graph --pretty="%C(bold green)%h%Creset %C(yellow)%an%Creset%C(auto)%d%Creset %s"'</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># pretty Git log, all references, show authors</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">glla</span><span class="o">=</span><span class="s1">&#39;gla --all&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="nb">alias </span><span class="nv">glla</span><span class="o">=</span><span class="s1">'gla --all'</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>As you can see, there are four aliases, and each does something a little
@@ -145,7 +144,7 @@ from the screenshots below is the text between the parentheses, which will
 instead all be the same color. To color these the same as below, add this text to
 the end of your <code>~/.gitconfig</code> file:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>[color "decorate"]
+<figure class='code'><figcaption><span>Global Git configuration settings</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>[color "decorate"]
 </span><span class='line'>  head = bold white
 </span><span class='line'>  branch = bold magenta
 </span><span class='line'>  remotebranch = blue
@@ -224,18 +223,17 @@ of the features I was using in the pretty format (the one that colors remotes
 and branches, <code>%C(auto)</code>) is not available in older versions of Git. These are
 the revised versions of the above aliases that I use on older machines:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gl</span><span class="o">=</span><span class="s1">&#39;git log --graph --pretty=&quot;%C(bold green)%h%Creset%C(blue)%d%Creset %s&quot;&#39;</span>
+<figure class='code'><figcaption><span>Compatible Git log aliases</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">gl</span><span class="o">=</span><span class="s1">'git log --graph --pretty="%C(bold green)%h%Creset%C(blue)%d%Creset %s"'</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># pretty Git log, all references</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gll</span><span class="o">=</span><span class="s1">&#39;gl --all&#39;</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">gll</span><span class="o">=</span><span class="s1">'gl --all'</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># pretty Git log, show authors</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gla</span><span class="o">=</span><span class="s1">&#39;git log --graph --pretty=&quot;%C(bold green)%h%Creset %C(yellow)%an%Creset%C(blue)%d%Creset %s&quot;&#39;</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">gla</span><span class="o">=</span><span class="s1">'git log --graph --pretty="%C(bold green)%h%Creset %C(yellow)%an%Creset%C(blue)%d%Creset %s"'</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># pretty Git log, all references, show authors</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">glla</span><span class="o">=</span><span class="s1">&#39;gla --all&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="nb">alias </span><span class="nv">glla</span><span class="o">=</span><span class="s1">'gla --all'</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>The only real difference is that all the remotes, branches, and tags are blue,

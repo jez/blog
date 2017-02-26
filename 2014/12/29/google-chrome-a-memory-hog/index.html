@@ -102,22 +102,19 @@ through the roof. For more specifics, check out the rest of of the article.</p>
 
 <p>For the impatient, here&rsquo;s the code. It uses standard Unix tools:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Chrome Memory Usage</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -ev | grep -i chrome | awk <span class="s1">'{print $12}'</span> | awk <span class="s1">'{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}'</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>Pretty isn&rsquo;t it? If you want to save this as an alias for handy use, add this
 line to your ~/.bashrc (or appropriate configuration file):</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">alias </span><span class="nv">chromemem</span><span class="o">=</span><span class="s2">&quot;ps -ev | grep -i chrome | awk &#39;{print \$12}&#39; | awk &#39;{for(i=1;i&lt;=NF;i++)s+=\$i}END{print s}&#39;&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Add as an alias</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">alias </span><span class="nv">chromemem</span><span class="o">=</span><span class="s2">"ps -ev | grep -i chrome | awk '{print </span><span class="se">\$</span><span class="s2">12}' | awk '{for(i=1;i&lt;=NF;i++)s+=</span><span class="se">\$</span><span class="s2">i}END{print s}'"</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>It outputs a percentage. Here&rsquo;s the alias in action:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>chromemem
-</span><span class='line'>60
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Usage</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>chromemem
+</span><span class='line'>60</span></code></pre></td></tr></table></div></figure>
 
 
 <h2>Explanation</h2>
@@ -129,15 +126,14 @@ but I&rsquo;m familiar with <code>ps</code>. After checking out the man page for
 came up with <code>ps -ev</code>, to show all information about all processes. Maybe
 wasteful, but it works.</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev
+<figure class='code'><figcaption><span>ps -ev</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -ev
 </span><span class='line'>  PID STAT      TIME  SL  RE PAGEIN      VSZ    RSS   LIM     TSIZ  %CPU %MEM COMMAND
-</span><span class='line'> <span class="m">3473</span> S      0:54.92   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3579092</span> <span class="m">301244</span>     -        <span class="m">0</span>   6.7  7.2 /Applications/Google C
-</span><span class='line'>  <span class="m">365</span> S      3:03.17   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3920732</span> <span class="m">206808</span>     -        <span class="m">0</span>   0.3  4.9 /Applications/Google C
-</span><span class='line'>  <span class="m">983</span> S      1:29.23   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3560272</span> <span class="m">193860</span>     -        <span class="m">0</span>   0.1  4.6 /Applications/Google C
-</span><span class='line'>  <span class="m">395</span> S      0:13.11   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">2824936</span> <span class="m">141644</span>     -        <span class="m">0</span>   0.0  3.4 /Applications/Google C
-</span><span class='line'>  <span class="m">422</span> S      0:27.22   <span class="m">0</span>   <span class="m">0</span>      <span class="m">0</span>  <span class="m">3345796</span> <span class="m">130796</span>     -        <span class="m">0</span>   0.0  3.1 /Applications/Google C
-</span><span class='line'>  ...
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'> 3473 S      0:54.92   0   0      0  3579092 301244     -        0   6.7  7.2 /Applications/Google C
+</span><span class='line'>  365 S      3:03.17   0   0      0  3920732 206808     -        0   0.3  4.9 /Applications/Google C
+</span><span class='line'>  983 S      1:29.23   0   0      0  3560272 193860     -        0   0.1  4.6 /Applications/Google C
+</span><span class='line'>  395 S      0:13.11   0   0      0  2824936 141644     -        0   0.0  3.4 /Applications/Google C
+</span><span class='line'>  422 S      0:27.22   0   0      0  3345796 130796     -        0   0.0  3.1 /Applications/Google C
+</span><span class='line'>  ...</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Notice that there&rsquo;s a convenient column describing memory usage as a percentage
@@ -153,14 +149,13 @@ lines, but rest assured: we&rsquo;re only looking at Chrome processes now.</p>
 column easy. If we want to print the 12th column (which just so happens to
 contain the memory consumption!) we can do <code>awk '{print $12}'</code>:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -ev <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span>
+<figure class='code'><figcaption><span>ps -ev | grep -i chrome | awk &#8216;{print $12}&#8217;</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -ev | grep -i chrome | awk <span class="s1">'{print $12}'</span>
 </span><span class='line'>7.2
 </span><span class='line'>5.1
 </span><span class='line'>4.6
 </span><span class='line'>3.4
 </span><span class='line'>3.2
-</span><span class='line'>...
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Finally, I found myself needing a way to add up a column of numbers. A quick
@@ -168,17 +163,15 @@ Google search led me to <a href="http://stackoverflow.com/questions/2572495/read
 <code>awk</code> solution because I knew I could just pipe the input to awk (as opposed to
 having to do weird hacks to get it to work with a bash for loop):</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -emv <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span>
-</span><span class='line'>60.4
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -emv | grep -i chrome | awk <span class="s1">'{print $12}'</span> | awk <span class="s1">'{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}'</span>
+</span><span class='line'>60.4</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Of course, you could change the last <code>awk</code> command to print out something
 fancier like</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ps -emv <span class="p">|</span> grep -i chrome <span class="p">|</span> awk <span class="s1">&#39;{print $12}&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print &quot;Chrome is using &quot;s&quot;% of total memory.&quot;}&#39;</span>
-</span><span class='line'>Chrome is using 60.4% of total memory.
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -emv | grep -i chrome | awk <span class="s1">'{print $12}'</span> | awk <span class="s1">'{for(i=1;i&lt;=NF;i++)s+=$i}END{print "Chrome is using "s"% of total memory."}'</span>
+</span><span class='line'>Chrome is using 60.4% of total memory.</span></code></pre></td></tr></table></div></figure>
 
 
 <p>There you have it! Bash oneliners save the day yet again.</p>

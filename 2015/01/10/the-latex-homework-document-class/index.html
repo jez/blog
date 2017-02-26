@@ -106,15 +106,13 @@ to your computer in the same directory as your LaTeX project directory.</p>
 repository</a> and then clone that fork to a particular folder on your
 computer:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/&lt;your-username&gt;/latex-hw-template
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Install</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/&lt;your-username&gt;/latex-hw-template</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then, whenever you need to use the template, you can copy the template wherever.
 Also, if there are ever any updates, you can simply run</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git pull
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Update</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git pull</span></code></pre></td></tr></table></div></figure>
 
 
 <p>to update the template.</p>
@@ -148,15 +146,13 @@ class.</p>
 with a line underneath to the document. If you&rsquo;d like to change &ldquo;Question&rdquo; to
 something else, use</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\renewcommand</span><span class="nb">{</span><span class="k">\questiontype</span><span class="nb">}{</span>Whatever You Want<span class="nb">}</span>
-</span><span class='line'><span class="c">% Now questions will be titled &quot;Whatever You Want #&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Change the Question Type</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\renewcommand</span><span class="p">{</span><span class="k">\questiontype</span><span class="p">}{</span>Whatever You Want<span class="p">}</span>
+</span><span class='line'><span class="c">% Now questions will be titled "Whatever You Want #"</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>Similarly, if you ever need to skip numbers, you can do</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\setcounter</span><span class="nb">{</span><span class="k">\questionCounter</span><span class="nb">}{</span>&lt;target number - 1&gt;<span class="nb">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Non-contiguous Question Numbers</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\setcounter</span><span class="p">{</span><span class="k">\questionCounter</span><span class="p">}{</span>&lt;target number - 1&gt;<span class="p">}</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>So, to skip to the 10th question, <code>&lt;target number - 1&gt;</code> = 9.</p>
@@ -175,24 +171,22 @@ case, you can use <code>\question*{The Question's Name}</code> to make a named q
 <p>Another common thing on homework assignments is to have multi-part questions. To
 deal with these, use the form</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>alphaparts<span class="nb">}</span>
+<figure class='code'><figcaption><span>Lettered Question Parts</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="nt">\begin{alphaparts}</span>
 </span><span class='line'>  <span class="k">\questionpart</span>
 </span><span class='line'>    This will be part (a).
 </span><span class='line'>  <span class="k">\questionpart</span>
 </span><span class='line'>    This will be part (b).
-</span><span class='line'><span class="k">\end</span><span class="nb">{</span>alphaparts<span class="nb">}</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="nt">\end{alphaparts}</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>or</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>arabicparts<span class="nb">}</span>
+<figure class='code'><figcaption><span>Numbered Question Parts</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="nt">\begin{arabicparts}</span>
 </span><span class='line'>  <span class="k">\questionpart</span>
 </span><span class='line'>    This will be part x.1.
 </span><span class='line'>  <span class="k">\questionpart</span>
 </span><span class='line'>    This will be part x.2.
-</span><span class='line'><span class="k">\end</span><span class="nb">{</span>arabicparts<span class="nb">}</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="nt">\end{arabicparts}</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>See <a href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
@@ -202,15 +196,14 @@ deal with these, use the form</p>
 <p>In math classes, induction proofs come up a lot, and they almost always have the
 same form: base case, induction hypothesis, and induction step.</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\begin</span><span class="nb">{</span>induction<span class="nb">}</span>
+<figure class='code'><figcaption><span>Induction Environment</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="nt">\begin{induction}</span>
 </span><span class='line'>  <span class="k">\basecase</span>
 </span><span class='line'>    This is my fancy base case.
 </span><span class='line'>  <span class="k">\indhyp</span>
 </span><span class='line'>    Assume some claim.
 </span><span class='line'>  <span class="k">\indstep</span>
 </span><span class='line'>    Finish off the proof
-</span><span class='line'><span class="k">\end</span><span class="nb">{</span>induction<span class="nb">}</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="nt">\end{induction}</span></span></code></pre></td></tr></table></div></figure>
 
 
 <h2>Markdown</h2>
@@ -220,7 +213,7 @@ same form: base case, induction hypothesis, and induction step.</p>
 concise syntax, together with a tool like <a href="http://johnmacfarlane.net/pandoc/"><code>pandoc</code></a> to convert Markdown
 into LaTeX. As an example, consider that we have the Markdown:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>#
+<figure class='code'><figcaption><span>my-homework.md</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>#
 </span><span class='line'>
 </span><span class='line'>This is my first answer.
 </span><span class='line'>
@@ -233,17 +226,16 @@ into LaTeX. As an example, consider that we have the Markdown:</p>
 
 <p>Running <code>pandoc -f markdown -t latex my-homework.md</code> will output</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="c">% $ pandoc -f markdown -t latex my-homework.md</span>
-</span><span class='line'><span class="k">\section</span><span class="nb">{}</span><span class="k">\label</span><span class="nb">{</span>section<span class="nb">}</span>
+<figure class='code'><figcaption><span>Convert markdown to LaTeX</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="c">% $ pandoc -f markdown -t latex my-homework.md</span>
+</span><span class='line'><span class="k">\section</span><span class="p">{}</span><span class="k">\label</span><span class="p">{</span>section<span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'>This is my first answer.
 </span><span class='line'>
-</span><span class='line'><span class="k">\section</span><span class="nb">{}</span><span class="k">\label</span><span class="nb">{</span>section-1<span class="nb">}</span>
+</span><span class='line'><span class="k">\section</span><span class="p">{}</span><span class="k">\label</span><span class="p">{</span>section-1<span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'>This is my next answer.
 </span><span class='line'>
-</span><span class='line'><span class="sb">\[</span><span class="nb">a^</span><span class="m">2</span><span class="nb"> </span><span class="o">+</span><span class="nb"> b^</span><span class="m">2</span><span class="nb"> </span><span class="o">=</span><span class="nb"> c^</span><span class="m">2</span><span class="s">\]</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="p">\[</span><span class="nb">a</span><span class="p">^</span><span class="m">2</span><span class="nb"> </span><span class="o">+</span><span class="nb"> b</span><span class="p">^</span><span class="m">2</span><span class="nb"> </span><span class="o">=</span><span class="nb"> c</span><span class="p">^</span><span class="m">2</span><span class="p">\]</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>And since <code>\section</code> is the same thing as \question, we&rsquo;re golden, and this

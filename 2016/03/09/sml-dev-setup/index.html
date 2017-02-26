@@ -107,7 +107,7 @@ packaged. Take the time to install a version of SML right now. At CMU, we use
 around with SML interactively. If you&rsquo;d like to play around with compiling and
 distributing programs written in SML, you might want to install <a href="http://www.mlton.org/">MLton</a>.</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># SML/NJ on OS X</span>
+<figure class='code'><figcaption><span>Install SML from your package manager</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># SML/NJ on OS X</span>
 </span><span class='line'>brew install smlnj
 </span><span class='line'><span class="c"># -- or --</span>
 </span><span class='line'><span class="c"># MLton on OS X</span>
@@ -117,8 +117,7 @@ distributing programs written in SML, you might want to install <a href="http://
 </span><span class='line'>sudo apt-get install smlnj
 </span><span class='line'><span class="c"># -- or --</span>
 </span><span class='line'><span class="c"># MLton on Ubuntu</span>
-</span><span class='line'>sudo apt-get install mlton
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>sudo apt-get install mlton</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Feel free to install both if you&rsquo;d like; they&rsquo;ll play nicely with each other and
@@ -166,11 +165,10 @@ change how you launch the SML/NJ REPL. In particular, we&rsquo;re going to prefa
 commands with <code>rlwrap</code>:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># instead of this...</span>
-</span><span class='line'><span class="nv">$ </span>sml
+</span><span class='line'><span class="gp">$ </span>sml
 </span><span class='line'>
 </span><span class='line'><span class="c"># use this:</span>
-</span><span class='line'><span class="nv">$ </span>rlwrap sml
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="gp">$ </span>rlwrap sml</span></code></pre></td></tr></table></div></figure>
 
 
 <p><code>rlwrap</code> stands for &ldquo;readline wrap.&rdquo; Readline is a library that simply adds to a
@@ -224,8 +222,7 @@ walkthrough, you can <a href="https://github.com/scrooloose/syntastic">visit the
 instructions. Go ahead and do this now, then try writing this in a file called
 <code>test.sml</code>:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">val</span> <span class="nv">foo</span> <span class="p">:</span> <span class="n">string</span> <span class="p">=</span> <span class="mi">42</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>test.sml</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">val</span> <span class="nv">foo</span> <span class="p">:</span> <span class="n">string</span> <span class="p">=</span> <span class="mi">42</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>You should see an &lsquo;x&rsquo; next to the line and a description of the error from the
@@ -237,21 +234,20 @@ type checker. You can imagine how handy this is.</p>
 you can add at your discretion. At the very least, I&rsquo;d suggest adding these
 lines to your vimrc:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'>...
+<figure class='code'><figcaption><span>.vimrc</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="p">...</span>
 </span><span class='line'>
 </span><span class='line'>augroup mySyntastic
-</span><span class='line'><span class="c">  &quot; tell syntastic to always stick any detected errors into the location-list</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> sml <span class="k">let</span> <span class="k">g</span>:syntastic_always_populate_loc_list <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>  <span class="c">" tell syntastic to always stick any detected errors into the location-list</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> sml <span class="k">let</span> <span class="nv">g:syntastic_always_populate_loc_list</span> <span class="p">=</span> <span class="m">1</span>
 </span><span class='line'>
-</span><span class='line'><span class="c">  &quot; automatically open and/or close the location-list</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> sml <span class="k">let</span> <span class="k">g</span>:syntastic_auto_loc_list <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>  <span class="c">" automatically open and/or close the location-list</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> sml <span class="k">let</span> <span class="nv">g:syntastic_auto_loc_list</span> <span class="p">=</span> <span class="m">1</span>
 </span><span class='line'>augroup END
 </span><span class='line'>
-</span><span class='line'><span class="c">&quot; press &lt;Leader&gt;S (i.e., \S) to not automatically check for errors</span>
-</span><span class='line'><span class="nb">nnoremap</span> <span class="p">&lt;</span>Leader<span class="p">&gt;</span>S :SyntasticToggleMode<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'><span class="c">" press &lt;Leader&gt;S (i.e., \S) to not automatically check for errors</span>
+</span><span class='line'>nnoremap <span class="p">&lt;</span>Leader<span class="p">&gt;</span>S <span class="p">:</span>SyntasticToggleMode<span class="p">&lt;</span>CR<span class="p">&gt;</span>
 </span><span class='line'>
-</span><span class='line'>...
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="p">...</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>By default, whenever you save your file, Syntastic will place symbols in Vim&rsquo;s
@@ -298,8 +294,7 @@ characters, not the end of the line).</p>
 
 <p>If you don&rsquo;t want Vim to do any of this wrapping, run this:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">setlocal</span> <span class="nb">textwidth</span><span class="p">=</span><span class="m">0</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Disable hard line wrapping</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">setlocal</span> textwidth<span class="p">=</span><span class="m">0</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>If you&rsquo;d like this change to persist between Vim sessions, add it to
@@ -311,8 +306,7 @@ after plugin code is.</p>
 <p>Conversely, if you&rsquo;d like a little better idea when Vim&rsquo;s going to hard wrap
 your line, you can add this line to your vimrc:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">colorcolumn</span><span class="p">+=</span><span class="m">0</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Show a color column</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">set</span> colorcolumn<span class="p">+=</span><span class="m">0</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>Note: this will only work if you&rsquo;re using Vim 7.4 or above. This setting tells

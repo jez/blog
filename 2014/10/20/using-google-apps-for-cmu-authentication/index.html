@@ -133,8 +133,7 @@
 
 <p>So in my case, I added the following line to my <code>settings.py</code>:</p>
 
-<figure class='code'><figcaption><span>settings.py</span><a href='https://github.com/jez/google-apps-cmu-login/blob/master/config/settings.py#L66'>link</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;hd&#39;</span> <span class="p">:</span> <span class="s">&#39;andrew.cmu.edu&#39;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>settings.py</span> <a href='https://github.com/jez/google-apps-cmu-login/blob/master/config/settings.py#L66'>(link)</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS</span> <span class="o">=</span> <span class="p">{</span><span class="s">'hd'</span> <span class="p">:</span> <span class="s">'andrew.cmu.edu'</span><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>Phew. That&rsquo;s a long variable name. But Jake, how did you come up with <code>GOOGLE_OAUTH2</code> for the backend name? There&rsquo;s really no good answer to this, because I haven&rsquo;t been able to find a web-readable list of all the names in one place. The way this name is generated is by taking the <code>name</code> property of the particular backend you&rsquo;re using (in my case, <code>social.backends.google.GoogleOAuth2</code> has <code>name = 'google-oauth2'</code>, which I found by looking at the source), replacing all hyphens with underscores and making everything capital.</p>
@@ -145,10 +144,9 @@
 
 <p>First, we&rsquo;ll get all our URLs in place. For Django, all the URLs dealing with logging in are already defined; we just have to include them:</p>
 
-<figure class='code'><figcaption><span>config/urls.py</span><a href='https://github.com/jez/google-apps-cmu-login/blob/master/config/urls.py#L10'>link</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="n">url</span><span class="p">(</span><span class="s">r&#39;&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;social.apps.django_app.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s">&#39;social&#39;</span><span class="p">)),</span>
-</span><span class='line'><span class="o">...</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>config/urls.py</span> <a href='https://github.com/jez/google-apps-cmu-login/blob/master/config/urls.py#L10'>(link)</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="n">url</span><span class="p">(</span><span class="s">r''</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">'social.apps.django_app.urls'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s">'social'</span><span class="p">)),</span>
+</span><span class='line'><span class="o">...</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then we can set up some simple URLs (a home page and a logout view), and accompanying views for these URLs that do exactly what you think they should.</p>

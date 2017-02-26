@@ -110,14 +110,13 @@
 
 <p>To solve the issue of entering personal information, the template defines a bunch of commands at the top of the file that enumerate all the fields you&rsquo;ll likely want to include on your homework.</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='latex'><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\myname</span><span class="nb">}{</span>Jacob Zimmerman<span class="nb">}</span>
-</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\myemail</span><span class="nb">}{</span>jezimmer<span class="nb">}</span>
-</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\myhwtype</span><span class="nb">}{</span>Homework<span class="nb">}</span>
-</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\myhwnum</span><span class="nb">}{</span>0<span class="nb">}</span>
-</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\myclass</span><span class="nb">}{</span>12-345<span class="nb">}</span>
-</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\mylecture</span><span class="nb">}{</span>0<span class="nb">}</span>
-</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\mysection</span><span class="nb">}{</span>Z<span class="nb">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Personal Information </span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='latex'><span class='line'><span class="k">\newcommand</span><span class="p">{</span><span class="k">\myname</span><span class="p">}{</span>Jacob Zimmerman<span class="p">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="p">{</span><span class="k">\myemail</span><span class="p">}{</span>jezimmer<span class="p">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="p">{</span><span class="k">\myhwtype</span><span class="p">}{</span>Homework<span class="p">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="p">{</span><span class="k">\myhwnum</span><span class="p">}{</span>0<span class="p">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="p">{</span><span class="k">\myclass</span><span class="p">}{</span>12-345<span class="p">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="p">{</span><span class="k">\mylecture</span><span class="p">}{</span>0<span class="p">}</span>
+</span><span class='line'><span class="k">\newcommand</span><span class="p">{</span><span class="k">\mysection</span><span class="p">}{</span>Z<span class="p">}</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p></p>
@@ -132,8 +131,7 @@
 
 <p><strong>The <code>numedquestion</code> environment</strong> takes no arguments, but that doesn&rsquo;t mean you can&rsquo;t configure it. By default, <code>numedquestions</code> begin counting at 1 and go up sequentially from there. To change this, you manually set the contents of the <code>questionCounter</code> counter. Using</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='latex'><span class='line'><span class="k">\setcounter</span><span class="nb">{</span>questionCounter<span class="nb">}{</span>-1<span class="nb">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='latex'><span class='line'><span class="k">\setcounter</span><span class="p">{</span>questionCounter<span class="p">}{</span>-1<span class="p">}</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>Before the first question will start the numbering at 0. You can use this pattern (set the <code>questionCounter</code> to one less than the next question) to arbitrarily skip around with your numbering. There&rsquo;s an example of this in the source.</p>
@@ -142,8 +140,7 @@
 
 <p>Similar to what we could do with <code>questionCounter</code>, you can manually turn on the section counter for certain questions by including something like</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='latex'><span class='line'><span class="k">\renewcommand</span><span class="nb">{</span><span class="k">\writtensection</span><span class="nb">}{</span>X<span class="nb">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>\renewcommand{\writtensection}{X}</span></code></pre></td></tr></table></div></figure>
 
 
 <p>in front of that particular question. Use <code>\renewcommand{\writtensection}{0}</code> after that question if you&rsquo;d like to turn it back off.</p>

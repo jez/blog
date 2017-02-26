@@ -121,11 +121,10 @@ Stack to manage the path to the compiler executable and sandboxes.</p></blockquo
 huge fan of things cluttering up your home folder, set the <code>STACK_ROOT</code> variable
 in you bashrc or zshrc:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">XDG_DATA_HOME</span><span class="o">=</span><span class="s2">&quot;$HOME/.local/share&quot;</span>
+<figure class='code'><figcaption><span>Set STACK_ROOT to avoid clutter</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">XDG_DATA_HOME</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.local/share"</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># Have Haskell Stack use XDG Base Directory spec</span>
-</span><span class='line'><span class="nb">export </span><span class="nv">STACK_ROOT</span><span class="o">=</span><span class="s2">&quot;$XDG_DATA_HOME/stack&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="nb">export </span><span class="nv">STACK_ROOT</span><span class="o">=</span><span class="s2">"</span><span class="nv">$XDG_DATA_HOME</span><span class="s2">/stack"</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>Of course, the choice of location is up to you. In particular I&rsquo;ve chosen to
@@ -141,22 +140,20 @@ continuing.</p>
 <p>If you&rsquo;re like me, you&rsquo;ll want to take a second to purge anything
 Haskell-related from previous botched setup attempts:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># If you had GHC installed</span>
-</span><span class='line'><span class="nv">$ </span>brew uninstall ghc
+<figure class='code'><figcaption><span>Wipe the slate clean</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># If you had GHC installed</span>
+</span><span class='line'><span class="gp">$ </span>brew uninstall ghc
 </span><span class='line'>
 </span><span class='line'><span class="c"># If you tried and failed at installing Stack already</span>
-</span><span class='line'><span class="nv">$ </span>brew uninstall haskell-stack
-</span><span class='line'><span class="nv">$ </span>rm -r ~/.stack
+</span><span class='line'><span class="gp">$ </span>brew uninstall haskell-stack
+</span><span class='line'><span class="gp">$ </span>rm -r ~/.stack
 </span><span class='line'><span class="c"># If you happened to also set STACK_ROOT</span>
-</span><span class='line'><span class="nv">$ </span>rm -r <span class="nv">$STACK_ROOT</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="gp">$ </span>rm -r <span class="nv">$STACK_ROOT</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>With that out of the way, we can actually get our hands on Stack. For OS X,
 we&rsquo;ll install through Homebrew:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='console'><span class='line'><span class="gp">$</span> brew install haskell-stack
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>Install Stack</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='console'><span class='line'><span class="w">$ </span><span class="nc">brew</span><span class="kv"> install haskell-stack</span></span></code></pre></td></tr></table></div></figure>
 
 
 <h2>Configure Stack, avoiding &ldquo;rootless&rdquo; issues</h2>
@@ -167,11 +164,10 @@ itself up with version 7.8.4 of GHC. We can get around this by specifying an
 explicit resolver to the <code>stack</code> command (you can find more information on
 &ldquo;resolvers&rdquo; elsewhere):</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Change the resolver to the most up-to-date one. This is a hack to ensure that</span>
-</span><span class='line'><span class="c"># get GHC version &gt; 7.8, because there&#39;s an issue with El Capitan&#39;s rootless</span>
+<figure class='code'><figcaption><span>Side-step rootless issue in setup</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Change the resolver to the most up-to-date one. This is a hack to ensure that</span>
+</span><span class='line'><span class="c"># get GHC version &gt; 7.8, because there's an issue with El Capitan's rootless</span>
 </span><span class='line'><span class="c"># mode.</span>
-</span><span class='line'>stack --resolver<span class="o">=</span>lts-6.10 setup
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>stack --resolver<span class="o">=</span>lts-6.10 setup</span></code></pre></td></tr></table></div></figure>
 
 
 <p>You&rsquo;ll notice we use the <code>--resolver=...</code> flag to force Stack to use a specific
