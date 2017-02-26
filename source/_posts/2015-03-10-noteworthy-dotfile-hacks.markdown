@@ -8,10 +8,13 @@ description: >
   Because it's much easier (for me at least) to read a blog post than read the
   code.
 share: false
+pinned: 9001
 ---
 
-There are some hidden gems in my dotfiles. This is a post to showcase them,
-putting them front and center.
+I have hundreds of files and folders in my dotfiles repo, and nearly 1000
+commits---there are quite a few hidden gems buried in there that generally don't
+get to see the light of day. Rather than wander aimlessly through them, let me
+give you the guided tour.
 
 <!-- more -->
 
@@ -117,6 +120,7 @@ before I even read about Shell Shock!
 
 The relevant links are [here][auto-update] for the core script that I [source in
 my zshrc][update-zsh], and then the following host specific links:
+
 - [here][update-mac] for my MacBook
 - [here][update-ubuntu] for my Ubuntu VPS
 

@@ -6,6 +6,7 @@ comments: false
 categories: [LaTeX, make, vim, unix]
 description: 
 share: false
+pinned: true
 ---
 
 While online clients like ShareLaTeX or writeLaTeX are popular for getting started with LaTeX quickly, developing LaTeX locally with Vim and the command line is my preferred LaTeX workflow. In this post, I'll describe the changes I've made that make working with LaTeX on the command line a seamless experience. 
@@ -118,6 +119,16 @@ That's it! I like this experience for a bunch of reasons:
 - __It's faster__. Using Vim to edit text is much more convenient than a standard text editor.
 
 Do you have a LaTeX tip, a fancier Makefile, or a favorite vim plugin for LaTeX? Share it in the comments!
+
+## [Part 2]!
+
+Actually that's not it, there's more! I wrote a [Part 2] to this post, which you
+should definitely check out.
+
+[Part 2]: /2015/01/10/offline-latex-development-part-2/
+
+
+
 
 {% include jake-on-the-web.markdown %}
 
