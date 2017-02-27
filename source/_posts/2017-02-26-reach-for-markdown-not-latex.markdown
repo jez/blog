@@ -12,6 +12,7 @@ description: >
   LaTeX is powerful but cumbersome to use. With Markdown, we can focus on our
   writing, and worry about the presentation later. Pandoc can take care of the
   presentation for us, so the only thing left to do is start.
+pinned: true
 ---
 
 I've written [in the past][latex-part1] ([twice][latex-part2]) about how to

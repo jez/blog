@@ -6,7 +6,6 @@ comments: false
 categories: [LaTeX, make, vim, unix]
 description: 
 share: false
-pinned: true
 ---
 
 While online clients like ShareLaTeX or writeLaTeX are popular for getting started with LaTeX quickly, developing LaTeX locally with Vim and the command line is my preferred LaTeX workflow. In this post, I'll describe the changes I've made that make working with LaTeX on the command line a seamless experience. 
