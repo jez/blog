@@ -21,9 +21,11 @@ image:
 <div class="pinned-divider"></div>
 
 {% for post in paginator.posts %}
-<article class="hentry">
-  {% include article.html %}
-</article><!-- /.hentry -->
+  {% unless post.pinned %}
+  <article class="hentry">
+    {% include article.html %}
+  </article><!-- /.hentry -->
+  {% endunless %}
 {% endfor %}
 
 <div class="pagination">
