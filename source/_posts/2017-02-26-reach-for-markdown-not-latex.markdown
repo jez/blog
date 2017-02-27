@@ -7,6 +7,7 @@ share: false
 categories:
   - markdown
   - latex
+  - vim
 description: >
   Writing should be a pleasant experience. With the right tools, it can be.
   LaTeX is powerful but cumbersome to use. With Markdown, we can focus on our
