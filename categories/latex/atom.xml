@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Latex | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/latex/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-02-26T00:16:58-05:00</updated>
+  <updated>2017-02-26T23:46:22-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,191 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Reach for Markdown, Not LaTeX]]></title>
+    <link href="https://blog.jez.io/2017/02/26/reach-for-markdown-not-latex/"/>
+    <updated>2017-02-26T21:26:53-05:00</updated>
+    <id>https://blog.jez.io/2017/02/26/reach-for-markdown-not-latex</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve written <a href="/2014/10/04/offline-latex-development/">in the past</a> (<a href="/2015/01/10/offline-latex-development-part-2/">twice</a>) about how to
+streamline the writing process when using LaTeX. Since then, I&rsquo;ve found that I
+enjoy writing even more when I don&rsquo;t have to reach for LaTeX at all. By reaching
+first for Markdown, then for LaTeX when necessary, writing is easier and more
+enjoyable.</p>
+
+<!-- more -->
+
+
+<h2>Writing at the Command Line</h2>
+
+<p>Last year, I <a href="https://jez.io/talks/writing-at-the-command-line/">gave a talk</a> about the merits of writing primarily at
+the command line. My main claims were that when writing we want:</p>
+
+<ul>
+<li>an open document format (so that our writings are future proof)</li>
+<li>to be using open source software (for considerations of privacy and cost)</li>
+<li>to optimize for the &ldquo;common case&rdquo;</li>
+<li>to be able to write for print and digital (PDFs, web pages, etc.)</li>
+</ul>
+
+
+<p>Markdown solves these constraints nicely:</p>
+
+<ul>
+<li>It&rsquo;s a plain text format&mdash;plain text has been around for decades and will
+be for decades more.</li>
+<li>Given a plain text format, we can bring our own text editor.</li>
+<li>Plenty of open source programs manipulate Markdown.</li>
+<li>When we need advanced features, we can mix LaTeX into our Markdown documents.</li>
+</ul>
+
+
+<p>For those unfamiliar with Markdown, it&rsquo;s super quick to pick up. If you only
+look at one guide, see this one:</p>
+
+<ul>
+<li><a href="http://commonmark.org/help/">CommonMark</a></li>
+</ul>
+
+
+<p>If you want to start comparing features available in certain implementations of
+Markdown:</p>
+
+<ul>
+<li><a href="https://guides.github.com/features/mastering-markdown/">GitHub Flavored Markdown</a></li>
+<li><a href="https://daringfireball.net/projects/markdown/">Markdown.pl</a></li>
+<li><a href="http://pandoc.org/MANUAL.html#pandocs-markdown">Pandoc Markdown</a></li>
+</ul>
+
+
+<p>For more on why you should want to be writing at the command line, you can
+<a href="https://jez.io/talks/writing-at-the-command-line/">check out the talk slides</a>.</p>
+
+<h2>Pandoc Starter</h2>
+
+<p>The central tool I spoke about in <em>Writing at the Command Line</em> is <a href="https://pandoc.org/">Pandoc</a>.
+Pandoc is an amazingly simple command line program that takes in Markdown files
+and spits out really anything you can think of.</p>
+
+<p>To make using Pandoc even easier than it already is, I put together a
+<a href="https://github.com/jez/pandoc-starter">collection of starter templates</a>. They&rsquo;re all available <a href="https://github.com/jez/pandoc-starter">on
+Github</a> if you&rsquo;d prefer to dive right in.</p>
+
+<p>There are currently six different templates, specialized for the kind of
+document you&rsquo;d like to create. Each has a <code>README</code> for installation and usage
+instructions, as well as a <code>Makefile</code> for invoking <code>pandoc</code> correctly.</p>
+
+<p>All the templates generate PDFs from Markdown by way of LaTeX. In addition to
+Pandoc, you&rsquo;ll also need LaTeX installed locally.</p>
+
+<h3><a href="https://github.com/jez/pandoc-starter/tree/master/article"><code>article</code></a></h3>
+
+<p>This template uses the standard LaTeX <code>article</code> document class. It&rsquo;s a
+no frills, no nonsense choice.</p>
+
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/article/src/sample.pdf"><img src="/images/pandoc-starter-article.png" alt="article template" /></a></p>
+
+<h3><a href="https://github.com/jez/pandoc-starter/tree/master/tufte-handout"><code>tufte-handout</code></a></h3>
+
+<p>As an alternative to the <code>article</code> document class, there&rsquo;s also the
+<code>tufte-handout</code> document class. It originates from the style Edward Tufte
+popularized in his books and articles on visualization and design.</p>
+
+<p>Apart from a different font (it uses Palatino instead of the default Computer
+Modern), this template features the ability add side notes to your documents. I
+often find myself reaching for this template when I want to disguise the fact
+that I&rsquo;m secretly using LaTeX.</p>
+
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/tufte-handout/src/sample.pdf"><img src="/images/pandoc-starter-tufte-handout.png" alt="tufte-handout template" /></a></p>
+
+<h3><a href="https://github.com/jez/pandoc-starter/tree/master/tufte-handout"><code>homework</code></a></h3>
+
+<p>A second alternative to the <code>article</code> document class is the <code>homework</code> document
+class. It works nicely for homework assignments and problem sets. The class
+itself has a number of handy features, like:</p>
+
+<ul>
+<li>the option to put your name on every page, or only on the first page</li>
+<li>an option to use wide or narrow margins</li>
+<li>most of the AMS Math packages you&rsquo;d include in the process of typesetting a
+math assignment</li>
+<li>a convenient environment for typesetting induction proofs</li>
+</ul>
+
+
+<p>For more features and usage information, check out <a href="/2015/01/10/the-latex-homework-document-class/">this blog post</a> or
+<a href="https://github.com/jez/latex-homework-class">the source</a> on GitHub.</p>
+
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/homework/src/sample.pdf"><img src="/images/pandoc-starter-homework.png" alt="homework template" /></a></p>
+
+<h3><a href="https://github.com/jez/pandoc-starter/tree/master/beamer"><code>beamer</code></a></h3>
+
+<p>LaTeX provides the <code>beamer</code> document class for creating slides; this template
+makes it even easier to use:</p>
+
+<ul>
+<li>Make a new slide with a &ldquo;<code>##</code>&rdquo; header</li>
+<li>Make a section divider with a &ldquo;<code>#</code>&rdquo; header</li>
+<li>Mix lists, links, code, and other Markdown features you&rsquo;re familiar with to
+create the content for a slide.</li>
+</ul>
+
+
+<p>So basically, just write the outline for your talk, and Pandoc takes care of
+making the slides&mdash;it doesn&rsquo;t get much simpler.</p>
+
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/beamer/src/sample.pdf"><img src="/images/pandoc-starter-beamer.png" alt="beamer template" /></a></p>
+
+<h3><a href="https://github.com/jez/pandoc-starter/tree/master/beamer-solarized"><code>beamer-solarized</code></a></h3>
+
+<p>The default beamer styles are pretty boring. To add a bit of flair and
+personality to my slide decks, I made a Solarized theme for beamer.</p>
+
+<p>In addition to the screenshot below, the <a href="https://jez.io/talks/writing-at-the-command-line/">Writing at the Command
+Line</a> slides I linked to earlier also use this theme, if you want
+to see a less contrived example.</p>
+
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/beamer-solarized/src/sample.pdf"><img src="/images/pandoc-starter-beamer-solarized.png" alt="beamer solarized template" /></a></p>
+
+<h3><a href="https://github.com/jez/pandoc-starter/tree/master/book-writeup"><code>book-writeup</code></a></h3>
+
+<p>Finally, sometimes a simple article or slide deck doesn&rsquo;t cut it. Usually this
+means I&rsquo;d like to group the writing into chapters. This template makes writing a
+chapter as easy as using a &ldquo;<code>#</code>&rdquo; Markdown header.</p>
+
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/book-writeup/src/sample.pdf"><img src="/images/pandoc-starter-book-writeup.png" alt="book writeup template" /></a></p>
+
+<h2>Writing Plugins for Vim</h2>
+
+<p>If you happen to use Vim, I&rsquo;d highly recommend installing <a href="https://github.com/junegunn/goyo.vim">goyo.vim</a> for
+writing. It removes all the visual frills Vim includes to make writing code
+easier so you can focus on your writing without distractions.</p>
+
+<p>I also really enjoy <a href="https://github.com/vim-pandoc/vim-pandoc">vim-pandoc</a> and <a href="https://github.com/vim-pandoc/vim-pandoc-syntax">vim-pandoc-syntax</a>. They&rsquo;re a pair of
+complementary plugins for highlighting and working with Pandoc Markdown-flavored
+documents. They work so well that I use them for Markdown documents even when
+not using Pandoc.</p>
+
+<h2>Reach for Markdown</h2>
+
+<p>Writing should be a pleasant experience. With the right tools, it can be. LaTeX
+is powerful but cumbersome to use. With Markdown, we can focus on our writing,
+and worry about the presentation later. Pandoc can take care of the presentation
+for us, so the <a href="https://github.com/jez/pandoc-starter">only thing left to do is start</a>.</p>
+
+<p>- - - - -
+<br>
+### Jake on the Web
+<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to comment, open an issue, or send me an email.
+ [g]: https://www.github.com/jez/
+ [h]: https://jez.io/
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The LaTeX Homework Document Class]]></title>
@@ -415,101 +600,6 @@ people think, so feel free to comment, open an issue, or send me an email.
 <p>After you install them in the right place, you can include <code>\usepackage{solarized-light}</code> to turn source code listings light (as in above), <code>\usepackage{solarized-dark}</code> to have listings styled with the dark Solarized theme, and just <code>\usepackage{solarized}</code> to have access to the raw Solarized color codes (see the source for their names).</p>
 
 <p>Once you&rsquo;ve done this, you just have to include your code in your LaTeX file using the <code>listings</code> packages. You might want to check out <a href="http://en.wikibooks.org/wiki/LaTeX/Source_Code_Listings">the LaTeX wiki</a> for more information on how to get started quickly with code listings, or <a href="http://mirror.hmc.edu/ctan/macros/latex/contrib/listings/listings.pdf">the official documentation</a> for a more comprehensive reference.</p>
-
-<p>- - - - -
-<br>
-### Jake on the Web
-<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.
- [g]: https://www.github.com/jez/
- [h]: https://jez.io/
-</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[A LaTeX Homework Template]]></title>
-    <link href="https://blog.jez.io/2014/10/04/a-latex-homework-template/"/>
-    <updated>2014-10-04T02:03:27-04:00</updated>
-    <id>https://blog.jez.io/2014/10/04/a-latex-homework-template</id>
-    <content type="html"><![CDATA[<p>Writing a LaTeX document from scratch for every assignment is tedious. Especially for homework assignments, a lot of the structure is repetitive. Read on to learn about the homework template I&rsquo;ve adapted for use in all my technical classes.</p>
-
-<!-- more -->
-
-
-<h2>Background</h2>
-
-<p>I&rsquo;ve been using LaTeX for assignments in college for over a year now, and from the get-go I loved it; It&rsquo;s a powerful way to transform plain text (which is editable in Vim!) into beautiful documents. In fact, I use LaTeX + Vim or Google Docs exclusively&ndash;no Microsoft Office. People often don&rsquo;t understand why I prefer this combination, claiming that LaTeX is time consuming and tedious. But with a good template and some Vim-foo, editing LaTeX is a breeze. In a later post, I&rsquo;ll elaborate how I use Vim + Unix as an IDE for LaTeX. For now, though, let&rsquo;s take a look at my template!</p>
-
-<h2><a href="https://github.com/jez/latex-hw-template">The Template</a></h2>
-
-<p>For those who like to learn by doing, I invite you to <strong><a href="https://github.com/jez/latex-hw-template">jump over to GitHub</a></strong> where you can see the source, download the template, and start tinkering. The source isn&rsquo;t that long, and it comes with tons of examples to get you going.</p>
-
-<p>The rest of this post goes into some fancy use cases for how to get the best out of this template. If you don&rsquo;t read it now, check it out later if you want to take advantage of it&rsquo;s more powerful features. You can also leave comments here asking how something works, and issues on GitHub if something&rsquo;s broken.</p>
-
-<h2>Screenshot</h2>
-
-<p>Here&rsquo;s a quick overview of what the theme looks like. You&rsquo;ll have to use your imagination a bit: this outline is more of a list of examples. I&rsquo;d show you how nice one of my actual homeworks looks, but then I&rsquo;d be giving out my homework!</p>
-
-<p><a class="image-link" href="href="https://raw.githubusercontent.com/jez/latex-hw-template/master/screenshot.png">https://raw.githubusercontent.com/jez/latex-hw-template/master/screenshot.png</a>&#8221;><img class="<a" src="href="https://raw.githubusercontent.com/jez/latex-hw-template/master/screenshot.png">https://raw.githubusercontent.com/jez/latex-hw-template/master/screenshot.png</a>&#8221;></a></p>
-
-<h2>Usage</h2>
-
-<p>My main use case for LaTeX is (unsurprisingly) to typeset homeworks for math and CS classes. In these classes, the questions are either numbered or have specific names, and they ask for your name, lecture, recitation section, student ID, email address, etc. It turns out that there are some pretty simple ways of modularizing each of these desired features.</p>
-
-<h3>Personal Info</h3>
-
-<p>To solve the issue of entering personal information, the template defines a bunch of commands at the top of the file that enumerate all the fields you&rsquo;ll likely want to include on your homework.</p>
-
-<pre><code class="latex Personal Information ">\newcommand{\myname}{Jacob Zimmerman}
-\newcommand{\myemail}{jezimmer}
-\newcommand{\myhwtype}{Homework}
-\newcommand{\myhwnum}{0}
-\newcommand{\myclass}{12-345}
-\newcommand{\mylecture}{0}
-\newcommand{\mysection}{Z}
-</code></pre>
-
-<p><strong>This is where forking comes in particularly handy</strong>. You&rsquo;d like to be able to define your own defaults and push them somewhere, but you also want to be able to update the template as new changes become available. If you fork the repo, you can both have a repository where you can include your own changes as well as pull any updates as they become available. (If you&rsquo;re new to forks, you should definitely <a href="https://help.github.com/articles/fork-a-repo/">check them out</a>).</p>
-
-<h3>Questions</h3>
-
-<p>Whenever I have an assignment to do, the questions generally come down to one of two forms: named or numbered questions. As such, there are two environments in the template that let you easily create a space to put your answers for each type of question. These are named <code>namedquestion</code> and <code>numedquestion</code> (<strong>not</strong> <code>numberedquestion</code>).</p>
-
-<p><strong>The <code>namedquestion</code> environment</strong> takes one required argument: the name! This environment is handy any time the questions don&rsquo;t have numbers attached to them, or if the ordering of the questions doesn&rsquo;t conform nicely to a sequential numbering.</p>
-
-<p><strong>The <code>numedquestion</code> environment</strong> takes no arguments, but that doesn&rsquo;t mean you can&rsquo;t configure it. By default, <code>numedquestions</code> begin counting at 1 and go up sequentially from there. To change this, you manually set the contents of the <code>questionCounter</code> counter. Using</p>
-
-<pre><code class="latex">\setcounter{questionCounter}{-1}
-</code></pre>
-
-<p>Before the first question will start the numbering at 0. You can use this pattern (set the <code>questionCounter</code> to one less than the next question) to arbitrarily skip around with your numbering. There&rsquo;s an example of this in the source.</p>
-
-<p>There are also times when you&rsquo;d like numbered questions to be of the form &ldquo;X.y&rdquo;, where &ldquo;X&rdquo; is the section number that the question comes from, and &ldquo;y&rdquo; is the number of the question within that section. The template tracks the value of &ldquo;X&rdquo; in <code>\writtensection</code>. By default, the template sets this to 0, which causes the section number to be omitted. If you manually set <code>\writtensection</code> to a non-zero value, this number will be prepended to all questions. When you do this, the value of &ldquo;y&rdquo; is determined by <code>questionCounter</code>.</p>
-
-<p>Similar to what we could do with <code>questionCounter</code>, you can manually turn on the section counter for certain questions by including something like</p>
-
-<pre><code>\renewcommand{\writtensection}{X}
-</code></pre>
-
-<p>in front of that particular question. Use <code>\renewcommand{\writtensection}{0}</code> after that question if you&rsquo;d like to turn it back off.</p>
-
-<h3>Question Parts</h3>
-
-<p>All in all, these two environments will take care of 90% of what you need to do in your homework. Sometimes, though, questions have multiple parts. To handle this, there are two environments, <code>alphaparts</code> and <code>arabicparts</code>, that take care of alphabetic and numeric question parts, respectively.</p>
-
-<p>The uses of these environments are pretty straightforward and have no real special cases. Each environment wraps around the <code>enumerate</code> environment. This means you can just use a normal <code>\item</code> to indicate a specific part of the question.</p>
-
-<h3>Induction Proofs</h3>
-
-<p>There&rsquo;s one more thing that I&rsquo;d like to mention here. Different people have different ways of typesetting induction proofs, with varying degrees of success. Personally, I like the <code>description</code> environment for outlining the base case, induction hypothesis, and inductive step of the proof. It works well for basically every induction proof, and looks nice and clean.</p>
-
-<h2>Feedback</h2>
-
-<p>Be sure to let me know how you like this template! It works for me, but obviously I&rsquo;m only using it for a small number of things on exactly one system. If something doesn&rsquo;t seem to work, or if you&rsquo;d like to see a particular feature implemented, comment or create a GitHub issue to let me know!</p>
 
 <p>- - - - -
 <br>
