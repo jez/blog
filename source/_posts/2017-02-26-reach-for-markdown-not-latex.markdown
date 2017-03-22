@@ -169,7 +169,7 @@ for us, so the [only thing left to do is start][pandoc-starter].
 {% include jake-on-the-web.markdown %}
 
 
-[latex-part1]: /2014/10/04/offline-latex-development/
+[latex-part1]: /2014/10/06/offline-latex-development/
 [latex-part2]: /2015/01/10/offline-latex-development-part-2/
 [writing-cli]: https://jez.io/talks/writing-at-the-command-line/
 [Pandoc]: https://pandoc.org/
