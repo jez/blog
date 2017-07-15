@@ -72,6 +72,7 @@ this by changing our workflow:
 1. Run `sml foo.sml` or `sml -m sources.cm`
 
 Look at that! We've,
+
 - dropped a step (having to launch the REPL first), and
 - introduced tab completion into our workflow (because the shell has filename
   completion)
