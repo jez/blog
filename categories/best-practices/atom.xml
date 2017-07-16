@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Best Practices | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/best-practices/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-03-21T23:08:10-04:00</updated>
+  <updated>2017-07-16T18:09:22-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,127 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Vim and Haskell in 2016 on OS X]]></title>
-    <link href="https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x/"/>
-    <updated>2016-08-03T00:04:08-04:00</updated>
-    <id>https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x</id>
-    <content type="html"><![CDATA[<p>Stephen Diehl&rsquo;s article <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> does a great
-job of outlining the quickest way to get a quality Haskell development
-experience. His post presumes Ubuntu; here we presume OS X.</p>
-
-<!-- more -->
-
-
-<p>This post wouldn&rsquo;t actually be necessary if it weren&rsquo;t for one thing: <a href="https://support.apple.com/en-us/HT204899">System
-Integrity Protection</a> in OS X El Capitan, also known as &ldquo;rootless&rdquo;
-mode. It affects Haskell&rsquo;s build and install step in a subtle (but solved) way,
-and the rest of the article will cover what to watch out for when installing on
-OS X.</p>
-
-<p>If you don&rsquo;t follow these instructions and you&rsquo;re on OS X El Capitan, you&rsquo;ll
-likely run into an issue that looks like <code>/usr/bin/ar: permission denied</code>. The
-Stack installation instructions call this out specifically:</p>
-
-<blockquote><p>If you are on OS X 10.11 (&ldquo;El Capitan&rdquo;) or later, GHC 7.8.4 is incompatible
-with System Integrity Protection (a.k.a. &ldquo;rootless&rdquo;). GHC 7.10.2 includes a
-fix, so this only affects users of GHC 7.8.4.</p></blockquote>
-
-<p>At the risk of spoiling the surprise, we&rsquo;re going to set up Stack while taking
-care to make sure that we get GHC >= 7.10. So let&rsquo;s do just that!</p>
-
-<h2>Environment Prep (optional)</h2>
-
-<p>Note that this step is optional and has nothing to do with OS X; I just wanted
-to point it out quickly.</p>
-
-<p>Under <a href="http://www.stephendiehl.com/posts/vim_2016.html#dev-environment">Dev Environment</a> on <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in
-2016</a>, Stephen Diehl writes:</p>
-
-<blockquote><p>Times have changed quite a bit, and the new preferred way of installing GHC in
-2016 is to forgo using the system package manager for installing ghc and use
-Stack to manage the path to the compiler executable and sandboxes.</p></blockquote>
-
-<p>Stack stores it&rsquo;s metadata in the <code>~/.stack</code> folder by default. If you&rsquo;re not a
-huge fan of things cluttering up your home folder, set the <code>STACK_ROOT</code> variable
-in you bashrc or zshrc:</p>
-
-<pre><code class="bash Set STACK_ROOT to avoid clutter">export XDG_DATA_HOME="$HOME/.local/share"
-
-# Have Haskell Stack use XDG Base Directory spec
-export STACK_ROOT="$XDG_DATA_HOME/stack"
-</code></pre>
-
-<p>Of course, the choice of location is up to you. In particular I&rsquo;ve chosen to
-adhere to the <a href="https://wiki.archlinux.org/index.php/XDG_Base_Directory_support">XDG Base Directory specification</a> here, which you may want
-to take a peek at if you&rsquo;re unfamiliar. That&rsquo;s why you see references to
-<code>XDG_DATA_HOME</code>.</p>
-
-<p>Make sure you restart your terminal to pick up the new variables before
-continuing.</p>
-
-<h2>Install Stack from Homebrew</h2>
-
-<p>If you&rsquo;re like me, you&rsquo;ll want to take a second to purge anything
-Haskell-related from previous botched setup attempts:</p>
-
-<pre><code class="bash Wipe the slate clean"># If you had GHC installed
-$ brew uninstall ghc
-
-# If you tried and failed at installing Stack already
-$ brew uninstall haskell-stack
-$ rm -r ~/.stack
-# If you happened to also set STACK_ROOT
-$ rm -r $STACK_ROOT
-</code></pre>
-
-<p>With that out of the way, we can actually get our hands on Stack. For OS X,
-we&rsquo;ll install through Homebrew:</p>
-
-<pre><code class="console Install Stack">$ brew install haskell-stack
-</code></pre>
-
-<h2>Configure Stack, avoiding &ldquo;rootless&rdquo; issues</h2>
-
-<p>Here&rsquo;s the trick. We need to run <code>stack setup</code> for the first time to let Stack
-configure itself. But remember: we want to make sure that Stack doesn&rsquo;t set
-itself up with version 7.8.4 of GHC. We can get around this by specifying an
-explicit resolver to the <code>stack</code> command (you can find more information on
-&ldquo;resolvers&rdquo; elsewhere):</p>
-
-<pre><code class="bash Side-step rootless issue in setup"># Change the resolver to the most up-to-date one. This is a hack to ensure that
-# get GHC version &gt; 7.8, because there's an issue with El Capitan's rootless
-# mode.
-stack --resolver=lts-6.10 setup
-</code></pre>
-
-<p>You&rsquo;ll notice we use the <code>--resolver=...</code> flag to force Stack to use a specific
-resolver. This post will be out of date as soon as it&rsquo;s written, so check
-<a href="https://www.stackage.org/snapshots">Stackage</a> to find the latest LTS snapshot.</p>
-
-<h2>Return to Vim and Haskell in 2016</h2>
-
-<p>That&rsquo;s it for the environment setup! Now you&rsquo;ll want to turn your attention to
-configuring Vim.</p>
-
-<p>The steps to set up Vim are platform independent, so now that we&rsquo;ve set up Stack
-correctly, you can head over to <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> to
-finish things out.</p>
-
-<p>- - - - -
-<br>
-### Jake on the Web
-<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.
- [g]: https://www.github.com/jez/
- [h]: https://jez.io/
-</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[SML Dev Setup]]></title>
@@ -205,10 +84,14 @@ this by changing our workflow:</p>
 </ol>
 
 
-<p>Look at that! We&rsquo;ve,
-- dropped a step (having to launch the REPL first), and
-- introduced tab completion into our workflow (because the shell has filename
-  completion)</p>
+<p>Look at that! We&rsquo;ve,</p>
+
+<ul>
+<li>dropped a step (having to launch the REPL first), and</li>
+<li>introduced tab completion into our workflow (because the shell has filename
+completion)</li>
+</ul>
+
 
 <p>It&rsquo;s the little things, but they add up.</p>
 
@@ -389,14 +272,14 @@ doesn&rsquo;t by default, and includes a couple extras.</li>
 <p>And as always, you can see even more Vim settings in my <a href="https://github.com/jez/dotfiles">dotfiles
 repo</a> on GitHub.</p>
 
-<p>- - - - -
-<br>
+<p>- - -
+
 ### Jake on the Web
-<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.
+people think, so feel free to open an issue or send me an email.
  [g]: https://www.github.com/jez/
  [h]: https://jez.io/
 </p>
@@ -649,14 +532,14 @@ the principles are generally applicable)</li>
 <p>Apart from that, try to find examples of these files that you can adapt to your
 needs.</p>
 
-<p>- - - - -
-<br>
+<p>- - -
+
 ### Jake on the Web
-<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.
+people think, so feel free to open an issue or send me an email.
  [g]: https://www.github.com/jez/
  [h]: https://jez.io/
 </p>
@@ -853,14 +736,14 @@ use <code>float: left</code>, so the content presented here is still good inform
 know. If you&rsquo;re having trouble getting floats to work, though, maybe you should
 look into <code>flexbox</code> instead!</p>
 
-<p>- - - - -
-<br>
+<p>- - -
+
 ### Jake on the Web
-<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.
+people think, so feel free to open an issue or send me an email.
  [g]: https://www.github.com/jez/
  [h]: https://jez.io/
 </p>
@@ -899,14 +782,60 @@ people think, so feel free to comment, open an issue, or send me an email.
 
 <p>Brooks of course follows this up with &ldquo;The Woes of the Craft&rdquo;, which is equally on point. I&rsquo;m only a few pages in, but I already feel like, respectfully, I&rsquo;ve learned more than I did in all of Tech Comm (<a href="https://enr-apps.as.cmu.edu/open/SOC/SOCServlet/courseDetails?COURSE=15221&amp;SEMESTER=F14">15-221</a>). I would absolutely recommend it to anyone considering pursing software engineering!</p>
 
-<p>- - - - -
-<br>
+<p>- - -
+
 ### Jake on the Web
-<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.
+people think, so feel free to open an issue or send me an email.
+ [g]: https://www.github.com/jez/
+ [h]: https://jez.io/
+</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Running a VPS, Log 2: Seriously, Back It Up]]></title>
+    <link href="https://blog.jez.io/2014/06/24/running-a-vps-log-2/"/>
+    <updated>2014-06-24T23:11:14-04:00</updated>
+    <id>https://blog.jez.io/2014/06/24/running-a-vps-log-2</id>
+    <content type="html"><![CDATA[<p>I don&rsquo;t have the best track record with configuring servers. I&rsquo;ve certainly brought down a ScottyLabs server or two before, but sometimes there&rsquo;s no avoiding that in the sake of learning. At times like these, you&rsquo;ve just gotta reboot and try again. With DigitalOcean&rsquo;s auto-backups though, this process is incredibly easy.</p>
+
+<!-- more -->
+
+
+<h2>EncFS Troubles</h2>
+
+<p>As part of my eventual goal of hosting my own mail, I tried following <a href="//sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/">this post</a> to set up a mail server on my VPS. Unfortunately, I never even made it out the gates. The first step is to install and set up EncFS for letting you mount encrypted filesystems, which the tutorial was planning on using to store email securely. Unfortunately, after following the steps listed to a T, my poor VPS whined and complained about being misconfigured.</p>
+
+<p><strong>Edit</strong>: After doing a little more research, I found that the root of my issue wasn&rsquo;t something I had been doing. Apparently, you have to <a href="https://www.digitalocean.com/community/tutorials/how-to-update-a-digitalocean-server-s-kernel-using-the-control-panel">manually update the kernel</a> through the DigitalOcean web console. You can read more about it on this <a href="https://github.com/al3x/sovereign/issues/147#issuecomment-43849647">GitHub issue</a>.</p>
+
+<p>Regardless, my first attempt to do something cool on this new VPS was a dud. All I had to show for it was a muddled, no-longer-pristine VPS with some packages and libraries that simply didn&rsquo;t work. If I were to continue with the tutorial by skipping this step, I would have never known whether the cause of any future issue was something misconfigured at this step.</p>
+
+<h2>The Day is Saved</h2>
+
+<p>But then I remembered: DigitalOcean is automatically backing up my droplet! After logging into the web interface, all I had to do was click a button and my whole system was reset to the way it looked 24 hours prior. It was <em>actually that easy</em>.</p>
+
+<p>Thus, for anyone getting started with a new server, whether it be on DigitalOcean or any other service (even a box you have running in your room), I cannot stress enough the value of automatic&ndash;or at least regular&ndash;backups. Not only is this a good idea to preserve data in the event of an outage, but it lends a seemingly unbounded ability to mess around and tinker.</p>
+
+<p>What this means is that you get all the fun of learning cool, new Linux-y things, but without ever having to worry about whether you&rsquo;ll break the whole system. Sure, this mindset isn&rsquo;t necessarily the best to adopt for a production machine, but for my circumstances, all I want is free reign to experiment and break things to my heart&rsquo;s content.</p>
+
+<h2>Back to Square One</h2>
+
+<p>With my first attempt at installing a mail server foiled, I think for my next attempt I&rsquo;ll try a different path. Instead of installing and configuring everything more or less manually (I really wanted to do this for the experience of it all, learning the nitty-gritty of how it works), this time around I think I&rsquo;m going to give <a href="https://github.com/al3x/sovereign">sovereign</a> a try. I&rsquo;ve heard good things, and it is in fact based on the original tutorial I had found, so it&rsquo;s looking pretty promising as of yet.</p>
+
+<p>Whatever happens though, I&rsquo;m feeling pretty good about the fact that I can turn things around with a single click.</p>
+
+<p>- - -
+
+### Jake on the Web
+<a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to open an issue or send me an email.
  [g]: https://www.github.com/jez/
  [h]: https://jez.io/
 </p>

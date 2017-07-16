@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Haskell | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/haskell/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-03-21T23:08:10-04:00</updated>
+  <updated>2017-07-16T18:09:22-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -14,13 +14,315 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Vim and Haskell in 2016 on OS X]]></title>
-    <link href="https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x/"/>
+    <title type="html"><![CDATA[Haskell Development With Neovim]]></title>
+    <link href="https://blog.jez.io/2017/07/16/haskell-development-with-neovim/"/>
+    <updated>2017-07-16T14:45:31-04:00</updated>
+    <id>https://blog.jez.io/2017/07/16/haskell-development-with-neovim</id>
+    <content type="html"><![CDATA[<p>Configuring an editor for a new language is a double-edged sword: it&rsquo;s intensely
+satisfying when done, but takes time away from diving into the language itself!
+After using Haskell for a little over a year, I&rsquo;ve settled on a high-quality set
+of editor plugins. They&rsquo;re simple, powerful, and all play nicely together.</p>
+
+<!-- more -->
+
+
+<h2>Requirements</h2>
+
+<p>I use <a href="https://www.haskellstack.org/">Haskell Stack</a> exclusively for managing GHC versions, installing
+packages, and building projects. Stack&rsquo;s goal is reproducible builds, which
+means that if two different people have the same code and both run <code>stack
+build</code>, they both get the same result. Since builds are reproducible, Stack can
+cache pretty aggressively to save time in the future<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. I never have to
+invoke <code>ghc</code> or <code>cabal</code> manually; Stack handles everything.</p>
+
+<p>I also use <a href="https://github.com/neovim/neovim">Neovim</a>, rather than normal Vim. Usually my justification
+for using it is more philosophical than technical, but with my Haskell setup
+it&rsquo;s actually a requirement (we&rsquo;ll see why further on). Neovim is quite stable,
+works as a drop-in replacement for Vim, yet brings new features<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. I love
+Neovim, and I&rsquo;ll be writing more about why in a future post.</p>
+
+<!-- TODO(jez): Update with link to Neovim post -->
+
+
+<h2>Overview</h2>
+
+<p>We&rsquo;re going to move in order of increasing complexity. That said, even the most
+&ldquo;complex&rdquo; plugin here is actually quite painless to set up. By the end, we&rsquo;ll
+have a complete development experience! Coming up:</p>
+
+<ul>
+<li>syntax highlighting &amp; indentation (<a href="https://github.com/neovimhaskell/haskell-vim">haskell-vim</a>)</li>
+<li>auto-formatting &amp; style (<a href="https://github.com/commercialhaskell/hindent">hindent</a>, <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a>)</li>
+<li>quickfix and sign column icons (using <a href="https://github.com/w0rp/ale">ale</a>) for:
+
+<ul>
+<li>linter style suggestions (hlint)</li>
+<li>compiler errors and warnings (ghc-mod)</li>
+</ul>
+</li>
+<li>Type inspection, REPL integration, and <strong>more!</strong> (<a href="https://github.com/parsonsmatt/intero-neovim">intero-neovim</a>)</li>
+</ul>
+
+
+<p>If you just want to browse the final configuration, <a href="https://gist.github.com/jez/ed4dc673385c82243805a19797a37ff6">here&rsquo;s a Gist</a>.</p>
+
+<!-- TODO(jez) Demonstrate everything with an asciicast -->
+
+
+<h2>Syntax Highlighting &amp; Indentation</h2>
+
+<ul>
+<li><strong>Plugin</strong>: <a href="https://github.com/neovimhaskell/haskell-vim">haskell-vim</a><sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></li>
+</ul>
+
+
+<p>Vim&rsquo;s default Haskell filetype plugin is pretty lack luster. Everything is blue,
+except for strings which are colored like comments and keywords which are
+colored like constants. Indentation is wonky in some edge cases, and isn&rsquo;t
+configurable.</p>
+
+<p>This plugin corrects all that. It&rsquo;s the filetype plugin for Haskell that
+<strong>should</strong> ship with Vim.</p>
+
+<p><code>haskell-vim</code> lets me configure certain parts of the indentation, too. These are
+my indentation settings. Note that the last setting only works because I&rsquo;ve
+merged <a href="https://github.com/neovimhaskell/haskell-vim/pull/98">this PR</a> locally.</p>
+
+<pre><code class="vim neovimhaskell/haskell-vim">" Align 'then' two spaces after 'if'
+let g:haskell_indent_if = 2
+" Indent 'where' block two spaces under previous body
+let g:haskell_indent_before_where = 2
+" Allow a second case indent style (see haskell-vim README)
+let g:haskell_indent_case_alternative = 1
+" Correct bug with aggressive let indentation
+let g:haskell_indent_let_no_in = 0
+</code></pre>
+
+<h2>Auto-formatting and Indentation</h2>
+
+<ul>
+<li><strong>Plugin</strong>: <a href="https://github.com/alx741/vim-hindent">vim-hindent</a></li>
+<li><strong>Tool</strong>: <code>stack install hindent</code></li>
+<li><strong>Tool</strong>: <code>stack install stylish-haskell</code></li>
+</ul>
+
+
+<p>For small projects, I like using my own, personal style. However, for larger
+projects it&rsquo;s a burden to ask contributors to learn my personal style. In these
+cases, tools come into play.</p>
+
+<p><code>go fmt</code> famously solved this problem for Golang by building the formatting tool
+into the compiler. For Haskell, there&rsquo;s <a href="https://github.com/commercialhaskell/hindent">hindent</a><sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>. <code>hindent</code> can be
+installed through Stack, and <code>vim-hindent</code> shims it.</p>
+
+<p>But I said I&rsquo;m partial to my own style in personal projects. There&rsquo;s another
+Haskell formatter that&rsquo;s much less invasive: <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a>. It basically
+only works with <code>import</code>s, <code>case</code> branches, and record fields, aligning them
+vertically.</p>
+
+<p>With these three tools, I can pick the right hammer for the job:</p>
+
+<ul>
+<li><strong>Bare hands</strong>: manually control the style myself</li>
+<li><strong>Normal hammer</strong>: run <code>stylish-haskell</code> only</li>
+<li><strong>Sledgehammer</strong>: run <code>hindent</code> only</li>
+<li><strong>Sledgehammer, then band-aid</strong>: run <code>hindent</code>, then <code>stylish-haskell</code></li>
+</ul>
+
+
+<p>Here&rsquo;s the config that gets them to play nicely together:</p>
+
+<pre><code class="vim hindent, vim-hindent, and stylish-haskell">" Indenting on save is too aggressive for me
+let g:hindent_on_save = 0
+
+" Helper function, called below with mappings
+function! HaskellFormat(which) abort
+  if a:which ==# 'hindent' || a:which ==# 'both'
+    :Hindent
+  endif
+  if a:which ==# 'stylish' || a:which ==# 'both'
+    silent! exe 'undojoin'
+    silent! exe 'keepjumps %!stylish-haskell'
+  endif
+endfunction
+
+" Key bindings
+augroup haskellStylish
+  au!
+  " Just hindent
+  au FileType haskell nnoremap &lt;leader&gt;hi :Hindent&lt;CR&gt;
+  " Just stylish-haskell
+  au FileType haskell nnoremap &lt;leader&gt;hs :call HaskellFormat('stylish')&lt;CR&gt;
+  " First hindent, then stylish-haskell
+  au FileType haskell nnoremap &lt;leader&gt;hf :call HaskellFormat('both')&lt;CR&gt;
+augroup END
+</code></pre>
+
+<h2>Quickfix &amp; Sign Columns</h2>
+
+<ul>
+<li><strong>Plugin</strong>: <a href="https://github.com/w0rp/ale">ale</a></li>
+<li><strong>Tool</strong>: <code>stack install hlint</code></li>
+<li><strong>Tool</strong>: <code>stack build ghc-mod</code></li>
+</ul>
+
+
+<p>This is where the Neovim dependency starts to creep up, though Vim 8 is an
+acceptable alternative for now. ALE stands for &ldquo;Asynchronous Lint Engine.&rdquo; It&rsquo;s
+like Syntastic, but asynchronous<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>.</p>
+
+<p>There are a number of Haskell engines that ship with ALE. For example, it will
+be able to show errors if all that&rsquo;s installed is Stack. My preferred tools to
+use for Haskell with ALE are <code>hlint</code> and <code>ghc-mod</code>.</p>
+
+<ul>
+<li><code>hlint</code> is a linter for Haskell. It warns about silly things like <code>if x then
+True else False</code>.</li>
+<li><code>ghc-mod</code> is a tool that can check files for compiler errors</li>
+</ul>
+
+
+<p>Note that we want to <strong>stack build</strong> ghc-mod, not stack install it. The former
+ensures that <code>ghc-mod</code> is local to the current stack project, so that the
+version never gets out of sync with your project.</p>
+
+<p>Once we&rsquo;ve installed all these programs, the setup is minimal. We&rsquo;ll be able to
+see <code>hlint</code> and <code>ghc-mod</code> errors in our quickfix window right away.</p>
+
+<pre><code class="vim ALE setup">let g:ale_linters.haskell = ['stack-ghc-mod', 'hlint']
+</code></pre>
+
+<h2>Intero: The Pièce de Résistance</h2>
+
+<ul>
+<li><strong>Plugin</strong>: <a href="https://github.com/parsonsmatt/intero-neovim">intero-neovim</a></li>
+</ul>
+
+
+<p>Intero is a complete development program for Haskell. Probably the best way to
+introduce it is with this asciicast:</p>
+
+<p align="center">
+  <a href="https://asciinema.org/a/128416">
+    <img
+      width="700px"
+      alt="Intero for Neovim asciicast"
+      src="https://asciinema.org/a/128416.png">
+  </a>
+</p>
+
+
+<p>Intero is designed for stack, sets itself up automatically, has point-and-click
+type information, and lets you jump to definitions. On top of it all, it uses
+Neovim to communicate back and forth with a terminal buffer so that you get a
+GHCi buffer <strong>right inside Neovim</strong>.</p>
+
+<p>Developing with the REPL in mind helps me write code better. Only top-level
+bindings are exposed in the REPL, so I write more small, testable functions.
+See here for more reasons <a href="http://chrisdone.com/posts/haskell-repl">why the REPL is awesome</a>.</p>
+
+<p>On top of providing access to the REPL, Intero provides about a dozen
+convenience commands that shell out to the REPL backend. Being able to reload
+your code in the REPL&mdash;from Vim, with a single keystroke!&mdash;is a huge boon when
+developing.</p>
+
+<p>Intero sets up no mappings by default, so here are mine. I also flip two config
+variables to make Intero a little faster:</p>
+
+<pre><code class="vim Intero settings">" Prefer starting Intero manually (faster startup times)
+let g:intero_start_immediately = 0
+" Use ALE (works even when not using Intero)
+let g:intero_use_neomake = 0
+
+augroup interoMaps
+  au!
+
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;io :InteroOpen&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;iov :InteroOpen&lt;CR&gt;&lt;C-W&gt;H
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;ih :InteroHide&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;is :InteroStart&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;ik :InteroKill&lt;CR&gt;
+
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;wr :w \| :InteroReload&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;il :InteroLoadCurrentModule&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;if :InteroLoadCurrentFile&lt;CR&gt;
+
+  au FileType haskell map &lt;leader&gt;t &lt;Plug&gt;InteroGenericType
+  au FileType haskell map &lt;leader&gt;T &lt;Plug&gt;InteroType
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;it :InteroTypeInsert&lt;CR&gt;
+
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;jd :InteroGoToDef&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;iu :InteroUses&lt;CR&gt;
+  au FileType haskell nnoremap &lt;leader&gt;ist :InteroSetTargets&lt;SPACE&gt;
+augroup END
+</code></pre>
+
+<p>Intero takes a little getting used to, so be sure to read the docs for some
+sample workflows.</p>
+
+<h2>Wrap Up</h2>
+
+<p>With these tools, I feel empowered rather than hindered when I sit down to write
+some Haskell.</p>
+
+<ul>
+<li>It uses Stack whenever possible, so things Just Work.
+
+<ul>
+<li>As a consequence, this means all these plugins work with the implicit global
+Stack project!</li>
+</ul>
+</li>
+<li>It scales up in power:
+
+<ul>
+<li>from simple syntax highlighting to a <strong>REPL in the editor</strong>!</li>
+<li>from manual indentation to an indentation sledgehammer</li>
+</ul>
+</li>
+</ul>
+
+
+<p>- - -
+
+### Jake on the Web
+<a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+[GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to open an issue or send me an email.
+ [g]: https://www.github.com/jez/
+ [h]: https://jez.io/
+</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Tip: sometimes it&rsquo;s handy for <a href="https://github.com/commercialhaskell/stack/blob/3d29b8c/doc/faq.md#why-doesnt-stack-rebuild-my-project-when-i-specify---ghc-options-on-the-command-line">force a complete recompile</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>If you still aren&rsquo;t convinced, the <a href="https://github.com/neovim/neovim#readme">Neovim logo</a> makes for a much better laptop sticker than Vim&rsquo;s.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>While listed under &ldquo;neovimhaskell&rdquo; on GitHub, this plugin works with normal Vim, too.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>Chris Done explains the appeal of solving style issues with tooling for Haskell well. The moral of the story is that hindent version 5 ships with only the most popular style formatter in an effort to arrive at a singular Haskell style: <a href="http://chrisdone.com/posts/hindent-5">http://chrisdone.com/posts/hindent-5</a><a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<li id="fn:5">
+<p>Some people are familiar with Neomake for this task. However, Neomake is much more minimal than ALE. Neomake basically only builds, whereas ALE is more configurable and hackable.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Troubleshooting Haskell Stack Setup on OS X]]></title>
+    <link href="https://blog.jez.io/2016/08/03/troubleshooting-haskell-stack-setup-on-os-x/"/>
     <updated>2016-08-03T00:04:08-04:00</updated>
-    <id>https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x</id>
+    <id>https://blog.jez.io/2016/08/03/troubleshooting-haskell-stack-setup-on-os-x</id>
     <content type="html"><![CDATA[<p>Stephen Diehl&rsquo;s article <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> does a great
 job of outlining the quickest way to get a quality Haskell development
-experience. His post presumes Ubuntu; here we presume OS X.</p>
+experience. I ran into a simple issue when I followed it due to a bit of an
+idiosyncrasy on OS X El Capitan. I also document a few of the extra steps I took
+which aren&rsquo;t mentioned explicitly in his original article.</p>
 
 <!-- more -->
 
@@ -120,14 +422,14 @@ configuring Vim.</p>
 correctly, you can head over to <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> to
 finish things out.</p>
 
-<p>- - - - -
-<br>
+<p>- - -
+
 ### Jake on the Web
-<a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 [GitHub][g] or paying a visit to [my homepage][h]. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.
+people think, so feel free to open an issue or send me an email.
  [g]: https://www.github.com/jez/
  [h]: https://jez.io/
 </p>

@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-03-21T23:08:10-04:00</updated>
+  <updated>2017-07-16T18:09:22-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,304 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Haskell Development With Neovim]]></title>
+    <link href="https://blog.jez.io/2017/07/16/haskell-development-with-neovim/"/>
+    <updated>2017-07-16T14:45:31-04:00</updated>
+    <id>https://blog.jez.io/2017/07/16/haskell-development-with-neovim</id>
+    <content type="html"><![CDATA[<p>Configuring an editor for a new language is a double-edged sword: it&rsquo;s intensely
+satisfying when done, but takes time away from diving into the language itself!
+After using Haskell for a little over a year, I&rsquo;ve settled on a high-quality set
+of editor plugins. They&rsquo;re simple, powerful, and all play nicely together.</p>
+
+<!-- more -->
+
+
+<h2>Requirements</h2>
+
+<p>I use <a href="https://www.haskellstack.org/">Haskell Stack</a> exclusively for managing GHC versions, installing
+packages, and building projects. Stack&rsquo;s goal is reproducible builds, which
+means that if two different people have the same code and both run <code>stack
+build</code>, they both get the same result. Since builds are reproducible, Stack can
+cache pretty aggressively to save time in the future<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. I never have to
+invoke <code>ghc</code> or <code>cabal</code> manually; Stack handles everything.</p>
+
+<p>I also use <a href="https://github.com/neovim/neovim">Neovim</a>, rather than normal Vim. Usually my justification
+for using it is more philosophical than technical, but with my Haskell setup
+it&rsquo;s actually a requirement (we&rsquo;ll see why further on). Neovim is quite stable,
+works as a drop-in replacement for Vim, yet brings new features<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. I love
+Neovim, and I&rsquo;ll be writing more about why in a future post.</p>
+
+<!-- TODO(jez): Update with link to Neovim post -->
+
+
+<h2>Overview</h2>
+
+<p>We&rsquo;re going to move in order of increasing complexity. That said, even the most
+&ldquo;complex&rdquo; plugin here is actually quite painless to set up. By the end, we&rsquo;ll
+have a complete development experience! Coming up:</p>
+
+<ul>
+<li>syntax highlighting &amp; indentation (<a href="https://github.com/neovimhaskell/haskell-vim">haskell-vim</a>)</li>
+<li>auto-formatting &amp; style (<a href="https://github.com/commercialhaskell/hindent">hindent</a>, <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a>)</li>
+<li>quickfix and sign column icons (using <a href="https://github.com/w0rp/ale">ale</a>) for:
+
+<ul>
+<li>linter style suggestions (hlint)</li>
+<li>compiler errors and warnings (ghc-mod)</li>
+</ul>
+</li>
+<li>Type inspection, REPL integration, and <strong>more!</strong> (<a href="https://github.com/parsonsmatt/intero-neovim">intero-neovim</a>)</li>
+</ul>
+
+
+<p>If you just want to browse the final configuration, <a href="https://gist.github.com/jez/ed4dc673385c82243805a19797a37ff6">here&rsquo;s a Gist</a>.</p>
+
+<!-- TODO(jez) Demonstrate everything with an asciicast -->
+
+
+<h2>Syntax Highlighting &amp; Indentation</h2>
+
+<ul>
+<li><strong>Plugin</strong>: <a href="https://github.com/neovimhaskell/haskell-vim">haskell-vim</a><sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></li>
+</ul>
+
+
+<p>Vim&rsquo;s default Haskell filetype plugin is pretty lack luster. Everything is blue,
+except for strings which are colored like comments and keywords which are
+colored like constants. Indentation is wonky in some edge cases, and isn&rsquo;t
+configurable.</p>
+
+<p>This plugin corrects all that. It&rsquo;s the filetype plugin for Haskell that
+<strong>should</strong> ship with Vim.</p>
+
+<p><code>haskell-vim</code> lets me configure certain parts of the indentation, too. These are
+my indentation settings. Note that the last setting only works because I&rsquo;ve
+merged <a href="https://github.com/neovimhaskell/haskell-vim/pull/98">this PR</a> locally.</p>
+
+<figure class='code'><figcaption><span>neovimhaskell/haskell-vim</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="c">" Align 'then' two spaces after 'if'</span>
+</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_if</span> <span class="p">=</span> <span class="m">2</span>
+</span><span class='line'><span class="c">" Indent 'where' block two spaces under previous body</span>
+</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_before_where</span> <span class="p">=</span> <span class="m">2</span>
+</span><span class='line'><span class="c">" Allow a second case indent style (see haskell-vim README)</span>
+</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_case_alternative</span> <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'><span class="c">" Correct bug with aggressive let indentation</span>
+</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_let_no_in</span> <span class="p">=</span> <span class="m">0</span></span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Auto-formatting and Indentation</h2>
+
+<ul>
+<li><strong>Plugin</strong>: <a href="https://github.com/alx741/vim-hindent">vim-hindent</a></li>
+<li><strong>Tool</strong>: <code>stack install hindent</code></li>
+<li><strong>Tool</strong>: <code>stack install stylish-haskell</code></li>
+</ul>
+
+
+<p>For small projects, I like using my own, personal style. However, for larger
+projects it&rsquo;s a burden to ask contributors to learn my personal style. In these
+cases, tools come into play.</p>
+
+<p><code>go fmt</code> famously solved this problem for Golang by building the formatting tool
+into the compiler. For Haskell, there&rsquo;s <a href="https://github.com/commercialhaskell/hindent">hindent</a><sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>. <code>hindent</code> can be
+installed through Stack, and <code>vim-hindent</code> shims it.</p>
+
+<p>But I said I&rsquo;m partial to my own style in personal projects. There&rsquo;s another
+Haskell formatter that&rsquo;s much less invasive: <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a>. It basically
+only works with <code>import</code>s, <code>case</code> branches, and record fields, aligning them
+vertically.</p>
+
+<p>With these three tools, I can pick the right hammer for the job:</p>
+
+<ul>
+<li><strong>Bare hands</strong>: manually control the style myself</li>
+<li><strong>Normal hammer</strong>: run <code>stylish-haskell</code> only</li>
+<li><strong>Sledgehammer</strong>: run <code>hindent</code> only</li>
+<li><strong>Sledgehammer, then band-aid</strong>: run <code>hindent</code>, then <code>stylish-haskell</code></li>
+</ul>
+
+
+<p>Here&rsquo;s the config that gets them to play nicely together:</p>
+
+<figure class='code'><figcaption><span>hindent, vim-hindent, and stylish-haskell</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="c">" Indenting on save is too aggressive for me</span>
+</span><span class='line'><span class="k">let</span> <span class="nv">g:hindent_on_save</span> <span class="p">=</span> <span class="m">0</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">" Helper function, called below with mappings</span>
+</span><span class='line'><span class="k">function</span><span class="p">!</span> HaskellFormat<span class="p">(</span>which<span class="p">)</span> abort
+</span><span class='line'>  <span class="k">if</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'hindent'</span> <span class="p">||</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'both'</span>
+</span><span class='line'>    <span class="p">:</span>Hindent
+</span><span class='line'>  <span class="k">endif</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'stylish'</span> <span class="p">||</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'both'</span>
+</span><span class='line'>    <span class="k">silent</span><span class="p">!</span> exe <span class="s1">'undojoin'</span>
+</span><span class='line'>    <span class="k">silent</span><span class="p">!</span> exe <span class="s1">'keepjumps %!stylish-haskell'</span>
+</span><span class='line'>  <span class="k">endif</span>
+</span><span class='line'><span class="k">endfunction</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">" Key bindings</span>
+</span><span class='line'>augroup haskellStylish
+</span><span class='line'>  <span class="k">au</span><span class="p">!</span>
+</span><span class='line'>  <span class="c">" Just hindent</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">hi</span> <span class="p">:</span>Hindent<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>  <span class="c">" Just stylish-haskell</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span>hs <span class="p">:</span><span class="k">call</span> HaskellFormat<span class="p">(</span><span class="s1">'stylish'</span><span class="p">)&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>  <span class="c">" First hindent, then stylish-haskell</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span>hf <span class="p">:</span><span class="k">call</span> HaskellFormat<span class="p">(</span><span class="s1">'both'</span><span class="p">)&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>augroup END</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Quickfix &amp; Sign Columns</h2>
+
+<ul>
+<li><strong>Plugin</strong>: <a href="https://github.com/w0rp/ale">ale</a></li>
+<li><strong>Tool</strong>: <code>stack install hlint</code></li>
+<li><strong>Tool</strong>: <code>stack build ghc-mod</code></li>
+</ul>
+
+
+<p>This is where the Neovim dependency starts to creep up, though Vim 8 is an
+acceptable alternative for now. ALE stands for &ldquo;Asynchronous Lint Engine.&rdquo; It&rsquo;s
+like Syntastic, but asynchronous<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>.</p>
+
+<p>There are a number of Haskell engines that ship with ALE. For example, it will
+be able to show errors if all that&rsquo;s installed is Stack. My preferred tools to
+use for Haskell with ALE are <code>hlint</code> and <code>ghc-mod</code>.</p>
+
+<ul>
+<li><code>hlint</code> is a linter for Haskell. It warns about silly things like <code>if x then
+True else False</code>.</li>
+<li><code>ghc-mod</code> is a tool that can check files for compiler errors</li>
+</ul>
+
+
+<p>Note that we want to <strong>stack build</strong> ghc-mod, not stack install it. The former
+ensures that <code>ghc-mod</code> is local to the current stack project, so that the
+version never gets out of sync with your project.</p>
+
+<p>Once we&rsquo;ve installed all these programs, the setup is minimal. We&rsquo;ll be able to
+see <code>hlint</code> and <code>ghc-mod</code> errors in our quickfix window right away.</p>
+
+<figure class='code'><figcaption><span>ALE setup</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">let</span> <span class="nv">g:ale_linters</span><span class="p">.</span>haskell <span class="p">=</span> <span class="p">[</span><span class="s1">'stack-ghc-mod'</span><span class="p">,</span> <span class="s1">'hlint'</span><span class="p">]</span></span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Intero: The Pièce de Résistance</h2>
+
+<ul>
+<li><strong>Plugin</strong>: <a href="https://github.com/parsonsmatt/intero-neovim">intero-neovim</a></li>
+</ul>
+
+
+<p>Intero is a complete development program for Haskell. Probably the best way to
+introduce it is with this asciicast:</p>
+
+<p align="center">
+  <a href="https://asciinema.org/a/128416">
+    <img
+      width="700px"
+      alt="Intero for Neovim asciicast"
+      src="https://asciinema.org/a/128416.png">
+  </a>
+</p>
+
+
+<p>Intero is designed for stack, sets itself up automatically, has point-and-click
+type information, and lets you jump to definitions. On top of it all, it uses
+Neovim to communicate back and forth with a terminal buffer so that you get a
+GHCi buffer <strong>right inside Neovim</strong>.</p>
+
+<p>Developing with the REPL in mind helps me write code better. Only top-level
+bindings are exposed in the REPL, so I write more small, testable functions.
+See here for more reasons <a href="http://chrisdone.com/posts/haskell-repl">why the REPL is awesome</a>.</p>
+
+<p>On top of providing access to the REPL, Intero provides about a dozen
+convenience commands that shell out to the REPL backend. Being able to reload
+your code in the REPL&mdash;from Vim, with a single keystroke!&mdash;is a huge boon when
+developing.</p>
+
+<p>Intero sets up no mappings by default, so here are mine. I also flip two config
+variables to make Intero a little faster:</p>
+
+<figure class='code'><figcaption><span>Intero settings</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="c">" Prefer starting Intero manually (faster startup times)</span>
+</span><span class='line'><span class="k">let</span> <span class="nv">g:intero_start_immediately</span> <span class="p">=</span> <span class="m">0</span>
+</span><span class='line'><span class="c">" Use ALE (works even when not using Intero)</span>
+</span><span class='line'><span class="k">let</span> <span class="nv">g:intero_use_neomake</span> <span class="p">=</span> <span class="m">0</span>
+</span><span class='line'>
+</span><span class='line'>augroup interoMaps
+</span><span class='line'>  <span class="k">au</span><span class="p">!</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>io <span class="p">:</span>InteroOpen<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>iov <span class="p">:</span>InteroOpen<span class="p">&lt;</span>CR<span class="p">&gt;&lt;</span>C<span class="p">-</span>W<span class="p">&gt;</span>H
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>ih <span class="p">:</span>InteroHide<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">is</span> <span class="p">:</span>InteroStart<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>ik <span class="p">:</span>InteroKill<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>wr <span class="p">:</span><span class="k">w</span> \<span class="p">|</span> <span class="p">:</span>InteroReload<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">il</span> <span class="p">:</span>InteroLoadCurrentModule<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">if</span> <span class="p">:</span>InteroLoadCurrentFile<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell map <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">t</span> <span class="p">&lt;</span>Plug<span class="p">&gt;</span>InteroGenericType
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell map <span class="p">&lt;</span>leader<span class="p">&gt;</span>T <span class="p">&lt;</span>Plug<span class="p">&gt;</span>InteroType
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>it <span class="p">:</span>InteroTypeInsert<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>jd <span class="p">:</span>InteroGoToDef<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>iu <span class="p">:</span>InteroUses<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span>ist <span class="p">:</span>InteroSetTargets<span class="p">&lt;</span>SPACE<span class="p">&gt;</span>
+</span><span class='line'>augroup END</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Intero takes a little getting used to, so be sure to read the docs for some
+sample workflows.</p>
+
+<h2>Wrap Up</h2>
+
+<p>With these tools, I feel empowered rather than hindered when I sit down to write
+some Haskell.</p>
+
+<ul>
+<li>It uses Stack whenever possible, so things Just Work.
+
+<ul>
+<li>As a consequence, this means all these plugins work with the implicit global
+Stack project!</li>
+</ul>
+</li>
+<li>It scales up in power:
+
+<ul>
+<li>from simple syntax highlighting to a <strong>REPL in the editor</strong>!</li>
+<li>from manual indentation to an indentation sledgehammer</li>
+</ul>
+</li>
+</ul>
+
+
+<hr />
+
+<h3>Jake on the Web</h3>
+
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
+If you cared enough to read that far, you should consider following me on
+<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
+my open source projects, make sure to star it on GitHub! I love hearing what
+people think, so feel free to open an issue or send me an email.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Tip: sometimes it&rsquo;s handy for <a href="https://github.com/commercialhaskell/stack/blob/3d29b8c/doc/faq.md#why-doesnt-stack-rebuild-my-project-when-i-specify---ghc-options-on-the-command-line">force a complete recompile</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>If you still aren&rsquo;t convinced, the <a href="https://github.com/neovim/neovim#readme">Neovim logo</a> makes for a much better laptop sticker than Vim&rsquo;s.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>While listed under &ldquo;neovimhaskell&rdquo; on GitHub, this plugin works with normal Vim, too.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>Chris Done explains the appeal of solving style issues with tooling for Haskell well. The moral of the story is that hindent version 5 ships with only the most popular style formatter in an effort to arrive at a singular Haskell style: <a href="http://chrisdone.com/posts/hindent-5">http://chrisdone.com/posts/hindent-5</a><a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<li id="fn:5">
+<p>Some people are familiar with Neomake for this task. However, Neomake is much more minimal than ALE. Neomake basically only builds, whereas ALE is more configurable and hackable.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Reach for Markdown, Not LaTeX]]></title>
@@ -186,26 +484,26 @@ for us, so the <a href="https://github.com/jez/pandoc-starter">only thing left t
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Vim and Haskell in 2016 on OS X]]></title>
-    <link href="https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x/"/>
+    <title type="html"><![CDATA[Troubleshooting Haskell Stack Setup on OS X]]></title>
+    <link href="https://blog.jez.io/2016/08/03/troubleshooting-haskell-stack-setup-on-os-x/"/>
     <updated>2016-08-03T00:04:08-04:00</updated>
-    <id>https://blog.jez.io/2016/08/03/vim-and-haskell-in-2016-on-os-x</id>
+    <id>https://blog.jez.io/2016/08/03/troubleshooting-haskell-stack-setup-on-os-x</id>
     <content type="html"><![CDATA[<p>Stephen Diehl&rsquo;s article <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> does a great
 job of outlining the quickest way to get a quality Haskell development
-experience. His post presumes Ubuntu; here we presume OS X.</p>
+experience. I ran into a simple issue when I followed it due to a bit of an
+idiosyncrasy on OS X El Capitan. I also document a few of the extra steps I took
+which aren&rsquo;t mentioned explicitly in his original article.</p>
 
 <!-- more -->
 
@@ -307,15 +605,13 @@ finish things out.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -593,15 +889,13 @@ grasp on things now that I didn&rsquo;t before. Thanks.&rdquo;</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 
 <!-- vim:ft=pandoc.liquid
 -->
@@ -680,10 +974,14 @@ this by changing our workflow:</p>
 </ol>
 
 
-<p>Look at that! We&rsquo;ve,
-- dropped a step (having to launch the REPL first), and
-- introduced tab completion into our workflow (because the shell has filename
-  completion)</p>
+<p>Look at that! We&rsquo;ve,</p>
+
+<ul>
+<li>dropped a step (having to launch the REPL first), and</li>
+<li>introduced tab completion into our workflow (because the shell has filename
+completion)</li>
+</ul>
+
 
 <p>It&rsquo;s the little things, but they add up.</p>
 
@@ -866,15 +1164,13 @@ repo</a> on GitHub.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -912,15 +1208,13 @@ snippets and features I&rsquo;ve collected into my dotfiles.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -980,15 +1274,13 @@ packages!</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1240,15 +1532,13 @@ needs.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1331,15 +1621,13 @@ more on top of <code>pip-uses</code>, be sure to send me a Pull Request!</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1431,15 +1719,13 @@ think are the most notable features I have in my dotfiles.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1611,15 +1897,13 @@ something interesting to share, leave a comment below!</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1791,15 +2075,13 @@ out.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2016,15 +2298,13 @@ to one of the above!</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2065,15 +2345,13 @@ letting me know!</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2240,15 +2518,13 @@ instead of being configurable in you <code>~/.gitconfig</code> file.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2427,15 +2703,13 @@ that much easier.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2482,15 +2756,13 @@ haven&rsquo;t actually tried any of them out.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2610,15 +2882,13 @@ from what I can tell so far it&rsquo;s responsive and effective.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2810,15 +3080,13 @@ look into <code>flexbox</code> instead!</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2917,104 +3185,13 @@ handy.</p>
 
 <hr />
 
-<p><br></p>
-
 <h3>Jake on the Web</h3>
 
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
+<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
 If you cared enough to read that far, you should consider following me on
 <a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
 my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Vim as a Man Page Viewer]]></title>
-    <link href="https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer/"/>
-    <updated>2014-12-20T21:17:46-05:00</updated>
-    <id>https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer</id>
-    <content type="html"><![CDATA[<p>Man pages are an essential part of every developer&rsquo;s workflow. Unfortunately,
-the default system pager <code>less</code> isn&rsquo;t the best interface. That&rsquo;s why I wrote a
-Vim plugin and a short shell function to take care of opening man pages in Vim.</p>
-
-<!-- more -->
-
-
-<h2>The Plugin</h2>
-
-<p>If you&rsquo;re eager to dive right into the source or to install the plugin, head on
-over to the <a href="https://github.com/jez/vim-superman">GitHub repository</a>. It&rsquo;s a whopping 32 SLOC, so feel
-free to peek under the hood.</p>
-
-<h2>Why?</h2>
-
-<p>You might be thinking, &ldquo;But Jake, <code>man</code> works just fine for me, why would I
-switch?&rdquo; I&rsquo;m glad you asked!</p>
-
-<h3>Mouse Support</h3>
-
-<p>The first reason why I was interested in getting man pages to open in Vim was
-because I wanted to be able to scroll with the mouse. When I have to read man
-pages for a long time, usually as a part of some more all-encompasing bit of
-research, I find scrolling to be a much better interface for quickly perusing
-the content of a man page.</p>
-
-<h3>Syntax Highlighting</h3>
-
-<p>As it turns out, man pages have a syntax to them, and Vim does a pretty
-excellent job at highlighting them. Rather than talk about it, here are some
-screenshots. Note how code samples (C system calls and library functions) are
-also syntax highlighted appropriately.</p>
-
-<figure class='code'><figcaption><span>Example 1</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>vman vim</span></code></pre></td></tr></table></div></figure>
-
-
-<p><a class="image-link" href="https://blog.jez.io/images/vim.1.png"><img src="https://blog.jez.io/images/vim.1.png"></a></p>
-
-<figure class='code'><figcaption><span>Example 2</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>vman 3 <span class="nb">printf</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p><a class="image-link" href="https://blog.jez.io/images/printf.3.png"><img src="https://blog.jez.io/images/printf.3.png"></a></p>
-
-<h3>All the benefits of Vim</h3>
-
-<p>While <code>less</code> makes a good effort to emulate certain Vim keybindings (or maybe
-it&rsquo;s the other way around, I don&rsquo;t know which came first), <code>less</code> certainly
-falls short of the full power of Vim.</p>
-
-<p>For example, once you&rsquo;ve opened a man page in Vim, you can open a new tab or
-split side-by-side with the man page. Especially if you&rsquo;re switching between Vim
-and the man page often, being able to open man pages in tabs or splits is
-invaluable.</p>
-
-<h2>Mine doesn&rsquo;t look like yours!</h2>
-
-<p>A couple of my other plugins are showing in the screenshots above. I&rsquo;m using the
-<a href="https://github.com/altercation/vim-colors-solarized">Solarized Dark color scheme</a>, the plugin
-<a href="https://github.com/bling/vim-airline">vim-airline</a> to take over the statuslines at the very top and
-bottom, and iTerm2 on Mac OS X 10.10.</p>
-
-<p>You can see my complete configuration <a href="https://github.com/jez/dotfiles">on GitHub</a>.</p>
-
-<h2>Feedback</h2>
-
-<p>As a matter of fact, this was my first Vim plugin! If you notice anything out of
-place, even if it&rsquo;s a small detail, I&rsquo;d love to hear it. Make no assumptions
-about the reasoning behind why certain decisions were made, because I have none
-XD</p>
-
-<hr />
-
-<p><br></p>
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg"><img class="left" src="https://pbs.twimg.com/profile_images/463467877593407488/hfwJj20L.jpeg" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to comment, open an issue, or send me an email.</p>
+people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
