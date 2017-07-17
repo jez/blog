@@ -73,7 +73,7 @@ blockquote {
 // Footnotes
 // --------------------------------------------------
 .entry-content .footnotes {
-  ol, li, p {
+  ol, li, p, code {
     @include font-rem($footer_fs);
     @include margin-after;
   }
@@ -91,7 +91,7 @@ li {
     line-height: 1.5;
     white-space: nowrap;
     margin: 0 2px;
-    padding: 2px 5px;
+    padding: 0px 5px;
     border: 1px solid lighten($black, 90%);
     background-color: lighten($black, 95%);
     @include border-radius(3px);
