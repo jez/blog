@@ -18,8 +18,8 @@ $alt-font:          Georgia, serif !default;
 $default-fs-mult:  1.0 !default;   // Multiplied by _all_ other font-sizes
                                    // (useful if one font is smaller than the next)
 
-$p_fs:               1.1 !default;            // Default size for paragraphs
-$p1_fs:              1.25 * $p_fs !default;  // First paragraph of post (p:first-child)
+$p_fs:               1.0 !default;            // Default size for paragraphs
+$p1_fs:              1.15 * $p_fs !default;  // First paragraph of post (p:first-child)
 
 $h1_fs:              2.0 !default;           // default for <h1> headings
 $h1_sm_fs:           1.75 * ($h1_fs / 2) !default; // <h1> in post title (small screens)
@@ -48,7 +48,7 @@ $socialcount_fs:     1.0 * $p_fs !default;   // Social share buttons in footer
 // line-height
 // ------------------------------
 $default-lh-mult:  1.0 !default;
-$p_lh:             1.625 !default;
+$p_lh:             1.5 !default;
 $p1_lh:            1.5 !default;
 
 // Set absolute stylings on the root elements so that rem's have a reference
@@ -80,8 +80,8 @@ $info       : #308cbc !default;
 // MEDIA QUERIES
 // ----------------------------------------------------------------------------
 $small:       "only screen and (min-width: 30em)" !default;
-$medium:      "only screen and (min-width: 45em)" !default;
-$large:       "only screen and (min-width: 45em)" !default;
+$medium:      "only screen and (min-width: 40em)" !default;
+$large:       "only screen and (min-width: 40em)" !default;
 $highdensity: "only screen and (-webkit-min-device-pixel-ratio: 1.5)",
               "only screen and (-o-min-device-pixel-ratio: 3/2)",
               "only screen and (min-resolution: 144dpi)",
