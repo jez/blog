@@ -95,7 +95,7 @@ of editor plugins. They&rsquo;re simple, powerful, and all play nicely together.
 which means that in general, things Just Work.</p>
 
 <p>I also use <a href="https://github.com/neovim/neovim">Neovim</a>, rather than normal Vim. Usually, my justification
-is ideological rather than technical. This Haskell setup, however, requires
+is ideological rather than technical. However, for Haskell my setup <strong>requires</strong>
 Neovim. Fear not! Neovim is feature-packed and also very stable. I love Neovim,
 and I&rsquo;ll be writing more about why in a future post.</p>
 
@@ -114,7 +114,7 @@ have a complete development experience! Coming up:</p>
 <ul>
 <li>syntax highlighting &amp; indentation (<strong><a href="https://github.com/neovimhaskell/haskell-vim">haskell-vim</a></strong>)</li>
 <li>auto-formatting &amp; style (<strong><a href="https://github.com/commercialhaskell/hindent">hindent</a>, <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a></strong>)</li>
-<li>quickfix and sign column icons (<strong>using <a href="https://github.com/w0rp/ale">ale</a></strong>) for:
+<li>quickfix and sign column support (<strong>using <a href="https://github.com/w0rp/ale">ale</a></strong>) for:
 
 <ul>
 <li>linter style suggestions (<strong>hlint</strong>)</li>
@@ -125,8 +125,8 @@ have a complete development experience! Coming up:</p>
 </ul>
 
 
-<p>If you just want to browse the final configuration for these plugins and tools,
-skip to the bottom. For now, let&rsquo;s start at the top.</p>
+<p>To keep things concise, I&rsquo;ve moved all the relevant configuration to the end of
+the post. For now, let&rsquo;s start at the top.</p>
 
 <!-- TODO(jez) Demonstrate everything with an asciicast -->
 
@@ -139,16 +139,18 @@ skip to the bottom. For now, let&rsquo;s start at the top.</p>
 
 
 <p>Vim&rsquo;s default Haskell filetype plugin is pretty lack luster. Everything is blue,
-except for strings which are colored like comments and keywords which are
+except for strings which are colored like comments, and keywords which are
 colored like constants. Indentation is wonky in some edge cases, and isn&rsquo;t
 configurable.</p>
 
 <p>This plugin corrects all that. It&rsquo;s the filetype plugin for Haskell that
 <strong>should</strong> ship with Vim.</p>
 
-<p><code>haskell-vim</code> lets me configure certain parts of the indentation, too. This is
-important, because it lets me use my own personal style. I&rsquo;ve included my
-settings at the end of this post.</p>
+<p>Not only does it come with saner defaults, it also comes with more config
+options, especially for indentation. This is important because it lets me
+tweak the automatic indentation to my own personal style.</p>
+
+<p>(Remember: all the config is at the end of the post.)</p>
 
 <h2>Auto-formatting and Indentation</h2>
 
@@ -159,30 +161,31 @@ settings at the end of this post.</p>
 </ul>
 
 
-<p>For small projects, I like using my own, personal style. However, for larger
-projects it&rsquo;s a burden to ask contributors to learn my personal style. In these
-cases, tools come into play.</p>
+<p>For small projects, I have an idea of what style I like best. However, for
+larger projects it&rsquo;s unfair to ask contributors that they learn the ins and outs
+of my style. Situations like these call for automated solutions.</p>
 
 <p><code>go fmt</code> famously solved this problem for Golang by building the formatting tool
 into the compiler. For Haskell, there&rsquo;s <a href="https://github.com/commercialhaskell/hindent">hindent</a><sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. <code>hindent</code> can be
-installed through Stack, and <code>vim-hindent</code> shims it.</p>
+installed through Stack, and <code>vim-hindent</code> is a Vim plugin that shims it.</p>
 
 <p>But I said I&rsquo;m partial to my own style in personal projects. There&rsquo;s another
 Haskell formatter that&rsquo;s much less invasive: <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a>. It basically
-only works with <code>import</code>s, <code>case</code> branches, and record fields, aligning them
+only reformats <code>import</code>s, <code>case</code> branches, and record fields, aligning them
 vertically. And in fact, it&rsquo;s possible to use this alongside <code>hindent</code>.</p>
 
-<p>With these three tools, I can pick the right hammer for the job:</p>
+<p>With these three tools, I can pick the right tool for the job:</p>
 
 <ul>
-<li><strong>Bare hands</strong>: manually control the style myself</li>
-<li><strong>Normal hammer</strong>: run <code>stylish-haskell</code> only</li>
-<li><strong>Sledgehammer</strong>: run <code>hindent</code> only</li>
-<li><strong>Sledgehammer, then band-aid</strong>: run <code>hindent</code>, then <code>stylish-haskell</code></li>
+<li><strong>Hand saw</strong>: let <code>haskell-vim</code> config control the indentation</li>
+<li><strong>Table saw</strong>: run <code>stylish-haskell</code> only</li>
+<li><strong>Chainsaw</strong>: run <code>hindent</code> only</li>
+<li><strong>Chainsaw, then sand paper</strong>: run <code>hindent</code>, then <code>stylish-haskell</code></li>
 </ul>
 
 
-<p>Getting them to play together requires a bit of config, which you can see below.</p>
+<p>Getting them to play together requires a bit of config, so I&rsquo;ve included mine at
+the end of the post.</p>
 
 <h2>Quickfix &amp; Sign Columns</h2>
 
@@ -198,13 +201,13 @@ vertically. And in fact, it&rsquo;s possible to use this alongside <code>hindent
 </ul>
 
 
-<p>This is where the Neovim dependency starts to creep up, though Vim 8 is an
-acceptable alternative for now. ALE stands for &ldquo;Asynchronous Lint Engine.&rdquo; It&rsquo;s
-like Syntastic, but asynchronous<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>.</p>
+<p>This step requires <em>either</em> Neovim or Vim 8; ALE stands for &ldquo;Asynchronous Lint
+Engine,&rdquo; so it&rsquo;s using the new asynchronous job control features of these two
+editors. It&rsquo;s like an asynchronous Syntastic<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>.</p>
 
-<p>ALE ships with a number of Haskell integrations by default. For example, it will
-be able to show errors if all that&rsquo;s installed is Stack. I prefer using two of
-these: <code>hlint</code> and <code>ghc-mod</code>.</p>
+<p>ALE ships with a number of Haskell integrations by default. For example, it can
+show errors if only Stack is installed. I prefer enabling two of ALE&rsquo;s Haskell
+integrations: <code>hlint</code> and <code>ghc-mod</code>.</p>
 
 <ul>
 <li><code>hlint</code> is a linter for Haskell. It warns me when I try to do silly things
@@ -213,8 +216,9 @@ like <code>if x then True else False</code>.</li>
 </ul>
 
 
-<p>There&rsquo;s minimal config once everything&rsquo;s installed. We just have to tell ALE not
-to use anything else (by telling it to use these two explicitly).</p>
+<p>The beauty of ALE is that it works almost entirely out of the box. The only real
+setup is to tell ALE to use only these two integrations explicitly. I&rsquo;ve
+included the one-liner to do this in the config at the bottom.</p>
 
 <h2>Intero: The Pièce de Résistance</h2>
 
@@ -223,7 +227,8 @@ to use anything else (by telling it to use these two explicitly).</p>
 </ul>
 
 
-<p>Intero is a complete development program for Haskell. Probably the best way to
+<p>Intero is a complete development program for Haskell. It started as an Emacs
+package, but has been ported almost entirely to Neovim. Probably the best way to
 introduce it is with this asciicast:</p>
 
 <p align="center">
@@ -237,25 +242,27 @@ introduce it is with this asciicast:</p>
 
 
 <p>Intero is designed for stack, sets itself up automatically, has point-and-click
-type information, and lets you jump to definitions. On top of it all, it uses
-Neovim to communicate back and forth with a terminal buffer so that you get a
-GHCi buffer <strong>right inside Neovim</strong>. For Emacs users, this is nothing new I&rsquo;m
-sure. But it continues to blow my mind 😮.</p>
+type information, and lets me jump to identifier definitions. On top of it all,
+it uses Neovim to communicate back and forth with a terminal buffer so that I
+get a GHCi buffer <strong>right inside Neovim</strong>. For Emacs users, this is nothing new
+I&rsquo;m sure. But having the REPL in my editor continues to blow my mind 😮.</p>
 
-<p>Developing with the REPL in mind helps me write code better. Only top-level
+<p>Developing with the REPL in mind helps me write better code. Only top-level
 bindings are exposed in the REPL, so I write more small, testable functions.
 See here for more reasons <a href="http://chrisdone.com/posts/haskell-repl">why the REPL is awesome</a>.</p>
 
 <p>On top of providing access to the REPL, Intero provides about a dozen
-convenience commands that shell out to the REPL backend. Being able to reload
-your code in the REPL&mdash;from Vim, with a single keystroke!&mdash;is a huge boon when
-developing.</p>
+convenience commands that shell out to the REPL backend asynchronously. Being
+able to reload my code in the REPL&mdash;from Vim, with a single keystroke!&mdash;is a
+huge boon when developing.</p>
 
 <p>Intero takes a little getting used to, so be sure to read the docs for some
-sample workflows. Intero sets up no mappings by default, so check mine out
-below. I also flip two config variables to make Intero a little faster.</p>
+sample workflows. Intero also sets up no mappings by default, so I&rsquo;ve included
+my settings below.</p>
 
 <h2>The Eagerly-Awaited Config</h2>
+
+<p>And without further ado&hellip;</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="c">" ----- neovimhaskell/haskell-vim -----</span>
 </span><span class='line'>
@@ -265,8 +272,7 @@ below. I also flip two config variables to make Intero a little faster.</p>
 </span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_before_where</span> <span class="p">=</span> <span class="m">2</span>
 </span><span class='line'><span class="c">" Allow a second case indent style (see haskell-vim README)</span>
 </span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_case_alternative</span> <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'><span class="c">" Caveat: requires this PR:</span>
-</span><span class='line'><span class="c">" https://github.com/neovimhaskell/haskell-vim/pull/98</span>
+</span><span class='line'><span class="c">" Only next under 'let' if there's an equals sign</span>
 </span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_let_no_in</span> <span class="p">=</span> <span class="m">0</span>
 </span><span class='line'>
 </span><span class='line'><span class="c">" ----- hindent &amp; stylish-haskell -----</span>
@@ -332,11 +338,11 @@ below. I also flip two config variables to make Intero a little faster.</p>
 
 <h2>Wrap Up</h2>
 
-<p>With these tools, I feel empowered (rather than hindered) when I sit down to work
-with Haskell.</p>
+<p>With these tools, I feel empowered (rather than hindered) when I sit down to
+work with Haskell.</p>
 
 <ul>
-<li>The entire setup Stack, so things Just Work.
+<li>The entire setup uses Stack, so things Just Work.
 
 <ul>
 <li>As a consequence, everything works with the implicit global Stack project!</li>
@@ -345,8 +351,8 @@ with Haskell.</p>
 <li>It scales up in power:
 
 <ul>
-<li>From simple syntax highlighting, manual indentation&hellip;</li>
-<li>to an indentation sledgehammer and a <strong>REPL embeded in the editor</strong>!</li>
+<li>From simple syntax highlighting and manual indentation&hellip;</li>
+<li>to an indentation chainsaw and a <strong>REPL embeded in the editor</strong>!</li>
 </ul>
 </li>
 <li>I can take full advantage of all my tools working together, leading to cleaner
@@ -379,7 +385,7 @@ people think, so feel free to open an issue or send me an email.</p>
 <li id="fn:2">
 <p>Chris Done explains the appeal of solving style issues with tooling for Haskell well. The moral of the story is that hindent version 5 ships with only the most popular style formatter in an effort to arrive at a singular Haskell style: <a href="http://chrisdone.com/posts/hindent-5">http://chrisdone.com/posts/hindent-5</a><a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 <li id="fn:3">
-<p>We want to install <code>ghc-mod</code> once in every project. You can do it globally, but it might get out of sync with your current project.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<p>We want to install <code>ghc-mod</code> once in every project. It can be done globally, but it might get out of sync with the current project.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 <li id="fn:4">
 <p>Some people are familiar with Neomake for this task. However, Neomake is much more minimal than ALE. Neomake basically only builds, whereas ALE is more configurable and hackable.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
 </ol>
