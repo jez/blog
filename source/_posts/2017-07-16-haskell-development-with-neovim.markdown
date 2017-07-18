@@ -23,7 +23,7 @@ I use [Haskell Stack][stack] exclusively. Stack's goal is reproducible builds,
 which means that in general, things Just Work.
 
 I also use [Neovim][neovim], rather than normal Vim. Usually, my justification
-is ideological rather than technical. This Haskell setup, however, requires
+is ideological rather than technical. However, for Haskell my setup **requires**
 Neovim. Fear not! Neovim is feature-packed and also very stable. I love Neovim,
 and I'll be writing more about why in a future post.
 
@@ -40,13 +40,13 @@ have a complete development experience! Coming up:
 
 - syntax highlighting & indentation (**[haskell-vim][]**)
 - auto-formatting & style (**[hindent][], [stylish-haskell][]**)
-- quickfix and sign column icons (**using [ale][]**) for:
+- quickfix and sign column support (**using [ale][]**) for:
   - linter style suggestions (**hlint**)
   - compiler errors and warnings (**ghc-mod**)
 - Type inspection, REPL integration, and more! (**[intero-neovim][]**)
 
-If you just want to browse the final configuration for these plugins and tools,
-skip to the bottom. For now, let's start at the top.
+To keep things concise, I've moved all the relevant configuration to the end of
+the post. For now, let's start at the top.
 
 <!-- TODO(jez) Demonstrate everything with an asciicast -->
 
@@ -55,16 +55,18 @@ skip to the bottom. For now, let's start at the top.
 - **Plugin**: [haskell-vim][haskell-vim][^neovimhaskell]
 
 Vim's default Haskell filetype plugin is pretty lack luster. Everything is blue,
-except for strings which are colored like comments and keywords which are
+except for strings which are colored like comments, and keywords which are
 colored like constants. Indentation is wonky in some edge cases, and isn't
 configurable.
 
 This plugin corrects all that. It's the filetype plugin for Haskell that
 **should** ship with Vim.
 
-`haskell-vim` lets me configure certain parts of the indentation, too. This is
-important, because it lets me use my own personal style. I've included my
-settings at the end of this post.
+Not only does it come with saner defaults, it also comes with more config
+options, especially for indentation. This is important because it lets me
+tweak the automatic indentation to my own personal style.
+
+(Remember: all the config is at the end of the post.)
 
 ## Auto-formatting and Indentation
 
@@ -72,27 +74,28 @@ settings at the end of this post.
 - **Tool**: `stack install hindent`
 - **Tool**: `stack install stylish-haskell`
 
-For small projects, I like using my own, personal style. However, for larger
-projects it's a burden to ask contributors to learn my personal style. In these
-cases, tools come into play.
+For small projects, I have an idea of what style I like best. However, for
+larger projects it's unfair to ask contributors that they learn the ins and outs
+of my style. Situations like these call for automated solutions.
 
 `go fmt` famously solved this problem for Golang by building the formatting tool
 into the compiler. For Haskell, there's [hindent][][^one-tool]. `hindent` can be
-installed through Stack, and `vim-hindent` shims it.
+installed through Stack, and `vim-hindent` is a Vim plugin that shims it.
 
 But I said I'm partial to my own style in personal projects. There's another
 Haskell formatter that's much less invasive: [stylish-haskell][]. It basically
-only works with `import`s, `case` branches, and record fields, aligning them
+only reformats `import`s, `case` branches, and record fields, aligning them
 vertically. And in fact, it's possible to use this alongside `hindent`.
 
-With these three tools, I can pick the right hammer for the job:
+With these three tools, I can pick the right tool for the job:
 
-- **Bare hands**: manually control the style myself
-- **Normal hammer**: run `stylish-haskell` only
-- **Sledgehammer**: run `hindent` only
-- **Sledgehammer, then band-aid**: run `hindent`, then `stylish-haskell`
+- **Hand saw**: let `haskell-vim` config control the indentation
+- **Table saw**: run `stylish-haskell` only
+- **Chainsaw**: run `hindent` only
+- **Chainsaw, then sand paper**: run `hindent`, then `stylish-haskell`
 
-Getting them to play together requires a bit of config, which you can see below.
+Getting them to play together requires a bit of config, so I've included mine at
+the end of the post.
 
 ## Quickfix & Sign Columns
 
@@ -101,26 +104,28 @@ Getting them to play together requires a bit of config, which you can see below.
 - **Tool**: `stack build ghc-mod`
   - N.B.: This is *build* not *install* here[^build].
 
-This is where the Neovim dependency starts to creep up, though Vim 8 is an
-acceptable alternative for now. ALE stands for "Asynchronous Lint Engine." It's
-like Syntastic, but asynchronous[^neomake].
+This step requires *either* Neovim or Vim 8; ALE stands for "Asynchronous Lint
+Engine," so it's using the new asynchronous job control features of these two
+editors. It's like an asynchronous Syntastic[^neomake].
 
-ALE ships with a number of Haskell integrations by default. For example, it will
-be able to show errors if all that's installed is Stack. I prefer using two of
-these: `hlint` and `ghc-mod`.
+ALE ships with a number of Haskell integrations by default. For example, it can
+show errors if only Stack is installed. I prefer enabling two of ALE's Haskell
+integrations: `hlint` and `ghc-mod`.
 
 - `hlint` is a linter for Haskell. It warns me when I try to do silly things
   like `if x then True else False`.
 - `ghc-mod` is a tool that can check files for compiler errors.
 
-There's minimal config once everything's installed. We just have to tell ALE not
-to use anything else (by telling it to use these two explicitly).
+The beauty of ALE is that it works almost entirely out of the box. The only real
+setup is to tell ALE to use only these two integrations explicitly. I've
+included the one-liner to do this in the config at the bottom.
 
 ## Intero: The Pièce de Résistance
 
 - **Plugin**: [intero-neovim][]
 
-Intero is a complete development program for Haskell. Probably the best way to
+Intero is a complete development program for Haskell. It started as an Emacs
+package, but has been ported almost entirely to Neovim. Probably the best way to
 introduce it is with this asciicast:
 
 <p align="center">
@@ -133,25 +138,27 @@ introduce it is with this asciicast:
 </p>
 
 Intero is designed for stack, sets itself up automatically, has point-and-click
-type information, and lets you jump to definitions. On top of it all, it uses
-Neovim to communicate back and forth with a terminal buffer so that you get a
-GHCi buffer **right inside Neovim**. For Emacs users, this is nothing new I'm
-sure. But it continues to blow my mind 😮.
+type information, and lets me jump to identifier definitions. On top of it all,
+it uses Neovim to communicate back and forth with a terminal buffer so that I
+get a GHCi buffer **right inside Neovim**. For Emacs users, this is nothing new
+I'm sure. But having the REPL in my editor continues to blow my mind 😮.
 
-Developing with the REPL in mind helps me write code better. Only top-level
+Developing with the REPL in mind helps me write better code. Only top-level
 bindings are exposed in the REPL, so I write more small, testable functions.
 See here for more reasons [why the REPL is awesome][haskell-repl].
 
 On top of providing access to the REPL, Intero provides about a dozen
-convenience commands that shell out to the REPL backend. Being able to reload
-your code in the REPL---from Vim, with a single keystroke!---is a huge boon when
-developing.
+convenience commands that shell out to the REPL backend asynchronously. Being
+able to reload my code in the REPL---from Vim, with a single keystroke!---is a
+huge boon when developing.
 
 Intero takes a little getting used to, so be sure to read the docs for some
-sample workflows. Intero sets up no mappings by default, so check mine out
-below. I also flip two config variables to make Intero a little faster.
+sample workflows. Intero also sets up no mappings by default, so I've included
+my settings below.
 
 ## The Eagerly-Awaited Config
+
+And without further ado...
 
 ```vim
 " ----- neovimhaskell/haskell-vim -----
@@ -162,8 +169,7 @@ let g:haskell_indent_if = 2
 let g:haskell_indent_before_where = 2
 " Allow a second case indent style (see haskell-vim README)
 let g:haskell_indent_case_alternative = 1
-" Caveat: requires this PR:
-" https://github.com/neovimhaskell/haskell-vim/pull/98
+" Only next under 'let' if there's an equals sign
 let g:haskell_indent_let_no_in = 0
 
 " ----- hindent & stylish-haskell -----
@@ -229,14 +235,14 @@ augroup END
 
 ## Wrap Up
 
-With these tools, I feel empowered (rather than hindered) when I sit down to work
-with Haskell.
+With these tools, I feel empowered (rather than hindered) when I sit down to
+work with Haskell.
 
-- The entire setup Stack, so things Just Work.
+- The entire setup uses Stack, so things Just Work.
   - As a consequence, everything works with the implicit global Stack project!
 - It scales up in power:
-  - From simple syntax highlighting, manual indentation...
-  - to an indentation sledgehammer and a **REPL embeded in the editor**!
+  - From simple syntax highlighting and manual indentation...
+  - to an indentation chainsaw and a **REPL embeded in the editor**!
 - I can take full advantage of all my tools working together, leading to cleaner
   code and fewer frustrations.
 
@@ -275,6 +281,6 @@ advantage of that!
 
 [^one-tool]: Chris Done explains the appeal of solving style issues with tooling for Haskell well. The moral of the story is that hindent version 5 ships with only the most popular style formatter in an effort to arrive at a singular Haskell style: <http://chrisdone.com/posts/hindent-5>
 
-[^build]: We want to install `ghc-mod` once in every project. You can do it globally, but it might get out of sync with your current project.
+[^build]: We want to install `ghc-mod` once in every project. It can be done globally, but it might get out of sync with the current project.
 
 [^neomake]: Some people are familiar with Neomake for this task. However, Neomake is much more minimal than ALE. Neomake basically only builds, whereas ALE is more configurable and hackable.
