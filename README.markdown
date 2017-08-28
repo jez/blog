@@ -5,6 +5,19 @@ For the compiled HTML, check the `gh-pages` branch of this repo.
 
 To view the blog live, check [here](https://blog.jez.io).
 
+## Setup
+
+1. Install [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html)
+  1. Note to Jake: check `~/.util/host.sh` for related config
+1. Follow [these instructions](https://blog.jez.io/2014/12/22/ruby-virtualenvs)
+1. Run these commands
+
+```shell
+rbenv install $(cat .ruby-version)
+gem install bundler
+bundle install
+```
+
 ## What is Octopress?
 Octopress is a "blogging framework for hackers." For more information, check out their [site][octoweb] or their [code][octocode].
 [octoweb]: <//octopress.org>
