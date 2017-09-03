@@ -26,9 +26,17 @@ body {
 
 // Single Post and Page
 // --------------------------------------------------
+.entry-title {
+  margin-top: 0;
+  margin-bottom: 3px;
+}
+.entry-wrapper {
+  margin-bottom: 20px;
+}
 .entry-meta {
 	@include font-rem($footer_fs);
 	text-transform: uppercase;
+  font-family: 'Concourse C3';
 	color: lighten($base-color,60%);
 	a {
 		color: lighten($base-color,60%);
@@ -45,7 +53,17 @@ body {
 		background-color: lighten($base-color,60%);
 		color: $white;
 		@include border-radius(3px);
-		color: $white;
+    &.hollow {
+      background-color: white;
+      font-size: 80%;
+      color: lighten($base-color,60%);
+      border: 2px solid lighten($base-color,60%);
+      margin-right: 4px;
+      &:hover {
+        background-color: lighten($base-color,60%);
+        color: $white;
+      }
+    }
 		span {
 			vertical-align: super;
 			@include font-rem($super_fs);
@@ -58,6 +76,13 @@ body {
 	        box-shadow: 0 0 1px rgba($base-color,0.20);
 		}
 	}
+  .entry-date {
+    padding: 4px 0;
+  }
+}
+.fa.pinned {
+  transform: rotate(30deg);
+  font-size: 80%;
 }
 #post,
 #page {
