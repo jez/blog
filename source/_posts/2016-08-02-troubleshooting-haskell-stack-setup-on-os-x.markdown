@@ -9,7 +9,8 @@ description: >
   outlining the quickest way to get a quality Haskell development experience.
   His post presumes Ubuntu; here we presume OS X.
 share: false
-permalink: /:year/:month/:day/:title/
+redirect_from:
+- /2016/08/02/troubleshooting-haskell-stack-setup-on-os-x/
 ---
 
 Stephen Diehl's article [Vim and Haskell in 2016][vim-and-haskell] does a great

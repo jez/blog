@@ -8,7 +8,8 @@ description: >
   Let's walk through a couple easy steps you can take to make developing SML
   feel more fluid, both in and out of your editor.
 share: false
-permalink: /:year/:month/:day/:title/
+redirect_from:
+- /2016/03/09/sml-dev-setup/
 ---
 
 When it comes right down to it, SML is a pretty great language. It's clear that

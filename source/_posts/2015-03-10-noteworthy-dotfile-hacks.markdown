@@ -8,7 +8,8 @@ description: >
   Because it's much easier (for me at least) to read a blog post than read the
   code.
 share: false
-permalink: /:year/:month/:day/:title/
+redirect_from:
+- /2015/03/10/noteworthy-dotfile-hacks/
 pinned: 9001
 ---
 

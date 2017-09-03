@@ -10,7 +10,8 @@ description: >
   forwards.
 comments: false
 share: false
-permalink: /:year/:month/:day/:title/
+redirect_from:
+- /2016/04/17/lets-have-a-chat-about-encryption/
 ---
 
 Discussions of encryption permeate tech and political news sites these days.

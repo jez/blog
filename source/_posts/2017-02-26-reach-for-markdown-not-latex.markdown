@@ -4,7 +4,8 @@ title: "Reach for Markdown, not LaTeX"
 date: 2017-02-26 21:26:53 -0500
 comments: false
 share: false
-permalink: /:year/:month/:day/:title/
+redirect_from:
+- /2017/02/26/reach-for-markdown-not-latex/
 categories:
   - markdown
   - latex

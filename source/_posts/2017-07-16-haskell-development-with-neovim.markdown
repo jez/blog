@@ -4,7 +4,8 @@ title: "Haskell Development with Neovim"
 date: 2017-07-16 13:45:31 -0500
 comments: false
 share: false
-permalink: /:year/:month/:day/:title/
+redirect_from:
+- /2017/07/16/haskell-development-with-neovim/
 categories: ['haskell', 'vim']
 description: >
   After a year and a half of using Haskell on and off, I've finally settled on a
