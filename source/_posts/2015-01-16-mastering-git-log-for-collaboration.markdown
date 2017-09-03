@@ -8,6 +8,7 @@ description: >
   Mastering git log is probably the best way to collaborate effectively on a
   project that uses Git.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Git is an incredibly powerful platform for collaboration. The ability to create

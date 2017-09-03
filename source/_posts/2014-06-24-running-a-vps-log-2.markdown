@@ -6,6 +6,7 @@ comments: false
 categories: [summer projects, digitalocean, best practices]
 description: Purchasing DitigalOcean's auto-backup services was perhaps the best decision I've made in a long time.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 I don't have the best track record with configuring servers. I've certainly brought down a ScottyLabs server or two before, but sometimes there's no avoiding that in the sake of learning. At times like these, you've just gotta reboot and try again. With DigitalOcean's auto-backups though, this process is incredibly easy.

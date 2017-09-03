@@ -6,6 +6,7 @@ comments: false
 categories: [LaTeX, design]
 description: I wrote a LaTeX package for styling code listings with Solarized.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Out of the box, LaTeX listings are pretty bad. With a bit of work, you can ascribe some colors to the code, but you're still stuck with choosing a theme. Given that I recently just switched to the Solarized colorscheme in Vim and iTerm2, I made a LaTeX package that styles code listings with the predefined Solarized light colors.

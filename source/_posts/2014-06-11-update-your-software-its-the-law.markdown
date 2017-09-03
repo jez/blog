@@ -6,6 +6,7 @@ comments: false
 categories: [terminal, unix, best practices]
 description: I wrote a short bash snippet to check my command line software for updates and alert me once a day.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Okay, so maybe the government won't come after you for not updating. But they should. To guard off any present or future threats (be they from governments, security vulnerabilities, or something else in the cyber realm), I wrote a short bash snippet to check my system for outdated packages.

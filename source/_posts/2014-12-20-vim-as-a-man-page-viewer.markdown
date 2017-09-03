@@ -8,6 +8,7 @@ description: >
   Use vim as a man page viewer to get better syntax highlighting, scroll
   quickly with a mouse, tabs, and more.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Man pages are an essential part of every developer's workflow. Unfortunately,

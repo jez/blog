@@ -6,6 +6,7 @@ comments: false
 categories: [summer projects]
 description: After spending most of the beginning of the summer moving around, riding trains, and starting a new job, it'finally time to start working on some cool projects.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 After spending most of the beginning of the summer flying, driving, moving, moving again, riding trains, riding different trains, and starting a new job, it's finally time to start working on some cool side projects.

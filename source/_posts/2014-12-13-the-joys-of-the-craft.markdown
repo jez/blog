@@ -6,6 +6,7 @@ comments: false
 categories: [best practices, books]
 description: "An exceprt from Frederick P. Brooks's book The Mythical Man-Month on the joys of programming."
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 A while ago, I was given the book _The Mythical Man-Month_, by Frederick P. Brooks, Jr. I finally have some time to sit down and read it, and I'm loving it. In the first chapter, this quote on "the joys of the craft" (i.e., programming) struck me as particularly on point:

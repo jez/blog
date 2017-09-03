@@ -8,6 +8,7 @@ description: >
   Some screenshots and clarifications for my Vim as an IDE walkthrough on
   GitHub.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 I took some screenshots to accompany my [Vim as an IDE][repo] repo on GitHub.

@@ -6,6 +6,7 @@ comments: false
 categories: [terminal, design]
 description: "I've used tomasr's vim color scheme 'molokai' for a long time now. Recently I decided that the default iTerm2 colors were a little lack luster, so I ported over the main colors from this theme into an iTerm2 theme."
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 I've used [tomasr][tomasr]'s vim color scheme [molokai][molokai-vim] for a long time now. Recently I decided that the default iTerm2 colors were a little lack luster, so I ported over the main colors from this theme into an iTerm2 theme.

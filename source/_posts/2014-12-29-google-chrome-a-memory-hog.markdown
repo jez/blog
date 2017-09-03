@@ -6,6 +6,7 @@ comments: false
 categories: [unix, bash]
 description: A bash oneliner to determine how much memory Chrome is using.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Whenever someone complains about a slow computer, the first thing I check is

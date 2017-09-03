@@ -6,6 +6,7 @@ comments: false
 categories: ['docker', 'best practices']
 description: 'A list of commands I use (and keep forgetting) every time I use Docker.'
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 I've been using Docker for a couple side projects lately, but only

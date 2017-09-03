@@ -8,6 +8,7 @@ description: >
   Because it's much easier (for me at least) to read a blog post than read the
   code.
 share: false
+permalink: /:year/:month/:day/:title/
 pinned: 9001
 ---
 

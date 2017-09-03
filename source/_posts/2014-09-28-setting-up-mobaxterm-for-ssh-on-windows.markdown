@@ -6,6 +6,7 @@ comments: false
 categories: [terminal]
 description: "How to set up MobaXterm and why you should"
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 For an optimal SSH experience, your best best is to use Linux or Mac OS X. However, if you're dead-set on using Windows, MobaXterm has the best overall experience. This post guides you through setting it up and outlines some of its coolest features.

@@ -8,6 +8,7 @@ description: >
   'I wrote a simple bash script that lists which Python packages use a given
   package.'
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 A while back I was doing some spring cleaning of my Python packages. I noticed

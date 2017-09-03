@@ -6,6 +6,7 @@ comments: false
 categories: [django, webdev]
 description: "Using python-social-auth and Django, I've been able to use login.cmu.edu to sign in CMU students by AndrewID."
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Using `python-social-auth` and Django, I've found a very straightfoward way of adding authentication to apps designed for CMU students. Given that all Andrew accounts are now Google Apps @ CMU accounts, we can take advantage of the widely used Google OAuth2 libraries to authenticate users, but just restrict sign-ins to the `andrew.cmu.edu` "hosted domain."

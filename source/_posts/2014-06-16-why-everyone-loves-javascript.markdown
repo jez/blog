@@ -7,6 +7,7 @@ external_url: https://github.com/airbnb/javascript/blob/master/README.md
 categories: [webdev, javascript, best practices, scottylabs]
 description: If you don't love JavaScript, you're probably using it wrong. Luckily, some smart people on the interwebs know how to use it right.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Airbnb has put together a stellar list of simple ways to make your JavaScript more maintainable and manageable. From comments and whitespace, to hoisting and type casting, this list covers nearly everything you should know when developing a JavaScript app.

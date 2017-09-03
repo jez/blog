@@ -6,6 +6,7 @@ comments: false
 categories: [summer projects, mail, troubleshooting]
 description: Just kidding. My poor mail server hardly works at all.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Whereas the tutorial I'm following to setup this mail server initially promised a working setup in more or less two hours, it's nearing two weeks for me and I've still got plenty of issues. In this log, I'll discuss some of the tools, log files, and online resources which I've found helpful, as well as give a description of my problem as I best understand it.

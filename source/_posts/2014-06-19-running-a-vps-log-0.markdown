@@ -6,6 +6,7 @@ comments: false
 categories: [linux, summer projects, security]
 description: My VPS setup, from provider to deployment to inital setup.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Since last Christmas, I've had a raspberry pi running as a server at my home back in Wisconsin. I had tons of plans for this little guy, but I quickly discovered that he was going to be a bit _too_ little for most of them. Thus, I am now the proud sysadmin of my own virtual private server. 

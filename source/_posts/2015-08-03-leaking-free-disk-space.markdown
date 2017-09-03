@@ -8,6 +8,7 @@ description: >
   I finally tracked down a free disk space leakage that's been bothering me for
   months.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 I've been watching a disk space leakage creep slowly upwards for months now;

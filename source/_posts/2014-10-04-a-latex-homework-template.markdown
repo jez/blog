@@ -6,6 +6,7 @@ comments: false
 categories: [LaTeX]
 description: "All about what template I use for LaTeX on homework assignments."
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Writing a LaTeX document from scratch for every assignment is tedious. Especially for homework assignments, a lot of the structure is repetitive. Read on to learn about the homework template I've adapted for use in all my technical classes.

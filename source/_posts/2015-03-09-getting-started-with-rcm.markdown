@@ -8,6 +8,7 @@ description: >
   An overview of how I use the software suite rcm to manage my dotfiles across
   multiple machines.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 I recently rewrote most of my dotfiles to clean them up and in the process

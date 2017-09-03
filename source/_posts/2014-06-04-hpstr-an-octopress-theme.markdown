@@ -6,6 +6,7 @@ date: 2014-06-04 21:51:41 -0400
 comments: false
 categories: [webdev, meta]
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 In case you didn't notice, we're rocking a new theme: [HPSTR for Octopress][hpstr-source]! Ported from the [theme of the same name][hpstr-jekyll] for Jekyll, this theme has a bunch of cool new features that make the theme easier to use and more customizable.

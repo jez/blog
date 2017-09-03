@@ -6,6 +6,7 @@ comments: false
 categories: [summer projects, mail]
 description: It's not you, it's me.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 It is with great sadness that I announce today that I am breaking up with my mail server. At least for a little while, that is. Let's say we're "taking a break" to "see other people."

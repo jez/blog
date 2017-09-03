@@ -11,6 +11,7 @@ description: >
   in mind, I've collected some of the zsh-specific bits of my dotfiles into one
   place to help people hit the ground running.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Zsh has given me so much mileage with respect to efficiency at the command line.

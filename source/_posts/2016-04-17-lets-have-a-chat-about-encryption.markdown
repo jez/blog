@@ -10,6 +10,7 @@ description: >
   forwards.
 comments: false
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Discussions of encryption permeate tech and political news sites these days.

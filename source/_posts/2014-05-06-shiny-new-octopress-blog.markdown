@@ -6,6 +6,7 @@ date: 2014-05-06 01:41:14 -0400
 comments: false
 categories: [meta]
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 The below is a post I originally posted on my first (failed) blog. While that blog didn't work out quite right, I hope to keep many of the same ideals at heart when continuing (and hopefully maintaining) this blog, so I decided I may as well repost it here.

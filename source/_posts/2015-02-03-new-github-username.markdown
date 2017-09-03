@@ -6,6 +6,7 @@ comments: false
 categories: [meta, git]
 description: I've changed my GitHub username! Please update your remote urls.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 I've changed my GitHub username from Z1MM32M4N to jez (hopefully it'll be a

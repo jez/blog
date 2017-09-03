@@ -9,6 +9,7 @@ description: >
   outlining the quickest way to get a quality Haskell development experience.
   His post presumes Ubuntu; here we presume OS X.
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 Stephen Diehl's article [Vim and Haskell in 2016][vim-and-haskell] does a great

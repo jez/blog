@@ -8,6 +8,7 @@ description: >
   LaTeX development with Vim and the command line, now featuring split-pane
   windows!
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 I've already written about how I develop LaTeX offline in Vim using GNU Make.

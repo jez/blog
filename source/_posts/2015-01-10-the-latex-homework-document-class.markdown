@@ -6,6 +6,7 @@ comments: false
 categories: [latex]
 description: "A LaTeX \\documentclass for typesetting homework assignments."
 share: false
+permalink: /:year/:month/:day/:title/
 ---
 
 There are LaTeX document classes for typesetting books, articles, exams,
