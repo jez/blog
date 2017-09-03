@@ -7,6 +7,7 @@ categories: [summer projects, digitalocean, mail]
 description: So my mail works now. Kinda.
 share: false
 permalink: /:year/:month/:day/:title/
+published: false
 ---
 
 After some initial troubles, I finally managed to get basic send and receive functionality  working on my mail server, using EncFS, Dovecot, and Postfix. That being said, it's _far_ from a perfect system, and it needs a good deal more TLC to get it working at a level that's on par with a more "professional" email service provider. This post details some fixes that I've implemented so far, as well as the functionality that I've managed to get working.

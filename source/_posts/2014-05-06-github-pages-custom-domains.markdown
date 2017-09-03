@@ -7,6 +7,7 @@ comments: false
 categories: [dns, webdev, troubleshooting]
 share: false
 permalink: /:year/:month/:day/:title/
+published: false
 ---
 
 I stumbled at first getting the DNS configured for my blog, because I've got a slighty more complicated setup than normal. I decided to supplement the documentation [GitHub Pages](https://pages.github.com/) gives by recounting my personal example and the setup that worked.
