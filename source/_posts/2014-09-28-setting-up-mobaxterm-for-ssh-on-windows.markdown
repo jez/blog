@@ -69,7 +69,6 @@ It also has a built in X server, which means that you can start programs on the 
 
 While all these features are great, ssh is a program that was meant to be used on Unix-based systems. I personally switched from Windows + Ubuntu to Mac OS X before coming to college, and it was one of the best decisions I made. If Mac OS X is a bit much for you, though, I strongly encourage you to install Linux, using either a VM or a dual-boot configuration. Doing programming and development work in a Linux environment makes nearly every task simpler than trying to do it on Windows.
 
-{% include jake-on-the-web.markdown %}
 
 [download]: http://mobaxterm.mobatek.net/download-home-edition.html
 [solarized]: http://ethanschoonover.com/solarized

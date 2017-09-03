@@ -33,6 +33,5 @@ A while ago, I was given the book _The Mythical Man-Month_, by Frederick P. Broo
 
 Brooks of course follows this up with "The Woes of the Craft", which is equally on point. I'm only a few pages in, but I already feel like, respectfully, I've learned more than I did in all of Tech Comm ([15-221][techcomm]). I would absolutely recommend it to anyone considering pursing software engineering!
 
-{% include jake-on-the-web.markdown %}
 
 [techcomm]: https://enr-apps.as.cmu.edu/open/SOC/SOCServlet/courseDetails?COURSE=15221&SEMESTER=F14

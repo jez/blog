@@ -278,7 +278,6 @@ and headed back upstairs. "No kidding that was a lot of information," said Emma.
 you put it that way. I'm glad you brought it up though. I feel like I have a
 grasp on things now that I didn't before. Thanks."
 
-{% include jake-on-the-web.markdown %}
 
 <!-- vim:ft=pandoc.liquid
 -->

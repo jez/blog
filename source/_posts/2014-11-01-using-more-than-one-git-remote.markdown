@@ -99,7 +99,6 @@ As always, let me know if something was unclear or incorrect in the comments!
 
 There are plenty other applications of using multiple remotes with Git. Perhaps the most common is to use them with the [__GitHub forking model__][forking], which is useful when collaborating on a software development project with others. You can use multiple remotes to do things like resolve merge conflicts in pull requests and to keep your fork up to date with the original repo.
 
-{% include jake-on-the-web.markdown %}
 
 
 [learnGitBranching]: http://pcottle.github.io/learnGitBranching/

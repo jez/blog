@@ -41,7 +41,6 @@ and I'm pretty fond of them if I do say so myself. You might want to read
 snippets and features I've collected into my dotfiles.
 
 
-{% include jake-on-the-web.markdown %}
 
 [starter]: https://github.com/jez/starter-zshrc
 [dotfiles]: https://github.com/jez/dotfiles

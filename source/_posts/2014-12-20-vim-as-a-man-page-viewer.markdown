@@ -81,7 +81,6 @@ place, even if it's a small detail, I'd love to hear it. Make no assumptions
 about the reasoning behind why certain decisions were made, because I have none
 XD
 
-{% include jake-on-the-web.markdown %}
 
 [vman-github]: https://github.com/jez/vim-superman
 

@@ -123,7 +123,6 @@ Then I discovered [μBlock][ublock], an "efficient blocker for Chromium and
 Firefox." The fancy graphs on it's homepage convinced me to give it a shot, and
 from what I can tell so far it's responsive and effective.
 
-{% include jake-on-the-web.markdown %}
 
 [iframe-irony]: http://mobile.extremetech.com/latest/221392-iframe-irony-adblock-plus-is-probably-the-reason-firefox-and-chrome-are-such-memory-hogs
 [sum]: http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers

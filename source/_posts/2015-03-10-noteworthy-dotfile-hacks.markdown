@@ -201,4 +201,3 @@ managed to capture a good portion of them. If you thought that one of these
 snippets was useful, are having trouble getting something to work, or have
 something interesting to share, leave a comment below! 
 
-{% include jake-on-the-web.markdown %}

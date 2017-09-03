@@ -70,7 +70,6 @@ I'd love for the script to also have these features:
 If you find this script useful and end up implementing one of these feature or
 more on top of `pip-uses`, be sure to send me a Pull Request!
 
-{% include jake-on-the-web.markdown %}
 
 
 [pip-uses-github]: https://github.com/jez/bin/blob/master/pip-uses

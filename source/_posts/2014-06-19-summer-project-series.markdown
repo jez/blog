@@ -46,4 +46,3 @@ In the mean time, if mail servers, Python 3, and Django are your thing, you may 
 
 Edit: I've started Print 2.0, and it's moving slowly now that classes have started to pick up. I have done a bit of work on it though, and I'll be documenting it soon. Since it's no longer the summer, though, it won't be published under the Summer Project Series tag.
 
-{% include jake-on-the-web.markdown %}

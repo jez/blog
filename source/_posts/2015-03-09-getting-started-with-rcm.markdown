@@ -171,7 +171,6 @@ free to drop questions in the comments and I'll see if I can't help sort things
 out.
 
 
-{% include jake-on-the-web.markdown %}
 
 
 [rcm]: https://robots.thoughtbot.com/rcm-for-rc-files-in-dotfiles-repos

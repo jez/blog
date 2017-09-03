@@ -54,6 +54,5 @@ After all this, if you’ve copied the PPD file into the right folder (`/etc/cup
 
 Happy printing!
 
-{% include jake-on-the-web.markdown %}
 
 

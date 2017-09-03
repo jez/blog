@@ -136,4 +136,3 @@ It's also quite possible that I'm completely off the mark with this diagnosis. T
 [telnet25]: http://www.port25.com/how-to-check-an-smtp-connection-with-a-manual-telnet-session-2/
 [nsa]: http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/
 
-{% include jake-on-the-web.markdown %}

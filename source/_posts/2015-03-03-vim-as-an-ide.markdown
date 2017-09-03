@@ -223,7 +223,6 @@ that you can fully utilize them. Be sure to comment on the commits with
 questions if you're stuck or are wondering why your setup doesn't look similar
 to one of the above!
 
-{% include jake-on-the-web.markdown %}
 
 [repo]: https://github.com/jez/vim-as-an-ide
 

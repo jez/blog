@@ -184,7 +184,6 @@ I've make a lot of other LaTeX-related posts. Be sure to [check them out][latex]
 as well! My hope is that you find something that makes developing LaTeX just
 that much easier.
 
-{% include jake-on-the-web.markdown %}
 
 [homework]: https://github.com/jez/latex-homework-class
 [homework.cls]: https://github.com/jez/latex-homework-class/blob/master/homework.cls

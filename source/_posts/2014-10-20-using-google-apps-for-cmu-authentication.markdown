@@ -88,7 +88,6 @@ One thing you'll want to look into is defining a custom Auth User model. Custom 
 
 As always, let me know if you have any questions or if by following these steps something didn't work for you. Because of how bare bones this app is, it's likely that I glossed over some points for the sake of minimalism. Comment below with your feedback and feel free to email me or make GitHub issues with your questions.
 
-{% include jake-on-the-web.markdown %}
 
 [print]: http://print.scottylabs.org/
 [weblogin]: https://login.cmu.edu

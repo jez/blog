@@ -33,4 +33,3 @@ While you're here, check out this video for an incredibly humorous and satisfyin
 ### [Wat](https://www.destroyallsoftware.com/talks/wat)
 Aaand while we're posting humorous JavaScript videos, I've gotta throw this one into the mix.
 
-{% include jake-on-the-web.markdown %}

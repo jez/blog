@@ -99,7 +99,6 @@ Note: a side effect of this nice sandboxing is that you can normally run
 commands without prefixing them with `bundle exec ...`, which is actually really
 handy.
 
-{% include jake-on-the-web.markdown %}
 
 [iv]: https://gist.github.com/IanVaughan/2902499
 [gist]: https://gist.github.com/jez/cc2ba08062c6183a489c

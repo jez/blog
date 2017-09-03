@@ -254,7 +254,6 @@ Haskell-the-language isn't quite on the same level as SML-the-language, but it's
 far and above when comparing by tooling support. I'm looking forward to taking
 advantage of that!
 
-{% include jake-on-the-web.markdown %}
 
 [stack]: https://www.haskellstack.org/
 [neovim]: https://github.com/neovim/neovim

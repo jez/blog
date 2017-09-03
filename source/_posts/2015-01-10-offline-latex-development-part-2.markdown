@@ -45,7 +45,6 @@ After looking into it a little more, it looks like there are other OS X tools
 for spitting the screen into two panes, like [BetterTouchTool][btt], though I
 haven't actually tried any of them out.
 
-{% include jake-on-the-web.markdown %}
 
 [part1]: /2014/10/06/offline-latex-development/
 [amethyst]: http://ianyh.com/amethyst/

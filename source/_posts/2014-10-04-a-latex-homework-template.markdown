@@ -86,7 +86,6 @@ There's one more thing that I'd like to mention here. Different people have diff
 
 Be sure to let me know how you like this template! It works for me, but obviously I'm only using it for a small number of things on exactly one system. If something doesn't seem to work, or if you'd like to see a particular feature implemented, comment or create a GitHub issue to let me know! 
 
-{% include jake-on-the-web.markdown %}
 
 [template-github]: https://github.com/jez/latex-hw-template
 [forks]: https://help.github.com/articles/fork-a-repo/

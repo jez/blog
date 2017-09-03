@@ -166,7 +166,6 @@ is powerful but cumbersome to use. With Markdown, we can focus on our writing,
 and worry about the presentation later. Pandoc can take care of the presentation
 for us, so the [only thing left to do is start][pandoc-starter].
 
-{% include jake-on-the-web.markdown %}
 
 
 [latex-part1]: /2014/10/06/offline-latex-development/

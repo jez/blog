@@ -254,7 +254,6 @@ We covered a lot, so here's a quick recap:
 And as always, you can see even more Vim settings in my [dotfiles
 repo][dotfiles] on GitHub.
 
-{% include jake-on-the-web.markdown %}
 
 [brew]: http://brew.sh
 [smlnj]: http://smlnj.org/

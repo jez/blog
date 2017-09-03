@@ -56,7 +56,6 @@ to either manually auto-remove these packages, or add `sudo apt-get autoremove
 Update: The bug has been addressed and closed. It now correctly removes header
 packages!
 
-{% include jake-on-the-web.markdown %}
 
 
 [essential]: http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers

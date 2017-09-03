@@ -49,4 +49,3 @@ Ultimately, I had to make the choice to put this project on the back burner. Tha
 If you've been following along this series and you've tragically decided to follow a similar path as that which I have followed, feel free to chat me up about it! I'd be more than happy to offer some support, or give you advice on some resources to look at. I can't say that I'll answer every question, else I would have a working system, but hopefully I have managed to scrounge up something to make your life easier. See below for ways to get in touch.
 
 [nsa]: http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/
-{% include jake-on-the-web.markdown %}

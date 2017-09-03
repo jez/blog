@@ -129,5 +129,4 @@ should definitely check out.
 
 
 
-{% include jake-on-the-web.markdown %}
 

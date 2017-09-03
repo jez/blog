@@ -85,4 +85,3 @@ Ideally, I'd like to have a setup where my password isn't being sent in a format
 [debugging]: /2014/07/05/running-a-vps-log-4
 
 
-{% include jake-on-the-web.markdown %}

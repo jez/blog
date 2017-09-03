@@ -123,7 +123,6 @@ correctly, you can head over to [Vim and Haskell in 2016][vim-and-haskell] to
 finish things out.
 
 
-{% include jake-on-the-web.markdown %}
 
 
 [vim-and-haskell]: http://www.stephendiehl.com/posts/vim_2016.html

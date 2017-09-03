@@ -42,4 +42,3 @@ So it’s getting pretty late and I’d like to get back to what I was learning 
 
 So here goes nothing... I’m sure that in the very least it’ll be fun to look over these entries 5, 10, 20 years from now and think about how quickly things changed.
 
-{% include jake-on-the-web.markdown %}

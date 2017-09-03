@@ -39,4 +39,3 @@ I tried to update all links referencing Z1MM32M4N to use the new username, but
 I'm sure I've missed a few. If you find a "broken" link, shoot me a message
 letting me know!
 
-{% include jake-on-the-web.markdown %}

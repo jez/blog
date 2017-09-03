@@ -153,7 +153,6 @@ know. If you're having trouble getting floats to work, though, maybe you should
 look into `flexbox` instead!
 
 
-{% include jake-on-the-web.markdown %}
 
 [pen1]: http://codepen.io/Z1MM32M4N/pen/qENvdx?editors=110
 [pen2]: http://codepen.io/Z1MM32M4N/pen/XJKGdg?editors=110

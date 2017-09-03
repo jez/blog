@@ -50,4 +50,3 @@ __I'd also love to hear about your installation process.__ If something didn't q
 [twitter]: https://www.twitter.com/Z1MM32M4N
 [email]: mailto:jake@zimmerman.io
 
-{% include jake-on-the-web.markdown %}

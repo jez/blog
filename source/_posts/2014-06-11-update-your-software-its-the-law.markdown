@@ -86,7 +86,6 @@ I was planning on checking pip for updates as well, but pip is kind of not even 
 
 If you have any questions about what I've done here, or you catch some bugs, be sure to comment below or file an issue on GitHub! I'd love to hear what you have to say.
 
-{% include jake-on-the-web.markdown %}
 
 [arch-discussion]: https://www.facebook.com/groups/cmuscs/permalink/727878180603546/
 [git]: https://git.kernel.org/cgit/git/git.git/tree/Documentation/RelNotes/2.0.0.txt

@@ -171,7 +171,6 @@ instead of being configurable in you `~/.gitconfig` file.
 
 
 
-{% include jake-on-the-web.markdown %}
 
 
 [learnGitBranching]: http://pcottle.github.io/learnGitBranching/

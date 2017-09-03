@@ -22,7 +22,6 @@ After you install them in the right place, you can include `\usepackage{solarize
 
 Once you've done this, you just have to include your code in your LaTeX file using the `listings` packages. You might want to check out [the LaTeX wiki][listings] for more information on how to get started quickly with code listings, or [the official documentation][docs] for a more comprehensive reference.
 
-{% include jake-on-the-web.markdown %}
 
 [source]: https://github.com/jez/latex-solarized
 [listings]: http://en.wikibooks.org/wiki/LaTeX/Source_Code_Listings

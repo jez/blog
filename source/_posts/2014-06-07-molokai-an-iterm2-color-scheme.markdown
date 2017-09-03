@@ -22,7 +22,6 @@ I don't have too many good screenshots of this theme that aren't vim because I'm
 
 {% img /images/molokai.png %}
 
-{% include jake-on-the-web.markdown %}
 
 [tomasr]: https://github.com/tomasr
 [molokai-vim]: https://github.com/tomasr/molokai

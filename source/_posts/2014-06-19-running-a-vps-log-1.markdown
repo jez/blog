@@ -50,4 +50,3 @@ Voilà! After that, I had my sick bash prompt, my [snazzy update function](/2014
 
 Sure, it's taken a bit of effort to get the point where I can run these commands and have it Just Work, but doing that work once means that from now on, whenever I sit down at a new work computer, a new VPS, a new laptop, or some other workstation, I'm only a few commands away from my favorite settings.
 
-{% include jake-on-the-web.markdown %}

@@ -58,4 +58,3 @@ Here's a screenshot of what my records look like with my DNS provider, in case t
 
 I'm personally using [Gandi](https://www.gandi.net/) for domain registration because they had the cheapest `.io` TLD registration, but their interface takes some getting used to. (It was certainly still worth the deal I got.)
 
-{% include jake-on-the-web.markdown %}

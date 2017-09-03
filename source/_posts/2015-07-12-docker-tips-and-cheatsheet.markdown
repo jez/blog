@@ -262,7 +262,6 @@ the principles are generally applicable)
 Apart from that, try to find examples of these files that you can adapt to your
 needs.
 
-{% include jake-on-the-web.markdown %}
 
 
 [dc]: https://docs.docker.com/compose/

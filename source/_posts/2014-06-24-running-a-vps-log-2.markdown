@@ -31,4 +31,3 @@ With my first attempt at installing a mail server foiled, I think for my next at
 
 Whatever happens though, I'm feeling pretty good about the fact that I can turn things around with a single click.
 
-{% include jake-on-the-web.markdown %}
