@@ -3,7 +3,7 @@ layout: post
 title: "SML Dev Setup"
 date: 2016-03-09 20:06:15 -0600
 comments: false
-categories: ['best practices', 'vim', 'osx', 'terminal', 'sml']
+categories: ['vim', 'osx', 'sml']
 description: >
   Let's walk through a couple easy steps you can take to make developing SML
   feel more fluid, both in and out of your editor.
