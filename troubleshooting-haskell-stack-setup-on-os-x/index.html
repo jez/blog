@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Troubleshooting Haskell Stack Setup on OS X - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="Stephen Diehl's article "Vim and Haskell in 2016" does a great job of outlining the quickest way to get a quality Haskell development experience. His &hellip;">
+
+<meta name="keywords" content="haskell osx troubleshooting vim ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/troubleshooting-haskell-stack-setup-on-os-x">
+<meta property="og:title" content="Troubleshooting Haskell Stack Setup on OS X">
+<meta property="og:description" content="Stephen Diehl's article "Vim and Haskell in 2016" does a great job of outlining the quickest way to get a quality Haskell development experience. His &hellip;">
+
+  <meta property="og:image" content="">
+
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/troubleshooting-haskell-stack-setup-on-os-x">
+<link href="/favicon.png" rel="icon">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+<script>Modernizr || document.write('<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
+
+
+
+
+</head>
+
+<body id="post" >
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
+  <button class="dl-trigger">Open Menu</button>
+  <ul class="dl-menu">
+    <li><a href="/">Home</a></li>
+    <li><a href="/posts/">All Posts</a></li>
+    <li><a href="/categories/">Posts by Category</a></li>
+    <li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
+  </ul><!-- /.dl-menu -->
+</nav><!-- /.dl-menuwrapper -->
+
+
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <header class="header-title">
+      <div class="header-title-wrap">
+        
+          <h1 class="entry-title">Troubleshooting Haskell Stack Setup on OS X</h1>
+        
+        <h2>August 03, 2016</h2>
+      </div><!-- /.header-title-wrap -->
+    </header>
+    <div class="entry-content">
+      <p>Stephen Diehl&rsquo;s article <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> does a great
+job of outlining the quickest way to get a quality Haskell development
+experience. I ran into a simple issue when I followed it due to a bit of an
+idiosyncrasy on OS X El Capitan. I also document a few of the extra steps I took
+which aren&rsquo;t mentioned explicitly in his original article.</p>
+
+<!-- more -->
+
+
+<p>This post wouldn&rsquo;t actually be necessary if it weren&rsquo;t for one thing: <a href="https://support.apple.com/en-us/HT204899">System
+Integrity Protection</a> in OS X El Capitan, also known as &ldquo;rootless&rdquo;
+mode. It affects Haskell&rsquo;s build and install step in a subtle (but solved) way,
+and the rest of the article will cover what to watch out for when installing on
+OS X.</p>
+
+<p>If you don&rsquo;t follow these instructions and you&rsquo;re on OS X El Capitan, you&rsquo;ll
+likely run into an issue that looks like <code>/usr/bin/ar: permission denied</code>. The
+Stack installation instructions call this out specifically:</p>
+
+<blockquote><p>If you are on OS X 10.11 (&ldquo;El Capitan&rdquo;) or later, GHC 7.8.4 is incompatible
+with System Integrity Protection (a.k.a. &ldquo;rootless&rdquo;). GHC 7.10.2 includes a
+fix, so this only affects users of GHC 7.8.4.</p></blockquote>
+
+<p>At the risk of spoiling the surprise, we&rsquo;re going to set up Stack while taking
+care to make sure that we get GHC >= 7.10. So let&rsquo;s do just that!</p>
+
+<h2>Environment Prep (optional)</h2>
+
+<p>Note that this step is optional and has nothing to do with OS X; I just wanted
+to point it out quickly.</p>
+
+<p>Under <a href="http://www.stephendiehl.com/posts/vim_2016.html#dev-environment">Dev Environment</a> on <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in
+2016</a>, Stephen Diehl writes:</p>
+
+<blockquote><p>Times have changed quite a bit, and the new preferred way of installing GHC in
+2016 is to forgo using the system package manager for installing ghc and use
+Stack to manage the path to the compiler executable and sandboxes.</p></blockquote>
+
+<p>Stack stores it&rsquo;s metadata in the <code>~/.stack</code> folder by default. If you&rsquo;re not a
+huge fan of things cluttering up your home folder, set the <code>STACK_ROOT</code> variable
+in you bashrc or zshrc:</p>
+
+<figure class='code'><figcaption><span>Set STACK_ROOT to avoid clutter</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">XDG_DATA_HOME</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.local/share"</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Have Haskell Stack use XDG Base Directory spec</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">STACK_ROOT</span><span class="o">=</span><span class="s2">"</span><span class="nv">$XDG_DATA_HOME</span><span class="s2">/stack"</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Of course, the choice of location is up to you. In particular I&rsquo;ve chosen to
+adhere to the <a href="https://wiki.archlinux.org/index.php/XDG_Base_Directory_support">XDG Base Directory specification</a> here, which you may want
+to take a peek at if you&rsquo;re unfamiliar. That&rsquo;s why you see references to
+<code>XDG_DATA_HOME</code>.</p>
+
+<p>Make sure you restart your terminal to pick up the new variables before
+continuing.</p>
+
+<h2>Install Stack from Homebrew</h2>
+
+<p>If you&rsquo;re like me, you&rsquo;ll want to take a second to purge anything
+Haskell-related from previous botched setup attempts:</p>
+
+<figure class='code'><figcaption><span>Wipe the slate clean</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># If you had GHC installed</span>
+</span><span class='line'><span class="gp">$ </span>brew uninstall ghc
+</span><span class='line'>
+</span><span class='line'><span class="c"># If you tried and failed at installing Stack already</span>
+</span><span class='line'><span class="gp">$ </span>brew uninstall haskell-stack
+</span><span class='line'><span class="gp">$ </span>rm -r ~/.stack
+</span><span class='line'><span class="c"># If you happened to also set STACK_ROOT</span>
+</span><span class='line'><span class="gp">$ </span>rm -r <span class="nv">$STACK_ROOT</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>With that out of the way, we can actually get our hands on Stack. For OS X,
+we&rsquo;ll install through Homebrew:</p>
+
+<figure class='code'><figcaption><span>Install Stack</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='console'><span class='line'><span class="w">$ </span><span class="nc">brew</span><span class="kv"> install haskell-stack</span></span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Configure Stack, avoiding &ldquo;rootless&rdquo; issues</h2>
+
+<p>Here&rsquo;s the trick. We need to run <code>stack setup</code> for the first time to let Stack
+configure itself. But remember: we want to make sure that Stack doesn&rsquo;t set
+itself up with version 7.8.4 of GHC. We can get around this by specifying an
+explicit resolver to the <code>stack</code> command (you can find more information on
+&ldquo;resolvers&rdquo; elsewhere):</p>
+
+<figure class='code'><figcaption><span>Side-step rootless issue in setup</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Change the resolver to the most up-to-date one. This is a hack to ensure that</span>
+</span><span class='line'><span class="c"># get GHC version &gt; 7.8, because there's an issue with El Capitan's rootless</span>
+</span><span class='line'><span class="c"># mode.</span>
+</span><span class='line'>stack --resolver<span class="o">=</span>lts-6.10 setup</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You&rsquo;ll notice we use the <code>--resolver=...</code> flag to force Stack to use a specific
+resolver. This post will be out of date as soon as it&rsquo;s written, so check
+<a href="https://www.stackage.org/snapshots">Stackage</a> to find the latest LTS snapshot.</p>
+
+<h2>Return to Vim and Haskell in 2016</h2>
+
+<p>That&rsquo;s it for the environment setup! Now you&rsquo;ll want to turn your attention to
+configuring Vim.</p>
+
+<p>The steps to set up Vim are platform independent, so now that we&rsquo;ve set up Stack
+correctly, you can head over to <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> to
+finish things out.</p>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="/categories/#haskell" title="Pages tagged haskell" class="tag">haskell</a><a href="/categories/#osx" title="Pages tagged osx" class="tag">osx</a><a href="/categories/#troubleshooting" title="Pages tagged troubleshooting" class="tag">troubleshooting</a><a href="/categories/#vim" title="Pages tagged vim" class="tag">vim</a></span>
+        <span class="entry-date date published updated"><time datetime="2016-08-03T00:04:08-04:00">August 03, 2016</time></span>
+        
+      </footer>
+    </div><!-- /.entry-content -->
+    
+      <div class="read-more">
+        
+          <div class="read-more-header">
+            <a href="/if-else-purity/" class="btn">Read More</a>
+          </div><!-- /.read-more-header -->
+          <div class="read-more-content">
+            <h3><a href="/if-else-purity/" title="If, Else, and Purity">If, Else, and Purity</a></h3>
+            <p>I prefer to let the language I&#8217;m using think on my behalf as much aspossible. Ideally, the language is rich enough that the proof &hellip;&hellip; <a href="/if-else-purity/"> Continue reading</a></p>
+          </div><!-- /.read-more-content -->
+        
+        <div class="read-more-list">
+          
+            <div class="list-item">
+              <h4><a href="/haskell-development-with-neovim/" title="Haskell Development with Neovim">Haskell Development with Neovim</a></h4>
+              <span>Published on July 16, 2017</span>
+            </div><!-- /.list-item -->
+          
+            <div class="list-item">
+              <h4><a href="/reach-for-markdown-not-latex/" title="Reach for Markdown, not LaTeX">Reach for Markdown, not LaTeX</a></h4>
+              <span>Published on February 26, 2017</span>
+            </div><!-- /.list-item -->
+          
+        </div><!-- /.read-more-list -->
+      </div><!-- /.read-more -->
+    
+    
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2017 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+
+	        
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="/javascripts/scripts.min.js"></script>
+&#8211;>
+	        
+
+</body>
+</html>

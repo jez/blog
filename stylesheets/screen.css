@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*!
 // ===========================================================
 // HPSTR Jekyll Theme for Octopress
@@ -5,22 +6,11 @@
 // Modified by: Jake Zimmerman
 // ===========================================================
 */
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i");
 /* All font sizes in rem's. Units are omitted to make calculating multipliers
  * and legacy px values easier. See base/_mixins.scss for more info on rem's. */
 body {
   margin-top: 26px;
   font-size: 16px;
-}
-
-.visuallyhidden.focusable:active,
-.visuallyhidden.focusable:focus {
-  position: static;
-  clip: auto;
-  height: auto;
-  width: auto;
-  margin: 0;
-  overflow: visible;
 }
 
 *, *:after, *:before {
@@ -246,6 +236,7 @@ textarea {
 
 .all-caps {
   text-transform: uppercase;
+  font-family: 'Concourse Caps';
 }
 
 .pull-left {
@@ -275,21 +266,19 @@ textarea {
   display: inline;
 }
 
-.well {
-  padding: 20px;
-  border: 1px solid #222222;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
+body {
+  font-family: "Concourse", "Avenir", Helvetica, sans-serif;
+  color: #222;
+  font-weight: 300;
 }
 
-body {
-  font-family: "Open Sans", Helvetica, sans-serif;
-  color: #222;
+.entry-content {
+  hyphens: auto;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Open Sans", Helvetica, sans-serif;
+  font-family: "Concourse", "Avenir", Helvetica, sans-serif;
+  font-weight: 400;
 }
 
 h1 {
@@ -319,8 +308,8 @@ a:hover, a:active {
 
 figcaption {
   padding-top: 10px;
-  font-size: 14px;
-  font-size: 0.875rem;
+  font-size: 16.8px;
+  font-size: 1.05rem;
   line-height: 1.3;
   color: #3c3c3c;
 }
@@ -329,30 +318,33 @@ figcaption {
   margin-top: 1.5em;
   padding: .5em 1em;
   text-indent: 0;
-  font-size: 14px;
-  font-size: 0.875rem;
+  font-size: 16.8px;
+  font-size: 1.05rem;
   background-color: #e8e8e8;
   border: 1px solid #b5b5b5;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
 }
 
 blockquote {
-  font-family: Georgia, serif;
+  margin-left: 40px;
   font-style: italic;
-  border-left: 8px solid #bbbbbb;
-  padding-left: 20px;
 }
-@media only screen and (min-width: 40em) {
-  blockquote {
-    margin-left: -28px;
-  }
+
+blockquote > *:first-child {
+  position: relative;
+}
+
+blockquote > *:first-child::before {
+  content: "“";
+  display: block;
+  position: absolute;
+  font-size: 5rem;
+  top: -1.9rem;
+  left: -3.2rem;
 }
 
 .entry-content .footnotes ol, .entry-content .footnotes li, .entry-content .footnotes p, .entry-content .footnotes code {
-  font-size: 12px;
-  font-size: 0.75rem;
+  font-size: 14.4px;
+  font-size: 0.9rem;
   margin-bottom: 26px;
   margin-bottom: 1.625rem;
 }
@@ -368,8 +360,7 @@ li code {
   line-height: 1.5;
   white-space: nowrap;
   margin: 0 2px;
-  padding: 0px 5px;
-  border: 1px solid #e6e6e6;
+  padding: 1px 5px;
   background-color: #f2f2f2;
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
@@ -507,7 +498,7 @@ pre::-webkit-scrollbar-thumb:horizontal {
 /* Generic.Prompt */
 .highlight .gs {
   color: #586e75;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 /* Generic.Strong */
@@ -770,9 +761,9 @@ body {
 }
 
 .entry-content {
-  font-size: 16px;
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 19.2px;
+  font-size: 1.2rem;
+  line-height: 1.3;
 }
 .entry-content p > a:not(.image-link),
 .entry-content li > a:not(.image-link) {
@@ -782,18 +773,28 @@ body {
 .entry-content li > a:not(.image-link):hover {
   border-bottom-style: solid;
 }
+.entry-content .image-link img {
+  cursor: zoom-in;
+}
+
+.entry-title {
+  margin-top: 0;
+  margin-bottom: 3px;
+}
+
+.entry-wrapper {
+  margin-bottom: 20px;
+}
 
 .entry-meta {
-  font-size: 12px;
-  font-size: 0.75rem;
+  font-size: 14.4px;
+  font-size: 0.9rem;
   text-transform: uppercase;
+  font-family: 'Concourse Caps';
   color: #bbbbbb;
 }
 .entry-meta a {
   color: #bbbbbb;
-}
-.entry-meta .vcard:before {
-  content: " by ";
 }
 .entry-meta .tag {
   display: inline-block;
@@ -804,6 +805,16 @@ body {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   border-radius: 3px;
+}
+.entry-meta .tag.hollow {
+  background-color: white;
+  font-size: 80%;
+  color: #bbbbbb;
+  border: 2px solid #bbbbbb;
+  margin-right: 4px;
+}
+.entry-meta .tag.hollow:hover {
+  background-color: #bbbbbb;
   color: #fff;
 }
 .entry-meta .tag span {
@@ -820,6 +831,14 @@ body {
   -webkit-transform: translate(0, 1px);
   transform: translate(0, 1px);
   box-shadow: 0 0 1px rgba(34, 34, 34, 0.2);
+}
+.entry-meta .entry-date {
+  padding: 4px 0;
+}
+
+.fa.pinned {
+  transform: rotate(30deg);
+  font-size: 80%;
 }
 
 #post .entry-content,
@@ -839,15 +858,16 @@ body {
 @media only screen and (min-width: 40em) {
   #post .entry-content,
   #page .entry-content {
-    max-width: 650px;
+    max-width: 675px;
     margin: 50px auto 30px auto;
     padding: 50px 80px;
   }
   #post .entry-content > p:first-child,
   #page .entry-content > p:first-child {
-    font-size: 18.4px;
-    font-size: 1.15rem;
-    line-height: 1.5;
+    font-weight: 400;
+    font-size: 22.08px;
+    font-size: 1.38rem;
+    line-height: 1.3;
     margin-bottom: 26px;
     margin-bottom: 1.625rem;
   }
@@ -863,23 +883,6 @@ body {
   margin-bottom: 6px;
 }
 
-.pagination {
-  margin: 20px 10px;
-  text-align: center;
-}
-.pagination ul {
-  display: inline;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-.pagination li {
-  padding-left: 4px;
-  padding-right: 4px;
-}
-.pagination .current-page {
-  font-weight: 700;
-}
-
 #post-index #main {
   margin: 40px 2px 20px 2px;
 }
@@ -891,7 +894,7 @@ body {
 }
 @media only screen and (min-width: 40em) {
   #post-index #main {
-    max-width: 650px;
+    max-width: 675px;
     margin-top: 50px;
     margin-left: auto;
     margin-right: auto;
@@ -939,6 +942,8 @@ body {
 .category h2,
 .archive-year h2 {
   text-align: right;
+  font-family: 'Concourse Caps';
+  font-weight: 600;
 }
 
 .upgrade {
@@ -975,7 +980,8 @@ b, i, strong, em, blockquote, p, q, span, figure, img, h1, h2, header, input, a 
 }
 .header-title h1 {
   margin: 10px 20px;
-  font-weight: 700;
+  font-family: 'Concourse Caps';
+  font-weight: 400;
   font-size: 28px;
   font-size: 1.75rem;
   color: #555555;
@@ -997,6 +1003,7 @@ b, i, strong, em, blockquote, p, q, span, figure, img, h1, h2, header, input, a 
   font-size: 18px;
   font-size: 1.125rem;
   text-transform: uppercase;
+  font-family: 'Concourse Caps';
   color: #888888;
 }
 @media only screen and (min-width: 40em) {
@@ -1023,7 +1030,8 @@ b, i, strong, em, blockquote, p, q, span, figure, img, h1, h2, header, input, a 
 }
 .feature .header-title h1 {
   margin: 10px;
-  font-weight: 700;
+  font-family: 'Concourse Caps';
+  font-weight: 400;
   margin: 10px 60px;
   color: #fff;
   text-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
@@ -1035,6 +1043,8 @@ b, i, strong, em, blockquote, p, q, span, figure, img, h1, h2, header, input, a 
   margin: 0;
   color: #fff;
   text-transform: uppercase;
+  font-family: 'Concourse Caps';
+  font-weight: 600;
 }
 @media only screen and (min-width: 40em) {
   .feature .header-title h2 a {
@@ -1111,10 +1121,6 @@ b, i, strong, em, blockquote, p, q, span, figure, img, h1, h2, header, input, a 
   margin: 40px 2px 20px 2px;
   padding: 40px 15px 25px;
   background-color: #fff;
-  box-shadow: 0 0 0 1px rgba(187, 187, 187, 0.1), 0 6px 12px rgba(0, 0, 0, 0.1);
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
   text-align: center;
   *zoom: 1;
 }
@@ -1126,7 +1132,7 @@ b, i, strong, em, blockquote, p, q, span, figure, img, h1, h2, header, input, a 
 }
 @media only screen and (min-width: 40em) {
   .read-more {
-    max-width: 650px;
+    max-width: 675px;
     padding: 30px 50px;
     margin: 60px auto;
   }
@@ -1149,9 +1155,9 @@ b, i, strong, em, blockquote, p, q, span, figure, img, h1, h2, header, input, a 
 }
 
 .read-more-content {
-  font-size: 16px;
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 19.2px;
+  font-size: 1.2rem;
+  line-height: 1.3;
 }
 .read-more-content p > a,
 .read-more-content li > a {
@@ -1941,8 +1947,8 @@ All this is done for any sub-level being entered.
 .btn {
   display: inline-block;
   padding: 8px 20px;
-  font-size: 14px;
-  font-size: 0.875rem;
+  font-size: 16.8px;
+  font-size: 1.05rem;
   background-color: #222;
   color: #fff;
   border-width: 2px !important;
@@ -1971,32 +1977,6 @@ All this is done for any sub-level being entered.
 .btn-success:hover {
   background-color: #fff;
   color: #5cb85c;
-}
-
-.btn-warning {
-  background-color: #dd8338;
-  color: #fff;
-  border-color: #dd8338;
-}
-.btn-warning:visited {
-  color: #fff;
-}
-.btn-warning:hover {
-  background-color: #fff;
-  color: #dd8338;
-}
-
-.btn-danger {
-  background-color: #C64537;
-  color: #fff;
-  border-color: #C64537;
-}
-.btn-danger:visited {
-  color: #fff;
-}
-.btn-danger:hover {
-  background-color: #fff;
-  color: #C64537;
 }
 
 .btn-info {
@@ -2069,25 +2049,6 @@ figure a img:hover {
 
 svg:not(:root) {
   overflow: hidden;
-}
-
-img.left, img.right {
-  margin-bottom: 0.5rem;
-  margin-top: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 5px;
-  background: #eee;
-}
-
-img.left {
-  float: left;
-  margin-right: 1.5rem;
-}
-
-img.right {
-  float: right;
-  margin-left: 1.5rem;
 }
 
 figure.code {

@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-07-18T19:29:06-04:00</updated>
+  <updated>2017-09-05T03:26:43-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -14,10 +14,189 @@
 
   
   <entry>
+    <title type="html"><![CDATA[If, Else, and Purity]]></title>
+    <link href="https://blog.jez.io/if-else-purity/"/>
+    <updated>2017-09-01T01:38:43-04:00</updated>
+    <id>https://blog.jez.io/if-else-purity</id>
+    <content type="html"><![CDATA[<p>I prefer to let the language I&rsquo;m using think on my behalf as much as
+possible. Ideally, the language is rich enough that the proof of
+correctness is inherent in the code I&rsquo;ve written. Having experience with
+these sorts of languages informs how I structure my code even when I&rsquo;m
+using other languages.</p>
+
+<!-- more -->
+
+
+<p>To see what I mean, let&rsquo;s take a look at some code:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">getErrors</span> <span class="o">=</span> <span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">let</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">moment</span><span class="p">(</span><span class="nx">date</span><span class="p">,</span> <span class="s1">'YYYY-MM-DD'</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">isValid</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">'error error-date'</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">classNames</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Especially when writing short functions like this one, I have a few
+goals in mind:</p>
+
+<ul>
+<li><p>Correctness should be obvious.</p>
+
+<p>Judging correctness usually comes down to exhaustiveness&mdash;especially
+for code like the above. Every case should be accounted for.</p></li>
+<li><p>Let&rsquo;s make sure it&rsquo;s pure.</p>
+
+<p>Purity is important because it makes testing and refactoring easy.
+Pure functions are also compose well with others.</p></li>
+<li><p>The intent should be immediately obvious.</p>
+
+<p>Readability enables collaboration and guards the code against a future
+me that might not remember what&rsquo;s on my mind right now.</p></li>
+</ul>
+
+
+<p>For this snippet in particular, we can actually improve along all three
+axes (exhaustiveness, purity, and readability) with one easy trick:
+match up the <code>if</code> with an <code>else</code>. Here&rsquo;s what it would look like, and
+then we&rsquo;ll break down why such a simple technique works so well.</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">getErrors</span> <span class="o">=</span> <span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">moment</span><span class="p">(</span><span class="nx">date</span><span class="p">,</span> <span class="s1">'YYYY-MM-DD'</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">isValid</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">'error error-date'</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">''</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Correctness</h2>
+
+<p>Understanding correctness of code really comes down to <em>proving</em> that
+the code does the right thing. What tools do we have as programmers for
+proving the correctness of our code?</p>
+
+<ul>
+<li><strong>Unit tests</strong> prove that the code correct for specific inputs.</li>
+<li><strong>Type systems</strong> prove the absence of (certain kinds of)
+incorrectness.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
+<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
+us.</li>
+<li><strong>Program authors</strong> can prove the correctness of their code (i.e., with a
+traditional pen-and-paper proof).</li>
+</ul>
+
+
+<p>The first three are exciting because they involve a computer doing most
+of the work for us! That said, none of the first three are as universally
+applicable as the last: doing the proof ourself. What does writing
+proofs have to do with correctness of <code>if</code>s? Consider how we&rsquo;d write a
+proof by cases:</p>
+
+<ul>
+<li>identify the cases,</li>
+<li>establish that the cases are exhaustive, and finally</li>
+<li>prove the claim in each case.</li>
+</ul>
+
+
+<p>I use this same process when I&rsquo;m writing code with branches! &ldquo;Proving
+the claim&rdquo; is just another way of saying &ldquo;returning the right value.&rdquo;
+We can avoid doing the second step ourselves! If we just match every
+<code>if</code> with an <code>else</code>, we&rsquo;ll automatically know that our logic is
+exhaustive. This, in turn, makes the correctness proof less toilsome.</p>
+
+<h2>Purity</h2>
+
+<p>A cool way to understand purity is using what&rsquo;s known as a &ldquo;modal
+separation.&rdquo; This is a really fancy way to say that we have
+&ldquo;expressions&rdquo; which are pure and always evaluate to a value, alongside
+&ldquo;commands&rdquo; which are impure and are executed for their side effects.
+If you&rsquo;ve ever used Haskell, you&rsquo;re already familiar with this
+notion&mdash;we only need <code>do</code> notation when we need to write impure (or
+&ldquo;monadic&rdquo;) code.</p>
+
+<p>In an expression language, every <code>if</code> <em>must</em> have an <code>else</code>; for the
+entire <code>if</code> expression to be used as a value, both branches must in turn
+evaluate to values. It&rsquo;s only when we move to a language with commands
+where it makes sense to allow omitting the <code>else</code> branch.</p>
+
+<p>An <code>if</code> <em>statement</em> (as opposed to an <code>if</code> expression) is a command;
+it&rsquo;s useful for running side-effectful code. Sometimes, we don&rsquo;t want
+one of the branches to have any side effects (for example, because the
+state of the world doesn&rsquo;t need to be changed). Languages with commands
+allow you to omit the <code>else</code>.</p>
+
+<p>What does this mean for us? Every pure function can be written where the
+<code>if</code> is matched with an <code>else</code>. Put another way, an unmatched <code>if</code> is a
+likely indicator that the code I&rsquo;ve written is impure. Using this
+indicator makes me more aware of when I&rsquo;m dealing with impure code,
+alerting me to handle it appropriately. For example, I might want to
+factor out as much of the pure code into a separate helper function.</p>
+
+<h2>Readability</h2>
+
+<p>Explicitly partitioning code into the <code>if</code> branch and the <code>else</code> branch
+makes it easier for me to read code. Since the code has been explicitly
+partitioned in two, I can read each half by itself. When an <code>if</code> is
+unmatched, this partition breaks down. The <code>else</code> branch of my code is
+implicitly &ldquo;everything else,&rdquo; which is no longer mutually exclusive with
+the <code>if</code> branch.</p>
+
+<p>Note, though, that there&rsquo;s a bit of a balance when it comes to
+readability. Sometimes matching every <code>if</code> leads to deeply nested code.
+In these cases, it might be better to flatten the nesting to a chain of
+unmatched <code>if</code>s that return early if there&rsquo;s an error. Even still, this
+moves the function from expression-dominated to command-dominated, so
+the usual caveat still applies: maybe we want to factor the pure part
+out into a separate function.</p>
+
+<p>Sometimes I&rsquo;m okay with being impure (maybe I&rsquo;m going for &ldquo;benign
+effects&rdquo;), and I&rsquo;m considering an unmatched <code>if</code> as a potential way to
+avoid code duplication. When I&rsquo;m making this consideration, I&rsquo;ll almost
+always choose a different technique for de-duplicating code: functions!
+So really, an unmatched <code>if</code> is a poor substitute for proper functions.</p>
+
+<p>Making code readable is important to me, because I like being able to
+share and collaborate with others. Matching <code>if</code>s with <code>else</code>s let me
+write more readable, understandable code.</p>
+
+<h2>Writing Clean Code</h2>
+
+<p>Writing clean code is as much about the small details as it is about the
+large, sweeping brush strokes. There&rsquo;s so much nuance in every
+<code>if-then-else</code>:</p>
+
+<ul>
+<li>They&rsquo;re more likely to be pure.</li>
+<li>It&rsquo;s easier to reason about their correctness.</li>
+<li>Their branches can be understood in isolation.</li>
+</ul>
+
+
+<p>We can get all these benefits for free; we lose nearly nothing for
+giving up unmatched <code>if</code>s!</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Note the double negation here. Type systems themselves don&rsquo;t prove correctness, they prove that there aren&rsquo;t certain kinds of incorrectness. Meanwhile, unit tests are rarely (if ever) exhaustive. This is why testing and type systems are complementary&mdash;one is not a substitute for the other.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Haskell Development with Neovim]]></title>
-    <link href="https://blog.jez.io/2017/07/16/haskell-development-with-neovim/"/>
+    <link href="https://blog.jez.io/haskell-development-with-neovim/"/>
     <updated>2017-07-16T14:45:31-04:00</updated>
-    <id>https://blog.jez.io/2017/07/16/haskell-development-with-neovim</id>
+    <id>https://blog.jez.io/haskell-development-with-neovim</id>
     <content type="html"><![CDATA[<p>Configuring an editor for a new language is a double-edged sword: it&rsquo;s intensely
 satisfying when done, but takes time away from diving into the language itself!
 After using Haskell for a little over a year, I&rsquo;ve settled on a high-quality set
@@ -304,16 +483,6 @@ experience.</p>
 <p>Haskell-the-language isn&rsquo;t quite on the same level as SML-the-language, but it&rsquo;s
 far and above when comparing by tooling support. I&rsquo;m looking forward to taking
 advantage of that!</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 <div class="footnotes">
 <hr/>
 <ol>
@@ -333,9 +502,9 @@ people think, so feel free to open an issue or send me an email.</p>
   
   <entry>
     <title type="html"><![CDATA[Reach for Markdown, not LaTeX]]></title>
-    <link href="https://blog.jez.io/2017/02/26/reach-for-markdown-not-latex/"/>
+    <link href="https://blog.jez.io/reach-for-markdown-not-latex/"/>
     <updated>2017-02-26T21:26:53-05:00</updated>
-    <id>https://blog.jez.io/2017/02/26/reach-for-markdown-not-latex</id>
+    <id>https://blog.jez.io/reach-for-markdown-not-latex</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve written <a href="https://blog.jez.io/2014/10/06/offline-latex-development/">in the past</a> (<a href="https://blog.jez.io/2015/01/10/offline-latex-development-part-2/">twice</a>) about how to
 streamline the writing process when using LaTeX. Since then, I&rsquo;ve found that I
 enjoy writing even more when I don&rsquo;t have to reach for LaTeX at all. By reaching
@@ -501,24 +670,14 @@ not using Pandoc.</p>
 is powerful but cumbersome to use. With Markdown, we can focus on our writing,
 and worry about the presentation later. Pandoc can take care of the presentation
 for us, so the <a href="https://github.com/jez/pandoc-starter">only thing left to do is start</a>.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Troubleshooting Haskell Stack Setup on OS X]]></title>
-    <link href="https://blog.jez.io/2016/08/03/troubleshooting-haskell-stack-setup-on-os-x/"/>
+    <link href="https://blog.jez.io/troubleshooting-haskell-stack-setup-on-os-x/"/>
     <updated>2016-08-03T00:04:08-04:00</updated>
-    <id>https://blog.jez.io/2016/08/03/troubleshooting-haskell-stack-setup-on-os-x</id>
+    <id>https://blog.jez.io/troubleshooting-haskell-stack-setup-on-os-x</id>
     <content type="html"><![CDATA[<p>Stephen Diehl&rsquo;s article <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> does a great
 job of outlining the quickest way to get a quality Haskell development
 experience. I ran into a simple issue when I followed it due to a bit of an
@@ -622,24 +781,14 @@ configuring Vim.</p>
 <p>The steps to set up Vim are platform independent, so now that we&rsquo;ve set up Stack
 correctly, you can head over to <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> to
 finish things out.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Let's Have a Chat about Encryption]]></title>
-    <link href="https://blog.jez.io/2016/04/17/lets-have-a-chat-about-encryption/"/>
+    <link href="https://blog.jez.io/lets-have-a-chat-about-encryption/"/>
     <updated>2016-04-17T17:40:17-04:00</updated>
-    <id>https://blog.jez.io/2016/04/17/lets-have-a-chat-about-encryption</id>
+    <id>https://blog.jez.io/lets-have-a-chat-about-encryption</id>
     <content type="html"><![CDATA[<p>Discussions of encryption permeate tech and political news sites these days.
 All too frequently though, ideas presented in these discussions draw upon
 outdated analogies and confusion due to technological progression. I think it&rsquo;s
@@ -907,16 +1056,6 @@ and headed back upstairs. &ldquo;No kidding that was a lot of information,&rdquo
 you put it that way. I&rsquo;m glad you brought it up though. I feel like I have a
 grasp on things now that I didn&rsquo;t before. Thanks.&rdquo;</p>
 
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
-
 <!-- vim:ft=pandoc.liquid
 -->
 
@@ -925,9 +1064,9 @@ people think, so feel free to open an issue or send me an email.</p>
   
   <entry>
     <title type="html"><![CDATA[SML Dev Setup]]></title>
-    <link href="https://blog.jez.io/2016/03/09/sml-dev-setup/"/>
+    <link href="https://blog.jez.io/sml-dev-setup/"/>
     <updated>2016-03-09T21:06:15-05:00</updated>
-    <id>https://blog.jez.io/2016/03/09/sml-dev-setup</id>
+    <id>https://blog.jez.io/sml-dev-setup</id>
     <content type="html"><![CDATA[<p>When it comes right down to it, SML is a pretty great language. It&rsquo;s clear that
 extensive thought has gone into its design and implementation. I quite enjoy
 programming in SML, due in no small part to my collection of workflow hacks that
@@ -1181,24 +1320,14 @@ doesn&rsquo;t by default, and includes a couple extras.</li>
 
 <p>And as always, you can see even more Vim settings in my <a href="https://github.com/jez/dotfiles">dotfiles
 repo</a> on GitHub.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Starter Zsh Setup]]></title>
-    <link href="https://blog.jez.io/2016/01/03/starter-zsh-setup/"/>
+    <link href="https://blog.jez.io/starter-zsh-setup/"/>
     <updated>2016-01-03T00:14:16-05:00</updated>
-    <id>https://blog.jez.io/2016/01/03/starter-zsh-setup</id>
+    <id>https://blog.jez.io/starter-zsh-setup</id>
     <content type="html"><![CDATA[<p>Zsh has given me so much mileage with respect to efficiency at the command line.
 Looking back I&rsquo;m a little sad I didn&rsquo;t switch to it sooner. One of the reasons
 why it took so long was that I didn&rsquo;t know where to start; with this in mind,
@@ -1225,16 +1354,6 @@ dotfiles, which are <a href="https://github.com/jez/dotfiles">also on GitHub</a>
 and I&rsquo;m pretty fond of them if I do say so myself. You might want to read
 <a href="http://blog.jez.io/2015/03/10/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a> if you&rsquo;re looking for a quick overview of some
 snippets and features I&rsquo;ve collected into my dotfiles.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1291,16 +1410,6 @@ to either manually auto-remove these packages, or add <code>sudo apt-get autorem
 
 <p>Update: The bug has been addressed and closed. It now correctly removes header
 packages!</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1549,16 +1658,6 @@ the principles are generally applicable)</li>
 
 <p>Apart from that, try to find examples of these files that you can adapt to your
 needs.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -1638,24 +1737,14 @@ couldn&rsquo;t find if there was a special way to add external commands to <code
 
 <p>If you find this script useful and end up implementing one of these feature or
 more on top of <code>pip-uses</code>, be sure to send me a Pull Request!</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Why zsh?]]></title>
-    <link href="https://blog.jez.io/2015/03/10/why-zsh/"/>
+    <link href="https://blog.jez.io/why-zsh/"/>
     <updated>2015-03-10T12:58:37-04:00</updated>
-    <id>https://blog.jez.io/2015/03/10/why-zsh</id>
+    <id>https://blog.jez.io/why-zsh</id>
     <content type="html"><![CDATA[<p>People often ask me why I switched to zsh. Back when I had first switched, I was
 hesitant to answer because I was still finding my way around. Now that I&rsquo;ve been
 using it, I&rsquo;ve managed to distill down a few things zsh does well that sets it
@@ -1736,24 +1825,14 @@ in mind that it&rsquo;s somewhat opinionated (it heavily favors vim keybindings 
 uses oh-my-zsh among other things). You might also want to check out my
 <a href="https://blog.jez.io/2015/03/10/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a> post, where I talked about what I
 think are the most notable features I have in my dotfiles.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Noteworthy Dotfile Hacks]]></title>
-    <link href="https://blog.jez.io/2015/03/10/noteworthy-dotfile-hacks/"/>
+    <link href="https://blog.jez.io/noteworthy-dotfile-hacks/"/>
     <updated>2015-03-10T01:22:33-04:00</updated>
-    <id>https://blog.jez.io/2015/03/10/noteworthy-dotfile-hacks</id>
+    <id>https://blog.jez.io/noteworthy-dotfile-hacks</id>
     <content type="html"><![CDATA[<p>I have hundreds of files and folders in my dotfiles repo, and nearly 1000
 commits&mdash;there are quite a few hidden gems buried in there that generally don&rsquo;t
 get to see the light of day. Rather than wander aimlessly through them, let me
@@ -1914,16 +1993,6 @@ particular) in long lines just as if they were short.</li>
 managed to capture a good portion of them. If you thought that one of these
 snippets was useful, are having trouble getting something to work, or have
 something interesting to share, leave a comment below!</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2092,16 +2161,6 @@ added in my dotfiles</li>
 <p>If you&rsquo;re using rcm or trying to get started with it but are having issues, feel
 free to drop questions in the comments and I&rsquo;ll see if I can&rsquo;t help sort things
 out.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2315,16 +2374,6 @@ reading the documentation for the plugins you think could be useful to you so
 that you can fully utilize them. Be sure to comment on the commits with
 questions if you&rsquo;re stuck or are wondering why your setup doesn&rsquo;t look similar
 to one of the above!</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2362,16 +2411,6 @@ pull you&rsquo;ll get a message from GitHub asking to update the remote URLs.</p
 <p>I tried to update all links referencing Z1MM32M4N to use the new username, but
 I&rsquo;m sure I&rsquo;ve missed a few. If you find a &ldquo;broken&rdquo; link, shoot me a message
 letting me know!</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2535,16 +2574,6 @@ the revised versions of the above aliases that I use on older machines:</p>
 
 <p>The only real difference is that all the remotes, branches, and tags are blue,
 instead of being configurable in you <code>~/.gitconfig</code> file.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2720,16 +2749,6 @@ a typeset homework.</p>
 <p>I&rsquo;ve make a lot of other LaTeX-related posts. Be sure to <a href="https://blog.jez.io/categories#latex">check them out</a>
 as well! My hope is that you find something that makes developing LaTeX just
 that much easier.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2773,16 +2792,6 @@ manipulate the window arrangements.</p>
 <p>After looking into it a little more, it looks like there are other OS X tools
 for spitting the screen into two panes, like <a href="http://www.bettertouchtool.net/">BetterTouchTool</a>, though I
 haven&rsquo;t actually tried any of them out.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -2899,214 +2908,6 @@ solution.</p>
 <p>Then I discovered <a href="https://github.com/gorhill/uBlock">μBlock</a>, an &ldquo;efficient blocker for Chromium and
 Firefox.&rdquo; The fancy graphs on it&rsquo;s homepage convinced me to give it a shot, and
 from what I can tell so far it&rsquo;s responsive and effective.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Intro to Columns in HTML]]></title>
-    <link href="https://blog.jez.io/2014/12/26/intro-to-columns-in-html/"/>
-    <updated>2014-12-26T13:00:00-05:00</updated>
-    <id>https://blog.jez.io/2014/12/26/intro-to-columns-in-html</id>
-    <content type="html"><![CDATA[<p>HTML and CSS can be frustrating when first starting out. Despite all you try, nothing is in the right place. I&rsquo;ve advised more than a few friends on how to figure out this mystery and I&rsquo;ve noticed a pattern: people don&rsquo;t realize they should be using a grid.</p>
-
-<!-- more -->
-
-
-<h2>Positioning Content</h2>
-
-<p>When something doesn&rsquo;t align correctly on the page, a natural phrase to Google is &ldquo;make div align right&rdquo; or &ldquo;move div up.&rdquo; In other media where content is positioned absolutely, like when using text boxes in Microsoft Word, these might be the right queries. With HTML &amp; CSS, though, they&rsquo;re off point. Don&rsquo;t get me wrong, there&rsquo;s definitely a time for <code>position: absolute</code>, but if this comes up when you&rsquo;re trying to make grids you&rsquo;re likely on the wrong path.</p>
-
-<p>In HTML, the page is drawn from top to bottom, left to right. This means that your page ends up being aligned how words in a book are. Once the first word has taken up a certain amount of space, the next word starts filling up the space after it. The trick then, is knowing <em>how much</em> space the first item takes up, and how to resize it appropriately so that the second item &ldquo;falls into place.&rdquo;</p>
-
-<h2>Blocks and Inline Elements</h2>
-
-<p>The easiest way to explain block and inline elements is to continue our book analogy. Block elements are like titles and headings&mdash;they take up the entire page width, spanning from the left border to the right border. That&rsquo;s why if you put two headings as close as possible to each other, they&rsquo;ll still each have their own lines. There&rsquo;s no &ldquo;room&rdquo; for it to be any other way! Meanwhile, inline elements are like individual words. Where one word stops, the next one begins. A word takes up no more space than is required to size it compactly.</p>
-
-<p>Disregarding some special cases, <em>every HTML element</em> falls into one of these two categories. Below are some examples of block elements and inline elements:</p>
-
-<table>
-<thead>
-<tr>
-<th style="text-align:center;"> Block </th>
-<th style="text-align:center;"> Inline   </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center;"> <code>div</code> </td>
-<td style="text-align:center;"> <code>span</code>   </td>
-</tr>
-<tr>
-<td style="text-align:center;"> <code>h1</code>  </td>
-<td style="text-align:center;"> <code>a</code>      </td>
-</tr>
-<tr>
-<td style="text-align:center;"> <code>p</code>   </td>
-<td style="text-align:center;"> <code>strong</code> </td>
-</tr>
-<tr>
-<td style="text-align:center;"> <code>ul</code>  </td>
-<td style="text-align:center;"> <code>em</code>  </td>
-</tr>
-<tr>
-<td style="text-align:center;"> <code>li</code>  </td>
-<td style="text-align:center;"> <code>br</code>     </td>
-</tr>
-<tr>
-<td style="text-align:center;"> <code>pre</code> </td>
-<td style="text-align:center;"> <code>button</code> </td>
-</tr>
-</tbody>
-</table>
-
-
-<p>We know that we need to use a div to house our columns. The problem is, divs are a block elements, so they&rsquo;ll span the whole width of the page. Luckily, there&rsquo;s a relatively simple (though non-intuitive) fix to get our divs to line up.</p>
-
-<h2>Floating Content</h2>
-
-<p>Let&rsquo;s take a look at what we&rsquo;ve got so far. We want to have two columns, so our HTML is going to look like this:</p>
-
-<figure class='code'><figcaption><span>HTML for two columns</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"row"</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"left column"</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- Your left content here --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"right column"</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- Your right content here --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/div&gt;</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Straightforward enough. Knowing what we know about block elements, what if we just set the width of the columns to 50%?</p>
-
-<figure class='code'><figcaption><span>Half-width columns</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
-</span><span class='line'>  <span class="c">/* arbitrary value for this example */</span>
-</span><span class='line'>  <span class="nl">height</span><span class="p">:</span> <span class="m">300px</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nl">width</span><span class="p">:</span> <span class="m">50%</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">/* so we can tell them appart */</span>
-</span><span class='line'><span class="nc">.left</span> <span class="p">{</span> <span class="nl">background</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.right</span> <span class="p">{</span> <span class="nl">background</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span> <span class="p">}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p><a href="http://codepen.io/Z1MM32M4N/pen/qENvdx?editors=110">Let&rsquo;s try it out and see what happens</a></p>
-
-<p>Uh oh, it looks like our columns aren&rsquo;t next to each other! In fact, it looks suspciously like something we mentioned earlier: if two page headings are as close together as possible, they&rsquo;ll still be placed on their own lines. We can verify that this is the case by using the <a href="https://developer.chrome.com/devtools">Chrome dev tools</a>. Inspecting the red div, we see the culprit:</p>
-
-<p><a class="image-link" href="https://blog.jez.io/images/left-column-margin.png"><img src="https://blog.jez.io/images/left-column-margin.png"></a></p>
-
-<p>For those familiar with the Chrome dev tools, that yellow-orange box is Chrome&rsquo;s attempt to show us the invisible <em>margin</em> present on our div. Since divs are block elements, by default there&rsquo;s enough margin on the div to make it fill up the whole width of the page.</p>
-
-<p>The solution, if you saw from the CodePen, is to add the property <code>float: left</code> to the columns. This essentially instructs the browser not to add that extra margin: instead of being positioned absolutely between the two sides of the screen, it should float to one side and forget about the other. This leaves room for the second column to file into place next to it.</p>
-
-<p>Go <a href="http://codepen.io/Z1MM32M4N/pen/qENvdx?editors=110">back to the pen</a> and uncomment the relevant line. <a href="http://codepen.io/Z1MM32M4N/pen/XJKGdg?editors=110">Observe</a> that we&rsquo;ve accomplished exactly what we wanted to.</p>
-
-<h2>Going Forward</h2>
-
-<p>Cool, this solves the problem of having two columns! What&rsquo;s next?</p>
-
-<ul>
-<li>How would we make three columns? Four columns? Twelve columns?</li>
-<li>Once we have multiple columns, how can we skip columns? (<strong>Hint</strong>: just because we have a column doesn&rsquo;t mean we have to put something in it)</li>
-<li>We can add multiple rows by duplicating the outer &ldquo;row&rdquo; div.
-
-<ul>
-<li>What if we want two 33%-width columns in the first row, but one 33%-width column in the second row? (This is actually a good one to work through. You might want to look into the <code>clear: both</code> CSS property)</li>
-</ul>
-</li>
-<li>The <code>border-left</code> and <code>border-right</code> CSS properties allow us to add a border to a div. We can even use <em>fancy CSS queries</em> (see below) to only add a border in between columns. But if we add a border, the columns overflow onto their own rows! Can you fix this?
-
-<ul>
-<li><strong>Warning</strong>: this one is the hardest. You will want to look into <code>box-sizing: border-box</code> and the &ldquo;CSS box model&rdquo;</li>
-</ul>
-</li>
-</ul>
-
-
-<p>Services like <a href="http://codepen.io/">CodePen</a> and <a href="http://jsfiddle.net/">JSFiddle</a> are excellent tools for trying out little experiments like this. I encourage you to actually tinker around with the <a href="http://codepen.io/Z1MM32M4N/pen/XJKGdg?editors=110">starter code from before</a> to see how you can answer all of these small questions.</p>
-
-<p>As it turns out, HTML/CSS grids are a very heavily studied point of design. So much so, that people build entire <em>CSS frameworks</em> around providing the building blocks to make grids easily. Here&rsquo;s a list:</p>
-
-<ul>
-<li><a href="http://getbootstrap.com/">Bootstrap</a></li>
-<li><a href="http://foundation.zurb.com/">Foundation</a></li>
-<li><a href="http://semantic-ui.com/">Semantic UI</a></li>
-<li><a href="http://unsemantic.com/">Unsemantic</a></li>
-</ul>
-
-
-<p>Bootstrap is by far the most common (once you see it, you&rsquo;ll start to realize how many sites look incredibly similar). However, many people misuse Bootstrap their first time around. <a href="http://www.helloerik.com/the-subtle-magic-behind-why-the-bootstrap-3-grid-works">This article</a> demystifies and documents how and why the Bootstrap 3 grid works.</p>
-
-<p>Even once you&rsquo;re an HTML and CSS master, it can still be frustrating. (Actually, I&rsquo;d believe it if the experts were the most frustrated!). I love answering question and trying to explain things, so if you need some help working through the exercises above or you&rsquo;re working on a personal project, I&rsquo;d love to see if I can help out! Protip: put your code on GitHub or somewhere else that&rsquo;s easily accessible so that it&rsquo;s easy to share changes quickly.</p>
-
-<h2>Appendix</h2>
-
-<p>I mentioned an example about &ldquo;fancy CSS queries&rdquo; above. This is certainly advanced territory, but it&rsquo;s something that I get asked a lot by beginners so here goes.</p>
-
-<p>Basically, the problem is that you only want vertical line separators in between columns, not on the edges. In ASCII art:</p>
-
-<figure class='code'><figcaption><span>Beautiful ASCII Art Diagram</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>
-</span><span class='line'>        |        |
-</span><span class='line'>  col1  |  col2  | col 3
-</span><span class='line'>        |        |
-</span><span class='line'>
-</span><span class='line'>        ^        ^
-</span><span class='line'>        | these. |</span></code></pre></td></tr></table></div></figure>
-
-
-<p>(Thank you, thank you, I know my drawings are beautiful XD).</p>
-
-<p>You already know that you can use <code>.class</code> and <code>#id</code> to select items based on their classes and IDs. But there are <a href="http://code.tutsplus.com/tutorials/the-30-css-selectors-you-must-memorize--net-16048">tons more query selectors</a> you can use! I&rsquo;ll use one to accomplish what we want with the vertical dividers:</p>
-
-<figure class='code'><figcaption><span>Super Fancy CSS Selectors</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.column</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nl">height</span><span class="p">:</span> <span class="m">300px</span><span class="p">;</span>
-</span><span class='line'>  <span class="c">/* Try uncommenting me! */</span>
-</span><span class='line'>  <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
-</span><span class='line'>  <span class="nl">width</span><span class="p">:</span> <span class="m">50%</span><span class="p">;</span>
-</span><span class='line'>  <span class="c">/* this kind of solves the "overflow" exersise I posted above YOLO */</span>
-</span><span class='line'>  <span class="nl">box-sizing</span><span class="p">:</span> <span class="n">border-box</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">/* marvel at the fanciness! */</span>
-</span><span class='line'><span class="nc">.column</span><span class="nd">:not</span><span class="o">(</span><span class="nd">:last-child</span><span class="o">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nl">border-right</span><span class="p">:</span> <span class="m">5px</span> <span class="nb">solid</span> <span class="no">black</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.left</span> <span class="p">{</span> <span class="nl">background</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.right</span> <span class="p">{</span> <span class="nl">background</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span> <span class="p">}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can combine this with a nice padding (<code>padding: 50px</code> should do the trick) on the <code>.column</code>, and you&rsquo;ve got yourself a vertical divider!</p>
-
-<h2>Update</h2>
-
-<p>After writing this post, I discovered a couple articles talking about the new
-<code>flexbox</code> feature. From what I can tell, it looks promising in terms of ease of
-use and browser compatibility. That being said, many common CSS frameworks still
-use <code>float: left</code>, so the content presented here is still good information to
-know. If you&rsquo;re having trouble getting floats to work, though, maybe you should
-look into <code>flexbox</code> instead!</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   
@@ -3202,16 +3003,6 @@ with the per-virtualenv solution above.</p>
 <p>Note: a side effect of this nice sandboxing is that you can normally run
 commands without prefixing them with <code>bundle exec ...</code>, which is actually really
 handy.</p>
-
-<hr />
-
-<h3>Jake on the Web</h3>
-
-<p><a class="image-link" href="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400"><img class="left" src="https://avatars5.githubusercontent.com/u/5544532?v=4&u=4640ad0fd7da51dc2a84c5ae9d11a96677b4d185&s=400" width="135" height="135"></a>
-If you cared enough to read that far, you should consider following me on
-<a href="https://www.github.com/jez/">GitHub</a> or paying a visit to <a href="https://jez.io/">my homepage</a>. If this post was about one of
-my open source projects, make sure to star it on GitHub! I love hearing what
-people think, so feel free to open an issue or send me an email.</p>
 ]]></content>
   </entry>
   

@@ -1,0 +1,300 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Noteworthy Dotfile Hacks - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="Because it's much easier (for me at least) to read a blog post than read the code.
+">
+
+<meta name="keywords" content="dotfiles git tmux vim zsh ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/noteworthy-dotfile-hacks">
+<meta property="og:title" content="Noteworthy Dotfile Hacks">
+<meta property="og:description" content="Because it's much easier (for me at least) to read a blog post than read the code.
+">
+
+  <meta property="og:image" content="">
+
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/noteworthy-dotfile-hacks">
+<link href="/favicon.png" rel="icon">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+<script>Modernizr || document.write('<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
+
+
+
+
+</head>
+
+<body id="post" >
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
+  <button class="dl-trigger">Open Menu</button>
+  <ul class="dl-menu">
+    <li><a href="/">Home</a></li>
+    <li><a href="/posts/">All Posts</a></li>
+    <li><a href="/categories/">Posts by Category</a></li>
+    <li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
+  </ul><!-- /.dl-menu -->
+</nav><!-- /.dl-menuwrapper -->
+
+
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <header class="header-title">
+      <div class="header-title-wrap">
+        
+          <h1 class="entry-title">Noteworthy Dotfile Hacks</h1>
+        
+        <h2>March 10, 2015</h2>
+      </div><!-- /.header-title-wrap -->
+    </header>
+    <div class="entry-content">
+      <p>I have hundreds of files and folders in my dotfiles repo, and nearly 1000
+commits&mdash;there are quite a few hidden gems buried in there that generally don&rsquo;t
+get to see the light of day. Rather than wander aimlessly through them, let me
+give you the guided tour.</p>
+
+<!-- more -->
+
+
+<p>I often tell people &ldquo;oh, and you can also go check out my dotfiles repository
+for more cool configurations&rdquo; when I&rsquo;m giving out dotfiles advice. If someone
+gave me this advice, I know I wouldn&rsquo;t follow up, even if I had the utmost awe
+for the recommender. Drudging through config files isn&rsquo;t all that fun, even
+though they can do fun things. Why not get rid of the drudgery?</p>
+
+<p>This post is designed to bring the coolest parts of my dotfiles to the top. It&rsquo;s
+organized by topic, so feel free to skip around.</p>
+
+<p><strong>Note</strong>: throughout this post, I&rsquo;ll be linking to my dotfiles <em>at a specific
+commit</em> on GitHub. While this solves the problem of line-level links breaking on
+updates, it means that you&rsquo;ll almost certainly be looking at out-dated code.
+Make sure to check out the corresponding file on the <code>master</code> branch for the
+most up-to-date version.</p>
+
+<p>Also, I <a href="/2015/03/09/getting-started-with-rcm/">just wrote</a> about one of my biggest dotfile hacks: using rcm
+to keep my dotfiles in sync across machines. Be sure to give it a read if you&rsquo;re
+running into that problem.</p>
+
+<h2><code>tmux</code></h2>
+
+<p>I have a lot of cool stuff going on in my <code>.tmux.conf</code></p>
+
+<ul>
+<li>I <a href="https://github.com/jez/dotfiles/blob/0ca7dfb042e8d0e6790e7142487812517b5a4209/tmux.conf#L1-L4">bind the prefix key to <code>C-f</code></a>, something which I haven&rsquo;t seen
+many people do.  I&rsquo;ve never had a problem with it conflicting with commonly
+used shortcuts, and it&rsquo;s incredibly easy to press (compared with the common
+options of <code>C-a</code> and <code>C-b</code>)</li>
+<li>I integrate with two Vim plugins:
+
+<ul>
+<li><a href="https://github.com/jez/dotfiles/blob/0ca7dfb042e8d0e6790e7142487812517b5a4209/tmux.conf#L18-L27">vim-tmux-navigator</a>, which lets you jump between vim
+splits and tmux splits as if they were the same thing</li>
+<li><a href="https://github.com/jez/dotfiles/blob/0ca7dfb042e8d0e6790e7142487812517b5a4209/tmux.conf#L48-L49">tmuxline</a>, which makes my tmux status bar look just like Vim with
+vim-airline (it even pulls down the colors from your Vim configuration!).</li>
+</ul>
+</li>
+</ul>
+
+
+<h2><code>dircolors</code></h2>
+
+<p>I use the GNU <code>dircolors</code> command to change the colors output by the <code>ls</code>
+program. After running <code>brew install coreutils</code> on OS X, I&rsquo;m able to see the
+colors thanks to <a href="https://github.com/jez/dotfiles/blob/0ca7dfb042e8d0e6790e7142487812517b5a4209/dircolors">this file</a> and <a href="https://github.com/jez/dotfiles/blob/0ca7dfb042e8d0e6790e7142487812517b5a4209/host-Jacobs-MacBook-Air/util/host.sh#L19-L21">this snippet</a> in my zshrc.</p>
+
+<p><a class="image-link" href="https://raw.githubusercontent.com/huyz/dircolors-solarized/master/img/screen-dircolors-in-iTerm2-solarized_dark.png"><img src="https://raw.githubusercontent.com/huyz/dircolors-solarized/master/img/screen-dircolors-in-iTerm2-solarized_dark.png"></a></p>
+
+<p>(image from the <a href="https://github.com/seebi/dircolors-solarized">dircolors-solarized</a> repository on GitHub)</p>
+
+<h2><code>gitconfig</code></h2>
+
+<p>I talked about this <a href="/2015/01/16/mastering-git-log-for-collaboration/">in a previous post</a>, but I have some <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-Jacobs-MacBook-Air/gitconfig#L20-L24">special
+settings</a> in my global gitconfig for adding colored decoration to git
+log commands. Here&rsquo;s a screenshot from that post:</p>
+
+<p><a class="image-link" href="/images/glla-tartanhacks.png"><img src="/images/glla-tartanhacks.png"></a></p>
+
+<h2><code>aklog cs.cmu.edu</code></h2>
+
+<p>For my friends at CMU, I have <code>aklog cs.cmu.edu</code> in <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-andrew/util/host.zshenv#L1">my ~/.zshenv</a>,
+which gets run even when you log in interactively (like what happens when you
+<code>scp</code> something), so that I can copy files from my local machine to the SCS AFS
+space, which is useful for doing things like making handins. Note that the file
+linked to above is a host-specific file that only &ldquo;exists&rdquo; for me on Andrew
+machines. You can read more about my setup <a href="/2015/03/09/getting-started-with-rcm/">in my
+previous post</a>.</p>
+
+<h2>zsh-syntax-highlighting</h2>
+
+<p>I use a <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/util/misc.zsh#L79-L80">zsh plugin</a> to syntax highlight my commands as I type them
+on the command line, similar to how the fish shell does it. It does various
+things, like coloring the command red or green based on whether it exists,
+underlines filenames that exist, highlights filenames that might be misspelled
+in yellow, highlights built-ins like <code>if</code> and <code>for</code> in orange, etc.</p>
+
+<p>Here are some examples from my setup:</p>
+
+<p><a class="image-link" href="/images/zsh-syntax-highlighting-for-loop.png"><img src="/images/zsh-syntax-highlighting-for-loop.png"></a></p>
+
+<p><a class="image-link" href="/images/zsh-syntax-highlighting.png"><img src="/images/zsh-syntax-highlighting.png"></a></p>
+
+<h2>Automatic Dotfile Updates</h2>
+
+<p>I wrote a pretty robust script that reminds me to update my dotfiles and my
+system regularly. All it does is remind me to check for system updates once
+every 24 hours, but it works so well that I had updated my system <code>bash</code> version
+before I even read about Shell Shock!</p>
+
+<p>The relevant links are <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/util/auto-update.sh">here</a> for the core script that I <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/zshrc#L44-L45">source in
+my zshrc</a>, and then the following host specific links:</p>
+
+<ul>
+<li><a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-Jacobs-MacBook-Air/util/host.sh#L69-L86">here</a> for my MacBook</li>
+<li><a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-ghost.zimmerman.io/util/host.sh#L24-L31">here</a> for my Ubuntu VPS</li>
+</ul>
+
+
+<h2>Shell aliases</h2>
+
+<p>I&rsquo;d like to think that my whole <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/util/aliases.sh"><code>aliases.sh</code></a> file is golden, but if
+you&rsquo;re looking for some specific things I like about it, check out my <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/util/aliases.sh#L75-L86"><code>git log</code></a>
+aliases, which I wrote about <a href="/2015/01/16/mastering-git-log-for-collaboration/">here</a>, and my <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/util/aliases.sh#L44-L45"><code>chromemem</code></a> alias, which I wrote about <a href="/2014/12/29/google-chrome-a-memory-hog/">here</a>.</p>
+
+<h2>Ruby Virtualenvs</h2>
+
+<p>I wrote about how I use <a href="/2014/12/22/ruby-virtualenvs/">Python Virtualenvs to sandbox Ruby
+gems</a>, a post in which I dropped some snippets that you can
+use to configure virtualenvwrapper to work with Ruby projects. I actually went
+ahead and <a href="https://github.com/jez/dotfiles/tree/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-Jacobs-MacBook-Air/virtualenvs">fed those files right into rcm</a>, so they&rsquo;ll always be available if I
+ever get a new laptop.</p>
+
+<h2><code>ssh</code></h2>
+
+<p>My hostname on every machine I ssh to for school is <code>jezimmer</code>, but there are
+countless servers I can ssh into (7 for <code>unix.andrew.cmu.edu</code>, 99+ for
+<code>ghc*.ghc.andrew.cmu.edu</code>, 10 for 15-213, the list goes on). <a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/host-Jacobs-MacBook-Air/ssh/config#L7-L19">These
+lines</a> enable me to ssh to any of those machines with just a
+hostname, and the username is assumed to be <code>jezimmer</code>.</p>
+
+<h2>iTerm2</h2>
+
+<p>There&rsquo;s not much to show for this one, but in Preferences > General of iTerm2,
+you can opt to load your iTerm2 preferences from a specific location. I&rsquo;ve set
+this to <code>/Users/jake/.dotfiles</code>, which means that my iTerm2 settings are always
+written to my <code>.dotfiles/</code> directory. If I ever make changes to iTerm2, they get
+propagated as changes that Git picks up on and which I subsequently check into
+Git history.</p>
+
+<h2>Vim</h2>
+
+<p>I&rsquo;m in love with my Vim setup. If you&rsquo;re looking for help getting started
+configuring Vim, you should checkout the <a href="https://github.com/jez/vim-as-an-ide">Vim plugins workshop I put
+together</a>, which gets you started with a &ldquo;fully-configured&rdquo; Vim
+setup. Once you think you&rsquo;ve &ldquo;mastered&rdquo; that and you&rsquo;re ready for more, here are
+a list of things I&rsquo;m proud of in my <code>.vimrc</code>:</p>
+
+<ul>
+<li><a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/vimrc#L65-L67"><code>set breakindent</code></a> A feature new in Vim 7.4, this allows you to
+align wrapped text at the same indentation level as the preceding text.</li>
+<li><a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/vimrc#L100-L106">these mappings</a>, which let me move around (move up and down in
+particular) in long lines just as if they were short.</li>
+<li><a href="https://github.com/jez/dotfiles/blob/eba0202443de6bcc171dbe6bc133fa9fe02357f7/vimrc#L90-L91">this mapping</a>, which lets me open Vim help pages in new tabs</li>
+</ul>
+
+
+<h2>Other</h2>
+
+<p>I&rsquo;ve only highlighted a fraction of my configuration files, but I think I&rsquo;ve
+managed to capture a good portion of them. If you thought that one of these
+snippets was useful, are having trouble getting something to work, or have
+something interesting to share, leave a comment below!</p>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="/categories/#dotfiles" title="Pages tagged dotfiles" class="tag">dotfiles</a><a href="/categories/#git" title="Pages tagged git" class="tag">git</a><a href="/categories/#tmux" title="Pages tagged tmux" class="tag">tmux</a><a href="/categories/#vim" title="Pages tagged vim" class="tag">vim</a><a href="/categories/#zsh" title="Pages tagged zsh" class="tag">zsh</a></span>
+        <span class="entry-date date published updated"><time datetime="2015-03-10T01:22:33-04:00">March 10, 2015</time></span>
+        
+      </footer>
+    </div><!-- /.entry-content -->
+    
+      <div class="read-more">
+        
+          <div class="read-more-header">
+            <a href="/if-else-purity/" class="btn">Read More</a>
+          </div><!-- /.read-more-header -->
+          <div class="read-more-content">
+            <h3><a href="/if-else-purity/" title="If, Else, and Purity">If, Else, and Purity</a></h3>
+            <p>I prefer to let the language I&#8217;m using think on my behalf as much aspossible. Ideally, the language is rich enough that the proof &hellip;&hellip; <a href="/if-else-purity/"> Continue reading</a></p>
+          </div><!-- /.read-more-content -->
+        
+        <div class="read-more-list">
+          
+            <div class="list-item">
+              <h4><a href="/haskell-development-with-neovim/" title="Haskell Development with Neovim">Haskell Development with Neovim</a></h4>
+              <span>Published on July 16, 2017</span>
+            </div><!-- /.list-item -->
+          
+            <div class="list-item">
+              <h4><a href="/reach-for-markdown-not-latex/" title="Reach for Markdown, not LaTeX">Reach for Markdown, not LaTeX</a></h4>
+              <span>Published on February 26, 2017</span>
+            </div><!-- /.list-item -->
+          
+        </div><!-- /.read-more-list -->
+      </div><!-- /.read-more -->
+    
+    
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2017 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+
+	        
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="/javascripts/scripts.min.js"></script>
+&#8211;>
+	        
+
+</body>
+</html>

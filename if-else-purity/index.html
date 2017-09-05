@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>If, Else, and Purity - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+
+<meta name="keywords" content=" ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/if-else-purity">
+<meta property="og:title" content="If, Else, and Purity">
+<meta property="og:description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+
+  <meta property="og:image" content="">
+
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/if-else-purity">
+<link href="/favicon.png" rel="icon">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+<script>Modernizr || document.write('<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
+
+
+
+
+</head>
+
+<body id="post" >
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
+  <button class="dl-trigger">Open Menu</button>
+  <ul class="dl-menu">
+    <li><a href="/">Home</a></li>
+    <li><a href="/posts/">All Posts</a></li>
+    <li><a href="/categories/">Posts by Category</a></li>
+    <li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
+  </ul><!-- /.dl-menu -->
+</nav><!-- /.dl-menuwrapper -->
+
+
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <header class="header-title">
+      <div class="header-title-wrap">
+        
+          <h1 class="entry-title">If, Else, and Purity</h1>
+        
+        <h2>September 01, 2017</h2>
+      </div><!-- /.header-title-wrap -->
+    </header>
+    <div class="entry-content">
+      <p>I prefer to let the language I&rsquo;m using think on my behalf as much as
+possible. Ideally, the language is rich enough that the proof of
+correctness is inherent in the code I&rsquo;ve written. Having experience with
+these sorts of languages informs how I structure my code even when I&rsquo;m
+using other languages.</p>
+
+<!-- more -->
+
+
+<p>To see what I mean, let&rsquo;s take a look at some code:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">getErrors</span> <span class="o">=</span> <span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">let</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">moment</span><span class="p">(</span><span class="nx">date</span><span class="p">,</span> <span class="s1">'YYYY-MM-DD'</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">isValid</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">'error error-date'</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">classNames</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Especially when writing short functions like this one, I have a few
+goals in mind:</p>
+
+<ul>
+<li><p>Correctness should be obvious.</p>
+
+<p>Judging correctness usually comes down to exhaustiveness&mdash;especially
+for code like the above. Every case should be accounted for.</p></li>
+<li><p>Let&rsquo;s make sure it&rsquo;s pure.</p>
+
+<p>Purity is important because it makes testing and refactoring easy.
+Pure functions are also compose well with others.</p></li>
+<li><p>The intent should be immediately obvious.</p>
+
+<p>Readability enables collaboration and guards the code against a future
+me that might not remember what&rsquo;s on my mind right now.</p></li>
+</ul>
+
+
+<p>For this snippet in particular, we can actually improve along all three
+axes (exhaustiveness, purity, and readability) with one easy trick:
+match up the <code>if</code> with an <code>else</code>. Here&rsquo;s what it would look like, and
+then we&rsquo;ll break down why such a simple technique works so well.</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">getErrors</span> <span class="o">=</span> <span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">moment</span><span class="p">(</span><span class="nx">date</span><span class="p">,</span> <span class="s1">'YYYY-MM-DD'</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">isValid</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">'error error-date'</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">''</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Correctness</h2>
+
+<p>Understanding correctness of code really comes down to <em>proving</em> that
+the code does the right thing. What tools do we have as programmers for
+proving the correctness of our code?</p>
+
+<ul>
+<li><strong>Unit tests</strong> prove that the code correct for specific inputs.</li>
+<li><strong>Type systems</strong> prove the absence of (certain kinds of)
+incorrectness.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
+<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
+us.</li>
+<li><strong>Program authors</strong> can prove the correctness of their code (i.e., with a
+traditional pen-and-paper proof).</li>
+</ul>
+
+
+<p>The first three are exciting because they involve a computer doing most
+of the work for us! That said, none of the first three are as universally
+applicable as the last: doing the proof ourself. What does writing
+proofs have to do with correctness of <code>if</code>s? Consider how we&rsquo;d write a
+proof by cases:</p>
+
+<ul>
+<li>identify the cases,</li>
+<li>establish that the cases are exhaustive, and finally</li>
+<li>prove the claim in each case.</li>
+</ul>
+
+
+<p>I use this same process when I&rsquo;m writing code with branches! &ldquo;Proving
+the claim&rdquo; is just another way of saying &ldquo;returning the right value.&rdquo;
+We can avoid doing the second step ourselves! If we just match every
+<code>if</code> with an <code>else</code>, we&rsquo;ll automatically know that our logic is
+exhaustive. This, in turn, makes the correctness proof less toilsome.</p>
+
+<h2>Purity</h2>
+
+<p>A cool way to understand purity is using what&rsquo;s known as a &ldquo;modal
+separation.&rdquo; This is a really fancy way to say that we have
+&ldquo;expressions&rdquo; which are pure and always evaluate to a value, alongside
+&ldquo;commands&rdquo; which are impure and are executed for their side effects.
+If you&rsquo;ve ever used Haskell, you&rsquo;re already familiar with this
+notion&mdash;we only need <code>do</code> notation when we need to write impure (or
+&ldquo;monadic&rdquo;) code.</p>
+
+<p>In an expression language, every <code>if</code> <em>must</em> have an <code>else</code>; for the
+entire <code>if</code> expression to be used as a value, both branches must in turn
+evaluate to values. It&rsquo;s only when we move to a language with commands
+where it makes sense to allow omitting the <code>else</code> branch.</p>
+
+<p>An <code>if</code> <em>statement</em> (as opposed to an <code>if</code> expression) is a command;
+it&rsquo;s useful for running side-effectful code. Sometimes, we don&rsquo;t want
+one of the branches to have any side effects (for example, because the
+state of the world doesn&rsquo;t need to be changed). Languages with commands
+allow you to omit the <code>else</code>.</p>
+
+<p>What does this mean for us? Every pure function can be written where the
+<code>if</code> is matched with an <code>else</code>. Put another way, an unmatched <code>if</code> is a
+likely indicator that the code I&rsquo;ve written is impure. Using this
+indicator makes me more aware of when I&rsquo;m dealing with impure code,
+alerting me to handle it appropriately. For example, I might want to
+factor out as much of the pure code into a separate helper function.</p>
+
+<h2>Readability</h2>
+
+<p>Explicitly partitioning code into the <code>if</code> branch and the <code>else</code> branch
+makes it easier for me to read code. Since the code has been explicitly
+partitioned in two, I can read each half by itself. When an <code>if</code> is
+unmatched, this partition breaks down. The <code>else</code> branch of my code is
+implicitly &ldquo;everything else,&rdquo; which is no longer mutually exclusive with
+the <code>if</code> branch.</p>
+
+<p>Note, though, that there&rsquo;s a bit of a balance when it comes to
+readability. Sometimes matching every <code>if</code> leads to deeply nested code.
+In these cases, it might be better to flatten the nesting to a chain of
+unmatched <code>if</code>s that return early if there&rsquo;s an error. Even still, this
+moves the function from expression-dominated to command-dominated, so
+the usual caveat still applies: maybe we want to factor the pure part
+out into a separate function.</p>
+
+<p>Sometimes I&rsquo;m okay with being impure (maybe I&rsquo;m going for &ldquo;benign
+effects&rdquo;), and I&rsquo;m considering an unmatched <code>if</code> as a potential way to
+avoid code duplication. When I&rsquo;m making this consideration, I&rsquo;ll almost
+always choose a different technique for de-duplicating code: functions!
+So really, an unmatched <code>if</code> is a poor substitute for proper functions.</p>
+
+<p>Making code readable is important to me, because I like being able to
+share and collaborate with others. Matching <code>if</code>s with <code>else</code>s let me
+write more readable, understandable code.</p>
+
+<h2>Writing Clean Code</h2>
+
+<p>Writing clean code is as much about the small details as it is about the
+large, sweeping brush strokes. There&rsquo;s so much nuance in every
+<code>if-then-else</code>:</p>
+
+<ul>
+<li>They&rsquo;re more likely to be pure.</li>
+<li>It&rsquo;s easier to reason about their correctness.</li>
+<li>Their branches can be understood in isolation.</li>
+</ul>
+
+
+<p>We can get all these benefits for free; we lose nearly nothing for
+giving up unmatched <code>if</code>s!</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Note the double negation here. Type systems themselves don&rsquo;t prove correctness, they prove that there aren&rsquo;t certain kinds of incorrectness. Meanwhile, unit tests are rarely (if ever) exhaustive. This is why testing and type systems are complementary&mdash;one is not a substitute for the other.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+
+      <footer class="entry-meta">
+        <span class="entry-tags"></span>
+        <span class="entry-date date published updated"><time datetime="2017-09-01T01:38:43-04:00">September 01, 2017</time></span>
+        
+      </footer>
+    </div><!-- /.entry-content -->
+    
+      <div class="read-more">
+        
+          <div class="read-more-header">
+            <a href="/haskell-development-with-neovim/" class="btn">Read More</a>
+          </div><!-- /.read-more-header -->
+          <div class="read-more-content">
+            <h3><a href="/haskell-development-with-neovim/" title="Haskell Development with Neovim">Haskell Development with Neovim</a></h3>
+            <p>After a year and a half of using Haskell on and off, I&#8217;ve finally settled on a set of high-quality development and editor tools, using Stack and Neovim.
+ <a href="/haskell-development-with-neovim/"> Continue reading</a></p>
+          </div><!-- /.read-more-content -->
+        
+        <div class="read-more-list">
+          
+            <div class="list-item">
+              <h4><a href="/reach-for-markdown-not-latex/" title="Reach for Markdown, not LaTeX">Reach for Markdown, not LaTeX</a></h4>
+              <span>Published on February 26, 2017</span>
+            </div><!-- /.list-item -->
+          
+            <div class="list-item">
+              <h4><a href="/troubleshooting-haskell-stack-setup-on-os-x/" title="Troubleshooting Haskell Stack Setup on OS X">Troubleshooting Haskell Stack Setup on OS X</a></h4>
+              <span>Published on August 03, 2016</span>
+            </div><!-- /.list-item -->
+          
+        </div><!-- /.read-more-list -->
+      </div><!-- /.read-more -->
+    
+    
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2017 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+
+	        
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="/javascripts/scripts.min.js"></script>
+&#8211;>
+	        
+
+</body>
+</html>
