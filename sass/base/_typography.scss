@@ -65,14 +65,21 @@ figcaption {
 
 // Blockquotes
 // --------------------------------------------------
+// Style the blockquotes with a fancy quote character
 blockquote {
-  font-family: $alt-font;
+  margin-left: 40px;
   font-style: italic;
-  border-left: 8px solid $border-color;
-  padding-left: 20px;
-  @media #{$medium} {
-    margin-left: -28px;
-  }
+}
+blockquote > *:first-child {
+  position: relative;
+}
+blockquote > *:first-child::before {
+  content: "“";
+  display: block;
+  position: absolute;
+  font-size: 5rem;
+  top: -1.9rem;
+  left: -3.2rem;
 }
 
 // Footnotes
