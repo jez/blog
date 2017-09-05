@@ -41,11 +41,6 @@ body {
 	a {
 		color: lighten($base-color,60%);
 	}
-	.vcard {
-		&:before {
-			content: " by ";
-		}
-	}
 	.tag {
 		display: inline-block;
 		margin: 4px;
@@ -114,23 +109,6 @@ body {
 .entry-tags {
 	display: block;
 	margin-bottom: 6px;
-}
-// Post Pagination Module
-.pagination {
-	margin: 20px 10px;
-	text-align: center;
-	ul {
-		display: inline;
-		margin-left: 10px;
-		margin-right: 10px;
-	}
-	li {
-		padding-left: 4px;
-		padding-right: 4px;
-	}
-	.current-page {
-		font-weight: 700;
-	}
 }
 
 // Post Index

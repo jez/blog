@@ -35,13 +35,6 @@
         <span class="entry-tags">{% for tag in page.categories %}<a href="{{ root_url }}/categories/#{{ tag | cgi_encode }}" title="Pages tagged {{ tag }}" class="tag">{{ tag }}</a>{% endfor %}</span>
         <span class="entry-date date published updated"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time></span>
         {% if page.modified %}(revised: <span class="entry-date date modified"><time datetime="{{ page.modified }}">{{ page.modified | date: "%m/%d/%Y" }}</time></span>){% endif %}
-        {% if page.share %}<div class="social-share">
-          <ul class="socialcount socialcount-small inline-list">
-            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u={{ canonical }}" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
-            <li class="twitter"><a href="https://twitter.com/intent/tweet?text={{ canonical }}" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
-            <li class="googleplus"><a href="https://plus.google.com/share?url={{ canonical}}" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
-          </ul>
-        </div><!-- /.social-share -->{% endif %}
       </footer>
     </div><!-- /.entry-content -->
     {% if site.related_posts.size %}
