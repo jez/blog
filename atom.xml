@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-09-05T03:27:15-04:00</updated>
+  <updated>2017-09-05T03:28:40-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,185 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[If, Else, and Purity]]></title>
-    <link href="https://blog.jez.io/if-else-purity/"/>
-    <updated>2017-09-01T01:38:43-04:00</updated>
-    <id>https://blog.jez.io/if-else-purity</id>
-    <content type="html"><![CDATA[<p>I prefer to let the language I&rsquo;m using think on my behalf as much as
-possible. Ideally, the language is rich enough that the proof of
-correctness is inherent in the code I&rsquo;ve written. Having experience with
-these sorts of languages informs how I structure my code even when I&rsquo;m
-using other languages.</p>
-
-<!-- more -->
-
-
-<p>To see what I mean, let&rsquo;s take a look at some code:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">getErrors</span> <span class="o">=</span> <span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kd">let</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">moment</span><span class="p">(</span><span class="nx">date</span><span class="p">,</span> <span class="s1">'YYYY-MM-DD'</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">isValid</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">'error error-date'</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="k">return</span> <span class="nx">classNames</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Especially when writing short functions like this one, I have a few
-goals in mind:</p>
-
-<ul>
-<li><p>Correctness should be obvious.</p>
-
-<p>Judging correctness usually comes down to exhaustiveness&mdash;especially
-for code like the above. Every case should be accounted for.</p></li>
-<li><p>Let&rsquo;s make sure it&rsquo;s pure.</p>
-
-<p>Purity is important because it makes testing and refactoring easy.
-Pure functions are also compose well with others.</p></li>
-<li><p>The intent should be immediately obvious.</p>
-
-<p>Readability enables collaboration and guards the code against a future
-me that might not remember what&rsquo;s on my mind right now.</p></li>
-</ul>
-
-
-<p>For this snippet in particular, we can actually improve along all three
-axes (exhaustiveness, purity, and readability) with one easy trick:
-match up the <code>if</code> with an <code>else</code>. Here&rsquo;s what it would look like, and
-then we&rsquo;ll break down why such a simple technique works so well.</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">getErrors</span> <span class="o">=</span> <span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">moment</span><span class="p">(</span><span class="nx">date</span><span class="p">,</span> <span class="s1">'YYYY-MM-DD'</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">isValid</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="s1">'error error-date'</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="s1">''</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Correctness</h2>
-
-<p>Understanding correctness of code really comes down to <em>proving</em> that
-the code does the right thing. What tools do we have as programmers for
-proving the correctness of our code?</p>
-
-<ul>
-<li><strong>Unit tests</strong> prove that the code correct for specific inputs.</li>
-<li><strong>Type systems</strong> prove the absence of (certain kinds of)
-incorrectness.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
-<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
-us.</li>
-<li><strong>Program authors</strong> can prove the correctness of their code (i.e., with a
-traditional pen-and-paper proof).</li>
-</ul>
-
-
-<p>The first three are exciting because they involve a computer doing most
-of the work for us! That said, none of the first three are as universally
-applicable as the last: doing the proof ourself. What does writing
-proofs have to do with correctness of <code>if</code>s? Consider how we&rsquo;d write a
-proof by cases:</p>
-
-<ul>
-<li>identify the cases,</li>
-<li>establish that the cases are exhaustive, and finally</li>
-<li>prove the claim in each case.</li>
-</ul>
-
-
-<p>I use this same process when I&rsquo;m writing code with branches! &ldquo;Proving
-the claim&rdquo; is just another way of saying &ldquo;returning the right value.&rdquo;
-We can avoid doing the second step ourselves! If we just match every
-<code>if</code> with an <code>else</code>, we&rsquo;ll automatically know that our logic is
-exhaustive. This, in turn, makes the correctness proof less toilsome.</p>
-
-<h2>Purity</h2>
-
-<p>A cool way to understand purity is using what&rsquo;s known as a &ldquo;modal
-separation.&rdquo; This is a really fancy way to say that we have
-&ldquo;expressions&rdquo; which are pure and always evaluate to a value, alongside
-&ldquo;commands&rdquo; which are impure and are executed for their side effects.
-If you&rsquo;ve ever used Haskell, you&rsquo;re already familiar with this
-notion&mdash;we only need <code>do</code> notation when we need to write impure (or
-&ldquo;monadic&rdquo;) code.</p>
-
-<p>In an expression language, every <code>if</code> <em>must</em> have an <code>else</code>; for the
-entire <code>if</code> expression to be used as a value, both branches must in turn
-evaluate to values. It&rsquo;s only when we move to a language with commands
-where it makes sense to allow omitting the <code>else</code> branch.</p>
-
-<p>An <code>if</code> <em>statement</em> (as opposed to an <code>if</code> expression) is a command;
-it&rsquo;s useful for running side-effectful code. Sometimes, we don&rsquo;t want
-one of the branches to have any side effects (for example, because the
-state of the world doesn&rsquo;t need to be changed). Languages with commands
-allow you to omit the <code>else</code>.</p>
-
-<p>What does this mean for us? Every pure function can be written where the
-<code>if</code> is matched with an <code>else</code>. Put another way, an unmatched <code>if</code> is a
-likely indicator that the code I&rsquo;ve written is impure. Using this
-indicator makes me more aware of when I&rsquo;m dealing with impure code,
-alerting me to handle it appropriately. For example, I might want to
-factor out as much of the pure code into a separate helper function.</p>
-
-<h2>Readability</h2>
-
-<p>Explicitly partitioning code into the <code>if</code> branch and the <code>else</code> branch
-makes it easier for me to read code. Since the code has been explicitly
-partitioned in two, I can read each half by itself. When an <code>if</code> is
-unmatched, this partition breaks down. The <code>else</code> branch of my code is
-implicitly &ldquo;everything else,&rdquo; which is no longer mutually exclusive with
-the <code>if</code> branch.</p>
-
-<p>Note, though, that there&rsquo;s a bit of a balance when it comes to
-readability. Sometimes matching every <code>if</code> leads to deeply nested code.
-In these cases, it might be better to flatten the nesting to a chain of
-unmatched <code>if</code>s that return early if there&rsquo;s an error. Even still, this
-moves the function from expression-dominated to command-dominated, so
-the usual caveat still applies: maybe we want to factor the pure part
-out into a separate function.</p>
-
-<p>Sometimes I&rsquo;m okay with being impure (maybe I&rsquo;m going for &ldquo;benign
-effects&rdquo;), and I&rsquo;m considering an unmatched <code>if</code> as a potential way to
-avoid code duplication. When I&rsquo;m making this consideration, I&rsquo;ll almost
-always choose a different technique for de-duplicating code: functions!
-So really, an unmatched <code>if</code> is a poor substitute for proper functions.</p>
-
-<p>Making code readable is important to me, because I like being able to
-share and collaborate with others. Matching <code>if</code>s with <code>else</code>s let me
-write more readable, understandable code.</p>
-
-<h2>Writing Clean Code</h2>
-
-<p>Writing clean code is as much about the small details as it is about the
-large, sweeping brush strokes. There&rsquo;s so much nuance in every
-<code>if-then-else</code>:</p>
-
-<ul>
-<li>They&rsquo;re more likely to be pure.</li>
-<li>It&rsquo;s easier to reason about their correctness.</li>
-<li>Their branches can be understood in isolation.</li>
-</ul>
-
-
-<p>We can get all these benefits for free; we lose nearly nothing for
-giving up unmatched <code>if</code>s!</p>
-
-<!-- vim:tw=72
--->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>Note the double negation here. Type systems themselves don&rsquo;t prove correctness, they prove that there aren&rsquo;t certain kinds of incorrectness. Meanwhile, unit tests are rarely (if ever) exhaustive. This is why testing and type systems are complementary&mdash;one is not a substitute for the other.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Haskell Development with Neovim]]></title>
@@ -3003,6 +2824,83 @@ with the per-virtualenv solution above.</p>
 <p>Note: a side effect of this nice sandboxing is that you can normally run
 commands without prefixing them with <code>bundle exec ...</code>, which is actually really
 handy.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vim as a Man Page Viewer]]></title>
+    <link href="https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer/"/>
+    <updated>2014-12-20T21:17:46-05:00</updated>
+    <id>https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer</id>
+    <content type="html"><![CDATA[<p>Man pages are an essential part of every developer&rsquo;s workflow. Unfortunately,
+the default system pager <code>less</code> isn&rsquo;t the best interface. That&rsquo;s why I wrote a
+Vim plugin and a short shell function to take care of opening man pages in Vim.</p>
+
+<!-- more -->
+
+
+<h2>The Plugin</h2>
+
+<p>If you&rsquo;re eager to dive right into the source or to install the plugin, head on
+over to the <a href="https://github.com/jez/vim-superman">GitHub repository</a>. It&rsquo;s a whopping 32 SLOC, so feel
+free to peek under the hood.</p>
+
+<h2>Why?</h2>
+
+<p>You might be thinking, &ldquo;But Jake, <code>man</code> works just fine for me, why would I
+switch?&rdquo; I&rsquo;m glad you asked!</p>
+
+<h3>Mouse Support</h3>
+
+<p>The first reason why I was interested in getting man pages to open in Vim was
+because I wanted to be able to scroll with the mouse. When I have to read man
+pages for a long time, usually as a part of some more all-encompasing bit of
+research, I find scrolling to be a much better interface for quickly perusing
+the content of a man page.</p>
+
+<h3>Syntax Highlighting</h3>
+
+<p>As it turns out, man pages have a syntax to them, and Vim does a pretty
+excellent job at highlighting them. Rather than talk about it, here are some
+screenshots. Note how code samples (C system calls and library functions) are
+also syntax highlighted appropriately.</p>
+
+<figure class='code'><figcaption><span>Example 1</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>vman vim</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a class="image-link" href="https://blog.jez.io/images/vim.1.png"><img src="https://blog.jez.io/images/vim.1.png"></a></p>
+
+<figure class='code'><figcaption><span>Example 2</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>vman 3 <span class="nb">printf</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p><a class="image-link" href="https://blog.jez.io/images/printf.3.png"><img src="https://blog.jez.io/images/printf.3.png"></a></p>
+
+<h3>All the benefits of Vim</h3>
+
+<p>While <code>less</code> makes a good effort to emulate certain Vim keybindings (or maybe
+it&rsquo;s the other way around, I don&rsquo;t know which came first), <code>less</code> certainly
+falls short of the full power of Vim.</p>
+
+<p>For example, once you&rsquo;ve opened a man page in Vim, you can open a new tab or
+split side-by-side with the man page. Especially if you&rsquo;re switching between Vim
+and the man page often, being able to open man pages in tabs or splits is
+invaluable.</p>
+
+<h2>Mine doesn&rsquo;t look like yours!</h2>
+
+<p>A couple of my other plugins are showing in the screenshots above. I&rsquo;m using the
+<a href="https://github.com/altercation/vim-colors-solarized">Solarized Dark color scheme</a>, the plugin
+<a href="https://github.com/bling/vim-airline">vim-airline</a> to take over the statuslines at the very top and
+bottom, and iTerm2 on Mac OS X 10.10.</p>
+
+<p>You can see my complete configuration <a href="https://github.com/jez/dotfiles">on GitHub</a>.</p>
+
+<h2>Feedback</h2>
+
+<p>As a matter of fact, this was my first Vim plugin! If you notice anything out of
+place, even if it&rsquo;s a small detail, I&rsquo;d love to hear it. Make no assumptions
+about the reasoning behind why certain decisions were made, because I have none
+XD</p>
 ]]></content>
   </entry>
   
