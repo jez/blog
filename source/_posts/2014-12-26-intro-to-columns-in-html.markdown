@@ -8,6 +8,7 @@ description: >
   A simple introduction to columns and designing with a grid in HTML & CSS.
 share: false
 permalink: /:year/:month/:day/:title/
+published: false
 ---
 
 HTML and CSS can be frustrating when first starting out. Despite all you try, nothing is in the right place. I've advised more than a few friends on how to figure out this mystery and I've noticed a pattern: people don't realize they should be using a grid.
