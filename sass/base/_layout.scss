@@ -36,7 +36,7 @@ body {
 .entry-meta {
 	@include font-rem($footer_fs);
 	text-transform: uppercase;
-  font-family: 'Concourse C3';
+	font-family: 'Concourse Caps';
 	color: lighten($base-color,60%);
 	a {
 		color: lighten($base-color,60%);
@@ -95,9 +95,10 @@ body {
 			margin: 50px auto 30px auto;
 			padding: 50px 80px;
 			> p:first-child {
+				font-weight: 400;
 				@include font-rem($p1_fs);
 				@include line-height($p1_lh);
-        @include margin-after
+				@include margin-after
 			}
 		}
 	}
@@ -162,6 +163,8 @@ body {
 .category h2,
 .archive-year h2 {
   text-align: right;
+  font-family: 'Concourse Caps';
+  font-weight: 600;
 }
 
 
