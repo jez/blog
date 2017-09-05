@@ -118,6 +118,10 @@ task :new_post, :title do |t, args|
     post.puts "categories: "
     post.puts "description: "
     post.puts "---"
+    post.puts ""
+    post.puts ""
+    post.puts "<!-- vim:tw=72"
+    post.puts "-->"
   end
 end
 
