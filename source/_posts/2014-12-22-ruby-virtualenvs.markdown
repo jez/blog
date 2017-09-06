@@ -8,7 +8,9 @@ description: >
   After some research, I found a much better solution to the problem of
   sandboxing Ruby gems.
 share: false
-permalink: /:year/:month/:day/:title/
+permalink: /:title/
+redirect_from:
+- /2014/12/22/ruby-virtualenvs/
 ---
 
 A while back I found a command that removes all Ruby gems installed on a system
