@@ -34,7 +34,7 @@
       <footer class="entry-meta">
         <span class="entry-tags">{% for tag in page.categories %}<a href="{{ root_url }}/categories/#{{ tag | cgi_encode }}" title="Pages tagged {{ tag }}" class="tag">{{ tag }}</a>{% endfor %}</span>
         <span class="entry-date date published updated"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time></span>
-        {% if page.modified %}(revised: <span class="entry-date date modified"><time datetime="{{ page.modified }}">{{ page.modified | date: "%m/%d/%Y" }}</time></span>){% endif %}
+        {% if page.modified %}<br>revised: <span class="entry-date date modified"><time datetime="{{ page.modified }}">{{ page.modified | date: "%B %d, %Y"  }}</time></span>{% endif %}
       </footer>
     </div><!-- /.entry-content -->
     {% if site.related_posts.size %}
