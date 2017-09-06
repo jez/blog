@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-09-05T03:28:40-04:00</updated>
+  <updated>2017-09-06T01:59:36-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,185 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[If, Else, & Purity]]></title>
+    <link href="https://blog.jez.io/if-else-purity/"/>
+    <updated>2017-09-01T01:38:43-04:00</updated>
+    <id>https://blog.jez.io/if-else-purity</id>
+    <content type="html"><![CDATA[<p>I prefer to let the language I&rsquo;m using think on my behalf as much as
+possible. Ideally, the language is rich enough that the proof of
+correctness is inherent in the code I&rsquo;ve written. Even when I use
+looser languages, these principled languages inform the structure of my
+code.</p>
+
+<!-- more -->
+
+
+<p>To see what I mean, let&rsquo;s take a look at some code:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Watch out! We'll improve this snippet shortly.</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">getErrors</span> <span class="o">=</span> <span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">let</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">moment</span><span class="p">(</span><span class="nx">date</span><span class="p">,</span> <span class="s1">'YYYY-MM-DD'</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">isValid</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">'error error-date'</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">classNames</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Especially when writing short functions like this one, I have these
+goals in mind:</p>
+
+<ul>
+<li><p><strong>Correctness</strong> should be obvious.</p>
+
+<p>Judging correctness usually comes down to exhaustiveness&mdash;especially
+for code like the above. Every case should be accounted for.</p></li>
+<li><p>Let&rsquo;s make sure it&rsquo;s <strong>pure</strong>.</p>
+
+<p>Purity is important because it makes testing and refactoring easy.
+Pure functions are also compose well with others.</p></li>
+<li><p>Readers should be able to follow the <strong>intent</strong> easily.</p>
+
+<p>Readability enables collaboration and guards the code against a
+&ldquo;future me&rdquo; that might not remember what&rsquo;s on my mind right now.</p></li>
+</ul>
+
+
+<p>For this snippet in particular, we can actually improve along all three
+axes (correctness, purity, and intent) with one easy trick:
+match up the <code>if</code> with an <code>else</code>. Here&rsquo;s what it would look like, and
+then we&rsquo;ll break down why such a simple technique works so well.</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Compare this improved snippet with the one above.</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">getErrors</span> <span class="o">=</span> <span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">moment</span><span class="p">(</span><span class="nx">date</span><span class="p">,</span> <span class="s1">'YYYY-MM-DD'</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">isValid</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">'error error-date'</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">''</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Correctness</h2>
+
+<p>Understanding correctness of code really comes down to <em>proving</em> that
+the code does the right thing. What tools do we have as programmers for
+proving the correctness of our code?</p>
+
+<ul>
+<li><strong>Unit tests</strong> prove that the code is correct for specific inputs.</li>
+<li><strong>Type systems</strong> prove the absence of (certain kinds of)
+incorrectness.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
+<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
+us.</li>
+<li><strong>Program authors</strong> can prove the correctness of their code (i.e., with a
+traditional pen-and-paper proof).</li>
+</ul>
+
+
+<p>The first three are exciting because they involve a computer doing most
+of the work for us! That said, none of the first three are as universally
+applicable as the last: doing the proof ourself. What does writing
+proofs have to do with correctness of <code>if</code>s? Consider how we&rsquo;d write a
+proof by cases. We&rsquo;d:</p>
+
+<ol>
+<li>identify the cases,</li>
+<li>establish that the cases are exhaustive, and finally</li>
+<li>prove the claim in each case.</li>
+</ol>
+
+
+<p>I use this same process to write code with cases! &ldquo;Proving
+the claim&rdquo; is just another way of saying &ldquo;returning the right value.&rdquo;
+And better yet, we can avoid doing the second step ourselves! If we just
+match every <code>if</code> with an <code>else</code>, we&rsquo;ll automatically know that our logic
+is exhaustive. This, in turn, makes the correctness proof less toilsome.</p>
+
+<h2>Purity</h2>
+
+<p>A cool way to understand purity is using what&rsquo;s known as a &ldquo;modal
+separation.&rdquo; This is a really fancy way to say that we have
+<strong>expressions</strong> which are pure and always evaluate to a value, alongside
+<strong>commands</strong> which are impure and are executed for their side effects.
+If you&rsquo;ve ever used Haskell, you&rsquo;re already familiar with this
+notion&mdash;we only need <code>do</code> notation when we need to write impure (or
+&ldquo;monadic&rdquo;) code.</p>
+
+<p>In an expression language, every <code>if</code> <em>must</em> have an <code>else</code>; for the
+entire <code>if</code> expression to be used as a value, both branches must in turn
+evaluate to values. It&rsquo;s only when we move to a language with commands
+where it makes sense to allow omitting the <code>else</code> branch.</p>
+
+<p>An <code>if</code> <em>statement</em> (as opposed to an <code>if</code> expression) is a command;
+it&rsquo;s useful for running side-effectful code. Sometimes, we don&rsquo;t want
+one of the branches to have any side effects (for example, because the
+state of the world doesn&rsquo;t need to be changed). Languages with commands
+allow omitting the <code>else</code>.</p>
+
+<p>What does this mean for us? Every pure function can be written where the
+<code>if</code> is matched with an <code>else</code>. Put another way, an unmatched <code>if</code> is a
+likely indicator that the code I&rsquo;ve written is impure.</p>
+
+<p>Using this indicator makes me more aware of when I&rsquo;m dealing with impure
+code, alerting me to handle it appropriately. For example, I might want
+to factor out as much of the pure code into a separate helper function.</p>
+
+<h2>Readability</h2>
+
+<p>Explicitly partitioning code into the <code>if</code> branch and the <code>else</code> branch
+makes it easier for me to read code. Since the code has been explicitly
+split in two, I can read each half by itself. When an <code>if</code> is unmatched,
+this partition breaks down. The <code>if</code> branch runs into the implicit
+<code>else</code> branch: that is, the rest of the function. Now I&rsquo;m left reasoning
+about code knowing that the condition might be <code>true</code> or <code>false</code>. And things
+only get (exponentially) worse when we add in more unmatched <code>if</code>s.</p>
+
+<p>Note, though, that there&rsquo;s a bit of a balance when it comes to
+readability. Sometimes matching every <code>if</code> leads to deeply nested code.
+In these cases, it might be better to flatten the nesting to a chain of
+unmatched <code>if</code>s that return early if there&rsquo;s an error. Even still, this
+moves the function from expression-dominated to command-dominated, so
+the usual caveat still applies: maybe we want to factor the pure part
+out into a separate function.</p>
+
+<p>Making code readable is important for sharing it and collaborating with
+others. Matching <code>if</code>s with <code>else</code>s let me write more readable,
+understandable code.</p>
+
+<h2>Writing Clean Code</h2>
+
+<p>Writing clean code is as much about the small details as it is about the
+large, sweeping brush strokes. There&rsquo;s so much nuance in every
+<code>if-then-else</code>:</p>
+
+<ul>
+<li>They&rsquo;re more likely to be <strong>pure</strong>.</li>
+<li>It&rsquo;s easier to reason about their <strong>correctness</strong>.</li>
+<li>We can dissect their <strong>intent</strong> piece-by-piece</li>
+</ul>
+
+
+<p>And we can get all these benefits for free! We lose nearly nothing for
+giving up unmatched <code>if</code>s. Even though I was writing these examples with
+JavaScript, we improve our code by considering how we&rsquo;d write it in a
+more principled language.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Note the double negation here. Type systems themselves don&rsquo;t prove correctness, they prove that there aren&rsquo;t certain kinds of incorrectness, namely: type errors. Meanwhile, unit tests are rarely (if ever) exhaustive. This is why testing and type systems are complementary&mdash;one is not a substitute for the other.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Haskell Development with Neovim]]></title>
@@ -323,9 +502,9 @@ advantage of that!</p>
   
   <entry>
     <title type="html"><![CDATA[Reach for Markdown, not LaTeX]]></title>
-    <link href="https://blog.jez.io/reach-for-markdown-not-latex/"/>
+    <link href="https://blog.jez.io/reach-for-markdown/"/>
     <updated>2017-02-26T21:26:53-05:00</updated>
-    <id>https://blog.jez.io/reach-for-markdown-not-latex</id>
+    <id>https://blog.jez.io/reach-for-markdown</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve written <a href="https://blog.jez.io/2014/10/06/offline-latex-development/">in the past</a> (<a href="https://blog.jez.io/2015/01/10/offline-latex-development-part-2/">twice</a>) about how to
 streamline the writing process when using LaTeX. Since then, I&rsquo;ve found that I
 enjoy writing even more when I don&rsquo;t have to reach for LaTeX at all. By reaching
@@ -1987,9 +2166,9 @@ out.</p>
   
   <entry>
     <title type="html"><![CDATA[Vim as an IDE]]></title>
-    <link href="https://blog.jez.io/2015/03/03/vim-as-an-ide/"/>
+    <link href="https://blog.jez.io/vim-as-an-ide/"/>
     <updated>2015-03-03T00:01:19-05:00</updated>
-    <id>https://blog.jez.io/2015/03/03/vim-as-an-ide</id>
+    <id>https://blog.jez.io/vim-as-an-ide</id>
     <content type="html"><![CDATA[<p>I took some screenshots to accompany my <a href="https://github.com/jez/vim-as-an-ide">Vim as an IDE</a> repo on GitHub.
 This is by no means a complete walkthrough! It&rsquo;s just a reference for those who
 are curious if they installed everything correctly. This is what my system looks
@@ -2237,164 +2416,110 @@ letting me know!</p>
   
   <entry>
     <title type="html"><![CDATA[Mastering git log for Collaboration]]></title>
-    <link href="https://blog.jez.io/2015/01/16/mastering-git-log-for-collaboration/"/>
+    <link href="https://blog.jez.io/git-log/"/>
     <updated>2015-01-16T20:57:01-05:00</updated>
-    <id>https://blog.jez.io/2015/01/16/mastering-git-log-for-collaboration</id>
-    <content type="html"><![CDATA[<p>Git is an incredibly powerful platform for collaboration. The ability to create
-light-weight branches as well as push to and pull from multiple remote repos is
-the foundation of this power. Learning to harness the <code>git log</code> command will
-help with visualizing all the information that supports these features, refining
-and invigorating your current workflows.</p>
+    <id>https://blog.jez.io/git-log</id>
+    <content type="html"><![CDATA[<p>One of the first Git commands people learn is <code>git status</code>. It&rsquo;s a great command
+to understand the state of your personal repository, but it tells you nothing
+about the structure of your teammates&#8217; branches or remotes. Luckily, <code>git log</code>
+visualises the state of a Git repository at any time, so we can collaborate
+seamlessly.</p>
 
 <!-- more -->
 
 
-<h2>Learn Git Branching</h2>
+<p>This post is going to focus on this one, amazing command. Behold:</p>
 
-<p>Obviously, to take full advantage of the collaborative features of Git, you
-first have to learn how to use Git branching. There&rsquo;s an <a href="http://pcottle.github.io/learnGitBranching/">excellent interactive
-tutorial</a> that instructs by converting the Git commands you
-run into fancy web animations. If you have a basic understanding of Git but have
-always wanted to learn about some of its more powerful features, this is the
-best tutorial out there. For a taste of how it works, there&rsquo;s also a
-<a href="http://pcottle.github.io/learnGitBranching/?demo">non-interactive demo</a> that features the animations which make this
-tutorial so well-designed.</p>
-
-<p>After I ran through this tutorial, I felt for the first time like I <em>really</em>
-knew Git. Unfortunately, being a visual learner, I struggled when trying to
-apply the same abstractions to actual git repositories. Shortly thereafter, I
-discovered that the <code>git log</code> command actually has features to replicate many of
-the same visualizations, but from right within the terminal!</p>
-
-<h2><code>git log</code></h2>
-
-<p>The following is a set of shell aliases that let you run <code>git log</code> with a
-lengthy set of flags culminating in some pretty awesome Git logs. I&rsquo;m going to
-leave a discussion of what the individual flags do to the man pages and just
-skip straight to the good part. Feel free to copy and paste these into your
-<code>~/.bashrc</code>, <code>~/.zshrc</code>, or similar file.</p>
-
-<figure class='code'><figcaption><span>pretty git log aliases</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gl</span><span class="o">=</span><span class="s1">'git log --graph --pretty="%C(bold green)%h%Creset%C(auto)%d%Creset %s"'</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git log --graph --oneline --abbrev-commit --decorate --all
 </span><span class='line'>
-</span><span class='line'><span class="c"># pretty Git log, all references</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gll</span><span class="o">=</span><span class="s1">'gl --all'</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># pretty Git log, show authors</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gla</span><span class="o">=</span><span class="s1">'git log --graph --pretty="%C(bold green)%h%Creset %C(yellow)%an%Creset%C(auto)%d%Creset %s"'</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># pretty Git log, all references, show authors</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">glla</span><span class="o">=</span><span class="s1">'gla --all'</span></span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="c"># That's borderlying fearsome! Let's make an alias:</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">gll</span><span class="o">=</span><span class="s2">"git log --graph --oneline --abbrev-commit --decorate --all"</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>As you can see, there are four aliases, and each does something a little
-different. The first, <code>gl</code>, just shows the graph for the current branch. <code>gll</code>
-shows the graph for <em>all</em> branches, including those which may have diverged from
-the current branch. Then there&rsquo;s a variation on each of these, <code>gla</code> and
-<code>glla</code>, which add author information to the logs produced by their
-companion.</p>
+<p>Don&rsquo;t worry about what all the flags are; if you&rsquo;re really curious, <code>git help
+log</code> explains them. What we care about is what information this gives us, and
+how we can leverage it to collaborate in a Git repo with confidence.</p>
 
-<p>On top of it all, I&rsquo;ve customized the colors to work especially nicely if you&rsquo;re
-using the <a href="ethanschoonover.com/solarized">Solarized</a> color scheme in your terminal. If you don&rsquo;t do
-anything but copy the above aliases, the only thing that will look different
-from the screenshots below is the text between the parentheses, which will
-instead all be the same color. To color these the same as below, add this text to
-the end of your <code>~/.gitconfig</code> file:</p>
+<p>Have you copied the alias into your <code>~/.bashrc</code> yet? There&rsquo;s no time like the
+present.</p>
 
-<figure class='code'><figcaption><span>Global Git configuration settings</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>[color "decorate"]
-</span><span class='line'>  head = bold white
-</span><span class='line'>  branch = bold magenta
-</span><span class='line'>  remotebranch = blue
-</span><span class='line'>  tag = bold red</span></code></pre></td></tr></table></div></figure>
+<h2>Using This Alias</h2>
+
+<p>When collaborating on a Git repo, it&rsquo;s important to know how the branch you&rsquo;re
+working on relates to <code>master</code>, and all your teammates&#8217; branches. I might want
+to preview their code, combine the feature I&rsquo;m working on with theirs, take over
+on a certain branch, etc. There are &ldquo;black magic&rdquo; Git incantations that will
+solve these problems for you. The trick is knowing which one you need.</p>
+
+<p>That&rsquo;s where <code>git log</code> comes in. Git is really just a big directed graph of
+commits, each one pointing to the one that came before. At the top of the graph,
+sometimes these directed chains of commits break off from one another. When this
+happens, we say that two branches have &ldquo;diverged.&rdquo; Understanding where divergent
+branches are pretty much the only trick to collaborating on Git repos.</p>
+
+<p>So what does our <code>gll</code> alias do for us? It visualizes the commit structure. In
+particular, if there are divergent branches, we&rsquo;ll see them:</p>
+
+<p><a class="image-link" href="https://blog.jez.io/images/gll-ale.png"><img src="https://blog.jez.io/images/gll-ale.png"></a></p>
+
+<p>Some points about what we&rsquo;re seeing here:</p>
+
+<ul>
+<li><p>Each <code>*</code> represents a commit.</p>
+
+<ul>
+<li>We can see information like commit hash and message next to it.</li>
+</ul>
+</li>
+<li><p>The commits start with most recent at the top, and get older going down.</p></li>
+<li><p>Git is helpful enough to draw quaint little ASCII art lines connecting
+commits.</p></li>
+<li><p>Each commit is &ldquo;decorated&rdquo; with any references that point to that commit.</p>
+
+<ul>
+<li>For example, ref <code>origin/master</code> is equal to commit <code>80c7fbc</code> here.</li>
+</ul>
+</li>
+</ul>
 
 
-<p>Of course, feel free to tinker with these colors to your liking.</p>
+<p>And most importantly: with just a glance, we can see where the divergent
+branches are. Our <code>smlnj-cm-files</code> forked off from <code>master</code>. In the mean time,
+since we branched off, there were three commits to master. This means we can
+expect some sort of merge or rebase before including our code into <code>master</code>.</p>
 
-<h2>Screenshots</h2>
+<p>I find this command nothing less than miraculous when working with Git. Between
+<code>git status</code> and <code>gll</code>, I can figure out what command I need, or make a
+well-informed Google search with what I&rsquo;d like to do&mdash;these two commands answer
+all of my questions nearly without fail.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
 
-<p>Here are an abundant number of screenshots showing what the commands look like
-for the <a href="https://github.com/ScottyLabs/tartanhacks">TartanHacks website</a> and the <a href="https://github.com/autolab/Autolab">Autolab Project</a>.</p>
+<h2>Go Forth and Git</h2>
 
-<h3>gl</h3>
+<p>To recap: whenever you&rsquo;re stuck: <code>git status</code> first,<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> and <code>gll</code> if
+needed. I&rsquo;d recommend running these commands even when you&rsquo;re convinced you
+don&rsquo;t need them just to start learning to recognize &ldquo;normal&rdquo; and &ldquo;weird&rdquo; graph
+shapes.</p>
 
-<p><a class="image-link" href="https://blog.jez.io/images/gl-tartanhacks.png"><img src="https://blog.jez.io/images/gl-tartanhacks.png"></a></p>
+<p>Want to learn more about how to leverage Git branches? There&rsquo;s an <a href="http://pcottle.github.io/learnGitBranching/">excellent
+interactive tutorial</a> that visualizes Git branches basically
+the same way we covered in this post (but simpler), and even has fancy
+animations. For a taste of how it works, there&rsquo;s also a <a href="http://pcottle.github.io/learnGitBranching/?demo">non-interactive
+demo</a>. After I ran through this tutorial, I felt for the first time like I
+<em>really</em> knew Git. I&rsquo;m a huge fan&mdash;give it a look!</p>
 
-<p>Even when just using <code>gl</code>, you&rsquo;ll be able to see all branches that lie further
-down on the tree. For example, from the <code>add_gitignore</code> branch we can see the
-<code>origin/gh-pages</code> branch because it&rsquo;s along the same path in history.</p>
-
-<h3>gll</h3>
-
-<p><a class="image-link" href="https://blog.jez.io/images/gll-tartanhacks.png"><img src="https://blog.jez.io/images/gll-tartanhacks.png"></a></p>
-
-<p>Here we see that multiple branches have diverged from <code>origin/gh-pages</code>; both
-<code>add_gitignore</code> and <code>fix_seo_and_readability</code> share <code>origin/gh-pages</code> as a
-common ancestor, but neither have anything in common with the other, which is
-why <code>fix_seo_and_readability</code> only showed up once we used <code>gll</code>.</p>
-
-<h3>gla</h3>
-
-<p><a class="image-link" href="https://blog.jez.io/images/gla-tartanhacks.png"><img src="https://blog.jez.io/images/gla-tartanhacks.png"></a></p>
-
-<p>Same as <code>gl</code> above, but with author information!</p>
-
-<h3>glla</h3>
-
-<p><a class="image-link" href="https://blog.jez.io/images/glla-tartanhacks.png"><img src="https://blog.jez.io/images/glla-tartanhacks.png"></a></p>
-
-<p>Same as <code>gll</code> above, but again with author information!</p>
-
-<hr />
-
-<p>Here are the same four examples, but for the <a href="https://github.com/autolab/Autolab">Autolab</a> repo. It&rsquo;s a
-little more involved because more people are working on it simultaneously. For
-projects like this, which have several open pull requests and feature branches,
-these aliases really shine.</p>
-
-<h3>gl</h3>
-
-<p><a class="image-link" href="https://blog.jez.io/images/gl-autolab.png"><img src="https://blog.jez.io/images/gl-autolab.png"></a></p>
-
-<h3>gll</h3>
-
-<p><a class="image-link" href="https://blog.jez.io/images/gll-autolab.png"><img src="https://blog.jez.io/images/gll-autolab.png"></a></p>
-
-<h3>gla</h3>
-
-<p><a class="image-link" href="https://blog.jez.io/images/gla-autolab.png"><img src="https://blog.jez.io/images/gla-autolab.png"></a></p>
-
-<h3>glla</h3>
-
-<p><a class="image-link" href="https://blog.jez.io/images/glla-autolab.png"><img src="https://blog.jez.io/images/glla-autolab.png"></a></p>
-
-<h2>Dotfiles</h2>
-
-<p>If you&rsquo;re hungry for more handy Git aliases or just some general ways to beef up
+<p>And if you&rsquo;re hungry for more handy Git aliases or just some general ways to beef up
 your terminal experience, you can find these four aliases and more in the
 <a href="https://github.com/jez/dotfiles/blob/master/zshrc">zshrc</a> in my <a href="https://github.com/jez/dotfiles">dotfiles repository</a> on GitHub.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Many people I know who are quite competent at Git manage to use it without <code>gll</code>. For me, <code>gll</code> is indispensible. My theory here is that these poor people have such intense muscle memory that they rarely, if ever, get their Git repository into a state they&rsquo;re unsure of. Rather than suffer through that learning curve, here&rsquo;s hoping that <code>gll</code> works as well for you as it has for me!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Why don&rsquo;t I go in depth into <code>git status</code> as well? Because <code>git status</code> almost always tells you the command you want to run next! It&rsquo;s actually pretty smart at this. Have you read your <code>git status</code> output carefully recently?<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
 
-<h2>Update</h2>
-
-<p>After testing out these aliases on various environments, I discovered that one
-of the features I was using in the pretty format (the one that colors remotes
-and branches, <code>%C(auto)</code>) is not available in older versions of Git. These are
-the revised versions of the above aliases that I use on older machines:</p>
-
-<figure class='code'><figcaption><span>Compatible Git log aliases</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># pretty Git log</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gl</span><span class="o">=</span><span class="s1">'git log --graph --pretty="%C(bold green)%h%Creset%C(blue)%d%Creset %s"'</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># pretty Git log, all references</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gll</span><span class="o">=</span><span class="s1">'gl --all'</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># pretty Git log, show authors</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">gla</span><span class="o">=</span><span class="s1">'git log --graph --pretty="%C(bold green)%h%Creset %C(yellow)%an%Creset%C(blue)%d%Creset %s"'</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># pretty Git log, all references, show authors</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">glla</span><span class="o">=</span><span class="s1">'gla --all'</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>The only real difference is that all the remotes, branches, and tags are blue,
-instead of being configurable in you <code>~/.gitconfig</code> file.</p>
 ]]></content>
   </entry>
   
@@ -2734,9 +2859,9 @@ from what I can tell so far it&rsquo;s responsive and effective.</p>
   
   <entry>
     <title type="html"><![CDATA[Ruby Virtualenvs]]></title>
-    <link href="https://blog.jez.io/2014/12/22/ruby-virtualenvs/"/>
+    <link href="https://blog.jez.io/ruby-virtualenvs/"/>
     <updated>2014-12-22T12:52:40-06:00</updated>
-    <id>https://blog.jez.io/2014/12/22/ruby-virtualenvs</id>
+    <id>https://blog.jez.io/ruby-virtualenvs</id>
     <content type="html"><![CDATA[<p>A while back I found a command that removes all Ruby gems installed on a system
 when you&rsquo;re using rbenv. It worked great, so I decided to build on top of it.
 After a bit of research, I found a much better solution to the root of my
@@ -2824,83 +2949,6 @@ with the per-virtualenv solution above.</p>
 <p>Note: a side effect of this nice sandboxing is that you can normally run
 commands without prefixing them with <code>bundle exec ...</code>, which is actually really
 handy.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Vim as a Man Page Viewer]]></title>
-    <link href="https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer/"/>
-    <updated>2014-12-20T21:17:46-05:00</updated>
-    <id>https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer</id>
-    <content type="html"><![CDATA[<p>Man pages are an essential part of every developer&rsquo;s workflow. Unfortunately,
-the default system pager <code>less</code> isn&rsquo;t the best interface. That&rsquo;s why I wrote a
-Vim plugin and a short shell function to take care of opening man pages in Vim.</p>
-
-<!-- more -->
-
-
-<h2>The Plugin</h2>
-
-<p>If you&rsquo;re eager to dive right into the source or to install the plugin, head on
-over to the <a href="https://github.com/jez/vim-superman">GitHub repository</a>. It&rsquo;s a whopping 32 SLOC, so feel
-free to peek under the hood.</p>
-
-<h2>Why?</h2>
-
-<p>You might be thinking, &ldquo;But Jake, <code>man</code> works just fine for me, why would I
-switch?&rdquo; I&rsquo;m glad you asked!</p>
-
-<h3>Mouse Support</h3>
-
-<p>The first reason why I was interested in getting man pages to open in Vim was
-because I wanted to be able to scroll with the mouse. When I have to read man
-pages for a long time, usually as a part of some more all-encompasing bit of
-research, I find scrolling to be a much better interface for quickly perusing
-the content of a man page.</p>
-
-<h3>Syntax Highlighting</h3>
-
-<p>As it turns out, man pages have a syntax to them, and Vim does a pretty
-excellent job at highlighting them. Rather than talk about it, here are some
-screenshots. Note how code samples (C system calls and library functions) are
-also syntax highlighted appropriately.</p>
-
-<figure class='code'><figcaption><span>Example 1</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>vman vim</span></code></pre></td></tr></table></div></figure>
-
-
-<p><a class="image-link" href="https://blog.jez.io/images/vim.1.png"><img src="https://blog.jez.io/images/vim.1.png"></a></p>
-
-<figure class='code'><figcaption><span>Example 2</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>vman 3 <span class="nb">printf</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p><a class="image-link" href="https://blog.jez.io/images/printf.3.png"><img src="https://blog.jez.io/images/printf.3.png"></a></p>
-
-<h3>All the benefits of Vim</h3>
-
-<p>While <code>less</code> makes a good effort to emulate certain Vim keybindings (or maybe
-it&rsquo;s the other way around, I don&rsquo;t know which came first), <code>less</code> certainly
-falls short of the full power of Vim.</p>
-
-<p>For example, once you&rsquo;ve opened a man page in Vim, you can open a new tab or
-split side-by-side with the man page. Especially if you&rsquo;re switching between Vim
-and the man page often, being able to open man pages in tabs or splits is
-invaluable.</p>
-
-<h2>Mine doesn&rsquo;t look like yours!</h2>
-
-<p>A couple of my other plugins are showing in the screenshots above. I&rsquo;m using the
-<a href="https://github.com/altercation/vim-colors-solarized">Solarized Dark color scheme</a>, the plugin
-<a href="https://github.com/bling/vim-airline">vim-airline</a> to take over the statuslines at the very top and
-bottom, and iTerm2 on Mac OS X 10.10.</p>
-
-<p>You can see my complete configuration <a href="https://github.com/jez/dotfiles">on GitHub</a>.</p>
-
-<h2>Feedback</h2>
-
-<p>As a matter of fact, this was my first Vim plugin! If you notice anything out of
-place, even if it&rsquo;s a small detail, I&rsquo;d love to hear it. Make no assumptions
-about the reasoning behind why certain decisions were made, because I have none
-XD</p>
 ]]></content>
   </entry>
   

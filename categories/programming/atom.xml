@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: programming | Bits, Bytes, and Words]]></title>
+  <link href="https://blog.jez.io/categories/programming/atom.xml" rel="self"/>
+  <link href="https://blog.jez.io/"/>
+  <updated>2017-09-06T01:59:36-04:00</updated>
+  <id>https://blog.jez.io/</id>
+  <author>
+    <name><![CDATA[Jake Zimmerman]]></name>
+    <email><![CDATA[jake@zimmerman.io]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[If, Else, & Purity]]></title>
+    <link href="https://blog.jez.io/if-else-purity/"/>
+    <updated>2017-09-01T01:38:43-04:00</updated>
+    <id>https://blog.jez.io/if-else-purity</id>
+    <content type="html"><![CDATA[<p>I prefer to let the language I&rsquo;m using think on my behalf as much as
+possible. Ideally, the language is rich enough that the proof of
+correctness is inherent in the code I&rsquo;ve written. Even when I use
+looser languages, these principled languages inform the structure of my
+code.</p>
+
+<!-- more -->
+
+
+<p>To see what I mean, let&rsquo;s take a look at some code:</p>
+
+<pre><code class="javascript">// Watch out! We'll improve this snippet shortly.
+const getErrors = (date) =&gt; {
+  let classNames = '';
+  if (moment(date, 'YYYY-MM-DD', true).isValid()) {
+    classNames = 'error error-date';
+  }
+  return classNames;
+}
+</code></pre>
+
+<p>Especially when writing short functions like this one, I have these
+goals in mind:</p>
+
+<ul>
+<li><p><strong>Correctness</strong> should be obvious.</p>
+
+<p>Judging correctness usually comes down to exhaustiveness&mdash;especially
+for code like the above. Every case should be accounted for.</p></li>
+<li><p>Let&rsquo;s make sure it&rsquo;s <strong>pure</strong>.</p>
+
+<p>Purity is important because it makes testing and refactoring easy.
+Pure functions are also compose well with others.</p></li>
+<li><p>Readers should be able to follow the <strong>intent</strong> easily.</p>
+
+<p>Readability enables collaboration and guards the code against a
+&ldquo;future me&rdquo; that might not remember what&rsquo;s on my mind right now.</p></li>
+</ul>
+
+
+<p>For this snippet in particular, we can actually improve along all three
+axes (correctness, purity, and intent) with one easy trick:
+match up the <code>if</code> with an <code>else</code>. Here&rsquo;s what it would look like, and
+then we&rsquo;ll break down why such a simple technique works so well.</p>
+
+<pre><code class="javascript">// Compare this improved snippet with the one above.
+const getErrors = (date) =&gt; {
+  if (moment(date, 'YYYY-MM-DD', true).isValid()) {
+    return 'error error-date';
+  } else {
+    return '';
+  }
+}
+</code></pre>
+
+<h2>Correctness</h2>
+
+<p>Understanding correctness of code really comes down to <em>proving</em> that
+the code does the right thing. What tools do we have as programmers for
+proving the correctness of our code?</p>
+
+<ul>
+<li><strong>Unit tests</strong> prove that the code is correct for specific inputs.</li>
+<li><strong>Type systems</strong> prove the absence of (certain kinds of)
+incorrectness.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
+<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
+us.</li>
+<li><strong>Program authors</strong> can prove the correctness of their code (i.e., with a
+traditional pen-and-paper proof).</li>
+</ul>
+
+
+<p>The first three are exciting because they involve a computer doing most
+of the work for us! That said, none of the first three are as universally
+applicable as the last: doing the proof ourself. What does writing
+proofs have to do with correctness of <code>if</code>s? Consider how we&rsquo;d write a
+proof by cases. We&rsquo;d:</p>
+
+<ol>
+<li>identify the cases,</li>
+<li>establish that the cases are exhaustive, and finally</li>
+<li>prove the claim in each case.</li>
+</ol>
+
+
+<p>I use this same process to write code with cases! &ldquo;Proving
+the claim&rdquo; is just another way of saying &ldquo;returning the right value.&rdquo;
+And better yet, we can avoid doing the second step ourselves! If we just
+match every <code>if</code> with an <code>else</code>, we&rsquo;ll automatically know that our logic
+is exhaustive. This, in turn, makes the correctness proof less toilsome.</p>
+
+<h2>Purity</h2>
+
+<p>A cool way to understand purity is using what&rsquo;s known as a &ldquo;modal
+separation.&rdquo; This is a really fancy way to say that we have
+<strong>expressions</strong> which are pure and always evaluate to a value, alongside
+<strong>commands</strong> which are impure and are executed for their side effects.
+If you&rsquo;ve ever used Haskell, you&rsquo;re already familiar with this
+notion&mdash;we only need <code>do</code> notation when we need to write impure (or
+&ldquo;monadic&rdquo;) code.</p>
+
+<p>In an expression language, every <code>if</code> <em>must</em> have an <code>else</code>; for the
+entire <code>if</code> expression to be used as a value, both branches must in turn
+evaluate to values. It&rsquo;s only when we move to a language with commands
+where it makes sense to allow omitting the <code>else</code> branch.</p>
+
+<p>An <code>if</code> <em>statement</em> (as opposed to an <code>if</code> expression) is a command;
+it&rsquo;s useful for running side-effectful code. Sometimes, we don&rsquo;t want
+one of the branches to have any side effects (for example, because the
+state of the world doesn&rsquo;t need to be changed). Languages with commands
+allow omitting the <code>else</code>.</p>
+
+<p>What does this mean for us? Every pure function can be written where the
+<code>if</code> is matched with an <code>else</code>. Put another way, an unmatched <code>if</code> is a
+likely indicator that the code I&rsquo;ve written is impure.</p>
+
+<p>Using this indicator makes me more aware of when I&rsquo;m dealing with impure
+code, alerting me to handle it appropriately. For example, I might want
+to factor out as much of the pure code into a separate helper function.</p>
+
+<h2>Readability</h2>
+
+<p>Explicitly partitioning code into the <code>if</code> branch and the <code>else</code> branch
+makes it easier for me to read code. Since the code has been explicitly
+split in two, I can read each half by itself. When an <code>if</code> is unmatched,
+this partition breaks down. The <code>if</code> branch runs into the implicit
+<code>else</code> branch: that is, the rest of the function. Now I&rsquo;m left reasoning
+about code knowing that the condition might be <code>true</code> or <code>false</code>. And things
+only get (exponentially) worse when we add in more unmatched <code>if</code>s.</p>
+
+<p>Note, though, that there&rsquo;s a bit of a balance when it comes to
+readability. Sometimes matching every <code>if</code> leads to deeply nested code.
+In these cases, it might be better to flatten the nesting to a chain of
+unmatched <code>if</code>s that return early if there&rsquo;s an error. Even still, this
+moves the function from expression-dominated to command-dominated, so
+the usual caveat still applies: maybe we want to factor the pure part
+out into a separate function.</p>
+
+<p>Making code readable is important for sharing it and collaborating with
+others. Matching <code>if</code>s with <code>else</code>s let me write more readable,
+understandable code.</p>
+
+<h2>Writing Clean Code</h2>
+
+<p>Writing clean code is as much about the small details as it is about the
+large, sweeping brush strokes. There&rsquo;s so much nuance in every
+<code>if-then-else</code>:</p>
+
+<ul>
+<li>They&rsquo;re more likely to be <strong>pure</strong>.</li>
+<li>It&rsquo;s easier to reason about their <strong>correctness</strong>.</li>
+<li>We can dissect their <strong>intent</strong> piece-by-piece</li>
+</ul>
+
+
+<p>And we can get all these benefits for free! We lose nearly nothing for
+giving up unmatched <code>if</code>s. Even though I was writing these examples with
+JavaScript, we improve our code by considering how we&rsquo;d write it in a
+more principled language.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Note the double negation here. Type systems themselves don&rsquo;t prove correctness, they prove that there aren&rsquo;t certain kinds of incorrectness, namely: type errors. Meanwhile, unit tests are rarely (if ever) exhaustive. This is why testing and type systems are complementary&mdash;one is not a substitute for the other.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[The Joys of the Craft]]></title>
+    <link href="https://blog.jez.io/2014/12/13/the-joys-of-the-craft/"/>
+    <updated>2014-12-13T20:52:09-05:00</updated>
+    <id>https://blog.jez.io/2014/12/13/the-joys-of-the-craft</id>
+    <content type="html"><![CDATA[<p>A while ago, I was given the book <em>The Mythical Man-Month</em>, by Frederick P. Brooks, Jr. I finally have some time to sit down and read it, and I&rsquo;m loving it. In the first chapter, this quote on &ldquo;the joys of the craft&rdquo; (i.e., programming) struck me as particularly on point:</p>
+
+<!-- more -->
+
+
+<blockquote><h3>The Joys of the Craft</h3>
+
+<p>Why is programming fun? What delights may its practitioner expect as his reward?</p>
+
+<p>First is the sheer joy of making things. As the child delights in his mud pie, so the adult enjoys building things, especially things of his own design. I think this delight must be an image of God&rsquo;s delight in making things, a delight shown in the distinctness and newness of each leaf and each snowflake.</p>
+
+<p>Second is the pleasure of making things that are useful to other people. Deep within, we want others to use our work and to find it helpful. In this respect the programming system is not essentially different from the child&rsquo;s first clay pencil holder &ldquo;for Daddy&rsquo;s office.&rdquo;</p>
+
+<p>Third is the fascination of fashioning complex puzzle-like objects of interlocking moving parts and watching them work in subtle cycles, playing out the consequences of principles built in from the beginning. The programmed computer has all the fascination of the pinball machine or the jukebox mechanism, carried to the ultimate.</p>
+
+<p>Fourth is the joy of always learning, which springs from the nonrepearing nature of the task. In one way or another the problem is ever new, and its solver learns something: sometimes practical, sometimes theoretical, and sometimes both.</p>
+
+<p>Finally, there is the delight of working in such a tractable medium. The programmer, like the poet, works only slightly removed from pure thought-stuff. He builds his castles in the air, from air, creating by exertion of the imagination. Few media of creation are so flexible, so easy to polish and rework, so readily capable of realizing grand conceptual structures. (As we shall see later, this very tractability has its own problems.)</p>
+
+<p>Yet the program construct, unlike the poet&rsquo;s words, is real in the sense that it moves and works, producing visible outputs separate from the construct itself. It prints results, draws pictures, produces sounds, moves arms. The magic of myth and legend has come true in our time. One types the correct incantation on a keyboard, and a display screen comes to life, showing things that never were nor could be.</p>
+
+<p>Programming then is fun because it gratifies creative longings built deep within us and delights sensibilities we have in common with all men.</p>
+
+<p>&ndash; &ldquo;The Tar Pit&rdquo;, <em>The Mythical Man-Month</em>, Frederick P. Brooks Jr.</p></blockquote>
+
+<p>Brooks of course follows this up with &ldquo;The Woes of the Craft&rdquo;, which is equally on point. I&rsquo;m only a few pages in, but I already feel like, respectfully, I&rsquo;ve learned more than I did in all of Tech Comm (<a href="https://enr-apps.as.cmu.edu/open/SOC/SOCServlet/courseDetails?COURSE=15221&amp;SEMESTER=F14">15-221</a>). I would absolutely recommend it to anyone considering pursing software engineering!</p>
+]]></content>
+  </entry>
+  
+</feed>
