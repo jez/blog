@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "If, Else, and Purity"
+title: "If, Else, & Purity"
 date: 2017-08-31T22:38:43-07:00
 comments: false
 share: false
