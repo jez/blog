@@ -85,9 +85,12 @@ blockquote > *:first-child::before {
 // Footnotes
 // --------------------------------------------------
 .entry-content .footnotes {
-  ol, li, p, code {
+  ol, li, p {
     @include font-rem($footer_fs);
     @include margin-after;
+  }
+  code {
+    @include font-rem($footer_fs - 0.2)
   }
 }
 
@@ -99,11 +102,11 @@ tt, code, kbd, samp, pre {
 p,
 li {
   code {
-    @include font-rem(1);
+    @include font-rem(0.9);
     line-height: 1.5;
     white-space: nowrap;
-    margin: 0 2px;
-    padding: 1px 5px;
+    margin: 0 -1px;
+    padding: 3px 5px;
     background-color: lighten($black, 95%);
     @include border-radius(3px);
   }
