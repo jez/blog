@@ -3,7 +3,7 @@
 {% include head.html %}
 </head>
 
-<body id="post" {% if page.image.feature %}class="feature"{% endif %}>
+<body id="post" class="{% if page.image.feature %} feature{% endif %}{% if page.strong_keywords %} strong-keywords{% endif %}">
 
 {% include browser-upgrade.html %}
 {% include navigation.html %}

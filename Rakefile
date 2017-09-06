@@ -117,6 +117,7 @@ task :new_post, :title do |t, args|
     post.puts "share: false"
     post.puts "categories: "
     post.puts "description: "
+    post.puts "strong_keywords: false"
     post.puts "---"
     post.puts ""
     post.puts ""
@@ -132,7 +133,7 @@ task :new_page, :filename do |t, args|
   args.with_defaults(:filename => 'new-page')
   page_dir = [source_dir]
   if args.filename.downcase =~ /(^.+\/)?(.+)/
-    filename, dot, extension = $2.rpartition('.').reject(&:empty?)         # Get filename and extension
+    filename, _, extension = $2.rpartition('.').reject(&:empty?)         # Get filename and extension
     title = filename
     page_dir.concat($1.downcase.sub(/^\//, '').split('/')) unless $1.nil?  # Add path to page_dir Array
     if extension.nil?
