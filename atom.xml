@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-09-06T02:40:44-04:00</updated>
+  <updated>2017-09-10T20:12:36-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,52 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Testing, Types, & Correctness]]></title>
+    <link href="https://blog.jez.io/testing-types/"/>
+    <updated>2017-09-10T19:50:36-04:00</updated>
+    <id>https://blog.jez.io/testing-types</id>
+    <content type="html"><![CDATA[<p>Understanding correctness of code really comes down to <em>proving</em> that
+the code does the right thing. What tools do we have as programmers for
+proving the correctness of our code?</p>
+
+<!-- more -->
+
+
+<ol>
+<li><strong>Unit tests</strong> prove that the code is correct for specific inputs.</li>
+<li><strong>Type systems</strong> prove the absence of (certain kinds of)
+incorrectness.</li>
+<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
+us.</li>
+<li><strong>Program authors</strong> can prove the correctness of their code (i.e.,
+with a traditional pen-and-paper proof).</li>
+</ol>
+
+
+<p>The first three are exciting because they involve a computer doing most
+of the work for us! That said, none of the first three are as
+universally applicable as the last: doing the proof ourself.
+Unfortunately, it&rsquo;s also usually the most toilsome.</p>
+
+<p>Note the double negation in (2). Type systems themselves don&rsquo;t prove
+correctness, they prove that there aren&rsquo;t certain kinds of
+incorrectness, namely: type errors. Meanwhile, unit tests are rarely (if
+ever) exhaustive. This is why testing and type systems are
+complementary&mdash;one is not a substitute for the other.</p>
+
+<p>It&rsquo;s important to both have strong testing practices and languages with
+disciplined type systems. The hardest part of writing quality software
+is ensuring that it runs without bugs. The more tools we have in our
+arsenal to combat incorrectness, the easier it is to write code for the
+long term.</p>
+
+<!-- vim:tw=72
+-->
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[If, Else, & Purity]]></title>
@@ -22,94 +68,11 @@
 possible. Ideally, the language is rich enough that the proof of
 correctness is inherent in the code I&rsquo;ve written. Even when I use
 looser languages, these principled languages inform the structure of my
-code.</p>
+code. To make this a bit more let&rsquo;s turn our focus to <code>if</code>, <code>else</code>, and
+purity.</p>
 
 <!-- more -->
 
-
-<p>To see what I mean, let&rsquo;s take a look at some code:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Watch out! We'll improve this snippet shortly.</span>
-</span><span class='line'><span class="kr">const</span> <span class="nx">getErrors</span> <span class="o">=</span> <span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kd">let</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">moment</span><span class="p">(</span><span class="nx">date</span><span class="p">,</span> <span class="s1">'YYYY-MM-DD'</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">isValid</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">'error error-date'</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="k">return</span> <span class="nx">classNames</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Especially when writing short functions like this one, I have these
-goals in mind:</p>
-
-<ul>
-<li><p><strong>Correctness</strong> should be obvious.</p>
-
-<p>Judging correctness usually comes down to exhaustiveness&mdash;especially
-for code like the above. Every case should be accounted for.</p></li>
-<li><p>Let&rsquo;s make sure it&rsquo;s <strong>pure</strong>.</p>
-
-<p>Purity is important because it makes testing and refactoring easy.
-Pure functions are also compose well with others.</p></li>
-<li><p>Readers should be able to follow the <strong>intent</strong> easily.</p>
-
-<p>Readability enables collaboration and guards the code against a
-&ldquo;future me&rdquo; that might not remember what&rsquo;s on my mind right now.</p></li>
-</ul>
-
-
-<p>For this snippet in particular, we can actually improve along all three
-axes (correctness, purity, and intent) with one easy trick:
-match up the <code>if</code> with an <code>else</code>. Here&rsquo;s what it would look like, and
-then we&rsquo;ll break down why such a simple technique works so well.</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Compare this improved snippet with the one above.</span>
-</span><span class='line'><span class="kr">const</span> <span class="nx">getErrors</span> <span class="o">=</span> <span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">moment</span><span class="p">(</span><span class="nx">date</span><span class="p">,</span> <span class="s1">'YYYY-MM-DD'</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">isValid</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="s1">'error error-date'</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="s1">''</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Correctness</h2>
-
-<p>Understanding correctness of code really comes down to <em>proving</em> that
-the code does the right thing. What tools do we have as programmers for
-proving the correctness of our code?</p>
-
-<ul>
-<li><strong>Unit tests</strong> prove that the code is correct for specific inputs.</li>
-<li><strong>Type systems</strong> prove the absence of (certain kinds of)
-incorrectness.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
-<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
-us.</li>
-<li><strong>Program authors</strong> can prove the correctness of their code (i.e., with a
-traditional pen-and-paper proof).</li>
-</ul>
-
-
-<p>The first three are exciting because they involve a computer doing most
-of the work for us! That said, none of the first three are as universally
-applicable as the last: doing the proof ourself. What does writing
-proofs have to do with correctness of <code>if</code>s? Consider how we&rsquo;d write a
-proof by cases. We&rsquo;d:</p>
-
-<ol>
-<li>identify the cases,</li>
-<li>establish that the cases are exhaustive, and finally</li>
-<li>prove the claim in each case.</li>
-</ol>
-
-
-<p>I use this same process to write code with cases! &ldquo;Proving
-the claim&rdquo; is just another way of saying &ldquo;returning the right value.&rdquo;
-And better yet, we can avoid doing the second step ourselves! If we just
-match every <code>if</code> with an <code>else</code>, we&rsquo;ll automatically know that our logic
-is exhaustive. This, in turn, makes the correctness proof less toilsome.</p>
-
-<h2>Purity</h2>
 
 <p>A cool way to understand purity is using what&rsquo;s known as a &ldquo;modal
 separation.&rdquo; This is a really fancy way to say that we have
@@ -122,7 +85,9 @@ notion&mdash;we only need <code>do</code> notation when we need to write impure 
 <p>In an expression language, every <code>if</code> <em>must</em> have an <code>else</code>; for the
 entire <code>if</code> expression to be used as a value, both branches must in turn
 evaluate to values. It&rsquo;s only when we move to a language with commands
-where it makes sense to allow omitting the <code>else</code> branch.</p>
+where it makes sense to allow omitting the <code>else</code> branch. <code>if</code>
+expressions are not some abstract concept; chances are you&rsquo;ve
+encountered them under the name &ldquo;the ternary operator.&rdquo;</p>
 
 <p>An <code>if</code> <em>statement</em> (as opposed to an <code>if</code> expression) is a command;
 it&rsquo;s useful for running side-effectful code. Sometimes, we don&rsquo;t want
@@ -130,64 +95,25 @@ one of the branches to have any side effects (for example, because the
 state of the world doesn&rsquo;t need to be changed). Languages with commands
 allow omitting the <code>else</code>.</p>
 
-<p>What does this mean for us? Every pure function can be written where the
-<code>if</code> is matched with an <code>else</code>. Put another way, an unmatched <code>if</code> is a
-likely indicator that the code I&rsquo;ve written is impure.</p>
+<p>What does this mean for us? Since expression languages form the basis
+for purity, every pure function can be written where the <code>if</code> is matched
+with an <code>else</code>. Put another way, an unmatched <code>if</code> is a likely indicator
+that the code I&rsquo;ve written is impure.</p>
 
-<p>Using this indicator makes me more aware of when I&rsquo;m dealing with impure
-code, alerting me to handle it appropriately. For example, I might want
-to factor out as much of the pure code into a separate helper function.</p>
+<p>This makes me more aware of when I&rsquo;m dealing with impure code. For
+example, I might want to factor out as much of the pure code into a
+separate helper function. There&rsquo;s a time and a place for impure code.
+But since pure code is more composable and easier to test, it&rsquo;s best to
+factor the impure code out whenever possible.</p>
 
-<h2>Readability</h2>
-
-<p>Explicitly partitioning code into the <code>if</code> branch and the <code>else</code> branch
-makes it easier for me to read code. Since the code has been explicitly
-split in two, I can read each half by itself. When an <code>if</code> is unmatched,
-this partition breaks down. The <code>if</code> branch runs into the implicit
-<code>else</code> branch: that is, the rest of the function. Now I&rsquo;m left reasoning
-about code knowing that the condition might be <code>true</code> or <code>false</code>. And things
-only get (exponentially) worse when we add in more unmatched <code>if</code>s.</p>
-
-<p>Note, though, that there&rsquo;s a bit of a balance when it comes to
-readability. Sometimes matching every <code>if</code> leads to deeply nested code.
-In these cases, it might be better to flatten the nesting to a chain of
-unmatched <code>if</code>s that return early if there&rsquo;s an error. Even still, this
-moves the function from expression-dominated to command-dominated, so
-the usual caveat still applies: maybe we want to factor the pure part
-out into a separate function.</p>
-
-<p>Making code readable is important for sharing it and collaborating with
-others. Matching <code>if</code>s with <code>else</code>s let me write more readable,
-understandable code.</p>
-
-<h2>Writing Clean Code</h2>
-
-<p>Writing clean code is as much about the small details as it is about the
-large, sweeping brush strokes. There&rsquo;s so much nuance in every
-<code>if-then-else</code>:</p>
-
-<ul>
-<li>They&rsquo;re more likely to be <strong>pure</strong>.</li>
-<li>It&rsquo;s easier to reason about their <strong>correctness</strong>.</li>
-<li>We can dissect their <strong>intent</strong> piece-by-piece</li>
-</ul>
-
-
-<p>And we can get all these benefits for free! We lose nearly nothing for
-giving up unmatched <code>if</code>s. Even though I was writing these examples with
-JavaScript, we improve our code by considering how we&rsquo;d write it in a
-more principled language.</p>
+<p>In a principled language, there&rsquo;s a distinction between <code>if</code> expressions
+and <code>if</code> statements. On the other hand, some language only have one, or
+they blur the line between the two. We can draw upon our experiences
+with languages that are rigorous about minutia like this to better
+inform how we write clean code.</p>
 
 <!-- vim:tw=72
 -->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>Note the double negation here. Type systems themselves don&rsquo;t prove correctness, they prove that there aren&rsquo;t certain kinds of incorrectness, namely: type errors. Meanwhile, unit tests are rarely (if ever) exhaustive. This is why testing and type systems are complementary&mdash;one is not a substitute for the other.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
 
 ]]></content>
   </entry>
@@ -2855,101 +2781,6 @@ solution.</p>
 <p>Then I discovered <a href="https://github.com/gorhill/uBlock">μBlock</a>, an &ldquo;efficient blocker for Chromium and
 Firefox.&rdquo; The fancy graphs on it&rsquo;s homepage convinced me to give it a shot, and
 from what I can tell so far it&rsquo;s responsive and effective.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Ruby Virtualenvs]]></title>
-    <link href="https://blog.jez.io/ruby-virtualenvs/"/>
-    <updated>2014-12-22T12:52:40-06:00</updated>
-    <id>https://blog.jez.io/ruby-virtualenvs</id>
-    <content type="html"><![CDATA[<p>A while back I found a command that removes all Ruby gems installed on a system
-when you&rsquo;re using rbenv. It worked great, so I decided to build on top of it.
-After a bit of research, I found a much better solution to the root of my
-problems: sandboxing Ruby gems.</p>
-
-<!-- more -->
-
-
-<h2>Ugh, Ruby&hellip;</h2>
-
-<p>If you&rsquo;re anything like me, you can never do anything right on the first try
-using Ruby. At one point, I found myself needing a script to just nuke
-everything and start over&hellip; That&rsquo;s when I found Ian Vaughan&rsquo;s <a href="https://gist.github.com/IanVaughan/2902499">script</a> that
-magically removes all gems. I was delighted to see that it worked perfectly on
-the first try, and went about the rest of my business.</p>
-
-<h2>Modifications</h2>
-
-<p>There were two ways though in which this script&rsquo;s functionality differed from
-what I wanted it to do: it always removed <strong>all</strong> gems, and it left behind a
-<code>.ruby_version</code> file after it was used, clobbering any file that might have been
-there before.</p>
-
-<p>In my updated script, you can specify a list of ruby versions as arguments, and
-it will only gems from those versions instead of all of them.  Also, it saves
-and restores the value of the old <code>.ruby_version</code> file once it&rsquo;s done.</p>
-
-<p>The new script is available <a href="https://gist.github.com/jez/cc2ba08062c6183a489c">as a fork of the original Gist</a> and also as
-a part of of <a href="https://github.com/jez/bin/blob/master/uninstall_gems">my personal bin folder</a>.</p>
-
-<h2>The Underlying Problem: Virtualenv&rsquo;s in Ruby</h2>
-
-<p>After a bit of reflection, I realized I should be trying to solve the underlying
-problem: different projects had different dependencies, and gems from one
-project were bleeding into gems from another. If you&rsquo;re a Python developer, you
-don&rsquo;t have this issue: <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">virtualenvwrapper</a>, <code>pip</code>, and <code>requirements.txt</code>
-files make this a non-issue.</p>
-
-<p>After looking into if there existed a similar Ruby solution, I came up with
-<a href="http://honza.ca/2011/06/install-ruby-gems-into-virtualenv">this blog post</a> outlining how you can do the exact same thing using
-virtualenvs but with Ruby gems! Once again, it needed a little bit of
-modification so that everything works again as you&rsquo;d expect when you
-<code>deactivate</code>. Add these lines to your virtualenv&rsquo;s <code>postactivate</code> script:</p>
-
-<figure class='code'><figcaption><span>$VIRTUAL_ENV/bin/postactivate</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">export</span> <span class="n">OLD_GEMHOME</span><span class="o">=</span><span class="s">"$GEM_HOME"</span>
-</span><span class='line'><span class="n">export</span> <span class="n">GEM_HOME</span><span class="o">=</span><span class="s">"$VIRTUAL_ENV/gems"</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">export</span> <span class="n">OLD_GEM_PATH</span><span class="o">=</span><span class="s">"$GEM_PATH"</span>
-</span><span class='line'><span class="n">export</span> <span class="n">GEM_PATH</span><span class="o">=</span><span class="s">""</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">export</span> <span class="n">OLD_PATH</span><span class="o">=</span><span class="s">"$PATH"</span>
-</span><span class='line'><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s">"$GEM_HOME/bin:$PATH"</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>And then add this complementary section to your <code>predeactivate</code> script:</p>
-
-<figure class='code'><figcaption><span>$VIRTUAL_ENV/bin/predeactivate</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">export</span> <span class="n">GEM_HOME</span><span class="o">=</span><span class="s">"$OLD_GEM_HOME"</span>
-</span><span class='line'><span class="n">unset</span> <span class="n">OLD_GEM_HOME</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">export</span> <span class="n">GEM_PATH</span><span class="o">=</span><span class="s">"$OLD_GEM_PATH"</span>
-</span><span class='line'><span class="n">unset</span> <span class="n">OLD_GEM_PATH</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s">"$OLD_PATH"</span>
-</span><span class='line'><span class="n">unset</span> <span class="n">OLD_PATH</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now, whenever you install gems, they&rsquo;ll install to the folder
-<code>$VIRTUAL_ENV/gems/</code> instead of the system&rsquo;s location, so no gems bleed into
-another project!</p>
-
-<h2>One Step Further</h2>
-
-<p>Bringing up this web page, copying those snippets, and pasting them in the two
-necessary files every time is a bit tedious. To automate this process, we can
-tap into virtualenvwrapper&rsquo;s configurability using hooks. Instead of dropping
-those snippets into <code>$VIRTUAL_ENV/bin/{post,prede}activate,</code>, place them in
-<code>$VIRTUALENVWRAPPER_HOOK_DIR/{post,prede}activate</code>.</p>
-
-<p>Now every time you <code>workon</code> a virtualenv, the appropriate configuration will
-be set up. Note that this means every normal Python project you use will have
-this Ruby configuration added (not just the Ruby projects), but that shouldn&rsquo;t
-matter because they interoperate nicely. If it&rsquo;s really an issue, you can stick
-with the per-virtualenv solution above.</p>
-
-<p>Note: a side effect of this nice sandboxing is that you can normally run
-commands without prefixing them with <code>bundle exec ...</code>, which is actually really
-handy.</p>
 ]]></content>
   </entry>
   

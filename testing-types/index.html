@@ -10,13 +10,13 @@
 <meta charset="utf-8">
 <meta http-equiv="cleartype" content="on">
 
-<title>If, Else, & Purity - Bits, Bytes, and Words</title>
+<title>Testing, Types, & Correctness - Bits, Bytes, and Words</title>
 <meta name="author" content="Jake Zimmerman">
 
 
 
 
-<meta name="description" content="I prefer to let the language I'm using think on my behalf as much as possible. Ideally, the language is rich enough that the proof of correctness is &hellip;">
+<meta name="description" content="It's important to both have strong testing practices and languages with disciplined type systems. The hardest part of writing quality software is &hellip;">
 
 <meta name="keywords" content="fragment programming ">
 
@@ -32,15 +32,15 @@
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/if-else-purity">
-<meta property="og:title" content="If, Else, & Purity">
-<meta property="og:description" content="I prefer to let the language I'm using think on my behalf as much as possible. Ideally, the language is rich enough that the proof of correctness is &hellip;">
+<meta property="og:url" content="https://blog.jez.io/testing-types">
+<meta property="og:title" content="Testing, Types, & Correctness">
+<meta property="og:description" content="It's important to both have strong testing practices and languages with disciplined type systems. The hardest part of writing quality software is &hellip;">
 
   <meta property="og:image" content="">
 
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/if-else-purity">
+<link rel="canonical" href="https://blog.jez.io/testing-types">
 <link href="/favicon.png" rel="icon">
 <link href="/fonts/concourse.css" rel="stylesheet">
 <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -55,7 +55,7 @@
 
 </head>
 
-<body id="post" class=" strong-keywords">
+<body id="post" class="">
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 <nav id="dl-menu" class="dl-menuwrapper" role="navigation">
@@ -73,9 +73,9 @@
     <header class="header-title">
       <div class="header-title-wrap">
         
-          <h1 class="entry-title">If, Else, & Purity</h1>
+          <h1 class="entry-title">Testing, Types, & Correctness</h1>
         
-        <h2>September 01, 2017</h2>
+        <h2>September 10, 2017</h2>
         
           <div class="entry-meta">
             <a href="/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
@@ -84,53 +84,40 @@
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <p>I prefer to let the language I&rsquo;m using think on my behalf as much as
-possible. Ideally, the language is rich enough that the proof of
-correctness is inherent in the code I&rsquo;ve written. Even when I use
-looser languages, these principled languages inform the structure of my
-code. To make this a bit more let&rsquo;s turn our focus to <code>if</code>, <code>else</code>, and
-purity.</p>
+      <p>Understanding correctness of code really comes down to <em>proving</em> that
+the code does the right thing. What tools do we have as programmers for
+proving the correctness of our code?</p>
 
 <!-- more -->
 
 
-<p>A cool way to understand purity is using what&rsquo;s known as a &ldquo;modal
-separation.&rdquo; This is a really fancy way to say that we have
-<strong>expressions</strong> which are pure and always evaluate to a value, alongside
-<strong>commands</strong> which are impure and are executed for their side effects.
-If you&rsquo;ve ever used Haskell, you&rsquo;re already familiar with this
-notion&mdash;we only need <code>do</code> notation when we need to write impure (or
-&ldquo;monadic&rdquo;) code.</p>
+<ol>
+<li><strong>Unit tests</strong> prove that the code is correct for specific inputs.</li>
+<li><strong>Type systems</strong> prove the absence of (certain kinds of)
+incorrectness.</li>
+<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
+us.</li>
+<li><strong>Program authors</strong> can prove the correctness of their code (i.e.,
+with a traditional pen-and-paper proof).</li>
+</ol>
 
-<p>In an expression language, every <code>if</code> <em>must</em> have an <code>else</code>; for the
-entire <code>if</code> expression to be used as a value, both branches must in turn
-evaluate to values. It&rsquo;s only when we move to a language with commands
-where it makes sense to allow omitting the <code>else</code> branch. <code>if</code>
-expressions are not some abstract concept; chances are you&rsquo;ve
-encountered them under the name &ldquo;the ternary operator.&rdquo;</p>
 
-<p>An <code>if</code> <em>statement</em> (as opposed to an <code>if</code> expression) is a command;
-it&rsquo;s useful for running side-effectful code. Sometimes, we don&rsquo;t want
-one of the branches to have any side effects (for example, because the
-state of the world doesn&rsquo;t need to be changed). Languages with commands
-allow omitting the <code>else</code>.</p>
+<p>The first three are exciting because they involve a computer doing most
+of the work for us! That said, none of the first three are as
+universally applicable as the last: doing the proof ourself.
+Unfortunately, it&rsquo;s also usually the most toilsome.</p>
 
-<p>What does this mean for us? Since expression languages form the basis
-for purity, every pure function can be written where the <code>if</code> is matched
-with an <code>else</code>. Put another way, an unmatched <code>if</code> is a likely indicator
-that the code I&rsquo;ve written is impure.</p>
+<p>Note the double negation in (2). Type systems themselves don&rsquo;t prove
+correctness, they prove that there aren&rsquo;t certain kinds of
+incorrectness, namely: type errors. Meanwhile, unit tests are rarely (if
+ever) exhaustive. This is why testing and type systems are
+complementary&mdash;one is not a substitute for the other.</p>
 
-<p>This makes me more aware of when I&rsquo;m dealing with impure code. For
-example, I might want to factor out as much of the pure code into a
-separate helper function. There&rsquo;s a time and a place for impure code.
-But since pure code is more composable and easier to test, it&rsquo;s best to
-factor the impure code out whenever possible.</p>
-
-<p>In a principled language, there&rsquo;s a distinction between <code>if</code> expressions
-and <code>if</code> statements. On the other hand, some language only have one, or
-they blur the line between the two. We can draw upon our experiences
-with languages that are rigorous about minutia like this to better
-inform how we write clean code.</p>
+<p>It&rsquo;s important to both have strong testing practices and languages with
+disciplined type systems. The hardest part of writing quality software
+is ensuring that it runs without bugs. The more tools we have in our
+arsenal to combat incorrectness, the easier it is to write code for the
+long term.</p>
 
 <!-- vim:tw=72
 -->
@@ -138,7 +125,7 @@ inform how we write clean code.</p>
 
       <footer class="entry-meta">
         <span class="entry-tags"><a href="/categories/#fragment" title="Pages tagged fragment" class="tag">fragment</a><a href="/categories/#programming" title="Pages tagged programming" class="tag">programming</a></span>
-        <span class="entry-date date published updated"><time datetime="2017-09-01T01:38:43-04:00">September 01, 2017</time></span>
+        <span class="entry-date date published updated"><time datetime="2017-09-10T19:50:36-04:00">September 10, 2017</time></span>
         
       </footer>
     </div><!-- /.entry-content -->
@@ -146,12 +133,12 @@ inform how we write clean code.</p>
       <div class="read-more">
         
           <div class="read-more-header">
-            <a href="/testing-types/" class="btn">Read More</a>
+            <a href="/if-else-purity/" class="btn">Read More</a>
           </div><!-- /.read-more-header -->
           <div class="read-more-content">
-            <h3><a href="/testing-types/" title="Testing, Types, & Correctness">Testing, Types, & Correctness</a></h3>
-            <p>It&#8217;s important to both have strong testing practices and languages with disciplined type systems. The hardest part of writing quality software is ensuring that it runs without bugs. This is why testing and type systems are complementary&#8212;they&#8217;re distinct tools to help us write better code.
- <a href="/testing-types/"> Continue reading</a></p>
+            <h3><a href="/if-else-purity/" title="If, Else, & Purity">If, Else, & Purity</a></h3>
+            <p>I prefer to let the language I&#8217;m using think on my behalf as much as possible. Ideally, the language is rich enough that the proof of correctness is inherent in the code I&#8217;ve written. Even when I use looser languages, these principled languages inform the structure of my code.
+ <a href="/if-else-purity/"> Continue reading</a></p>
           </div><!-- /.read-more-content -->
         
         <div class="read-more-list">
