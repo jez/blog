@@ -27,6 +27,11 @@
           <h1 class="entry-title">{{ page.title }}</h1>
         {% endif %}
         <h2>{{ page.date | date: "%B %d, %Y" }}</h2>
+        {% if page.categories contains 'fragment' %}
+          <div class="entry-meta">
+            <a href="{{ root_url }}/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
+          </div>
+        {% endif %}
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
