@@ -74,4 +74,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
 <script>Modernizr || document.write('<script src="{{ root_url }}/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
 
+{% if page.mathjax %}
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML"></script>
+{% endif %}
+
+
 {% include background_image.html %}

@@ -31,6 +31,10 @@
           <div class="entry-meta">
             <a href="{{ root_url }}/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
           </div>
+        {% elsif page.categories contains 'recitation' %}
+          <div class="entry-meta">
+            <a href="{{ root_url }}/categories/#recitation" title="This post is structured like 'recitation notes.' It aims to be instructive, and also makes some assumptions about prerequisit knowledge." class="tag">recitation notes</a>
+          </div>
         {% endif %}
       </div><!-- /.header-title-wrap -->
     </header>
