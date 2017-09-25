@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-09-10T20:29:53-04:00</updated>
+  <updated>2017-09-25T05:26:58-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,336 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[System Fω and Parameterization]]></title>
+    <link href="https://blog.jez.io/system-f-param/"/>
+    <updated>2017-09-27T22:14:45-04:00</updated>
+    <id>https://blog.jez.io/system-f-param</id>
+    <content type="html"><![CDATA[<p>My understanding of System F<sub>ω</sub> used to be really shaky. In
+particular, I&rsquo;d been confused about the difference between <code>∀(t.τ)</code>
+(forall types) and <code>λ(u.c)</code> (type abstractions) for a long time. Both of
+these constructs have to do with parameterization (factoring out a
+variable so that it&rsquo;s bound), but each has a drastically different
+meaning.</p>
+
+<!-- more -->
+
+
+<h2>Questions</h2>
+
+<p>We&rsquo;ll start off with some questions to keep in mind throughout these
+notes. Our goals by the end are to understand what the questions are
+asking, and have at least a partial&mdash;if not complete&mdash;answer to each.</p>
+
+<p>First, consider this code.</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">datatype</span> <span class="nd">'a</span> <span class="kt">list</span> <span class="p">=</span> <span class="nc">Nil</span> <span class="p">|</span> <span class="nc">Cons</span> <span class="kr">of</span> <span class="nd">'a</span> <span class="n">*</span> <span class="nd">'a</span> <span class="n">list</span></span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>What really is &ldquo;<code>list</code>&rdquo; in this code?</li>
+<li>Or put another way, how would we define <code>list</code> in System
+F<sub>ω</sub>?</li>
+</ul>
+
+
+<p>Thinking more broadly,</p>
+
+<ul>
+<li>What separates <code>∀(t.τ)</code> and <code>λ(u.c)</code>?</li>
+<li>What is parameterization, and how does it relate to these things?</li>
+</ul>
+
+
+<h2>System F<sub>ω</sub></h2>
+
+<p>The answers to most of these questions rely on a solid definition of
+System F<sub>ω</sub>. We&rsquo;ll be using this setup.</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>Kind κ ::= * | κ → κ | ···
+</span><span class='line'>
+</span><span class='line'>           abstract       concrete      arity/valence
+</span><span class='line'>Con c  ::= ···
+</span><span class='line'>         | arr(c₁; c₂)    c₁ → c₂       (Con, Con)Con
+</span><span class='line'>         | all{κ}(u.c)    ∀(u ∷ κ). c   (Kind, Con.Con)Con
+</span><span class='line'>         | lam{κ}(u.c)    λ(u ∷ κ). c   (Kind, Con.Con)Con
+</span><span class='line'>         | app(c₁; c₂)    c₁(c₂)        (Con, Con)Con</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Some points to note:</p>
+
+<ul>
+<li><code>∀(u ∷ κ). c</code> and <code>λ(u ∷ κ). c</code> have the same arity.</li>
+<li><code>∀(u ∷ κ). c</code> and <code>λ(u ∷ κ). c</code> both <em>bind</em> a constructor variable.
+This makes these two operators <em>parametric</em>.</li>
+<li>Only <code>λ(u ∷ κ). c</code> has a matching elim form: <code>c₁(c₂)</code>.
+(There are no elim forms for <code>c₁ → c₂</code> and <code>∀(u ∷ κ). c</code>, because they
+construct types of kind <code>*</code>. This will be important later.)</li>
+</ul>
+
+
+<p>It&rsquo;ll also be important to have these two inference rules for kinding:</p>
+
+<p>$$
+\frac{
+  \Delta, u :: \kappa \vdash c :: *
+}{
+  \Delta \vdash \forall(u :: \kappa). \, c :: *
+}\;(\texttt{forall-kind})
+$$
+$$
+\frac{
+  \Delta, u :: \kappa \vdash c :: \kappa&#8217;
+}{
+  \Delta \vdash \lambda(u :: \kappa). \, c :: \kappa \to \kappa&#8217;
+}\;(\texttt{lambda-kind})
+$$</p>
+
+<h2>Defining the <code>list</code> Constructor</h2>
+
+<p>Let&rsquo;s take another look at this datatype definition from above:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">datatype</span> <span class="nd">'a</span> <span class="kt">list</span> <span class="p">=</span> <span class="nc">Nil</span> <span class="p">|</span> <span class="nc">Cons</span> <span class="kr">of</span> <span class="nd">'a</span> <span class="n">*</span> <span class="nd">'a</span> <span class="n">list</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;ve <a href="http://www.cs.cmu.edu/~rwh/courses/ppl/recitations/variables-in-types-jezimmer.pdf">already seen</a> how to encode the type of lists
+of integers using inductive types:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>intlist = μ(t. 1 + (int × t))</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Knowing what we know about System F (the &ldquo;<strong>polymorphic</strong> lambda
+calculus&rdquo;), our next question should be &ldquo;how do we encode
+<strong>polymorphic</strong> lists?&rdquo; Or more specifically, which of these two
+operators (<code>λ</code> or <code>∀</code>) should we pick, and why?</p>
+
+<p>First, we should be more specific, because there&rsquo;s a difference between
+<code>list</code> and <code>'a list</code>. Let&rsquo;s start off with defining <code>list</code> in
+particular. From what we know of programming in Standard ML, we can do
+things like:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">type</span> <span class="kt">grades</span> <span class="p">=</span> <span class="n">int</span> <span class="n">list</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">type</span> <span class="kt">key</span> <span class="p">=</span> <span class="n">string</span>
+</span><span class='line'><span class="kr">type</span> <span class="kt">val</span> <span class="p">=</span> <span class="n">real</span>
+</span><span class='line'><span class="kr">type</span> <span class="kt">updates</span> <span class="p">=</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kr">val</span><span class="p">)</span> <span class="n">list</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we look really closely, what&rsquo;s actually happening here is that <code>list</code>
+is a type-level <em>function</em> that returns a type (and we use the <code>type foo
+= ...</code> syntax to store that returned type in a variable).<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+
+<p>Since <code>list</code> is actually a function from types to types, it must have
+an arrow kind: <code>* → *</code>. Looking back at our two inference rules for
+kinding, we see only one rule that lets us introduce an arrow kind: <code>λ(u
+∷ κ). c</code>. On the other hand, <code>∀(u ∷ κ). c</code> must have kind <code>*</code>; it
+<em>can&rsquo;t</em> be used to define type constructors.</p>
+
+<p>Step 1: define list constructor? Check:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>list = λ(α ∷ *). μ(t. 1 + (α × t)))</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Defining Polymorphic Lists</h2>
+
+<p>It doesn&rsquo;t stop with the above definition, because it&rsquo;s still not
+<em>polymorphic</em>. In particular, we can&rsquo;t just go write functions on
+polymorphic lists with code like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">fun</span> <span class="nf">foo</span> <span class="p">(</span><span class="n">x</span> <span class="p">:</span> <span class="n">list</span><span class="p">)</span> <span class="p">=</span> <span class="c">(*</span><span class="cm"> ··· *)</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can&rsquo;t say <code>x : list</code> because all intermediate terms in a given
+program have to type check as a type of kind <code>*</code>, whereas <code>list ∷ * →
+*</code>. Another way of saying this: there isn&rsquo;t any way to introduce a value
+of type <code>list</code> because there&rsquo;s no way to introduce values with arrow
+kinds.</p>
+
+<p>Meanwhile, we <em>can</em> write this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">fun</span> <span class="nf">foo</span> <span class="p">(</span><span class="n">x</span> <span class="p">:</span> <span class="nd">'a</span> <span class="n">list</span><span class="p">)</span> <span class="p">=</span> <span class="c">(*</span><span class="cm"> ··· *)</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you get down to it, this is actually kind of weird. Why is it okay
+to use <code>'a list</code>? I never defined <code>'a</code> anywhere, so wouldn&rsquo;t that make
+it an unbound variable?</p>
+
+<p>It turns out that when we use type variables like this, SML
+automatically binds them for us by inserting <code>∀</code>s into our code. In
+particular, it implicitly infers a type like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">val</span> <span class="nv">foo</span> <span class="p">:</span> <span class="n">forall</span> <span class="nd">'a</span><span class="err">.</span> <span class="nd">'a</span> <span class="n">list</span> <span class="p">-&gt;</span> <span class="p">()</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>SML inserts this <code>forall</code> automatically because its type system is a bit
+less polymorphic than System F<sub>ω</sub>&rsquo;s, which can be thought of as
+a drawback. But on the other hand, it does at least save us from typing
+these <code>forall</code> annotations. For most of the other &ldquo;drawbacks&rdquo; we get
+from not being able to write the <code>forall</code> ourself, SML makes up the
+difference with modules.<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+
+<p>Step 2: make polymorphic list for use in annotation? Check:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>α list = ∀(α ∷ *). list(α)</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Variables &amp; Parameterization</h2>
+
+<p>Tada! We&rsquo;ve figured out how to take a list datatype from SML and encode
+it in System F<sub>ω</sub>, using these two definitions:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>  list = λ(α ∷ *). μ(t. 1 + (α × t)))
+</span><span class='line'>α list = ∀(α ∷ *). list(α)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We could end here, but there&rsquo;s one more interesting point. If we look
+back, we started out with the <code>∀</code> and <code>λ</code> operators having the same
+arity, but somewhere along the way their behaviors differed. <code>λ</code> was
+used to create type constructors, while <code>∀</code> was used to introduce
+polymorphism.</p>
+
+<p>Where did this split come from? What distinguishes <code>∀</code> as being the
+go-to type for polymorphism, while <code>λ</code> makes type constructors
+(type-to-type functions)? Recall one of the earliest ideas we teach in
+<a href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312</a>:</p>
+
+<blockquote><p>&hellip; the core idea carries over from school mathematics, namely
+that <strong>a variable is an unknown, or a place-holder, whose meaning is
+given by substitution.</strong></p>
+
+<p>&ndash; Harper, <em>Practical Foundations for Programming Languages</em></p></blockquote>
+
+<p>Variables are given meaning by substitution, so we can look to the
+appropriate substitutions to uncover the meaning and the differences
+between <code>λ</code> and <code>∀</code>. Let&rsquo;s first look at the substitution for <code>λ</code>:</p>
+
+<p>$$
+\frac{
+  \Delta, u :: \kappa_1 \vdash c_2 :: \kappa_2 \qquad \Delta \vdash c_1
+  :: \kappa_1
+}{
+  \Delta \vdash (\lambda(u :: \kappa_1). \, c_2)(c_1) \equiv  [c_1/u]c_2 :: \kappa_2
+}
+$$</p>
+
+<p>We can think of this as saying &ldquo;when you apply one type to another, the
+second type gets full access to the first type to construct a new type.&rdquo;
+We notice that the substitution here is completely <strong>internal to the
+type system</strong>.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></p>
+
+<p>On the other hand, the substitution for <code>∀</code> <strong>bridges the gap</strong> from
+types to terms:</p>
+
+<p>$$
+\frac{
+  \Delta \, \Gamma, e : \forall (u :: \kappa). \tau \qquad \Delta \vdash c :: \kappa
+}{
+  \Delta \, \Gamma \vdash e[c] : [c/u]\tau
+}
+$$
+$$
+\frac{
+  \mbox{}
+}{
+  (\Lambda u. \, e)[\tau] \mapsto [\tau / u]e
+}
+$$</p>
+
+<p>When we&rsquo;re type checking a polymorphic type application, we don&rsquo;t get to
+know anything about the type parameter <code>u</code> other than its kind. But when
+we&rsquo;re running a program and get to the evaluation of a polymorphic type
+application, we substitute the concrete <code>τ</code> directly in for <code>u</code> in <code>e</code>,
+which bridges the gap from the type-level to the term-level.</p>
+
+<p>At the end of the day, all the interesting stuff came from using
+functions (aka, something parameterized by a value) in cool ways. Isn&rsquo;t
+that baffling? Functions are so powerful that they seem to always pop up
+at the heart of the most interesting constructs. I think it&rsquo;s
+straight-up amazing that something so simple can at the same time be
+that powerful. Functions!</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Noticing that these are functions is a bit weird because in Standard ML, the type applications are backwards. Instead of <code>f(x)</code>, it&rsquo;s <code>x f</code>. But this is more similar to how we actually think; in some sense, the parameters of a function are like adjectives modifying a noun&mdash;and adjectives come before the noun they describe.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Other languages (like Haskell or PureScript) have a language feature called &ldquo;Rank-N Types&rdquo; which is really just a fancy way of saying &ldquo;you can put the <code>forall a.</code> anywhere you want.&rdquo; Oftentimes, this makes it harder for the compiler to infer where the variable bindings are, so you sometimes have to use more annotations than you might if you weren&rsquo;t using Rank-N types.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>It&rsquo;s not super relevant to this discussion, but this inference rule is for the judgement defining equality of type constructors. This comes up all over the place when you&rsquo;re writing a compiler for SML. If this sounds interesting, definitely take 15-417 HOT Compilation!<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Variables in Types]]></title>
+    <link href="https://blog.jez.io/variables-in-types/"/>
+    <updated>2017-09-25T05:17:31-04:00</updated>
+    <id>https://blog.jez.io/variables-in-types</id>
+    <content type="html"><![CDATA[<p>These are some recitation notes for an ad-hoc recitation I gave for the
+class <a href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles of Programming Languages</a>. It was probably
+my favorite 312 recitation content-wise, because it&rsquo;s the first
+recitation where we&rsquo;ve covered enough stuff to where we can really start
+connecting the dots.</p>
+
+<p><strong>Abstract</strong>:</p>
+
+<blockquote><p>We&rsquo;ve seen a number of examples in class of types which use variables.
+Having variables in our type systems lends a great deal of power to
+languages using these type systems. We&rsquo;re going to look at how
+variables are used in generic programming, inductive &amp; coinductive
+types, and polymorphic types.</p></blockquote>
+
+<h3>→ <a href="https://blog.jez.io/notes/variables-in-types.pdf">Variables in Types</a></h3>
+
+<!-- vim:tw=72
+-->
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Recitation Notes]]></title>
+    <link href="https://blog.jez.io/recitation-notes-tag/"/>
+    <updated>2017-09-24T17:40:10-04:00</updated>
+    <id>https://blog.jez.io/recitation-notes-tag</id>
+    <content type="html"><![CDATA[<!-- Empty header to prevent first paragraph from being big -->
+
+
+<p></p>
+
+
+<p>One thing I miss from being a teaching assistant is getting to write up
+recitation and lecture notes for technical topics. Like with teaching
+any other subject, writing up explanations for interesting things I&rsquo;ve
+found helps me round out what concepts are still confusing. I also miss
+getting to make nice LaTeX-typeset PDFs.</p>
+
+<!-- more -->
+
+
+<p>Recitation notes are distinguished from normal blog posts in that
+they&rsquo;ll cover more CS theory-oriented topics and will be more
+<em>instructive</em> than <em>experience-based</em>. All recitation notes are tagged
+with the tag <code>recitation</code>.</p>
+
+<h3>→ <a href="https://blog.jez.io/categories/#recitation">All posts tagged with <code>recitation</code></a></h3>
+
+<p>I might &ldquo;cross post&rdquo; a few of the more interesting existing recitation
+handouts I&rsquo;ve made over the years (though some of them make a
+heavy-handed assumption that you&rsquo;re in the class currently).</p>
+
+<!-- vim:tw=72
+-->
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Testing, Types, & Correctness]]></title>
@@ -2447,340 +2777,6 @@ on GitHub.</p>
 </ol>
 </div>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[The LaTeX homework Document Class]]></title>
-    <link href="https://blog.jez.io/2015/01/10/the-latex-homework-document-class/"/>
-    <updated>2015-01-10T18:00:00-05:00</updated>
-    <id>https://blog.jez.io/2015/01/10/the-latex-homework-document-class</id>
-    <content type="html"><![CDATA[<p>There are LaTeX document classes for typesetting books, articles, exams,
-presentations, and more. Now, there&rsquo;s one for homework assignments, too.</p>
-
-<!-- more -->
-
-
-<h2><a href="https://github.com/jez/latex-homework-class">Source</a></h2>
-
-<p>Check out and download the source <a href="https://github.com/jez/latex-homework-class">on GitHub</a>.</p>
-
-<h2>What</h2>
-
-<p>This is a LaTeX document class. That means you use it with
-<code>\documentclass{homework}</code> at the top of the document. It provides a document
-layout and some helper commands that make working with questions easy.</p>
-
-<h2>Installation</h2>
-
-<p>Certainly the easiest way to start using this template is to copy the .cls file
-to your computer in the same directory as your LaTeX project directory.</p>
-
-<p>A better way to install this template is to fork <a href="https://github.com/jez/latex-homework-class">the above
-repository</a> and then clone that fork to a particular folder on your
-computer:</p>
-
-<figure class='code'><figcaption><span>Install</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/&lt;your-username&gt;/latex-hw-template</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then, whenever you need to use the template, you can copy the template wherever.
-Also, if there are ever any updates, you can simply run</p>
-
-<figure class='code'><figcaption><span>Update</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git pull</span></code></pre></td></tr></table></div></figure>
-
-
-<p>to update the template.</p>
-
-<h3>Preferred Installation</h3>
-
-<p>The <em>best</em> way to install this file is to <a href="https://github.com/jez/latex-solarized#installation">follow the instructions
-here</a>, keeping in mind that you&rsquo;re trying to install a <code>.cls</code> file
-instead of three <code>.sty</code> files.</p>
-
-<h2>Usage</h2>
-
-<p>See the <a href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a> file for an exhaustive list of usage
-examples. There are also comments explaining features for which there are no
-examples given.</p>
-
-<p>The result is the following:</p>
-
-<p><a class="image-link" href="https://blog.jez.io/images/homework-class.png"><img src="https://blog.jez.io/images/homework-class.png"></a></p>
-
-<p>The class file also has a bunch of helper <code>\usepackage</code>s that you might want to
-take a look at in <a href="https://github.com/jez/latex-homework-class/blob/master/homework.cls">homework.cls</a>.</p>
-
-<p>For your convenience, the file <a href="https://github.com/jez/latex-homework-class/blob/master/template.tex">template.tex</a> is a nearly-empty
-LaTeX file that contains the bare essentials to get started using the homework
-class.</p>
-
-<h3><code>\question</code></h3>
-
-<p>To start a question, just type <code>\question</code>. It will add the text &ldquo;Question #&rdquo;
-with a line underneath to the document. If you&rsquo;d like to change &ldquo;Question&rdquo; to
-something else, use</p>
-
-<figure class='code'><figcaption><span>Change the Question Type</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\renewcommand</span><span class="p">{</span><span class="k">\questiontype</span><span class="p">}{</span>Whatever You Want<span class="p">}</span>
-</span><span class='line'><span class="c">% Now questions will be titled "Whatever You Want #"</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Similarly, if you ever need to skip numbers, you can do</p>
-
-<figure class='code'><figcaption><span>Non-contiguous Question Numbers</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\setcounter</span><span class="p">{</span><span class="k">\questionCounter</span><span class="p">}{</span>&lt;target number - 1&gt;<span class="p">}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>So, to skip to the 10th question, <code>&lt;target number - 1&gt;</code> = 9.</p>
-
-<p>See <a href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
-
-<h3><code>\question*</code></h3>
-
-<p>Some classes like to give their homework questions fancy names. If this is the
-case, you can use <code>\question*{The Question's Name}</code> to make a named question.</p>
-
-<p>See <a href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
-
-<h3>Question Parts</h3>
-
-<p>Another common thing on homework assignments is to have multi-part questions. To
-deal with these, use the form</p>
-
-<figure class='code'><figcaption><span>Lettered Question Parts</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="nt">\begin{alphaparts}</span>
-</span><span class='line'>  <span class="k">\questionpart</span>
-</span><span class='line'>    This will be part (a).
-</span><span class='line'>  <span class="k">\questionpart</span>
-</span><span class='line'>    This will be part (b).
-</span><span class='line'><span class="nt">\end{alphaparts}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>or</p>
-
-<figure class='code'><figcaption><span>Numbered Question Parts</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="nt">\begin{arabicparts}</span>
-</span><span class='line'>  <span class="k">\questionpart</span>
-</span><span class='line'>    This will be part x.1.
-</span><span class='line'>  <span class="k">\questionpart</span>
-</span><span class='line'>    This will be part x.2.
-</span><span class='line'><span class="nt">\end{arabicparts}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>See <a href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
-
-<h3>Induction Proofs</h3>
-
-<p>In math classes, induction proofs come up a lot, and they almost always have the
-same form: base case, induction hypothesis, and induction step.</p>
-
-<figure class='code'><figcaption><span>Induction Environment</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="nt">\begin{induction}</span>
-</span><span class='line'>  <span class="k">\basecase</span>
-</span><span class='line'>    This is my fancy base case.
-</span><span class='line'>  <span class="k">\indhyp</span>
-</span><span class='line'>    Assume some claim.
-</span><span class='line'>  <span class="k">\indstep</span>
-</span><span class='line'>    Finish off the proof
-</span><span class='line'><span class="nt">\end{induction}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Markdown</h2>
-
-<p>One of my favorite features of this document class is that it redefines the
-<code>\section</code> macros. This means you can use tools like Markdown, which have a
-concise syntax, together with a tool like <a href="http://johnmacfarlane.net/pandoc/"><code>pandoc</code></a> to convert Markdown
-into LaTeX. As an example, consider that we have the Markdown:</p>
-
-<figure class='code'><figcaption><span>my-homework.md</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>#
-</span><span class='line'>
-</span><span class='line'>This is my first answer.
-</span><span class='line'>
-</span><span class='line'>#
-</span><span class='line'>
-</span><span class='line'>This is my next answer.
-</span><span class='line'>
-</span><span class='line'>$$a^2 + b^2 = c^2$$</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Running <code>pandoc -f markdown -t latex my-homework.md</code> will output</p>
-
-<figure class='code'><figcaption><span>Convert markdown to LaTeX</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="c">% $ pandoc -f markdown -t latex my-homework.md</span>
-</span><span class='line'><span class="k">\section</span><span class="p">{}</span><span class="k">\label</span><span class="p">{</span>section<span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>This is my first answer.
-</span><span class='line'>
-</span><span class='line'><span class="k">\section</span><span class="p">{}</span><span class="k">\label</span><span class="p">{</span>section-1<span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>This is my next answer.
-</span><span class='line'>
-</span><span class='line'><span class="p">\[</span><span class="nb">a</span><span class="p">^</span><span class="m">2</span><span class="nb"> </span><span class="o">+</span><span class="nb"> b</span><span class="p">^</span><span class="m">2</span><span class="nb"> </span><span class="o">=</span><span class="nb"> c</span><span class="p">^</span><span class="m">2</span><span class="p">\]</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>And since <code>\section</code> is the same thing as \question, we&rsquo;re golden, and this
-compiles as we&rsquo;d want it to. Throw it into the blank
-<a href="https://github.com/jez/latex-homework-class/blob/master/template.tex">template.tex</a> file included in the repo, and you&rsquo;ve got yourself
-a typeset homework.</p>
-
-<h2>More</h2>
-
-<p>I&rsquo;ve make a lot of other LaTeX-related posts. Be sure to <a href="https://blog.jez.io/categories#latex">check them out</a>
-as well! My hope is that you find something that makes developing LaTeX just
-that much easier.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Offline LaTeX Development - Part 2]]></title>
-    <link href="https://blog.jez.io/2015/01/10/offline-latex-development-part-2/"/>
-    <updated>2015-01-10T17:00:00-05:00</updated>
-    <id>https://blog.jez.io/2015/01/10/offline-latex-development-part-2</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve already written about how I develop LaTeX offline in Vim using GNU Make.
-Recently, though, I found a tool that implements another feature that GUI
-editors had to themselves: splitting panes.</p>
-
-<!-- more -->
-
-
-<h2><a href="https://blog.jez.io/2014/10/06/offline-latex-development/">Offline LaTeX Development</a></h2>
-
-<p>If you missed it, check out my previous post here before reading on. There&rsquo;s a
-lot of handy stuff there!</p>
-
-<h2>Split Panes</h2>
-
-<p>Out of the box, tools like ShareLaTeX and TeXShop feature split pane editing:
-you can have your LaTeX on one half of the screen and the PDF on the other.
-Previously, I justified not having this feature with the reasoning that the
-<code>:WV</code> binding (something I explained <a href="https://blog.jez.io/2014/10/06/offline-latex-development/">here</a>) immediately opened up the
-PDF and the windows switched.</p>
-
-<p>However, I read about a tool called <a href="http://ianyh.com/amethyst/">Amethyst</a> on Hacker News the
-other day and immediately realized it&rsquo;s potential for improving my LaTeX setup.
-Amethyst is a tool that strives to be a tiling window manager like xmonad for OS
-X. At times it falls short of this goal, but for the most part it works really
-well. Just open up two apps, like MacVim and Preview, and it&rsquo;ll show them
-side-by-side with no added effort. There are also plenty of keybindings to
-manipulate the window arrangements.</p>
-
-<p>Here&rsquo;s a screenshot of what the new setup looks like:</p>
-
-<p><a class="image-link" href="https://blog.jez.io/images/latex-amethyst.png"><img src="https://blog.jez.io/images/latex-amethyst.png"></a></p>
-
-<p>After looking into it a little more, it looks like there are other OS X tools
-for spitting the screen into two panes, like <a href="http://www.bettertouchtool.net/">BetterTouchTool</a>, though I
-haven&rsquo;t actually tried any of them out.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Google Chrome: A Memory Hog]]></title>
-    <link href="https://blog.jez.io/2014/12/29/google-chrome-a-memory-hog/"/>
-    <updated>2014-12-29T18:00:00-05:00</updated>
-    <id>https://blog.jez.io/2014/12/29/google-chrome-a-memory-hog</id>
-    <content type="html"><![CDATA[<p>Whenever someone complains about a slow computer, the first thing I check is
-how many Chrome tabs they have open. Chrome hogs memory like no other. For
-users, this means Chrome is snappy and responsive, but oftentimes it comes at
-the expense of crowding out other programs. To get an idea of how much memory
-Chrome is really using, I wrote a quick bash oneliner.</p>
-
-<!-- more -->
-
-
-<h2>Why does Chrome Hog Memory?</h2>
-
-<p><a href="http://mobile.extremetech.com/latest/221392-iframe-irony-adblock-plus-is-probably-the-reason-firefox-and-chrome-are-such-memory-hogs">An article posted to Hacker News</a> recently brought some light to
-the question of why Chrome and Firefox suck up so much memory: Adblock Plus. The
-general idea is that the excessive use of iframes in most websites today ramps
-up the amount of processing that Adblock Plus has to do, driving memory usage
-through the roof. For more specifics, check out the rest of of the article.</p>
-
-<h2>The Oneliner</h2>
-
-<p>For the impatient, here&rsquo;s the code. It uses standard Unix tools:</p>
-
-<figure class='code'><figcaption><span>Chrome Memory Usage</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -ev | grep -i chrome | awk <span class="s1">'{print $12}'</span> | awk <span class="s1">'{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}'</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Pretty isn&rsquo;t it? If you want to save this as an alias for handy use, add this
-line to your ~/.bashrc (or appropriate configuration file):</p>
-
-<figure class='code'><figcaption><span>Add as an alias</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">alias </span><span class="nv">chromemem</span><span class="o">=</span><span class="s2">"ps -ev | grep -i chrome | awk '{print </span><span class="se">\$</span><span class="s2">12}' | awk '{for(i=1;i&lt;=NF;i++)s+=</span><span class="se">\$</span><span class="s2">i}END{print s}'"</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>It outputs a percentage. Here&rsquo;s the alias in action:</p>
-
-<figure class='code'><figcaption><span>Usage</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>chromemem
-</span><span class='line'>60</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Explanation</h2>
-
-<p>There&rsquo;s a lot of good stuff going on here, so let&rsquo;s take it step-by-step.</p>
-
-<p>First, we&rsquo;ll need a program that tells us memory usage. I&rsquo;m sure there are many,
-but I&rsquo;m familiar with <code>ps</code>. After checking out the man page for a few options, I
-came up with <code>ps -ev</code>, to show all information about all processes. Maybe
-wasteful, but it works.</p>
-
-<figure class='code'><figcaption><span>ps -ev</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -ev
-</span><span class='line'>  PID STAT      TIME  SL  RE PAGEIN      VSZ    RSS   LIM     TSIZ  %CPU %MEM COMMAND
-</span><span class='line'> 3473 S      0:54.92   0   0      0  3579092 301244     -        0   6.7  7.2 /Applications/Google C
-</span><span class='line'>  365 S      3:03.17   0   0      0  3920732 206808     -        0   0.3  4.9 /Applications/Google C
-</span><span class='line'>  983 S      1:29.23   0   0      0  3560272 193860     -        0   0.1  4.6 /Applications/Google C
-</span><span class='line'>  395 S      0:13.11   0   0      0  2824936 141644     -        0   0.0  3.4 /Applications/Google C
-</span><span class='line'>  422 S      0:27.22   0   0      0  3345796 130796     -        0   0.0  3.1 /Applications/Google C
-</span><span class='line'>  ...</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Notice that there&rsquo;s a convenient column describing memory usage as a percentage
-of total available memory, as well as what command is being run in that
-process. Let&rsquo;s make sure that we&rsquo;re looking at only the processes running
-some sort of Chrome service before totaling up the memory. We can find these
-lines with <code>ps -ev | grep -i chrome</code> (the -i means case-insensitive). Due to the
-way I clipped the previous sample output, nothing changes in the first five
-lines, but rest assured: we&rsquo;re only looking at Chrome processes now.</p>
-
-<p>Now it&rsquo;s time to get rid of all the other nonsense that we included with <code>ps
--ev</code>. Luckily, there&rsquo;s a handy tool called <code>awk</code> that makes parsing text by
-column easy. If we want to print the 12th column (which just so happens to
-contain the memory consumption!) we can do <code>awk '{print $12}'</code>:</p>
-
-<figure class='code'><figcaption><span>ps -ev | grep -i chrome | awk &#8216;{print $12}&#8217;</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -ev | grep -i chrome | awk <span class="s1">'{print $12}'</span>
-</span><span class='line'>7.2
-</span><span class='line'>5.1
-</span><span class='line'>4.6
-</span><span class='line'>3.4
-</span><span class='line'>3.2
-</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Finally, I found myself needing a way to add up a column of numbers. A quick
-Google search led me to <a href="http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers">this StackOverflow question</a>, and I picked the
-<code>awk</code> solution because I knew I could just pipe the input to awk (as opposed to
-having to do weird hacks to get it to work with a bash for loop):</p>
-
-<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -emv | grep -i chrome | awk <span class="s1">'{print $12}'</span> | awk <span class="s1">'{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}'</span>
-</span><span class='line'>60.4</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Of course, you could change the last <code>awk</code> command to print out something
-fancier like</p>
-
-<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -emv | grep -i chrome | awk <span class="s1">'{print $12}'</span> | awk <span class="s1">'{for(i=1;i&lt;=NF;i++)s+=$i}END{print "Chrome is using "s"% of total memory."}'</span>
-</span><span class='line'>Chrome is using 60.4% of total memory.</span></code></pre></td></tr></table></div></figure>
-
-
-<p>There you have it! Bash oneliners save the day yet again.</p>
-
-<h2>Update</h2>
-
-<p>After writing this article, I stopped using Ad Block Plus, and I noticed a
-significant drop in Chrome&rsquo;s memory usage. Obviously, though, that came at the
-cost of not blocking ads! Also, from time to time I would encounter a site that
-seemed sluggish, presumably because of all the ads attempting to be loaded. My
-simple solution to this was just to disable JavaScript on that page (I use an
-extension called Quick JavaScript Switcher), but this wasn&rsquo;t an automated
-solution.</p>
-
-<p>Then I discovered <a href="https://github.com/gorhill/uBlock">μBlock</a>, an &ldquo;efficient blocker for Chromium and
-Firefox.&rdquo; The fancy graphs on it&rsquo;s homepage convinced me to give it a shot, and
-from what I can tell so far it&rsquo;s responsive and effective.</p>
 ]]></content>
   </entry>
   

@@ -299,6 +299,9 @@ a:hover, a:active {
 a[href^="#fn:"] {
   font-weight: 600;
 }
+a[href$=".pdf"]::after {
+  content: ' (PDF)';
+}
 
 .link-arrow {
   text-decoration: underline;
@@ -327,6 +330,9 @@ blockquote {
   margin-left: 40px;
   font-style: italic;
 }
+blockquote em {
+  font-style: normal;
+}
 
 blockquote > *:first-child {
   position: relative;
@@ -336,8 +342,8 @@ blockquote > *:first-child::before {
   content: "“";
   display: block;
   position: absolute;
-  font-size: 5rem;
-  top: -1.9rem;
+  font-size: 4rem;
+  top: -1.7rem;
   left: -3.2rem;
 }
 
@@ -368,6 +374,16 @@ li code {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   border-radius: 3px;
+}
+
+h2 code {
+  font-size: 22.4px;
+  font-size: 1.4rem;
+}
+
+h3 code {
+  font-size: 17.6px;
+  font-size: 1.1rem;
 }
 
 pre {
