@@ -98,7 +98,7 @@ datatype 'a list = Nil | Cons of 'a * 'a list
 We've [already seen][variables-in-types] how to encode the type of lists
 of integers using inductive types:
 
-[variables-in-types]: http://www.cs.cmu.edu/~rwh/courses/ppl/recitations/variables-in-types-jezimmer.pdf
+[variables-in-types]: /variables-in-types/
 
 ```
 intlist = μ(t. 1 + (int × t))
