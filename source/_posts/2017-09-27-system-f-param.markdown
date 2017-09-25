@@ -1,10 +1,10 @@
 ---
 layout: post
 title: System Fω and Parameterization
-date: 2017-09-25 19:14:45 -0700
+date: 2017-09-27 19:14:45 -0700
 comments: false
 share: false
-categories: ['recitation']
+categories: ['recitation', 'sml', 'plt']
 description: >
   Some recitation-style notes on System F, polymorphism, and functions.
   I used to not know the difference between ∀(t.τ) and λ(u.c). Turns
@@ -210,7 +210,7 @@ go-to type for polymorphism, while `λ` makes type constructors
 (type-to-type functions)? Recall one of the earliest ideas we teach in
 [15-312][ppl]:
 
-[ppl]: www.cs.cmu.edu/~rwh/courses/ppl/
+[ppl]: http://www.cs.cmu.edu/~rwh/courses/ppl/
 
 > ... the core idea carries over from school mathematics, namely
 > that **a variable is an unknown, or a place-holder, whose meaning is
