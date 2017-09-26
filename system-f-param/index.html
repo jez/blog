@@ -83,7 +83,7 @@
         <h2>September 27, 2017</h2>
         
           <div class="entry-meta">
-            <a href="/categories/#recitation" title="This post is structured like 'recitation notes.' It aims to be instructive, and also makes some assumptions about prerequisit knowledge." class="tag">recitation notes</a>
+            <a href="/categories/#recitation" title="This post is structured like 'recitation notes.' It aims to be instructive, and also makes some assumptions about prerequisite knowledge." class="tag">recitation notes</a>
           </div>
         
       </div><!-- /.header-title-wrap -->
@@ -192,10 +192,13 @@ operators (<code>λ</code> or <code>∀</code>) should we pick, and why?</p>
 particular. From what we know of programming in Standard ML, we can do
 things like:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">type</span> <span class="kt">grades</span> <span class="p">=</span> <span class="n">int</span> <span class="n">list</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="c">(*</span><span class="cm"> Apply 'int' to 'list' function! *)</span>
+</span><span class='line'><span class="kr">type</span> <span class="kt">grades</span> <span class="p">=</span> <span class="n">int</span> <span class="n">list</span>
 </span><span class='line'>
 </span><span class='line'><span class="kr">type</span> <span class="kt">key</span> <span class="p">=</span> <span class="n">string</span>
 </span><span class='line'><span class="kr">type</span> <span class="kt">val</span> <span class="p">=</span> <span class="n">real</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">(*</span><span class="cm"> Apply '(key, val)' to 'list' function! *)</span>
 </span><span class='line'><span class="kr">type</span> <span class="kt">updates</span> <span class="p">=</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kr">val</span><span class="p">)</span> <span class="n">list</span></span></code></pre></td></tr></table></div></figure>
 
 
@@ -246,11 +249,10 @@ particular, it implicitly infers a type like this:</p>
 
 
 <p>SML inserts this <code>forall</code> automatically because its type system is a bit
-less polymorphic than System F<sub>ω</sub>&rsquo;s, which can be thought of as
-a drawback. But on the other hand, it does at least save us from typing
-these <code>forall</code> annotations. For most of the other &ldquo;drawbacks&rdquo; we get
-from not being able to write the <code>forall</code> ourself, SML makes up the
-difference with modules.<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+less polymorphic than System F<sub>ω</sub>&rsquo;s. Some might call this a
+drawback, though it does save us from typing <code>forall</code> annotations
+ourselves. And really, for most anything else we&rsquo;d call a &ldquo;drawback&rdquo; of
+this design, SML makes up the difference with modules.<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
 
 <p>Step 2: make polymorphic list for use in annotation? Check:</p>
 
@@ -339,7 +341,7 @@ that powerful. Functions!</p>
 <hr/>
 <ol>
 <li id="fn:1">
-<p>Noticing that these are functions is a bit weird because in Standard ML, the type applications are backwards. Instead of <code>f(x)</code>, it&rsquo;s <code>x f</code>. But this is more similar to how we actually think; in some sense, the parameters of a function are like adjectives modifying a noun&mdash;and adjectives come before the noun they describe.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<p>Noticing that these are functions is a bit weird because in Standard ML, the type applications are backwards. Instead of <code>f(x)</code>, it&rsquo;s <code>x f</code>. This is more similar to how we actually think when we see a function. Consider <code>h(g(f(x)))</code> (or another way: <code>h . g . f $ x</code>). We read this as &ldquo;take x, do f, pass that to g, and pass that to h&rdquo;. Why not write <code>x f g h</code> in the first place? In fact, in OCaml there&rsquo;s an operator for exactly this: <code>x |&gt; f |&gt; h |&gt; h</code>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 <li id="fn:2">
 <p>Other languages (like Haskell or PureScript) have a language feature called &ldquo;Rank-N Types&rdquo; which is really just a fancy way of saying &ldquo;you can put the <code>forall a.</code> anywhere you want.&rdquo; Oftentimes, this makes it harder for the compiler to infer where the variable bindings are, so you sometimes have to use more annotations than you might if you weren&rsquo;t using Rank-N types.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 <li id="fn:3">
