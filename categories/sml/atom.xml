@@ -4,7 +4,7 @@
   <title><![CDATA[Category: sml | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/sml/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-09-26T17:48:52-04:00</updated>
+  <updated>2017-09-26T17:51:52-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -270,7 +270,7 @@ that powerful. Functions!</p>
 <hr/>
 <ol>
 <li id="fn:1">
-<p>Noticing that these are functions is a bit weird because in Standard ML, the type applications are backwards. Instead of <code>f(x)</code>, it&rsquo;s <code>x f</code>. This is more similar to how we actually think when we see a function. Consider <code>h(g(f(x)))</code> (or another way: <code>h . g . f $ x</code>). We read this as &ldquo;take x, do f, pass that to g, and pass that to h&rdquo;. Why not write <code>x f g h</code> in the first place? In fact, in OCaml there&rsquo;s an operator for exactly this: <code>x |&gt; f |&gt; h |&gt; h</code>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<p>It&rsquo;s easy to not notice at first that type definitions are really function calls because in Standard ML, the type function applications are backwards. Instead of <code>f(x)</code>, it&rsquo;s <code>x f</code>. This is more similar to how we actually think when we see a function. Consider <code>h(g(f(x)))</code> (or another way: <code>h . g . f $ x</code>). We read this as &ldquo;take x, do f, pass that to g, and pass that to h&rdquo;. Why not write <code>x f g h</code> in the first place?<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 <li id="fn:2">
 <p>Other languages (like Haskell or PureScript) have a language feature called &ldquo;Rank-N Types&rdquo; which is really just a fancy way of saying &ldquo;you can put the <code>forall a.</code> anywhere you want.&rdquo; Oftentimes, this makes it harder for the compiler to infer where the variable bindings are, so you sometimes have to use more annotations than you might if you weren&rsquo;t using Rank-N types.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 <li id="fn:3">
