@@ -4,7 +4,7 @@
   <title><![CDATA[Category: plt | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/plt/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-11-12T01:50:51-05:00</updated>
+  <updated>2017-11-12T02:03:25-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -50,7 +50,7 @@ substitution is variable capture.</p>
 accidentally let variables be <em>captured</em> during substitution. Consider
 this example:</p>
 
-<pre><code class="python">                      ◀────────────────┐
+<pre><code class="python">                      ◀────────────────┐                    
                              ┌──────┐  │
                        (λx. λy. x + y) y
                          └──────┘
@@ -86,7 +86,7 @@ After partially applying that function, we&rsquo;ve ended up with a function
 that doubles it&rsquo;s argument. Whoops! We can look at the issue visually in
 this diagram:</p>
 
-<pre><code class="python">           ◀─────┐             ┃         ┌──┐
+<pre><code class="python">           ◀─────┐             ┃         ┌──┐               
              λy. y + y         ┃        λy. y + y
               └──────┘         ┃         └──────┘
 </code></pre>
@@ -173,7 +173,7 @@ whether to α-vary before a collision happened. The next representation
 we&rsquo;ll look at sidesteps this problem by not giving name to variables at
 all! Let&rsquo;s take a look at our picture from before:</p>
 
-<pre><code class="python">                             ┌──────┐
+<pre><code class="python">                             ┌──────┐                        
                         λx. λy. x + y
                          └──────┘
 </code></pre>
@@ -184,7 +184,7 @@ just care that applying this function sticks the argument everywhere the
 line on the bottom points to. We could omit the names entirely, as long
 as we can still capture where the lines should connect to:</p>
 
-<pre><code class="python">                            ┌─────┐
+<pre><code class="python">                            ┌─────┐                        
                        (λ. λ. ◆ + ◆)
                          └────┘
 </code></pre>
@@ -194,7 +194,7 @@ have to go before you arrive at the location the variable is bound.
 Under this representation, variables are just indices into a list of the
 binding sites; we call these indices <strong>de Bruijn indices</strong>:</p>
 
-<pre><code class="python">                       (λ. λ. ① + ⓪)
+<pre><code class="python">                       (λ. λ. ① + ⓪)                       
 </code></pre>
 
 <p><strong>Note</strong>: I&rsquo;m using circled numbers like <code>⓪</code> for the variable with de
@@ -219,7 +219,7 @@ back the appropriate number of <code>Lam</code>s to skip over.</p>
 know which variables are free and which are bound: a variable is free if
 its index is larger than the number of lambdas it&rsquo;s under.</p>
 
-<pre><code class="python">                      ◀───────────────┐
+<pre><code class="python">                      ◀───────────────┐                      
                             ┌──────┐  │
                        (λ. λ. ① + ⓪) ③
                          └────┘

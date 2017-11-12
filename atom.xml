@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-11-12T01:50:51-05:00</updated>
+  <updated>2017-11-12T02:03:25-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -50,7 +50,7 @@ substitution is variable capture.</p>
 accidentally let variables be <em>captured</em> during substitution. Consider
 this example:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                  <span class="err">◀────────────────┐</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                  <span class="err">◀────────────────┐</span>                    
 </span><span class='line'>                         <span class="err">┌──────┐</span>  <span class="err">│</span>
 </span><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="n">x</span><span class="o">.</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span> <span class="n">y</span>
 </span><span class='line'>                     <span class="err">└──────┘</span></span></code></pre></td></tr></table></div></figure>
@@ -86,7 +86,7 @@ After partially applying that function, we&rsquo;ve ended up with a function
 that doubles it&rsquo;s argument. Whoops! We can look at the issue visually in
 this diagram:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>       <span class="err">◀─────┐</span>             <span class="err">┃</span>         <span class="err">┌──┐</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>       <span class="err">◀─────┐</span>             <span class="err">┃</span>         <span class="err">┌──┐</span>               
 </span><span class='line'>         <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span>         <span class="err">┃</span>        <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span>
 </span><span class='line'>          <span class="err">└──────┘</span>         <span class="err">┃</span>         <span class="err">└──────┘</span></span></code></pre></td></tr></table></div></figure>
 
@@ -173,7 +173,7 @@ whether to α-vary before a collision happened. The next representation
 we&rsquo;ll look at sidesteps this problem by not giving name to variables at
 all! Let&rsquo;s take a look at our picture from before:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                         <span class="err">┌──────┐</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                         <span class="err">┌──────┐</span>                        
 </span><span class='line'>                    <span class="err">λ</span><span class="n">x</span><span class="o">.</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
 </span><span class='line'>                     <span class="err">└──────┘</span></span></code></pre></td></tr></table></div></figure>
 
@@ -184,7 +184,7 @@ just care that applying this function sticks the argument everywhere the
 line on the bottom points to. We could omit the names entirely, as long
 as we can still capture where the lines should connect to:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                        <span class="err">┌─────┐</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                        <span class="err">┌─────┐</span>                        
 </span><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">◆</span> <span class="o">+</span> <span class="err">◆</span><span class="p">)</span>
 </span><span class='line'>                     <span class="err">└────┘</span></span></code></pre></td></tr></table></div></figure>
 
@@ -194,7 +194,7 @@ have to go before you arrive at the location the variable is bound.
 Under this representation, variables are just indices into a list of the
 binding sites; we call these indices <strong>de Bruijn indices</strong>:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span>                       </span></code></pre></td></tr></table></div></figure>
 
 
 <p><strong>Note</strong>: I&rsquo;m using circled numbers like <code>⓪</code> for the variable with de
@@ -219,7 +219,7 @@ back the appropriate number of <code>Lam</code>s to skip over.</p>
 know which variables are free and which are bound: a variable is free if
 its index is larger than the number of lambdas it&rsquo;s under.</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                  <span class="err">◀───────────────┐</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                  <span class="err">◀───────────────┐</span>                      
 </span><span class='line'>                        <span class="err">┌──────┐</span>  <span class="err">│</span>
 </span><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span> <span class="err">③</span>
 </span><span class='line'>                     <span class="err">└────┘</span></span></code></pre></td></tr></table></div></figure>
