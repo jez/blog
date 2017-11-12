@@ -159,7 +159,7 @@ ever get a new laptop.
 
 ## `ssh`
 
-My hostname on every machine I ssh to for school is `jezimmer`, but there are
+My username on every machine I ssh to for school is `jezimmer`, but there are
 countless servers I can ssh into (7 for `unix.andrew.cmu.edu`, 99+ for
 `ghc*.ghc.andrew.cmu.edu`, 10 for 15-213, the list goes on). [These
 lines][ssh-jezimmer] enable me to ssh to any of those machines with just a
