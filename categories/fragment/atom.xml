@@ -4,7 +4,7 @@
   <title><![CDATA[Category: fragment | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/fragment/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-11-12T03:46:26-05:00</updated>
+  <updated>2017-11-12T18:46:43-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,90 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ABTs in Haskell]]></title>
+    <link href="https://blog.jez.io/abts-in-haskell/"/>
+    <updated>2017-11-12T01:31:41-05:00</updated>
+    <id>https://blog.jez.io/abts-in-haskell</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been learning and using Haskell on-and-off for the past couple
+of years. One of my early complaints was that I couldn&rsquo;t find a good
+library for working with variables and binding that used locally
+nameless terms. Recently though, I found <a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>, which
+checks all my previously unfilled boxes.</p>
+
+<p>Abstract binding trees (or ABTs) are abstract syntax trees (ASTs)
+augmented with the ability to capture the binding structure of a
+program. ABTs are one of the first topics we cover in <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles
+of Programming Languages</a> because variables show up in every
+interesting feature of a programming language.</p>
+
+<p>I recently wrote at length about the various strategies for dealing with
+<a href="/variables-and-binding/">variables and binding</a> and their implementations. While it&rsquo;s a good
+exercise<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to implement ABTs from scratch, in most cases I&rsquo;d
+rather just use a library. In school we used <a href="https://github.com/robsimmons/abbot"><code>abbot</code></a>, which is an ABT
+library for Standard ML. For tinkering with Haskell, I recently found
+<a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>, which provides a similar API.</p>
+
+<p>I gave it a test drive while learning how to implement type inference
+for the simply-typed lambda calculus (STLC) and was rather pleased. The
+source code for my STLC inference program is <a href="https://github.com/jez/stlc-infer">on GitHub</a> if
+you&rsquo;re looking for an example of <a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a> in action.</p>
+
+<p>To pluck a few snippets out, here&rsquo;s the definition of STLC terms:</p>
+
+<pre><code class="haskell">data Term
+  = Tvar Tvar
+  | Tlam (Bind Tvar Term)
+  | Tapp Term Term
+  | Tlet Term (Bind Tvar Term)
+  | Tz
+  | Ts Term
+  | Tifz Term Term (Bind Tvar Term)
+  | Tbool Bool
+  | Tif Term Term Term
+  deriving (Show, Generic, Typeable)
+</code></pre>
+
+<p><code>Bind</code> is the abstract type for locally nameless terms that bind a
+variable. It&rsquo;s cool in Haskell (compared to SML) because the compiler
+can automatically derive the locally nameless representation from this
+data type definition (with help from the <code>unbound-generics</code> library).</p>
+
+<p>Here&rsquo;s what it looks like in use:</p>
+
+<pre><code class="haskell">-- (This is a snippet from the type inference code)
+constraintsWithCon ctx (Tlam bnd) = do
+  -- 'out' the ABT to get a fresh variable
+  -- (x used to be "locally nameless", but now has a globally unique name)
+  (x, e) &lt;- unbind bnd
+  -- Generate fresh type variable to put into the context
+  t1 &lt;- Cvar &lt;$&gt; fresh (string2name "t1_")
+  let ctx' = Map.insert x t1 ctx
+  t2 &lt;- constraintsWithCon ctx' e
+  return $ Carrow t1 t2
+</code></pre>
+
+<p>Apart from <code>out</code> being called <code>unbind</code> and <code>into</code> being called <code>bind</code>,
+the API is pretty similar. Also, unlike <code>abbot</code>, which required a
+standalone build step to generate SML code, <code>unbound-generics</code> uses the
+Haskell&rsquo;s <code>derive Generic</code> to bake the code generation for capture
+avoiding substitution and alpha equivalence right into the compiler. All
+in all, <code>unbound-generics</code> is really pleasant to use!</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>In fact, it&rsquo;s hw1 for 15-312! If you&rsquo;re curious, check out the <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/hws/assn1.pdf">handout</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Testing, Types, & Correctness]]></title>

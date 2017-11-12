@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>ABTs in Haskell - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="I've been learning and using Haskell on-and-off for the past couple of years. One of my early complaints was that I couldn't find a good library for &hellip;">
+
+<meta name="keywords" content="fragment haskell plt ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/abts-in-haskell">
+<meta property="og:title" content="ABTs in Haskell">
+<meta property="og:description" content="I've been learning and using Haskell on-and-off for the past couple of years. One of my early complaints was that I couldn't find a good library for &hellip;">
+
+  <meta property="og:image" content="">
+
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/abts-in-haskell">
+<link href="/favicon.png" rel="icon">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+<script>Modernizr || document.write('<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
+
+
+
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
+  <button class="dl-trigger">Open Menu</button>
+  <ul class="dl-menu">
+    <li><a href="/">All Posts</a></li><li><a href="/categories#fragment">Fragments</a></li><li><a href="/categories/">Posts by Category</a></li><li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
+  </ul><!-- /.dl-menu -->
+</nav><!-- /.dl-menuwrapper -->
+
+
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <header class="header-title">
+      <div class="header-title-wrap">
+        
+          <h1 class="entry-title">ABTs in Haskell</h1>
+        
+        <h2>November 12, 2017</h2>
+        
+          <div class="entry-meta">
+            <a href="/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
+          </div>
+        
+      </div><!-- /.header-title-wrap -->
+    </header>
+    <div class="entry-content">
+      <p>I&rsquo;ve been learning and using Haskell on-and-off for the past couple
+of years. One of my early complaints was that I couldn&rsquo;t find a good
+library for working with variables and binding that used locally
+nameless terms. Recently though, I found <a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>, which
+checks all my previously unfilled boxes.</p>
+
+<p>Abstract binding trees (or ABTs) are abstract syntax trees (ASTs)
+augmented with the ability to capture the binding structure of a
+program. ABTs are one of the first topics we cover in <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles
+of Programming Languages</a> because variables show up in every
+interesting feature of a programming language.</p>
+
+<p>I recently wrote at length about the various strategies for dealing with
+<a href="/variables-and-binding/">variables and binding</a> and their implementations. While it&rsquo;s a good
+exercise<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to implement ABTs from scratch, in most cases I&rsquo;d
+rather just use a library. In school we used <a href="https://github.com/robsimmons/abbot"><code>abbot</code></a>, which is an ABT
+library for Standard ML. For tinkering with Haskell, I recently found
+<a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>, which provides a similar API.</p>
+
+<p>I gave it a test drive while learning how to implement type inference
+for the simply-typed lambda calculus (STLC) and was rather pleased. The
+source code for my STLC inference program is <a href="https://github.com/jez/stlc-infer">on GitHub</a> if
+you&rsquo;re looking for an example of <a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a> in action.</p>
+
+<p>To pluck a few snippets out, here&rsquo;s the definition of STLC terms:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">data</span> <span class="kt">Term</span>
+</span><span class='line'>  <span class="o">=</span> <span class="kt">Tvar</span> <span class="kt">Tvar</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tlam</span> <span class="p">(</span><span class="kt">Bind</span> <span class="kt">Tvar</span> <span class="kt">Term</span><span class="p">)</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tapp</span> <span class="kt">Term</span> <span class="kt">Term</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tlet</span> <span class="kt">Term</span> <span class="p">(</span><span class="kt">Bind</span> <span class="kt">Tvar</span> <span class="kt">Term</span><span class="p">)</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tz</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Ts</span> <span class="kt">Term</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tifz</span> <span class="kt">Term</span> <span class="kt">Term</span> <span class="p">(</span><span class="kt">Bind</span> <span class="kt">Tvar</span> <span class="kt">Term</span><span class="p">)</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tbool</span> <span class="kt">Bool</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tif</span> <span class="kt">Term</span> <span class="kt">Term</span> <span class="kt">Term</span>
+</span><span class='line'>  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Show</span><span class="p">,</span> <span class="kt">Generic</span><span class="p">,</span> <span class="kt">Typeable</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>Bind</code> is the abstract type for locally nameless terms that bind a
+variable. It&rsquo;s cool in Haskell (compared to SML) because the compiler
+can automatically derive the locally nameless representation from this
+data type definition (with help from the <code>unbound-generics</code> library).</p>
+
+<p>Here&rsquo;s what it looks like in use:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="c1">-- (This is a snippet from the type inference code)</span>
+</span><span class='line'><span class="n">constraintsWithCon</span> <span class="n">ctx</span> <span class="p">(</span><span class="kt">Tlam</span> <span class="n">bnd</span><span class="p">)</span> <span class="o">=</span> <span class="kr">do</span>
+</span><span class='line'>  <span class="c1">-- 'out' the ABT to get a fresh variable</span>
+</span><span class='line'>  <span class="c1">-- (x used to be "locally nameless", but now has a globally unique name)</span>
+</span><span class='line'>  <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">unbind</span> <span class="n">bnd</span>
+</span><span class='line'>  <span class="c1">-- Generate fresh type variable to put into the context</span>
+</span><span class='line'>  <span class="n">t1</span> <span class="o">&lt;-</span> <span class="kt">Cvar</span> <span class="o">&lt;$&gt;</span> <span class="n">fresh</span> <span class="p">(</span><span class="n">string2name</span> <span class="s">"t1_"</span><span class="p">)</span>
+</span><span class='line'>  <span class="kr">let</span> <span class="n">ctx'</span> <span class="o">=</span> <span class="kt">Map</span><span class="o">.</span><span class="n">insert</span> <span class="n">x</span> <span class="n">t1</span> <span class="n">ctx</span>
+</span><span class='line'>  <span class="n">t2</span> <span class="o">&lt;-</span> <span class="n">constraintsWithCon</span> <span class="n">ctx'</span> <span class="n">e</span>
+</span><span class='line'>  <span class="n">return</span> <span class="o">$</span> <span class="kt">Carrow</span> <span class="n">t1</span> <span class="n">t2</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Apart from <code>out</code> being called <code>unbind</code> and <code>into</code> being called <code>bind</code>,
+the API is pretty similar. Also, unlike <code>abbot</code>, which required a
+standalone build step to generate SML code, <code>unbound-generics</code> uses the
+Haskell&rsquo;s <code>derive Generic</code> to bake the code generation for capture
+avoiding substitution and alpha equivalence right into the compiler. All
+in all, <code>unbound-generics</code> is really pleasant to use!</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>In fact, it&rsquo;s hw1 for 15-312! If you&rsquo;re curious, check out the <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/hws/assn1.pdf">handout</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="/categories/#fragment" title="Pages tagged fragment" class="tag">fragment</a><a href="/categories/#haskell" title="Pages tagged haskell" class="tag">haskell</a><a href="/categories/#plt" title="Pages tagged plt" class="tag">plt</a></span>
+        <span class="entry-date date published updated"><time datetime="2017-11-12T01:31:41-05:00">November 12, 2017</time></span>
+        
+      </footer>
+    </div><!-- /.entry-content -->
+    
+      <div class="read-more">
+        
+          <div class="read-more-header">
+            <a href="/variables-and-binding/" class="btn">Read More</a>
+          </div><!-- /.read-more-header -->
+          <div class="read-more-content">
+            <h3><a href="/variables-and-binding/" title="Variables and Binding">Variables and Binding</a></h3>
+            <p>Nearly every interesting programming language feature derives its power from variables. Functions wouldn&#8217;t be functions if not for variables. Modularity and linking reduce to variables and substitution. I&#8217;ve written in the past about all sorts of cool variables in types, as well as how parametric polymorphism in System F is the result of using type variables in two ways within the same system.
+ <a href="/variables-and-binding/"> Continue reading</a></p>
+          </div><!-- /.read-more-content -->
+        
+        <div class="read-more-list">
+          
+            <div class="list-item">
+              <h4><a href="/system-f-param/" title="System Fω and Parameterization">System Fω and Parameterization</a></h4>
+              <span>Published on September 27, 2017</span>
+            </div><!-- /.list-item -->
+          
+            <div class="list-item">
+              <h4><a href="/variables-in-types/" title="Variables in Types">Variables in Types</a></h4>
+              <span>Published on September 25, 2017</span>
+            </div><!-- /.list-item -->
+          
+        </div><!-- /.read-more-list -->
+      </div><!-- /.read-more -->
+    
+    
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2017 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+
+	        
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="/javascripts/scripts.min.js"></script>
+&#8211;>
+	        
+
+</body>
+</html>

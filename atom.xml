@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-11-12T03:46:26-05:00</updated>
+  <updated>2017-11-12T18:46:43-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,90 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ABTs in Haskell]]></title>
+    <link href="https://blog.jez.io/abts-in-haskell/"/>
+    <updated>2017-11-12T01:31:41-05:00</updated>
+    <id>https://blog.jez.io/abts-in-haskell</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been learning and using Haskell on-and-off for the past couple
+of years. One of my early complaints was that I couldn&rsquo;t find a good
+library for working with variables and binding that used locally
+nameless terms. Recently though, I found <a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>, which
+checks all my previously unfilled boxes.</p>
+
+<p>Abstract binding trees (or ABTs) are abstract syntax trees (ASTs)
+augmented with the ability to capture the binding structure of a
+program. ABTs are one of the first topics we cover in <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles
+of Programming Languages</a> because variables show up in every
+interesting feature of a programming language.</p>
+
+<p>I recently wrote at length about the various strategies for dealing with
+<a href="https://blog.jez.io/variables-and-binding/">variables and binding</a> and their implementations. While it&rsquo;s a good
+exercise<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to implement ABTs from scratch, in most cases I&rsquo;d
+rather just use a library. In school we used <a href="https://github.com/robsimmons/abbot"><code>abbot</code></a>, which is an ABT
+library for Standard ML. For tinkering with Haskell, I recently found
+<a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>, which provides a similar API.</p>
+
+<p>I gave it a test drive while learning how to implement type inference
+for the simply-typed lambda calculus (STLC) and was rather pleased. The
+source code for my STLC inference program is <a href="https://github.com/jez/stlc-infer">on GitHub</a> if
+you&rsquo;re looking for an example of <a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a> in action.</p>
+
+<p>To pluck a few snippets out, here&rsquo;s the definition of STLC terms:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">data</span> <span class="kt">Term</span>
+</span><span class='line'>  <span class="o">=</span> <span class="kt">Tvar</span> <span class="kt">Tvar</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tlam</span> <span class="p">(</span><span class="kt">Bind</span> <span class="kt">Tvar</span> <span class="kt">Term</span><span class="p">)</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tapp</span> <span class="kt">Term</span> <span class="kt">Term</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tlet</span> <span class="kt">Term</span> <span class="p">(</span><span class="kt">Bind</span> <span class="kt">Tvar</span> <span class="kt">Term</span><span class="p">)</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tz</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Ts</span> <span class="kt">Term</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tifz</span> <span class="kt">Term</span> <span class="kt">Term</span> <span class="p">(</span><span class="kt">Bind</span> <span class="kt">Tvar</span> <span class="kt">Term</span><span class="p">)</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tbool</span> <span class="kt">Bool</span>
+</span><span class='line'>  <span class="o">|</span> <span class="kt">Tif</span> <span class="kt">Term</span> <span class="kt">Term</span> <span class="kt">Term</span>
+</span><span class='line'>  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Show</span><span class="p">,</span> <span class="kt">Generic</span><span class="p">,</span> <span class="kt">Typeable</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>Bind</code> is the abstract type for locally nameless terms that bind a
+variable. It&rsquo;s cool in Haskell (compared to SML) because the compiler
+can automatically derive the locally nameless representation from this
+data type definition (with help from the <code>unbound-generics</code> library).</p>
+
+<p>Here&rsquo;s what it looks like in use:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="c1">-- (This is a snippet from the type inference code)</span>
+</span><span class='line'><span class="n">constraintsWithCon</span> <span class="n">ctx</span> <span class="p">(</span><span class="kt">Tlam</span> <span class="n">bnd</span><span class="p">)</span> <span class="o">=</span> <span class="kr">do</span>
+</span><span class='line'>  <span class="c1">-- 'out' the ABT to get a fresh variable</span>
+</span><span class='line'>  <span class="c1">-- (x used to be "locally nameless", but now has a globally unique name)</span>
+</span><span class='line'>  <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">unbind</span> <span class="n">bnd</span>
+</span><span class='line'>  <span class="c1">-- Generate fresh type variable to put into the context</span>
+</span><span class='line'>  <span class="n">t1</span> <span class="o">&lt;-</span> <span class="kt">Cvar</span> <span class="o">&lt;$&gt;</span> <span class="n">fresh</span> <span class="p">(</span><span class="n">string2name</span> <span class="s">"t1_"</span><span class="p">)</span>
+</span><span class='line'>  <span class="kr">let</span> <span class="n">ctx'</span> <span class="o">=</span> <span class="kt">Map</span><span class="o">.</span><span class="n">insert</span> <span class="n">x</span> <span class="n">t1</span> <span class="n">ctx</span>
+</span><span class='line'>  <span class="n">t2</span> <span class="o">&lt;-</span> <span class="n">constraintsWithCon</span> <span class="n">ctx'</span> <span class="n">e</span>
+</span><span class='line'>  <span class="n">return</span> <span class="o">$</span> <span class="kt">Carrow</span> <span class="n">t1</span> <span class="n">t2</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Apart from <code>out</code> being called <code>unbind</code> and <code>into</code> being called <code>bind</code>,
+the API is pretty similar. Also, unlike <code>abbot</code>, which required a
+standalone build step to generate SML code, <code>unbound-generics</code> uses the
+Haskell&rsquo;s <code>derive Generic</code> to bake the code generation for capture
+avoiding substitution and alpha equivalence right into the compiler. All
+in all, <code>unbound-generics</code> is really pleasant to use!</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>In fact, it&rsquo;s hw1 for 15-312! If you&rsquo;re curious, check out the <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/hws/assn1.pdf">handout</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Variables and Binding]]></title>
@@ -3080,43 +3164,6 @@ reading the documentation for the plugins you think could be useful to you so
 that you can fully utilize them. Be sure to comment on the commits with
 questions if you&rsquo;re stuck or are wondering why your setup doesn&rsquo;t look similar
 to one of the above!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[New GitHub Username]]></title>
-    <link href="https://blog.jez.io/2015/02/03/new-github-username/"/>
-    <updated>2015-02-03T04:01:04-05:00</updated>
-    <id>https://blog.jez.io/2015/02/03/new-github-username</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve changed my GitHub username from Z1MM32M4N to jez (hopefully it&rsquo;ll be a
-little easier to type now!). Make sure you update any remote URLs for repos of
-mine that you&rsquo;ve cloned.</p>
-
-<!-- more -->
-
-
-<h2>Updating your Git remotes</h2>
-
-<p>If you&rsquo;ve cloned one of my repositories, you can update it&rsquo;s URL by running</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>git remote -v</span></code></pre></td></tr></table></div></figure>
-
-
-<p>to check the current remote URL, which should look something like
-<code>https://github.com/Z1MM32M4N/&lt;repo name&gt;</code>. Then, you can run</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>git remote <span class="nb">set</span>-url origin https://github.com/jez/&lt;repo name&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>to actually change the URL.</p>
-
-<p>Because of the way that GitHub handles username changes, you should be able to
-continue using the current URLs at least for the time being, but any time you
-pull you&rsquo;ll get a message from GitHub asking to update the remote URLs.</p>
-
-<p>I tried to update all links referencing Z1MM32M4N to use the new username, but
-I&rsquo;m sure I&rsquo;ve missed a few. If you find a &ldquo;broken&rdquo; link, shoot me a message
-letting me know!</p>
 ]]></content>
   </entry>
   
