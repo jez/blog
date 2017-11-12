@@ -30,7 +30,7 @@
 		margin: 0;
 		@include font-rem($title-date_sm_fs);
 		text-transform: uppercase;
-		font-family: 'Concourse Caps';
+		font-family: $caps-font;
 		color: lighten($base-color,40%);
 		@media #{$medium} {
 			@include font-rem($title-date_lg_fs);
@@ -53,7 +53,7 @@
 	}
 	h1 {
 		margin: 10px;
-		font-family: 'Concourse Caps';
+		font-family: $caps-font;
 		font-weight: 400;
 		margin: 10px 60px;
 		color: $white;
@@ -68,7 +68,7 @@
 		margin: 0;
 		color: $white;
 		text-transform: uppercase;
-		font-family: 'Concourse Caps';
+		font-family: $caps-font;
 		font-weight: 600;
 		@media #{$medium} {
 			a {
