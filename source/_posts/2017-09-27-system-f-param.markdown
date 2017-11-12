@@ -13,12 +13,12 @@ strong_keywords: false
 mathjax: true
 ---
 
-My understanding of System F<sub>ω</sub> used to be really shaky. In
-particular, I'd been confused about the difference between `∀(t.τ)`
-(forall types) and `λ(u.c)` (type abstractions) for a long time. Both of
-these constructs have to do with parameterization (factoring out a
-variable so that it's bound), but each has a drastically different
-meaning.
+When I first learned about System F<sub>ω</sub>, I was confused about
+the difference between `∀(t.τ)` (forall types) and `λ(u.c)` (type
+abstractions) for a long time, but recently I finally grasped the
+difference! Both of these constructs have to do with parameterization
+(factoring out a variable so that it's bound), but the two types have
+drastically different meanings.
 
 <!-- more -->
 
@@ -115,10 +115,13 @@ particular. From what we know of programming in Standard ML, we can do
 things like:
 
 ```sml
+(* Apply 'int' to 'list' function! *)
 type grades = int list
 
 type key = string
 type val = real
+
+(* Apply '(key, val)' to 'list' function! *)
 type updates = (key, val) list
 ```
 
@@ -126,7 +129,7 @@ If we look really closely, what's actually happening here is that `list`
 is a type-level *function* that returns a type (and we use the `type foo
 = ...` syntax to store that returned type in a variable).[^backwards]
 
-[^backwards]: Noticing that these are functions is a bit weird because in Standard ML, the type applications are backwards. Instead of `f(x)`, it's `x f`. But this is more similar to how we actually think; in some sense, the parameters of a function are like adjectives modifying a noun---and adjectives come before the noun they describe.
+[^backwards]: It's easy to not notice at first that type definitions are really function calls because in Standard ML, the type function applications are backwards. Instead of `f(x)`, it's `x f`. This is more similar to how we actually think when we see a function. Consider `h(g(f(x)))` (or another way: `h . g . f $ x`). We read this as "take x, do f, pass that to g, and pass that to h". Why not write `x f g h` in the first place?
 
 Since `list` is actually a function from types to types, it must have
 an arrow kind: `* → *`. Looking back at our two inference rules for
@@ -175,11 +178,10 @@ val foo : forall 'a. 'a list -> ()
 ```
 
 SML inserts this `forall` automatically because its type system is a bit
-less polymorphic than System F<sub>ω</sub>'s, which can be thought of as
-a drawback. But on the other hand, it does at least save us from typing
-these `forall` annotations. For most of the other "drawbacks" we get
-from not being able to write the `forall` ourself, SML makes up the
-difference with modules.[^rankn]
+less polymorphic than System F<sub>ω</sub>'s. Some might call this a
+drawback, though it does save us from typing `forall` annotations
+ourselves. And really, for most anything else we'd call a "drawback" of
+this design, SML makes up the difference with modules.[^rankn]
 
 [^rankn]: Other languages (like Haskell or PureScript) have a language feature called "Rank-N Types" which is really just a fancy way of saying "you can put the `forall a.` anywhere you want." Oftentimes, this makes it harder for the compiler to infer where the variable bindings are, so you sometimes have to use more annotations than you might if you weren't using Rank-N types.
 
