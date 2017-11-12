@@ -49,7 +49,7 @@ accidentally let variables be *captured* during substitution. Consider
 this example:
 
 ```python
-                      ◀────────────────┐
+                      ◀────────────────┐                    
                              ┌──────┐  │
                        (λx. λy. x + y) y
                          └──────┘
@@ -84,7 +84,7 @@ that doubles it's argument. Whoops! We can look at the issue visually in
 this diagram:
 
 ```python
-           ◀─────┐             ┃         ┌──┐
+           ◀─────┐             ┃         ┌──┐               
              λy. y + y         ┃        λy. y + y
               └──────┘         ┃         └──────┘
 ```
@@ -173,7 +173,7 @@ we'll look at sidesteps this problem by not giving name to variables at
 all! Let's take a look at our picture from before:
 
 ```python
-                             ┌──────┐
+                             ┌──────┐                        
                         λx. λy. x + y
                          └──────┘
 ```
@@ -185,7 +185,7 @@ line on the bottom points to. We could omit the names entirely, as long
 as we can still capture where the lines should connect to:
 
 ```python
-                            ┌─────┐
+                            ┌─────┐                        
                        (λ. λ. ◆ + ◆)
                          └────┘
 ```
@@ -196,7 +196,7 @@ Under this representation, variables are just indices into a list of the
 binding sites; we call these indices **de Bruijn indices**:
 
 ```python
-                       (λ. λ. ① + ⓪)
+                       (λ. λ. ① + ⓪)                       
 ```
 
 **Note**: I'm using circled numbers like `⓪` for the variable with de
@@ -223,7 +223,7 @@ know which variables are free and which are bound: a variable is free if
 its index is larger than the number of lambdas it's under.
 
 ```python
-                      ◀───────────────┐
+                      ◀───────────────┐                      
                             ┌──────┐  │
                        (λ. λ. ① + ⓪) ③
                          └────┘
