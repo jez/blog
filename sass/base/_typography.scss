@@ -125,7 +125,8 @@ h3 code {
 }
 pre {
   @include font-rem(0.9);
-  line-height: 1.5;
+  // Needs to be 1.38 so that box drawing characters align correctly
+  line-height: 1.38;
   overflow-x: auto;
   &::-webkit-scrollbar {
     height: 12px;
