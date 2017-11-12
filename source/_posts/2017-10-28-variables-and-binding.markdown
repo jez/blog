@@ -17,12 +17,12 @@ strong_keywords: true
 mathjax: true
 ---
 
-Variables are central to programming languages, yet they're often
-overlooked. Academic PL theory papers usually take for granted having
-proper implementations of variables. Most popular languages butcher
-variables, [confusing them with assignables][words-matter]. Despite
-being taken for granted, implementing substitution on variables is easy
-to get wrong.
+Variables are central[^central] to programming languages, yet they're
+often overlooked. Academic PL theory papers usually take for granted
+having proper implementations of variables. Most popular languages
+butcher variables, [confusing them with assignables][words-matter].
+Despite being taken for granted, implementing substitution on variables
+is easy to get wrong.
 
 [^central]: Nearly every interesting programming language feature derives its power from variables. Functions wouldn't be functions if not for variables. Modularity and linking reduce to variables and substitution. I've written in the past about all sorts of cool [variables in types](/variables-in-types), as well as how [parametric polymorphism in System F](/system-f-param) is the result of using type variables in two ways within the same system.
 
@@ -49,7 +49,7 @@ accidentally let variables be *captured* during substitution. Consider
 this example:
 
 ```python
-                      ◀────────────────┐                    
+                      ◀────────────────┐
                              ┌──────┐  │
                        (λx. λy. x + y) y
                          └──────┘
@@ -84,7 +84,7 @@ that doubles it's argument. Whoops! We can look at the issue visually in
 this diagram:
 
 ```python
-           ◀─────┐             ┃         ┌──┐               
+           ◀─────┐             ┃         ┌──┐
              λy. y + y         ┃        λy. y + y
               └──────┘         ┃         └──────┘
 ```
@@ -129,7 +129,7 @@ have two functions like `λx. x + y` and `λx. x + z`, we can't safely
 α-vary `y` to `z`, because we have no way of knowing whether `y` and `z`
 are the same! Their same-ness depends on the context.
 
-We can implement capture-avoiding substution for the explicit variable
+We can implement capture-avoiding substitution for the explicit variable
 representation by α-varying whenever we detect that a variable might be
 captured. To revisit our example from earlier:
 
@@ -150,7 +150,7 @@ implementation can either
 
 - calculate the set of free variables used in a subexpression and make
   sure not to use one of those, or
-- just generate a globally unique name by incrementing a global
+- generate a globally unique name by incrementing a global
   counter, giving us names like `x1`, `x2`, `x3`, etc.
 
 On the surface, explicit variables look rather naïve, and maybe they
@@ -169,11 +169,11 @@ capture-avoiding substitution.
 
 With explicit variables, we had to keep track of names in use and check
 whether to α-vary before a collision happened. The next representation
-we'll look at sidesteps this problem by not giving name to variables at
+we'll look at sidesteps this problem by not giving names to variables at
 all! Let's take a look at our picture from before:
 
 ```python
-                             ┌──────┐                        
+                             ┌──────┐
                         λx. λy. x + y
                          └──────┘
 ```
@@ -182,21 +182,21 @@ In this picture, the only thing that's really important to us is the
 binding structure; we don't actually care that `x` is called `x`, we
 just care that applying this function sticks the argument everywhere the
 line on the bottom points to. We could omit the names entirely, as long
-as we can still capture where the lines should connect to:
+as we can still remember where the lines should connect to:
 
 ```python
-                            ┌─────┐                        
+                            ┌─────┐
                        (λ. λ. ◆ + ◆)
                          └────┘
 ```
 
-One way of doing this is just to count how many bindings sites up you
-have to go before you arrive at the location the variable is bound.
-Under this representation, variables are just indices into a list of the
-binding sites; we call these indices **de Bruijn indices**:
+One way of doing this is to count how many bindings sites up you have to
+go before you arrive at the location the variable is bound. Under this
+representation, variables are indices into a list of the binding sites;
+we call these indices **de Bruijn indices**:
 
 ```python
-                       (λ. λ. ① + ⓪)                       
+                       (λ. λ. ① + ⓪)
 ```
 
 **Note**: I'm using circled numbers like `⓪` for the variable with de
@@ -215,23 +215,24 @@ datatype term
 ```
 
 `Var` now takes an `int` instead of a `string`. `Lam` only takes the
-body of the lambda: to refer to argument of a lambda function, count
-back the appropriate number of `Lam`s to skip over.
+body of the lambda (it used to also take a name for it's argument). To
+refer to argument of a lambda function, we count back the appropriate
+number of `Lam`s to skip over.
 
 Now that all variables are represented by indices, it's much easier to
 know which variables are free and which are bound: a variable is free if
 its index is larger than the number of lambdas it's under.
 
 ```python
-                      ◀───────────────┐                      
+                      ◀───────────────┐
                             ┌──────┐  │
                        (λ. λ. ① + ⓪) ③
                          └────┘
 ```
 
-The second `③` is free because it's under zero lambdas. Put another way,
-if we were keeping a list of the binding sites we'd traverse under to
-reach `③` our list would be empty, so accessing index 3 would be out of
+The `③` is free because it's under zero lambdas. Put another way, if we
+were keeping a list of the binding sites we'd traverse under to reach
+`③` our list would be empty, so accessing index 3 would be out of
 bounds.
 
 With this representation, capture avoiding substitution becomes much
@@ -249,14 +250,14 @@ more manageable.
 Note how the `③` changed to a `④`: its new location in the program lies
 under one extra lambda than before. Thus to refer to the same position
 as at the start of the substitution, we increment to record that we'll
-have to skip over one extra lambda. This process of adding one when
+have to skip over that extra lambda. This process of adding one when
 going under a binder is called **lifting** (or sometimes, **shifting**).
 
 Lifting takes the guesswork out of implementing substitution. As a
 bonus, we've actually forced α-equivalent terms to have identical
-structure! Checking for α-equivalence now is a straightforward tree
-traversal: we check that both nodes are simply pairwise equal, then that
-their children are α-equivalent.
+structure! Checking for α-equivalence is now a straightforward tree
+traversal: we check that both nodes are pairwise equal, then that their
+children are α-equivalent.
 
 
 ## De Bruijn Indices and Lifting
@@ -266,9 +267,9 @@ It's easy enough to remember to lift variables when substituting, but
 more generally, you have to remember to lift *whenever* you put a free
 variable into a context different from where it was defined. This can
 get really hairy; spotting when a usage context diverges from a
-definition context is often learned the hard way! Namely, by forgetting
-to lift somewhere, pouring over the code and the types for hours, then
-finally spotting the mistake.[^biased]
+definition context is a skill that's often learned the hard way! Namely,
+by forgetting to lift somewhere, pouring over the code and the types for
+hours, then finally spotting the mistake.[^biased]
 
 [^biased]: If it wasn't clear, this has happened to me many times, and yes I'm still getting over it 😓
 
@@ -309,11 +310,13 @@ just pushed on (`κ₁`) is on the top of the stack at index `0`, and
 everything else in the context can now be found at `index + 1`. That
 means that above the line, `⓪` refers to the `κ₁` in the context.
 
-But `⓪)` might *also* be in use at the top level of `c` or `c'`! In
+But `⓪` might *also* be in use at the top level of `c` or `c'`! In
 either of these terms, `⓪` at the top level is a free variable referring
-to the first thing in `Γ`. The problem is that the first thing in `Γ,
-κ₁` is not the first thing in `Γ`! To preserve the correct binding
-structure, we'd have to go through `c` and `c'`, lifting all free
+to the first thing in `Γ`. The problem is that we're checking `c ⓪ <=>
+c' ⓪` with context `Γ, κ₁` rather than `Γ`, so all our indices are off.
+
+To make all the indices in `c` and `c'` route to the correct variable in
+the new context, we have to go through `c` and `c'` and lift all free
 variables by one to reflect the fact that we just injected something
 into the surrounding context:
 
@@ -361,8 +364,8 @@ datatype term
 ```
 
 `FV` constructs a free variable, and similarly `BV` constructs a bound
-variable. `FV` takes a `String`, because free variables get names, and
-`BV` takes an `Int`, because bound variables are nameless de Bruijn
+variable. `FV` takes a `string`, because free variables get names, and
+`BV` takes an `int`, because bound variables are nameless de Bruijn
 indices. As before, `Lam` only takes the body of the lambda function;
 we'll use de Bruijn indices to count back to the appropriate binding
 site of a variable.
@@ -424,6 +427,7 @@ Despite these drawbacks, I still prefer locally nameless terms.
   easier to be correct when working with locally nameless terms. We can
   always optimize for performance later by profiling the code to find
   the slowness!
+
 - Calling `out` in a few places is a small ergonomic price to pay for
   correctness. When you forget to call `out` or `into`, the type checker
   will remind you. There are also some cool language extensions which
@@ -437,7 +441,7 @@ trouble and programmers are forced to cope with their absence.[^trouble]
 
 I think variables are just so cool!
 
-[^trouble]: It's for this very reason that variables are the first topic we cover in 15-312 Principles of Programming Languages.
+[^trouble]: It's for this very reason that variables are the first topic we cover in [15-312 Principles of Programming Languages](https://www.cs.cmu.edu/~rwh/courses/ppl/).
 
 
 [variables-in-types]: /variables-in-types/
