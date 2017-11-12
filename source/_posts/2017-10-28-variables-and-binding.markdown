@@ -259,7 +259,7 @@ traversal: we check that both nodes are simply pairwise equal, then that
 their children are α-equivalent.
 
 
-## de Bruijn Indices and Lifting
+## De Bruijn Indices and Lifting
 
 On the other hand, working with de Bruijn indices can still be tricky.
 It's easy enough to remember to lift variables when substituting, but
