@@ -346,7 +346,7 @@ representation.
 We identified that de Bruijn indices represent bound variables well at
 the expense of free variables. **Locally nameless terms** solve this by
 giving free variables explicit names, but using indices instead of names
-for bound (or "local") variables, thus the name[^globally-nameless].
+for bound (or "local") variables, thus the name.[^globally-nameless]
 
 [^globally-nameless]: We could, by analogy, refer to the de Bruijn index representation as the globally nameless representation, which is more descriptive but isn't something you'll hear used anywhere.
 
