@@ -85,12 +85,12 @@
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <p>Variables are central to programming languages, yet they&rsquo;re often
-overlooked. Academic PL theory papers usually take for granted having
-proper implementations of variables. Most popular languages butcher
-variables, <a href="https://existentialtype.wordpress.com/2012/02/01/words-matter/">confusing them with assignables</a>. Despite
-being taken for granted, implementing substitution on variables is easy
-to get wrong.</p>
+      <p>Variables are central<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to programming languages, yet they&rsquo;re
+often overlooked. Academic PL theory papers usually take for granted
+having proper implementations of variables. Most popular languages
+butcher variables, <a href="https://existentialtype.wordpress.com/2012/02/01/words-matter/">confusing them with assignables</a>.
+Despite being taken for granted, implementing substitution on variables
+is easy to get wrong.</p>
 
 <!-- more -->
 
@@ -117,7 +117,7 @@ substitution is variable capture.</p>
 accidentally let variables be <em>captured</em> during substitution. Consider
 this example:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                  <span class="err">◀────────────────┐</span>                    
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                  <span class="err">◀────────────────┐</span>
 </span><span class='line'>                         <span class="err">┌──────┐</span>  <span class="err">│</span>
 </span><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="n">x</span><span class="o">.</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span> <span class="n">y</span>
 </span><span class='line'>                     <span class="err">└──────┘</span></span></code></pre></td></tr></table></div></figure>
@@ -153,7 +153,7 @@ After partially applying that function, we&rsquo;ve ended up with a function
 that doubles it&rsquo;s argument. Whoops! We can look at the issue visually in
 this diagram:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>       <span class="err">◀─────┐</span>             <span class="err">┃</span>         <span class="err">┌──┐</span>               
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>       <span class="err">◀─────┐</span>             <span class="err">┃</span>         <span class="err">┌──┐</span>
 </span><span class='line'>         <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span>         <span class="err">┃</span>        <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span>
 </span><span class='line'>          <span class="err">└──────┘</span>         <span class="err">┃</span>         <span class="err">└──────┘</span></span></code></pre></td></tr></table></div></figure>
 
@@ -196,7 +196,7 @@ have two functions like <code>λx. x + y</code> and <code>λx. x + z</code>, we 
 α-vary <code>y</code> to <code>z</code>, because we have no way of knowing whether <code>y</code> and <code>z</code>
 are the same! Their same-ness depends on the context.</p>
 
-<p>We can implement capture-avoiding substution for the explicit variable
+<p>We can implement capture-avoiding substitution for the explicit variable
 representation by α-varying whenever we detect that a variable might be
 captured. To revisit our example from earlier:</p>
 
@@ -217,7 +217,7 @@ implementation can either</p>
 <ul>
 <li>calculate the set of free variables used in a subexpression and make
 sure not to use one of those, or</li>
-<li>just generate a globally unique name by incrementing a global
+<li>generate a globally unique name by incrementing a global
 counter, giving us names like <code>x1</code>, <code>x2</code>, <code>x3</code>, etc.</li>
 </ul>
 
@@ -237,10 +237,10 @@ capture-avoiding substitution.</p>
 
 <p>With explicit variables, we had to keep track of names in use and check
 whether to α-vary before a collision happened. The next representation
-we&rsquo;ll look at sidesteps this problem by not giving name to variables at
+we&rsquo;ll look at sidesteps this problem by not giving names to variables at
 all! Let&rsquo;s take a look at our picture from before:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                         <span class="err">┌──────┐</span>                        
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                         <span class="err">┌──────┐</span>
 </span><span class='line'>                    <span class="err">λ</span><span class="n">x</span><span class="o">.</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
 </span><span class='line'>                     <span class="err">└──────┘</span></span></code></pre></td></tr></table></div></figure>
 
@@ -249,19 +249,19 @@ all! Let&rsquo;s take a look at our picture from before:</p>
 binding structure; we don&rsquo;t actually care that <code>x</code> is called <code>x</code>, we
 just care that applying this function sticks the argument everywhere the
 line on the bottom points to. We could omit the names entirely, as long
-as we can still capture where the lines should connect to:</p>
+as we can still remember where the lines should connect to:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                        <span class="err">┌─────┐</span>                        
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                        <span class="err">┌─────┐</span>
 </span><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">◆</span> <span class="o">+</span> <span class="err">◆</span><span class="p">)</span>
 </span><span class='line'>                     <span class="err">└────┘</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>One way of doing this is just to count how many bindings sites up you
-have to go before you arrive at the location the variable is bound.
-Under this representation, variables are just indices into a list of the
-binding sites; we call these indices <strong>de Bruijn indices</strong>:</p>
+<p>One way of doing this is to count how many bindings sites up you have to
+go before you arrive at the location the variable is bound. Under this
+representation, variables are indices into a list of the binding sites;
+we call these indices <strong>de Bruijn indices</strong>:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span>                       </span></code></pre></td></tr></table></div></figure>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p><strong>Note</strong>: I&rsquo;m using circled numbers like <code>⓪</code> for the variable with de
@@ -279,22 +279,23 @@ with this datatype:</p>
 
 
 <p><code>Var</code> now takes an <code>int</code> instead of a <code>string</code>. <code>Lam</code> only takes the
-body of the lambda: to refer to argument of a lambda function, count
-back the appropriate number of <code>Lam</code>s to skip over.</p>
+body of the lambda (it used to also take a name for it&rsquo;s argument). To
+refer to argument of a lambda function, we count back the appropriate
+number of <code>Lam</code>s to skip over.</p>
 
 <p>Now that all variables are represented by indices, it&rsquo;s much easier to
 know which variables are free and which are bound: a variable is free if
 its index is larger than the number of lambdas it&rsquo;s under.</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                  <span class="err">◀───────────────┐</span>                      
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                  <span class="err">◀───────────────┐</span>
 </span><span class='line'>                        <span class="err">┌──────┐</span>  <span class="err">│</span>
 </span><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span> <span class="err">③</span>
 </span><span class='line'>                     <span class="err">└────┘</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>The second <code>③</code> is free because it&rsquo;s under zero lambdas. Put another way,
-if we were keeping a list of the binding sites we&rsquo;d traverse under to
-reach <code>③</code> our list would be empty, so accessing index 3 would be out of
+<p>The <code>③</code> is free because it&rsquo;s under zero lambdas. Put another way, if we
+were keeping a list of the binding sites we&rsquo;d traverse under to reach
+<code>③</code> our list would be empty, so accessing index 3 would be out of
 bounds.</p>
 
 <p>With this representation, capture avoiding substitution becomes much
@@ -311,14 +312,14 @@ more manageable.</p>
 <p>Note how the <code>③</code> changed to a <code>④</code>: its new location in the program lies
 under one extra lambda than before. Thus to refer to the same position
 as at the start of the substitution, we increment to record that we&rsquo;ll
-have to skip over one extra lambda. This process of adding one when
+have to skip over that extra lambda. This process of adding one when
 going under a binder is called <strong>lifting</strong> (or sometimes, <strong>shifting</strong>).</p>
 
 <p>Lifting takes the guesswork out of implementing substitution. As a
 bonus, we&rsquo;ve actually forced α-equivalent terms to have identical
-structure! Checking for α-equivalence now is a straightforward tree
-traversal: we check that both nodes are simply pairwise equal, then that
-their children are α-equivalent.</p>
+structure! Checking for α-equivalence is now a straightforward tree
+traversal: we check that both nodes are pairwise equal, then that their
+children are α-equivalent.</p>
 
 <h2>De Bruijn Indices and Lifting</h2>
 
@@ -327,9 +328,9 @@ It&rsquo;s easy enough to remember to lift variables when substituting, but
 more generally, you have to remember to lift <em>whenever</em> you put a free
 variable into a context different from where it was defined. This can
 get really hairy; spotting when a usage context diverges from a
-definition context is often learned the hard way! Namely, by forgetting
-to lift somewhere, pouring over the code and the types for hours, then
-finally spotting the mistake.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+definition context is a skill that&rsquo;s often learned the hard way! Namely,
+by forgetting to lift somewhere, pouring over the code and the types for
+hours, then finally spotting the mistake.<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
 
 <p>To make this a little more concrete, I&rsquo;ll use a specific example. It
 comes from the judgement for deciding whether two type constructors are
@@ -368,11 +369,13 @@ just pushed on (<code>κ₁</code>) is on the top of the stack at index <code>0<
 everything else in the context can now be found at <code>index + 1</code>. That
 means that above the line, <code>⓪</code> refers to the <code>κ₁</code> in the context.</p>
 
-<p>But <code>⓪)</code> might <em>also</em> be in use at the top level of <code>c</code> or <code>c'</code>! In
+<p>But <code>⓪</code> might <em>also</em> be in use at the top level of <code>c</code> or <code>c'</code>! In
 either of these terms, <code>⓪</code> at the top level is a free variable referring
-to the first thing in <code>Γ</code>. The problem is that the first thing in <code>Γ,
-κ₁</code> is not the first thing in <code>Γ</code>! To preserve the correct binding
-structure, we&rsquo;d have to go through <code>c</code> and <code>c'</code>, lifting all free
+to the first thing in <code>Γ</code>. The problem is that we&rsquo;re checking <code>c ⓪ &lt;=&gt;
+c' ⓪</code> with context <code>Γ, κ₁</code> rather than <code>Γ</code>, so all our indices are off.</p>
+
+<p>To make all the indices in <code>c</code> and <code>c'</code> route to the correct variable in
+the new context, we have to go through <code>c</code> and <code>c'</code> and lift all free
 variables by one to reflect the fact that we just injected something
 into the surrounding context:</p>
 
@@ -405,7 +408,7 @@ representation.</p>
 <p>We identified that de Bruijn indices represent bound variables well at
 the expense of free variables. <strong>Locally nameless terms</strong> solve this by
 giving free variables explicit names, but using indices instead of names
-for bound (or &ldquo;local&rdquo;) variables, thus the name.<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+for bound (or &ldquo;local&rdquo;) variables, thus the name.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></p>
 
 <p>Locally nameless terms might be represented by a data type like this:</p>
 
@@ -417,8 +420,8 @@ for bound (or &ldquo;local&rdquo;) variables, thus the name.<sup id="fnref:2"><a
 
 
 <p><code>FV</code> constructs a free variable, and similarly <code>BV</code> constructs a bound
-variable. <code>FV</code> takes a <code>String</code>, because free variables get names, and
-<code>BV</code> takes an <code>Int</code>, because bound variables are nameless de Bruijn
+variable. <code>FV</code> takes a <code>string</code>, because free variables get names, and
+<code>BV</code> takes an <code>int</code>, because bound variables are nameless de Bruijn
 indices. As before, <code>Lam</code> only takes the body of the lambda function;
 we&rsquo;ll use de Bruijn indices to count back to the appropriate binding
 site of a variable.</p>
@@ -486,22 +489,22 @@ call <code>out</code> and pattern match the result.</li>
 <p>Despite these drawbacks, I still prefer locally nameless terms.</p>
 
 <ul>
-<li>I&rsquo;ll gladly trade correctness for performance, and it&rsquo;s definitely
+<li><p>I&rsquo;ll gladly trade correctness for performance, and it&rsquo;s definitely
 easier to be correct when working with locally nameless terms. We can
 always optimize for performance later by profiling the code to find
-the slowness!</li>
-<li>Calling <code>out</code> in a few places is a small ergonomic price to pay for
+the slowness!</p></li>
+<li><p>Calling <code>out</code> in a few places is a small ergonomic price to pay for
 correctness. When you forget to call <code>out</code> or <code>into</code>, the type checker
 will remind you. There are also some cool language extensions which
 can make calling <code>out</code> and <code>in</code> syntactically more pleasant, like
-<a href="https://ocharles.org.uk/blog/posts/2014-12-02-view-patterns.html">View Patterns</a> in Haskell.</li>
+<a href="https://ocharles.org.uk/blog/posts/2014-12-02-view-patterns.html">View Patterns</a> in Haskell.</p></li>
 </ul>
 
 
 <p>Variables show up in the most interesting places, and I always smile
 when I find them being used in new and surprising ways. On the flip
 side, languages that implement variables and binding suffer no end of
-trouble and programmers are forced to cope with their absence.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></p>
+trouble and programmers are forced to cope with their absence.<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup></p>
 
 <p>I think variables are just so cool!</p>
 
@@ -512,11 +515,13 @@ trouble and programmers are forced to cope with their absence.<sup id="fnref:3">
 <hr/>
 <ol>
 <li id="fn:1">
-<p>If it wasn&rsquo;t clear, this has happened to me many times, and yes I&rsquo;m still getting over it 😓<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<p>Nearly every interesting programming language feature derives its power from variables. Functions wouldn&rsquo;t be functions if not for variables. Modularity and linking reduce to variables and substitution. I&rsquo;ve written in the past about all sorts of cool <a href="/variables-in-types">variables in types</a>, as well as how <a href="/system-f-param">parametric polymorphism in System F</a> is the result of using type variables in two ways within the same system.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 <li id="fn:2">
-<p>We could, by analogy, refer to the de Bruijn index representation as the globally nameless representation, which is more descriptive but isn&rsquo;t something you&rsquo;ll hear used anywhere.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<p>If it wasn&rsquo;t clear, this has happened to me many times, and yes I&rsquo;m still getting over it 😓<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 <li id="fn:3">
-<p>It&rsquo;s for this very reason that variables are the first topic we cover in 15-312 Principles of Programming Languages.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<p>We could, by analogy, refer to the de Bruijn index representation as the globally nameless representation, which is more descriptive but isn&rsquo;t something you&rsquo;ll hear used anywhere.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>It&rsquo;s for this very reason that variables are the first topic we cover in <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles of Programming Languages</a>.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
