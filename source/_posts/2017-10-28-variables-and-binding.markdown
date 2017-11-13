@@ -111,7 +111,7 @@ have this:
 ```sml
 datatype term
   = Var of string
-  | Lam of ident * term
+  | Lam of string * term
   | App of term * term
 ```
 
