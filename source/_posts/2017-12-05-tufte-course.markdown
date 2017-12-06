@@ -22,9 +22,9 @@ number of things I took away from the day.
 
 1. Text, numbers, and visuals should be **woven tightly together**.
 1. From a small set of principles, we can have a **rigorous, analytical
-   framework** to evaluating information designs.
+   framework** for evaluating information designs.
 1. Information benefits from being shown in **space and time**.
-1. **Effective presentations** lead to the outsized impact of your work.
+1. Effective presentations lead to the **outsized impact** of your work.
 1. **High-density** visualizations trump those of low-density.
 1. Tufte-the-personality is over-hyped.
 1. Learning is a lifelong process.
@@ -84,10 +84,9 @@ weave visualizations with your text at the level of single words.
 > --- *Beautiful Evidence*
 
 The key point here was that with a few principles, we can be more
-rigorous in evaluating the effectiveness of our designs. The beauty of
-it is that many principles parallel similar principles from the
-scientific method, which is a time-tested tool for discovering
-knowledge.
+rigorous in evaluating our designs. The beauty is it parallels similar
+principles from the scientific method, which is a time-tested tool for
+discovering knowledge.
 
 ### The principles themselves
 
@@ -111,8 +110,8 @@ Quality, relevance, and integrity of content counts most of all.
 - The credibility of an "executive summary" depends intimately on the
   quality, relevance, and integrity of the evidence.
 - Analytical processes for design rely heavily on mutual respect,
-  because criticism is inherent.
-- It's "easy" to default to uni- or bi-variate data (these are what our
+  because criticism is inherent to the process.
+- It's easy to default to uni- or bi-variate data (these are what our
   tools are good at). By overcoming the comfort of what our tools do
   well, we can draw stronger conclusions.
 
@@ -133,14 +132,13 @@ one page, so it's all in the field of view at once.
 
 This echoed a similar idea to one Adam brought up in the Frontend
 Learning Group: Sketch effectively converted designing UIs from
-something taken over time (by replaying some number of changes to
-Photoshop layers) to something over space (artboards or screens).
+something being seen over time (by showing/hiding various Photoshop
+layers) to being seen over space (artboards or screens).
 
-A general problem with information presented over time is that it
-happens to fast. This isn't to say presenting information in time
-is terrible: it's just shouldn't be the only way. Often information
-displayed in time can be complemented by information displayed in space
-and vice versa.
+Often a stronger case can be made by presenting information in both time
+and in space. A general problem with information presented over time is
+that it happens too fast. This isn't to say presenting information in
+time is terrible: it's just shouldn't be the only way.
 
 
 ## Talking & Presenting
@@ -150,8 +148,8 @@ and vice versa.
 > --- Kayvon Fatahalian
 
 Tufte spent a surprising amount of time talking about effectively
-talking and presenting. I thought many of his ideas about effective
-presentations were out of touch with reality.
+presenting. I thought many of his ideas about effective presentations
+were out of touch with reality.
 
 Instead, I prefer these resources on giving clear presentations by
 Kayvon Fatahalian:
@@ -161,23 +159,24 @@ Kayvon Fatahalian:
 
 The key points are:
 
-- An effective talk leads to a **non-linear** increase in the value of
+- An effective talk leads to a *non-linear* increase in the value of
   your work.
 - The audience prefers not to think (much).
     - They don't want to think about what you left out or what you're
-    hinting at.
+      hinting at.
     - They'd much rather think about how they can put your work to use.
 - Every sentence matters.
     - If it doesn't provide value, strike it out.
 - Surprises are bad.
-    - Say where you're going before you go there.
+    - Say where you're going and why before you go there.
 - Titles matter.
     - Reading nothing but the titles of a slide deck should be a great
       summary of the talk.
     - Sometimes this means titles are short sentences!
 - End on a positive note!
     - People remember the beginnings and ends.
-    - You want them to walk out with a rising rather than sinking feeling.
+    - You want them to walk out with a rising rather than sinking
+      feeling.
 
 That being said, Tufte did have a few good tips for presentations.
 For example: give handouts with your talks. Handouts overcome the
@@ -199,7 +198,7 @@ low information density of slides. This tip is just a restatement of
 
 Tufte discussed a very clear preference for high-density visualizations
 over low-density. High-density visualizations should present
-multivariate data cohesively, and weave text, numbers, and visuals.
+multivariate data cohesively, weaving text, numbers, and visuals.
 
 In a high-density visualization, the arrangement and composition is key.
 If you get it wrong, you end up with information overload. But the goal
@@ -212,10 +211,10 @@ side-by-side) is *significantly* higher than most displays are these
 days. In his books, every two-page spread shows a high-density
 visualization, which is what makes them so powerful.
 
-The flipside: he detested interfaces that presented shallow views into
+The flip side: he detested interfaces that presented shallow views into
 the data or sacrificed analytical design for aesthetic design. It's
-common on the web to be scared of information overload, and just present
-less. Instead, we should present more, but thoughtfully and with clear
+common on the web to be scared of information overload, and instead show
+less. We should present more, but *thoughtfully* and with clear
 relationships between all the elements.
 
 As a closing rebut, he made the claim that we should "design forward,
@@ -226,8 +225,8 @@ currently, with no hope of improving rapidly.
 
 ## Meta
 
-I was a little disappointed to meet with Tufte the personality as
-opposed to Tufte the writer.
+I was a little disappointed to meet with Tufte-the-personality as
+opposed to Tufte-the-writer.
 
 As a presenter, there seemed to be a stronger focus on bravado and
 showmanship than on learning and growth. Until this event, I hadn't been
@@ -246,9 +245,10 @@ books dance around, giving the effect of after-images of some underlying
 truth which is withheld.
 
 Tufte's speaking style favored shaming and derision to inclusion and
-passion. There was a certain element of, "it's okay, as long as I laugh
-along with everyone else I'll belong," even though it was only really
-chance that the negativity wasn't addressed at anyone in the audience.
+passion. In the audience, there was a certain amount of, "it's okay, as
+long as I laugh along with everyone else I'll belong." This line of
+thinking leads to toxic behavior where people think they need to put
+down others to grow.
 
 Tufte repeatedly made arguments of the form:
 
@@ -256,15 +256,16 @@ Tufte repeatedly made arguments of the form:
 - These two are wildly successful.
 - Therefore, it's the correct thing to do.
 
-Reasoning like this ignores confounding variables like survivorship
-bias, and success in spite of flawed design. While we can draw
-inspiration from what others do, it's important to verify them from
-first principles, rather than blindly follow.
+This reasoning ignores confounding variables like survivorship
+bias. It's also possible to succeed *in spite of* flawed design. While
+we can draw inspiration from what others do, it's important to verify
+them from first principles, rather than blindly follow.
 
 That being said, he mentioned something to the effect of "even
 lobbyists can be right." Even in spite of the commercialism of it all,
-we can still learn from what he has to say. This "Meta" section is last,
-because there were still important and valuable ideas to take away.
+we can still learn from what he has to say. I presented the four earlier
+sections before this section because I did take away many valuable
+ideas from the day.
 
 
 ## Open Questions
@@ -293,7 +294,7 @@ I had a couple personal realizations while I was there.
 At the first hackathon I ever went to during my freshman year of
 college, the thing we built was a tool to try and visualize geographic
 data on a 3D, interactive globe. I was so proud of this thing we built.
-It was the **first** time I ever wrote JavaScript (I had literally never
+It was the first time I ever wrote JavaScript (I had literally never
 touched it before). After 36 hours, we had a live, running thing that
 people could *actually interact with!*
 
