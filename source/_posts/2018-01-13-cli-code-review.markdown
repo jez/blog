@@ -29,7 +29,7 @@ In particular, I'll walk through how I...
 - bring up the code diffs in Vim,
 - leverage the unique power of the editor and the terminal.
 
-But first, let's talk a little bit about the point of code review in the
+But first, let's talk briefly about the point of code review in the
 first place.
 
 
@@ -100,10 +100,12 @@ Under the hood, it just works using `git diff`, `git merge-base`, and a
 personal environment variable `REVIEW_BASE`.
 
 `REVIEW_BASE` lets us choose which branch to review relative to. Most of
-the time, `REVIEW_BASE` is `master`, but this isn't alway the case! Some
-repos branch off of `gh-pages`; sometimes I like to review the most
-recent commit as if it were it's own branch. To review the code relative
-so some other base, set `REVIEW_BASE` before running the command:
+the time, `REVIEW_BASE` is `master`, but this isn't always the case! Some
+repos branch off of `gh-pages`. Sometimes I like to review the most
+recent commit as if it were its own branch.
+
+To review the code relative so some other base, set `REVIEW_BASE` before
+running `git stat`:
 
 ```bash
 # Review between 'gh-pages' and the current branch
@@ -116,14 +118,14 @@ REVIEW_BASE=HEAD^ git stat
 I have `export REVIEW_BASE=master` in my `~/.bashrc`, because most
 projects branch off of `master`.
 
-We've seen nothing too out of the ordinary so far. GitHub can already
-pretty much do everything we've seen---let's start to up the ante.
+Nothing too crazy yet---GitHub can already do everything we've seen so
+far. Let's start to up the ante.
 
 
 ## Visualizing file change frequency
 
 I've written a short script that shows me a visualization of how
-frequently the files involved in this branch change overall in the repo:
+frequently the files involved in this branch change over time:
 
 {% img fullwidth /images/git-heatmap.png git heatmap %}
 
@@ -135,16 +137,18 @@ This command identifies two main things:
   future. I review these files with an eye towards what the *next*
   change will bring.
 
-  *"Is this change robust enough to still be useful in the future?"
-  "Will we throw this out soon after merging it?"*
+  *"Is this change robust enough to still be useful in the future?
+  Will we throw this out soon after merging it?"*
 
 - **Files with few changes**.
 
-  Files that aren't changed frequently are more likely to be brittle,
-  depending on implicit assumptions.
+  Files that aren't changed frequently are more likely to be brittle.
+  Alternatively, it's often the case that infrequently changed files
+  stay unchanged because the change is better made elsewhere.
 
-  *"Is it possible this change invalidates a long-held, implicit
-  assumption that hasn't been challenged yet?"*
+  *"Does this change challenge an implicit assumption so that some other
+  part of the code was relying on? Is there a better place for this
+  change?"*
 
 Those two commands (`git stat` and `git heatmap`) are how I kick off my
 code review: getting a birds-eye view of the change and some historical
@@ -154,12 +158,12 @@ relationships between the files that changed.
 
 ## Visualizing relationships between files
 
-At work I mostly review JavaScript files, so I've built out this next
-bit of tooling specifically for JavaScript.[^mldepgraph] It helps to
-understand which files import others, so I have a command that computes
-the dependency graph of the files changed on this branch:
+At work I review JavaScript files, so I've built out this next bit of
+tooling specifically for JavaScript.[^mldepgraph] It helps to understand
+which files import others, so I have a command that computes the
+dependency graph of the files changed on this branch:
 
-[^mldepgraph]: That being said, the techniques here can be applied to any language that you can statically analyze. In particular, I have a rough prototype of everything JavaScript-specific you see here that works with Standard ML instead. If you can find me the dependency information for your favorite language, I'd be happy to help you turn it into a visualization.
+[^mldepgraph]: The techniques here apply to any language that you can statically analyze. In particular, I have a rough prototype of everything JavaScript-specific you see here that works with Standard ML instead. If you can find me the dependency information for your favorite language, I'd be happy to help you turn it into a visualization.
 
 {% img fullwidth /images/git-depgraph.png git depgraph %}
 
@@ -176,8 +180,8 @@ dependency graph for files changed by this branch. Why is this useful?
 
 In either case, we can see the structure of the change. Three files
 depend on `Elements.js`, so it's serving the needs of many modules.
-`Element.js` only has one dependency. Each branch's dependency graph
-shows different information; sometimes it's surprising what turns up.
+`Element.js` only has one dependency, etc. Each branch's dependency
+graph shows different information; it can be surprising what turns up.
 
 I have the `git depgraph` alias defined like this:
 
@@ -209,7 +213,7 @@ Some notes about this definition:
 The `git depgraph` alias is a game changer. It makes it easier to get spun
 up in new code bases, helps make sense of large changes, and just looks
 plain cool. But at the end of the day, we came here to review some code,
-so lets take a look at how we can actually view the diffs of the files
+so let's take a look at how we can actually view the diffs of the files
 that changed.
 
 
@@ -229,7 +233,7 @@ master..HEAD`. This has a bunch of downsides:
   `yarn.lock` file is sometimes nice to hide).
 
 My solution to all of these problems is to view the diffs in Vim, with
-the help of a few Vim plugins and a few git aliases. Before we get to
+the help of two Vim plugins and two git aliases. Before we get to
 that, here's a screenshot:
 
 {% img fullwidth /images/git-review.png git review %}
@@ -242,7 +246,7 @@ it's using my favorite colorscheme! The Vim plugins featured are:
 - [jez/vim-colors-solarized] for tweaking the diff highlight
   colors.[^vcs]
 
-[^vcs]: I've patched the default Solarized colors for Vim so that lines retain their syntax highlighting in the diff mode, while the backgrounds are highlighted. You can see how this is done in this commit: <https://github.com/jez/vim-colors-solarized/commit/bca72cc>
+[^vcs]: I've patched the default Solarized colors for Vim so that lines retain their syntax highlighting in the diff mode, while the backgrounds are highlighted. You can see how this works in this commit: <https://github.com/jez/vim-colors-solarized/commit/bca72cc>
 
 [tpope/vim-fugitive]: https://github.com/tpope/vim-fugitive
 [airblade/vim-gitgutter]: https://github.com/airblade/vim-gitgutter
@@ -278,7 +282,7 @@ Like with the `git stat` alias, these aliases respect the `REVIEW_BASE`
 environment variable I've set up in my `~/.bashrc`. (Scroll back up for
 a refresher.) For example, to review all files relative to `master`:
 
-```
+```bash
 REVIEW_BASE=master git review
 ```
 
@@ -296,9 +300,9 @@ code review to the terminal, we can now edit files, jump to other files,
 and run arbitrary commands at no cost.
 
 It might not be obvious how huge of a win this is, so let's see some
-examples. Take the screenshot below of the `requireElement` function.
-It's been moved from *above* the `findElement` function to *below* it
-(probably because the former calls the latter):
+examples. Take this screenshot of the `requireElement` function. It
+moved from *above* the `findElement` function to *below* it (probably
+because the former calls the latter):
 
 {% img fullwidth /images/requireElement01.png diff %}
 
@@ -321,8 +325,8 @@ beyond this example:
 - In a test file, we can change the test and see if it still passes or
   if it now fails.
 
-- We can `grep` the project for all places that a function is used
-  (including files *not* changed by this branch).
+- We can `grep` the project for all uses of a function (including files
+  *not* changed by this branch).
 
 - We can open up related files for cross-referencing.
 
