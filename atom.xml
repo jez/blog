@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2017-12-06T14:25:43-05:00</updated>
+  <updated>2018-01-14T03:50:43-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,356 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Code Review from the Command Line]]></title>
+    <link href="https://blog.jez.io/cli-code-review/"/>
+    <updated>2018-01-13T16:14:24-05:00</updated>
+    <id>https://blog.jez.io/cli-code-review</id>
+    <content type="html"><![CDATA[<p>I do the bulk of my code reviews from the command line, especially when
+reviewing larger changes. I&rsquo;ve built up a number of tools and config
+settings that help me dig into the nuances of the code I&rsquo;m reviewing, so
+that I can understand it better than if I were just browsing online.</p>
+
+<!-- more -->
+
+
+<p>In particular, I&rsquo;ll walk through how I&hellip;</p>
+
+<ul>
+<li>check out the code in the first place,</li>
+<li>get a feel for what changed,</li>
+<li>visualize the relationships between the files that changed,</li>
+<li>bring up the code diffs in Vim,</li>
+<li>leverage the unique power of the editor and the terminal.</li>
+</ul>
+
+
+<p>But first, let&rsquo;s talk a little bit about the point of code review in the
+first place.</p>
+
+<h2>Code review philosophy</h2>
+
+<p>When I ask that other people review my code, it&rsquo;s an opportunity for me
+to teach them about the change I&rsquo;ve just made. When I review someone
+else&rsquo;s code, it&rsquo;s to learn something from them. Some other benefits of
+code review include:</p>
+
+<ul>
+<li>Team awareness (to keep a pulse on what else is going on within your
+team).</li>
+<li>Finding alternative solutions (maybe there&rsquo;s a small change that lets
+us kill two birds with one stone).</li>
+</ul>
+
+
+<p>If this is different from how you think about code review, <a href="https://www.youtube.com/watch?v=PJjmw9TRB7s">check out
+this talk</a>. Code review is a powerful tool for
+learning and growing a team.</p>
+
+<p>With that out of the way, let&rsquo;s dive into the tools I use to maximize
+benefit I get from code review.</p>
+
+<h2>Checking out the code</h2>
+
+<p>The first step to reviewing code in the terminal is to check out the
+code in the first place. One option is to simply to <code>git pull</code> and then
+<code>git checkout &lt;branch&gt;</code>. But if you happen to be using GitHub, we can
+get this down to just one command:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>hub pr checkout &lt;pr-number&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It works using <a href="https://github.com/github/hub">hub</a>, which is a tool that exposes various features of
+GitHub from the command line. If the pull request is from someone else&rsquo;s
+fork, <code>hub</code> is even smart enough to add their fork as a remote and fetch
+it.</p>
+
+<h2>At first glance</h2>
+
+<p>With the branch checked out locally, usually my next step is to get a
+feel for what changed. For this, I&rsquo;ve written a git alias that shows:</p>
+
+<ul>
+<li>which files changed</li>
+<li>how many lines changed in each file (additions and deletions)</li>
+<li>how many lines changed overall</li>
+</ul>
+
+
+<p><a class="image-link" href="https://blog.jez.io/images/git-stat.png"><img class="fullwidth" src="https://blog.jez.io/images/git-stat.png" title="git stat" ></a></p>
+
+<p>Here&rsquo;s the definition of <code>git stat</code> from my <code>~/.gitconfig</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span><span class="nb">alias</span><span class="o">]</span>
+</span><span class='line'>  <span class="c"># list files which have changed since REVIEW_BASE</span>
+</span><span class='line'>  <span class="c"># (REVIEW_BASE defaults to 'master' in my zshrc)</span>
+</span><span class='line'>  files <span class="o">=</span> !git diff --name-only <span class="k">$(</span>git merge-base HEAD <span class="se">\"</span><span class="nv">$REVIEW_BASE</span><span class="se">\"</span><span class="k">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># Same as above, but with a diff stat instead of just names</span>
+</span><span class='line'>  <span class="c"># (better for interactive use)</span>
+</span><span class='line'>  stat <span class="o">=</span> !git diff --stat <span class="k">$(</span>git merge-base HEAD <span class="se">\"</span><span class="nv">$REVIEW_BASE</span><span class="se">\"</span><span class="k">)</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Under the hood, it just works using <code>git diff</code>, <code>git merge-base</code>, and a
+personal environment variable <code>REVIEW_BASE</code>.</p>
+
+<p><code>REVIEW_BASE</code> lets us choose which branch to review relative to. Most of
+the time, <code>REVIEW_BASE</code> is <code>master</code>, but this isn&rsquo;t alway the case! Some
+repos branch off of <code>gh-pages</code>; sometimes I like to review the most
+recent commit as if it were it&rsquo;s own branch. To review the code relative
+so some other base, set <code>REVIEW_BASE</code> before running the command:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Review between 'gh-pages' and the current branch</span>
+</span><span class='line'><span class="nv">REVIEW_BASE</span><span class="o">=</span>gh-pages git stat
+</span><span class='line'>
+</span><span class='line'><span class="c"># Review changes made by the last commit of this branch:</span>
+</span><span class='line'><span class="nv">REVIEW_BASE</span><span class="o">=</span>HEAD^ git stat</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I have <code>export REVIEW_BASE=master</code> in my <code>~/.bashrc</code>, because most
+projects branch off of <code>master</code>.</p>
+
+<p>We&rsquo;ve seen nothing too out of the ordinary so far. GitHub can already
+pretty much do everything we&rsquo;ve seen&mdash;let&rsquo;s start to up the ante.</p>
+
+<h2>Visualizing file change frequency</h2>
+
+<p>I&rsquo;ve written a short script that shows me a visualization of how
+frequently the files involved in this branch change overall in the repo:</p>
+
+<p><a class="image-link" href="https://blog.jez.io/images/git-heatmap.png"><img class="fullwidth" src="https://blog.jez.io/images/git-heatmap.png" title="git heatmap" ></a></p>
+
+<p>This command identifies two main things:</p>
+
+<ul>
+<li><p><strong>Files with lots of changes</strong>.</p>
+
+<p>Files that have changed a lot in the past are likely to change in the
+future. I review these files with an eye towards what the <em>next</em>
+change will bring.</p>
+
+<p><em>&ldquo;Is this change robust enough to still be useful in the future?&rdquo;
+&ldquo;Will we throw this out soon after merging it?&rdquo;</em></p></li>
+<li><p><strong>Files with few changes</strong>.</p>
+
+<p>Files that aren&rsquo;t changed frequently are more likely to be brittle,
+depending on implicit assumptions.</p>
+
+<p><em>&ldquo;Is it possible this change invalidates a long-held, implicit
+assumption that hasn&rsquo;t been challenged yet?&rdquo;</em></p></li>
+</ul>
+
+
+<p>Those two commands (<code>git stat</code> and <code>git heatmap</code>) are how I kick off my
+code review: getting a birds-eye view of the change and some historical
+context for what I&rsquo;m dealing with. Next, I drill down into the
+relationships between the files that changed.</p>
+
+<h2>Visualizing relationships between files</h2>
+
+<p>At work I mostly review JavaScript files, so I&rsquo;ve built out this next
+bit of tooling specifically for JavaScript.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> It helps to
+understand which files import others, so I have a command that computes
+the dependency graph of the files changed on this branch:</p>
+
+<p><a class="image-link" href="https://blog.jez.io/images/git-depgraph.png"><img class="fullwidth" src="https://blog.jez.io/images/git-depgraph.png" title="git depgraph" ></a></p>
+
+<p>This is where we start to see some distinct advantages over what GitHub
+provides. As you see above, the <code>git depgraph</code> alias calculates the
+dependency graph for files changed by this branch. Why is this useful?</p>
+
+<ul>
+<li><p>Maybe we want to start reviewing from <code>Provider.js</code>, since it doesn&rsquo;t
+depend on any other files that have changed.</p></li>
+<li><p>Maybe we want to work the other way: start with <code>Elements.js</code> so we
+know the motivation for why <code>Provider.js</code> had to changed in the first
+place.</p></li>
+</ul>
+
+
+<p>In either case, we can see the structure of the change. Three files
+depend on <code>Elements.js</code>, so it&rsquo;s serving the needs of many modules.
+<code>Element.js</code> only has one dependency. Each branch&rsquo;s dependency graph
+shows different information; sometimes it&rsquo;s surprising what turns up.</p>
+
+<p>I have the <code>git depgraph</code> alias defined like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span><span class="nb">alias</span><span class="o">]</span>
+</span><span class='line'>  depgraph <span class="o">=</span> !git madge image --webpack-config webpack.config.js --basedir . --style solarized-dark src</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Some notes about this definition:</p>
+
+<ul>
+<li><p>It depends on the <code>git-madge</code> command, which you can <a href="https://github.com/jez/git-madge">download
+and install here</a>.</p></li>
+<li><p>It&rsquo;s using <em>this project&rsquo;s</em> <code>webpack.config.js</code> file, so I&rsquo;ve made
+this alias local to the repo, rather than available globally.</p></li>
+<li><p>It dumps the image to stdout. Above, we used iTerm2&rsquo;s <a href="https://iterm2.com/documentation-images.html">imgcat</a>
+program to pipe stdin and dump a raster image to the terminal.</p>
+
+<p>If you don&rsquo;t use iTerm2 or don&rsquo;t want to install <code>imgcat</code>, you can
+pipe it to Preview using open<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> (<code>open -f -a Preview</code>) or just
+redirect the PNG to a file.</p></li>
+</ul>
+
+
+<p>The <code>git depgraph</code> alias is a game changer. It makes it easier to get spun
+up in new code bases, helps make sense of large changes, and just looks
+plain cool. But at the end of the day, we came here to review some code,
+so lets take a look at how we can actually view the diffs of the files
+that changed.</p>
+
+<h2>Reviewing the diffs</h2>
+
+<p>To review the diffs, the simplest option is to just run <code>git diff
+master..HEAD</code>. This has a bunch of downsides:</p>
+
+<ul>
+<li><p>No syntax highlighting (everything is either green or red).</p></li>
+<li><p>No surrounding context (for example, GitHub lets you click to expand
+lines above or below a diff hunk).</p></li>
+<li><p>The diff is &ldquo;unified,&rdquo; instead of split into two columns.</p></li>
+<li><p>No way to exclude a specific file (the 300 line diff to your
+<code>yarn.lock</code> file is sometimes nice to hide).</p></li>
+</ul>
+
+
+<p>My solution to all of these problems is to view the diffs in Vim, with
+the help of a few Vim plugins and a few git aliases. Before we get to
+that, here&rsquo;s a screenshot:</p>
+
+<p><a class="image-link" href="https://blog.jez.io/images/git-review.png"><img class="fullwidth" src="https://blog.jez.io/images/git-review.png" title="git review" ></a></p>
+
+<p>Looks pretty similar to GitHub&rsquo;s interface, with the added bonus that
+it&rsquo;s using my favorite colorscheme! The Vim plugins featured are:</p>
+
+<ul>
+<li><a href="https://github.com/tpope/vim-fugitive">tpope/vim-fugitive</a> for showing the side-by-side diff (<code>:Gdiff</code>).</li>
+<li><a href="https://github.com/airblade/vim-gitgutter">airblade/vim-gitgutter</a> for showing the <code>+/-</code> signs.</li>
+<li><a href="https://github.com/jez/vim-colors-solarized">jez/vim-colors-solarized</a> for tweaking the diff highlight
+colors.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></li>
+</ul>
+
+
+<p>And to orchestrate the whole thing, I&rsquo;ve set up these two aliases:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span><span class="nb">alias</span><span class="o">]</span>
+</span><span class='line'>  <span class="c"># NOTE: These aliases depend on the `git files` alias from</span>
+</span><span class='line'>  <span class="c"># a few sections ago!</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># Open all files changed since REVIEW_BASE in Vim tabs</span>
+</span><span class='line'>  <span class="c"># Then, run fugitive's :Gdiff in each tab, and finally</span>
+</span><span class='line'>  <span class="c"># tell vim-gitgutter to show +/- for changes since REVIEW_BASE</span>
+</span><span class='line'>  review <span class="o">=</span> !vim -p <span class="k">$(</span>git files<span class="k">)</span> +<span class="se">\"</span>tabdo Gdiff <span class="nv">$REVIEW_BASE</span><span class="se">\"</span> +<span class="se">\"</span><span class="nb">let </span>g:gitgutter_diff_base <span class="o">=</span> <span class="s1">'$REVIEW_BASE'</span><span class="se">\"</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># Same as the above, except specify names of files as arguments,</span>
+</span><span class='line'>  <span class="c"># instead of opening all files:</span>
+</span><span class='line'>  <span class="c"># git reviewone foo.js bar.js</span>
+</span><span class='line'>  reviewone <span class="o">=</span> !vim -p +<span class="se">\"</span>tabdo Gdiff <span class="nv">$REVIEW_BASE</span><span class="se">\"</span> +<span class="se">\"</span><span class="nb">let </span>g:gitgutter_diff_base <span class="o">=</span> <span class="s1">'$REVIEW_BASE'</span><span class="se">\"</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here&rsquo;s how they work:</p>
+
+<ul>
+<li><p><code>git review</code> opens each file changed by this branch as a tab in Vim.
+Then <code>:Gdiff</code> from vim-fugitive shows the diff in each tab.</p></li>
+<li><p><code>git reviewone</code> is like <code>git review</code>, but you specify which
+files to open (in case you only want to diff a few).</p></li>
+</ul>
+
+
+<p>Like with the <code>git stat</code> alias, these aliases respect the <code>REVIEW_BASE</code>
+environment variable I&rsquo;ve set up in my <code>~/.bashrc</code>. (Scroll back up for
+a refresher.) For example, to review all files relative to <code>master</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>REVIEW_BASE=master git review</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At this point, you might think that all we&rsquo;ve done is re-create the
+GitHub code review experience in Vim. But actually what we&rsquo;ve done is so
+much more powerful.</p>
+
+<h2>Interactive Code Review</h2>
+
+<p>When reviewing on GitHub, the code is completely static&mdash;you can&rsquo;t
+change it. Also, because the code is coming from GitHub&rsquo;s servers,
+it&rsquo;s laggy when you click around to view related files. By switching our
+code review to the terminal, we can now edit files, jump to other files,
+and run arbitrary commands at no cost.</p>
+
+<p>It might not be obvious how huge of a win this is, so let&rsquo;s see some
+examples. Take the screenshot below of the <code>requireElement</code> function.
+It&rsquo;s been moved from <em>above</em> the <code>findElement</code> function to <em>below</em> it
+(probably because the former calls the latter):</p>
+
+<p><a class="image-link" href="https://blog.jez.io/images/requireElement01.png"><img class="fullwidth" src="https://blog.jez.io/images/requireElement01.png" title="diff" ></a></p>
+
+<p>But is the location of the <code>requireElement</code> function the only thing
+that&rsquo;s changed? By editing the file to move the function back to its
+original location, vim-fugitive will automatically recompute the diff.
+And in fact, we can see that the <em>type of the argument</em> has changed too,
+from <code>string</code> to <code>ElementType</code>:</p>
+
+<p><a class="image-link" href="https://blog.jez.io/images/requireElement02.png"><img class="fullwidth" src="https://blog.jez.io/images/requireElement02.png" title="diff" ></a></p>
+
+<p>If we had been viewing this on GitHub, we might have taken for granted
+that the function didn&rsquo;t change. But since we&rsquo;re in our editor, we can
+interactively play around with our code and discover things we might
+have missed otherwise. The advantages of interactive code review go well
+beyond this example:</p>
+
+<ul>
+<li><p>In a Flow project, we can ask for the type of a variable.</p></li>
+<li><p>In a test file, we can change the test and see if it still passes or
+if it now fails.</p></li>
+<li><p>We can <code>grep</code> the project for all places that a function is used
+(including files <em>not</em> changed by this branch).</p></li>
+<li><p>We can open up related files for cross-referencing.</p></li>
+</ul>
+
+
+<p>By having the full power of our editor, we can literally retrace the
+steps that the author went through to create the pull request. If our
+goal is to understand and learn from code review, there&rsquo;s no better way
+than walking in the author&rsquo;s shoes.</p>
+
+<h2>Recap</h2>
+
+<p>To recap, here&rsquo;s a list of the tools I use to review code at the command
+line:</p>
+
+<ul>
+<li><code>hub pr checkout</code></li>
+<li><code>git stat</code> to list files that have changed</li>
+<li><code>git heatmap</code> to show how frequently these files change</li>
+<li><code>git depgraph</code> to show a graph of which files depend on which</li>
+<li><code>git review</code> to open diffs of all the files in Vim</li>
+<li><code>git reviewone</code> to open diffs for a specific handful of files</li>
+</ul>
+
+
+<p>If you&rsquo;re having trouble incorporating any of these into your workflow,
+feel free to reach out and let me know! I&rsquo;m happy to help.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>That being said, the techniques here can be applied to any language that you can statically analyze. In particular, I have a rough prototype of everything JavaScript-specific you see here that works with Standard ML instead. If you can find me the dependency information for your favorite language, I&rsquo;d be happy to help you turn it into a visualization.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>The <code>open</code> command is macOS-specific. On Linux, you might want to look at the <code>display</code> command from ImageMagick.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>I&rsquo;ve patched the default Solarized colors for Vim so that lines retain their syntax highlighting in the diff mode, while the backgrounds are highlighted. You can see how this is done in this commit: <a href="https://github.com/jez/vim-colors-solarized/commit/bca72cc">https://github.com/jez/vim-colors-solarized/commit/bca72cc</a><a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Presenting Data & Information: Notes]]></title>
@@ -3167,174 +3517,6 @@ particular) in long lines just as if they were short.</li>
 managed to capture a good portion of them. If you thought that one of these
 snippets was useful, are having trouble getting something to work, or have
 something interesting to share, leave a comment below!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Getting Started with RCM]]></title>
-    <link href="https://blog.jez.io/2015/03/09/getting-started-with-rcm/"/>
-    <updated>2015-03-09T19:30:39-04:00</updated>
-    <id>https://blog.jez.io/2015/03/09/getting-started-with-rcm</id>
-    <content type="html"><![CDATA[<p>I recently rewrote most of my dotfiles to clean them up and in the process
-decided to take a renewed look at using <a href="https://robots.thoughtbot.com/rcm-for-rc-files-in-dotfiles-repos">rcm</a>&rsquo;s array of features to manage
-syncing my dotfiles across multiple servers and hosts.</p>
-
-<!-- more -->
-
-
-<h2>Installation and Usage</h2>
-
-<p>Thoughbot has written some excellent documentation for rcm, including a whole
-set of man pages and a <a href="https://robots.thoughtbot.com/rcm-for-rc-files-in-dotfiles-repos">nice blog post</a> that runs through its core
-features. As far as <a href="https://github.com/thoughtbot/rcm#installation">installation</a> goes, there&rsquo;s a package for just
-about every platform on top of the standard autotools, so you should have no
-problem getting up and running.</p>
-
-<p>Rather than just run through the same stuff, I&rsquo;m going to walk through some of
-the places where my experience varied from the examples given in the
-documentation.</p>
-
-<h2>Background</h2>
-
-<p>I&rsquo;ve already been using rcm for a while now, though my setup was a little
-non-standard as far as rcm installations go; instead of using the system built
-into rcm for managing host-specific configuration files, I had <a href="https://github.com/jez/dotfiles/blob/6beee7eb426a21102da174f65d1a706bedc28b57/zshrc#L135-L204">huge case
-statements</a> littering my config files. After starting to get a little
-traffic for <a href="https://github.com/jez/vim-as-an-ide">some of my other configuration work</a>, I decided it was time to
-make my config files something worth looking at.</p>
-
-<p>Thus, given the state of my old files, much of my effort this time around
-were spent refactoring my current setup to increase modularity and get it to
-integrate nicely with rcm. I think that this use case is a little
-under-documented and lacking in first-class support in the suite, so I&rsquo;ll talk
-about how I got around this later on. That being said, if you&rsquo;re coming from no
-dotfiles management software or are interested in trying out something new,
-you&rsquo;ll have a much smoother experience.</p>
-
-<h2>Goals</h2>
-
-<p>My two goals for the refactor that I mentioned above were to</p>
-
-<ul>
-<li>make everything modular, so that people could more easily pick and choose
-pieces from my dotfiles to include in theirs, and</li>
-<li>make it easy to swap around host-specific configurations.</li>
-</ul>
-
-
-<p>While the work required to achieve this setup was a bit hairy, maintaining it
-should be straightforward from now on.</p>
-
-<p>If you haven&rsquo;t taken a second to peruse some of the <a href="http://thoughtbot.github.io/rcm/rcm.7.html">documentation</a> yet,
-it probably wouldn&rsquo;t hurt to do so now. It&rsquo;s about to get technical.</p>
-
-<h2>Host-independent files</h2>
-
-<p>I started this time around with the host independent files, because they
-required no real refactoring. Linking these up was a simple matter of running
-commands that looked like</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc &lt;rc-file&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I ran this on files like my <code>.vimrc</code>, <code>.tmux.conf</code>, <code>.ackrc</code>, and other simple
-files. I also handled my <code>.vim/</code> folder in this step, but slightly differently.
-The default rcm behavior is to create symlinks when given a single file, and to
-recursively descend and create symlinks when given a folder. For folders like my
-<code>.vim/</code> folder, which can get pretty large pretty quickly, I used the <code>-S</code>
-option to force rcm to symlink the directory:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc -S .vim/</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The first time I ran <code>mkrc</code>, it automatically created a folder called
-<code>~/.dotfiles</code>, which is where all my dotfiles files will live from now on. Then,
-every time <code>mkrc</code> is run, it moves the file into this folder and creates a
-symbolic link where it use to exist. I always thought this was a curious name
-for the program, &ldquo;make rc file&rdquo;, but really what I just mentioned is all there
-is to it: <code>mkrc</code> <em>moves</em> and <em>links</em> an rc file.</p>
-
-<p><a class="image-link" href="https://blog.jez.io/images/mkrc-host-independent.png"><img src="https://blog.jez.io/images/mkrc-host-independent.png"></a></p>
-
-<p>Above you can see the results of this first step on a couple files: my <code>.vimrc</code>
-and my <code>.vim/</code> folder. You can see that where there once were a file and a
-folder, there are now two symbolic links, which point to the moved files inside
-of my <code>.dotfiles/</code> directory.</p>
-
-<h2>Host-dependent files</h2>
-
-<p>Next up are obviously the host-dependent files, though we can split this
-category once more based on which need to be refactored.</p>
-
-<h3>Just Add Water</h3>
-
-<p>For my host-dependent
-files that didn&rsquo;t need to be refactored, like my <code>.ssh/config</code> and my
-<code>.gitconfig</code> (files which, by the way, I wasn&rsquo;t tracking at all before this
-rewrite), I just ran the following command:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ mkrc -o .gitconfig</span></code></pre></td></tr></table></div></figure>
-
-
-<p>When I&rsquo;m on my Mac, this goes through the same move + link procedure described
-above, but it moves the file into the <code>~/.dotfiles/host-Jacobs-MacBook-Air/</code>
-subfolder.</p>
-
-<h3>Refactor and Profit</h3>
-
-<p>Finally, I dealt with the piece of my dotfiles that was sorely lacking a
-refactor: my <code>.zshrc</code>. For this, I took a cue from <a href="https://github.com/holman/dotfiles">Zach Holman&rsquo;s
-dotfiles</a> organization and broke up my zshrc into it&rsquo;s components, like
-<code>aliases.sh</code>, <code>colors.sh</code>, and more. Most important of these components was
-the <code>host.sh</code> file, which contained all the host-specific configurations that I
-was doing. Whenever I deploy my <code>.zshrc</code> on a new host now, rcm will put a
-<code>host.sh</code> file in a location where my <code>.zshrc</code> knows where to look, but the
-contents of that file change depending on the host. Getting the many <code>host.sh</code>
-files in place is where I think mkrc&rsquo;s power can be improved.</p>
-
-<p>The <code>mkrc -o</code> command takes an option that lets you specify a host explicitly
-(<code>-B &lt;hostname&gt;</code>) rather than calculating it with the <code>hostname</code> command, but it doesn&rsquo;t
-let you specify that you&rsquo;d just like to move the file, rather than move and link
-it. As such, when I was refactoring, I created a bunch of files:
-<code>host-Jacobs-MacBook-Air.sh</code>, <code>host-ghost.zimmerman.io.sh</code>, etc., creating one
-<code>host-&lt;something&gt;.sh</code> file for each host that I needed to deploy my dotfiles to.
-Then, for each of these files, I</p>
-
-<ul>
-<li>ran <code>mkrc -o -B &lt;hostname&gt; host-&lt;hostname&gt;.sh</code></li>
-<li>removed the link created by <code>mkrc</code> (I skipped this step the last time around,
-when I had just linked the correct <code>host.sh</code> file for the host I was working
-on)</li>
-<li>renamed the file that rcm created in the <code>.dotfiles/host-&lt;hostname&gt;/</code> folder
-to just <code>host.sh</code>.</li>
-</ul>
-
-
-<p>Since there were a bunch of different host-specific files in my case, this
-process was a little tedious. It&rsquo;d have been nice if there was an option to
-automate my use case, but I&rsquo;m not sure if it&rsquo;s common enough to warrant
-the additional complexity, especially considering it&rsquo;s a one-time cost.</p>
-
-<p>In any case, with all this in place, I had finally met my two goals: everything
-was modular, and host-specific configurations were clearly defined and easily
-deployable.</p>
-
-<h2>Up Next</h2>
-
-<p>If you&rsquo;re reading this and wondering where to go next, you could:</p>
-
-<ul>
-<li>take a dive into the rcm documentation to get started applying it to your own
-set of dotfiles</li>
-<li>browse my <a href="https://github.com/jez/dotfiles">new-and-improved dotfiles</a> repository on GitHub</li>
-<li>wait for an upcoming post where I point out some of the noteworthy things I&rsquo;ve
-added in my dotfiles</li>
-</ul>
-
-
-<p>If you&rsquo;re using rcm or trying to get started with it but are having issues, feel
-free to drop questions in the comments and I&rsquo;ll see if I can&rsquo;t help sort things
-out.</p>
 ]]></content>
   </entry>
   
