@@ -4,7 +4,7 @@
   <title><![CDATA[Category: vim | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/vim/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2018-01-14T03:50:43-05:00</updated>
+  <updated>2018-01-14T15:52:21-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -37,7 +37,7 @@ that I can understand it better than if I were just browsing online.</p>
 </ul>
 
 
-<p>But first, let&rsquo;s talk a little bit about the point of code review in the
+<p>But first, let&rsquo;s talk briefly about the point of code review in the
 first place.</p>
 
 <h2>Code review philosophy</h2>
@@ -107,10 +107,12 @@ feel for what changed. For this, I&rsquo;ve written a git alias that shows:</p>
 personal environment variable <code>REVIEW_BASE</code>.</p>
 
 <p><code>REVIEW_BASE</code> lets us choose which branch to review relative to. Most of
-the time, <code>REVIEW_BASE</code> is <code>master</code>, but this isn&rsquo;t alway the case! Some
-repos branch off of <code>gh-pages</code>; sometimes I like to review the most
-recent commit as if it were it&rsquo;s own branch. To review the code relative
-so some other base, set <code>REVIEW_BASE</code> before running the command:</p>
+the time, <code>REVIEW_BASE</code> is <code>master</code>, but this isn&rsquo;t always the case! Some
+repos branch off of <code>gh-pages</code>. Sometimes I like to review the most
+recent commit as if it were its own branch.</p>
+
+<p>To review the code relative so some other base, set <code>REVIEW_BASE</code> before
+running <code>git stat</code>:</p>
 
 <pre><code class="bash"># Review between 'gh-pages' and the current branch
 REVIEW_BASE=gh-pages git stat
@@ -122,13 +124,13 @@ REVIEW_BASE=HEAD^ git stat
 <p>I have <code>export REVIEW_BASE=master</code> in my <code>~/.bashrc</code>, because most
 projects branch off of <code>master</code>.</p>
 
-<p>We&rsquo;ve seen nothing too out of the ordinary so far. GitHub can already
-pretty much do everything we&rsquo;ve seen&mdash;let&rsquo;s start to up the ante.</p>
+<p>Nothing too crazy yet&mdash;GitHub can already do everything we&rsquo;ve seen so
+far. Let&rsquo;s start to up the ante.</p>
 
 <h2>Visualizing file change frequency</h2>
 
 <p>I&rsquo;ve written a short script that shows me a visualization of how
-frequently the files involved in this branch change overall in the repo:</p>
+frequently the files involved in this branch change over time:</p>
 
 <p><a class="image-link" href="/images/git-heatmap.png"><img class="fullwidth" src="/images/git-heatmap.png" title="git heatmap" ></a></p>
 
@@ -141,15 +143,17 @@ frequently the files involved in this branch change overall in the repo:</p>
 future. I review these files with an eye towards what the <em>next</em>
 change will bring.</p>
 
-<p><em>&ldquo;Is this change robust enough to still be useful in the future?&rdquo;
-&ldquo;Will we throw this out soon after merging it?&rdquo;</em></p></li>
+<p><em>&ldquo;Is this change robust enough to still be useful in the future?
+Will we throw this out soon after merging it?&rdquo;</em></p></li>
 <li><p><strong>Files with few changes</strong>.</p>
 
-<p>Files that aren&rsquo;t changed frequently are more likely to be brittle,
-depending on implicit assumptions.</p>
+<p>Files that aren&rsquo;t changed frequently are more likely to be brittle.
+Alternatively, it&rsquo;s often the case that infrequently changed files
+stay unchanged because the change is better made elsewhere.</p>
 
-<p><em>&ldquo;Is it possible this change invalidates a long-held, implicit
-assumption that hasn&rsquo;t been challenged yet?&rdquo;</em></p></li>
+<p><em>&ldquo;Does this change challenge an implicit assumption so that some other
+part of the code was relying on? Is there a better place for this
+change?&rdquo;</em></p></li>
 </ul>
 
 
@@ -160,10 +164,10 @@ relationships between the files that changed.</p>
 
 <h2>Visualizing relationships between files</h2>
 
-<p>At work I mostly review JavaScript files, so I&rsquo;ve built out this next
-bit of tooling specifically for JavaScript.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> It helps to
-understand which files import others, so I have a command that computes
-the dependency graph of the files changed on this branch:</p>
+<p>At work I review JavaScript files, so I&rsquo;ve built out this next bit of
+tooling specifically for JavaScript.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> It helps to understand
+which files import others, so I have a command that computes the
+dependency graph of the files changed on this branch:</p>
 
 <p><a class="image-link" href="/images/git-depgraph.png"><img class="fullwidth" src="/images/git-depgraph.png" title="git depgraph" ></a></p>
 
@@ -182,8 +186,8 @@ place.</p></li>
 
 <p>In either case, we can see the structure of the change. Three files
 depend on <code>Elements.js</code>, so it&rsquo;s serving the needs of many modules.
-<code>Element.js</code> only has one dependency. Each branch&rsquo;s dependency graph
-shows different information; sometimes it&rsquo;s surprising what turns up.</p>
+<code>Element.js</code> only has one dependency, etc. Each branch&rsquo;s dependency
+graph shows different information; it can be surprising what turns up.</p>
 
 <p>I have the <code>git depgraph</code> alias defined like this:</p>
 
@@ -210,7 +214,7 @@ redirect the PNG to a file.</p></li>
 <p>The <code>git depgraph</code> alias is a game changer. It makes it easier to get spun
 up in new code bases, helps make sense of large changes, and just looks
 plain cool. But at the end of the day, we came here to review some code,
-so lets take a look at how we can actually view the diffs of the files
+so let&rsquo;s take a look at how we can actually view the diffs of the files
 that changed.</p>
 
 <h2>Reviewing the diffs</h2>
@@ -229,7 +233,7 @@ lines above or below a diff hunk).</p></li>
 
 
 <p>My solution to all of these problems is to view the diffs in Vim, with
-the help of a few Vim plugins and a few git aliases. Before we get to
+the help of two Vim plugins and two git aliases. Before we get to
 that, here&rsquo;s a screenshot:</p>
 
 <p><a class="image-link" href="/images/git-review.png"><img class="fullwidth" src="/images/git-review.png" title="git review" ></a></p>
@@ -276,7 +280,7 @@ files to open (in case you only want to diff a few).</p></li>
 environment variable I&rsquo;ve set up in my <code>~/.bashrc</code>. (Scroll back up for
 a refresher.) For example, to review all files relative to <code>master</code>:</p>
 
-<pre><code>REVIEW_BASE=master git review
+<pre><code class="bash">REVIEW_BASE=master git review
 </code></pre>
 
 <p>At this point, you might think that all we&rsquo;ve done is re-create the
@@ -292,9 +296,9 @@ code review to the terminal, we can now edit files, jump to other files,
 and run arbitrary commands at no cost.</p>
 
 <p>It might not be obvious how huge of a win this is, so let&rsquo;s see some
-examples. Take the screenshot below of the <code>requireElement</code> function.
-It&rsquo;s been moved from <em>above</em> the <code>findElement</code> function to <em>below</em> it
-(probably because the former calls the latter):</p>
+examples. Take this screenshot of the <code>requireElement</code> function. It
+moved from <em>above</em> the <code>findElement</code> function to <em>below</em> it (probably
+because the former calls the latter):</p>
 
 <p><a class="image-link" href="/images/requireElement01.png"><img class="fullwidth" src="/images/requireElement01.png" title="diff" ></a></p>
 
@@ -316,8 +320,8 @@ beyond this example:</p>
 <li><p>In a Flow project, we can ask for the type of a variable.</p></li>
 <li><p>In a test file, we can change the test and see if it still passes or
 if it now fails.</p></li>
-<li><p>We can <code>grep</code> the project for all places that a function is used
-(including files <em>not</em> changed by this branch).</p></li>
+<li><p>We can <code>grep</code> the project for all uses of a function (including files
+<em>not</em> changed by this branch).</p></li>
 <li><p>We can open up related files for cross-referencing.</p></li>
 </ul>
 
@@ -352,11 +356,11 @@ feel free to reach out and let me know! I&rsquo;m happy to help.</p>
 <hr/>
 <ol>
 <li id="fn:1">
-<p>That being said, the techniques here can be applied to any language that you can statically analyze. In particular, I have a rough prototype of everything JavaScript-specific you see here that works with Standard ML instead. If you can find me the dependency information for your favorite language, I&rsquo;d be happy to help you turn it into a visualization.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<p>The techniques here apply to any language that you can statically analyze. In particular, I have a rough prototype of everything JavaScript-specific you see here that works with Standard ML instead. If you can find me the dependency information for your favorite language, I&rsquo;d be happy to help you turn it into a visualization.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 <li id="fn:2">
 <p>The <code>open</code> command is macOS-specific. On Linux, you might want to look at the <code>display</code> command from ImageMagick.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 <li id="fn:3">
-<p>I&rsquo;ve patched the default Solarized colors for Vim so that lines retain their syntax highlighting in the diff mode, while the backgrounds are highlighted. You can see how this is done in this commit: <a href="https://github.com/jez/vim-colors-solarized/commit/bca72cc">https://github.com/jez/vim-colors-solarized/commit/bca72cc</a><a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<p>I&rsquo;ve patched the default Solarized colors for Vim so that lines retain their syntax highlighting in the diff mode, while the backgrounds are highlighted. You can see how this works in this commit: <a href="https://github.com/jez/vim-colors-solarized/commit/bca72cc">https://github.com/jez/vim-colors-solarized/commit/bca72cc</a><a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
