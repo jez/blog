@@ -4,7 +4,7 @@
   <title><![CDATA[Category: haskell | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/haskell/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2018-02-06T01:55:29-05:00</updated>
+  <updated>2018-02-06T02:35:26-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,82 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Lenses & Composition]]></title>
+    <link href="https://blog.jez.io/lens-composition/"/>
+    <updated>2018-02-06T02:07:37-05:00</updated>
+    <id>https://blog.jez.io/lens-composition</id>
+    <content type="html"><![CDATA[<!-- more -->
+
+
+<p>A lens is really just a function <code>a -&gt; b</code> that we represent
+backwards<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> and with an extra <code>Functor f</code> parameter lying
+around:</p>
+
+<pre><code>type Lens' a b = Functor f =&gt; (b -&gt; f b) -&gt; (a -&gt; f a)
+</code></pre>
+
+<p>What does this mean for function composition? Normal function
+composition looks like this:</p>
+
+<pre><code class="haskell">(.) :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; (a -&gt; c)
+
+f :: a -&gt; b
+g :: b -&gt; c
+
+g . f :: (a -&gt; c)
+</code></pre>
+
+<p>We often see something like this:</p>
+
+<pre><code class="haskell">g . f $ x
+</code></pre>
+
+<p>This means &ldquo;start with <code>x</code>, then run <code>f</code> on it, and run <code>g</code> after that.&rdquo;
+This sentence reads opposite from how the code reads!</p>
+
+<p>What about for lenses? Now we&rsquo;re working with these reversed,
+functorized lens functions:</p>
+
+<pre><code class="haskell">-- f' and g' are parallel to f and g from above
+
+f' :: Functor f =&gt; (b -&gt; f b) -&gt; (a -&gt; f a)
+--  ≈ a -&gt; b
+g' :: Functor f =&gt; (c -&gt; f c) -&gt; (b -&gt; f b)
+--  ≈ b -&gt; c
+
+f' . g' :: Functor f =&gt; (c -&gt; f c) -&gt; (a -&gt; f a)
+--       ≈ a -&gt; c
+</code></pre>
+
+<p>In the lens world, <code>^.</code> behaves kind of like a flipped <code>$</code> that turns
+lenses into getters, which lets us write code like this:</p>
+
+<pre><code class="haskell">x ^. f' . g'
+</code></pre>
+
+<p>This means &ldquo;start with <code>x</code>, then get <code>f'</code> from it, then get <code>g'</code> after
+that.&rdquo; The sentence reads just like the code!</p>
+
+<p>This is pretty cool, because it means that lenses (which are
+&ldquo;functional&rdquo; getters) read almost exactly like property access (which
+are &ldquo;imperative&rdquo; getters). Same concise syntax, but with an elegant
+semantics.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>I&rsquo;m exaggerating a bit here 😅 To see what I <em>really</em> mean, see <a href="/lens-intuition">this post</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Some Intuition on Lenses]]></title>
