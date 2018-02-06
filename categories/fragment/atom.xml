@@ -4,7 +4,7 @@
   <title><![CDATA[Category: fragment | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/fragment/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2018-02-06T02:35:26-05:00</updated>
+  <updated>2018-02-06T02:39:52-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -18,7 +18,7 @@
     <link href="https://blog.jez.io/lens-composition/"/>
     <updated>2018-02-06T02:07:37-05:00</updated>
     <id>https://blog.jez.io/lens-composition</id>
-    <content type="html"><![CDATA[<!-- more -->
+    <content type="html"><![CDATA[<p></p>
 
 
 <p>A lens is really just a function <code>a -&gt; b</code> that we represent
@@ -28,8 +28,12 @@ around:</p>
 <pre><code>type Lens' a b = Functor f =&gt; (b -&gt; f b) -&gt; (a -&gt; f a)
 </code></pre>
 
-<p>What does this mean for function composition? Normal function
-composition looks like this:</p>
+<p><strong>What does this mean for function composition?</strong></p>
+
+<!-- more -->
+
+
+<p>Normal function composition looks like this:</p>
 
 <pre><code class="haskell">(.) :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; (a -&gt; c)
 
@@ -39,7 +43,7 @@ g :: b -&gt; c
 g . f :: (a -&gt; c)
 </code></pre>
 
-<p>We often see something like this:</p>
+<p>We often have to read code that looks like this:</p>
 
 <pre><code class="haskell">g . f $ x
 </code></pre>
@@ -47,12 +51,10 @@ g . f :: (a -&gt; c)
 <p>This means &ldquo;start with <code>x</code>, then run <code>f</code> on it, and run <code>g</code> after that.&rdquo;
 This sentence reads opposite from how the code reads!</p>
 
-<p>What about for lenses? Now we&rsquo;re working with these reversed,
-functorized lens functions:</p>
+<p>What about for lenses? Here we have <code>f'</code> and <code>g'</code> which behave similarly
+in some sense to <code>f</code> and <code>g</code> from before:</p>
 
-<pre><code class="haskell">-- f' and g' are parallel to f and g from above
-
-f' :: Functor f =&gt; (b -&gt; f b) -&gt; (a -&gt; f a)
+<pre><code class="haskell">f' :: Functor f =&gt; (b -&gt; f b) -&gt; (a -&gt; f a)
 --  ≈ a -&gt; b
 g' :: Functor f =&gt; (c -&gt; f c) -&gt; (b -&gt; f b)
 --  ≈ b -&gt; c

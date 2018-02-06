@@ -89,7 +89,7 @@
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <!-- more -->
+      <p></p>
 
 
 <p>A lens is really just a function <code>a -&gt; b</code> that we represent
@@ -99,8 +99,12 @@ around:</p>
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>type Lens' a b = Functor f =&gt; (b -&gt; f b) -&gt; (a -&gt; f a)</span></code></pre></td></tr></table></div></figure>
 
 
-<p>What does this mean for function composition? Normal function
-composition looks like this:</p>
+<p><strong>What does this mean for function composition?</strong></p>
+
+<!-- more -->
+
+
+<p>Normal function composition looks like this:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="p">(</span><span class="o">.</span><span class="p">)</span> <span class="o">::</span> <span class="p">(</span><span class="n">b</span> <span class="o">-&gt;</span> <span class="n">c</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">c</span><span class="p">)</span>
 </span><span class='line'>
@@ -110,7 +114,7 @@ composition looks like this:</p>
 </span><span class='line'><span class="n">g</span> <span class="o">.</span> <span class="n">f</span> <span class="o">::</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">c</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>We often see something like this:</p>
+<p>We often have to read code that looks like this:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">g</span> <span class="o">.</span> <span class="n">f</span> <span class="o">$</span> <span class="n">x</span></span></code></pre></td></tr></table></div></figure>
 
@@ -118,12 +122,10 @@ composition looks like this:</p>
 <p>This means &ldquo;start with <code>x</code>, then run <code>f</code> on it, and run <code>g</code> after that.&rdquo;
 This sentence reads opposite from how the code reads!</p>
 
-<p>What about for lenses? Now we&rsquo;re working with these reversed,
-functorized lens functions:</p>
+<p>What about for lenses? Here we have <code>f'</code> and <code>g'</code> which behave similarly
+in some sense to <code>f</code> and <code>g</code> from before:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="c1">-- f' and g' are parallel to f and g from above</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">f'</span> <span class="o">::</span> <span class="kt">Functor</span> <span class="n">f</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">b</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">a</span><span class="p">)</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">f'</span> <span class="o">::</span> <span class="kt">Functor</span> <span class="n">f</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">b</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">a</span><span class="p">)</span>
 </span><span class='line'><span class="c1">--  ≈ a -&gt; b</span>
 </span><span class='line'><span class="n">g'</span> <span class="o">::</span> <span class="kt">Functor</span> <span class="n">f</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">c</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">c</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">b</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">b</span><span class="p">)</span>
 </span><span class='line'><span class="c1">--  ≈ b -&gt; c</span>
