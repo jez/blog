@@ -10,7 +10,7 @@ description: >
 strong_keywords: false
 ---
 
-<!-- more -->
+<p></p>
 
 A lens is really just a function `a -> b` that we represent
 backwards[^backwards] and with an extra `Functor f` parameter lying
@@ -20,8 +20,11 @@ around:
 type Lens' a b = Functor f => (b -> f b) -> (a -> f a)
 ```
 
-What does this mean for function composition? Normal function
-composition looks like this:
+**What does this mean for function composition?**
+
+<!-- more -->
+
+Normal function composition looks like this:
 
 ```haskell
 (.) :: (b -> c) -> (a -> b) -> (a -> c)
@@ -32,7 +35,7 @@ g :: b -> c
 g . f :: (a -> c)
 ```
 
-We often see something like this:
+We often have to read code that looks like this:
 
 ```haskell
 g . f $ x
@@ -41,12 +44,10 @@ g . f $ x
 This means "start with `x`, then run `f` on it, and run `g` after that."
 This sentence reads opposite from how the code reads!
 
-What about for lenses? Now we're working with these reversed,
-functorized lens functions:
+What about for lenses? Here we have `f'` and `g'` which behave similarly
+in some sense to `f` and `g` from before:
 
 ```haskell
--- f' and g' are parallel to f and g from above
-
 f' :: Functor f => (b -> f b) -> (a -> f a)
 --  ≈ a -> b
 g' :: Functor f => (c -> f c) -> (b -> f b)
