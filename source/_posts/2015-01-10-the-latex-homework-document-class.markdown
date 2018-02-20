@@ -3,7 +3,7 @@ layout: post
 title: "The LaTeX homework Document Class"
 date: 2015-01-10 17:00:00 -0600
 comments: false
-categories: [latex]
+categories: ['latex']
 description: "A LaTeX \\documentclass for typesetting homework assignments."
 share: false
 permalink: /:year/:month/:day/:title/

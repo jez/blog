@@ -3,7 +3,7 @@ layout: post
 title: "A LaTeX Homework Template"
 date: 2014-10-04 02:03:27 -0400
 comments: false
-categories: [LaTeX]
+categories: ['latex']
 description: "All about what template I use for LaTeX on homework assignments."
 share: false
 permalink: /:year/:month/:day/:title/
