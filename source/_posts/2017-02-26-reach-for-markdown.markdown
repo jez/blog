@@ -183,7 +183,7 @@ for us, so the [only thing left to do is start][pandoc-starter].
 
 [ps-article]: https://github.com/jez/pandoc-starter/tree/master/article
 [ps-tufte-handout]: https://github.com/jez/pandoc-starter/tree/master/tufte-handout
-[ps-homework]: https://github.com/jez/pandoc-starter/tree/master/tufte-handout
+[ps-homework]: https://github.com/jez/pandoc-starter/tree/master/homework
 [ps-beamer]: https://github.com/jez/pandoc-starter/tree/master/beamer
 [ps-beamer-solarized]: https://github.com/jez/pandoc-starter/tree/master/beamer-solarized
 [ps-book-writeup]: https://github.com/jez/pandoc-starter/tree/master/book-writeup
