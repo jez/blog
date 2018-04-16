@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2018-04-13T00:49:50-04:00</updated>
+  <updated>2018-04-16T00:36:57-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,215 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Case Exhaustiveness in Flow]]></title>
+    <link href="https://blog.jez.io/flow-exhaustiveness/"/>
+    <updated>2018-04-15T23:02:26-04:00</updated>
+    <id>https://blog.jez.io/flow-exhaustiveness</id>
+    <content type="html"><![CDATA[<p>Compared to some other languages, Flow&rsquo;s story around exhaustiveness
+checking within <code>if / else</code> and <code>switch</code> statements leaves something to
+be desired. By default, Flow doesn&rsquo;t do any exhaustiveness checks! But
+we <strong>can</strong> opt-in to exhaustiveness checking one statement at a time.</p>
+
+<p>In this post, we&rsquo;ll discover from the ground up how Flow&rsquo;s
+exhaustiveness checking behaves. But if you&rsquo;re just looking for the
+result, here&rsquo;s a snippet:</p>
+
+<h2>TL;DR</h2>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">type</span> <span class="nx">A</span> <span class="o">=</span> <span class="p">{</span><span class="na">tag</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">};</span>
+</span><span class='line'><span class="nx">type</span> <span class="nx">B</span> <span class="o">=</span> <span class="p">{</span><span class="na">tag</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">};</span>
+</span><span class='line'><span class="nx">type</span> <span class="nx">AorB</span> <span class="o">=</span> <span class="nx">A</span> <span class="o">|</span> <span class="nx">B</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">absurd</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">x</span><span class="p">:</span> <span class="nx">empty</span><span class="p">):</span> <span class="nx">T</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'This function will never run!'</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">allGood</span> <span class="o">=</span> <span class="p">(</span><span class="na">x</span><span class="p">:</span> <span class="nx">AorB</span><span class="p">):</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"A"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch A"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"B"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch B"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">absurd</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">forgotTagB</span> <span class="o">=</span> <span class="p">(</span><span class="na">x</span><span class="p">:</span> <span class="nx">AorB</span><span class="p">):</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"A"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch A"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// B. This type is incompatible with the expected param type of empty.</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">absurd</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<h2>How Exhaustiveness Behaves in Flow</h2>
+
+<p><a href="https://flow.org/try/#0PTAEAEDMBsHsHcBQiQrACQKYCdOnngBYCGAbnsaAC4CeADngOQCCs2AQo-gJZWHXxYoUsWzdiAOyoBnNIloNQzUAF5QAbyrEA5gC5QAImYGAvgG559PO1Uatew+1MWFeVh1vKAPqHYXEAMawEtJUoJASAIy2ABQAHvru7ACU+qFiEtqqAHwaiKCg3JDxAHT2qipqRgbJ6vkFoLhUAK7YEoYAku0ARtiSAfzGFgUmoJjQ0nh1DY2YLW2dPX0SA74Gw6AmiFtyIErQ0Pjjh5IAJqDasLCnADSg3c1h8CRhRUegxKfnlBKY8KABYiTAD8aFAADE2GM4sQALZ0aCYO4EWaQYgBKhQvgUbqwcjhbiI0AAPWoQmx93GCF0cksigAwrZNDp9AZ6c46W42Ow2Iy1N5fKAfPT-EEQmEIgAmWIJJTc3mpUDpbiZHJ5ApFUrlSpVYzJdUNJqtdoGLr3ZarIb1UbjSYGgpGhampb9fhODZbHaoPYAdWIvA+SswYtuhTCrgBhGDAGtpABCMEAFRejGklMBzTtKMzmG+AOIVAGAFpiAdQIxbZguL1XSVdmAfS9CpB3rDiNG8Jh0fwayt+Jg4gjuAFeKDUGCAKIAJSnAHkp-oZkvl6BADCkgABSQBtpIA4P6VVAy2hKoGT3DTEdPhRWsHhBe43SJ8F4-EkhXh0GHvGgNCLjt+52aEinJgkAqrmdZiqE4QSAAzDKiTytg9KKsqqoqLk0zNlqOgVLqNT2rM8wmmavaWus1pjBMeBvFhWQ6o4eEYQ6czGos5qumsHrbMg3pgAAClG8B3NIQi8KmsywiqpwqlkmbUE2BCMLgoASLAYRBOQB4fGWFKApM0h1nsAAycxiZ85wUr8-yMPSXC6ZgNLjns05zguK5uQUG47nuB5HieZ5WIUaYqkEN5UHeD5Ph87TcG+H5UF+P7MW0uagABQEgX+4HBJBEQACxwXKHAKmk+7SWqGGanEZTYXR1T6oxBEsc6bF9koZEjBRdrUVV2qVPR9X1ExhGsSRbrtZsnVUS2NE4YY7IDTMv4jRa-DspxXrAGCfoBpQkwhiUB1hnuhKHHwKqxnJBattw2iEGES1pcBoGnAmezsI8RyMPi6Uqrw4w0ACeI4ClpanVG+Z6UeuhnRI0bSQA+miAT2fWoCNldKL0swAByoCnCJaZmYG6XEM00BqUCSL3B9QLRhCcD-JioC8XOABqE6XU8eCAhIjBhNocxycDDmbYE2UShIACsBVJMV3llWhBqVdVtF9XV+FLc1o1tR6k3NqAM21U4C2GklREuq17rkZW+uG2r80a2by3sWt1uUfh8T6Jg8K0MkGwFHw2AIMpfygBO2BB9gMSMMQ3TSK0pyMH71pcajyZMIHweWWHEdsFw76-B8uL4o+Za-BpjQAXc3TBqTkxgqJaYqWEdCwNI0jhXgTMQfuzQYoGIjQM0eCwC2EYVj7NCMGCMQGOnSmiHgKnCKWw9Be0FLe3QtBBlQNSox0LYop8sDb3JF50AWVA4O0mAaTQzzA8iVbnJMXeEBeOCR6AsKYO3OiYAbkfPAkA2CXHDEIImFlQ52XCFCekItkA9yggANhlghJCJVNKKwqsUHqNU1Z6kdsNLWK0dZuy6tNfBqsqjG2IU1YiZCrYdRtg1PY9JfIf38ooC8wVryXzCvePAj4+BjEnnWGYnsxHbxoMnGYmd-jZ3DpHaOsd47YETnIzYqceL02DtfA4aZZIGCwDQO4HQ4FpUDPSOMoAADKQgLFBDJqcXmLcg74j4FdM6aZpAiNWPAIE0ISCZjCuQEoBhUbvXDFw0AAjr4LAvNId8t14oA0kCpGgZUmY5mrrXHMYc7GGRVGpfh0B-QhBFqAXIKkiwARzKcIsA46C4HbtwbK+gJyDmDNfb47QgQd20BIX+UhQBQkgABDE7T2iAjLGcS8oQuyv2IP8F8zTWkd2CAZTavpuYvhAnEc+aZugAyRpiTSFJ4k30vEzSgUZoAMGwOESZYVgiILBDHOOCcuAXgsnCbm15YTBC-KlSY5xKyPyUqAp5PjnkrFeRII8kInkDjhAiFGew7pUDoNIXQIASABGjAAkoJBpAdgOCUMBwBL6EoAcAUgsBuCNIAAwlAAOwlEiMAfGARpDAAACIFmIEWVmjLTgkqoLCaAABiUgug1EJzFuKIu6jzhqAADyJmyFIrevt9CJnKvUBRId-jKLYKor5Gik4WHMEg8WUE2XoKKohZCpVULoXqMrXquETZDQYRbUiusbbdRVrNAwdCGqa0YexZhE1g1UNDbVB2kanakJduNG07sU3DQVRo+IWjPSDSXEqnKEgAAcTqeQuqwQrD1Go8GJsIQxItUaA2DAzXrEN3r+r0KdNGy2HbWFFvYZw35AVeFXlCp3HgojN7dIxClS+fRYTUACqPaRtAJGmxzZa04+b1pAA"><strong>Read on flow.org/try/</strong></a></p>
+
+<p>Here we have a type <code>AorB</code> with two variants;</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">type</span> <span class="nx">A</span> <span class="o">=</span> <span class="p">{</span><span class="na">tag</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">};</span>
+</span><span class='line'><span class="nx">type</span> <span class="nx">B</span> <span class="o">=</span> <span class="p">{</span><span class="na">tag</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">};</span>
+</span><span class='line'><span class="nx">type</span> <span class="nx">AorB</span> <span class="o">=</span> <span class="nx">A</span> <span class="o">|</span> <span class="nx">B</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">fn1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">x</span><span class="p">:</span> <span class="nx">AorB</span><span class="p">):</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"A"</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch A"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch B"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>All well and good, but what if we add a new case?
+For example, what if we take the snippet above and add this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">type</span> <span class="nx">C</span> <span class="o">=</span> <span class="p">{</span><span class="na">tag</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">};</span>
+</span><span class='line'><span class="nx">type</span> <span class="nx">AorBorC</span> <span class="o">=</span> <span class="nx">A</span> <span class="o">|</span> <span class="nx">B</span> <span class="o">|</span> <span class="nx">C</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">fn2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">x</span><span class="p">:</span> <span class="nx">AorBorC</span><span class="p">):</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"A"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch A"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch B"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Wait a second, it type checks!</p>
+
+<p>That&rsquo;s because we used a catch-all <code>else</code> branch. What if we make each
+branch explicit?</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// ERROR:                 ┌─▶︎ string. This type is incompatible with an implicitly-returned undefined.</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">fn3</span> <span class="o">=</span> <span class="p">(</span><span class="nx">x</span><span class="p">:</span> <span class="nx">AorBorC</span><span class="p">):</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"A"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch A"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"B"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch B"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Phew, so it&rsquo;s reminding us that we&rsquo;re not covering all the cases.
+Let&rsquo;s add the new <code>C</code> case:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// ERROR:                 ┌─▶︎ string. This type is incompatible with an implicitly-returned undefined.</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">fn4</span> <span class="o">=</span> <span class="p">(</span><span class="nx">x</span><span class="p">:</span> <span class="nx">AorBorC</span><span class="p">):</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"A"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch A"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"B"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch B"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"C"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch C"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Hmm: it still thinks that we might return <code>undefined</code>, even though we&rsquo;ve
+definitely covered all the cases&hellip; 🤔</p>
+
+<p>What we <strong>can</strong> do is add a default case, but ask Flow to <strong>prove</strong> that
+we can&rsquo;t get there, using Flow&rsquo;s <code>empty</code> type:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kr">const</span> <span class="nx">fn5</span> <span class="o">=</span> <span class="p">(</span><span class="nx">x</span><span class="p">:</span> <span class="nx">AorBorC</span><span class="p">):</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"A"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch A"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"B"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch B"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"C"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch C"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">(</span><span class="na">x</span><span class="p">:</span> <span class="nx">empty</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'This will never run!'</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>throw new Error</code> line above will never run, because it&rsquo;s not
+possible to construct a value of type <code>empty</code>.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> (&ldquo;There are no
+values in the empty set.&rdquo;)</p>
+
+<p>If we adopt this pattern everywhere, we&rsquo;d see this error message if we
+forgot to add the new case for <code>C</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kr">const</span> <span class="nx">fn6</span> <span class="o">=</span> <span class="p">(</span><span class="nx">x</span><span class="p">:</span> <span class="nx">AorBorC</span><span class="p">):</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"A"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch A"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"B"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch B"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// C. This type is incompatible with empty.</span>
+</span><span class='line'>    <span class="p">(</span><span class="na">x</span><span class="p">:</span> <span class="nx">empty</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'absurd'</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Flow tells us &ldquo;Hey, I found a C! So I couldn&rsquo;t prove that this switch
+was exhaustive.&rdquo;</p>
+
+<p>But this pattern is slightly annoying to use, because ESLint complains:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>no-unused-expressions: Expected an assignment or function call and instead saw an expression.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can fix this by factoring that <code>empty ... throw</code> pattern into a
+helper function:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// 'absurd' is the name commonly used elsewhere for this function. For example:</span>
+</span><span class='line'><span class="c1">// https://hackage.haskell.org/package/void-0.7.1/docs/Data-Void.html#v:absurd</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">absurd</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">x</span><span class="p">:</span> <span class="nx">empty</span><span class="p">):</span> <span class="nx">T</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'absurd'</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">fn7</span> <span class="o">=</span> <span class="p">(</span><span class="na">x</span><span class="p">:</span> <span class="nx">AorBorC</span><span class="p">):</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"A"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch A"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"B"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch B"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"C"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch C"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">absurd</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">fn8</span> <span class="o">=</span> <span class="p">(</span><span class="na">x</span><span class="p">:</span> <span class="nx">AorBorC</span><span class="p">):</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"A"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch A"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">tag</span> <span class="o">===</span> <span class="s2">"B"</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">"In branch B"</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// C. This type is incompatible with the expected param type of empty.</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">absurd</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>So there you have it! You can put that helper function (<code>absurd</code>) in a
+file somewhere and import it anywhere. You could even give it a
+different name if you want! I&rsquo;ve been using this pattern in all the Flow
+code I write these days and it&rsquo;s been nice to rely on it when doing
+refactors.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Of course, this presumes that Flow&rsquo;s type system is sound, which it isn&rsquo;t. It&rsquo;s possible to accidentally inhabit <code>empty</code> if you use <code>any</code>! Moral of the story: be <em>very</em> diligent about eradicating <code>any</code>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Lenses & Composition]]></title>
@@ -3450,85 +3659,6 @@ the principles are generally applicable)</li>
 
 <p>Apart from that, try to find examples of these files that you can adapt to your
 needs.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Show where a Python package is used]]></title>
-    <link href="https://blog.jez.io/2015/06/12/show-where-a-python-package-is-used/"/>
-    <updated>2015-06-12T02:36:05-04:00</updated>
-    <id>https://blog.jez.io/2015/06/12/show-where-a-python-package-is-used</id>
-    <content type="html"><![CDATA[<p>A while back I was doing some spring cleaning of my Python packages. I noticed
-that there were a bunch of packages that I couldn&rsquo;t recall installing. I wanted
-to know if I could safely remove them, so I wrote a simple bash script to tell
-me called <code>pip-uses</code>.</p>
-
-<!-- more -->
-
-
-<h2>Source</h2>
-
-<p>Rather than post the source here and let it get more out of date every time I
-change it, you can find the source <a href="https://github.com/jez/bin/blob/master/pip-uses">on GitHub</a>. It&rsquo;s in my <a href="https://github.com/jez/bin">bin
-repository</a>, where I keep my notable helper scripts; feel free to
-poke around.</p>
-
-<h2>Motivations</h2>
-
-<p>I was primarily influenced by Homebrew&rsquo;s <code>brew uses</code> command. It does a nice job
-of giving you exactly the information you want, and I think the way the command
-is named makes sense.</p>
-
-<figure class='code'><figcaption><span>Homebrew: brew uses</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ brew uses --installed pango
-</span><span class='line'>imagemagick</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>pip-uses</code> gives you basically the experience:</p>
-
-<figure class='code'><figcaption><span>Pip: pip-uses</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>$ pip-uses stevedore
-</span><span class='line'>virtualenvwrapper</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In this example, the Python package <code>virtualenvwrapper</code> uses <code>stevedore</code>, just
-as <code>imagemagick</code> uses <code>pango</code>. Both commands can save you from accidentally
-removing a crucial dependency and answer the burning question, &ldquo;How in the world
-did this thing get installed?&rdquo;</p>
-
-<h2>Wish List</h2>
-
-<p>I&rsquo;m not doing much Python development these days, but if I had some spare time
-I&rsquo;d love for the script to also have these features:</p>
-
-<ul>
-<li>Recursive enumeration of dependencies
-
-<ul>
-<li>It&rsquo;d be nice if <code>pip-uses</code> kept recursively searching until it found no more
-dependencies. This way, it&rsquo;d be easy to see if you could safely uninstall a
-whole slew of packages that you&rsquo;re no longer using.</li>
-</ul>
-</li>
-<li>Operate on more than one package
-
-<ul>
-<li>I didn&rsquo;t need it at the time, so I didn&rsquo;t implement it, but it&rsquo;d be nice if
-the command took a variable amount of arguments and ran the same logic on
-all supplied packages.</li>
-</ul>
-</li>
-<li>Integrate with <code>pip</code>
-
-<ul>
-<li>Programs like <code>brew</code> and <code>pip</code> allow developers to add &ldquo;external commands&rdquo;
-by adding commands to the <code>PATH</code> that look like <code>brew-xyz</code> or <code>git-xyz</code>. I
-couldn&rsquo;t find if there was a special way to add external commands to <code>pip</code>.</li>
-</ul>
-</li>
-</ul>
-
-
-<p>If you find this script useful and end up implementing one of these feature or
-more on top of <code>pip-uses</code>, be sure to send me a Pull Request!</p>
 ]]></content>
   </entry>
   
