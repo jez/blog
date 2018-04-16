@@ -15,10 +15,12 @@ description: >
 strong_keywords: false
 ---
 
-Compared to some other languages, Flow's story around exhaustiveness
+Compared to some other languages, [Flow]'s story around exhaustiveness
 checking within `if / else` and `switch` statements leaves something to
 be desired. By default, Flow doesn't do any exhaustiveness checks! But
 we **can** opt-in to exhaustiveness checking one statement at a time.
+
+[Flow]: https://flow.org/
 
 In this post, we'll discover from the ground up how Flow's
 exhaustiveness checking behaves. But if you're just looking for the
