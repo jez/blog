@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: flow | Bits, Bytes, and Words]]></title>
-  <link href="https://blog.jez.io/categories/flow/atom.xml" rel="self"/>
+  <title><![CDATA[Category: types | Bits, Bytes, and Words]]></title>
+  <link href="https://blog.jez.io/categories/types/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
   <updated>2018-04-20T01:16:22-04:00</updated>
   <id>https://blog.jez.io/</id>
@@ -599,6 +599,538 @@ refactors.</p>
 <ol>
 <li id="fn:1">
 <p>Of course, this presumes that Flow&rsquo;s type system is sound, which it isn&rsquo;t. It&rsquo;s possible to accidentally inhabit <code>empty</code> if you use <code>any</code>! Moral of the story: be <em>very</em> diligent about eradicating <code>any</code>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Lenses & Composition]]></title>
+    <link href="https://blog.jez.io/lens-composition/"/>
+    <updated>2018-02-06T02:07:37-05:00</updated>
+    <id>https://blog.jez.io/lens-composition</id>
+    <content type="html"><![CDATA[<p></p>
+
+
+<p>A lens is really just a function <code>a -&gt; b</code> that we represent
+backwards<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> and with an extra <code>Functor f</code> parameter lying
+around:</p>
+
+<pre><code>type Lens' a b = Functor f =&gt; (b -&gt; f b) -&gt; (a -&gt; f a)
+</code></pre>
+
+<p><strong>What does this mean for function composition?</strong></p>
+
+<!-- more -->
+
+
+<p>Normal function composition looks like this:</p>
+
+<pre><code class="haskell">(.) :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; (a -&gt; c)
+
+f :: a -&gt; b
+g :: b -&gt; c
+
+g . f :: (a -&gt; c)
+</code></pre>
+
+<p>We often have to read code that looks like this:</p>
+
+<pre><code class="haskell">g . f $ x
+</code></pre>
+
+<p>This means &ldquo;start with <code>x</code>, then run <code>f</code> on it, and run <code>g</code> after that.&rdquo;
+This sentence reads opposite from how the code reads!</p>
+
+<p>What about for lenses? Here we have <code>f'</code> and <code>g'</code> which behave similarly
+in some sense to <code>f</code> and <code>g</code> from before:</p>
+
+<pre><code class="haskell">f' :: Functor f =&gt; (b -&gt; f b) -&gt; (a -&gt; f a)
+--  ≈ a -&gt; b
+g' :: Functor f =&gt; (c -&gt; f c) -&gt; (b -&gt; f b)
+--  ≈ b -&gt; c
+
+f' . g' :: Functor f =&gt; (c -&gt; f c) -&gt; (a -&gt; f a)
+--       ≈ a -&gt; c
+</code></pre>
+
+<p>In the lens world, <code>^.</code> behaves kind of like a flipped <code>$</code> that turns
+lenses into getters, which lets us write code like this:</p>
+
+<pre><code class="haskell">x ^. f' . g'
+</code></pre>
+
+<p>This means &ldquo;start with <code>x</code>, then get <code>f'</code> from it, then get <code>g'</code> after
+that.&rdquo; The sentence reads just like the code!</p>
+
+<p>This is pretty cool, because it means that lenses (which are
+&ldquo;functional&rdquo; getters) read almost exactly like property access (which
+are &ldquo;imperative&rdquo; getters). Same concise syntax, but with an elegant
+semantics.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>I&rsquo;m exaggerating a bit here 😅 To see what I <em>really</em> mean, see <a href="/lens-intuition">this post</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Some Intuition on Lenses]]></title>
+    <link href="https://blog.jez.io/lens-intuition/"/>
+    <updated>2018-02-06T00:09:43-05:00</updated>
+    <id>https://blog.jez.io/lens-intuition</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been working on a small project in Haskell recently that uses the
+<a href="https://hackage.haskell.org/package/wreq">wreq</a> library. It&rsquo;s an HTTP client library that exposes most of its
+functionality through lenses. Using this library is my first time really
+using lenses pervasively, so I&rsquo;ve spent some time trying to understand
+how lenses really work.</p>
+
+<!-- more -->
+
+
+<p>Lenses try to bring the concept of getters and setters into a functional
+setting. Here, &ldquo;functional&rdquo; means that lenses prioritize composition
+(chaining one lens after another) and immutability (returning a new
+data structure<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> instead of mutating the old one in place).</p>
+
+<p>In a functional setting, if we have a type <code>s</code> and we want to get some
+field of type <code>a</code> from it, a getter is just a function <code>s -&gt; a</code>.</p>
+
+<p>Similarly, a setter that updates that field has the type <code>s -&gt; a -&gt; s</code>
+which takes the old <code>s</code> and slots the <code>a</code> into it, giving us back a new
+<code>s</code>.</p>
+
+<p>Let&rsquo;s see if we can build up some intuition, starting with these types
+and ending with the type of <code>Lens'</code> from the lens library:</p>
+
+<pre><code class="haskell">type Lens' s a = forall f. Functor f =&gt; (a -&gt; f a) -&gt; (s -&gt; f s)
+</code></pre>
+
+<p>In particular, let&rsquo;s start with our getter:</p>
+
+<pre><code class="haskell">fn :: s -&gt; a
+</code></pre>
+
+<p>The first thing we can do is convert it to continuation-passing style
+(CPS). In CPS form, a function throws it&rsquo;s return value to a
+user-specified callback function (or continuation) instead of returning
+its value directly. So our <code>s -&gt; a</code> becomes:</p>
+
+<pre><code class="haskell">fn :: (a -&gt; r) -&gt; s -&gt; r
+</code></pre>
+
+<p>After we&rsquo;re done computing an <code>a</code> from the <code>s</code> we were given, we throw
+it to the continuation of type <code>a -&gt; r</code>. We then take <strong>that</strong> result and
+return it. I like to put parens around the second function:</p>
+
+<pre><code class="haskell">fn :: (a -&gt; r) -&gt; (s -&gt; r)
+</code></pre>
+
+<p>But it&rsquo;s kind of hard to do anything with this, because <code>r</code> is
+completely arbitrary. It&rsquo;s chosen by whoever calls us, so we have no
+information about what can be done on an <code>r</code>. What if we instead require
+that the continuation result be a Functor?</p>
+
+<pre><code class="haskell">fn :: Functor f =&gt; (a -&gt; f r) -&gt; (s -&gt; f r)
+</code></pre>
+
+<p>And while we&rsquo;re at it, it was kind an arbitrary stipulation that the <code>f
+r</code> of the continuation&rsquo;s callback be the same as the <code>f r</code> of our
+function&rsquo;s result type, so let&rsquo;s relax that:</p>
+
+<pre><code class="haskell">fn :: Functor f =&gt; (a -&gt; f b) -&gt; (s -&gt; f t)
+</code></pre>
+
+<p>This relaxation makes sense as long as we know of some function with
+type <code>b -&gt; t</code>, because then we could</p>
+
+<ul>
+<li>take the <code>s</code>,</li>
+<li>apply our <code>s -&gt; a</code> getter to get an <code>a</code>,</li>
+<li>throw this to the <code>a -&gt; f b</code> continuation to get an <code>f b</code>, and</li>
+<li><code>fmap</code> our <code>b -&gt; t</code> function over this to get an <code>f t</code>.</li>
+</ul>
+
+
+<p>In general, we might not know of some <code>b -&gt; t</code> function. But remember
+that we do have our <code>s -&gt; a -&gt; s</code> function! So if we choose <code>b = a</code> and
+<code>s = t</code>, then we get:</p>
+
+<pre><code class="haskell">fn :: Functor f =&gt; (a -&gt; f a) -&gt; (s -&gt; f s)
+</code></pre>
+
+<p>With a function like this, we can</p>
+
+<ul>
+<li>take the <code>s</code>,</li>
+<li>apply our <code>s -&gt; a</code> getter to get an <code>a</code>,</li>
+<li>throw our <code>a</code> to the <code>a -&gt; f a</code> continuation to get an <code>f a</code>,</li>
+<li>partially apply our <code>s -&gt; a -&gt; s</code> setter with the <code>s</code> we were given,
+
+<ul>
+<li>(so we have an <code>a -&gt; s</code> now)</li>
+</ul>
+</li>
+<li><code>fmap</code> this <code>a -&gt; s</code> function over the <code>f a</code> to get an <code>f s</code></li>
+</ul>
+
+
+<p>And we&rsquo;ve arrived at the type of <code>Lens'</code>! What really happened here was
+we marked the interesting<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> part of our data structure with
+a Functor. So if we choose an interesting Functor instance, it&rsquo;ll act on
+that point.</p>
+
+<p>What if the Functor we choose is <code>Const a</code>? Well, then it&rsquo;s on us to
+provide an <code>a -&gt; f a</code> continuation. Since we&rsquo;ve chosen <code>f = Const a</code> we
+have to come up with a function with type <code>a -&gt; Const a a</code>. This is a
+special case of the <code>Const</code> constructor:</p>
+
+<pre><code class="haskell">Const :: forall b. a -&gt; Const a b
+</code></pre>
+
+<p>So our continuation remembers the <code>a</code> it was given. After the last step,
+we&rsquo;ll have a <code>Const a s</code>, which we can call <code>getConst</code> on to give us
+the <code>a</code> we stashed. So by choosing <code>Const</code>, our lens acts like a getter!</p>
+
+<p>What if the Functor we choose is <code>Identity</code>? Now we have to provide a
+function <code>a -&gt; Identity a</code>. At this point, you probably guessed this
+makes our lens a setter. If we&rsquo;re trying to use a setter, then we&rsquo;ll
+also have access to some new <code>y :: a</code> that we want to use to slot into
+our <code>s</code>. Let&rsquo;s see what happens if we make this our continuation:</p>
+
+<pre><code class="haskell">inj :: a -&gt; Identity a
+inj x = Identity y
+</code></pre>
+
+<p>The <code>x :: a</code> is the old value of <code>x</code>. By dropping <code>x</code> on the floor and
+returning <code>y</code> instead, we&rsquo;ve slotted <code>y</code> into our <code>s</code>. Remember
+that above we took the <code>f a</code> and our setter <code>s -&gt; a -&gt; s</code>, partially
+applied it to get <code>a -&gt; s</code>, and <code>fmap</code>&rsquo;d this over the <code>f a</code>. Since our
+continuation now holds a wrapped up <code>y :: a</code>, we&rsquo;ll reconstruct a new
+<code>s</code> using <code>y</code>. Great!</p>
+
+<h2>More Resources</h2>
+
+<p>These are some resources that helped make lenses less intimidating for
+me:</p>
+
+<ul>
+<li><a href="https://www.youtube.com/watch?v=cefnmjtAolY">Lenses, Folds, and
+Traversals</a> (video)
+
+<ul>
+<li>by Edward Kmett, the author of the lens library</li>
+<li>highly technical, long, exhaustive</li>
+</ul>
+</li>
+<li><a href="https://hackage.haskell.org/package/lens-4.16/docs/Control-Lens-Getter.html">Control.Lens.Getter</a> (hackage)
+
+<ul>
+<li>in particular, the first few lines of the intro paragraph</li>
+<li>also: <code>(^.)</code> to see where the <code>f</code> becomes <code>Const a</code></li>
+</ul>
+</li>
+<li><code>#haskell</code> on Freenode
+
+<ul>
+<li>Special thanks to <code>johnw_</code> and <code>dminuoso</code>!</li>
+</ul>
+</li>
+</ul>
+
+
+<p>Lenses seem intimidating at first, but in the end they&rsquo;re just a really
+cool uses of functions. We use nothing more exotic here than the Functor
+type class and a couple of Functor instances, and in return we get such
+concise code!</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>It&rsquo;s common to think that &ldquo;immutable&rdquo; means &ldquo;copy the entire thing&rdquo; and then change the parts you care about. But if you start with <strong>all data</strong> being immutable, then you only need to allocate new memory for the subcomponents of your data structure that <strong>actually</strong> changed. Everything else can be shared by the old and the new.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>In the same way that glass lenses focus light on a point, functional lenses focus a data structure on a point! Isn&rsquo;t it neat how that name works out? It&rsquo;s certainly a cooler name than &ldquo;generalized getter/setter <a href="https://www.youtube.com/watch?v=pD_imYhNoQ4">wombo combo</a>&rdquo; (video, language warning).<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[System Fω and Parameterization]]></title>
+    <link href="https://blog.jez.io/system-f-param/"/>
+    <updated>2017-09-27T22:14:45-04:00</updated>
+    <id>https://blog.jez.io/system-f-param</id>
+    <content type="html"><![CDATA[<p>When I first learned about System F<sub>ω</sub>, I was confused about
+the difference between <code>∀(t.τ)</code> (forall types) and <code>λ(u.c)</code> (type
+abstractions) for a long time, but recently I finally grasped the
+difference! Both of these constructs have to do with parameterization
+(factoring out a variable so that it&rsquo;s bound), but the two types have
+drastically different meanings.</p>
+
+<!-- more -->
+
+
+<h2>Questions</h2>
+
+<p>We&rsquo;ll start off with some questions to keep in mind throughout these
+notes. Our goals by the end are to understand what the questions are
+asking, and have at least a partial&mdash;if not complete&mdash;answer to each.</p>
+
+<p>First, consider this code.</p>
+
+<pre><code class="sml">datatype 'a list = Nil | Cons of 'a * 'a list
+</code></pre>
+
+<ul>
+<li>What really is &ldquo;<code>list</code>&rdquo; in this code?</li>
+<li>Or put another way, how would we define <code>list</code> in System
+F<sub>ω</sub>?</li>
+</ul>
+
+
+<p>Thinking more broadly,</p>
+
+<ul>
+<li>What separates <code>∀(t.τ)</code> and <code>λ(u.c)</code>?</li>
+<li>What is parameterization, and how does it relate to these things?</li>
+</ul>
+
+
+<h2>System F<sub>ω</sub></h2>
+
+<p>The answers to most of these questions rely on a solid definition of
+System F<sub>ω</sub>. We&rsquo;ll be using this setup.</p>
+
+<pre><code>Kind κ ::= * | κ → κ | ···
+
+           abstract       concrete      arity/valence
+Con c  ::= ···
+         | arr(c₁; c₂)    c₁ → c₂       (Con, Con)Con
+         | all{κ}(u.c)    ∀(u ∷ κ). c   (Kind, Con.Con)Con
+         | lam{κ}(u.c)    λ(u ∷ κ). c   (Kind, Con.Con)Con
+         | app(c₁; c₂)    c₁(c₂)        (Con, Con)Con
+</code></pre>
+
+<p>Some points to note:</p>
+
+<ul>
+<li><code>∀(u ∷ κ). c</code> and <code>λ(u ∷ κ). c</code> have the same arity.</li>
+<li><code>∀(u ∷ κ). c</code> and <code>λ(u ∷ κ). c</code> both <em>bind</em> a constructor variable.
+This makes these two operators <em>parametric</em>.</li>
+<li>Only <code>λ(u ∷ κ). c</code> has a matching elim form: <code>c₁(c₂)</code>.
+(There are no elim forms for <code>c₁ → c₂</code> and <code>∀(u ∷ κ). c</code>, because they
+construct types of kind <code>*</code>. This will be important later.)</li>
+</ul>
+
+
+<p>It&rsquo;ll also be important to have these two inference rules for kinding:</p>
+
+<p>$$
+\frac{
+  \Delta, u :: \kappa \vdash c :: *
+}{
+  \Delta \vdash \forall(u :: \kappa). \, c :: *
+}\;(\texttt{forall-kind})
+$$
+$$
+\frac{
+  \Delta, u :: \kappa \vdash c :: \kappa&#8217;
+}{
+  \Delta \vdash \lambda(u :: \kappa). \, c :: \kappa \to \kappa&#8217;
+}\;(\texttt{lambda-kind})
+$$</p>
+
+<h2>Defining the <code>list</code> Constructor</h2>
+
+<p>Let&rsquo;s take another look at this datatype definition from above:</p>
+
+<pre><code class="sml">datatype 'a list = Nil | Cons of 'a * 'a list
+</code></pre>
+
+<p>We&rsquo;ve <a href="/variables-in-types/">already seen</a> how to encode the type of lists
+of integers using inductive types:</p>
+
+<pre><code>intlist = μ(t. 1 + (int × t))
+</code></pre>
+
+<p>Knowing what we know about System F (the &ldquo;<strong>polymorphic</strong> lambda
+calculus&rdquo;), our next question should be &ldquo;how do we encode
+<strong>polymorphic</strong> lists?&rdquo; Or more specifically, which of these two
+operators (<code>λ</code> or <code>∀</code>) should we pick, and why?</p>
+
+<p>First, we should be more specific, because there&rsquo;s a difference between
+<code>list</code> and <code>'a list</code>. Let&rsquo;s start off with defining <code>list</code> in
+particular. From what we know of programming in Standard ML, we can do
+things like:</p>
+
+<pre><code class="sml">(* Apply 'int' to 'list' function! *)
+type grades = int list
+
+type key = string
+type val = real
+
+(* Apply '(key, val)' to 'list' function! *)
+type updates = (key, val) list
+</code></pre>
+
+<p>If we look really closely, what&rsquo;s actually happening here is that <code>list</code>
+is a type-level <em>function</em> that returns a type (and we use the <code>type foo
+= ...</code> syntax to store that returned type in a variable).<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+
+<p>Since <code>list</code> is actually a function from types to types, it must have
+an arrow kind: <code>* → *</code>. Looking back at our two inference rules for
+kinding, we see only one rule that lets us introduce an arrow kind: <code>λ(u
+∷ κ). c</code>. On the other hand, <code>∀(u ∷ κ). c</code> must have kind <code>*</code>; it
+<em>can&rsquo;t</em> be used to define type constructors.</p>
+
+<p>Step 1: define list constructor? Check:</p>
+
+<pre><code>list = λ(α ∷ *). μ(t. 1 + (α × t)))
+</code></pre>
+
+<h2>Defining Polymorphic Lists</h2>
+
+<p>It doesn&rsquo;t stop with the above definition, because it&rsquo;s still not
+<em>polymorphic</em>. In particular, we can&rsquo;t just go write functions on
+polymorphic lists with code like this:</p>
+
+<pre><code class="sml">fun foo (x : list) = (* ··· *)
+</code></pre>
+
+<p>We can&rsquo;t say <code>x : list</code> because all intermediate terms in a given
+program have to type check as a type of kind <code>*</code>, whereas <code>list ∷ * →
+*</code>. Another way of saying this: there isn&rsquo;t any way to introduce a value
+of type <code>list</code> because there&rsquo;s no way to introduce values with arrow
+kinds.</p>
+
+<p>Meanwhile, we <em>can</em> write this:</p>
+
+<pre><code class="sml">fun foo (x : 'a list) = (* ··· *)
+</code></pre>
+
+<p>When you get down to it, this is actually kind of weird. Why is it okay
+to use <code>'a list</code>? I never defined <code>'a</code> anywhere, so wouldn&rsquo;t that make
+it an unbound variable?</p>
+
+<p>It turns out that when we use type variables like this, SML
+automatically binds them for us by inserting <code>∀</code>s into our code. In
+particular, it implicitly infers a type like this:</p>
+
+<pre><code class="sml">val foo : forall 'a. 'a list -&gt; ()
+</code></pre>
+
+<p>SML inserts this <code>forall</code> automatically because its type system is a bit
+less polymorphic than System F<sub>ω</sub>&rsquo;s. Some might call this a
+drawback, though it does save us from typing <code>forall</code> annotations
+ourselves. And really, for most anything else we&rsquo;d call a &ldquo;drawback&rdquo; of
+this design, SML makes up the difference with modules.<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+
+<p>Step 2: make polymorphic list for use in annotation? Check:</p>
+
+<pre><code>α list = ∀(α ∷ *). list(α)
+</code></pre>
+
+<h2>Variables &amp; Parameterization</h2>
+
+<p>Tada! We&rsquo;ve figured out how to take a list datatype from SML and encode
+it in System F<sub>ω</sub>, using these two definitions:</p>
+
+<pre><code>  list = λ(α ∷ *). μ(t. 1 + (α × t)))
+α list = ∀(α ∷ *). list(α)
+</code></pre>
+
+<p>We could end here, but there&rsquo;s one more interesting point. If we look
+back, we started out with the <code>∀</code> and <code>λ</code> operators having the same
+arity, but somewhere along the way their behaviors differed. <code>λ</code> was
+used to create type constructors, while <code>∀</code> was used to introduce
+polymorphism.</p>
+
+<p>Where did this split come from? What distinguishes <code>∀</code> as being the
+go-to type for polymorphism, while <code>λ</code> makes type constructors
+(type-to-type functions)? Recall one of the earliest ideas we teach in
+<a href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312</a>:</p>
+
+<blockquote><p>&hellip; the core idea carries over from school mathematics, namely
+that <strong>a variable is an unknown, or a place-holder, whose meaning is
+given by substitution.</strong></p>
+
+<p>&ndash; Harper, <em>Practical Foundations for Programming Languages</em></p></blockquote>
+
+<p>Variables are given meaning by substitution, so we can look to the
+appropriate substitutions to uncover the meaning and the differences
+between <code>λ</code> and <code>∀</code>. Let&rsquo;s first look at the substitution for <code>λ</code>:</p>
+
+<p>$$
+\frac{
+  \Delta, u :: \kappa_1 \vdash c_2 :: \kappa_2 \qquad \Delta \vdash c_1
+  :: \kappa_1
+}{
+  \Delta \vdash (\lambda(u :: \kappa_1). \, c_2)(c_1) \equiv  [c_1/u]c_2 :: \kappa_2
+}
+$$</p>
+
+<p>We can think of this as saying &ldquo;when you apply one type to another, the
+second type gets full access to the first type to construct a new type.&rdquo;
+We notice that the substitution here is completely <strong>internal to the
+type system</strong>.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></p>
+
+<p>On the other hand, the substitution for <code>∀</code> <strong>bridges the gap</strong> from
+types to terms:</p>
+
+<p>$$
+\frac{
+  \Delta \, \Gamma, e : \forall (u :: \kappa). \tau \qquad \Delta \vdash c :: \kappa
+}{
+  \Delta \, \Gamma \vdash e[c] : [c/u]\tau
+}
+$$
+$$
+\frac{
+  \mbox{}
+}{
+  (\Lambda u. \, e)[\tau] \mapsto [\tau / u]e
+}
+$$</p>
+
+<p>When we&rsquo;re type checking a polymorphic type application, we don&rsquo;t get to
+know anything about the type parameter <code>u</code> other than its kind. But when
+we&rsquo;re running a program and get to the evaluation of a polymorphic type
+application, we substitute the concrete <code>τ</code> directly in for <code>u</code> in <code>e</code>,
+which bridges the gap from the type-level to the term-level.</p>
+
+<p>At the end of the day, all the interesting stuff came from using
+functions (aka, something parameterized by a value) in cool ways. Isn&rsquo;t
+that baffling? Functions are so powerful that they seem to always pop up
+at the heart of the most interesting constructs. I think it&rsquo;s
+straight-up amazing that something so simple can at the same time be
+that powerful. Functions!</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>It&rsquo;s easy to not notice at first that type definitions are really function calls because in Standard ML, the type function applications are backwards. Instead of <code>f(x)</code>, it&rsquo;s <code>x f</code>. This is more similar to how we actually think when we see a function. Consider <code>h(g(f(x)))</code> (or another way: <code>h . g . f $ x</code>). We read this as &ldquo;take x, do f, pass that to g, and pass that to h&rdquo;. Why not write <code>x f g h</code> in the first place?<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Other languages (like Haskell or PureScript) have a language feature called &ldquo;Rank-N Types&rdquo; which is really just a fancy way of saying &ldquo;you can put the <code>forall a.</code> anywhere you want.&rdquo; Oftentimes, this makes it harder for the compiler to infer where the variable bindings are, so you sometimes have to use more annotations than you might if you weren&rsquo;t using Rank-N types.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>It&rsquo;s not super relevant to this discussion, but this inference rule is for the judgement defining equality of type constructors. This comes up all over the place when you&rsquo;re writing a compiler for SML. If this sounds interesting, definitely take 15-417 HOT Compilation!<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
