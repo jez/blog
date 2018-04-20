@@ -4,7 +4,7 @@ title: "Case Exhaustiveness in Flow"
 date: 2018-04-15 20:02:26 -0700
 comments: false
 share: false
-categories: ['javascript', 'flow', 'programming']
+categories: ['javascript', 'types', 'flow', 'programming']
 description: >
   Compared to some other languages, Flow's story around exhaustiveness
   checking within 'if / else' and 'switch' statements leaves something to

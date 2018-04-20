@@ -4,7 +4,7 @@ title: System Fω and Parameterization
 date: 2017-09-27 19:14:45 -0700
 comments: false
 share: false
-categories: ['recitation', 'sml', 'plt']
+categories: ['recitation', 'sml', 'plt', 'types']
 description: >
   Some recitation-style notes on System F, polymorphism, and functions.
   I used to not know the difference between ∀(t.τ) and λ(u.c). Turns

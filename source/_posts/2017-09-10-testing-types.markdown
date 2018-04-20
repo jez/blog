@@ -4,7 +4,7 @@ title: "Testing, Types, & Correctness"
 date: 2017-09-10 16:50:36 -0700
 comments: false
 share: false
-categories: ['programming', 'fragment']
+categories: ['programming', 'fragment', 'types']
 description: >
   It's important to both have strong testing practices and languages
   with disciplined type systems. The hardest part of writing quality

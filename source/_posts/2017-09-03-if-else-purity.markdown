@@ -4,7 +4,7 @@ title: "If, Else, & Purity"
 date: 2017-08-31T22:38:43-07:00
 comments: false
 share: false
-categories: ['programming', 'fragment']
+categories: ['programming', 'fragment', 'types']
 description: >
   I prefer to let the language I'm using think on my behalf as much as
   possible. Ideally, the language is rich enough that the proof of

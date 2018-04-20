@@ -4,7 +4,7 @@ title: "Variables in Types"
 date: 2017-09-25 02:17:31 -0700
 comments: false
 share: false
-categories: ['recitation', 'plt']
+categories: ['recitation', 'plt', 'types']
 description: >
   Having variables in our type systems lends a great deal of power to
   languages using these type systems. We’re going to look at how

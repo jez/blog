@@ -4,7 +4,7 @@ title: Some Intuition on Lenses
 date: 2018-02-05 21:09:43 -0800
 comments: false
 share: false
-categories: ['haskell']
+categories: ['haskell', 'types']
 description: >
   I've been working with lenses on a small project recently, and I
   thought I'd write up some of my intuition about how they work.

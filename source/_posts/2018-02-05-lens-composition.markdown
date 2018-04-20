@@ -4,7 +4,7 @@ title: Lenses & Composition
 date: 2018-02-05 23:07:37 -0800
 comments: false
 share: false
-categories: ['haskell', 'fragment']
+categories: ['haskell', 'types', 'fragment']
 description: >
   It's really cool how composition works with lenses!
 strong_keywords: false
