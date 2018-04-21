@@ -14,23 +14,27 @@ strong_keywords: false
 ---
 
 
-Union types are a powerful tool and often overlooked. At work we use
-Flow, which thankfully supports union types. But as I refactor certain
-code paths to use more of them I've noticed that our bundle size has
-been steadily increasing!
+Union types are a powerful tool which is often overlooked. For work I've
+been using Flow, which thankfully supports union types. As I've
+refactored more of our code to use union types, I've noticed that our
+bundle size has been steadily increasing!
 
 In this post, we're going to explore why that's the case. We'll start
-with a problem, flesh it out some more to motivate why we definitely
-want union types for this, and then examine the resulting cost of
-introducing union types. In the end, we'll compare Flow to other
-compile-to-JS languages. I'm especially excited about [Reason], so
-that's the one we'll spend the most time talking about.
+with a problem which union types can solve, flesh out the problem to
+motivate why union types are definitely the solution, then examine the
+resulting cost of introducing them. In the end, we'll compare Flow to
+other compile-to-JS languages on the basis of how they represent union
+types in the compiled output. I'm especially excited about [Reason], so
+we'll talk about it the most.
+
 
 ## Setup: Union Types in a React Component
 
-Let's consider we're writing a simple React two-factor auth modal.
+Let's consider we're writing a simple React 2FA[^2fa] modal.
 We'll be using Flow, but you can pretend it's TypeScript if you want.
 The mockup we were given looks like this:
+
+[^2fa]: 2FA: two-factor authentication
 
 [![A sample mockup for a two-factor authenticaion modal](/images/2fa-mockup.jpeg)](/images/2fa-mockup.jpeg)
 
@@ -68,8 +72,8 @@ particular screen:
 
 ```js
 const needsCancelButton = (screen: Screen): boolean => {
-  // Recall: 'SuccessScreen' final, so it doesn't
-  // make sense to have a cancel button
+  // Recall: 'SuccessScreen' is final, so it doesn't
+  // make sense to have a cancel button.
   return screen !== 'SuccessScreen';
 };
 ```
@@ -96,10 +100,27 @@ type Screen =
   | 'FailureScreen';
 ```
 
-But now there's a bug in our `needsCancelButton` function. 😧
-According to the current implementation, there's a cancel button on the
-`'FailureScreen'` too! It would have been really nice if Flow told us
-right away that our `needsCancelButton` function was out of date:
+But now there's a bug in our `needsCancelButton` function. 😧 We should
+only show a close button on screens where it makes sense, and
+`'FailureScreen'` is not one of those screens.
+
+Our first reaction after discovering the bug would be to just blacklist
+`'FailureScreen'` too:
+
+```js
+const needsCancelButton = (screen: Screen): boolean => {
+  return (
+    screen !== 'SuccessScreen' ||
+    screen !== 'FailureScreen'
+  );
+};
+```
+
+But we can do better. We should hold ourselves to the standard that when
+we add a new case to a union type, our type checker **always** complains
+when we haven't updated our logic to cover the additional case. What if
+instead of a silent bug, we got this cheery message from our type
+checker?
 
 > Hey, you forgot to add a case to `needsCancelButton` for the new
 > screen you added. *🙂*
@@ -111,9 +132,6 @@ us this when adding new cases. We'll use a `switch` statement with
 [something special in the `default` case][absurd]:
 
 ```js
-// I named this function 'absurd' in my previous blog post,
-// but they both do the same thing.
-// See: https://blog.jez.io/flow-exhaustivness/
 const impossible = <T>(x: empty): T => {
   throw new Error('This case is impossible.');
 }
@@ -130,6 +148,10 @@ const needsCancelButton = (screen: Screen): boolean => {
     // case 'FailureScreen':
     //   return false;
     default:
+      // (I named this function 'absurd' in my previous blog post:
+      // https://blog.jez.io/flow-exhaustivness/)
+      // This function is here to ask Flow to check for exhaustiveness.
+      //
       // [flow]: Error: Cannot call `impossible` with `screen` bound to `x` because string literal `FailureScreen` [1] is incompatible with empty [2].
       return impossible(screen);
   }
@@ -142,6 +164,8 @@ Now Flow is smart enough to give us an error! Making our code safer, one
 `switch` statement at a time. 😅 Union types in Flow are a powerful way
 to use types to guarantee correctness. But to get the most out of union
 types, **only[^only] ever access them** through a `switch` statement.
+Every time you use a union type without an exhaustive switch statement,
+you make it harder for Flow to tell you where you've missing something.
 
 [^only]: "Only ever" is a very strong statement. Please use your best judgement. But know that if you're not using a `switch`, you're trading off the burden of exhaustiveness & correctness from the type checker to the programmer!
 
@@ -180,7 +204,7 @@ const needsCancelButton = (screen) => {
 ```
 
 With just an `if` statement, our function was quite small: 62 bytes
-minified. But when we refactored to use a `switch` statement, it size
+minified. But when we refactored to use a `switch` statement, its size
 shot up to 240 bytes! That's a 4x increase, just to get exhaustiveness.
 Admittedly, `needsCancelButton` is a bit of a pathological case. But in
 general: as we make our code bases **more safe** using Flow's union
@@ -203,7 +227,7 @@ when we run the code.[^strip-types] What can we achieve if we were to
 [^strip-types]: Even though TypeScript defines both a language **and** a compiler for that language, in practice it's not much different from Flow here. A goal of the TypeScript compiler is to generate JavaScript that closely resembles the original TypeScript, so it doesn't do compile-time optimizations based on the types.
 
 [Reason] (i.e., ReasonML) is an exciting effort to bring all the
-benefits of the OCaml tool chain to the masses. In particular, Reason
+benefits of the OCaml tool chain to the web. In particular, Reason
 works using OCaml's very mature optimizing compiler alongside
 BuckleScript (which turns OCaml to JavaScript) to emit great code.
 
@@ -228,8 +252,8 @@ let needsCancelButton = (screen: screen): bool => {
 Looks pretty close to JavaScript with Flow types, doesn't it? The
 biggest difference is that we the `case` keyword was replaced with the
 `|` character. (This directly mirrors the definition of the `screen`
-type---it's a nice reminder[^copy/paste] to always use `switch`
-statements when using union types). Another difference: Reason does
+type---it's a nice reminder to always use `switch` statements when using
+union types[^copy/paste]). Another difference: Reason does
 exhaustiveness checking out of the box!
 
 [^copy/paste]: More than being a nice reminder, it makes it easy to copy / paste our type definition as boilerplate to start writing a new function!
@@ -254,10 +278,13 @@ function needsCancelButton(status) {
 Not bad! Telling Reason that our function was exhaustive let it optimize
 the entire `switch` statement back down to a single `if` statement, like
 we started with. In fact, it gets even better: when we run this through
-`uglifyjs`:
+`uglifyjs`, it removes the redundant `true` / `false`:
 
 ```js
-"use strict";function needsCancelButton(n){return!(n>=2)}
+"use strict";
+function needsCancelButton(n){
+  return !(n>=2)
+}
 ```
 
 Wow! This is actually **better** than our initial, hand-written `if`
@@ -291,16 +318,16 @@ compare on the optimizations front:
 
 ### TypeScript
 
-Despite being a language and compiler all-in-one, TypeScript maintains a
+Despite being a language **and** compiler, TypeScript maintains a
 goal of compiling to JavaScript that closely resembles the source
 TypesScript code. TypeScript also has two language constructs for
 working with exhaustiveness:
 
-- union types, analogous to what Flow has
+- union types, analogous to what Flow has, and
 - `enum`s, which are basically like Java's `enum`s.
 
-With union types, TypeScript behaved comparably to Flow. But what was
-surprising: `enum`s compressed **even worse**:
+With union types, TypeScript behaves basically the same as Flow 🙁. But
+what was surprising: `enum`s compressed **even worse**:
 
 ```js
 var Screen_;
@@ -375,14 +402,43 @@ var needsCancelButton = function (v) {
 
 - It's generating ES5 classes for each data constructor.
 - It compiles pattern matching to a series of `instanceof` checks.
-- Even though it **knows** the is exhaustive, it still emits a `throw`
-  statement in case the pattern match fails!
+- Even though it **knows** the match is exhaustive, it still emits a
+  `throw` statement in case the pattern match fails!
 
 Admittedly, I didn't try that hard to turn on optimizations in the
 compiler. Maybe there's a flag I can pass to get this `Error` to go
 away. But that's pretty disappointing, compared to how small Reason's
 generated code was!
 
+## Elm
+
+I put Elm in the same class as Reason and PureScript. Like the other
+two, it lets you define custom data types, and will automatically warn
+when your pattern matches aren't exhaustive.
+
+```js
+var _user$project$Main$needsCancelButton = function (page) {
+	var _p0 = page;
+	switch (_p0.ctor) {
+		case 'LoadingScreen':
+			return true;
+		case 'CodeEntryScreen':
+			return true;
+		default:
+			return false;
+	}
+};
+var _user$project$Main$SuccessScreen = {ctor: 'SuccessScreen'};
+var _user$project$Main$CodeEntryScreen = {ctor: 'CodeEntryScreen'};
+var _user$project$Main$LoadingScreen = {ctor: 'LoadingScreen'};
+```
+
+- It's using string literals, much like Flow and TypeScript.
+- It's smart enough to collapse the last case to just use `default`
+  (at least it doesn't `throw` in the `default` case!)
+- The variable names are long, but these would still minify well.
+
+It's interesting to see that even though Reason, PureScript, and Elm all have ML-style datatypes, Reason is the only one that uses an integer representation for the constructor tags.
 
 
 [flow-union]: https://flow.org/en/docs/types/unions/
