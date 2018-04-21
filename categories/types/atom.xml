@@ -4,7 +4,7 @@
   <title><![CDATA[Category: types | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/types/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2018-04-21T01:46:01-04:00</updated>
+  <updated>2018-04-21T03:33:27-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -18,7 +18,7 @@
     <link href="https://blog.jez.io/js-union-types-opt/"/>
     <updated>2018-04-19T01:43:26-04:00</updated>
     <id>https://blog.jez.io/js-union-types-opt</id>
-    <content type="html"><![CDATA[<p>Union types are a powerful tool which is often overlooked. For work I&rsquo;ve
+    <content type="html"><![CDATA[<p>Union types are a powerful tool which is often overlooked. At work I&rsquo;ve
 been using Flow, which thankfully supports union types. As I&rsquo;ve
 refactored more of our code to use union types, I&rsquo;ve noticed that our
 bundle size has been steadily increasing!</p>
@@ -96,7 +96,7 @@ entered the wrong code too many times:</p>
   | 'LoadingScreen'
   | 'CodeEntryScreen'
   | 'SuccessScreen'
-  // New case to handle when an incorrect code was added:
+  // New case to handle too many wrong attempts:
   | 'FailureScreen';
 </code></pre>
 
@@ -252,7 +252,7 @@ exhaustiveness checking out of the box!</p>
 'use strict';
 
 function needsCancelButton(status) {
-  if (status !== 0) {
+  if (status !== 2) {
     return false;
   } else {
     return true;

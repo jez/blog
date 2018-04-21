@@ -83,7 +83,7 @@
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <p>Union types are a powerful tool which is often overlooked. For work I&rsquo;ve
+      <p>Union types are a powerful tool which is often overlooked. At work I&rsquo;ve
 been using Flow, which thankfully supports union types. As I&rsquo;ve
 refactored more of our code to use union types, I&rsquo;ve noticed that our
 bundle size has been steadily increasing!</p>
@@ -161,7 +161,7 @@ entered the wrong code too many times:</p>
 </span><span class='line'>  <span class="o">|</span> <span class="s1">'LoadingScreen'</span>
 </span><span class='line'>  <span class="o">|</span> <span class="s1">'CodeEntryScreen'</span>
 </span><span class='line'>  <span class="o">|</span> <span class="s1">'SuccessScreen'</span>
-</span><span class='line'>  <span class="c1">// New case to handle when an incorrect code was added:</span>
+</span><span class='line'>  <span class="c1">// New case to handle too many wrong attempts:</span>
 </span><span class='line'>  <span class="o">|</span> <span class="s1">'FailureScreen'</span><span class="p">;</span></span></code></pre></td></tr></table></div></figure>
 
 
@@ -317,7 +317,7 @@ exhaustiveness checking out of the box!</p>
 </span><span class='line'><span class="s1">'use strict'</span><span class="p">;</span>
 </span><span class='line'>
 </span><span class='line'><span class="kd">function</span> <span class="nx">needsCancelButton</span><span class="p">(</span><span class="nx">status</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">status</span> <span class="o">!==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">status</span> <span class="o">!==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
 </span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
 </span><span class='line'>    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
