@@ -4,7 +4,7 @@
   <title><![CDATA[Category: types | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/types/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2018-04-21T03:33:27-04:00</updated>
+  <updated>2018-04-21T16:26:51-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -14,12 +14,12 @@
 
   
   <entry>
-    <title type="html"><![CDATA[JavaScript, Union Types, and Optimizing Compilers]]></title>
-    <link href="https://blog.jez.io/js-union-types-opt/"/>
+    <title type="html"><![CDATA[Union Types in Flow & Reason]]></title>
+    <link href="https://blog.jez.io/union-types-flow-reason/"/>
     <updated>2018-04-19T01:43:26-04:00</updated>
-    <id>https://blog.jez.io/js-union-types-opt</id>
-    <content type="html"><![CDATA[<p>Union types are a powerful tool which is often overlooked. At work I&rsquo;ve
-been using Flow, which thankfully supports union types. As I&rsquo;ve
+    <id>https://blog.jez.io/union-types-flow-reason</id>
+    <content type="html"><![CDATA[<p>Union types are powerful yet often overlooked. At work I&rsquo;ve been using
+Flow, which thankfully supports <a href="https://flow.org/en/docs/types/unions/">union types</a>. But as I&rsquo;ve
 refactored more of our code to use union types, I&rsquo;ve noticed that our
 bundle size has been steadily increasing!</p>
 
@@ -39,7 +39,7 @@ The mockup we were given looks like this:</p>
 
 <p><a href="/images/2fa-mockup.jpeg"><img src="/images/2fa-mockup.jpeg" alt="A sample mockup for a two-factor authenticaion modal" /></a></p>
 
-<p>Some things we notice from this mockup:</p>
+<p>In this mockup:</p>
 
 <ul>
 <li>There&rsquo;s a loading state while we send the text message.</li>
@@ -58,24 +58,24 @@ is visible. Let&rsquo;s use a <a href="https://flow.org/en/docs/types/unions/">u
 </code></pre>
 
 <p>Union types are a perfect fit! 🎉  Union types document intent and can
-help guard against mistakes. Fellow developers and your compiler can
-know &ldquo;these are all the cases.&rdquo; In particular, Flow can warn you when
-you&rsquo;ve <a href="/flow-exhaustiveness/">forotten a case</a>.</p>
+help guard against mistakes. Fellow developers and our compiler can
+know &ldquo;these are all the cases.&rdquo; In particular, Flow can warn us when
+we&rsquo;ve <a href="/flow-exhaustiveness/">forotten a case</a>.</p>
 
 <p>Our initial implementation is working great. After sharing it with the
 team, someone suggests adding a &ldquo;cancel&rdquo; button in the top corner. It
 doesn&rsquo;t make sense to cancel when the flow has already succeeded, so
-we&rsquo;ll exclude it from the last screen (i.e., <code>'SuccessScreen'</code>):</p>
+we&rsquo;ll exclude it from the last screen:</p>
 
 <p><a href="/images/2fa-close-btn.jpeg"><img src="/images/2fa-close-btn.jpeg" alt="Adding a close button to our modal" /></a></p>
 
 <p>No problem: let&rsquo;s write a function called <code>needsCancelButton</code> to
-determine if a we need to put a cancel button in the header for a
+determine if a we need to put a cancel button in the header of a
 particular screen:</p>
 
 <pre><code class="js">const needsCancelButton = (screen: Screen): boolean =&gt; {
-  // Recall: 'SuccessScreen' is final, so it doesn't
-  // make sense to have a cancel button.
+  // Recall: 'SuccessScreen' is the last screen,
+  // so it shouldn't have a cancel button.
   return screen !== 'SuccessScreen';
 };
 </code></pre>
@@ -100,12 +100,10 @@ entered the wrong code too many times:</p>
   | 'FailureScreen';
 </code></pre>
 
-<p>But now there&rsquo;s a bug in our <code>needsCancelButton</code> function. 😧 We should
-only show a close button on screens where it makes sense, and
-<code>'FailureScreen'</code> is not one of those screens.</p>
-
-<p>Our first reaction after discovering the bug would be to just blacklist
-<code>'FailureScreen'</code> too:</p>
+<p>But now <strong>there&rsquo;s a bug</strong> in our <code>needsCancelButton</code> function. 😧 We
+should only show a close button on screens where it makes sense, and
+<code>'FailureScreen'</code> is not one of those screens. Our first reaction after
+discovering the bug would be to just blacklist <code>'FailureScreen'</code> too:</p>
 
 <pre><code class="js">const needsCancelButton = (screen: Screen): boolean =&gt; {
   return (
@@ -115,11 +113,10 @@ only show a close button on screens where it makes sense, and
 };
 </code></pre>
 
-<p>But we can do better. We should hold ourselves to the standard that when
-we add a new case to a union type, our type checker <strong>always</strong> complains
-when we haven&rsquo;t updated our logic to cover the additional case. What if
-instead of a silent bug, we got this cheery message from our type
-checker?</p>
+<p>But we can do better than just fixing the <strong>current</strong> bug. We should
+write code so that when we add a new case to a union type, our type
+checker alerts us before a <strong>future</strong> bug even happens. What if instead
+of a silent bug, we got this cheery message from our type checker?</p>
 
 <blockquote><p>Hey, you forgot to add a case to <code>needsCancelButton</code> for the new
 screen you added. <em>🙂</em></p>
@@ -142,13 +139,10 @@ const needsCancelButton = (screen: Screen): boolean =&gt; {
       return true;
     case 'SuccessScreen':
       return false;
-    // Uncomment to fix the Flow error
-    // case 'FailureScreen':
-    //   return false;
     default:
-      // (I named this function 'absurd' in my previous blog post:
-      // https://blog.jez.io/flow-exhaustivness/)
-      // This function is here to ask Flow to check for exhaustiveness.
+      // (I named this function 'absurd' in my earlier post:
+      // https://blog.jez.io/flow-exhaustiveness/)
+      // This function asks Flow to check for exhaustiveness.
       //
       // [flow]: Error: Cannot call `impossible` with `screen` bound to `x` because string literal `FailureScreen` [1] is incompatible with empty [2].
       return impossible(screen);
@@ -161,9 +155,9 @@ const needsCancelButton = (screen: Screen): boolean =&gt; {
 <p>Now Flow is smart enough to give us an error! Making our code safer, one
 <code>switch</code> statement at a time. 😅 Union types in Flow are a powerful way
 to use types to guarantee correctness. But to get the most out of union
-types, <strong>only<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> ever access them</strong> through a <code>switch</code> statement.
-Every time you use a union type without an exhaustive switch statement,
-you make it harder for Flow to tell you where you&rsquo;ve missing something.</p>
+types, <strong>always<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> access them</strong> through a <code>switch</code> statement.
+Every time we use a union type without an exhaustive switch statement,
+we make it harder for Flow to tell us where we&rsquo;ve missed something.</p>
 
 <h2>Correctness, but at what cost?</h2>
 
@@ -240,13 +234,12 @@ let needsCancelButton = (screen: screen): bool =&gt; {
 </code></pre>
 
 <p>Looks pretty close to JavaScript with Flow types, doesn&rsquo;t it? The
-biggest difference is that we the <code>case</code> keyword was replaced with the
-<code>|</code> character. (This directly mirrors the definition of the <code>screen</code>
-type&mdash;it&rsquo;s a nice reminder to always use <code>switch</code> statements when using
-union types<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>). Another difference: Reason does
-exhaustiveness checking out of the box!</p>
+biggest difference is that the <code>case</code> keyword was replaced with the <code>|</code>
+character. Sharing the same syntax is a subtle reminder to always pair
+union types with <code>switch</code> statements! <sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup> Another difference:
+Reason handles exhaustiveness checking out of the box. 🙂</p>
 
-<p>What code does Reason output (via BuckleScript) for our function?</p>
+<p>What does the Reason output look like?</p>
 
 <pre><code class="js">// Generated by BUCKLESCRIPT VERSION 3.0.1, PLEASE EDIT WITH CARE
 'use strict';
@@ -263,9 +256,9 @@ function needsCancelButton(status) {
 <p><a href="https://reasonml.github.io/en/try.html?rrjsx=true&amp;reason=C4TwDgpgBAzgxgJwhAdlAvAKClAPlAGQHsBDAEwEsUBzAZUWRWzygGEiyIBRFYBEeklTN8tAK5w4EGDEGMA3JkwAbCMCgpkZGKxIopygEJjgwImnRQAFPCEoAXLAaoAlI4BGRIsowA+KADezDAA7hTAcAAW1raMLoEihKSUNHKoflB8YhCKOPjsnDx8As4W-lk5ieKS0rKlGQBmJMowlTgAvpjtikA"><strong>(Play with it on Try Reason →)</strong></a></p>
 
 <p>Not bad! Telling Reason that our function was exhaustive let it optimize
-the entire <code>switch</code> statement back down to a single <code>if</code> statement, like
-we started with. In fact, it gets even better: when we run this through
-<code>uglifyjs</code>, it removes the redundant <code>true</code> / <code>false</code>:</p>
+the entire <code>switch</code> statement back down to a single <code>if</code> statement. In
+fact, it gets even better: when we run this through <code>uglifyjs</code>, it
+removes the redundant <code>true</code> / <code>false</code>:</p>
 
 <pre><code class="js">"use strict";
 function needsCancelButton(n){
@@ -277,7 +270,7 @@ function needsCancelButton(n){
 statement. Reason compiled what used to be a string literal
 <code>'SuccessScreen'</code> to just the number <code>2</code>. Reason can do this safely
 because custom-defined types in Reason <strong>can&rsquo;t</strong> be treated like
-strings, so it doesn&rsquo;t matter if you mangle the names.</p>
+strings, so it doesn&rsquo;t matter if the names get mangled.</p>
 
 <p>Taking a step back, Reason&rsquo;s type system delivered on the promise of
 types in a way Flow couldn&rsquo;t:</p>
@@ -353,10 +346,10 @@ enum values at run time, in a format that doesn&rsquo;t minify well.</li>
 
 <h2>PureScript</h2>
 
-<p>PureScript is another high-level language like Reason. They both have
-data types where you can define unions with custom constructor names.
-Despite that, PureScript&rsquo;s generated code is significantly worse than
-Reason&rsquo;s.</p>
+<p>PureScript is another high-level language like Reason. Both Reason and
+PureScript have data types where we can define unions with custom
+constructor names. Despite that, PureScript&rsquo;s generated code is
+significantly worse than Reason&rsquo;s.</p>
 
 <pre><code class="js">"use strict";
 var LoadingScreen = (function () {
@@ -403,9 +396,10 @@ generated code was!</p>
 
 <h2>Elm</h2>
 
-<p>I put Elm in the same class as Reason and PureScript. Like the other
-two, it lets you define custom data types, and will automatically warn
-when your pattern matches aren&rsquo;t exhaustive.</p>
+<p>I list Elm in the same class as Reason and PureScript. Like the other
+two, it lets us define custom data types, and will automatically warn
+when us pattern matches aren&rsquo;t exhaustive. Here&rsquo;s the code Elm
+generates:</p>
 
 <pre><code class="js">var _user$project$Main$needsCancelButton = function (page) {
     var _p0 = page;
@@ -442,7 +436,7 @@ var _user$project$Main$LoadingScreen = {ctor: 'LoadingScreen'};
 <li id="fn:1">
 <p>2FA: two-factor authentication<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 <li id="fn:2">
-<p>&ldquo;Only ever&rdquo; is a very strong statement. Please use your best judgement. But know that if you&rsquo;re not using a <code>switch</code>, you&rsquo;re trading off the burden of exhaustiveness &amp; correctness from the type checker to the programmer!<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<p>&ldquo;Always&rdquo; is a very strong statement. Please use your best judgement. But know that if you&rsquo;re not using a <code>switch</code>, you&rsquo;re trading off the burden of exhaustiveness &amp; correctness from the type checker to the programmer!<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 <li id="fn:3">
 <p>Even though TypeScript defines both a language <strong>and</strong> a compiler for that language, in practice it&rsquo;s not much different from Flow here. A goal of the TypeScript compiler is to generate JavaScript that closely resembles the original TypeScript, so it doesn&rsquo;t do compile-time optimizations based on the types.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 <li id="fn:4">
