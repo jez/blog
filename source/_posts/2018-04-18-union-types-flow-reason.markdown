@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "JavaScript, Union Types, and Optimizing Compilers"
+title: "Union Types in Flow & Reason"
 date: 2018-04-18 22:43:26 -0700
 comments: false
 share: false
@@ -14,8 +14,8 @@ strong_keywords: false
 ---
 
 
-Union types are a powerful tool which is often overlooked. At work I've
-been using Flow, which thankfully supports union types. As I've
+Union types are powerful yet often overlooked. At work I've been using
+Flow, which thankfully supports [union types][flow-union]. But as I've
 refactored more of our code to use union types, I've noticed that our
 bundle size has been steadily increasing!
 
@@ -38,7 +38,7 @@ The mockup we were given looks like this:
 
 [![A sample mockup for a two-factor authenticaion modal](/images/2fa-mockup.jpeg)](/images/2fa-mockup.jpeg)
 
-Some things we notice from this mockup:
+In this mockup:
 
 - There's a loading state while we send the text message.
 - We'll show an input to get the code after it's been sent.
@@ -55,25 +55,25 @@ type Screen =
 ```
 
 Union types are a perfect fit! 🎉  Union types document intent and can
-help guard against mistakes. Fellow developers and your compiler can
-know "these are all the cases." In particular, Flow can warn you when
-you've [forotten a case][absurd].
+help guard against mistakes. Fellow developers and our compiler can
+know "these are all the cases." In particular, Flow can warn us when
+we've [forotten a case][absurd].
 
 Our initial implementation is working great. After sharing it with the
 team, someone suggests adding a "cancel" button in the top corner. It
 doesn't make sense to cancel when the flow has already succeeded, so
-we'll exclude it from the last screen (i.e., `'SuccessScreen'`):
+we'll exclude it from the last screen:
 
 [![Adding a close button to our modal](/images/2fa-close-btn.jpeg)](/images/2fa-close-btn.jpeg)
 
 No problem: let's write a function called `needsCancelButton` to
-determine if a we need to put a cancel button in the header for a
+determine if a we need to put a cancel button in the header of a
 particular screen:
 
 ```js
 const needsCancelButton = (screen: Screen): boolean => {
-  // Recall: 'SuccessScreen' is final, so it doesn't
-  // make sense to have a cancel button.
+  // Recall: 'SuccessScreen' is the last screen,
+  // so it shouldn't have a cancel button.
   return screen !== 'SuccessScreen';
 };
 ```
@@ -100,12 +100,10 @@ type Screen =
   | 'FailureScreen';
 ```
 
-But now there's a bug in our `needsCancelButton` function. 😧 We should
-only show a close button on screens where it makes sense, and
-`'FailureScreen'` is not one of those screens.
-
-Our first reaction after discovering the bug would be to just blacklist
-`'FailureScreen'` too:
+But now **there's a bug** in our `needsCancelButton` function. 😧 We
+should only show a close button on screens where it makes sense, and
+`'FailureScreen'` is not one of those screens. Our first reaction after
+discovering the bug would be to just blacklist `'FailureScreen'` too:
 
 ```js
 const needsCancelButton = (screen: Screen): boolean => {
@@ -116,11 +114,10 @@ const needsCancelButton = (screen: Screen): boolean => {
 };
 ```
 
-But we can do better. We should hold ourselves to the standard that when
-we add a new case to a union type, our type checker **always** complains
-when we haven't updated our logic to cover the additional case. What if
-instead of a silent bug, we got this cheery message from our type
-checker?
+But we can do better than just fixing the **current** bug. We should
+write code so that when we add a new case to a union type, our type
+checker alerts us before a **future** bug even happens. What if instead
+of a silent bug, we got this cheery message from our type checker?
 
 > Hey, you forgot to add a case to `needsCancelButton` for the new
 > screen you added. *🙂*
@@ -144,13 +141,10 @@ const needsCancelButton = (screen: Screen): boolean => {
       return true;
     case 'SuccessScreen':
       return false;
-    // Uncomment to fix the Flow error
-    // case 'FailureScreen':
-    //   return false;
     default:
-      // (I named this function 'absurd' in my previous blog post:
-      // https://blog.jez.io/flow-exhaustivness/)
-      // This function is here to ask Flow to check for exhaustiveness.
+      // (I named this function 'absurd' in my earlier post:
+      // https://blog.jez.io/flow-exhaustiveness/)
+      // This function asks Flow to check for exhaustiveness.
       //
       // [flow]: Error: Cannot call `impossible` with `screen` bound to `x` because string literal `FailureScreen` [1] is incompatible with empty [2].
       return impossible(screen);
@@ -163,11 +157,11 @@ const needsCancelButton = (screen: Screen): boolean => {
 Now Flow is smart enough to give us an error! Making our code safer, one
 `switch` statement at a time. 😅 Union types in Flow are a powerful way
 to use types to guarantee correctness. But to get the most out of union
-types, **only[^only] ever access them** through a `switch` statement.
-Every time you use a union type without an exhaustive switch statement,
-you make it harder for Flow to tell you where you've missing something.
+types, **always[^always] access them** through a `switch` statement.
+Every time we use a union type without an exhaustive switch statement,
+we make it harder for Flow to tell us where we've missed something.
 
-[^only]: "Only ever" is a very strong statement. Please use your best judgement. But know that if you're not using a `switch`, you're trading off the burden of exhaustiveness & correctness from the type checker to the programmer!
+[^always]: "Always" is a very strong statement. Please use your best judgement. But know that if you're not using a `switch`, you're trading off the burden of exhaustiveness & correctness from the type checker to the programmer!
 
 
 ## Correctness, but at what cost?
@@ -250,15 +244,14 @@ let needsCancelButton = (screen: screen): bool => {
 ```
 
 Looks pretty close to JavaScript with Flow types, doesn't it? The
-biggest difference is that we the `case` keyword was replaced with the
-`|` character. (This directly mirrors the definition of the `screen`
-type---it's a nice reminder to always use `switch` statements when using
-union types[^copy/paste]). Another difference: Reason does
-exhaustiveness checking out of the box!
+biggest difference is that the `case` keyword was replaced with the `|`
+character. Sharing the same syntax is a subtle reminder to always pair
+union types with `switch` statements! [^copy/paste] Another difference:
+Reason handles exhaustiveness checking out of the box. 🙂
 
 [^copy/paste]: More than being a nice reminder, it makes it easy to copy / paste our type definition as boilerplate to start writing a new function!
 
-What code does Reason output (via BuckleScript) for our function?
+What does the Reason output look like?
 
 ```js
 // Generated by BUCKLESCRIPT VERSION 3.0.1, PLEASE EDIT WITH CARE
@@ -276,9 +269,9 @@ function needsCancelButton(status) {
 [**(Play with it on Try Reason →)**](https://reasonml.github.io/en/try.html?rrjsx=true&reason=C4TwDgpgBAzgxgJwhAdlAvAKClAPlAGQHsBDAEwEsUBzAZUWRWzygGEiyIBRFYBEeklTN8tAK5w4EGDEGMA3JkwAbCMCgpkZGKxIopygEJjgwImnRQAFPCEoAXLAaoAlI4BGRIsowA+KADezDAA7hTAcAAW1raMLoEihKSUNHKoflB8YhCKOPjsnDx8As4W-lk5ieKS0rKlGQBmJMowlTgAvpjtikA)
 
 Not bad! Telling Reason that our function was exhaustive let it optimize
-the entire `switch` statement back down to a single `if` statement, like
-we started with. In fact, it gets even better: when we run this through
-`uglifyjs`, it removes the redundant `true` / `false`:
+the entire `switch` statement back down to a single `if` statement. In
+fact, it gets even better: when we run this through `uglifyjs`, it
+removes the redundant `true` / `false`:
 
 ```js
 "use strict";
@@ -291,7 +284,7 @@ Wow! This is actually **better** than our initial, hand-written `if`
 statement. Reason compiled what used to be a string literal
 `'SuccessScreen'` to just the number `2`. Reason can do this safely
 because custom-defined types in Reason **can't** be treated like
-strings, so it doesn't matter if you mangle the names.
+strings, so it doesn't matter if the names get mangled.
 
 Taking a step back, Reason's type system delivered on the promise of
 types in a way Flow couldn't:
@@ -364,10 +357,10 @@ var needsCancelButton = function (screen) {
 
 ## PureScript
 
-PureScript is another high-level language like Reason. They both have
-data types where you can define unions with custom constructor names.
-Despite that, PureScript's generated code is significantly worse than
-Reason's.
+PureScript is another high-level language like Reason. Both Reason and
+PureScript have data types where we can define unions with custom
+constructor names. Despite that, PureScript's generated code is
+significantly worse than Reason's.
 
 ```js
 "use strict";
@@ -412,9 +405,10 @@ generated code was!
 
 ## Elm
 
-I put Elm in the same class as Reason and PureScript. Like the other
-two, it lets you define custom data types, and will automatically warn
-when your pattern matches aren't exhaustive.
+I list Elm in the same class as Reason and PureScript. Like the other
+two, it lets us define custom data types, and will automatically warn
+when us pattern matches aren't exhaustive. Here's the code Elm
+generates:
 
 ```js
 var _user$project$Main$needsCancelButton = function (page) {
