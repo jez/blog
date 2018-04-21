@@ -14,7 +14,7 @@ strong_keywords: false
 ---
 
 
-Union types are a powerful tool which is often overlooked. For work I've
+Union types are a powerful tool which is often overlooked. At work I've
 been using Flow, which thankfully supports union types. As I've
 refactored more of our code to use union types, I've noticed that our
 bundle size has been steadily increasing!
@@ -96,7 +96,7 @@ type Screen =
   | 'LoadingScreen'
   | 'CodeEntryScreen'
   | 'SuccessScreen'
-  // New case to handle when an incorrect code was added:
+  // New case to handle too many wrong attempts:
   | 'FailureScreen';
 ```
 
@@ -265,7 +265,7 @@ What code does Reason output (via BuckleScript) for our function?
 'use strict';
 
 function needsCancelButton(status) {
-  if (status !== 0) {
+  if (status !== 2) {
     return false;
   } else {
     return true;
