@@ -16,7 +16,7 @@
 
 
 
-<meta name="description" content="Union types are a powerful tool and often overlooked. At work we use Flow, which thankfully supports union types. But as I refactor certain code &hellip;">
+<meta name="description" content="Union types are powerful yet often overlooked. At work, I've been using Flow which thankfully supports union types. But as I've refactored more of &hellip;">
 
 <meta name="keywords" content="flow javascript reasonml types ">
 
@@ -34,7 +34,7 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.jez.io/union-types-flow-reason">
 <meta property="og:title" content="Union Types in Flow & Reason">
-<meta property="og:description" content="Union types are a powerful tool and often overlooked. At work we use Flow, which thankfully supports union types. But as I refactor certain code &hellip;">
+<meta property="og:description" content="Union types are powerful yet often overlooked. At work, I've been using Flow which thankfully supports union types. But as I've refactored more of &hellip;">
 
   <meta property="og:image" content="">
 
@@ -83,10 +83,13 @@
       </div><!-- /.header-title-wrap -->
     </header>
     <div class="entry-content">
-      <p>Union types are powerful yet often overlooked. At work I&rsquo;ve been using
-Flow, which thankfully supports <a href="https://flow.org/en/docs/types/unions/">union types</a>. But as I&rsquo;ve
+      <p>Union types are powerful yet often overlooked. At work, I&rsquo;ve been using
+Flow which <a href="https://flow.org/en/docs/types/unions/">thankfully supports union types</a>. But as I&rsquo;ve
 refactored more of our code to use union types, I&rsquo;ve noticed that our
 bundle size has been steadily increasing!</p>
+
+<!-- more -->
+
 
 <p>In this post, we&rsquo;re going to explore why that&rsquo;s the case. We&rsquo;ll start
 with a problem which union types can solve, flesh out the problem to
@@ -108,7 +111,7 @@ The mockup we were given looks like this:</p>
 
 <ul>
 <li>There&rsquo;s a loading state while we send the text message.</li>
-<li>We&rsquo;ll show an input to get the code after it&rsquo;s been sent.</li>
+<li>We&rsquo;ll show an input for the code after the message is sent.</li>
 <li>There&rsquo;s no failure screen (it hasn&rsquo;t been drawn up yet).</li>
 </ul>
 
@@ -135,7 +138,7 @@ we&rsquo;ll exclude it from the last screen:</p>
 <p><a href="/images/2fa-close-btn.jpeg"><img src="/images/2fa-close-btn.jpeg" alt="Adding a close button to our modal" /></a></p>
 
 <p>No problem: let&rsquo;s write a function called <code>needsCancelButton</code> to
-determine if a we need to put a cancel button in the header of a
+determine if we need to put a cancel button in the header of a
 particular screen:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kr">const</span> <span class="nx">needsCancelButton</span> <span class="o">=</span> <span class="p">(</span><span class="nx">screen</span><span class="p">:</span> <span class="nx">Screen</span><span class="p">):</span> <span class="kr">boolean</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -229,8 +232,7 @@ we make it harder for Flow to tell us where we&rsquo;ve missed something.</p>
 <p>You might not have noticed, but we paid a subtle cost in rewriting
 our <code>needsCancelButton</code> function. Let&rsquo;s compare our two functions:</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'>
-</span><span class='line'><span class="c1">// ----- before: 62 bytes (minified) -----</span>
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// ----- before: 62 bytes (minified) -----</span>
 </span><span class='line'>
 </span><span class='line'><span class="kr">const</span> <span class="nx">needsCancelButton</span> <span class="o">=</span> <span class="p">(</span><span class="nx">screen</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
 </span><span class='line'>  <span class="k">return</span> <span class="nx">screen</span> <span class="o">!==</span> <span class="s1">'SuccessScreen'</span><span class="p">;</span>
@@ -256,12 +258,12 @@ our <code>needsCancelButton</code> function. Let&rsquo;s compare our two functio
 </span><span class='line'><span class="p">};</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>With just an <code>if</code> statement, our function was quite small: 62 bytes
-minified. But when we refactored to use a <code>switch</code> statement, its size
-shot up to 240 bytes! That&rsquo;s a 4x increase, just to get exhaustiveness.
-Admittedly, <code>needsCancelButton</code> is a bit of a pathological case. But in
-general: as we make our code bases <strong>more safe</strong> using Flow&rsquo;s union
-types of string literals, our <strong>bundle size bloats</strong>!</p>
+<p>With just an equality check, our function was small: 62 bytes minified.
+But when we refactored to use a <code>switch</code> statement, its size shot up to
+240 bytes! That&rsquo;s a 4x increase, just to get exhaustiveness. Admittedly,
+<code>needsCancelButton</code> is a bit of a pathological case. But in general: as
+we make our code bases <strong>more safe</strong> using Flow&rsquo;s union types of string
+literals, our <strong>bundle size bloats</strong>!</p>
 
 <h2>Types and Optimizing Compilers</h2>
 
@@ -272,14 +274,14 @@ captures our original intent, but as efficiently as possible.</p>
 
 <p>Flow is decidedly <strong>not</strong> a compiler: it&rsquo;s only a type checker. To run
 JavaScript annotated with Flow types, we first strip the types (with
-something like Babel). All information about the types is lost
-when we run the code.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> What can we achieve if we were to
-<strong>keep the types around</strong> all the way through compilation?</p>
+something like Babel). All information about the types vanishes when we
+run the code.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> What can we achieve if we were to <strong>keep the
+types around</strong> all the way through compilation?</p>
 
 <p><a href="https://reasonml.github.io/">Reason</a> (i.e., ReasonML) is an exciting effort to bring all the
 benefits of the OCaml tool chain to the web. In particular, Reason
-works using OCaml&rsquo;s very mature optimizing compiler alongside
-BuckleScript (which turns OCaml to JavaScript) to emit great code.</p>
+works using OCaml&rsquo;s mature optimizing compiler alongside BuckleScript
+(which turns OCaml to JavaScript) to emit great code.</p>
 
 <p>To see what I mean, let&rsquo;s re-implement our <code>Screen</code> type and
 <code>needsCancelButton</code> function, this time in Reason:</p>
@@ -300,9 +302,10 @@ BuckleScript (which turns OCaml to JavaScript) to emit great code.</p>
 
 <p>Looks pretty close to JavaScript with Flow types, doesn&rsquo;t it? The
 biggest difference is that the <code>case</code> keyword was replaced with the <code>|</code>
-character. Sharing the same syntax is a subtle reminder to always pair
-union types with <code>switch</code> statements! <sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup> Another difference:
-Reason handles exhaustiveness checking out of the box. 🙂</p>
+character. Making the way we define and use union types look the same is
+a subtle reminder to always pair union types with <code>switch</code> statements!
+<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup> Another difference: Reason handles exhaustiveness checking
+out of the box. 🙂</p>
 
 <p>What does the Reason output look like?</p>
 
@@ -334,17 +337,17 @@ removes the redundant <code>true</code> / <code>false</code>:</p>
 <p>Wow! This is actually <strong>better</strong> than our initial, hand-written <code>if</code>
 statement. Reason compiled what used to be a string literal
 <code>'SuccessScreen'</code> to just the number <code>2</code>. Reason can do this safely
-because custom-defined types in Reason <strong>can&rsquo;t</strong> be treated like
-strings, so it doesn&rsquo;t matter if the names get mangled.</p>
+because custom-defined types in Reason <strong>aren&rsquo;t</strong> strings, so it doesn&rsquo;t
+matter if the names get mangled.</p>
 
 <p>Taking a step back, Reason&rsquo;s type system delivered on the promise of
 types in a way Flow couldn&rsquo;t:</p>
 
 <ul>
 <li>We wrote high-level, expressive code.</li>
-<li>The type checker gave us strong guarantees about the correctness
-(exhaustiveness) of our code.</li>
-<li>And the compiler translated that all to tiny, performant code.</li>
+<li>The type checker gave us strong guarantees about our code&rsquo;s
+correctness via exhaustiveness.</li>
+<li>The compiler translated that all to tiny, performant output.</li>
 </ul>
 
 
