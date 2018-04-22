@@ -12,6 +12,8 @@ strong_keywords: false
 
 <p></p>
 
+<!-- more -->
+
 A lens is really just a function `a -> b` that we represent
 backwards[^backwards] and with an extra `Functor f` parameter lying
 around:

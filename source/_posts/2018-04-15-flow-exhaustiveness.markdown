@@ -20,6 +20,8 @@ checking within `if / else` and `switch` statements leaves something to
 be desired. By default, Flow doesn't do any exhaustiveness checks! But
 we **can** opt-in to exhaustiveness checking one statement at a time.
 
+<!-- more -->
+
 [Flow]: https://flow.org/
 
 In this post, we'll discover from the ground up how Flow's

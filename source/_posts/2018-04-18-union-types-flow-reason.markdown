@@ -6,18 +6,20 @@ comments: false
 share: false
 categories: ['flow', 'types', 'javascript', 'reasonml']
 description: >
-  Union types are a powerful tool and often overlooked. At work we use
-  Flow, which thankfully supports union types. But as I refactor certain
-  code paths to use more of them I've noticed that our bundle size has
-  been steadily increasing!
+  Union types are powerful yet often overlooked. At work, I've been using
+  Flow which thankfully supports union types. But as I've refactored
+  more of our code to use union types, I've noticed that our bundle size
+  has been steadily increasing!
 strong_keywords: false
 ---
 
 
-Union types are powerful yet often overlooked. At work I've been using
-Flow, which thankfully supports [union types][flow-union]. But as I've
+Union types are powerful yet often overlooked. At work, I've been using
+Flow which [thankfully supports union types][flow-union]. But as I've
 refactored more of our code to use union types, I've noticed that our
 bundle size has been steadily increasing!
+
+<!-- more -->
 
 In this post, we're going to explore why that's the case. We'll start
 with a problem which union types can solve, flesh out the problem to
@@ -41,7 +43,7 @@ The mockup we were given looks like this:
 In this mockup:
 
 - There's a loading state while we send the text message.
-- We'll show an input to get the code after it's been sent.
+- We'll show an input for the code after the message is sent.
 - There's no failure screen (it hasn't been drawn up yet).
 
 We'll need some way for our component to know which of the three screens
@@ -67,7 +69,7 @@ we'll exclude it from the last screen:
 [![Adding a close button to our modal](/images/2fa-close-btn.jpeg)](/images/2fa-close-btn.jpeg)
 
 No problem: let's write a function called `needsCancelButton` to
-determine if a we need to put a cancel button in the header of a
+determine if we need to put a cancel button in the header of a
 particular screen:
 
 ```js
@@ -170,7 +172,6 @@ You might not have noticed, but we paid a subtle cost in rewriting
 our `needsCancelButton` function. Let's compare our two functions:
 
 ```js
-
 // ----- before: 62 bytes (minified) -----
 
 const needsCancelButton = (screen) => {
@@ -197,12 +198,12 @@ const needsCancelButton = (screen) => {
 };
 ```
 
-With just an `if` statement, our function was quite small: 62 bytes
-minified. But when we refactored to use a `switch` statement, its size
-shot up to 240 bytes! That's a 4x increase, just to get exhaustiveness.
-Admittedly, `needsCancelButton` is a bit of a pathological case. But in
-general: as we make our code bases **more safe** using Flow's union
-types of string literals, our **bundle size bloats**!
+With just an equality check, our function was small: 62 bytes minified.
+But when we refactored to use a `switch` statement, its size shot up to
+240 bytes! That's a 4x increase, just to get exhaustiveness. Admittedly,
+`needsCancelButton` is a bit of a pathological case. But in general: as
+we make our code bases **more safe** using Flow's union types of string
+literals, our **bundle size bloats**!
 
 
 ## Types and Optimizing Compilers
@@ -214,16 +215,16 @@ captures our original intent, but as efficiently as possible.
 
 Flow is decidedly **not** a compiler: it's only a type checker. To run
 JavaScript annotated with Flow types, we first strip the types (with
-something like Babel). All information about the types is lost
-when we run the code.[^strip-types] What can we achieve if we were to
-**keep the types around** all the way through compilation?
+something like Babel). All information about the types vanishes when we
+run the code.[^strip-types] What can we achieve if we were to **keep the
+types around** all the way through compilation?
 
 [^strip-types]: Even though TypeScript defines both a language **and** a compiler for that language, in practice it's not much different from Flow here. A goal of the TypeScript compiler is to generate JavaScript that closely resembles the original TypeScript, so it doesn't do compile-time optimizations based on the types.
 
 [Reason] (i.e., ReasonML) is an exciting effort to bring all the
 benefits of the OCaml tool chain to the web. In particular, Reason
-works using OCaml's very mature optimizing compiler alongside
-BuckleScript (which turns OCaml to JavaScript) to emit great code.
+works using OCaml's mature optimizing compiler alongside BuckleScript
+(which turns OCaml to JavaScript) to emit great code.
 
 To see what I mean, let's re-implement our `Screen` type and
 `needsCancelButton` function, this time in Reason:
@@ -245,9 +246,10 @@ let needsCancelButton = (screen: screen): bool => {
 
 Looks pretty close to JavaScript with Flow types, doesn't it? The
 biggest difference is that the `case` keyword was replaced with the `|`
-character. Sharing the same syntax is a subtle reminder to always pair
-union types with `switch` statements! [^copy/paste] Another difference:
-Reason handles exhaustiveness checking out of the box. 🙂
+character. Making the way we define and use union types look the same is
+a subtle reminder to always pair union types with `switch` statements!
+[^copy/paste] Another difference: Reason handles exhaustiveness checking
+out of the box. 🙂
 
 [^copy/paste]: More than being a nice reminder, it makes it easy to copy / paste our type definition as boilerplate to start writing a new function!
 
@@ -283,16 +285,16 @@ function needsCancelButton(n){
 Wow! This is actually **better** than our initial, hand-written `if`
 statement. Reason compiled what used to be a string literal
 `'SuccessScreen'` to just the number `2`. Reason can do this safely
-because custom-defined types in Reason **can't** be treated like
-strings, so it doesn't matter if the names get mangled.
+because custom-defined types in Reason **aren't** strings, so it doesn't
+matter if the names get mangled.
 
 Taking a step back, Reason's type system delivered on the promise of
 types in a way Flow couldn't:
 
 - We wrote high-level, expressive code.
-- The type checker gave us strong guarantees about the correctness
-  (exhaustiveness) of our code.
-- And the compiler translated that all to tiny, performant code.
+- The type checker gave us strong guarantees about our code's
+  correctness via exhaustiveness.
+- The compiler translated that all to tiny, performant output.
 
 I'm really excited about Reason. 😄 It has a delightful type system and
 is backed by a decades-old optimizing compiler tool chain. I'd love to
