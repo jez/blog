@@ -59,7 +59,7 @@ type Screen =
 Union types are a perfect fit! 🎉  Union types document intent and can
 help guard against mistakes. Fellow developers and our compiler can
 know "these are all the cases." In particular, Flow can warn us when
-we've [forotten a case][absurd].
+we've [forgotten a case][absurd].
 
 Our initial implementation is working great. After sharing it with the
 team, someone suggests adding a "cancel" button in the top corner. It
