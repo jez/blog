@@ -315,14 +315,28 @@ compare on the optimizations front:
 
 Despite being a language **and** compiler, TypeScript maintains a
 goal of compiling to JavaScript that closely resembles the source
-TypesScript code. TypeScript also has two language constructs for
-working with exhaustiveness:
+TypesScript code. TypeScript has three language constructs for working
+with exhaustiveness:
 
-- union types, analogous to what Flow has, and
-- `enum`s, which are basically like Java's `enum`s.
+1. union types (identical to the Flow unions that we've been talking
+   about),
+1. `enum`s, which are sort of like definition a group of variable
+   constants all at once, and
+1. `const enum`s which are like `enum`s except that they're represented
+   more succinctly in the compiled output.
 
-With union types, TypeScript behaves basically the same as Flow 🙁. But
-what was surprising: `enum`s compressed **even worse**:
+TypeScript's union type over string literals are represented the same
+way as Flow, so I'm going to skip (1) and focus instead on (2) and (3).
+
+TypeScript's `enum` and `const enum` are subtly different. Not having
+used the language much, I'll refer you to [the TypeScript
+documentation][ts-enum] to learn more about the differences. But for
+sure, `const enum`s compile much better than normal `enum`s.
+
+[ts-enum]: https://www.typescriptlang.org/docs/handbook/enums.html
+
+Here's what normal `enum`s look like in TypeScript---they're **even
+worse** than unions of string literals:
 
 ```js
 var Screen_;
@@ -347,14 +361,45 @@ var needsCancelButton = function (screen) {
     }
 };
 ```
+[**TypeScript Playground →**][typescript1]
 
-[**TypeScript Playground →**][typescript]
+[typescript1]: https://www.typescriptlang.org/play/#src=enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error('This%20case%20is%20impossible.')%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D
 
-[typescript]: https://www.typescriptlang.org/play/#src=enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error('This%20case%20is%20impossible.')%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D
+So for normal `enum`s:
 
 - It's not smart enough to optimize away the `impossible` call.
 - It keeps around a JavaScript object representing the collection of
   enum values at run time, in a format that doesn't minify well.
+
+And then here's what `const enum`s look like---you can see that
+TypeScript represents them under the hood without any sort of `Screen_`
+object:
+
+```js
+var impossible = function (x) {
+    throw new Error('This case is impossible.');
+};
+var needsCancelButton = function (screen) {
+    switch (screen) {
+        case 0 /* LoadingScreen */:
+            return true;
+        case 1 /* CodeEntryScreen */:
+            return true;
+        case 2 /* SuccessScreen */:
+            return false;
+        default:
+            return impossible(screen);
+    }
+};
+```
+
+[**TypeScript Playground →**][typescript2]
+
+[typescript2]: https://www.typescriptlang.org/play/#src=const%20enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error('This%20case%20is%20impossible.')%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D
+
+- It uses numbers instead of strings.
+- It still uses a switch statement, instead of reducing to just an `if`
+  statement.
 
 
 ## PureScript
@@ -434,8 +479,9 @@ var _user$project$Main$LoadingScreen = {ctor: 'LoadingScreen'};
   (at least it doesn't `throw` in the `default` case!)
 - The variable names are long, but these would still minify well.
 
-It's interesting to see that even though Reason, PureScript, and Elm all have ML-style datatypes, Reason is the only one that uses an integer representation for the constructor tags.
-
+It's interesting to see that even though Reason, PureScript, and Elm all
+have ML-style datatypes, Reason is the only one that uses an integer
+representation for the constructor tags.
 
 [flow-union]: https://flow.org/en/docs/types/unions/
 [absurd]: /flow-exhaustiveness/
