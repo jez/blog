@@ -128,7 +128,7 @@ is visible. Let&rsquo;s use a <a href="https://flow.org/en/docs/types/unions/">u
 <p>Union types are a perfect fit! 🎉  Union types document intent and can
 help guard against mistakes. Fellow developers and our compiler can
 know &ldquo;these are all the cases.&rdquo; In particular, Flow can warn us when
-we&rsquo;ve <a href="/flow-exhaustiveness/">forotten a case</a>.</p>
+we&rsquo;ve <a href="/flow-exhaustiveness/">forgotten a case</a>.</p>
 
 <p>Our initial implementation is working great. After sharing it with the
 team, someone suggests adding a &ldquo;cancel&rdquo; button in the top corner. It
@@ -368,17 +368,29 @@ compare on the optimizations front:</p>
 
 <p>Despite being a language <strong>and</strong> compiler, TypeScript maintains a
 goal of compiling to JavaScript that closely resembles the source
-TypesScript code. TypeScript also has two language constructs for
-working with exhaustiveness:</p>
+TypesScript code. TypeScript has three language constructs for working
+with exhaustiveness:</p>
 
-<ul>
-<li>union types, analogous to what Flow has, and</li>
-<li><code>enum</code>s, which are basically like Java&rsquo;s <code>enum</code>s.</li>
-</ul>
+<ol>
+<li>union types (identical to the Flow unions that we&rsquo;ve been talking
+about),</li>
+<li><code>enum</code>s, which are sort of like definition a group of variable
+constants all at once, and</li>
+<li><code>const enum</code>s which are like <code>enum</code>s except that they&rsquo;re represented
+more succinctly in the compiled output.</li>
+</ol>
 
 
-<p>With union types, TypeScript behaves basically the same as Flow 🙁. But
-what was surprising: <code>enum</code>s compressed <strong>even worse</strong>:</p>
+<p>TypeScript&rsquo;s union type over string literals are represented the same
+way as Flow, so I&rsquo;m going to skip (1) and focus instead on (2) and (3).</p>
+
+<p>TypeScript&rsquo;s <code>enum</code> and <code>const enum</code> are subtly different. Not having
+used the language much, I&rsquo;ll refer you to <a href="https://www.typescriptlang.org/docs/handbook/enums.html">the TypeScript
+documentation</a> to learn more about the differences. But for
+sure, <code>const enum</code>s compile much better than normal <code>enum</code>s.</p>
+
+<p>Here&rsquo;s what normal <code>enum</code>s look like in TypeScript&mdash;they&rsquo;re <strong>even
+worse</strong> than unions of string literals:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Screen_</span><span class="p">;</span>
 </span><span class='line'><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">Screen_</span><span class="p">)</span> <span class="p">{</span>
@@ -405,10 +417,42 @@ what was surprising: <code>enum</code>s compressed <strong>even worse</strong>:<
 
 <p><a href="https://www.typescriptlang.org/play/#src=enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error('This%20case%20is%20impossible.')%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D"><strong>TypeScript Playground →</strong></a></p>
 
+<p>So for normal <code>enum</code>s:</p>
+
 <ul>
 <li>It&rsquo;s not smart enough to optimize away the <code>impossible</code> call.</li>
 <li>It keeps around a JavaScript object representing the collection of
 enum values at run time, in a format that doesn&rsquo;t minify well.</li>
+</ul>
+
+
+<p>And then here&rsquo;s what <code>const enum</code>s look like&mdash;you can see that
+TypeScript represents them under the hood without any sort of <code>Screen_</code>
+object:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">impossible</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'This case is impossible.'</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">needsCancelButton</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">screen</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">switch</span> <span class="p">(</span><span class="nx">screen</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="mi">0</span> <span class="cm">/* LoadingScreen */</span><span class="p">:</span>
+</span><span class='line'>            <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">case</span> <span class="mi">1</span> <span class="cm">/* CodeEntryScreen */</span><span class="p">:</span>
+</span><span class='line'>            <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">case</span> <span class="mi">2</span> <span class="cm">/* SuccessScreen */</span><span class="p">:</span>
+</span><span class='line'>            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+</span><span class='line'>        <span class="nl">default</span><span class="p">:</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">impossible</span><span class="p">(</span><span class="nx">screen</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="https://www.typescriptlang.org/play/#src=const%20enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error('This%20case%20is%20impossible.')%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D"><strong>TypeScript Playground →</strong></a></p>
+
+<ul>
+<li>It uses numbers instead of strings.</li>
+<li>It still uses a switch statement, instead of reducing to just an <code>if</code>
+statement.</li>
 </ul>
 
 
@@ -472,12 +516,12 @@ generates:</p>
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">_user$project$Main$needsCancelButton</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">page</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>  <span class="kd">var</span> <span class="nx">_p0</span> <span class="o">=</span> <span class="nx">page</span><span class="p">;</span>
 </span><span class='line'>  <span class="k">switch</span> <span class="p">(</span><span class="nx">_p0</span><span class="p">.</span><span class="nx">ctor</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">case</span> <span class="s1">'LoadingScreen'</span><span class="p">:</span>
-</span><span class='line'>          <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-</span><span class='line'>      <span class="k">case</span> <span class="s1">'CodeEntryScreen'</span><span class="p">:</span>
-</span><span class='line'>          <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-</span><span class='line'>      <span class="nl">default</span><span class="p">:</span>
-</span><span class='line'>          <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="s1">'LoadingScreen'</span><span class="p">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="s1">'CodeEntryScreen'</span><span class="p">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="nl">default</span><span class="p">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
 </span><span class='line'>  <span class="p">}</span>
 </span><span class='line'><span class="p">};</span>
 </span><span class='line'><span class="kd">var</span> <span class="nx">_user$project$Main$SuccessScreen</span> <span class="o">=</span> <span class="p">{</span><span class="na">ctor</span><span class="p">:</span> <span class="s1">'SuccessScreen'</span><span class="p">};</span>
@@ -493,7 +537,9 @@ generates:</p>
 </ul>
 
 
-<p>It&rsquo;s interesting to see that even though Reason, PureScript, and Elm all have ML-style datatypes, Reason is the only one that uses an integer representation for the constructor tags.</p>
+<p>It&rsquo;s interesting to see that even though Reason, PureScript, and Elm all
+have ML-style datatypes, Reason is the only one that uses an integer
+representation for the constructor tags.</p>
 
 <!-- vim:tw=72
 -->
