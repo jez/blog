@@ -414,15 +414,15 @@ generates:
 
 ```js
 var _user$project$Main$needsCancelButton = function (page) {
-	var _p0 = page;
-	switch (_p0.ctor) {
-		case 'LoadingScreen':
-			return true;
-		case 'CodeEntryScreen':
-			return true;
-		default:
-			return false;
-	}
+  var _p0 = page;
+  switch (_p0.ctor) {
+    case 'LoadingScreen':
+      return true;
+    case 'CodeEntryScreen':
+      return true;
+    default:
+      return false;
+  }
 };
 var _user$project$Main$SuccessScreen = {ctor: 'SuccessScreen'};
 var _user$project$Main$CodeEntryScreen = {ctor: 'CodeEntryScreen'};
