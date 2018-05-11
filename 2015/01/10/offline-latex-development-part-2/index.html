@@ -1,8 +1,5 @@
 
 <!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 
 <head>
 
@@ -19,7 +16,7 @@
 <meta name="description" content="LaTeX development with Vim and the command line, now featuring split-pane windows!
 ">
 
-<meta name="keywords" content="latex osx terminal vim ">
+<meta name="keywords" content="latex terminal vim osx ">
 
 
 <!-- http://t.co/dKP3o1e -->
@@ -37,9 +34,7 @@
 <meta property="og:title" content="Offline LaTeX Development - Part 2">
 <meta property="og:description" content="LaTeX development with Vim and the command line, now featuring split-pane windows!
 ">
-
-  <meta property="og:image" content="">
-
+<meta property="og:image" content="">
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
 <link rel="canonical" href="https://blog.jez.io/2015/01/10/offline-latex-development-part-2">
@@ -49,41 +44,54 @@
 <link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
-<script>Modernizr || document.write('<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
-
-
-
-
-
 
 
 </head>
 
 <body id="post" class="">
 
-<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
-<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
-  <button class="dl-trigger">Open Menu</button>
-  <ul class="dl-menu">
-    <li><a href="/">All Posts</a></li><li><a href="/categories#fragment">Fragments</a></li><li><a href="/categories/">Posts by Category</a></li><li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
-  </ul><!-- /.dl-menu -->
-</nav><!-- /.dl-menuwrapper -->
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
 
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Offline LaTeX Development - Part 2</h1>
+  <h2 class="EntryHeader-subtitle">January 10, 2015</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
 
 
 
 <div id="main" role="main">
-  <article class="hentry">
-    <header class="header-title">
-      <div class="header-title-wrap">
-        <h1 class="entry-title">Offline LaTeX Development - Part 2</h1>
-        <h2>January 10, 2015</h2>
-        
-      </div><!-- /.header-title-wrap -->
-    </header>
-    <div class="entry-content">
-      <p>I&rsquo;ve already written about how I develop LaTeX offline in Vim using GNU Make.
+  <article class="Post-content">
+    <p>I&rsquo;ve already written about how I develop LaTeX offline in Vim using GNU Make.
 Recently, though, I found a tool that implements another feature that GUI
 editors had to themselves: splitting panes.</p>
 
@@ -119,57 +127,66 @@ manipulate the window arrangements.</p>
 for spitting the screen into two panes, like <a href="http://www.bettertouchtool.net/">BetterTouchTool</a>, though I
 haven&rsquo;t actually tried any of them out.</p>
 
-      <footer class="entry-meta">
-        <span class="entry-tags"><a href="/categories/#latex" title="Pages tagged latex" class="tag">latex</a><a href="/categories/#osx" title="Pages tagged osx" class="tag">osx</a><a href="/categories/#terminal" title="Pages tagged terminal" class="tag">terminal</a><a href="/categories/#vim" title="Pages tagged vim" class="tag">vim</a></span>
-        <span class="entry-date date published updated"><time datetime="2015-01-10T17:00:00-05:00">January 10, 2015</time></span>
-        
-      </footer>
-    </div><!-- /.entry-content -->
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#latex" title="Pages tagged latex">latex</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#terminal" title="Pages tagged terminal">terminal</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#vim" title="Pages tagged vim">vim</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#osx" title="Pages tagged osx">osx</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2015-01-10T17:00:00-05:00">January 10, 2015</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
     
-      <div class="read-more">
-        
-          <div class="read-more-header">
-            <a href="/union-types-flow-reason/" class="btn">Read More</a>
-          </div><!-- /.read-more-header -->
-          <div class="read-more-content">
-            <h3><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h3>
-            <p>Union types are powerful yet often overlooked. At work, I&#8217;ve been using Flow which thankfully supports union types. But as I&#8217;ve refactored more of our code to use union types, I&#8217;ve noticed that our bundle size has been steadily increasing!
+      <div class="read-more-header">
+        <a href="/union-types-flow-reason/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h3>
+      <p>Union types are powerful yet often overlooked. At work, I&#8217;ve been using Flow which thankfully supports union types. But as I&#8217;ve refactored more of our code to use union types, I&#8217;ve noticed that our bundle size has been steadily increasing!
  <a href="/union-types-flow-reason/"> Continue reading</a></p>
-          </div><!-- /.read-more-content -->
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
         
-        <div class="read-more-list">
-          
-            <div class="list-item">
-              <h4><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h4>
-              <span>Published on April 15, 2018</span>
-            </div><!-- /.list-item -->
-          
-            <div class="list-item">
-              <h4><a href="/lens-composition/" title="Lenses & Composition">Lenses & Composition</a></h4>
-              <span>Published on February 06, 2018</span>
-            </div><!-- /.list-item -->
-          
-        </div><!-- /.read-more-list -->
-      </div><!-- /.read-more -->
-    
-    
-  </article>
-</div><!-- /#main -->
+          <div class="list-item">
+            <h4><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h4>
+            <span>Published on April 15, 2018</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/lens-composition/" title="Lenses & Composition">Lenses & Composition</a></h4>
+            <span>Published on February 06, 2018</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
 
 <div class="footer-wrapper">
-  <footer role="contentinfo">
-    <span>&copy; 2018 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
 
-  </footer>
-</div><!-- /.footer-wrapper -->
-
-
-	        
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="/javascripts/scripts.min.js"></script>
-&#8211;>
-	        
+</div>
 
 </body>
 </html>

@@ -1,8 +1,5 @@
 
 <!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 
 <head>
 
@@ -35,9 +32,7 @@
 <meta property="og:url" content="https://blog.jez.io/2014/05/06/adding-a-network-printer-to-a-linux-server">
 <meta property="og:title" content="Adding a Network Printer to a Linux Server">
 <meta property="og:description" content="A walkthrough of how I installed a network-attached printer to a production printing server.">
-
-  <meta property="og:image" content="">
-
+<meta property="og:image" content="">
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
 <link rel="canonical" href="https://blog.jez.io/2014/05/06/adding-a-network-printer-to-a-linux-server">
@@ -47,41 +42,54 @@
 <link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
-<script>Modernizr || document.write('<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
-
-
-
-
-
 
 
 </head>
 
 <body id="post" class="">
 
-<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
-<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
-  <button class="dl-trigger">Open Menu</button>
-  <ul class="dl-menu">
-    <li><a href="/">All Posts</a></li><li><a href="/categories#fragment">Fragments</a></li><li><a href="/categories/">Posts by Category</a></li><li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
-  </ul><!-- /.dl-menu -->
-</nav><!-- /.dl-menuwrapper -->
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
 
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Adding a Network Printer to a Linux Server</h1>
+  <h2 class="EntryHeader-subtitle">May 06, 2014</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
 
 
 
 <div id="main" role="main">
-  <article class="hentry">
-    <header class="header-title">
-      <div class="header-title-wrap">
-        <h1 class="entry-title">Adding a Network Printer to a Linux Server</h1>
-        <h2>May 06, 2014</h2>
-        
-      </div><!-- /.header-title-wrap -->
-    </header>
-    <div class="entry-content">
-      <p>It&rsquo;s one thing to plug in a CD, click through a few dialogs, and wait for the computer to chime at you saying that your printer has been installed. Unfortunately, this is not how server administration works. Here&rsquo;s my account of installing multiple network-attached printers on a Debian server.</p>
+  <article class="Post-content">
+    <p>It&rsquo;s one thing to plug in a CD, click through a few dialogs, and wait for the computer to chime at you saying that your printer has been installed. Unfortunately, this is not how server administration works. Here&rsquo;s my account of installing multiple network-attached printers on a Debian server.</p>
 
 <!-- more -->
 
@@ -92,7 +100,7 @@
 
 <h2>The Hard Way</h2>
 
-<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#109;&#x61;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#112;&#114;&#x69;&#x6e;&#x74;&#64;&#115;&#99;&#111;&#x74;&#x74;&#121;&#x6c;&#x61;&#x62;&#115;&#x2e;&#x6f;&#114;&#103;">&#x70;&#114;&#x69;&#110;&#116;&#x40;&#x73;&#x63;&#x6f;&#116;&#116;&#x79;&#x6c;&#97;&#x62;&#115;&#46;&#x6f;&#114;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
+<p>As I mentioned in my last post, I&rsquo;m a part of a student organization called <a href="//www.scottylabs.org">ScottyLabs</a>. We do tons of cool things, but the project which I&rsquo;m currently working on is <a href="//print.scottylabs.org">Print@ScottyLabs</a>. It&rsquo;s a really handy service which lets you send an attachment to <a href="&#109;&#x61;&#x69;&#108;&#116;&#x6f;&#58;&#112;&#x72;&#105;&#110;&#116;&#64;&#115;&#99;&#111;&#x74;&#116;&#x79;&#108;&#x61;&#x62;&#x73;&#x2e;&#x6f;&#114;&#103;">&#112;&#114;&#x69;&#110;&#116;&#x40;&#x73;&#x63;&#x6f;&#116;&#x74;&#x79;&#x6c;&#x61;&#x62;&#115;&#x2e;&#x6f;&#114;&#103;</a> and have it sent to the printer. I&rsquo;m currently in the process of rewriting much of the code base from scratch to support a plethora of highly-requested features, so there will no doubt be more posts about my exploits.</p>
 
 <p>Luckily, CMU (and arguably every college) is not terribly notable for keeping up-to-date information on it&rsquo;s website. This means that I got the &ldquo;wonderful&rdquo; opportunity to dig through CUPS documentation, sketchy printer manufacturer websites, and the depths of the Internet to finagle together a solution. Here&rsquo;s to hoping that you have a far more pleasurable experience. Without further ado, these are the steps I went through to get it done.</p>
 
@@ -134,57 +142,58 @@ After all this, if you’ve copied the PPD file into the right folder (<code>/et
 
 <p>Happy printing!</p>
 
-      <footer class="entry-meta">
-        <span class="entry-tags"><a href="/categories/#linux" title="Pages tagged linux" class="tag">linux</a><a href="/categories/#printing" title="Pages tagged printing" class="tag">printing</a></span>
-        <span class="entry-date date published updated"><time datetime="2014-05-06T02:09:29-04:00">May 06, 2014</time></span>
-        
-      </footer>
-    </div><!-- /.entry-content -->
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#linux" title="Pages tagged linux">linux</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#printing" title="Pages tagged printing">printing</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2014-05-06T02:09:29-04:00">May 06, 2014</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
     
-      <div class="read-more">
-        
-          <div class="read-more-header">
-            <a href="/union-types-flow-reason/" class="btn">Read More</a>
-          </div><!-- /.read-more-header -->
-          <div class="read-more-content">
-            <h3><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h3>
-            <p>Union types are powerful yet often overlooked. At work, I&#8217;ve been using Flow which thankfully supports union types. But as I&#8217;ve refactored more of our code to use union types, I&#8217;ve noticed that our bundle size has been steadily increasing!
+      <div class="read-more-header">
+        <a href="/union-types-flow-reason/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h3>
+      <p>Union types are powerful yet often overlooked. At work, I&#8217;ve been using Flow which thankfully supports union types. But as I&#8217;ve refactored more of our code to use union types, I&#8217;ve noticed that our bundle size has been steadily increasing!
  <a href="/union-types-flow-reason/"> Continue reading</a></p>
-          </div><!-- /.read-more-content -->
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
         
-        <div class="read-more-list">
-          
-            <div class="list-item">
-              <h4><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h4>
-              <span>Published on April 15, 2018</span>
-            </div><!-- /.list-item -->
-          
-            <div class="list-item">
-              <h4><a href="/lens-composition/" title="Lenses & Composition">Lenses & Composition</a></h4>
-              <span>Published on February 06, 2018</span>
-            </div><!-- /.list-item -->
-          
-        </div><!-- /.read-more-list -->
-      </div><!-- /.read-more -->
-    
-    
-  </article>
-</div><!-- /#main -->
+          <div class="list-item">
+            <h4><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h4>
+            <span>Published on April 15, 2018</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/lens-composition/" title="Lenses & Composition">Lenses & Composition</a></h4>
+            <span>Published on February 06, 2018</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
 
 <div class="footer-wrapper">
-  <footer role="contentinfo">
-    <span>&copy; 2018 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
 
-  </footer>
-</div><!-- /.footer-wrapper -->
-
-
-	        
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="/javascripts/scripts.min.js"></script>
-&#8211;>
-	        
+</div>
 
 </body>
 </html>

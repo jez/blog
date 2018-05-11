@@ -1,8 +1,5 @@
 
 <!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 
 <head>
 
@@ -19,7 +16,7 @@
 <meta name="description" content="After some research, I found a much better solution to the problem of sandboxing Ruby gems.
 ">
 
-<meta name="keywords" content="python ruby ">
+<meta name="keywords" content="ruby python ">
 
 
 <!-- http://t.co/dKP3o1e -->
@@ -37,9 +34,7 @@
 <meta property="og:title" content="Ruby Virtualenvs">
 <meta property="og:description" content="After some research, I found a much better solution to the problem of sandboxing Ruby gems.
 ">
-
-  <meta property="og:image" content="">
-
+<meta property="og:image" content="">
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
 <link rel="canonical" href="https://blog.jez.io/ruby-virtualenvs">
@@ -49,41 +44,54 @@
 <link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
-<script>Modernizr || document.write('<script src="/javascripts/vendor/modernizr-2.6.2.custom.min.js"><\/script>') </script>
-
-
-
-
-
 
 
 </head>
 
 <body id="post" class="">
 
-<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
-<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
-  <button class="dl-trigger">Open Menu</button>
-  <ul class="dl-menu">
-    <li><a href="/">All Posts</a></li><li><a href="/categories#fragment">Fragments</a></li><li><a href="/categories/">Posts by Category</a></li><li><a href="https://jez.io">About Jake</a></li><li><a href="https://github.com/jez">GitHub</a></li>
-  </ul><!-- /.dl-menu -->
-</nav><!-- /.dl-menuwrapper -->
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
 
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Ruby Virtualenvs</h1>
+  <h2 class="EntryHeader-subtitle">December 22, 2014</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
 
 
 
 <div id="main" role="main">
-  <article class="hentry">
-    <header class="header-title">
-      <div class="header-title-wrap">
-        <h1 class="entry-title">Ruby Virtualenvs</h1>
-        <h2>December 22, 2014</h2>
-        
-      </div><!-- /.header-title-wrap -->
-    </header>
-    <div class="entry-content">
-      <p>A while back I found a command that removes all Ruby gems installed on a system
+  <article class="Post-content">
+    <p>A while back I found a command that removes all Ruby gems installed on a system
 when you&rsquo;re using rbenv. It worked great, so I decided to build on top of it.
 After a bit of research, I found a much better solution to the root of my
 problems: sandboxing Ruby gems.</p>
@@ -171,57 +179,58 @@ with the per-virtualenv solution above.</p>
 commands without prefixing them with <code>bundle exec ...</code>, which is actually really
 handy.</p>
 
-      <footer class="entry-meta">
-        <span class="entry-tags"><a href="/categories/#python" title="Pages tagged python" class="tag">python</a><a href="/categories/#ruby" title="Pages tagged ruby" class="tag">ruby</a></span>
-        <span class="entry-date date published updated"><time datetime="2014-12-22T12:52:40-06:00">December 22, 2014</time></span>
-        
-      </footer>
-    </div><!-- /.entry-content -->
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#ruby" title="Pages tagged ruby">ruby</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#python" title="Pages tagged python">python</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2014-12-22T12:52:40-06:00">December 22, 2014</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
     
-      <div class="read-more">
-        
-          <div class="read-more-header">
-            <a href="/union-types-flow-reason/" class="btn">Read More</a>
-          </div><!-- /.read-more-header -->
-          <div class="read-more-content">
-            <h3><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h3>
-            <p>Union types are powerful yet often overlooked. At work, I&#8217;ve been using Flow which thankfully supports union types. But as I&#8217;ve refactored more of our code to use union types, I&#8217;ve noticed that our bundle size has been steadily increasing!
+      <div class="read-more-header">
+        <a href="/union-types-flow-reason/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h3>
+      <p>Union types are powerful yet often overlooked. At work, I&#8217;ve been using Flow which thankfully supports union types. But as I&#8217;ve refactored more of our code to use union types, I&#8217;ve noticed that our bundle size has been steadily increasing!
  <a href="/union-types-flow-reason/"> Continue reading</a></p>
-          </div><!-- /.read-more-content -->
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
         
-        <div class="read-more-list">
-          
-            <div class="list-item">
-              <h4><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h4>
-              <span>Published on April 15, 2018</span>
-            </div><!-- /.list-item -->
-          
-            <div class="list-item">
-              <h4><a href="/lens-composition/" title="Lenses & Composition">Lenses & Composition</a></h4>
-              <span>Published on February 06, 2018</span>
-            </div><!-- /.list-item -->
-          
-        </div><!-- /.read-more-list -->
-      </div><!-- /.read-more -->
-    
-    
-  </article>
-</div><!-- /#main -->
+          <div class="list-item">
+            <h4><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h4>
+            <span>Published on April 15, 2018</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/lens-composition/" title="Lenses & Composition">Lenses & Composition</a></h4>
+            <span>Published on February 06, 2018</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
 
 <div class="footer-wrapper">
-  <footer role="contentinfo">
-    <span>&copy; 2018 Jake Zimmerman. Powered by <a href="http://octopress.org">Octopress</a> using the <a href="https://github.com/jez/hpstr-theme/">HPSTR Theme for Octopress</a>.</span>
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
 
-  </footer>
-</div><!-- /.footer-wrapper -->
-
-
-	        
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="/javascripts/scripts.min.js"></script>
-&#8211;>
-	        
+</div>
 
 </body>
 </html>
