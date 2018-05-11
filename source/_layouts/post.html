@@ -8,36 +8,12 @@
 {% include browser-upgrade.html %}
 {% include navigation.html %}
 
-{% if page.image.feature %}
-<div class="entry-header">
-  {% if page.image.credit %}<div class="image-credit">Image source: {% if page.image.creditlink %}<a href="{{ page.image.creditlink }}">{% endif %}{{ page.image.credit }}{% if page.image.creditlink %}</a>{% endif %}</div><!-- /.image-credit -->{% endif %}
-  <div class="entry-image">
-    <img src="{{ page.image.feature }}" alt="{{ page.title }}">
-  </div><!-- /.entry-image -->
-</div><!-- /.entry-header -->
-{% endif %}
+{% assign header_title = page.title %}
+{% assign header_subtitle = page.date | date: "%B %d, %Y" %}
+{% include entryheader.html %}
 
 <div id="main" role="main">
   <article class="hentry">
-    <header class="header-title">
-      <div class="header-title-wrap">
-        {% if page.external_url %}
-          <h1 class="entry-title"><a href="{{ page.external_url }}">{{ page.title }}</a></h1>
-        {% else %}
-          <h1 class="entry-title">{{ page.title }}</h1>
-        {% endif %}
-        <h2>{{ page.date | date: "%B %d, %Y" }}</h2>
-        {% if page.categories contains 'fragment' %}
-          <div class="entry-meta">
-            <a href="{{ root_url }}/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
-          </div>
-        {% elsif page.categories contains 'recitation' %}
-          <div class="entry-meta">
-            <a href="{{ root_url }}/categories/#recitation" title="This post is structured like 'recitation notes.' It aims to be instructive, and also makes some assumptions about prerequisite knowledge." class="tag">recitation notes</a>
-          </div>
-        {% endif %}
-      </div><!-- /.header-title-wrap -->
-    </header>
     <div class="entry-content">
       {{ content }}
       <footer class="entry-meta">
@@ -50,7 +26,7 @@
       <div class="read-more">
         {% for post in site.related_posts limit:1 %}
           <div class="read-more-header">
-            <a href="{{ root_url }}{{ post.url }}" class="btn">Read More</a>
+            <a href="{{ root_url }}{{ post.url }}" class="Button">Read More</a>
           </div><!-- /.read-more-header -->
           <div class="read-more-content">
             <h3><a href="{{ root_url }}{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></h3>
@@ -76,9 +52,6 @@
     {% include footer.html %}
   </footer>
 </div><!-- /.footer-wrapper -->
-
-{% include custom/after_footer.html %}	        
-{% include scripts.html %}	        
 
 </body>
 </html>

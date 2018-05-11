@@ -13,7 +13,7 @@ I've used [tomasr][tomasr]'s vim color scheme [molokai][molokai-vim] for a long 
 
 <!-- more -->
 
-## [<i class="fa fa-angle-double-right"></i> Installation][molokai-iterm2]
+## [Installation][molokai-iterm2]
 If you don't already have your iTerm2 colors configured or you're looking for a change, you should definitely check out [iTerm2-Color-Schemes][iTerm2-Color-Schemes], a GitHub repo by [mbadolato][mbadolato] filled with tons of themes he's ported, collected, and been given. 
 
 You can see and install the [Molokai theme][molokai-iterm2] there.

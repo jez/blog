@@ -1,31 +1,29 @@
 ---
 layout: default
+# TODO(jez) Change title and description
 title: A Tech Blog by Jake Zimmerman
 description: "A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, and hacks that have helped me out."
+# TODO(jez) What are these categories?
 categories: [Jekyll, theme, themes, responsive, blog, modern, tech, hacks]
+# TODO(jez) Better keywords...?
 keywords: Jekyll theme themes responsive blog modern tech hacks
-image:
-  feature: /images/threaded-blue-on-black-cropped.jpg
 ---
 
 {% assign index = true %}
 
 {% unless paginator.previous_page %}
   {% for post in site.pinned %}
-  <article class="hentry">
-    {% include article.html %}
-  </article><!-- /.hentry -->
+  <div class="Card">
+    {% assign for_pinned = true %}
+    {% include entry.html %}
+  </div>
   {% endfor %}
 {% endunless %}
 
 <div class="pinned-divider"></div>
 
-<article class="hentry">
-  {% capture numposts %}{{ site.posts | size }}{% endcapture %}
-
+<div id="all-posts" class="Card">
   {% for post in site.posts %}
-    {% capture titlecased %}{% if site.titlecase %}{{ post.title | titlecase }}{% else %}{{ post.title }}{% endif %}{% endcapture %}
-
     {% assign currentyear = post.date | date: "%Y" %}
 
     {% if currentyear != prevyear %}
@@ -33,29 +31,7 @@ image:
       {% assign prevyear = currentyear %}
     {% endif %}
 
-    <div class="entry-wrapper">
-      {% if post.external_url %}
-        <h3 class="entry-title">
-          <a href="{{ post.external_url }}" rel="bookmark" title="{{ titlecased }}"><i class="fa fa-external-link"></i>&nbsp;</a>
-          <a href="{{ root_url }}{{ post.url }}">{{ titlecased }}</a>
-        </h3>
-      {% else %}
-        <h3 class="entry-title">
-          <a href="{{ root_url }}{{ post.url }}" rel="bookmark" title="{{ titlecased }}" itemprop="url">{{ titlecased }}</a>
-        </h3>
-      {% endif %}
-
-      <div class="entry-meta">
-        <span class="entry-date date published updated">
-          <time datetime="{{ post.date | date_to_xmlschema }}">
-            <a href="{{ root_url }}{{ post.url }}">{{ post.date | date: "%B %d, %Y" }}</a>
-          </time>
-        </span>
-        &nbsp;
-        {% for tag in post.categories %}
-          <a href="{{ root_url }}/categories/#{{ tag | cgi_encode }}" title="Pages tagged {{ tag }}" class="tag hollow">{{ tag }}</a>
-        {% endfor %}
-      </div><!-- /.entry-meta -->
-    </div>
+    {% assign for_pinned = false %}
+    {% include entry.html %}
   {% endfor %}
-</article><!-- /.hentry -->
+</div>

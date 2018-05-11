@@ -1,0 +1,37 @@
+{% capture titlecased %}{% if site.titlecase %}{{ post.title | titlecase }}{% else %}{{ post.title }}{% endif %}{% endcapture %}
+{% capture abs_url %}{{ root_url }}{{ post.url }}{% endcapture %}
+
+<div class="Entry{% if for_pinned %} Entry--pinned{% endif %}">
+  <header class="Entry-header">
+    <div class="Entry-title">
+      <a href="{{ abs_url }}" title="{{ titlecased }}">{{ titlecased }}</a>
+    </div>
+    <div class="Entry-date">
+      <a href="{{ abs_url }}">{{ post.date | date: "%B %d, %Y" }}</a>
+      {% unless for_pinned %}
+        &nbsp;
+        <ul class="Tags">
+          {% for tag in post.categories %}
+            <li class="Tag Tag--hollow">
+              {% capture cat_url %}{{ root_url }}/categories/#{{ tag | cgi_encode }}{% endcapture %}
+              <a href="{{ cat_url }}" title="Pages tagged {{ tag }}">
+                {{ tag }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endunless %}
+    </div>
+  </header>
+
+  {% if for_pinned %}
+    {% capture excerpted %}{{ post.content | has_excerpt }}{% endcapture %}
+    {% if excerpted == 'true' %}
+      <div class="Post-content">
+        {{ post.content | excerpt }}
+      </div>
+    {% endif %}
+
+    <a class="Button" href="{{ abs_url }}">{{ site.excerpt_link }}</a>
+  {% endif %}
+</div>

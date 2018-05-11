@@ -1,0 +1,18 @@
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">{{ header_title }}</h1>
+  <h2 class="EntryHeader-subtitle">{{ header_subtitle }}</h2>
+
+  <ul class="Tags">
+    {% if page.categories contains 'fragment' %}
+      <li class="Tag">
+        <a href="{{ root_url }}/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
+      </li>
+    {% elsif page.categories contains 'recitation' %}
+      <li class="Tag">
+        <a href="{{ root_url }}/categories/#recitation" title="This post is structured like 'recitation notes.' It aims to be instructive, and also makes some assumptions about prerequisite knowledge." class="tag">recitation notes</a>
+      </li>
+    {% endif %}
+  </ul>
+</div>
+

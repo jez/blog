@@ -1,0 +1,26 @@
+//
+// Styles for Button component
+//
+
+.Button {
+  display: inline-block;
+  padding: 8px 20px;
+
+  border-radius: 3px;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-color: $primary;
+
+  background-color: $primary;
+  color: $white;
+
+  @include font-rem($button_fs);
+
+  &:visited {
+    color: $white;
+  }
+  &:hover {
+    background-color: $white;
+    color: $primary;
+  }
+}

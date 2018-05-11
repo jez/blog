@@ -1,6 +1,13 @@
-<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
-  <button class="dl-trigger">Open Menu</button>
-  <ul class="dl-menu">
-    {% for link in site.links %}<li>{% if link.external %}<a href="{{ link.url }}">{{ link.title }}</a>{% else %}<a href="{{ root_url }}{{ link.url }}">{{ link.title }}</a>{% endif %}</li>{% endfor %}
-  </ul><!-- /.dl-menu -->
-</nav><!-- /.dl-menuwrapper -->
+<nav class="Navigation">
+  <ul class="Tags">
+    {% for link in site.links %}
+      <li class="Tag">
+        {% if link.external %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% else %}
+          <a href="{{ root_url }}{{ link.url }}">{{ link.title }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

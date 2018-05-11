@@ -4,7 +4,7 @@
 // --------------------------------------------------
 
 *, *:after, *:before {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
 }
 
 // Display in IE6-9 and FF3
@@ -135,7 +135,7 @@ input[type="checkbox"] {
     cursor: pointer; // Improves usability and consistency of cursor style between image-type `input` and others.
 }
 input[type="search"] { // Appearance in Safari/Chrome
-  @include box-sizing(content-box);
+  box-sizing: content-box;
   -webkit-appearance: textfield;
 }
 input[type="search"]::-webkit-search-decoration,

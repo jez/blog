@@ -3,38 +3,36 @@ layout: post-index
 permalink: /categories/
 title: Categories
 description: "An archive of posts sorted by category."
-image:
-    feature: /images/threaded-blue-on-black-cropped.jpg
 ---
 
 {% assign categories_list = site.categories | sort %}
 
-<ul class="entry-meta inline-list">
+<ul class="Tags">
   {% if categories_list.first[0] == null %}
     {% for category in categories_list %}
-    	<li><a href="#{{ category }}" class="tag">{{ category }} <span>{{ site.categories[category].size }}</span></a></li>
+      <li class="Tag"><a href="#{{ category }}" >{{ category }} <span class="Tag-size">{{ site.categories[category].size }}</span></a></li>
     {% endfor %}
   {% else %}
     {% for category in categories_list %}
-    	<li><a href="#{{ category[0] }}" class="tag">{{ category[0] }} <span>{{ category[1].size }}</span></a></li>
+      <li class="Tag"><a href="#{{ category[0] }}">{{ category[0] }} <span class="Tag-size">{{ category[1].size }}</span></a></li>
     {% endfor %}
   {% endif %}
 </ul>
 
 {% for category in categories_list %}
-	<article id="{{ category[0] }}" class="category">
-	<h2>{{ category[0] }}</h2>
-		{% assign pages_list = category[1] %}
-		{% for post in pages_list %}
-			{% if post.title != null %}
-			{% if group == null or group == post.group %}
-				<h3><a href="{{ root_url }}{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></h3>
-			{% endif %}
-			{% endif %}
-		{% endfor %}
-		{% assign pages_list = nil %}
-		{% assign group = nil %}
-	</article><!-- /.hentry -->
+  <article id="{{ category[0] }}" class="category">
+  <h2>{{ category[0] }}</h2>
+    {% assign pages_list = category[1] %}
+    {% for post in pages_list %}
+      {% if post.title != null %}
+      {% if group == null or group == post.group %}
+        <h3><a href="{{ root_url }}{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></h3>
+      {% endif %}
+      {% endif %}
+    {% endfor %}
+    {% assign pages_list = nil %}
+    {% assign group = nil %}
+  </article><!-- /.hentry -->
 {% endfor %}
 
 {% assign categories_list = nil %}

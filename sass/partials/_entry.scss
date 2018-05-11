@@ -1,0 +1,36 @@
+//
+// Styles for Entry component (source/_includes/entry.html)
+//
+
+.Entry {
+  margin-bottom: 20px;
+}
+.Entry.Entry--pinned {
+  margin-bottom: 0;
+}
+
+.Entry-title {
+  margin-top: 0;
+  margin-bottom: 3px;
+
+  @include font-rem(1.17);
+  font-family: $heading-font;
+  font-weight: 400;
+}
+.Entry--pinned .Entry-title {
+  @include font-rem($h1_fs);
+}
+
+.Entry-date {
+  color: lighten($base-color,60%);
+
+  @include font-rem($footer_fs);
+  text-transform: uppercase;
+  font-family: $caps-font;
+
+  a {
+    color: lighten($base-color,60%);
+  }
+}
+
+
