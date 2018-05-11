@@ -1,10 +1,6 @@
 {% comment %}
   Uses the following pieces of information:
 
-  page.image.feature: Absolute URL of a feature (i.e. large) image
-    OR
-  page.image.thumb: Absolute URL of a thumbnail image
-    OR
   site.logo: Absolute URL of a site-wide thumbnail image
 
   page.title / site.title
@@ -37,13 +33,8 @@
 
 <!-- Twitter Cards -->
 {% if site.twitter_user %}
-  {% if page.image.feature %}
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="{{ page.image.feature }}"
-  {% else %}
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:image" content"{% if page.image.thumb %}{{ page.image.thumb }}{% elsif site.logo %}{{ site.logo }}{% endif%}">
-  {% endif %}
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content"{% if page.image.thumb %}{{ page.image.thumb }}{% elsif site.logo %}{{ site.logo }}{% endif%}">
   <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title  }}{% endif %}">
   <meta name="twitter:description" content="{{ description | strip_html | condense_spaces | truncate:150 }}">
   <meta name="twitter:creator" content="@{{ site.twitter_user }}">
@@ -55,13 +46,7 @@
 <meta property="og:url" content="{{ canonical }}">
 <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
 <meta property="og:description" content="{{ description | strip_html | condense_spaces | truncate:150 }}">
-{% if page.image.feature %}
-  <meta property="og:image" content="{{ page.image.feature }}">
-{% elsif page.image.thumb %}
-  <meta property="og:image" content="{{ page.image.thumb }}">
-{% else %}
-  <meta property="og:image" content="{{ site.logo }}">
-{% endif %}
+<meta property="og:image" content="{{ site.logo }}">
 <meta property="og:site_name" content="{{ site.title }}">
 
 <link rel="canonical" href="{{ canonical }}">
@@ -74,6 +59,3 @@
 {% if page.mathjax %}
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML"></script>
 {% endif %}
-
-
-{% include background_image.html %}
