@@ -8,7 +8,9 @@
     </div>
     <div class="Entry-date">
       <a href="{{ abs_url }}">{{ post.date | date: "%B %d, %Y" }}</a>
-      {% unless for_pinned %}
+      {% if for_pinned %}
+        &ndash; pinned
+      {% else %}
         &nbsp;
         <ul class="Tags">
           {% for tag in post.categories %}
@@ -20,7 +22,7 @@
             </li>
           {% endfor %}
         </ul>
-      {% endunless %}
+      {% endif %}
     </div>
   </header>
 

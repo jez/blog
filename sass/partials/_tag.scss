@@ -10,6 +10,10 @@
 
 .Tag {
   display: inline-block;
+}
+
+.Tag a {
+  display: inline-block;
   margin: 4px;
   padding: 2px 6px;
 
@@ -17,14 +21,11 @@
 
   background-color: lighten($base-color,60%);
   color: $white;
-  a {
-    color: $white;
-  }
-  cursor: pointer;
 
   @include font-rem($footer_fs);
   text-transform: uppercase;
   font-family: $caps-font;
+  line-height: normal;
 
   &:hover {
     background-color: lighten($base-color,50%);
@@ -35,7 +36,7 @@
   }
 }
 
-.Tag--hollow {
+.Tag--hollow a {
   margin-right: 4px;
 
   border: 2px solid lighten($base-color,60%);
@@ -48,9 +49,6 @@
   &:hover {
     background-color: lighten($base-color,60%);
     color: $white;
-    a {
-      color: $white;
-    }
   }
 }
 
