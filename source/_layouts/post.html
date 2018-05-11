@@ -12,7 +12,7 @@
 {% include entryheader.html %}
 
 <div id="main" role="main">
-  <div class="entry-content">
+  <article class="Post-content">
     {{ content }}
     <footer class="entry-meta">
       <span class="entry-tags">
@@ -27,13 +27,13 @@
       <span class="entry-date date published updated"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time></span>
       {% if page.modified %}<br>revised: <span class="entry-date date modified"><time datetime="{{ page.modified }}">{{ page.modified | date: "%B %d, %Y"  }}</time></span>{% endif %}
     </footer>
-  </div><!-- /.entry-content -->
+  </div>
   {% include readmore.html %}
-</div><!-- /#main -->
+</div>
 
 <div class="footer-wrapper">
   {% include footer.html %}
-</div><!-- /.footer-wrapper -->
+</div>
 
 </body>
 </html>

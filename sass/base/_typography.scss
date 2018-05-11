@@ -88,9 +88,14 @@ blockquote > *:first-child::before {
   left: -3.2rem;
 }
 
-// Footnotes
+// Post-content
 // --------------------------------------------------
-.entry-content .footnotes {
+.Post-content {
+  @include font-rem($p_fs);
+  @include line-height($p_lh);
+}
+
+.Post-content .footnotes {
   ol, li, p {
     @include font-rem($footer_fs);
     @include margin-after;

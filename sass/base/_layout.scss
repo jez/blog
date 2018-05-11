@@ -5,83 +5,77 @@ body {
   background-color: $body-color;
 }
 
-// Main
+// Post-specific
 // --------------------------------------------------
-.entry-content {
-  @include font-rem($p_fs);
-  @include line-height($p_lh);
+#post article {
+  background-color: $white;
 
-  .image-link img,
-  a img {
-    cursor: zoom-in;
-  }
+  margin: 40px 2px 20px 2px;
 
+  padding: 10px 15px;
   img.fullwidth {
     margin-left: -15px;
     margin-right: -15px;
     max-width: calc(100% + 30px);
-    @media #{$medium} {
+  }
+
+  @media #{$medium} {
+    margin-left: 10px;
+    margin-right: 10px;
+
+    padding: 20px 30px;
+    img.fullwidth {
       margin-left: -30px;
       margin-right: -30px;
       max-width: calc(100% + 60px);
     }
-    @media #{$large} {
+  }
+
+  @media #{$large} {
+    max-width: 675px;
+    margin: 50px auto 30px auto;
+
+    padding: 50px 80px;
+    img.fullwidth {
       margin-left: -80px;
       margin-right: -80px;
       max-width: calc(100% + 160px);
     }
+
+    > p:first-child {
+      @include font-rem($p1_fs);
+      @include line-height($p1_lh);
+      @include margin-after;
+      code {
+        font-size: 1.0rem;
+      }
+    }
   }
 }
 
-// Single Post
+// The stuff at the bottom of a post
 // --------------------------------------------------
 .entry-meta {
-	@include font-rem($footer_fs);
-	text-transform: uppercase;
-	font-family: $caps-font;
-	color: lighten($base-color,60%);
-	a {
-		color: lighten($base-color,60%);
-	}
+  margin: 50px 30px 30px;
+
+  color: lighten($base-color,60%);
+  a {
+    color: lighten($base-color,60%);
+  }
+
+  @include font-rem($footer_fs);
+  text-transform: uppercase;
+  text-align: center;
+  font-family: $caps-font;
+
   .entry-date {
     padding: 4px 0;
   }
 }
-#post {
-	.entry-content {
-		margin: 40px 2px 20px 2px;
-		padding: 10px 15px;
-		background-color: $white;
-		@media #{$medium} {
-			margin-left: 10px;
-			margin-right: 10px;
-			padding: 20px 30px;
-		}
-		@media #{$large} {
-			max-width: 675px;
-			margin: 50px auto 30px auto;
-			padding: 50px 80px;
-			> p:first-child {
-				@include font-rem($p1_fs);
-				@include line-height($p1_lh);
-				@include margin-after;
-				code {
-					font-size: 1.0rem;
-				}
-			}
-		}
-	}
-	.entry-meta {
-		margin: 50px 30px 30px;
-		text-align: center;
-	}
-	.header-title .entry-meta {
-		margin: 3px 0;
-	}
-}
+
 .entry-tags {
-	display: block;
-	margin-bottom: 6px;
+  display: block;
+  margin-bottom: 6px;
 }
 
 // Post Index
@@ -114,12 +108,13 @@ body {
 			padding: 40px 50px;
 		}
 	}
-  .pinned-divider {
-    border: 0.5px solid $border-color;
-    margin: 30px 0;
-    @media #{$medium} {
-      margin: 30px -30px;
-    }
+}
+
+.pinned-divider {
+  border: 0.5px solid $border-color;
+  margin: 30px 0;
+  @media #{$medium} {
+    margin: 30px -30px;
   }
 }
 
@@ -128,6 +123,23 @@ body {
 .footer-wrapper {
   margin-bottom: 40px;
   text-align: center;
+}
+
+// Extras (probably doesn't belong here)
+// --------------------------------------------------
+.image-link img,
+a img {
+  cursor: zoom-in;
+}
+
+hr {
+  display: block;
+  margin: 1em 0;
+  padding: 0;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #fff;
 }
 
 // Category, Archives
