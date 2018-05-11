@@ -12,46 +12,23 @@
 {% include entryheader.html %}
 
 <div id="main" role="main">
-  <article class="hentry">
-    <div class="entry-content">
-      {{ content }}
-      <footer class="entry-meta">
-        <span class="entry-tags">
-          <ul class="Tags">
-            {% for tag in page.categories %}
-              <li class="Tag">
-                <a href="{{ root_url }}/categories/#{{ tag | cgi_encode }}" title="Pages tagged {{ tag }}">{{ tag }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-        </span>
-        <span class="entry-date date published updated"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time></span>
-        {% if page.modified %}<br>revised: <span class="entry-date date modified"><time datetime="{{ page.modified }}">{{ page.modified | date: "%B %d, %Y"  }}</time></span>{% endif %}
-      </footer>
-    </div><!-- /.entry-content -->
-    {% if site.related_posts.size %}
-      <div class="read-more">
-        {% for post in site.related_posts limit:1 %}
-          <div class="read-more-header">
-            <a href="{{ root_url }}{{ post.url }}" class="Button">Read More</a>
-          </div><!-- /.read-more-header -->
-          <div class="read-more-content">
-            <h3><a href="{{ root_url }}{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></h3>
-            <p>{% if post.description %}{{ post.description }}{% else %}{{ post.content | strip_html | strip_newlines | truncate: 140 }}&hellip;{% endif %} <a href="{{ root_url }}{{ post.url }}"> Continue reading</a></p>
-          </div><!-- /.read-more-content -->
-        {% endfor %}
-        <div class="read-more-list">
-          {% for post in site.related_posts limit:2 offset:1 %}
-            <div class="list-item">
-              <h4><a href="{{ root_url }}{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></h4>
-              <span>Published on {{ post.date | date: "%B %d, %Y" }}</span>
-            </div><!-- /.list-item -->
+  <div class="entry-content">
+    {{ content }}
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          {% for tag in page.categories %}
+            <li class="Tag">
+              <a href="{{ root_url }}/categories/#{{ tag | cgi_encode }}" title="Pages tagged {{ tag }}">{{ tag }}</a>
+            </li>
           {% endfor %}
-        </div><!-- /.read-more-list -->
-      </div><!-- /.read-more -->
-    {% endif %}
-    {% if site.disqus_short_name and page.comments %}<section id="disqus_thread"></section><!-- /#disqus_thread -->{% endif %}
-  </article>
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time></span>
+      {% if page.modified %}<br>revised: <span class="entry-date date modified"><time datetime="{{ page.modified }}">{{ page.modified | date: "%B %d, %Y"  }}</time></span>{% endif %}
+    </footer>
+  </div><!-- /.entry-content -->
+  {% include readmore.html %}
 </div><!-- /#main -->
 
 <div class="footer-wrapper">
