@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2018-05-11T03:12:58-04:00</updated>
+  <updated>2018-05-31T19:44:11-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,156 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Prefer .then() over .catch()]]></title>
+    <link href="https://blog.jez.io/prefer-then-over-catch/"/>
+    <updated>2018-05-31T18:58:52-04:00</updated>
+    <id>https://blog.jez.io/prefer-then-over-catch</id>
+    <content type="html"><![CDATA[<p>When designing asynchronous APIs that could error in Flow, prefer using
+<code>.then</code> for both successful and failure cases. Flow exposes a relatively
+unsafe library definition for the <code>.catch</code> method, so it&rsquo;s best to avoid
+it if you can.</p>
+
+<!-- more -->
+
+
+<h2>Problem</h2>
+
+<p>What does this look like in practice? Say you&rsquo;re thinking about writing
+code that looks similar to this:</p>
+
+<figure class='code'><figcaption><span>Bad code; don&#8217;t do this</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// "Success" and "failure" types (definitions omitted)</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">type</span> <span class="p">{</span><span class="nx">OkResult</span><span class="p">,</span> <span class="nx">ErrResult</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'src/types'</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">doSomething</span> <span class="o">=</span> <span class="p">():</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">OkResult</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">new</span> <span class="nx">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// call resolve(...) when it worked, but</span>
+</span><span class='line'>    <span class="c1">// cal reject(...) when it failed.</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">doSomething</span>
+</span><span class='line'>  <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">...)</span>
+</span><span class='line'>  <span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">...)</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is okay code, but not great. Why? Because Flow won&rsquo;t prevent us
+from calling <code>reject(...)</code> with something that&rsquo;s <strong>not</strong> of type
+<code>ErrResult</code>, and it won&rsquo;t warn us when we try to use <code>err</code> incorrectly.
+Concretely, if we had this type definition:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">type</span> <span class="nx">ErrResult</span> <span class="o">=</span> <span class="nx">string</span><span class="p">;</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Flow wouldn&rsquo;t prevent us from doing this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// number, not a string!</span>
+</span><span class='line'><span class="nx">reject</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>nor from doing this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// boolean, not a string!</span>
+</span><span class='line'><span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">:</span> <span class="kr">boolean</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">...);</span></span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Solution</h2>
+
+<p>As mentioned, we can work around this by only using <code>resolve</code> and
+<code>.then</code>. For example, we can replace our code above with this:</p>
+
+<figure class='code'><figcaption><span>Better code than before</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Helper function for exhaustiveness.</span>
+</span><span class='line'><span class="c1">// See here: https://blog.jez.io/flow-exhaustiveness/</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span><span class="nx">absurd</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'src/absurd'</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">import</span> <span class="nx">type</span> <span class="p">{</span><span class="nx">OkResult</span><span class="p">,</span> <span class="nx">ErrResult</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'src/types'</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Use a union type to mean "success OR failure"</span>
+</span><span class='line'><span class="nx">type</span> <span class="nx">Result</span> <span class="o">=</span>
+</span><span class='line'>  <span class="o">|</span> <span class="p">{</span><span class="o">|</span><span class="na">tag</span><span class="p">:</span> <span class="s1">'ok'</span><span class="p">,</span> <span class="na">val</span><span class="p">:</span> <span class="nx">OkResult</span><span class="o">|</span><span class="p">}</span>
+</span><span class='line'>  <span class="o">|</span> <span class="p">{</span><span class="o">|</span><span class="na">tag</span><span class="p">:</span> <span class="s1">'err'</span><span class="p">,</span> <span class="na">val</span><span class="p">:</span> <span class="nx">ErrResult</span><span class="o">|</span><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//     Use our new union type ──┐</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">doSomething</span> <span class="o">=</span> <span class="p">():</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">Result</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">new</span> <span class="nx">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// call resolve({tag: 'ok',  val: ...}) when it worked, and</span>
+</span><span class='line'>    <span class="c1">// call resolve({tag: 'err', val: ...}) when it failed</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">doSomething</span>
+</span><span class='line'>  <span class="c1">// Use a switch statement in the result:</span>
+</span><span class='line'>  <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">switch</span> <span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">tag</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">'ok'</span><span class="p">:</span>
+</span><span class='line'>        <span class="c1">// ...</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">'err'</span><span class="p">:</span>
+</span><span class='line'>        <span class="c1">// ...</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>      <span class="nl">default</span><span class="p">:</span>
+</span><span class='line'>        <span class="c1">// Guarantees we covered all cases.</span>
+</span><span class='line'>        <span class="nx">absurd</span><span class="p">(</span><span class="nx">res</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">})</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>There&rsquo;s a lot of benefits in this newer code:</p>
+
+<ul>
+<li><p>Using <code>resolve</code> is much safer than <code>reject</code>. Flow will always warn us
+if we call <code>resolve</code> with an improperly-typed input.</p></li>
+<li><p>Using <code>.then</code> is the same. Flow will warn for improper usage, <strong>and</strong>
+even correctly infer the type of <code>res</code> in our handler.</p></li>
+<li><p>We got exhaustiveness as a bonus. We now handle all errors, whereas
+before it was easy to forget to include a <code>.catch</code>.</p></li>
+</ul>
+
+
+<h2>Caveats</h2>
+
+<p>Of course, there are some times when the you&rsquo;re interfacing with code
+not under your control that exposes critical functionality over
+<code>.catch</code>. In these cases, it&rsquo;s not an option to just &ldquo;not use <code>.catch</code>&rdquo;.
+Instead, you have two options.</p>
+
+<p>If you trust that the library you&rsquo;re using will never &ldquo;misbehave&rdquo;,
+you can ascribe a narrow type to the <code>.catch</code> callback function:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// If I know that throwNumber will always call `reject` with a</span>
+</span><span class='line'><span class="c1">// number, I can stop the loose types from propagating further</span>
+</span><span class='line'><span class="c1">// with an explicit annotation:</span>
+</span><span class='line'><span class="nx">throwNumber</span>
+</span><span class='line'>  <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Didn't throw!"</span><span class="p">))</span>
+</span><span class='line'>  <span class="c1">//         ┌── explicit annotation</span>
+</span><span class='line'>  <span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">n</span><span class="p">:</span> <span class="nx">number</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">handleWhenRejected</span><span class="p">(</span><span class="nx">n</span><span class="p">))</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you aren&rsquo;t comfortable putting this much trust in the API, you
+should instead ascribe <code>mixed</code> to the result of the callback.</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">throwNumber</span>
+</span><span class='line'>  <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Didn't throw!"</span><span class="p">))</span>
+</span><span class='line'>  <span class="c1">//         ┌── defensive annotation</span>
+</span><span class='line'>  <span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">n</span><span class="p">:</span> <span class="nx">mixed</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">n</span> <span class="o">===</span> <span class="s1">'number'</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">handleWhenRejected</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// Reports misbehavior to an imaginary observability service</span>
+</span><span class='line'>      <span class="nx">tracker</span><span class="p">.</span><span class="nx">increment</span><span class="p">(</span><span class="s1">'throwNumber.unexpected_input'</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span></span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- vim:tw=72
+-->
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Union Types in Flow & Reason]]></title>
@@ -3846,62 +3996,6 @@ dotfiles, which are <a href="https://github.com/jez/dotfiles">also on GitHub</a>
 and I&rsquo;m pretty fond of them if I do say so myself. You might want to read
 <a href="http://blog.jez.io/2015/03/10/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a> if you&rsquo;re looking for a quick overview of some
 snippets and features I&rsquo;ve collected into my dotfiles.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Leaking Free Disk Space]]></title>
-    <link href="https://blog.jez.io/2015/08/03/leaking-free-disk-space/"/>
-    <updated>2015-08-03T03:05:31-04:00</updated>
-    <id>https://blog.jez.io/2015/08/03/leaking-free-disk-space</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve been watching a disk space leakage creep slowly upwards for months now;
-finally, I figured out where it was going!</p>
-
-<!-- more -->
-
-
-<p>Whenever I set up a VPS, I follow Brian Kennedy&rsquo;s excellent <a href="http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers">My First 5 Minutes
-On A Server; Or, Essential Security for Linux Servers</a>. It covers
-setting up a number of initial tools that make server administration much
-easier:</p>
-
-<ul>
-<li>fail2ban, for blocking suspicious log in activity</li>
-<li>setting up a non-root user</li>
-<li>ufw, a simple firewall program</li>
-<li>unattended-upgrades, which installs security upgrades periodically</li>
-<li>logwatch, so you can read a digest of what&rsquo;s happened in your logs</li>
-</ul>
-
-
-<p>Ever since I set up my VPS, I&rsquo;d seen the disk space creep up in the daily
-logwatch digest. I had looked a few times and figured it must be related to some
-sort of misconfiguration of the Ruby app server I have running on it right now.</p>
-
-<p>Recently, it got up to more than half of my disk space gone. For a VPS that I
-used maybe twice a month, this was ridiculous. I investigated once more and
-finally came up with the culprit: <code>unattended-upgrades</code> wasn&rsquo;t autoremoving
-packages. I had gigabytes worth of packages that could be autoremoved.</p>
-
-<h2>Solution</h2>
-
-<p>There&rsquo;s a one-line config file fix. Add this to
-/etc/apt/apt.conf.d/50unattended-upgrades:</p>
-
-<figure class='code'><figcaption><span>/etc/apt/apt.conf.d/50unattended-upgrades</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>...
-</span><span class='line'>// Do automatic removal of new unused dependencies after the upgrade
-</span><span class='line'>// (equivalent to apt-get autoremove)
-</span><span class='line'>Unattended-Upgrade::Remove-Unused-Dependencies "true";
-</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Update: It looks like a bug in unattented-upgrades is <a href="https://bugs.launchpad.net/ubuntu/+source/unattended-upgrades/+bug/1267059">preventing it from
-automatically removing header packages</a>. For the time being you will have
-to either manually auto-remove these packages, or add <code>sudo apt-get autoremove
--y</code> to your crontab.</p>
-
-<p>Update: The bug has been addressed and closed. It now correctly removes header
-packages!</p>
 ]]></content>
   </entry>
   

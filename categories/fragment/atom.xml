@@ -4,7 +4,7 @@
   <title><![CDATA[Category: fragment | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/fragment/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2018-05-11T03:12:58-04:00</updated>
+  <updated>2018-05-31T19:44:11-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,154 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Prefer .then() over .catch()]]></title>
+    <link href="https://blog.jez.io/prefer-then-over-catch/"/>
+    <updated>2018-05-31T18:58:52-04:00</updated>
+    <id>https://blog.jez.io/prefer-then-over-catch</id>
+    <content type="html"><![CDATA[<p>When designing asynchronous APIs that could error in Flow, prefer using
+<code>.then</code> for both successful and failure cases. Flow exposes a relatively
+unsafe library definition for the <code>.catch</code> method, so it&rsquo;s best to avoid
+it if you can.</p>
+
+<!-- more -->
+
+
+<h2>Problem</h2>
+
+<p>What does this look like in practice? Say you&rsquo;re thinking about writing
+code that looks similar to this:</p>
+
+<pre><code class="js Bad code; don't do this">// "Success" and "failure" types (definitions omitted)
+import type {OkResult, ErrResult} from 'src/types';
+
+const doSomething = (): Promise&lt;OkResult&gt; =&gt; {
+  return new Promise((resolve, reject) =&gt; {
+    // call resolve(...) when it worked, but
+    // cal reject(...) when it failed.
+  });
+};
+
+doSomething
+  .then((res) =&gt; ...)
+  .catch((err) =&gt; ...)
+</code></pre>
+
+<p>This is okay code, but not great. Why? Because Flow won&rsquo;t prevent us
+from calling <code>reject(...)</code> with something that&rsquo;s <strong>not</strong> of type
+<code>ErrResult</code>, and it won&rsquo;t warn us when we try to use <code>err</code> incorrectly.
+Concretely, if we had this type definition:</p>
+
+<pre><code class="js">type ErrResult = string;
+</code></pre>
+
+<p>Flow wouldn&rsquo;t prevent us from doing this:</p>
+
+<pre><code class="js">// number, not a string!
+reject(42);
+</code></pre>
+
+<p>nor from doing this:</p>
+
+<pre><code class="js">// boolean, not a string!
+.catch((err: boolean) =&gt; ...);
+</code></pre>
+
+<h2>Solution</h2>
+
+<p>As mentioned, we can work around this by only using <code>resolve</code> and
+<code>.then</code>. For example, we can replace our code above with this:</p>
+
+<pre><code class="js Better code than before">// Helper function for exhaustiveness.
+// See here: https://blog.jez.io/flow-exhaustiveness/
+import {absurd} from 'src/absurd';
+
+import type {OkResult, ErrResult} from 'src/types';
+
+// Use a union type to mean "success OR failure"
+type Result =
+  | {|tag: 'ok', val: OkResult|}
+  | {|tag: 'err', val: ErrResult|};
+
+//     Use our new union type ──┐
+const doSomething = (): Promise&lt;Result&gt; =&gt; {
+  return new Promise((resolve, reject) =&gt; {
+    // call resolve({tag: 'ok',  val: ...}) when it worked, and
+    // call resolve({tag: 'err', val: ...}) when it failed
+  });
+};
+
+doSomething
+  // Use a switch statement in the result:
+  .then((res) =&gt; {
+    switch (res.tag) {
+      case 'ok':
+        // ...
+        break;
+      case 'err':
+        // ...
+        break;
+      default:
+        // Guarantees we covered all cases.
+        absurd(res);
+        break;
+    }
+  })
+</code></pre>
+
+<p>There&rsquo;s a lot of benefits in this newer code:</p>
+
+<ul>
+<li><p>Using <code>resolve</code> is much safer than <code>reject</code>. Flow will always warn us
+if we call <code>resolve</code> with an improperly-typed input.</p></li>
+<li><p>Using <code>.then</code> is the same. Flow will warn for improper usage, <strong>and</strong>
+even correctly infer the type of <code>res</code> in our handler.</p></li>
+<li><p>We got exhaustiveness as a bonus. We now handle all errors, whereas
+before it was easy to forget to include a <code>.catch</code>.</p></li>
+</ul>
+
+
+<h2>Caveats</h2>
+
+<p>Of course, there are some times when the you&rsquo;re interfacing with code
+not under your control that exposes critical functionality over
+<code>.catch</code>. In these cases, it&rsquo;s not an option to just &ldquo;not use <code>.catch</code>&rdquo;.
+Instead, you have two options.</p>
+
+<p>If you trust that the library you&rsquo;re using will never &ldquo;misbehave&rdquo;,
+you can ascribe a narrow type to the <code>.catch</code> callback function:</p>
+
+<pre><code class="js">// If I know that throwNumber will always call `reject` with a
+// number, I can stop the loose types from propagating further
+// with an explicit annotation:
+throwNumber
+  .then(() =&gt; console.log("Didn't throw!"))
+  //         ┌── explicit annotation
+  .catch((n: number) =&gt; handleWhenRejected(n))
+</code></pre>
+
+<p>If you aren&rsquo;t comfortable putting this much trust in the API, you
+should instead ascribe <code>mixed</code> to the result of the callback.</p>
+
+<pre><code class="js">throwNumber
+  .then(() =&gt; console.log("Didn't throw!"))
+  //         ┌── defensive annotation
+  .catch((n: mixed) =&gt; {
+    if (typeof n === 'number') {
+      handleWhenRejected(n);
+    } else {
+      // Reports misbehavior to an imaginary observability service
+      tracker.increment('throwNumber.unexpected_input');
+    }
+  });
+</code></pre>
+
+<!-- vim:tw=72
+-->
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Lenses & Composition]]></title>
