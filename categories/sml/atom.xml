@@ -4,7 +4,7 @@
   <title><![CDATA[Category: sml | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/sml/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2018-05-31T19:44:11-04:00</updated>
+  <updated>2018-07-19T14:34:01-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,204 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Concurrent Programming in ML: A Race]]></title>
+    <link href="https://blog.jez.io/cpml-race/"/>
+    <updated>2018-07-18T00:23:23-04:00</updated>
+    <id>https://blog.jez.io/cpml-race</id>
+    <content type="html"><![CDATA[<p>Lately I&rsquo;ve been super interested in language models for concurrency,
+after hearing a fascinating talk from on <a href="https://medium.com/@asolove/synchronizable-abstractions-for-understandable-concurrency-64ae57cd61d1">synchronizable abstractions for
+UI</a>.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> Ever since, I&rsquo;ve been working my way through a handful
+of books, including <a href="https://simonmar.github.io/pages/pcph.html">PCPH</a>, the Concurrency section of <a href="http://www.cs.cmu.edu/~rwh/pfpl.html">PFPL</a>, and most
+recently <a href="http://www.cambridge.org/gb/academic/subjects/computer-science/distributed-networked-and-mobile-computing/concurrent-programming-ml?format=AR">Concurrent Programming in ML</a>, by John Reppy.</p>
+
+<h2>Setup: Snippets from the Book</h2>
+
+<p>In particular, I want to call attention to what I think is a race
+condition in one of the code listings for Concurrent Programming in ML.
+The problem is that some of the data isn&rsquo;t protected by a lock, which
+can lead to a stale read and incorrect behavior. Here&rsquo;s the listing, in
+full.</p>
+
+<pre><code class="sml Concurrent Programming in ML, Listing 2.3">datatype 'a buffer = BUF of {
+  data      : 'a option ref,
+  mu        : mutex,
+  dataAvail : condition,
+  dataEmpty : condition
+}
+
+fun buffer () =
+  let val mu = mutex() in
+    BUF {
+      data      = ref NONE,
+      mu        = mu,
+      dataAvail = condition mu,
+      dataEmpty = condition mu
+    }
+  end
+
+fun insert (BUF {data, mu, dataAvail, dataEmpty}, v) =
+  let
+    fun waitLp NONE = (data := SOME v; signal dataAvail)
+      | waitLp (SOME v) = (wait dataEmpty; waitLp (!data))
+  in
+    withLock mu waitLp (!data)
+  end
+
+fun remove (BUF {data, mu, dataAvail, dataEmpty}) =
+  let
+    fun waitLp NONE = (wait dataAvail; waitLp (!data))
+      | waitLp (SOME v) = (data := NONE; signal dataEmpty)
+  in
+    withLock mu waitLp (!data)
+  end
+</code></pre>
+
+<p>You might also want to reference this snippet about how condition
+variables work definitions:</p>
+
+<blockquote><p>The semantics of the expression</p>
+
+<p><code>withLock mu f x</code></p>
+
+<p>are that first the lock mu is acquired, then the function f is applied
+to x, and then the function&rsquo;s result is returned after releasing the
+lock.</p>
+
+<p>The basic operations on condition variables are</p>
+
+<p><code>val wait : condition -&gt; unit</code></p>
+
+<p>which causes a process to block on the condition variable, and</p>
+
+<p><code>val signal : condition -&gt; unit</code></p>
+
+<p>which wakes up one waiting process. A condition variable is associated
+with a specific mutex lock, which must be held when performing a wait
+operation on the variable. The semantics of the wait operation are
+that the mutex lock is released, and then the process is blocked; when
+the condition is signaled, the next process in the condition&rsquo;s waiting
+queue is unblocked and it reacquires the mutex lock and proceeds. A
+signal operation on a condition variable that has an empty waiting
+queue has no effect; in this sense condition variables are memoryless.</p>
+
+<p>&mdash; <em>Concurrent Programming in ML</em>, section 2.4.2</p></blockquote>
+
+<p>Study the snippet and definitions above for a while, and see if you can
+spot the same race, or are convinced the code is correct.</p>
+
+<h2>A trace to expose the problem</h2>
+
+<p>The problem I see has to do with SML&rsquo;s eager evaluation: before calling
+a function <code>f e</code>, we evaluate <code>e</code> to a value <code>v</code>. Then substitution
+kicks in and we substitute <code>v</code> into the function body of <code>f</code>. For us,
+that means that in the definition of <code>insert</code>:</p>
+
+<pre><code class="sml">withLock mu waitLp (!data)
+</code></pre>
+
+<p>we evaluate <code>!data</code> to a value, i.e., <code>NONE</code> before we run the body of
+<code>withLock</code>, which locks on <code>mu</code>. Here&rsquo;s a sample trace of a program
+allocating a buffer and then operating on it concurrently:</p>
+
+<pre><code class="sml Sample trace, showing that first insert gets dropped">(* new initial, empty buffer *)
+let buf = buffer ()
+
+(* fork two threads, both have access to 'buf' *)
+
+(* thread 1 *)                       (* thread 2 *)
+insert buf 1                         insert buf 2
+withLock mu waitLp (!data)           withLock mu waitLp (!data)
+(* No lock on (!data) so both deref, and both see NONE *)
+withLock mu waitLp NONE              withLock mu waitLp NONE
+
+(* thread 1 acquires lock *)
+waitLp NONE
+(data := SOME v; signal dataAvail)
+(data := SOME 1; signal dataAvail)
+(* ==&gt; data = ref (SOME 1) *)
+((); signal dataAvail)
+signal dataAvail
+()
+(* thread 1 releases lock *)
+
+                                     (* thread 2 acquires lock *)
+                                     (* we evaluated !data before lock! *)
+                                     (* NONE is now stale! *)
+                                     waitLp NONE
+                                     (* selects wrong case in function *)
+                                     (data := SOME v; signal dataAvail)
+                                     (data := SOME 2; signal dataAvail)
+                                     (* ==&gt; data = ref (SOME 2) *)
+                                     ((); signal dataAvail)
+                                     signal dataAvail
+                                     ()
+</code></pre>
+
+<p>Notice how we allowed two insert operations to happen consecutively.
+This shouldn&rsquo;t be allowed: the second insert overwrites the first
+because our &ldquo;buffer&rdquo; has size 1. Note how the first thread inserts <code>SOME
+1</code>, and this value is discarded in favor of <code>SOME 2</code> when the next
+thread wakes up. Instead, the second insert should block, because it
+sees that the buffer is full. Since we had a stale read, it doesn&rsquo;t see
+that the buffer became full.</p>
+
+<h2>Fixing the stale read</h2>
+
+<p>The solution to this is just to delay the <code>!data</code> until the body of the
+<code>waitLp</code> function, which ensures that we can&rsquo;t read a stale value for
+the content of the buffer.</p>
+
+<pre><code class="sml Listing 2.3, updated to avoid race">datatype 'a buffer = (* ··· *)
+fun buffer () = (* ··· *)
+
+fun insert (BUF {data, mu, dataAvail, dataEmpty}, v) =
+  let
+    (* !data is now within waitLp, so it's never stale. *)
+    fun waitLp () =
+      case !data
+        of NONE =&gt; (data := SOME v; signal dataAvail)
+         | SOME v =&gt; (wait dataEmpty; waitLp ())
+  in
+    withLock mu waitLp ()
+  end
+
+fun remove (BUF {data, mu, dataAvail, dataEmpty}) =
+  let
+    fun waitLp () =
+      case !data
+        of NONE =&gt; (wait dataAvail; waitLp ())
+         | SOME v =&gt; (data := NONE; signal dataEmpty)
+  in
+    withLock mu waitLp ()
+  end
+</code></pre>
+
+<p>Pretty small bug, and it doesn&rsquo;t detract from the main point of the
+listing, which is to show how to use condition variables in a sort of
+&ldquo;mutually recursive&rdquo; style where <code>dataEmpty</code> wakes up <code>insert</code> which
+signals on <code>dataAvail</code> which wakes up <code>remove</code>.</p>
+
+<p>This also underscores how difficult concurrency really is to ensure
+correctness! That&rsquo;s exactly why I&rsquo;ve been reading about all these
+language models for concurrency, to better understand how we can
+leverage our programming language to ensure our programs are correct by
+construction.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Unfortunately, the talk isn&rsquo;t online (Adam presented it at work), so the blog post linked above is the next best thing!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[System Fω and Parameterization]]></title>

@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Concurrent Programming in ML: A Race - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="I want to call attention to what I think is a race condition in one of the code listings in the book "Concurrent Programming in ML". The problem is &hellip;">
+
+<meta name="keywords" content="sml concurrency ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/cpml-race">
+<meta property="og:title" content="Concurrent Programming in ML: A Race">
+<meta property="og:description" content="I want to call attention to what I think is a race condition in one of the code listings in the book "Concurrent Programming in ML". The problem is &hellip;">
+<meta property="og:image" content="">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/cpml-race">
+<link href="/favicon.png" rel="icon">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Concurrent Programming in ML: A Race</h1>
+  <h2 class="EntryHeader-subtitle">July 18, 2018</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <p>Lately I&rsquo;ve been super interested in language models for concurrency,
+after hearing a fascinating talk from on <a href="https://medium.com/@asolove/synchronizable-abstractions-for-understandable-concurrency-64ae57cd61d1">synchronizable abstractions for
+UI</a>.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> Ever since, I&rsquo;ve been working my way through a handful
+of books, including <a href="https://simonmar.github.io/pages/pcph.html">PCPH</a>, the Concurrency section of <a href="http://www.cs.cmu.edu/~rwh/pfpl.html">PFPL</a>, and most
+recently <a href="http://www.cambridge.org/gb/academic/subjects/computer-science/distributed-networked-and-mobile-computing/concurrent-programming-ml?format=AR">Concurrent Programming in ML</a>, by John Reppy.</p>
+
+<h2>Setup: Snippets from the Book</h2>
+
+<p>In particular, I want to call attention to what I think is a race
+condition in one of the code listings for Concurrent Programming in ML.
+The problem is that some of the data isn&rsquo;t protected by a lock, which
+can lead to a stale read and incorrect behavior. Here&rsquo;s the listing, in
+full.</p>
+
+<figure class='code'><figcaption><span>Concurrent Programming in ML, Listing 2.3</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">datatype</span> <span class="nd">'a</span> <span class="kt">buffer</span> <span class="p">=</span> <span class="nc">BUF</span> <span class="kr">of</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">data</span>      <span class="p">:</span> <span class="nd">'a</span> <span class="n">option</span> <span class="n">ref</span><span class="p">,</span>
+</span><span class='line'>  <span class="n">mu</span>        <span class="p">:</span> <span class="n">mutex</span><span class="p">,</span>
+</span><span class='line'>  <span class="n">dataAvail</span> <span class="p">:</span> <span class="n">condition</span><span class="p">,</span>
+</span><span class='line'>  <span class="n">dataEmpty</span> <span class="p">:</span> <span class="n">condition</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">fun</span> <span class="n">buffer</span> <span class="p">()</span> <span class="p">=</span>
+</span><span class='line'>  <span class="kr">let</span> <span class="kr">val</span> <span class="n">mu</span> <span class="p">=</span> <span class="n">mutex</span><span class="p">()</span> <span class="kr">in</span>
+</span><span class='line'>    <span class="n">BUF</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">data</span>      <span class="p">=</span> <span class="n">ref</span> <span class="n">NONE</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">mu</span>        <span class="p">=</span> <span class="n">mu</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">dataAvail</span> <span class="p">=</span> <span class="n">condition</span> <span class="n">mu</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">dataEmpty</span> <span class="p">=</span> <span class="n">condition</span> <span class="n">mu</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="kr">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">fun</span> <span class="n">insert</span> <span class="p">(</span><span class="n">BUF</span> <span class="p">{</span><span class="n">data</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">dataAvail</span><span class="p">,</span> <span class="n">dataEmpty</span><span class="p">},</span> <span class="n">v</span><span class="p">)</span> <span class="p">=</span>
+</span><span class='line'>  <span class="kr">let</span>
+</span><span class='line'>    <span class="kr">fun</span> <span class="n">waitLp</span> <span class="n">NONE</span> <span class="p">=</span> <span class="p">(</span><span class="n">data</span> <span class="n">:=</span> <span class="n">SOME</span> <span class="n">v</span><span class="p">;</span> <span class="n">signal</span> <span class="n">dataAvail</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">|</span> <span class="nc">waitLp</span> <span class="p">(</span><span class="n">SOME</span> <span class="n">v</span><span class="p">)</span> <span class="p">=</span> <span class="p">(</span><span class="n">wait</span> <span class="n">dataEmpty</span><span class="p">;</span> <span class="n">waitLp</span> <span class="p">(</span><span class="n">!data</span><span class="p">))</span>
+</span><span class='line'>  <span class="kr">in</span>
+</span><span class='line'>    <span class="n">withLock</span> <span class="n">mu</span> <span class="n">waitLp</span> <span class="p">(</span><span class="n">!data</span><span class="p">)</span>
+</span><span class='line'>  <span class="kr">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">fun</span> <span class="n">remove</span> <span class="p">(</span><span class="n">BUF</span> <span class="p">{</span><span class="n">data</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">dataAvail</span><span class="p">,</span> <span class="n">dataEmpty</span><span class="p">})</span> <span class="p">=</span>
+</span><span class='line'>  <span class="kr">let</span>
+</span><span class='line'>    <span class="kr">fun</span> <span class="n">waitLp</span> <span class="n">NONE</span> <span class="p">=</span> <span class="p">(</span><span class="n">wait</span> <span class="n">dataAvail</span><span class="p">;</span> <span class="n">waitLp</span> <span class="p">(</span><span class="n">!data</span><span class="p">))</span>
+</span><span class='line'>      <span class="p">|</span> <span class="nc">waitLp</span> <span class="p">(</span><span class="n">SOME</span> <span class="n">v</span><span class="p">)</span> <span class="p">=</span> <span class="p">(</span><span class="n">data</span> <span class="n">:=</span> <span class="n">NONE</span><span class="p">;</span> <span class="n">signal</span> <span class="n">dataEmpty</span><span class="p">)</span>
+</span><span class='line'>  <span class="kr">in</span>
+</span><span class='line'>    <span class="n">withLock</span> <span class="n">mu</span> <span class="n">waitLp</span> <span class="p">(</span><span class="n">!data</span><span class="p">)</span>
+</span><span class='line'>  <span class="kr">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>You might also want to reference this snippet about how condition
+variables work definitions:</p>
+
+<blockquote><p>The semantics of the expression</p>
+
+<p><code>withLock mu f x</code></p>
+
+<p>are that first the lock mu is acquired, then the function f is applied
+to x, and then the function&rsquo;s result is returned after releasing the
+lock.</p>
+
+<p>The basic operations on condition variables are</p>
+
+<p><code>val wait : condition -&gt; unit</code></p>
+
+<p>which causes a process to block on the condition variable, and</p>
+
+<p><code>val signal : condition -&gt; unit</code></p>
+
+<p>which wakes up one waiting process. A condition variable is associated
+with a specific mutex lock, which must be held when performing a wait
+operation on the variable. The semantics of the wait operation are
+that the mutex lock is released, and then the process is blocked; when
+the condition is signaled, the next process in the condition&rsquo;s waiting
+queue is unblocked and it reacquires the mutex lock and proceeds. A
+signal operation on a condition variable that has an empty waiting
+queue has no effect; in this sense condition variables are memoryless.</p>
+
+<p>&mdash; <em>Concurrent Programming in ML</em>, section 2.4.2</p></blockquote>
+
+<p>Study the snippet and definitions above for a while, and see if you can
+spot the same race, or are convinced the code is correct.</p>
+
+<h2>A trace to expose the problem</h2>
+
+<p>The problem I see has to do with SML&rsquo;s eager evaluation: before calling
+a function <code>f e</code>, we evaluate <code>e</code> to a value <code>v</code>. Then substitution
+kicks in and we substitute <code>v</code> into the function body of <code>f</code>. For us,
+that means that in the definition of <code>insert</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="n">withLock</span> <span class="n">mu</span> <span class="n">waitLp</span> <span class="p">(</span><span class="n">!data</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>we evaluate <code>!data</code> to a value, i.e., <code>NONE</code> before we run the body of
+<code>withLock</code>, which locks on <code>mu</code>. Here&rsquo;s a sample trace of a program
+allocating a buffer and then operating on it concurrently:</p>
+
+<figure class='code'><figcaption><span>Sample trace, showing that first insert gets dropped</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="c">(*</span><span class="cm"> new initial, empty buffer *)</span>
+</span><span class='line'> <span class="n">buf</span> <span class="p">=</span> <span class="n">buffer</span> <span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">(*</span><span class="cm"> fork two threads, both have access to 'buf' *)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">(*</span><span class="cm"> thread 1 *)</span>                       <span class="c">(*</span><span class="cm"> thread 2 *)</span>
+</span><span class='line'><span class="n">insert</span> <span class="n">buf</span> <span class="mi">1</span>                         <span class="n">insert</span> <span class="n">buf</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">withLock</span> <span class="n">mu</span> <span class="n">waitLp</span> <span class="p">(</span><span class="n">!data</span><span class="p">)</span>           <span class="n">withLock</span> <span class="n">mu</span> <span class="n">waitLp</span> <span class="p">(</span><span class="n">!data</span><span class="p">)</span>
+</span><span class='line'><span class="c">(*</span><span class="cm"> No lock on (!data) so both deref, and both see NONE *)</span>
+</span><span class='line'><span class="n">withLock</span> <span class="n">mu</span> <span class="n">waitLp</span> <span class="n">NONE</span>              <span class="n">withLock</span> <span class="n">mu</span> <span class="n">waitLp</span> <span class="n">NONE</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">(*</span><span class="cm"> thread 1 acquires lock *)</span>
+</span><span class='line'><span class="n">waitLp</span> <span class="n">NONE</span>
+</span><span class='line'><span class="p">(</span><span class="n">data</span> <span class="n">:=</span> <span class="n">SOME</span> <span class="n">v</span><span class="p">;</span> <span class="n">signal</span> <span class="n">dataAvail</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="n">data</span> <span class="n">:=</span> <span class="n">SOME</span> <span class="mi">1</span><span class="p">;</span> <span class="n">signal</span> <span class="n">dataAvail</span><span class="p">)</span>
+</span><span class='line'><span class="c">(*</span><span class="cm"> ==&gt; data = ref (SOME 1) *)</span>
+</span><span class='line'><span class="p">(();</span> <span class="n">signal</span> <span class="n">dataAvail</span><span class="p">)</span>
+</span><span class='line'><span class="n">signal</span> <span class="n">dataAvail</span>
+</span><span class='line'><span class="p">()</span>
+</span><span class='line'><span class="c">(*</span><span class="cm"> thread 1 releases lock *)</span>
+</span><span class='line'>
+</span><span class='line'>                                     <span class="c">(*</span><span class="cm"> thread 2 acquires lock *)</span>
+</span><span class='line'>                                     <span class="c">(*</span><span class="cm"> we evaluated !data before lock! *)</span>
+</span><span class='line'>                                     <span class="c">(*</span><span class="cm"> NONE is now stale! *)</span>
+</span><span class='line'>                                     <span class="n">waitLp</span> <span class="n">NONE</span>
+</span><span class='line'>                                     <span class="c">(*</span><span class="cm"> selects wrong case in function *)</span>
+</span><span class='line'>                                     <span class="p">(</span><span class="n">data</span> <span class="n">:=</span> <span class="n">SOME</span> <span class="n">v</span><span class="p">;</span> <span class="n">signal</span> <span class="n">dataAvail</span><span class="p">)</span>
+</span><span class='line'>                                     <span class="p">(</span><span class="n">data</span> <span class="n">:=</span> <span class="n">SOME</span> <span class="mi">2</span><span class="p">;</span> <span class="n">signal</span> <span class="n">dataAvail</span><span class="p">)</span>
+</span><span class='line'>                                     <span class="c">(*</span><span class="cm"> ==&gt; data = ref (SOME 2) *)</span>
+</span><span class='line'>                                     <span class="p">(();</span> <span class="n">signal</span> <span class="n">dataAvail</span><span class="p">)</span>
+</span><span class='line'>                                     <span class="n">signal</span> <span class="n">dataAvail</span>
+</span><span class='line'>                                     <span class="p">()</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Notice how we allowed two insert operations to happen consecutively.
+This shouldn&rsquo;t be allowed: the second insert overwrites the first
+because our &ldquo;buffer&rdquo; has size 1. Note how the first thread inserts <code>SOME
+1</code>, and this value is discarded in favor of <code>SOME 2</code> when the next
+thread wakes up. Instead, the second insert should block, because it
+sees that the buffer is full. Since we had a stale read, it doesn&rsquo;t see
+that the buffer became full.</p>
+
+<h2>Fixing the stale read</h2>
+
+<p>The solution to this is just to delay the <code>!data</code> until the body of the
+<code>waitLp</code> function, which ensures that we can&rsquo;t read a stale value for
+the content of the buffer.</p>
+
+<figure class='code'><figcaption><span>Listing 2.3, updated to avoid race</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">datatype</span> <span class="nd">'a</span> <span class="kt">buffer</span> <span class="p">=</span> <span class="c">(*</span><span class="cm"> ··· *)</span>
+</span><span class='line'><span class="nc">fun</span> <span class="n">buffer</span> <span class="p">()</span> <span class="p">=</span> <span class="c">(*</span><span class="cm"> ··· *)</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">fun</span> <span class="n">insert</span> <span class="p">(</span><span class="n">BUF</span> <span class="p">{</span><span class="n">data</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">dataAvail</span><span class="p">,</span> <span class="n">dataEmpty</span><span class="p">},</span> <span class="n">v</span><span class="p">)</span> <span class="p">=</span>
+</span><span class='line'>  <span class="kr">let</span>
+</span><span class='line'>    <span class="c">(*</span><span class="cm"> !data is now within waitLp, so it's never stale. *)</span>
+</span><span class='line'>    <span class="kr">fun</span> <span class="n">waitLp</span> <span class="p">()</span> <span class="p">=</span>
+</span><span class='line'>      <span class="kr">case</span> <span class="n">!data</span>
+</span><span class='line'>        <span class="kr">of</span> <span class="n">NONE</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="n">data</span> <span class="n">:=</span> <span class="n">SOME</span> <span class="n">v</span><span class="p">;</span> <span class="n">signal</span> <span class="n">dataAvail</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">|</span> <span class="nc">SOME</span> <span class="n">v</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="n">wait</span> <span class="n">dataEmpty</span><span class="p">;</span> <span class="n">waitLp</span> <span class="p">())</span>
+</span><span class='line'>  <span class="kr">in</span>
+</span><span class='line'>    <span class="n">withLock</span> <span class="n">mu</span> <span class="n">waitLp</span> <span class="p">()</span>
+</span><span class='line'>  <span class="kr">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">fun</span> <span class="n">remove</span> <span class="p">(</span><span class="n">BUF</span> <span class="p">{</span><span class="n">data</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">dataAvail</span><span class="p">,</span> <span class="n">dataEmpty</span><span class="p">})</span> <span class="p">=</span>
+</span><span class='line'>  <span class="kr">let</span>
+</span><span class='line'>    <span class="kr">fun</span> <span class="n">waitLp</span> <span class="p">()</span> <span class="p">=</span>
+</span><span class='line'>      <span class="kr">case</span> <span class="n">!data</span>
+</span><span class='line'>        <span class="kr">of</span> <span class="n">NONE</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="n">wait</span> <span class="n">dataAvail</span><span class="p">;</span> <span class="n">waitLp</span> <span class="p">())</span>
+</span><span class='line'>         <span class="p">|</span> <span class="nc">SOME</span> <span class="n">v</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="n">data</span> <span class="n">:=</span> <span class="n">NONE</span><span class="p">;</span> <span class="n">signal</span> <span class="n">dataEmpty</span><span class="p">)</span>
+</span><span class='line'>  <span class="kr">in</span>
+</span><span class='line'>    <span class="n">withLock</span> <span class="n">mu</span> <span class="n">waitLp</span> <span class="p">()</span>
+</span><span class='line'>  <span class="kr">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Pretty small bug, and it doesn&rsquo;t detract from the main point of the
+listing, which is to show how to use condition variables in a sort of
+&ldquo;mutually recursive&rdquo; style where <code>dataEmpty</code> wakes up <code>insert</code> which
+signals on <code>dataAvail</code> which wakes up <code>remove</code>.</p>
+
+<p>This also underscores how difficult concurrency really is to ensure
+correctness! That&rsquo;s exactly why I&rsquo;ve been reading about all these
+language models for concurrency, to better understand how we can
+leverage our programming language to ensure our programs are correct by
+construction.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Unfortunately, the talk isn&rsquo;t online (Adam presented it at work), so the blog post linked above is the next best thing!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#sml" title="Pages tagged sml">sml</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#concurrency" title="Pages tagged concurrency">concurrency</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2018-07-18T00:23:23-04:00">July 18, 2018</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/prefer-then-over-catch/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/prefer-then-over-catch/" title="Prefer .then() over .catch()">Prefer .then() over .catch()</a></h3>
+      <p>When designing asynchronous APIs that could error in Flow, prefer using `.then` for both successful and failure cases. Flow exposes a relatively unsafe library definition for the `.catch` method, so it&#8217;s best to avoid it if you can.
+ <a href="/prefer-then-over-catch/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h4>
+            <span>Published on April 19, 2018</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h4>
+            <span>Published on April 15, 2018</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>
