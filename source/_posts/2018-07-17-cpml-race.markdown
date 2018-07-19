@@ -1,0 +1,211 @@
+---
+layout: post
+title: "Concurrent Programming in ML: A Race"
+date: 2018-07-17 21:23:23 -0700
+comments: false
+share: false
+categories: ['sml', 'concurrency']
+description: >
+  I want to call attention to what I think is a race condition in one of
+  the code listings in the book "Concurrent Programming in ML". The
+  problem is that some of the data isn't protected by a lock, which can
+  lead to a stale read and incorrect behavior. I trace the bad behavior,
+  and propose a fix.
+strong_keywords: false
+---
+
+Lately I've been super interested in language models for concurrency,
+after hearing a fascinating talk from on [synchronizable abstractions for
+UI].[^asolove] Ever since, I've been working my way through a handful
+of books, including [PCPH], the Concurrency section of [PFPL], and most
+recently [Concurrent Programming in ML], by John Reppy.
+
+[synchronizable abstractions for UI]: https://medium.com/@asolove/synchronizable-abstractions-for-understandable-concurrency-64ae57cd61d1
+[PCPH]: https://simonmar.github.io/pages/pcph.html
+[PFPL]: http://www.cs.cmu.edu/~rwh/pfpl.html
+[Concurrent Programming in ML]: http://www.cambridge.org/gb/academic/subjects/computer-science/distributed-networked-and-mobile-computing/concurrent-programming-ml?format=AR
+
+[^asolove]: Unfortunately, the talk isn't online (Adam presented it at work), so the blog post linked above is the next best thing!
+
+[^books]: I started with Parallel and Concurrent Programming in Haskell, then moved to the Concurrency section in Practical Foundations for Programming Languages. Strongly recommend both!
+
+## Setup: Snippets from the Book
+
+In particular, I want to call attention to what I think is a race
+condition in one of the code listings for Concurrent Programming in ML.
+The problem is that some of the data isn't protected by a lock, which
+can lead to a stale read and incorrect behavior. Here's the listing, in
+full.
+
+
+```sml Concurrent Programming in ML, Listing 2.3
+datatype 'a buffer = BUF of {
+  data      : 'a option ref,
+  mu        : mutex,
+  dataAvail : condition,
+  dataEmpty : condition
+}
+
+fun buffer () =
+  let val mu = mutex() in
+    BUF {
+      data      = ref NONE,
+      mu        = mu,
+      dataAvail = condition mu,
+      dataEmpty = condition mu
+    }
+  end
+
+fun insert (BUF {data, mu, dataAvail, dataEmpty}, v) =
+  let
+    fun waitLp NONE = (data := SOME v; signal dataAvail)
+      | waitLp (SOME v) = (wait dataEmpty; waitLp (!data))
+  in
+    withLock mu waitLp (!data)
+  end
+
+fun remove (BUF {data, mu, dataAvail, dataEmpty}) =
+  let
+    fun waitLp NONE = (wait dataAvail; waitLp (!data))
+      | waitLp (SOME v) = (data := NONE; signal dataEmpty)
+  in
+    withLock mu waitLp (!data)
+  end
+```
+
+You might also want to reference this snippet about how condition
+variables work definitions:
+
+> The semantics of the expression
+>
+> `withLock mu f x`
+>
+> are that first the lock mu is acquired, then the function f is applied
+> to x, and then the function's result is returned after releasing the
+> lock.
+>
+> The basic operations on condition variables are
+>
+> `val wait : condition -> unit`
+>
+> which causes a process to block on the condition variable, and
+>
+> `val signal : condition -> unit`
+>
+> which wakes up one waiting process. A condition variable is associated
+> with a specific mutex lock, which must be held when performing a wait
+> operation on the variable. The semantics of the wait operation are
+> that the mutex lock is released, and then the process is blocked; when
+> the condition is signaled, the next process in the condition's waiting
+> queue is unblocked and it reacquires the mutex lock and proceeds. A
+> signal operation on a condition variable that has an empty waiting
+> queue has no effect; in this sense condition variables are memoryless.
+>
+> --- *Concurrent Programming in ML*, section 2.4.2
+
+Study the snippet and definitions above for a while, and see if you can
+spot the same race, or are convinced the code is correct.
+
+## A trace to expose the problem
+
+The problem I see has to do with SML's eager evaluation: before calling
+a function `f e`, we evaluate `e` to a value `v`. Then substitution
+kicks in and we substitute `v` into the function body of `f`. For us,
+that means that in the definition of `insert`:
+
+```sml
+withLock mu waitLp (!data)
+```
+
+we evaluate `!data` to a value, i.e., `NONE` before we run the body of
+`withLock`, which locks on `mu`. Here's a sample trace of a program
+allocating a buffer and then operating on it concurrently:
+
+```sml Sample trace, showing that first insert gets dropped
+(* new initial, empty buffer *)
+let buf = buffer ()
+
+(* fork two threads, both have access to 'buf' *)
+
+(* thread 1 *)                       (* thread 2 *)
+insert buf 1                         insert buf 2
+withLock mu waitLp (!data)           withLock mu waitLp (!data)
+(* No lock on (!data) so both deref, and both see NONE *)
+withLock mu waitLp NONE              withLock mu waitLp NONE
+
+(* thread 1 acquires lock *)
+waitLp NONE
+(data := SOME v; signal dataAvail)
+(data := SOME 1; signal dataAvail)
+(* ==> data = ref (SOME 1) *)
+((); signal dataAvail)
+signal dataAvail
+()
+(* thread 1 releases lock *)
+
+                                     (* thread 2 acquires lock *)
+                                     (* we evaluated !data before lock! *)
+                                     (* NONE is now stale! *)
+                                     waitLp NONE
+                                     (* selects wrong case in function *)
+                                     (data := SOME v; signal dataAvail)
+                                     (data := SOME 2; signal dataAvail)
+                                     (* ==> data = ref (SOME 2) *)
+                                     ((); signal dataAvail)
+                                     signal dataAvail
+                                     ()
+```
+
+Notice how we allowed two insert operations to happen consecutively.
+This shouldn't be allowed: the second insert overwrites the first
+because our "buffer" has size 1. Note how the first thread inserts `SOME
+1`, and this value is discarded in favor of `SOME 2` when the next
+thread wakes up. Instead, the second insert should block, because it
+sees that the buffer is full. Since we had a stale read, it doesn't see
+that the buffer became full.
+
+## Fixing the stale read
+
+The solution to this is just to delay the `!data` until the body of the
+`waitLp` function, which ensures that we can't read a stale value for
+the content of the buffer.
+
+```sml Listing 2.3, updated to avoid race
+datatype 'a buffer = (* ··· *)
+fun buffer () = (* ··· *)
+
+fun insert (BUF {data, mu, dataAvail, dataEmpty}, v) =
+  let
+    (* !data is now within waitLp, so it's never stale. *)
+    fun waitLp () =
+      case !data
+        of NONE => (data := SOME v; signal dataAvail)
+         | SOME v => (wait dataEmpty; waitLp ())
+  in
+    withLock mu waitLp ()
+  end
+
+fun remove (BUF {data, mu, dataAvail, dataEmpty}) =
+  let
+    fun waitLp () =
+      case !data
+        of NONE => (wait dataAvail; waitLp ())
+         | SOME v => (data := NONE; signal dataEmpty)
+  in
+    withLock mu waitLp ()
+  end
+```
+
+Pretty small bug, and it doesn't detract from the main point of the
+listing, which is to show how to use condition variables in a sort of
+"mutually recursive" style where `dataEmpty` wakes up `insert` which
+signals on `dataAvail` which wakes up `remove`.
+
+This also underscores how difficult concurrency really is to ensure
+correctness! That's exactly why I've been reading about all these
+language models for concurrency, to better understand how we can
+leverage our programming language to ensure our programs are correct by
+construction.
+
+<!-- vim:tw=72
+-->
