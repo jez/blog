@@ -4,7 +4,7 @@
   <title><![CDATA[Category: concurrency | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/concurrency/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2018-07-19T14:34:01-04:00</updated>
+  <updated>2018-07-20T00:08:45-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -19,18 +19,21 @@
     <updated>2018-07-18T00:23:23-04:00</updated>
     <id>https://blog.jez.io/cpml-race</id>
     <content type="html"><![CDATA[<p>Lately I&rsquo;ve been super interested in language models for concurrency,
-after hearing a fascinating talk from on <a href="https://medium.com/@asolove/synchronizable-abstractions-for-understandable-concurrency-64ae57cd61d1">synchronizable abstractions for
-UI</a>.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> Ever since, I&rsquo;ve been working my way through a handful
-of books, including <a href="https://simonmar.github.io/pages/pcph.html">PCPH</a>, the Concurrency section of <a href="http://www.cs.cmu.edu/~rwh/pfpl.html">PFPL</a>, and most
-recently <a href="http://www.cambridge.org/gb/academic/subjects/computer-science/distributed-networked-and-mobile-computing/concurrent-programming-ml?format=AR">Concurrent Programming in ML</a>, by John Reppy.</p>
+after hearing a fascinating talk from Adam Solove on <a href="https://medium.com/@asolove/synchronizable-abstractions-for-understandable-concurrency-64ae57cd61d1">synchronizable
+abstractions for UI</a>.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> I&rsquo;ve been working my way through a
+handful of books, including <a href="https://simonmar.github.io/pages/pcph.html">PCPH</a>, the Concurrency section of <a href="http://www.cs.cmu.edu/~rwh/pfpl.html">PFPL</a>,
+and most recently <a href="http://www.cambridge.org/gb/academic/subjects/computer-science/distributed-networked-and-mobile-computing/concurrent-programming-ml?format=AR">Concurrent Programming in ML</a>, by John Reppy.</p>
+
+<p>In particular, I think I&rsquo;ve found a race condition in one of the code
+listings of Concurrent Programming in ML. After introducing the listing
+itself, we&rsquo;ll walk through a trace that shows the errant behavior, then
+propose a small change that prevents it from happening.</p>
 
 <h2>Setup: Snippets from the Book</h2>
 
-<p>In particular, I want to call attention to what I think is a race
-condition in one of the code listings for Concurrent Programming in ML.
-The problem is that some of the data isn&rsquo;t protected by a lock, which
-can lead to a stale read and incorrect behavior. Here&rsquo;s the listing, in
-full.</p>
+<p>Before we begin, here&rsquo;s the listing in full. It&rsquo;s a sample
+implementation of a 1-element concurrent buffer, using condition
+variables. It supports creation, insertion, and removal.</p>
 
 <pre><code class="sml Concurrent Programming in ML, Listing 2.3">datatype 'a buffer = BUF of {
   data      : 'a option ref,
@@ -66,8 +69,11 @@ fun remove (BUF {data, mu, dataAvail, dataEmpty}) =
   end
 </code></pre>
 
-<p>You might also want to reference this snippet about how condition
-variables work definitions:</p>
+<p>You might also want to reference this exerpt which explains the
+semantics of the concurrency primitives at play in the snippet above:
+locks and condition variables. Study the listing above and exerpt below
+for a moment. See if you can spot a race, or are convinced the code is
+correct.</p>
 
 <blockquote><p>The semantics of the expression</p>
 
@@ -96,70 +102,73 @@ queue has no effect; in this sense condition variables are memoryless.</p>
 
 <p>&mdash; <em>Concurrent Programming in ML</em>, section 2.4.2</p></blockquote>
 
-<p>Study the snippet and definitions above for a while, and see if you can
-spot the same race, or are convinced the code is correct.</p>
-
 <h2>A trace to expose the problem</h2>
 
 <p>The problem I see has to do with SML&rsquo;s eager evaluation: before calling
 a function <code>f e</code>, we evaluate <code>e</code> to a value <code>v</code>. Then substitution
-kicks in and we substitute <code>v</code> into the function body of <code>f</code>. For us,
+kicks in and we substitute <code>v</code> into the body of <code>f</code>. For us,
 that means that in the definition of <code>insert</code>:</p>
 
-<pre><code class="sml">withLock mu waitLp (!data)
+<pre><code class="sml">fun insert (* ··· *) =
+  (* ··· *)
+    withLock mu waitLp (!data)
+  (* ··· *)
 </code></pre>
 
-<p>we evaluate <code>!data</code> to a value, i.e., <code>NONE</code> before we run the body of
-<code>withLock</code>, which locks on <code>mu</code>. Here&rsquo;s a sample trace of a program
-allocating a buffer and then operating on it concurrently:</p>
+<p>we evaluate <code>!data</code> to a value before we run the body of <code>withLock</code> to
+acquire the lock. When inserting into an empty queue, <code>!data</code> evaluates
+to <code>NONE</code>. And since this happens outside the <code>withLock</code> if two calls to
+insert attempt to acquire the lock at the same time, they&rsquo;ll both think
+the queue is empty when they wake up! When this happens, the one to wake
+up second will unknowingly overwrite what the first one inserted.</p>
 
-<pre><code class="sml Sample trace, showing that first insert gets dropped">(* new initial, empty buffer *)
-let buf = buffer ()
+<p>Here&rsquo;s a sample trace of a program allocating a buffer and then
+doing two concurrent insertions:</p>
 
-(* fork two threads, both have access to 'buf' *)
+<pre><code class="sml Sample trace, showing that first insert gets dropped">(* '=&gt;' marks steps where two threads evolve concurrently  *)
+(* '-&gt;' marks steps where just one thread evalautes        *)
 
-(* thread 1 *)                       (* thread 2 *)
-insert buf 1                         insert buf 2
-withLock mu waitLp (!data)           withLock mu waitLp (!data)
-(* No lock on (!data) so both deref, and both see NONE *)
-withLock mu waitLp NONE              withLock mu waitLp NONE
+-&gt; val buf = buffer ()
 
-(* thread 1 acquires lock *)
-waitLp NONE
-(data := SOME v; signal dataAvail)
-(data := SOME 1; signal dataAvail)
-(* ==&gt; data = ref (SOME 1) *)
-((); signal dataAvail)
-signal dataAvail
-()
-(* thread 1 releases lock *)
+(* Fork two threads; both have access to 'buf'.            *)
 
-                                     (* thread 2 acquires lock *)
-                                     (* we evaluated !data before lock! *)
-                                     (* NONE is now stale! *)
-                                     waitLp NONE
-                                     (* selects wrong case in function *)
-                                     (data := SOME v; signal dataAvail)
-                                     (data := SOME 2; signal dataAvail)
-                                     (* ==&gt; data = ref (SOME 2) *)
-                                     ((); signal dataAvail)
-                                     signal dataAvail
-                                     ()
+   (* thread 1 *)                       (* thread 2 *)
+=&gt; insert buf 1                         insert buf 2
+=&gt; withLock mu waitLp (!data)           withLock mu waitLp (!data)
+=&gt; withLock mu waitLp NONE              withLock mu waitLp NONE
+
+   (* thread 1 acquires lock *)
+-&gt; waitLp NONE
+-&gt; (data := SOME v; signal dataAvail)
+-&gt; (data := SOME 1; signal dataAvail)
+   (* {data = ref (SOME 1), ...} *)
+-&gt; ((); signal dataAvail)
+-&gt; signal dataAvail
+-&gt; ()
+   (* thread 1 releases lock *)
+
+                                        (* thread 2 acquires lock *)
+                                        (* NONE is now stale! *)
+-&gt;                                      waitLp NONE
+                                        (* selects wrong case in function *)
+-&gt;                                      (data := SOME v; signal dataAvail)
+-&gt;                                      (data := SOME 2; signal dataAvail)
+                                        (* ==&gt; data = ref (SOME 2) *)
+-&gt;                                      ((); signal dataAvail)
+-&gt;                                      signal dataAvail
+-&gt;                                      ()
 </code></pre>
 
-<p>Notice how we allowed two insert operations to happen consecutively.
-This shouldn&rsquo;t be allowed: the second insert overwrites the first
-because our &ldquo;buffer&rdquo; has size 1. Note how the first thread inserts <code>SOME
-1</code>, and this value is discarded in favor of <code>SOME 2</code> when the next
-thread wakes up. Instead, the second insert should block, because it
-sees that the buffer is full. Since we had a stale read, it doesn&rsquo;t see
-that the buffer became full.</p>
+<p>Notice how the stale read allowed two consecutive inserts. What we
+wanted was for the second insert to wake up, see that the buffer is
+full, then wait for the <code>dataEmpty</code> condition variable to wake it up.
+So having the <code>!data</code> outside the lock is not good.</p>
 
 <h2>Fixing the stale read</h2>
 
-<p>The solution to this is just to delay the <code>!data</code> until the body of the
-<code>waitLp</code> function, which ensures that we can&rsquo;t read a stale value for
-the content of the buffer.</p>
+<p>The solution to this is to delay evaluating <code>!data</code> until the body of the
+<code>waitLp</code> function, which only executes when we have the lock. This
+ensures that we don&rsquo;t read a stale value for the content of the buffer.</p>
 
 <pre><code class="sml Listing 2.3, updated to avoid race">datatype 'a buffer = (* ··· *)
 fun buffer () = (* ··· *)
@@ -191,11 +200,11 @@ listing, which is to show how to use condition variables in a sort of
 &ldquo;mutually recursive&rdquo; style where <code>dataEmpty</code> wakes up <code>insert</code> which
 signals on <code>dataAvail</code> which wakes up <code>remove</code>.</p>
 
-<p>This also underscores how difficult concurrency really is to ensure
-correctness! That&rsquo;s exactly why I&rsquo;ve been reading about all these
-language models for concurrency, to better understand how we can
-leverage our programming language to ensure our programs are correct by
-construction.</p>
+<p>This also underscores how difficult it really is to ensure correctness
+in the presence of concurrency! That&rsquo;s exactly why I&rsquo;ve been reading
+about all these language models for concurrency, to better understand
+how we can leverage our programming language to ensure our programs are
+correct by construction.</p>
 
 <!-- vim:tw=72
 -->
