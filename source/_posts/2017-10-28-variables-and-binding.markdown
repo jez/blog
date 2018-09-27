@@ -436,8 +436,9 @@ Despite these drawbacks, I still prefer locally nameless terms.
 
 Variables show up in the most interesting places, and I always smile
 when I find them being used in new and surprising ways. On the flip
-side, languages that implement variables and binding suffer no end of
-trouble and programmers are forced to cope with their absence.[^trouble]
+side, languages that don't implement variables and binding suffer no end
+of trouble and programmers are forced to cope with their
+absence.[^trouble]
 
 I think variables are just so cool!
 
