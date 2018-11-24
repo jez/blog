@@ -140,7 +140,7 @@ captured. To revisit our example from earlier:
   # this λ, so let's α-vary the bound 'y' to 'z':
 → [y / x] (λz. x + z)
 → λz. [y / x] (x + z)
-→ λz. x + z
+→ λz. y + z
 ```
 
 The trick here is that by picking `z` we picked a name that doesn't
