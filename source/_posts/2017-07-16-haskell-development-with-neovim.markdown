@@ -58,7 +58,7 @@ the post. For now, let's start at the top.
 
 Vim's default Haskell filetype plugin is pretty lack luster. Everything is blue,
 except for strings which are colored like comments, and keywords which are
-colored like constants. Indentation is wonky in some edge cases, and isn't
+colored like constants. Indentation is wonky in some cases, and isn't
 configurable.
 
 This plugin corrects all that. It's the filetype plugin for Haskell that
