@@ -330,6 +330,8 @@ beyond this example:
 
 - We can open up related files for cross-referencing.
 
+- We can run the code in a debugger and see how it behaves.
+
 By having the full power of our editor, we can literally retrace the
 steps that the author went through to create the pull request. If our
 goal is to understand and learn from code review, there's no better way
