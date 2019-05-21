@@ -154,7 +154,7 @@ Stack it's **super** simple:
 ```
 
 That's all it took, and it generated a `bingo-sim.prof` file that had a
-bunch of lines that looked like this:
+bunch of lines that [looked like this][prof-snippet]:
 
 ```
 COST CENTRE              MODULE  SRC  no.  entries  %time %alloc   %time %alloc
@@ -166,7 +166,7 @@ COST CENTRE              MODULE  SRC  no.  entries  %time %alloc   %time %alloc
 ```
 
 There's a bunch of extra information in the actual `.prof` file (which
-you can [see on GitHub][bingo-sim.2.prof]) but the important parts for
+you can [see on GitHub][prof-snippet]) but the important parts for
 me were the four columns at the end. The first two are the proporion of
 execution time and allocated memory attributable to this cost center
 specifically. The last two are the same, but include the resources of
@@ -304,7 +304,7 @@ If you have any questions about anything, feel free to [reach out]!
 [README]: https://github.com/jez/bingo-sim#readme
 
 [Attempt #1]: https://github.com/jez/bingo-sim/commit/994481b
-[Attempt #2]: https://github.com/jez/bingo-sim/commit/8886a66
+[Attempt #2]: https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5
 [Attempt #3]: https://github.com/jez/bingo-sim/commit/0a04839
 [Attempt #4]: https://github.com/jez/bingo-sim/commit/4048469
 [Attempt #5]: https://github.com/jez/bingo-sim/commit/eafa39f
@@ -320,13 +320,13 @@ If you have any questions about anything, feel free to [reach out]!
 [fisher-yates-bits]: https://github.com/jez/bingo-sim/blob/8886a66/src/BingoSim/Simulation.hs#L111-L126
 
 [GHC User Guide]: https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html
-
+[prof-snippet]: https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof#L112-L115
 
 [this reddit thread]: https://www.reddit.com/r/haskell/comments/7ma9rd/in_your_professional_experience_how_suitable_is/
-[this article]: Finding the Best 64-bit Simulation PRNG
+[this article]: https://nullprogram.com/blog/2017/09/21/
 [suggested PRNG]: http://xoshiro.di.unimi.it/
 [xoshiro256starstar.c]: http://xoshiro.di.unimi.it/xoshiro256starstar.c
-[Prng.hs]: https://github.com/jez/bingo-sim/blob/8886a66/src/BingoSim/Prng.hs
+[Prng.hs]: https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs
 
 [reach out]: https://jez.io/
 
