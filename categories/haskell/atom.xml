@@ -4,7 +4,7 @@
   <title><![CDATA[Category: haskell | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/haskell/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-05-21T04:46:49-04:00</updated>
+  <updated>2019-05-21T15:36:28-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -92,7 +92,7 @@ space, which means boards can just be vectors of bits.</p>
 
 <p><a href="https://github.com/jez/bingo-sim/commit/994481b">Attempt #1</a> was <em>really</em> slow, so we won&rsquo;t talk about it 😅</p>
 
-<p><a href="https://github.com/jez/bingo-sim/commit/8886a66">Attempt #2</a> was a little bit faster (but not by much, which made me
+<p><a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a> was a little bit faster (but not by much, which made me
 disappointed—more on this later). The solution looked like this:</p>
 
 <ul>
@@ -128,7 +128,7 @@ how many boards have at least one bingo.</li>
 
 <h2>Clever, but not in the right ways</h2>
 
-<p>All told, I thought the approach in <a href="https://github.com/jez/bingo-sim/commit/8886a66">Attempt #2</a> was pretty clever. It
+<p>All told, I thought the approach in <a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a> was pretty clever. It
 used a single <code>Word64</code> (instead of a larger structure like a list) to
 represent the board, so it should have had needed to allocate a lot. And
 because it was just a <code>Word64</code>, it could use bit operations to
@@ -150,7 +150,7 @@ of running with <code>stack exec --</code>; we don&rsquo;t care for the overhead
 running via Stack).</p>
 
 <p>So even after using a bit vector for the board, it took 738ms. To be
-clear, these results for <a href="https://github.com/jez/bingo-sim/commit/8886a66">Attempt #2</a> were an improvement over my even
+clear, these results for <a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a> were an improvement over my even
 slower <a href="https://github.com/jez/bingo-sim/commit/994481b">Attempt #1</a>, but not by much—maybe by 200ms. 700ms+ seemed
 excessive.</p>
 
@@ -168,7 +168,7 @@ Stack it&rsquo;s <strong>super</strong> simple:</p>
 </code></pre>
 
 <p>That&rsquo;s all it took, and it generated a <code>bingo-sim.prof</code> file that had a
-bunch of lines that looked like this:</p>
+bunch of lines that <a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof#L112-L115">looked like this</a>:</p>
 
 <pre><code>COST CENTRE              MODULE  SRC  no.  entries  %time %alloc   %time %alloc
 ...
@@ -179,7 +179,7 @@ bunch of lines that looked like this:</p>
 </code></pre>
 
 <p>There&rsquo;s a bunch of extra information in the actual <code>.prof</code> file (which
-you can [see on GitHub][bingo-sim.2.prof]) but the important parts for
+you can <a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof#L112-L115">see on GitHub</a>) but the important parts for
 me were the four columns at the end. The first two are the proporion of
 execution time and allocated memory attributable to this cost center
 specifically. The last two are the same, but include the resources of
@@ -201,11 +201,11 @@ absurd abount of time. Non-cryptographically secure pseudo random number
 generation shouldn&rsquo;t take this long. And indeed, after a bit of
 searching I came across <a href="https://www.reddit.com/r/haskell/comments/7ma9rd/in_your_professional_experience_how_suitable_is/">this reddit thread</a> complaining about how slow
 <code>System.Random</code> in Haskell is for PRNG, and then moments later I found
-<a href="Finding">this article</a> from Chris Wellons comparing various PRNGs for
+<a href="https://nullprogram.com/blog/2017/09/21/">this article</a> from Chris Wellons comparing various PRNGs for
 performance&hellip; Exactly what I was looking for 👌</p>
 
 <p>So for <a href="https://github.com/jez/bingo-sim/commit/0a04839">Attempt #3</a>, I took his <a href="http://xoshiro.di.unimi.it/">suggested PRNG</a> and ported it from
-<a href="http://xoshiro.di.unimi.it/xoshiro256starstar.c">C</a> to <a href="https://github.com/jez/bingo-sim/blob/8886a66/src/BingoSim/Prng.hs">Haskell</a>.</p>
+<a href="http://xoshiro.di.unimi.it/xoshiro256starstar.c">C</a> to <a href="https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs">Haskell</a>.</p>
 
 <p>And lo and behold, it was faster. A lot faster:</p>
 
@@ -223,7 +223,7 @@ in the process—things this good usually come at a price. The biggest one
 that I notice is that the API I provide for random number generation is
 far less generic.</p>
 
-<p>My <a href="https://github.com/jez/bingo-sim/blob/8886a66/src/BingoSim/Prng.hs"><code>Prng.hs</code></a> is a direct translation of the C to Haskell. It
+<p>My <a href="https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs"><code>Prng.hs</code></a> is a direct translation of the C to Haskell. It
 only generates 64-bit unsigned ints. <code>System.Random</code> has an arguably
 nicer API, using type classes to generate random ints, characters, etc.,
 allowing users to implement generators for their custom types, and
@@ -233,7 +233,7 @@ of random numbers.</p>
 <p>It&rsquo;s possible we could prune some of the fat from <code>System.Random</code>&rsquo;s
 default implementations without also changing the underlying random
 number generator, and see a considerable speedup. It&rsquo;s also possible we
-could make <a href="https://github.com/jez/bingo-sim/blob/8886a66/src/BingoSim/Prng.hs"><code>Prng.hs</code></a> export instances of the appropriate type
+could make <a href="https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs"><code>Prng.hs</code></a> export instances of the appropriate type
 classes, and again also see a partial speedup.</p>
 
 <p>But considering that I wasn&rsquo;t using any of that extra stuff, I figured
@@ -268,7 +268,7 @@ Hit rate: 0.0367
   0.06s user   0.01s system   92% cpu   0.070 total
 </code></pre>
 
-<p>This is a 10x speedup over my dissapointing <a href="https://github.com/jez/bingo-sim/commit/8886a66">Attempt #2</a>, and a 12.8x
+<p>This is a 10x speedup over my dissapointing <a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a>, and a 12.8x
 speedup over my super naive <a href="https://github.com/jez/bingo-sim/commit/994481b">Attempt #1</a>. Not bad for a first attempt at
 profiling in Haskell!</p>
 
@@ -285,7 +285,7 @@ want to compare and constrast the approaches feel free:</p>
 
 <ul>
 <li><a href="https://github.com/jez/bingo-sim/commit/994481b">Attempt #1</a> (899ms)</li>
-<li><a href="https://github.com/jez/bingo-sim/commit/8886a66">Attempt #2</a> (738ms)</li>
+<li><a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a> (738ms)</li>
 <li><a href="https://github.com/jez/bingo-sim/commit/0a04839">Attempt #3</a> (126ms)</li>
 <li><a href="https://github.com/jez/bingo-sim/commit/4048469">Attempt #4</a> (101ms)</li>
 <li><a href="https://github.com/jez/bingo-sim/commit/eafa39f">Attempt #5</a> (70ms)</li>
