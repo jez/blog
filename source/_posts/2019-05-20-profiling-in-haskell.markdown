@@ -113,8 +113,8 @@ shuffleBits gen (Board bs) n =
 
 All told, I thought the approach in [Attempt #2] was pretty clever. It
 used a single `Word64` (instead of a larger structure like a list) to
-represent the board, so it should have had needed to allocate a lot. And
-because it was just a `Word64`, it could use bit operations to
+represent the board, so it should not have had needed to allocate a lot.
+And because it was just a `Word64`, it could use bit operations to
 manipulate the board and check for bingos, avoiding the need to walk a
 large structure.
 
