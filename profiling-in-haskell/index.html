@@ -201,8 +201,8 @@ how many boards have at least one bingo.</li>
 
 <p>All told, I thought the approach in <a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a> was pretty clever. It
 used a single <code>Word64</code> (instead of a larger structure like a list) to
-represent the board, so it should have had needed to allocate a lot. And
-because it was just a <code>Word64</code>, it could use bit operations to
+represent the board, so it should not have had needed to allocate a lot.
+And because it was just a <code>Word64</code>, it could use bit operations to
 manipulate the board and check for bingos, avoiding the need to walk a
 large structure.</p>
 
