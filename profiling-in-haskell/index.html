@@ -147,7 +147,7 @@ generate random boards, and check how many of them have bingos.</p>
 <h2>Naive solution</h2>
 
 <p>In the course of playing around with this problem, I implemented a bunch
-of different solutions—about 5 in total, each one faster than the next.
+of different solutions—about 5 in total, each one faster than the last.
 At a high level, each solution followed this pattern:</p>
 
 <ul>
@@ -156,8 +156,8 @@ At a high level, each solution followed this pattern:</p>
 </ul>
 
 
-<p>All the solutions exploited the fact that <strong>where</strong> the characters on
-the board are and <strong>what</strong> characters are on the tiles don&rsquo;t matter. The
+<p>All the solutions exploited the fact that we don&rsquo;t care where the
+characters on the board are nor what characters are on the tiles. The
 only thing that matters is whether a tile ends up on a specific grid
 space, which means boards can just be vectors of bits.</p>
 
@@ -192,8 +192,8 @@ on a bit vector:</p></li>
 
 
 <ul>
-<li>We generate 100,000 random boards using the above method, and check
-how many boards have at least one bingo.</li>
+<li>With the above method, we generate 100,000 random boards using and
+check how many boards have at least one bingo.</li>
 </ul>
 
 
@@ -201,7 +201,7 @@ how many boards have at least one bingo.</li>
 
 <p>All told, I thought the approach in <a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a> was pretty clever. It
 used a single <code>Word64</code> (instead of a larger structure like a list) to
-represent the board, so it should not have had needed to allocate a lot.
+represent the board, so it shouldn&rsquo;t have had needed many allocations.
 And because it was just a <code>Word64</code>, it could use bit operations to
 manipulate the board and check for bingos, avoiding the need to walk a
 large structure.</p>
@@ -253,17 +253,16 @@ bunch of lines that <a href="https://github.com/jez/bingo-sim/blob/master/prof/b
 you can <a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof#L112-L115">see on GitHub</a>) but the important parts for
 me were the four columns at the end. The first two are the proporion of
 execution time and allocated memory attributable to this cost center
-specifically. The last two are the same, but include the resources of
-all sub cost centers.</p>
+specifically. The last two are the same, but summed over all child cost
+centers.</p>
 
-<p>(I found the <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html">GHC User Guide</a> super helpful to learn everything I wanted
-to know about this format, what a cost center is, and some tips for
-profiling in general).</p>
+<p>(I found the <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html">GHC User Guide</a> <em>super</em> helpful to learn everything I
+wanted to know: what the columns mean, what a cost center is, and some
+tips for profiling in general).</p>
 
-<p>So the glaring thing that jumps out from the data: we&rsquo;re spending 85% of
-our 738ms running time <strong>generating random numbers</strong>. All my effort
-spent optimizing memory, but it was the PRNG that was slow the whole
-time. 😣</p>
+<p>So the glaring realization in the data: we&rsquo;re spending 85% of our 738ms
+running time <strong>generating random numbers</strong>. All my effort spent
+optimizing memory, but it was the PRNG that was slow the whole time. 😣</p>
 
 <h2>Fast PRNG in Haskell</h2>
 
@@ -302,10 +301,10 @@ having helpers for generating random values within a range and sequences
 of random numbers.</p>
 
 <p>It&rsquo;s possible we could prune some of the fat from <code>System.Random</code>&rsquo;s
-default implementations without also changing the underlying random
-number generator, and see a considerable speedup. It&rsquo;s also possible we
+default implementations (without also changing the underlying random
+number generator) and see a considerable speedup. It&rsquo;s also possible we
 could make <a href="https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs"><code>Prng.hs</code></a> export instances of the appropriate type
-classes, and again also see a partial speedup.</p>
+classes, and again see a speedup.</p>
 
 <p>But considering that I wasn&rsquo;t using any of that extra stuff, I figured
 I&rsquo;d just keep it simple. The code to generate random boards hardly
