@@ -65,14 +65,14 @@ generate random boards, and check how many of them have bingos.
 ## Naive solution
 
 In the course of playing around with this problem, I implemented a bunch
-of different solutions—about 5 in total, each one faster than the next.
+of different solutions—about 5 in total, each one faster than the last.
 At a high level, each solution followed this pattern:
 
 - generate a board uniformly at random
 - count how many of the generated boards had bingos
 
-All the solutions exploited the fact that **where** the characters on
-the board are and **what** characters are on the tiles don't matter. The
+All the solutions exploited the fact that we don't care where the
+characters on the board are nor what characters are on the tiles. The
 only thing that matters is whether a tile ends up on a specific grid
 space, which means boards can just be vectors of bits.
 
@@ -105,15 +105,15 @@ shuffleBits gen (Board bs) n =
   in  shuffleBits gen' (Board bs') (n - 1)
 ```
 
-- We generate 100,000 random boards using the above method, and check
-  how many boards have at least one bingo.
+- With the above method, we generate 100,000 random boards using and
+  check how many boards have at least one bingo.
 
 
 ## Clever, but not in the right ways
 
 All told, I thought the approach in [Attempt #2] was pretty clever. It
 used a single `Word64` (instead of a larger structure like a list) to
-represent the board, so it should not have had needed to allocate a lot.
+represent the board, so it shouldn't have had needed many allocations.
 And because it was just a `Word64`, it could use bit operations to
 manipulate the board and check for bingos, avoiding the need to walk a
 large structure.
@@ -169,17 +169,16 @@ There's a bunch of extra information in the actual `.prof` file (which
 you can [see on GitHub][prof-snippet]) but the important parts for
 me were the four columns at the end. The first two are the proporion of
 execution time and allocated memory attributable to this cost center
-specifically. The last two are the same, but include the resources of
-all sub cost centers.
+specifically. The last two are the same, but summed over all child cost
+centers.
 
-(I found the [GHC User Guide] super helpful to learn everything I wanted
-to know about this format, what a cost center is, and some tips for
-profiling in general).
+(I found the [GHC User Guide] *super* helpful to learn everything I
+wanted to know: what the columns mean, what a cost center is, and some
+tips for profiling in general).
 
-So the glaring thing that jumps out from the data: we're spending 85% of
-our 738ms running time **generating random numbers**. All my effort
-spent optimizing memory, but it was the PRNG that was slow the whole
-time. 😣
+So the glaring realization in the data: we're spending 85% of our 738ms
+running time **generating random numbers**. All my effort spent
+optimizing memory, but it was the PRNG that was slow the whole time. 😣
 
 
 ## Fast PRNG in Haskell
@@ -220,10 +219,10 @@ having helpers for generating random values within a range and sequences
 of random numbers.
 
 It's possible we could prune some of the fat from `System.Random`'s
-default implementations without also changing the underlying random
-number generator, and see a considerable speedup. It's also possible we
+default implementations (without also changing the underlying random
+number generator) and see a considerable speedup. It's also possible we
 could make [`Prng.hs`][Prng.hs] export instances of the appropriate type
-classes, and again also see a partial speedup.
+classes, and again see a speedup.
 
 But considering that I wasn't using any of that extra stuff, I figured
 I'd just keep it simple. The code to generate random boards hardly
