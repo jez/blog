@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Standard ML in Travis CI"
+title: "Standard ML in Travis&nbsp;CI"
 date: 2019-06-04 09:26:45 -0700
 comments: false
 share: false
 categories: ['sml', 'bash']
 description: >
-  TODO
+  For one of my recent projects I went through the work to get Standard
+  ML building in Travis CI.
 strong_keywords: false
 ---
 
