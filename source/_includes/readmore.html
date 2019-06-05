@@ -13,7 +13,7 @@
         {% for post in site.related_posts limit:2 offset:1 %}
           <div class="list-item">
             <h4><a href="{{ root_url }}{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></h4>
-            <span>Published on {{ post.date | date: "%B %d, %Y" }}</span>
+            <span>Published on {{ post.date | date: "%B %-d, %Y" }}</span>
           </div><!-- /.list-item -->
         {% endfor %}
       </div><!-- /.read-more-list -->

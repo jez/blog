@@ -7,7 +7,7 @@
       <a href="{{ abs_url }}" title="{{ titlecased }}">{{ titlecased }}</a>
     </div>
     <div class="Entry-date">
-      <a href="{{ abs_url }}">{{ post.date | date: "%B %d, %Y" }}</a>
+      <a href="{{ abs_url }}">{{ post.date | date: "%B %-d, %Y" }}</a>
       {% if for_pinned %}
         &ndash; pinned
       {% else %}

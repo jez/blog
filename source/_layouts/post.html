@@ -8,7 +8,7 @@
 {% include navigation.html %}
 
 {% assign header_title = page.title %}
-{% assign header_subtitle = page.date | date: "%B %d, %Y" %}
+{% assign header_subtitle = page.date | date: "%B %-d, %Y" %}
 {% include entryheader.html %}
 
 <div id="main" role="main">
@@ -24,8 +24,8 @@
           {% endfor %}
         </ul>
       </span>
-      <span class="entry-date date published updated"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time></span>
-      {% if page.modified %}<br>revised: <span class="entry-date date modified"><time datetime="{{ page.modified }}">{{ page.modified | date: "%B %d, %Y"  }}</time></span>{% endif %}
+      <span class="entry-date date published updated"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time></span>
+      {% if page.modified %}<br>revised: <span class="entry-date date modified"><time datetime="{{ page.modified }}">{{ page.modified | date: "%B %-d, %Y"  }}</time></span>{% endif %}
     </footer>
   </div>
   {% include readmore.html %}
