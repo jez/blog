@@ -4,7 +4,7 @@
   <title><![CDATA[Category: sml | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/sml/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-05-26T21:28:08-04:00</updated>
+  <updated>2019-06-04T23:12:22-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,123 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Standard ML in Travis CI]]></title>
+    <link href="https://blog.jez.io/sml-travis-ci/"/>
+    <updated>2019-06-04T12:26:45-04:00</updated>
+    <id>https://blog.jez.io/sml-travis-ci</id>
+    <content type="html"><![CDATA[<p>For one of my recent projects (<a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a>) I went through the work to
+get Standard ML building in Travis CI. It turned out to be not too
+hard—in fact, the hardest part is already done, and I&rsquo;m happy to share
+how it works.</p>
+
+<!-- more -->
+
+
+<h2>Features</h2>
+
+<p>The way I set up my builds, I can:</p>
+
+<ul>
+<li>build and test with both macOS and Linux</li>
+<li>build and test with both SML/NJ and MLton</li>
+<li>create executables, even with SML/NJ</li>
+<li>publish the resulting builds to GitHub as releases</li>
+</ul>
+
+
+<p>Apart from some scripts to install things on each operating system,
+under the hood it&rsquo;s powered by <a href="https://github.com/jez/symbol">Symbol</a>, which is a build tool for
+Standard ML I wrote which factors out most of the project-agnostic
+stuff.</p>
+
+<h2>The core setup</h2>
+
+<p>Rather than paste the code into a snippet here and wait for it to get
+out of date, see my <a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a> project on GitHub for all the
+up-to-date files. In total, there are three files in that repo which set
+the whole thing up:</p>
+
+<ol>
+<li><a href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/.travis.yml">.travis.yml</a> (kicks off the build)</li>
+<li><a href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/Brewfile">Brewfile</a> (deps for macOS build)</li>
+<li><a href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/tests/travis-install.sh">tests/travis-install.sh</a> (deps for Linux build)</li>
+</ol>
+
+
+<p>If you haven&rsquo;t used Travis CI before, you&rsquo;ll probably also want to check
+out the <a href="https://docs.travis-ci.com/">Travis CI docs</a> to get a feel for how to actually set things
+up, and where these pieces fit in.</p>
+
+<h2>Why write a whole build tool?</h2>
+
+<p>I mentioned above that I&rsquo;d written a build tool for Standard ML, called
+<a href="https://github.com/jez/symbol">Symbol</a>. Why? It started as a shell script + <code>Makefile</code> for
+<a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a> and then I realized that these scripts could be useful in
+any Standard ML project.</p>
+
+<p>SML/NJ and MLton are already great compilers with their own build tools.
+It&rsquo;s useful to be able to build a project with both (SML/NJ for faster
+builds and a REPL, and MLton for faster compiled executables). All
+Symbol really does is put SML/NJ and MLton behind a unified, very
+stripped down interface.</p>
+
+<p>There&rsquo;s more information <a href="https://github.com/jez/symbol">in the README</a>, but some key points:</p>
+
+<ul>
+<li>Symbol makes it easy to build and install executables, even with
+SML/NJ which traditionally uses heap images.</li>
+<li>Symbol is built on <code>make</code>, so if <strong>no</strong> source files change, even
+recompiling with MLton is instant.</li>
+<li>Symbol also supports scaffolding new Standard ML projects, which is
+nicer than starting from scratch.</li>
+</ul>
+
+
+<p>Again, there&rsquo;s way more information <a href="https://github.com/jez/symbol">in the README</a>, so
+definitely check it out if you&rsquo;re thinking about setting up a new
+Standard ML project. The usage looks something like this:</p>
+
+<pre><code class="bash"># initialize a new project:
+❯ symbol-new hello
+❯ cd hello
+
+# build with SML/NJ:
+❯ ./symbol make
+❯ .symbol-work/bin/hello
+Hello, world!
+
+# or, build with MLton:
+❯ ./symbol make with=mlton
+❯ .symbol-work/bin/hello
+Hello, world!
+</code></pre>
+
+<h2>Why Standard ML in the first place?</h2>
+
+<p>I&rsquo;ll probably get around to writing about <a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a> (and related
+tools like <a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a> and <a href="https://github.com/jez/multi-sub"><code>multi-sub</code></a>) but at the end of the day:
+SML is a really pleasant language to use in a lot of ways:</p>
+
+<ul>
+<li>Type inference in Standard ML is a breath of fresh air.</li>
+<li>Data types let me wonder less about how things work.</li>
+<li>Pattern matching makes for concise, clean, and correct code.</li>
+</ul>
+
+
+<p>Standard ML was my most commonly used programming language throughout
+all of my university courses, so there&rsquo;s a definite soft spot in my
+heart for it. There are features that I wish it had sometimes, but it&rsquo;s
+the only language that I&rsquo;ve used that doesn&rsquo;t feel fundamentally broken
+in some way.</p>
+
+<!-- vim:tw=72
+-->
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Concurrent Programming in ML: A Race]]></title>

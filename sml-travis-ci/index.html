@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Standard ML in Travis CI - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="TODO
+">
+
+<meta name="keywords" content="sml bash ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/sml-travis-ci">
+<meta property="og:title" content="Standard ML in Travis CI">
+<meta property="og:description" content="TODO
+">
+<meta property="og:image" content="">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/sml-travis-ci">
+<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+<link href="/favicon@2x.png" rel="icon" sizes="32x32">
+<link href="/favicon.png" rel="icon" sizes="16x16">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Standard ML in Travis CI</h1>
+  <h2 class="EntryHeader-subtitle">June 04, 2019</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <p>For one of my recent projects (<a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a>) I went through the work to
+get Standard ML building in Travis CI. It turned out to be not too
+hard—in fact, the hardest part is already done, and I&rsquo;m happy to share
+how it works.</p>
+
+<!-- more -->
+
+
+<h2>Features</h2>
+
+<p>The way I set up my builds, I can:</p>
+
+<ul>
+<li>build and test with both macOS and Linux</li>
+<li>build and test with both SML/NJ and MLton</li>
+<li>create executables, even with SML/NJ</li>
+<li>publish the resulting builds to GitHub as releases</li>
+</ul>
+
+
+<p>Apart from some scripts to install things on each operating system,
+under the hood it&rsquo;s powered by <a href="https://github.com/jez/symbol">Symbol</a>, which is a build tool for
+Standard ML I wrote which factors out most of the project-agnostic
+stuff.</p>
+
+<h2>The core setup</h2>
+
+<p>Rather than paste the code into a snippet here and wait for it to get
+out of date, see my <a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a> project on GitHub for all the
+up-to-date files. In total, there are three files in that repo which set
+the whole thing up:</p>
+
+<ol>
+<li><a href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/.travis.yml">.travis.yml</a> (kicks off the build)</li>
+<li><a href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/Brewfile">Brewfile</a> (deps for macOS build)</li>
+<li><a href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/tests/travis-install.sh">tests/travis-install.sh</a> (deps for Linux build)</li>
+</ol>
+
+
+<p>If you haven&rsquo;t used Travis CI before, you&rsquo;ll probably also want to check
+out the <a href="https://docs.travis-ci.com/">Travis CI docs</a> to get a feel for how to actually set things
+up, and where these pieces fit in.</p>
+
+<h2>Why write a whole build tool?</h2>
+
+<p>I mentioned above that I&rsquo;d written a build tool for Standard ML, called
+<a href="https://github.com/jez/symbol">Symbol</a>. Why? It started as a shell script + <code>Makefile</code> for
+<a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a> and then I realized that these scripts could be useful in
+any Standard ML project.</p>
+
+<p>SML/NJ and MLton are already great compilers with their own build tools.
+It&rsquo;s useful to be able to build a project with both (SML/NJ for faster
+builds and a REPL, and MLton for faster compiled executables). All
+Symbol really does is put SML/NJ and MLton behind a unified, very
+stripped down interface.</p>
+
+<p>There&rsquo;s more information <a href="https://github.com/jez/symbol">in the README</a>, but some key points:</p>
+
+<ul>
+<li>Symbol makes it easy to build and install executables, even with
+SML/NJ which traditionally uses heap images.</li>
+<li>Symbol is built on <code>make</code>, so if <strong>no</strong> source files change, even
+recompiling with MLton is instant.</li>
+<li>Symbol also supports scaffolding new Standard ML projects, which is
+nicer than starting from scratch.</li>
+</ul>
+
+
+<p>Again, there&rsquo;s way more information <a href="https://github.com/jez/symbol">in the README</a>, so
+definitely check it out if you&rsquo;re thinking about setting up a new
+Standard ML project. The usage looks something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># initialize a new project:</span>
+</span><span class='line'>❯ symbol-new hello
+</span><span class='line'>❯ <span class="nb">cd </span>hello
+</span><span class='line'>
+</span><span class='line'><span class="c"># build with SML/NJ:</span>
+</span><span class='line'>❯ ./symbol make
+</span><span class='line'>❯ .symbol-work/bin/hello
+</span><span class='line'>Hello, world!
+</span><span class='line'>
+</span><span class='line'><span class="c"># or, build with MLton:</span>
+</span><span class='line'>❯ ./symbol make <span class="nv">with</span><span class="o">=</span>mlton
+</span><span class='line'>❯ .symbol-work/bin/hello
+</span><span class='line'>Hello, world!</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Why Standard ML in the first place?</h2>
+
+<p>I&rsquo;ll probably get around to writing about <a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a> (and related
+tools like <a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a> and <a href="https://github.com/jez/multi-sub"><code>multi-sub</code></a>) but at the end of the day:
+SML is a really pleasant language to use in a lot of ways:</p>
+
+<ul>
+<li>Type inference in Standard ML is a breath of fresh air.</li>
+<li>Data types let me wonder less about how things work.</li>
+<li>Pattern matching makes for concise, clean, and correct code.</li>
+</ul>
+
+
+<p>Standard ML was my most commonly used programming language throughout
+all of my university courses, so there&rsquo;s a definite soft spot in my
+heart for it. There are features that I wish it had sometimes, but it&rsquo;s
+the only language that I&rsquo;ve used that doesn&rsquo;t feel fundamentally broken
+in some way.</p>
+
+<!-- vim:tw=72
+-->
+
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#sml" title="Pages tagged sml">sml</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#bash" title="Pages tagged bash">bash</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2019-06-04T12:26:45-04:00">June 04, 2019</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/profiling-in-haskell/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/profiling-in-haskell/" title="Profiling in Haskell for a 10x Speedup">Profiling in Haskell for a 10x Speedup</a></h3>
+      <p>I wrote up a toy project in Haskell and profiled it to learn about Haskell&#8217;s profiling tools and about profiling code in general. Profiling in Haskell with Stack is super easy&#8230;
+ <a href="/profiling-in-haskell/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/cpml-race/" title="Concurrent Programming in ML: A Race">Concurrent Programming in ML: A Race</a></h4>
+            <span>Published on July 18, 2018</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/prefer-then-over-catch/" title="Prefer .then() over .catch()">Prefer .then() over .catch()</a></h4>
+            <span>Published on May 31, 2018</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>
