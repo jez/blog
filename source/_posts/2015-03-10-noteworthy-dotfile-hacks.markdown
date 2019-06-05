@@ -10,7 +10,6 @@ description: >
 share: false
 redirect_from:
 - /2015/03/10/noteworthy-dotfile-hacks/
-pinned: 9001
 ---
 
 I have hundreds of files and folders in my dotfiles repo, and nearly 1000

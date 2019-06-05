@@ -12,6 +12,7 @@ description: >
   reviewing, so that I can understand it better than if I were just
   browsing online.
 strong_keywords: false
+pinned: true
 ---
 
 I do the bulk of my code reviews from the command line, especially when

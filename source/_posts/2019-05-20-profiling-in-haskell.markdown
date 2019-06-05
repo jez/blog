@@ -10,6 +10,7 @@ description: >
   Haskell's profiling tools and about profiling code in general.
   Profiling in Haskell with Stack is super easy...
 strong_keywords: false
+pinned: true
 ---
 
 I wrote up a toy project in Haskell and profiled it to learn about

@@ -15,6 +15,7 @@ description: >
   system.
 strong_keywords: true
 mathjax: true
+pinned: true
 ---
 
 Variables are central[^central] to programming languages, yet they're
