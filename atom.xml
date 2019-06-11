@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-06-09T00:55:54-04:00</updated>
+  <updated>2019-06-11T12:49:54-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,108 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Improving CLIs with isatty]]></title>
+    <link href="https://blog.jez.io/cli-tty/"/>
+    <updated>2019-06-09T00:17:59-04:00</updated>
+    <id>https://blog.jez.io/cli-tty</id>
+    <content type="html"><![CDATA[<p>One thing I like to do to improve the command-line programs I maintain
+is to make them aware of whether they&rsquo;re being run interactively. In
+this post I&rsquo;ll show off an easy trick to make programs running
+interactively more usable.</p>
+
+<!-- more -->
+
+
+<p>This always used to trip me up when I was first learning to use the
+terminal:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>❯ grep <span class="s1">'def foo'</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&rsquo;d drop this into the command-line and what happens? It hangs&hellip; Is it
+because it&rsquo;s taking a long time to search? Nope—I&rsquo;ve forgetten to tell
+<code>grep</code> what files to search in!</p>
+
+<p>When <code>grep</code> is given only a pattern to search for and no files to search
+in, it assumes we want to search for that pattern on stdin. This is
+great for shell scripts and one-liners at the command-line, but it&rsquo;s
+<strong>super</strong> annoying when we&rsquo;re just grepping interactively.</p>
+
+<p>The thing is, it&rsquo;s super easy to detect when the user might have made
+this mistake: if we&rsquo;re defaulting to reading from stdin <strong>and</strong> the file
+corresponding to stdin represents a terminal (more specifically, a
+<a href="https://unix.stackexchange.com/questions/4126/">tty</a>). And once we&rsquo;ve detected it, we can print a helpful message.</p>
+
+<p>Here&rsquo;s how I did it when writing <a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a>, one of the command-line
+programs I&rsquo;ve been working on lately:</p>
+
+<figure class='code'><figcaption><span>Check if stdin is a tty in Haskell</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">fileIn</span> <span class="o">&lt;-</span> <span class="kr">case</span> <span class="n">inputStyle</span> <span class="kr">of</span>
+</span><span class='line'>  <span class="kt">InputFromFile</span> <span class="n">filename</span> <span class="o">-&gt;</span> <span class="kt">IO</span><span class="o">.</span><span class="n">openFile</span> <span class="n">filename</span> <span class="kt">IO</span><span class="o">.</span><span class="kt">ReadMode</span>
+</span><span class='line'>  <span class="kt">InputFromStdin</span>         <span class="o">-&gt;</span> <span class="kr">do</span>
+</span><span class='line'>    <span class="n">isTTY</span> <span class="o">&lt;-</span> <span class="n">hIsTerminalDevice</span> <span class="kt">IO</span><span class="o">.</span><span class="n">stdin</span>
+</span><span class='line'>    <span class="n">when</span> <span class="n">isTTY</span> <span class="o">$</span> <span class="kr">do</span>
+</span><span class='line'>      <span class="n">errPutStrLn</span> <span class="s">"Warning: reading from stdin, which is a tty."</span>
+</span><span class='line'>    <span class="n">return</span> <span class="kt">IO</span><span class="o">.</span><span class="n">stdin</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we&rsquo;ve been given a file explicitly, just open it. Otherwise, fall
+back to reading from stdin. But first, check if <code>IO.stdin</code> is a terminal
+device and when it <strong>is</strong>, print a warning.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> The complete file
+containing the snippet above is <a href="https://github.com/jez/diff-locs/blob/743bff5cb1abb6e405b0369b195614aea6ec018d/app/Main.hs#L17-L24">on GitHub</a>.</p>
+
+<p>I&rsquo;ve implemented <code>diff-locs</code> as a standard Unix filter—it takes input on
+stdin and emits output on stdout. Normal usage looks something like
+this, where we <code>git diff</code> into <code>diff-locs</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>❯ git diff | diff-locs</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But if someone is just playing around at the terminal (maybe, trying to
+get the help output to show up), they might run <code>diff-locs</code> without
+args, and then be greeted with this message:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ diff-locs
+</span><span class='line'>Warning: reading from stdin, which is a tty.
+</span><span class='line'>█</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is much better than just sitting there appearing to hang!</p>
+
+<h2><code>isatty</code> in other languages</h2>
+
+<p>The trick above works in pretty much every language that supports Unix
+programming. Under the hood, the Haskell snippet above is powered by the
+<code>isatty</code> function in the C standard library <code>(man 3 isatty)</code>, which most
+other languages wrap in some way. For example, two other languages I&rsquo;ve
+done this in recently:</p>
+
+<figure class='code'><figcaption><span>Ruby</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">if</span> <span class="no">STDIN</span><span class="p">.</span><span class="nf">isatty?</span>
+</span><span class='line'>  <span class="no">STDERR</span><span class="p">.</span><span class="nf">puts</span> <span class="s1">'Warning: reading from stdin, which is a tty.'</span>
+</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>OCaml</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ocaml'><span class='line'><span class="k">if</span> <span class="nn">Unix</span><span class="p">.</span><span class="n">isatty</span> <span class="nn">Unix</span><span class="p">.</span><span class="n">stdin</span>
+</span><span class='line'><span class="k">then</span> <span class="n">prerr_endline</span> <span class="s2">"Warning: reading from stdin, which is a tty."</span>
+</span><span class='line'><span class="k">else</span> <span class="bp">()</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>And again, a quick search for <code>isatty &lt;language&gt;</code> should suffice for any
+language that supports Unix programming. It&rsquo;s little things like this
+that add up and make certain command-line utilities delightful to use.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>We don&rsquo;t really need to check whether the file we&rsquo;re opening is a tty. If the user managed to pass in the <em>name</em> of a tty file, they probably know what they&rsquo;re doing.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Standard ML in Travis&nbsp;CI]]></title>
@@ -3945,117 +4047,6 @@ not using Pandoc.</p>
 is powerful but cumbersome to use. With Markdown, we can focus on our writing,
 and worry about the presentation later. Pandoc can take care of the presentation
 for us, so the <a href="https://github.com/jez/pandoc-starter">only thing left to do is start</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Troubleshooting Haskell Stack Setup on OS X]]></title>
-    <link href="https://blog.jez.io/troubleshooting-haskell-stack-setup-on-os-x/"/>
-    <updated>2016-08-03T00:04:08-04:00</updated>
-    <id>https://blog.jez.io/troubleshooting-haskell-stack-setup-on-os-x</id>
-    <content type="html"><![CDATA[<p>Stephen Diehl&rsquo;s article <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> does a great
-job of outlining the quickest way to get a quality Haskell development
-experience. I ran into a simple issue when I followed it due to a bit of an
-idiosyncrasy on OS X El Capitan. I also document a few of the extra steps I took
-which aren&rsquo;t mentioned explicitly in his original article.</p>
-
-<!-- more -->
-
-
-<p>This post wouldn&rsquo;t actually be necessary if it weren&rsquo;t for one thing: <a href="https://support.apple.com/en-us/HT204899">System
-Integrity Protection</a> in OS X El Capitan, also known as &ldquo;rootless&rdquo;
-mode. It affects Haskell&rsquo;s build and install step in a subtle (but solved) way,
-and the rest of the article will cover what to watch out for when installing on
-OS X.</p>
-
-<p>If you don&rsquo;t follow these instructions and you&rsquo;re on OS X El Capitan, you&rsquo;ll
-likely run into an issue that looks like <code>/usr/bin/ar: permission denied</code>. The
-Stack installation instructions call this out specifically:</p>
-
-<blockquote><p>If you are on OS X 10.11 (&ldquo;El Capitan&rdquo;) or later, GHC 7.8.4 is incompatible
-with System Integrity Protection (a.k.a. &ldquo;rootless&rdquo;). GHC 7.10.2 includes a
-fix, so this only affects users of GHC 7.8.4.</p></blockquote>
-
-<p>At the risk of spoiling the surprise, we&rsquo;re going to set up Stack while taking
-care to make sure that we get GHC >= 7.10. So let&rsquo;s do just that!</p>
-
-<h2>Environment Prep (optional)</h2>
-
-<p>Note that this step is optional and has nothing to do with OS X; I just wanted
-to point it out quickly.</p>
-
-<p>Under <a href="http://www.stephendiehl.com/posts/vim_2016.html#dev-environment">Dev Environment</a> on <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in
-2016</a>, Stephen Diehl writes:</p>
-
-<blockquote><p>Times have changed quite a bit, and the new preferred way of installing GHC in
-2016 is to forgo using the system package manager for installing ghc and use
-Stack to manage the path to the compiler executable and sandboxes.</p></blockquote>
-
-<p>Stack stores it&rsquo;s metadata in the <code>~/.stack</code> folder by default. If you&rsquo;re not a
-huge fan of things cluttering up your home folder, set the <code>STACK_ROOT</code> variable
-in you bashrc or zshrc:</p>
-
-<figure class='code'><figcaption><span>Set STACK_ROOT to avoid clutter</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">XDG_DATA_HOME</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.local/share"</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Have Haskell Stack use XDG Base Directory spec</span>
-</span><span class='line'><span class="nb">export </span><span class="nv">STACK_ROOT</span><span class="o">=</span><span class="s2">"</span><span class="nv">$XDG_DATA_HOME</span><span class="s2">/stack"</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Of course, the choice of location is up to you. In particular I&rsquo;ve chosen to
-adhere to the <a href="https://wiki.archlinux.org/index.php/XDG_Base_Directory_support">XDG Base Directory specification</a> here, which you may want
-to take a peek at if you&rsquo;re unfamiliar. That&rsquo;s why you see references to
-<code>XDG_DATA_HOME</code>.</p>
-
-<p>Make sure you restart your terminal to pick up the new variables before
-continuing.</p>
-
-<h2>Install Stack from Homebrew</h2>
-
-<p>If you&rsquo;re like me, you&rsquo;ll want to take a second to purge anything
-Haskell-related from previous botched setup attempts:</p>
-
-<figure class='code'><figcaption><span>Wipe the slate clean</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># If you had GHC installed</span>
-</span><span class='line'><span class="gp">$ </span>brew uninstall ghc
-</span><span class='line'>
-</span><span class='line'><span class="c"># If you tried and failed at installing Stack already</span>
-</span><span class='line'><span class="gp">$ </span>brew uninstall haskell-stack
-</span><span class='line'><span class="gp">$ </span>rm -r ~/.stack
-</span><span class='line'><span class="c"># If you happened to also set STACK_ROOT</span>
-</span><span class='line'><span class="gp">$ </span>rm -r <span class="nv">$STACK_ROOT</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>With that out of the way, we can actually get our hands on Stack. For OS X,
-we&rsquo;ll install through Homebrew:</p>
-
-<figure class='code'><figcaption><span>Install Stack</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='console'><span class='line'><span class="w">$ </span><span class="nc">brew</span><span class="kv"> install haskell-stack</span></span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Configure Stack, avoiding &ldquo;rootless&rdquo; issues</h2>
-
-<p>Here&rsquo;s the trick. We need to run <code>stack setup</code> for the first time to let Stack
-configure itself. But remember: we want to make sure that Stack doesn&rsquo;t set
-itself up with version 7.8.4 of GHC. We can get around this by specifying an
-explicit resolver to the <code>stack</code> command (you can find more information on
-&ldquo;resolvers&rdquo; elsewhere):</p>
-
-<figure class='code'><figcaption><span>Side-step rootless issue in setup</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Change the resolver to the most up-to-date one. This is a hack to ensure that</span>
-</span><span class='line'><span class="c"># get GHC version &gt; 7.8, because there's an issue with El Capitan's rootless</span>
-</span><span class='line'><span class="c"># mode.</span>
-</span><span class='line'>stack --resolver<span class="o">=</span>lts-6.10 setup</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You&rsquo;ll notice we use the <code>--resolver=...</code> flag to force Stack to use a specific
-resolver. This post will be out of date as soon as it&rsquo;s written, so check
-<a href="https://www.stackage.org/snapshots">Stackage</a> to find the latest LTS snapshot.</p>
-
-<h2>Return to Vim and Haskell in 2016</h2>
-
-<p>That&rsquo;s it for the environment setup! Now you&rsquo;ll want to turn your attention to
-configuring Vim.</p>
-
-<p>The steps to set up Vim are platform independent, so now that we&rsquo;ve set up Stack
-correctly, you can head over to <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> to
-finish things out.</p>
 ]]></content>
   </entry>
   

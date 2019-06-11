@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Improving CLIs with isatty - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="One thing I like to do to improve the command-line programs I maintain is to make them aware of whether they're being run interactively. In this post &hellip;">
+
+<meta name="keywords" content="unix bash terminal ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/cli-tty">
+<meta property="og:title" content="Improving CLIs with isatty">
+<meta property="og:description" content="One thing I like to do to improve the command-line programs I maintain is to make them aware of whether they're being run interactively. In this post &hellip;">
+<meta property="og:image" content="">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/cli-tty">
+<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+<link href="/favicon@2x.png" rel="icon" sizes="32x32">
+<link href="/favicon.png" rel="icon" sizes="16x16">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Improving CLIs with isatty</h1>
+  <h2 class="EntryHeader-subtitle">June 9, 2019</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <p>One thing I like to do to improve the command-line programs I maintain
+is to make them aware of whether they&rsquo;re being run interactively. In
+this post I&rsquo;ll show off an easy trick to make programs running
+interactively more usable.</p>
+
+<!-- more -->
+
+
+<p>This always used to trip me up when I was first learning to use the
+terminal:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>❯ grep <span class="s1">'def foo'</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&rsquo;d drop this into the command-line and what happens? It hangs&hellip; Is it
+because it&rsquo;s taking a long time to search? Nope—I&rsquo;ve forgetten to tell
+<code>grep</code> what files to search in!</p>
+
+<p>When <code>grep</code> is given only a pattern to search for and no files to search
+in, it assumes we want to search for that pattern on stdin. This is
+great for shell scripts and one-liners at the command-line, but it&rsquo;s
+<strong>super</strong> annoying when we&rsquo;re just grepping interactively.</p>
+
+<p>The thing is, it&rsquo;s super easy to detect when the user might have made
+this mistake: if we&rsquo;re defaulting to reading from stdin <strong>and</strong> the file
+corresponding to stdin represents a terminal (more specifically, a
+<a href="https://unix.stackexchange.com/questions/4126/">tty</a>). And once we&rsquo;ve detected it, we can print a helpful message.</p>
+
+<p>Here&rsquo;s how I did it when writing <a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a>, one of the command-line
+programs I&rsquo;ve been working on lately:</p>
+
+<figure class='code'><figcaption><span>Check if stdin is a tty in Haskell</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">fileIn</span> <span class="o">&lt;-</span> <span class="kr">case</span> <span class="n">inputStyle</span> <span class="kr">of</span>
+</span><span class='line'>  <span class="kt">InputFromFile</span> <span class="n">filename</span> <span class="o">-&gt;</span> <span class="kt">IO</span><span class="o">.</span><span class="n">openFile</span> <span class="n">filename</span> <span class="kt">IO</span><span class="o">.</span><span class="kt">ReadMode</span>
+</span><span class='line'>  <span class="kt">InputFromStdin</span>         <span class="o">-&gt;</span> <span class="kr">do</span>
+</span><span class='line'>    <span class="n">isTTY</span> <span class="o">&lt;-</span> <span class="n">hIsTerminalDevice</span> <span class="kt">IO</span><span class="o">.</span><span class="n">stdin</span>
+</span><span class='line'>    <span class="n">when</span> <span class="n">isTTY</span> <span class="o">$</span> <span class="kr">do</span>
+</span><span class='line'>      <span class="n">errPutStrLn</span> <span class="s">"Warning: reading from stdin, which is a tty."</span>
+</span><span class='line'>    <span class="n">return</span> <span class="kt">IO</span><span class="o">.</span><span class="n">stdin</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we&rsquo;ve been given a file explicitly, just open it. Otherwise, fall
+back to reading from stdin. But first, check if <code>IO.stdin</code> is a terminal
+device and when it <strong>is</strong>, print a warning.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> The complete file
+containing the snippet above is <a href="https://github.com/jez/diff-locs/blob/743bff5cb1abb6e405b0369b195614aea6ec018d/app/Main.hs#L17-L24">on GitHub</a>.</p>
+
+<p>I&rsquo;ve implemented <code>diff-locs</code> as a standard Unix filter—it takes input on
+stdin and emits output on stdout. Normal usage looks something like
+this, where we <code>git diff</code> into <code>diff-locs</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>❯ git diff | diff-locs</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But if someone is just playing around at the terminal (maybe, trying to
+get the help output to show up), they might run <code>diff-locs</code> without
+args, and then be greeted with this message:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ diff-locs
+</span><span class='line'>Warning: reading from stdin, which is a tty.
+</span><span class='line'>█</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is much better than just sitting there appearing to hang!</p>
+
+<h2><code>isatty</code> in other languages</h2>
+
+<p>The trick above works in pretty much every language that supports Unix
+programming. Under the hood, the Haskell snippet above is powered by the
+<code>isatty</code> function in the C standard library <code>(man 3 isatty)</code>, which most
+other languages wrap in some way. For example, two other languages I&rsquo;ve
+done this in recently:</p>
+
+<figure class='code'><figcaption><span>Ruby</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">if</span> <span class="no">STDIN</span><span class="p">.</span><span class="nf">isatty?</span>
+</span><span class='line'>  <span class="no">STDERR</span><span class="p">.</span><span class="nf">puts</span> <span class="s1">'Warning: reading from stdin, which is a tty.'</span>
+</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>OCaml</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ocaml'><span class='line'><span class="k">if</span> <span class="nn">Unix</span><span class="p">.</span><span class="n">isatty</span> <span class="nn">Unix</span><span class="p">.</span><span class="n">stdin</span>
+</span><span class='line'><span class="k">then</span> <span class="n">prerr_endline</span> <span class="s2">"Warning: reading from stdin, which is a tty."</span>
+</span><span class='line'><span class="k">else</span> <span class="bp">()</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>And again, a quick search for <code>isatty &lt;language&gt;</code> should suffice for any
+language that supports Unix programming. It&rsquo;s little things like this
+that add up and make certain command-line utilities delightful to use.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>We don&rsquo;t really need to check whether the file we&rsquo;re opening is a tty. If the user managed to pass in the <em>name</em> of a tty file, they probably know what they&rsquo;re doing.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#unix" title="Pages tagged unix">unix</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#bash" title="Pages tagged bash">bash</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#terminal" title="Pages tagged terminal">terminal</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2019-06-09T00:17:59-04:00">June 9, 2019</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/sml-travis-ci/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/sml-travis-ci/" title="Standard ML in Travis&nbsp;CI">Standard ML in Travis&nbsp;CI</a></h3>
+      <p>For one of my recent projects I went through the work to get Standard ML building in Travis CI.
+ <a href="/sml-travis-ci/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/profiling-in-haskell/" title="Profiling in Haskell for a 10x Speedup">Profiling in Haskell for a 10x Speedup</a></h4>
+            <span>Published on May 19, 2019</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/cpml-race/" title="Concurrent Programming in ML: A Race">Concurrent Programming in ML: A Race</a></h4>
+            <span>Published on July 18, 2018</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>

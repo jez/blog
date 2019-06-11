@@ -4,7 +4,7 @@
   <title><![CDATA[Category: terminal | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/terminal/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-06-09T00:55:54-04:00</updated>
+  <updated>2019-06-11T12:49:54-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,106 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Improving CLIs with isatty]]></title>
+    <link href="https://blog.jez.io/cli-tty/"/>
+    <updated>2019-06-09T00:17:59-04:00</updated>
+    <id>https://blog.jez.io/cli-tty</id>
+    <content type="html"><![CDATA[<p>One thing I like to do to improve the command-line programs I maintain
+is to make them aware of whether they&rsquo;re being run interactively. In
+this post I&rsquo;ll show off an easy trick to make programs running
+interactively more usable.</p>
+
+<!-- more -->
+
+
+<p>This always used to trip me up when I was first learning to use the
+terminal:</p>
+
+<pre><code class="bash">❯ grep 'def foo'
+</code></pre>
+
+<p>I&rsquo;d drop this into the command-line and what happens? It hangs&hellip; Is it
+because it&rsquo;s taking a long time to search? Nope—I&rsquo;ve forgetten to tell
+<code>grep</code> what files to search in!</p>
+
+<p>When <code>grep</code> is given only a pattern to search for and no files to search
+in, it assumes we want to search for that pattern on stdin. This is
+great for shell scripts and one-liners at the command-line, but it&rsquo;s
+<strong>super</strong> annoying when we&rsquo;re just grepping interactively.</p>
+
+<p>The thing is, it&rsquo;s super easy to detect when the user might have made
+this mistake: if we&rsquo;re defaulting to reading from stdin <strong>and</strong> the file
+corresponding to stdin represents a terminal (more specifically, a
+<a href="https://unix.stackexchange.com/questions/4126/">tty</a>). And once we&rsquo;ve detected it, we can print a helpful message.</p>
+
+<p>Here&rsquo;s how I did it when writing <a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a>, one of the command-line
+programs I&rsquo;ve been working on lately:</p>
+
+<pre><code class="haskell Check if stdin is a tty in Haskell">fileIn &lt;- case inputStyle of
+  InputFromFile filename -&gt; IO.openFile filename IO.ReadMode
+  InputFromStdin         -&gt; do
+    isTTY &lt;- hIsTerminalDevice IO.stdin
+    when isTTY $ do
+      errPutStrLn "Warning: reading from stdin, which is a tty."
+    return IO.stdin
+</code></pre>
+
+<p>If we&rsquo;ve been given a file explicitly, just open it. Otherwise, fall
+back to reading from stdin. But first, check if <code>IO.stdin</code> is a terminal
+device and when it <strong>is</strong>, print a warning.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> The complete file
+containing the snippet above is <a href="https://github.com/jez/diff-locs/blob/743bff5cb1abb6e405b0369b195614aea6ec018d/app/Main.hs#L17-L24">on GitHub</a>.</p>
+
+<p>I&rsquo;ve implemented <code>diff-locs</code> as a standard Unix filter—it takes input on
+stdin and emits output on stdout. Normal usage looks something like
+this, where we <code>git diff</code> into <code>diff-locs</code>:</p>
+
+<pre><code class="bash">❯ git diff | diff-locs
+</code></pre>
+
+<p>But if someone is just playing around at the terminal (maybe, trying to
+get the help output to show up), they might run <code>diff-locs</code> without
+args, and then be greeted with this message:</p>
+
+<pre><code>❯ diff-locs
+Warning: reading from stdin, which is a tty.
+█
+</code></pre>
+
+<p>This is much better than just sitting there appearing to hang!</p>
+
+<h2><code>isatty</code> in other languages</h2>
+
+<p>The trick above works in pretty much every language that supports Unix
+programming. Under the hood, the Haskell snippet above is powered by the
+<code>isatty</code> function in the C standard library <code>(man 3 isatty)</code>, which most
+other languages wrap in some way. For example, two other languages I&rsquo;ve
+done this in recently:</p>
+
+<pre><code class="ruby Ruby">if STDIN.isatty?
+  STDERR.puts 'Warning: reading from stdin, which is a tty.'
+end
+</code></pre>
+
+<pre><code class="ocaml OCaml">if Unix.isatty Unix.stdin
+then prerr_endline "Warning: reading from stdin, which is a tty."
+else ()
+</code></pre>
+
+<p>And again, a quick search for <code>isatty &lt;language&gt;</code> should suffice for any
+language that supports Unix programming. It&rsquo;s little things like this
+that add up and make certain command-line utilities delightful to use.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>We don&rsquo;t really need to check whether the file we&rsquo;re opening is a tty. If the user managed to pass in the <em>name</em> of a tty file, they probably know what they&rsquo;re doing.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Offline LaTeX Development - Part 2]]></title>

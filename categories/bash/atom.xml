@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/bash/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-06-09T00:55:54-04:00</updated>
+  <updated>2019-06-11T12:49:54-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,106 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Improving CLIs with isatty]]></title>
+    <link href="https://blog.jez.io/cli-tty/"/>
+    <updated>2019-06-09T00:17:59-04:00</updated>
+    <id>https://blog.jez.io/cli-tty</id>
+    <content type="html"><![CDATA[<p>One thing I like to do to improve the command-line programs I maintain
+is to make them aware of whether they&rsquo;re being run interactively. In
+this post I&rsquo;ll show off an easy trick to make programs running
+interactively more usable.</p>
+
+<!-- more -->
+
+
+<p>This always used to trip me up when I was first learning to use the
+terminal:</p>
+
+<pre><code class="bash">❯ grep 'def foo'
+</code></pre>
+
+<p>I&rsquo;d drop this into the command-line and what happens? It hangs&hellip; Is it
+because it&rsquo;s taking a long time to search? Nope—I&rsquo;ve forgetten to tell
+<code>grep</code> what files to search in!</p>
+
+<p>When <code>grep</code> is given only a pattern to search for and no files to search
+in, it assumes we want to search for that pattern on stdin. This is
+great for shell scripts and one-liners at the command-line, but it&rsquo;s
+<strong>super</strong> annoying when we&rsquo;re just grepping interactively.</p>
+
+<p>The thing is, it&rsquo;s super easy to detect when the user might have made
+this mistake: if we&rsquo;re defaulting to reading from stdin <strong>and</strong> the file
+corresponding to stdin represents a terminal (more specifically, a
+<a href="https://unix.stackexchange.com/questions/4126/">tty</a>). And once we&rsquo;ve detected it, we can print a helpful message.</p>
+
+<p>Here&rsquo;s how I did it when writing <a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a>, one of the command-line
+programs I&rsquo;ve been working on lately:</p>
+
+<pre><code class="haskell Check if stdin is a tty in Haskell">fileIn &lt;- case inputStyle of
+  InputFromFile filename -&gt; IO.openFile filename IO.ReadMode
+  InputFromStdin         -&gt; do
+    isTTY &lt;- hIsTerminalDevice IO.stdin
+    when isTTY $ do
+      errPutStrLn "Warning: reading from stdin, which is a tty."
+    return IO.stdin
+</code></pre>
+
+<p>If we&rsquo;ve been given a file explicitly, just open it. Otherwise, fall
+back to reading from stdin. But first, check if <code>IO.stdin</code> is a terminal
+device and when it <strong>is</strong>, print a warning.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> The complete file
+containing the snippet above is <a href="https://github.com/jez/diff-locs/blob/743bff5cb1abb6e405b0369b195614aea6ec018d/app/Main.hs#L17-L24">on GitHub</a>.</p>
+
+<p>I&rsquo;ve implemented <code>diff-locs</code> as a standard Unix filter—it takes input on
+stdin and emits output on stdout. Normal usage looks something like
+this, where we <code>git diff</code> into <code>diff-locs</code>:</p>
+
+<pre><code class="bash">❯ git diff | diff-locs
+</code></pre>
+
+<p>But if someone is just playing around at the terminal (maybe, trying to
+get the help output to show up), they might run <code>diff-locs</code> without
+args, and then be greeted with this message:</p>
+
+<pre><code>❯ diff-locs
+Warning: reading from stdin, which is a tty.
+█
+</code></pre>
+
+<p>This is much better than just sitting there appearing to hang!</p>
+
+<h2><code>isatty</code> in other languages</h2>
+
+<p>The trick above works in pretty much every language that supports Unix
+programming. Under the hood, the Haskell snippet above is powered by the
+<code>isatty</code> function in the C standard library <code>(man 3 isatty)</code>, which most
+other languages wrap in some way. For example, two other languages I&rsquo;ve
+done this in recently:</p>
+
+<pre><code class="ruby Ruby">if STDIN.isatty?
+  STDERR.puts 'Warning: reading from stdin, which is a tty.'
+end
+</code></pre>
+
+<pre><code class="ocaml OCaml">if Unix.isatty Unix.stdin
+then prerr_endline "Warning: reading from stdin, which is a tty."
+else ()
+</code></pre>
+
+<p>And again, a quick search for <code>isatty &lt;language&gt;</code> should suffice for any
+language that supports Unix programming. It&rsquo;s little things like this
+that add up and make certain command-line utilities delightful to use.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>We don&rsquo;t really need to check whether the file we&rsquo;re opening is a tty. If the user managed to pass in the <em>name</em> of a tty file, they probably know what they&rsquo;re doing.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Standard ML in Travis&nbsp;CI]]></title>
@@ -677,83 +777,6 @@ solution.</p>
 <p>Then I discovered <a href="https://github.com/gorhill/uBlock">μBlock</a>, an &ldquo;efficient blocker for Chromium and
 Firefox.&rdquo; The fancy graphs on it&rsquo;s homepage convinced me to give it a shot, and
 from what I can tell so far it&rsquo;s responsive and effective.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Vim as a Man Page Viewer]]></title>
-    <link href="https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer/"/>
-    <updated>2014-12-20T21:17:46-05:00</updated>
-    <id>https://blog.jez.io/2014/12/20/vim-as-a-man-page-viewer</id>
-    <content type="html"><![CDATA[<p>Man pages are an essential part of every developer&rsquo;s workflow. Unfortunately,
-the default system pager <code>less</code> isn&rsquo;t the best interface. That&rsquo;s why I wrote a
-Vim plugin and a short shell function to take care of opening man pages in Vim.</p>
-
-<!-- more -->
-
-
-<h2>The Plugin</h2>
-
-<p>If you&rsquo;re eager to dive right into the source or to install the plugin, head on
-over to the <a href="https://github.com/jez/vim-superman">GitHub repository</a>. It&rsquo;s a whopping 32 SLOC, so feel
-free to peek under the hood.</p>
-
-<h2>Why?</h2>
-
-<p>You might be thinking, &ldquo;But Jake, <code>man</code> works just fine for me, why would I
-switch?&rdquo; I&rsquo;m glad you asked!</p>
-
-<h3>Mouse Support</h3>
-
-<p>The first reason why I was interested in getting man pages to open in Vim was
-because I wanted to be able to scroll with the mouse. When I have to read man
-pages for a long time, usually as a part of some more all-encompasing bit of
-research, I find scrolling to be a much better interface for quickly perusing
-the content of a man page.</p>
-
-<h3>Syntax Highlighting</h3>
-
-<p>As it turns out, man pages have a syntax to them, and Vim does a pretty
-excellent job at highlighting them. Rather than talk about it, here are some
-screenshots. Note how code samples (C system calls and library functions) are
-also syntax highlighted appropriately.</p>
-
-<pre><code class="bash Example 1">vman vim
-</code></pre>
-
-<p><a class="image-link" href="/images/vim.1.png"><img src="/images/vim.1.png"></a></p>
-
-<pre><code class="bash Example 2">vman 3 printf
-</code></pre>
-
-<p><a class="image-link" href="/images/printf.3.png"><img src="/images/printf.3.png"></a></p>
-
-<h3>All the benefits of Vim</h3>
-
-<p>While <code>less</code> makes a good effort to emulate certain Vim keybindings (or maybe
-it&rsquo;s the other way around, I don&rsquo;t know which came first), <code>less</code> certainly
-falls short of the full power of Vim.</p>
-
-<p>For example, once you&rsquo;ve opened a man page in Vim, you can open a new tab or
-split side-by-side with the man page. Especially if you&rsquo;re switching between Vim
-and the man page often, being able to open man pages in tabs or splits is
-invaluable.</p>
-
-<h2>Mine doesn&rsquo;t look like yours!</h2>
-
-<p>A couple of my other plugins are showing in the screenshots above. I&rsquo;m using the
-<a href="https://github.com/altercation/vim-colors-solarized">Solarized Dark color scheme</a>, the plugin
-<a href="https://github.com/bling/vim-airline">vim-airline</a> to take over the statuslines at the very top and
-bottom, and iTerm2 on Mac OS X 10.10.</p>
-
-<p>You can see my complete configuration <a href="https://github.com/jez/dotfiles">on GitHub</a>.</p>
-
-<h2>Feedback</h2>
-
-<p>As a matter of fact, this was my first Vim plugin! If you notice anything out of
-place, even if it&rsquo;s a small detail, I&rsquo;d love to hear it. Make no assumptions
-about the reasoning behind why certain decisions were made, because I have none
-XD</p>
 ]]></content>
   </entry>
   
