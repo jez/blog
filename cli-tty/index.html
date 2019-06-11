@@ -169,6 +169,13 @@ done this in recently:</p>
 
 
 
+<figure class='code'><figcaption><span>Bash</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="k">if</span> <span class="o">[</span> -t 0 <span class="o">]</span>; <span class="k">then
+</span><span class='line'>  </span><span class="nb">echo</span> <span class="s1">'Warning: reading from stdin, which is a tty.'</span> &gt;&amp;2
+</span><span class='line'>end</span></code></pre></td></tr></table></div></figure>
+
+
+
+
 <figure class='code'><figcaption><span>OCaml</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ocaml'><span class='line'><span class="k">if</span> <span class="nn">Unix</span><span class="p">.</span><span class="n">isatty</span> <span class="nn">Unix</span><span class="p">.</span><span class="n">stdin</span>
 </span><span class='line'><span class="k">then</span> <span class="n">prerr_endline</span> <span class="s2">"Warning: reading from stdin, which is a tty."</span>
 </span><span class='line'><span class="k">else</span> <span class="bp">()</span></span></code></pre></td></tr></table></div></figure>

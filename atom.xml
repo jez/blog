@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-06-11T12:49:54-04:00</updated>
+  <updated>2019-06-11T13:02:44-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -92,6 +92,13 @@ done this in recently:</p>
 <figure class='code'><figcaption><span>Ruby</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">if</span> <span class="no">STDIN</span><span class="p">.</span><span class="nf">isatty?</span>
 </span><span class='line'>  <span class="no">STDERR</span><span class="p">.</span><span class="nf">puts</span> <span class="s1">'Warning: reading from stdin, which is a tty.'</span>
 </span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Bash</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="k">if</span> <span class="o">[</span> -t 0 <span class="o">]</span>; <span class="k">then
+</span><span class='line'>  </span><span class="nb">echo</span> <span class="s1">'Warning: reading from stdin, which is a tty.'</span> &gt;&amp;2
+</span><span class='line'>end</span></code></pre></td></tr></table></div></figure>
 
 
 
