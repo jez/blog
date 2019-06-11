@@ -101,6 +101,12 @@ if STDIN.isatty?
 end
 ```
 
+```bash Bash
+if [ -t 0 ]; then
+  echo 'Warning: reading from stdin, which is a tty.' >&2
+end
+```
+
 ```ocaml OCaml
 if Unix.isatty Unix.stdin
 then prerr_endline "Warning: reading from stdin, which is a tty."
