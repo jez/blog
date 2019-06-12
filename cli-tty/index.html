@@ -138,7 +138,7 @@ containing the snippet above is <a href="https://github.com/jez/diff-locs/blob/7
 
 <p>I&rsquo;ve implemented <code>diff-locs</code> as a standard Unix filter—it takes input on
 stdin and emits output on stdout. Normal usage looks something like
-this, where we <code>git diff</code> into <code>diff-locs</code>:</p>
+this, where we pipe <code>git diff</code> into <code>diff-locs</code>:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>❯ git diff | diff-locs</span></code></pre></td></tr></table></div></figure>
 
@@ -158,8 +158,8 @@ args, and then be greeted with this message:</p>
 
 <p>The trick above works in pretty much every language that supports Unix
 programming. Under the hood, the Haskell snippet above is powered by the
-<code>isatty</code> function in the C standard library <code>(man 3 isatty)</code>, which most
-other languages wrap in some way. For example, two other languages I&rsquo;ve
+<code>isatty</code> function in the C standard library (<code>man 3 isatty</code>), which most
+other languages wrap in some way. For example, three other languages I&rsquo;ve
 done this in recently:</p>
 
 <figure class='code'><figcaption><span>Ruby</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">if</span> <span class="no">STDIN</span><span class="p">.</span><span class="nf">isatty?</span>

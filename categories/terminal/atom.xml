@@ -4,7 +4,7 @@
   <title><![CDATA[Category: terminal | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/terminal/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-06-11T13:03:47-04:00</updated>
+  <updated>2019-06-12T02:14:52-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -65,7 +65,7 @@ containing the snippet above is <a href="https://github.com/jez/diff-locs/blob/7
 
 <p>I&rsquo;ve implemented <code>diff-locs</code> as a standard Unix filter—it takes input on
 stdin and emits output on stdout. Normal usage looks something like
-this, where we <code>git diff</code> into <code>diff-locs</code>:</p>
+this, where we pipe <code>git diff</code> into <code>diff-locs</code>:</p>
 
 <pre><code class="bash">❯ git diff | diff-locs
 </code></pre>
@@ -85,8 +85,8 @@ Warning: reading from stdin, which is a tty.
 
 <p>The trick above works in pretty much every language that supports Unix
 programming. Under the hood, the Haskell snippet above is powered by the
-<code>isatty</code> function in the C standard library <code>(man 3 isatty)</code>, which most
-other languages wrap in some way. For example, two other languages I&rsquo;ve
+<code>isatty</code> function in the C standard library (<code>man 3 isatty</code>), which most
+other languages wrap in some way. For example, three other languages I&rsquo;ve
 done this in recently:</p>
 
 <pre><code class="ruby Ruby">if STDIN.isatty?
