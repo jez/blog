@@ -68,7 +68,7 @@ containing the snippet above is [on GitHub][haskell-isatty].
 
 I've implemented `diff-locs` as a standard Unix filter—it takes input on
 stdin and emits output on stdout. Normal usage looks something like
-this, where we `git diff` into `diff-locs`:
+this, where we pipe `git diff` into `diff-locs`:
 
 ```bash
 ❯ git diff | diff-locs
@@ -91,8 +91,8 @@ This is much better than just sitting there appearing to hang!
 
 The trick above works in pretty much every language that supports Unix
 programming. Under the hood, the Haskell snippet above is powered by the
-`isatty` function in the C standard library `(man 3 isatty)`, which most
-other languages wrap in some way. For example, two other languages I've
+`isatty` function in the C standard library (`man 3 isatty`), which most
+other languages wrap in some way. For example, three other languages I've
 done this in recently:
 
 ```ruby Ruby
