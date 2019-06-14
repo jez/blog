@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/bash/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-06-13T12:21:12-04:00</updated>
+  <updated>2019-06-14T01:56:07-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,117 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A debugger for Bash in six lines of Bash]]></title>
+    <link href="https://blog.jez.io/bash-debugger/"/>
+    <updated>2019-06-16T12:25:06-04:00</updated>
+    <id>https://blog.jez.io/bash-debugger</id>
+    <content type="html"><![CDATA[<p>I implemented a &ldquo;debugger&rdquo; for Bash in six lines of Bash. It kind of
+behaves like JavaScript&rsquo;s <code>debugger</code> keyword. Here&rsquo;s how it works:</p>
+
+<!-- more -->
+
+
+<pre><code class="bash">debugger() {
+  echo "Stopped in REPL. Press ^D to resume, or ^C to abort."
+  local line
+  while read -r -p "&gt; " line; do
+    eval "$line"
+  done
+  echo
+}
+</code></pre>
+
+<p>And there it is. Add this to a script, insert a call to <code>debugger</code>
+somewhere, and run the script. It&rsquo;ll pause right execution right there.
+Once paused, we can do things like:</p>
+
+<ul>
+<li>print the contents of variables with <code>echo</code></li>
+<li>run commands that are on our <code>PATH</code> (e.g., <code>pwd</code>, <code>ls</code>, &hellip;)</li>
+<li>call functions defined in the script</li>
+</ul>
+
+
+<p>&hellip; and pretty much everything that we could have done if we were
+editing the script directly. Here&rsquo;s a short session demonstrating how it
+can be used:</p>
+
+<pre><code class="bash">#!/usr/bin/env bash
+
+debugger() {
+  # ... implemented above ...
+}
+
+foo=1
+debugger
+echo "foo: $foo"
+</code></pre>
+
+<pre><code>❯ foo.sh
+Stopped in REPL. Press ^D to resume, or ^C to abort.
+&gt; pwd
+/Users/jez
+&gt; echo $foo
+1
+&gt; foo=42
+&gt; ^D
+foo: 42
+</code></pre>
+
+<h2>Stopping on failures</h2>
+
+<p>I find that most of the time this is useful when a script is failing for
+some reason. Rather than put a <code>debugger</code> call right before the failing
+command, I can just add this at the top of the file:</p>
+
+<pre><code class="bash">trap 'debugger' ERR
+</code></pre>
+
+<p>When any command has a non-zero exit code, Bash will run <code>debugger</code> and
+pause the program.</p>
+
+<p>I&rsquo;ve been keeping this function and <code>trap</code> call commented out at the top
+of my scripts and uncommenting them when needed (It uses <code>eval</code>, which
+is not the best from a security perspective, which is why it&rsquo;s commented
+by default).</p>
+
+<h2>Future work</h2>
+
+<p>Of course, I said &ldquo;debugger&rdquo; in quotes earlier because it&rsquo;s not
+<strong>really</strong> a debugger:</p>
+
+<ul>
+<li><p>Using it requires editing the script we want to debug to include these
+lines, and then calling <code>debugger</code> anywhere we want to pause
+execution.</p></li>
+<li><p>There&rsquo;s no <code>break</code> command that let us edit breakpoints while stopped.
+All breakpoints must have been written into the program up front.</p></li>
+<li><p>There&rsquo;s also no <code>step</code> or <code>next</code> commands for stepping into or over
+the next function or command.</p></li>
+<li><p>When it stops, it doesn&rsquo;t show the text content of the last line that
+executed, or even the line number.</p></li>
+</ul>
+
+
+<p>But I have some thoughts on how to implement these, too&hellip; Bash&rsquo;s <code>trap</code>
+builtin has a way to trap <code>DEBUG</code>, which runs after every command. I
+think I could make clever use of <code>trap</code>s to implementat least one of
+<code>step</code> or <code>next</code>, and definitely something that says &ldquo;stopped on line X&rdquo;
+and maybe even use that to print the source text of that line.
+Implementing <code>break</code> seems to be the hardest—I don&rsquo;t have any ideas for
+that one right now.</p>
+
+<p>I&rsquo;m releasing this code into the public domain. If you want to change it
+to implement any of these features, I&rsquo;d be more than interested to hear
+about it!</p>
+
+<!-- vim:tw=72
+-->
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Improving CLIs with isatty]]></title>
@@ -666,122 +777,6 @@ couldn&rsquo;t find if there was a special way to add external commands to <code
 
 <p>If you find this script useful and end up implementing one of these feature or
 more on top of <code>pip-uses</code>, be sure to send me a Pull Request!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Google Chrome: A Memory Hog]]></title>
-    <link href="https://blog.jez.io/2014/12/29/google-chrome-a-memory-hog/"/>
-    <updated>2014-12-29T18:00:00-05:00</updated>
-    <id>https://blog.jez.io/2014/12/29/google-chrome-a-memory-hog</id>
-    <content type="html"><![CDATA[<p>Whenever someone complains about a slow computer, the first thing I check is
-how many Chrome tabs they have open. Chrome hogs memory like no other. For
-users, this means Chrome is snappy and responsive, but oftentimes it comes at
-the expense of crowding out other programs. To get an idea of how much memory
-Chrome is really using, I wrote a quick bash oneliner.</p>
-
-<!-- more -->
-
-
-<h2>Why does Chrome Hog Memory?</h2>
-
-<p><a href="http://mobile.extremetech.com/latest/221392-iframe-irony-adblock-plus-is-probably-the-reason-firefox-and-chrome-are-such-memory-hogs">An article posted to Hacker News</a> recently brought some light to
-the question of why Chrome and Firefox suck up so much memory: Adblock Plus. The
-general idea is that the excessive use of iframes in most websites today ramps
-up the amount of processing that Adblock Plus has to do, driving memory usage
-through the roof. For more specifics, check out the rest of of the article.</p>
-
-<h2>The Oneliner</h2>
-
-<p>For the impatient, here&rsquo;s the code. It uses standard Unix tools:</p>
-
-<pre><code class="bash Chrome Memory Usage">$ ps -ev | grep -i chrome | awk '{print $12}' | awk '{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}'
-</code></pre>
-
-<p>Pretty isn&rsquo;t it? If you want to save this as an alias for handy use, add this
-line to your ~/.bashrc (or appropriate configuration file):</p>
-
-<pre><code class="bash Add as an alias">alias chromemem="ps -ev | grep -i chrome | awk '{print \$12}' | awk '{for(i=1;i&lt;=NF;i++)s+=\$i}END{print s}'"
-</code></pre>
-
-<p>It outputs a percentage. Here&rsquo;s the alias in action:</p>
-
-<pre><code class="bash Usage">$ chromemem
-60
-</code></pre>
-
-<h2>Explanation</h2>
-
-<p>There&rsquo;s a lot of good stuff going on here, so let&rsquo;s take it step-by-step.</p>
-
-<p>First, we&rsquo;ll need a program that tells us memory usage. I&rsquo;m sure there are many,
-but I&rsquo;m familiar with <code>ps</code>. After checking out the man page for a few options, I
-came up with <code>ps -ev</code>, to show all information about all processes. Maybe
-wasteful, but it works.</p>
-
-<pre><code class="bash ps -ev">$ ps -ev
-  PID STAT      TIME  SL  RE PAGEIN      VSZ    RSS   LIM     TSIZ  %CPU %MEM COMMAND
- 3473 S      0:54.92   0   0      0  3579092 301244     -        0   6.7  7.2 /Applications/Google C
-  365 S      3:03.17   0   0      0  3920732 206808     -        0   0.3  4.9 /Applications/Google C
-  983 S      1:29.23   0   0      0  3560272 193860     -        0   0.1  4.6 /Applications/Google C
-  395 S      0:13.11   0   0      0  2824936 141644     -        0   0.0  3.4 /Applications/Google C
-  422 S      0:27.22   0   0      0  3345796 130796     -        0   0.0  3.1 /Applications/Google C
-  ...
-</code></pre>
-
-<p>Notice that there&rsquo;s a convenient column describing memory usage as a percentage
-of total available memory, as well as what command is being run in that
-process. Let&rsquo;s make sure that we&rsquo;re looking at only the processes running
-some sort of Chrome service before totaling up the memory. We can find these
-lines with <code>ps -ev | grep -i chrome</code> (the -i means case-insensitive). Due to the
-way I clipped the previous sample output, nothing changes in the first five
-lines, but rest assured: we&rsquo;re only looking at Chrome processes now.</p>
-
-<p>Now it&rsquo;s time to get rid of all the other nonsense that we included with <code>ps
--ev</code>. Luckily, there&rsquo;s a handy tool called <code>awk</code> that makes parsing text by
-column easy. If we want to print the 12th column (which just so happens to
-contain the memory consumption!) we can do <code>awk '{print $12}'</code>:</p>
-
-<pre><code class="bash ps -ev | grep -i chrome | awk '{print $12}'">$ ps -ev | grep -i chrome | awk '{print $12}'
-7.2
-5.1
-4.6
-3.4
-3.2
-...
-</code></pre>
-
-<p>Finally, I found myself needing a way to add up a column of numbers. A quick
-Google search led me to <a href="http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers">this StackOverflow question</a>, and I picked the
-<code>awk</code> solution because I knew I could just pipe the input to awk (as opposed to
-having to do weird hacks to get it to work with a bash for loop):</p>
-
-<pre><code class="bash Final Solution">$ ps -emv | grep -i chrome | awk '{print $12}' | awk '{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}'
-60.4
-</code></pre>
-
-<p>Of course, you could change the last <code>awk</code> command to print out something
-fancier like</p>
-
-<pre><code class="bash Final Solution">$ ps -emv | grep -i chrome | awk '{print $12}' | awk '{for(i=1;i&lt;=NF;i++)s+=$i}END{print "Chrome is using "s"% of total memory."}'
-Chrome is using 60.4% of total memory.
-</code></pre>
-
-<p>There you have it! Bash oneliners save the day yet again.</p>
-
-<h2>Update</h2>
-
-<p>After writing this article, I stopped using Ad Block Plus, and I noticed a
-significant drop in Chrome&rsquo;s memory usage. Obviously, though, that came at the
-cost of not blocking ads! Also, from time to time I would encounter a site that
-seemed sluggish, presumably because of all the ads attempting to be loaded. My
-simple solution to this was just to disable JavaScript on that page (I use an
-extension called Quick JavaScript Switcher), but this wasn&rsquo;t an automated
-solution.</p>
-
-<p>Then I discovered <a href="https://github.com/gorhill/uBlock">μBlock</a>, an &ldquo;efficient blocker for Chromium and
-Firefox.&rdquo; The fancy graphs on it&rsquo;s homepage convinced me to give it a shot, and
-from what I can tell so far it&rsquo;s responsive and effective.</p>
 ]]></content>
   </entry>
   

@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>A debugger for Bash in six lines of Bash - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="I implemented a "debugger" for Bash in six lines of Bash.
+">
+
+<meta name="keywords" content="bash ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/bash-debugger">
+<meta property="og:title" content="A debugger for Bash in six lines of Bash">
+<meta property="og:description" content="I implemented a "debugger" for Bash in six lines of Bash.
+">
+<meta property="og:image" content="">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/bash-debugger">
+<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+<link href="/favicon@2x.png" rel="icon" sizes="32x32">
+<link href="/favicon.png" rel="icon" sizes="16x16">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">A debugger for Bash in six lines of Bash</h1>
+  <h2 class="EntryHeader-subtitle">June 16, 2019</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <p>I implemented a &ldquo;debugger&rdquo; for Bash in six lines of Bash. It kind of
+behaves like JavaScript&rsquo;s <code>debugger</code> keyword. Here&rsquo;s how it works:</p>
+
+<!-- more -->
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>debugger<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s2">"Stopped in REPL. Press ^D to resume, or ^C to abort."</span>
+</span><span class='line'>  <span class="nb">local </span>line
+</span><span class='line'>  <span class="k">while </span><span class="nb">read</span> -r -p <span class="s2">"&gt; "</span> line; <span class="k">do
+</span><span class='line'>    </span><span class="nb">eval</span> <span class="s2">"</span><span class="nv">$line</span><span class="s2">"</span>
+</span><span class='line'>  <span class="k">done
+</span><span class='line'>  </span><span class="nb">echo</span>
+</span><span class='line'><span class="o">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>And there it is. Add this to a script, insert a call to <code>debugger</code>
+somewhere, and run the script. It&rsquo;ll pause right execution right there.
+Once paused, we can do things like:</p>
+
+<ul>
+<li>print the contents of variables with <code>echo</code></li>
+<li>run commands that are on our <code>PATH</code> (e.g., <code>pwd</code>, <code>ls</code>, &hellip;)</li>
+<li>call functions defined in the script</li>
+</ul>
+
+
+<p>&hellip; and pretty much everything that we could have done if we were
+editing the script directly. Here&rsquo;s a short session demonstrating how it
+can be used:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'>
+</span><span class='line'>debugger<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="c"># ... implemented above ...</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">foo</span><span class="o">=</span>1
+</span><span class='line'>debugger
+</span><span class='line'><span class="nb">echo</span> <span class="s2">"foo: </span><span class="nv">$foo</span><span class="s2">"</span></span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ foo.sh
+</span><span class='line'>Stopped in REPL. Press ^D to resume, or ^C to abort.
+</span><span class='line'>&gt; pwd
+</span><span class='line'>/Users/jez
+</span><span class='line'>&gt; echo $foo
+</span><span class='line'>1
+</span><span class='line'>&gt; foo=42
+</span><span class='line'>&gt; ^D
+</span><span class='line'>foo: 42</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Stopping on failures</h2>
+
+<p>I find that most of the time this is useful when a script is failing for
+some reason. Rather than put a <code>debugger</code> call right before the failing
+command, I can just add this at the top of the file:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">trap</span> <span class="s1">'debugger'</span> ERR</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When any command has a non-zero exit code, Bash will run <code>debugger</code> and
+pause the program.</p>
+
+<p>I&rsquo;ve been keeping this function and <code>trap</code> call commented out at the top
+of my scripts and uncommenting them when needed (It uses <code>eval</code>, which
+is not the best from a security perspective, which is why it&rsquo;s commented
+by default).</p>
+
+<h2>Future work</h2>
+
+<p>Of course, I said &ldquo;debugger&rdquo; in quotes earlier because it&rsquo;s not
+<strong>really</strong> a debugger:</p>
+
+<ul>
+<li><p>Using it requires editing the script we want to debug to include these
+lines, and then calling <code>debugger</code> anywhere we want to pause
+execution.</p></li>
+<li><p>There&rsquo;s no <code>break</code> command that let us edit breakpoints while stopped.
+All breakpoints must have been written into the program up front.</p></li>
+<li><p>There&rsquo;s also no <code>step</code> or <code>next</code> commands for stepping into or over
+the next function or command.</p></li>
+<li><p>When it stops, it doesn&rsquo;t show the text content of the last line that
+executed, or even the line number.</p></li>
+</ul>
+
+
+<p>But I have some thoughts on how to implement these, too&hellip; Bash&rsquo;s <code>trap</code>
+builtin has a way to trap <code>DEBUG</code>, which runs after every command. I
+think I could make clever use of <code>trap</code>s to implementat least one of
+<code>step</code> or <code>next</code>, and definitely something that says &ldquo;stopped on line X&rdquo;
+and maybe even use that to print the source text of that line.
+Implementing <code>break</code> seems to be the hardest—I don&rsquo;t have any ideas for
+that one right now.</p>
+
+<p>I&rsquo;m releasing this code into the public domain. If you want to change it
+to implement any of these features, I&rsquo;d be more than interested to hear
+about it!</p>
+
+<!-- vim:tw=72
+-->
+
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#bash" title="Pages tagged bash">bash</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2019-06-16T12:25:06-04:00">June 16, 2019</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/cli-tty/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/cli-tty/" title="Improving CLIs with isatty">Improving CLIs with isatty</a></h3>
+      <p>One thing I like to do to improve the command-line programs I maintain is to make them aware of whether they&#8217;re being run interactively. In this post I&#8217;ll show off an easy trick to make programs running interactively more usable.
+ <a href="/cli-tty/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/sml-travis-ci/" title="Standard ML in Travis&nbsp;CI">Standard ML in Travis&nbsp;CI</a></h4>
+            <span>Published on June 4, 2019</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/profiling-in-haskell/" title="Profiling in Haskell for a 10x Speedup">Profiling in Haskell for a 10x Speedup</a></h4>
+            <span>Published on May 19, 2019</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>
