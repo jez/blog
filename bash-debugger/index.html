@@ -174,10 +174,10 @@ by default).</p>
 
 <ul>
 <li><p>Using it requires editing the script we want to debug to include these
-lines, and then calling <code>debugger</code> anywhere we want to pause
-execution.</p></li>
-<li><p>There&rsquo;s no <code>break</code> command that let us edit breakpoints while stopped.
-All breakpoints must have been written into the program up front.</p></li>
+lines, and then calling <code>debugger</code> somewhere. It doesn&rsquo;t launch an
+inferior process and control it, like <code>gdb</code> or <code>lldb</code> would.</p></li>
+<li><p>There&rsquo;s no <code>break</code> command to edit breakpoints while stopped. All
+breakpoints must have been written into the program up front.</p></li>
 <li><p>There&rsquo;s also no <code>step</code> or <code>next</code> commands for stepping into or over
 the next function or command.</p></li>
 <li><p>When it stops, it doesn&rsquo;t show the text content of the last line that
