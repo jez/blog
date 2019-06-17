@@ -5,8 +5,7 @@ date: 2019-06-16 09:25:06 -0700
 comments: false
 share: false
 categories: ['bash']
-description: >
-  I implemented a "debugger" for Bash in six lines of Bash.
+description: I implemented a debugger for Bash in six lines of Bash.
 strong_keywords: false
 ---
 
