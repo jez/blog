@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Notes on Continuations"
-date: 2018-08-18 18:03:13 -0700
+date: 2019-06-18 18:03:13 -0700
 comments: false
 share: false
 categories: ['recitation', 'plt', 'types']
@@ -12,10 +12,20 @@ strong_keywords: false
 ---
 
 These are some notes I gave out at one of my weekly recitations when I
-was teaching [15-312 Principles of Programming Languages][ppl] at CMU.
-Continuations have a *really* interesting analogy with proofs by
+was teaching [15-312 Principles of Programming Languages][ppl] at CMU in
+April 2017. Continuations have a *fascinating* analogy with proofs by
 contradiction that I might flesh out into a proper post in the future,
-but for now here are some rough recitation notes:
+but for now here are some rough recitation notes.
+
+They're best understood with Chapter 30 of [Practical Foundations for
+Programming Languages][pfpl] open. (Unfortunately this chapter isn't
+available in the online preview of the 2nd edition. I'm happy to lend
+you my hard copy if I know you IRL.)
+
+[ppl]: http://www.cs.cmu.edu/~rwh/courses/ppl/
+[pfpl]: http://www.cs.cmu.edu/~rwh/pfpl/
+
+### → [Continuations](/notes/continuations.pdf)
 
 **Abstract**:
 
@@ -25,16 +35,6 @@ but for now here are some rough recitation notes:
 > a way, continuations are like a much nicer version of `goto`. But
 > they're way more than this—specifically, they reify the concept of a
 > "proof by contradiction" into the type system.
-
-### → [Continuations](/notes/continuations.pdf)
-
-They're best understood with Chapter 30 of [Practical Foundations for
-Programming Languages][pfpl] open. (Unfortunately this chapter isn't
-available in the online preview of the 2nd edition. I'm happy to lend
-you my hard copy if I know you IRL.)
-
-[ppl]: http://www.cs.cmu.edu/~rwh/courses/ppl/
-[pfpl]: http://www.cs.cmu.edu/~rwh/pfpl/
 
 
 <!-- vim:tw=72
