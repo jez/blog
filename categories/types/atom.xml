@@ -4,7 +4,7 @@
   <title><![CDATA[Category: types | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/types/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-06-19T02:43:18-04:00</updated>
+  <updated>2019-06-19T03:36:39-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -16,13 +16,20 @@
   <entry>
     <title type="html"><![CDATA[Notes on Continuations]]></title>
     <link href="https://blog.jez.io/continuations-notes/"/>
-    <updated>2018-08-18T21:03:13-04:00</updated>
+    <updated>2019-06-18T21:03:13-04:00</updated>
     <id>https://blog.jez.io/continuations-notes</id>
     <content type="html"><![CDATA[<p>These are some notes I gave out at one of my weekly recitations when I
-was teaching <a href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles of Programming Languages</a> at CMU.
-Continuations have a <em>really</em> interesting analogy with proofs by
+was teaching <a href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles of Programming Languages</a> at CMU in
+April 2017. Continuations have a <em>fascinating</em> analogy with proofs by
 contradiction that I might flesh out into a proper post in the future,
-but for now here are some rough recitation notes:</p>
+but for now here are some rough recitation notes.</p>
+
+<p>They&rsquo;re best understood with Chapter 30 of <a href="http://www.cs.cmu.edu/~rwh/pfpl/">Practical Foundations for
+Programming Languages</a> open. (Unfortunately this chapter isn&rsquo;t
+available in the online preview of the 2nd edition. I&rsquo;m happy to lend
+you my hard copy if I know you IRL.)</p>
+
+<h3>→ <a href="/notes/continuations.pdf">Continuations</a></h3>
 
 <p><strong>Abstract</strong>:</p>
 
@@ -32,13 +39,6 @@ continuations transfer control to some other part of your program. In
 a way, continuations are like a much nicer version of <code>goto</code>. But
 they&rsquo;re way more than this—specifically, they reify the concept of a
 &ldquo;proof by contradiction&rdquo; into the type system.</p></blockquote>
-
-<h3>→ <a href="/notes/continuations.pdf">Continuations</a></h3>
-
-<p>They&rsquo;re best understood with Chapter 30 of <a href="http://www.cs.cmu.edu/~rwh/pfpl/">Practical Foundations for
-Programming Languages</a> open. (Unfortunately this chapter isn&rsquo;t
-available in the online preview of the 2nd edition. I&rsquo;m happy to lend
-you my hard copy if I know you IRL.)</p>
 
 <!-- vim:tw=72
 -->
