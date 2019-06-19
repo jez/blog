@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-06-14T12:44:20-04:00</updated>
+  <updated>2019-06-19T02:43:18-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,210 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[On Programming Language Choice]]></title>
+    <link href="https://blog.jez.io/on-language-choice/"/>
+    <updated>2019-06-21T23:39:25-04:00</updated>
+    <id>https://blog.jez.io/on-language-choice</id>
+    <content type="html"><![CDATA[<p>My opinion on programming language choice has changed over the years,
+from &ldquo;Java is the only language I know&rdquo; to &ldquo;Standard ML is clearly the
+right answer&rdquo; to something more modest and nuanced now. Still, since
+this post is largely my <strong>opinion</strong>, I withold the right to make claims
+without evidence and say things you&rsquo;ll disagree with. But enough
+qualifiers—let&rsquo;s get into it.</p>
+
+<!-- more -->
+
+
+<p>Earlier in my career, I thought that the answer to &ldquo;which language
+should I use&rdquo; should be constant. That there should be One Best
+Language. And while I still think it makes sense to compare languages on
+the relative merits of their designs, answering the question &ldquo;which
+language is <strong>best</strong> designed&rdquo; is a completely different question. The
+question I&rsquo;ll answer in this post is: &ldquo;Which language should I choose to
+start this new project?&rdquo;<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+
+<p>Answering &ldquo;which language is best designed&rdquo; is better left to
+programming language theorists. To claim that I (or most people reading
+this) have any authority to answer this question is absurd. Language
+design is a well-studied, complex problem, with a wealth of
+peer-reviewed, prior work. One semester studying programming language
+theory in college is not sufficient qualification to answer this
+question.</p>
+
+<p>As it turns out, most people trying to answer &ldquo;which language is best
+designed&rdquo; knowingly or unknowingly end up answering the latter question:
+&ldquo;which language should I choose to start this new project?&rdquo; Luckily,
+this is a much easier question to answer! Because we can narrow the
+choice space by asking questions about the specifics of the project,
+like these:</p>
+
+<ul>
+<li>What languages does the initial team know?</li>
+<li>What languages will future collaborators know?</li>
+<li>What languages have strong package ecosystems? (Especially for our
+domain?)</li>
+<li>What performance properties must our solution have?</li>
+<li>&hellip;</li>
+</ul>
+
+
+<p>But there&rsquo;s one big question missing, and it 100% overshadows all other
+questions. Absolutely the most regret from choosing a programming
+language has come from forgetting to ask this question:</p>
+
+<p><strong>In this language, how easy is it to delete code?</strong></p>
+
+<p>Code is a liability. More code means more to understand, more systems to
+maintain. More moving parts means more points of failure. More failures
+mean more people try to fix old code with new code. Company pressures to
+ship more features mean more code accumulating on top of the old code.</p>
+
+<p>This is a nightmare.</p>
+
+<p>Code is a liability, so regardless of language it must be trivial to
+delete code. That means our language must be easy to statically analyze
+(ideally, though not necessarily, a language with a type system). Static
+analysis means that <strong>when</strong> I delete code, I can know whether other
+code relied on it. Renaming a function, relocating files, deleting
+unused features—I choose languages that make these operations easy.</p>
+
+<p>As a quick aside, I&rsquo;d like to elaborate on what I mean by &ldquo;not
+necessarily&rdquo; a type system. Take for example the case of JavaScript&rsquo;s
+<code>package.json</code> files (specified with JSON) versus Ruby&rsquo;s <code>Gemfile</code>s
+(specified with Ruby code). Neither of these configuration files are
+&ldquo;typed&rdquo; in the traditional sense, but that does not mean they&rsquo;re
+statically unanalyzable:</p>
+
+<ul>
+<li><p><code>package.json</code> files can be (and frequently are) parsed and analyzed
+in any language with a JSON parser. It&rsquo;s easy to check that all
+required keys are passed, that custom config for some specific package
+has been set up correctly, etc.</p></li>
+<li><p>On the other hand, <code>Gemfile</code>s can only be analyzed from Ruby and even
+then only by actually running the code. <code>Gemfile</code>s can have different
+behavior based on the environment (just one tempting <code>ENV[...]</code> call
+away) so even running the code might not be enough to completely
+analyze all of it.</p></li>
+</ul>
+
+
+<p>Even though JSON is untyped<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> it&rsquo;s still statically analyzeable,
+which is better than nothing.</p>
+
+<p>Going back to the case where the language <strong>does</strong> use a type system to
+achieve static analysis, the set of features we get expnads from &ldquo;safely
+delete code&rdquo; to loads of other things:</p>
+
+<ul>
+<li>types are machine-checked documentation</li>
+<li>jump to definition powered by the tool is fast and accurate</li>
+<li>trustworthy autocompletion results mean people use them more</li>
+<li>&hellip;</li>
+</ul>
+
+
+<p>This list is of course longer, but I want to re-iterate: choosing a
+typed language is for me a downstream consequence of choosing a language
+where it&rsquo;s trivial to delete code.</p>
+
+<p>Until now I&rsquo;ve relied on an implicit assumption that only via static
+analysis or type checking can we easily reason about how to delete code.
+The alternative might be to use some sort of dynamic analysis, like
+running tests, rolling out refactors behind feature flags, or using some
+sort of manual QA checklist.</p>
+
+<p>And while these techniques are still valuable, on their own they&rsquo;re a
+poor substitute for static analysis. Why? First: because they&rsquo;re opt in.
+Programmers have to remember to write tests and to choose to use feature
+flags. Static analysis on the other hand is opt out. Having chosen a
+language with static analysis from the beginning, it applies everywhere.
+This also means if we choose a language we&rsquo;re not satisfied with, it&rsquo;s
+easier to change our mind in the future.</p>
+
+<p>Second: because they over-index on the quality of the data they&rsquo;re fed.
+An example of &ldquo;poor data quality&rdquo; might be excessive use of mocks and
+stubs in tests. I&rsquo;ve seen all too many test suites that overuse mocking
+and stubbing to the point where they&rsquo;re really just testing the testing
+framework.</p>
+
+<p>Another common dynamic analysis technique where I work is using &ldquo;soft
+assertions&rdquo; which we define as an assertion that raises an exception in
+tests, but logs to Sentry in production. Before deleting the core code,
+we&rsquo;ll preface all calls to it with soft assertions, and merge to
+production to see whether any assertions fire. Our confidence is
+directly tied to how well the production data in that time represents
+all production data.</p>
+
+<p>How long spent waiting for no soft assertions is enough to get a
+representative sample? A day? A week? What if we have behavior that only
+executes on the first of the month? Or code paths that customers only
+hit when they&rsquo;re computing quarterly accounting statements? Or yearly
+when they&rsquo;re doing taxes? A week of data collected for changing tax code
+might as well be useless if it isn&rsquo;t in March or April.</p>
+
+<p>For these two reasons, dynamic analysis fails us when we need it the
+most: when we&rsquo;re trying to delete the code that&rsquo;s untested, uncommonly
+run, yet critically important. With only dynamic analysis, the code that
+we understand the least is also the code that&rsquo;s the hardest to remove.</p>
+
+<p>So here&rsquo;s my unsubstantiated claim: dynamic analysis techniques
+(anything that involves running the code) are too weak to empower people
+to delete code. If we want to delete code (and we do because code is a
+liability), we want static analysis. Though as <a href="https://blog.jez.io/tests-types-correctness/">I&rsquo;ve written
+before</a>, these techniques are still valuable
+complements.</p>
+
+<p>The next thing to point out is that not all forms of static analysis are
+created equal. Arguably Haskell&rsquo;s static analysis is more powerful than
+C&rsquo;s. And while I&rsquo;ll acknowledge that some languages give <strong>more</strong> static
+guarantees than others, as long as a language can at least reason about
+code that&rsquo;s been mistakenly deleted, I prefer to turn my attention to
+the questions I posed earlier in this article before getting into those
+minutia. Comparing C and Haskell gets back into debating language
+design which, again, is a bit fruitless.</p>
+
+<p>After all that, here&rsquo;s my checklist when choosing a language to start a
+new project:</p>
+
+<ol>
+<li>Rule out languages where we can&rsquo;t easily delete code.</li>
+<li>Narrow the remaining languages to those that fit the circumstances.</li>
+<li>Pick anything that&rsquo;s left, because according to step (2) they all
+fit the circumstances of the project.</li>
+</ol>
+
+
+<p>Optimizing for deleting code minimizes the biggest regret I&rsquo;ve seen stem
+from a language choice, and keeps the door open so we can change our
+mind in the future. As a consequence we usually pick up extra benefits
+in the process (namely those that come from a good type system), but
+choosing a language to fit the circumstances trumps attempting to
+debate which type system is The Best.</p>
+
+<p>&nbsp;</p>
+
+<p><em>If you read this far and were hoping that I declare one winner in the
+end, I&rsquo;m sorry to disappoint. I&rsquo;m happy to indulge you over lunch or
+email, or you can read <a href="https://blog.jez.io/categories/#bash">the rest</a> of <a href="https://blog.jez.io/categories/#haskell">my blog</a> and <a href="https://blog.jez.io/categories/#sml">guess</a> at what I
+might say. Regardless, thanks for your time.</em></p>
+
+<!-- vim:tw=72:fdm=marker
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Fundamentally, I believe language choice <strong>only</strong> applies to new projects. Given an existing project, the question is not &ldquo;which language&rdquo; but instead &ldquo;should we rewrite,&rdquo; to which the answer is overwhelmingly <strong>no</strong>. But that&rsquo;s a topic for another post.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>I&rsquo;m aware that it&rsquo;s possible to use schemas and specs to approximate types for JSON, but this only goes to strengthen my argument: those make it <strong>even easier</strong> to statically analyze JSON.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Debugger for Bash in Six Lines of Bash]]></title>
@@ -654,6 +858,39 @@ attempt:</p>
 
 
 <p>If you have any questions about anything, feel free to <a href="https://jez.io/">reach out</a>!</p>
+
+<!-- vim:tw=72
+-->
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Notes on Continuations]]></title>
+    <link href="https://blog.jez.io/continuations-notes/"/>
+    <updated>2018-08-18T21:03:13-04:00</updated>
+    <id>https://blog.jez.io/continuations-notes</id>
+    <content type="html"><![CDATA[<p>These are some notes I gave out at one of my weekly recitations when I
+was teaching <a href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles of Programming Languages</a> at CMU.
+Continuations have a <em>really</em> interesting analogy with proofs by
+contradiction that I might flesh out into a proper post in the future,
+but for now here are some rough recitation notes:</p>
+
+<p><strong>Abstract</strong>:</p>
+
+<blockquote><p>Continuations allow for lots of things. Intuitively, we can think of
+continuations as &ldquo;functions that never come back.&rdquo; That is,
+continuations transfer control to some other part of your program. In
+a way, continuations are like a much nicer version of <code>goto</code>. But
+they&rsquo;re way more than this—specifically, they reify the concept of a
+&ldquo;proof by contradiction&rdquo; into the type system.</p></blockquote>
+
+<h3>→ <a href="https://blog.jez.io/notes/continuations.pdf">Continuations</a></h3>
+
+<p>They&rsquo;re best understood with Chapter 30 of <a href="http://www.cs.cmu.edu/~rwh/pfpl/">Practical Foundations for
+Programming Languages</a> open. (Unfortunately this chapter isn&rsquo;t
+available in the online preview of the 2nd edition. I&rsquo;m happy to lend
+you my hard copy if I know you IRL.)</p>
 
 <!-- vim:tw=72
 -->
@@ -3587,10 +3824,10 @@ heavy-handed assumption that you&rsquo;re in the class currently).</p>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Testing, Types, & Correctness]]></title>
-    <link href="https://blog.jez.io/testing-types/"/>
+    <title type="html"><![CDATA[Tests, Types, & Correctness]]></title>
+    <link href="https://blog.jez.io/tests-types-correctness/"/>
     <updated>2017-09-10T19:50:36-04:00</updated>
-    <id>https://blog.jez.io/testing-types</id>
+    <id>https://blog.jez.io/tests-types-correctness</id>
     <content type="html"><![CDATA[<p>Understanding correctness of code really comes down to <em>proving</em> that
 the code does the right thing. What tools do we have as programmers for
 proving the correctness of our code?</p>
@@ -3599,400 +3836,44 @@ proving the correctness of our code?</p>
 
 
 <ol>
-<li><strong>Unit tests</strong> prove that the code is correct for specific inputs.</li>
+<li><strong>Tests</strong> prove that the code is correct for specific inputs.</li>
 <li><strong>Type systems</strong> prove the absence of (certain kinds of)
 incorrectness.</li>
 <li><strong>Theorem provers</strong> prove sophisticated claims about our code for
 us.</li>
+<li><strong>Monitoring tools</strong> prove that incorrect behavior hasn&rsquo;t occurred
+<em>yet</em>, or provide us with a concrete counter example when it
+happens.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
 <li><strong>Program authors</strong> can prove the correctness of their code (i.e.,
 with a traditional pen-and-paper proof).</li>
 </ol>
 
 
 <p>The first three are exciting because they involve a computer doing most
-of the work for us! That said, none of the first three are as
-universally applicable as the last: doing the proof ourself.
-Unfortunately, it&rsquo;s also usually the most toilsome.</p>
+of the work for us! The fourth might seem not helpful, but is often
+better than nothing, and in many situations can be leveraged into making
+powerful claims. None of the above are as universally applicable as the
+last: doing the proof ourself, but it&rsquo;s also usually the most error prone.</p>
 
 <p>Note the double negation in (2). Type systems themselves don&rsquo;t prove
 correctness, they prove that there aren&rsquo;t certain kinds of
-incorrectness, namely: type errors. Meanwhile, unit tests are rarely (if
-ever) exhaustive. This is why testing and type systems are
-complementary&mdash;one is not a substitute for the other.</p>
+incorrectness, namely: type errors. Meanwhile, tests are rarely (if
+ever) exhaustive, and frequently allow bugs to pass through to
+production. This is why testing, types, and monitoring are
+complementary&mdash;one is not a substitute for another.</p>
 
-<p>It&rsquo;s important to both have strong testing practices and languages with
-disciplined type systems. The hardest part of writing quality software
-is ensuring that it runs without bugs. The more tools we have in our
-arsenal to combat incorrectness, the easier it is to write code for the
-long term.</p>
-
-<!-- vim:tw=72
--->
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[If, Else, & Purity]]></title>
-    <link href="https://blog.jez.io/if-else-purity/"/>
-    <updated>2017-09-01T01:38:43-04:00</updated>
-    <id>https://blog.jez.io/if-else-purity</id>
-    <content type="html"><![CDATA[<p>I prefer to let the language I&rsquo;m using think on my behalf as much as
-possible. Ideally, the language is rich enough that the proof of
-correctness is inherent in the code I&rsquo;ve written. Even when I use
-looser languages, these principled languages inform the structure of my
-code. To make this a bit more let&rsquo;s turn our focus to <code>if</code>, <code>else</code>, and
-purity.</p>
-
-<!-- more -->
-
-
-<p>A cool way to understand purity is using what&rsquo;s known as a &ldquo;modal
-separation.&rdquo; This is a really fancy way to say that we have
-<strong>expressions</strong> which are pure and always evaluate to a value, alongside
-<strong>commands</strong> which are impure and are executed for their side effects.
-If you&rsquo;ve ever used Haskell, you&rsquo;re already familiar with this
-notion&mdash;we only need <code>do</code> notation when we need to write impure (or
-&ldquo;monadic&rdquo;) code.</p>
-
-<p>In an expression language, every <code>if</code> <em>must</em> have an <code>else</code>; for the
-entire <code>if</code> expression to be used as a value, both branches must in turn
-evaluate to values. It&rsquo;s only when we move to a language with commands
-where it makes sense to allow omitting the <code>else</code> branch. <code>if</code>
-expressions are not some abstract concept; chances are you&rsquo;ve
-encountered them under the name &ldquo;the ternary operator.&rdquo;</p>
-
-<p>An <code>if</code> <em>statement</em> (as opposed to an <code>if</code> expression) is a command;
-it&rsquo;s useful for running side-effectful code. Sometimes, we don&rsquo;t want
-one of the branches to have any side effects (for example, because the
-state of the world doesn&rsquo;t need to be changed). Languages with commands
-allow omitting the <code>else</code>.</p>
-
-<p>What does this mean for us? Since expression languages form the basis
-for purity, every pure function can be written where the <code>if</code> is matched
-with an <code>else</code>. Put another way, an unmatched <code>if</code> is a likely indicator
-that the code I&rsquo;ve written is impure.</p>
-
-<p>This makes me more aware of when I&rsquo;m dealing with impure code. For
-example, I might want to factor out as much of the pure code into a
-separate helper function. There&rsquo;s a time and a place for impure code.
-But since pure code is more composable and easier to test, it&rsquo;s best to
-factor the impure code out whenever possible.</p>
-
-<p>In a principled language, there&rsquo;s a distinction between <code>if</code> expressions
-and <code>if</code> statements. On the other hand, some language only have one, or
-they blur the line between the two. We can draw upon our experiences
-with languages that are rigorous about minutia like this to better
-inform how we write clean code.</p>
+<p>The hardest part of writing high-quality software is ensuring that it
+runs without bugs. The more tools we have in our arsenal to combat
+incorrectness, the easier it is to write code for the long term.</p>
 
 <!-- vim:tw=72
 -->
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Haskell Development with Neovim]]></title>
-    <link href="https://blog.jez.io/haskell-development-with-neovim/"/>
-    <updated>2017-07-16T14:45:31-04:00</updated>
-    <id>https://blog.jez.io/haskell-development-with-neovim</id>
-    <content type="html"><![CDATA[<p>Configuring an editor for a new language is a double-edged sword: it&rsquo;s intensely
-satisfying when done, but takes time away from diving into the language itself!
-After using Haskell for a little over a year, I&rsquo;ve settled on a high-quality set
-of editor plugins. They&rsquo;re simple, powerful, and all play nicely together.</p>
-
-<!-- more -->
-
-
-<h2>Requirements</h2>
-
-<p>I use <a href="https://www.haskellstack.org/">Haskell Stack</a> exclusively. Stack&rsquo;s goal is reproducible builds,
-which means that in general, things Just Work.</p>
-
-<p>I also use <a href="https://github.com/neovim/neovim">Neovim</a>, rather than normal Vim. Usually, my justification
-is ideological rather than technical. However, for Haskell my setup <strong>requires</strong>
-Neovim. Fear not! Neovim is feature-packed and also very stable. I love Neovim,
-and I&rsquo;ll be writing more about why in a future post.</p>
-
-<p>By the way, new to Vim plugins? I happen to have <a href="https://github.com/jez/vim-as-an-ide">just the post for
-you</a>!</p>
-
-<!-- TODO(jez): Update with link to Neovim post -->
-
-
-<h2>Overview</h2>
-
-<p>We&rsquo;re going to move in order of increasing complexity. That said, even the most
-&ldquo;complex&rdquo; plugin here is actually quite painless to set up. By the end, we&rsquo;ll
-have a complete development experience! Coming up:</p>
-
-<ul>
-<li>syntax highlighting &amp; indentation (<strong><a href="https://github.com/neovimhaskell/haskell-vim">haskell-vim</a></strong>)</li>
-<li>auto-formatting &amp; style (<strong><a href="https://github.com/commercialhaskell/hindent">hindent</a>, <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a></strong>)</li>
-<li>quickfix and sign column support (<strong>using <a href="https://github.com/w0rp/ale">ale</a></strong>) for:
-
-<ul>
-<li>linter style suggestions (<strong>hlint</strong>)</li>
-<li>compiler errors and warnings (<strong>ghc-mod</strong>)</li>
-</ul>
-</li>
-<li>Type inspection, REPL integration, and more! (<strong><a href="https://github.com/parsonsmatt/intero-neovim">intero-neovim</a></strong>)</li>
-</ul>
-
-
-<p>To keep things concise, I&rsquo;ve moved all the relevant configuration to the end of
-the post. For now, let&rsquo;s start at the top.</p>
-
-<!-- TODO(jez) Demonstrate everything with an asciicast -->
-
-
-<h2>Syntax Highlighting &amp; Indentation</h2>
-
-<ul>
-<li><strong>Plugin</strong>: <a href="https://github.com/neovimhaskell/haskell-vim">haskell-vim</a><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
-</ul>
-
-
-<p>Vim&rsquo;s default Haskell filetype plugin is pretty lack luster. Everything is blue,
-except for strings which are colored like comments, and keywords which are
-colored like constants. Indentation is wonky in some cases, and isn&rsquo;t
-configurable.</p>
-
-<p>This plugin corrects all that. It&rsquo;s the filetype plugin for Haskell that
-<strong>should</strong> ship with Vim.</p>
-
-<p>Not only does it come with saner defaults, it also comes with more config
-options, especially for indentation. This is important because it lets me
-tweak the automatic indentation to my own personal style.</p>
-
-<p>(Remember: all the config is at the end of the post.)</p>
-
-<h2>Auto-formatting and Indentation</h2>
-
-<ul>
-<li><strong>Plugin</strong>: <a href="https://github.com/alx741/vim-hindent">vim-hindent</a></li>
-<li><strong>Tool</strong>: <code>stack install hindent</code></li>
-<li><strong>Tool</strong>: <code>stack install stylish-haskell</code></li>
-</ul>
-
-
-<p>For small projects, I have an idea of what style I like best. However, for
-larger projects it&rsquo;s unfair to ask contributors that they learn the ins and outs
-of my style. Situations like these call for automated solutions.</p>
-
-<p><code>go fmt</code> famously solved this problem for Golang by building the formatting tool
-into the compiler. For Haskell, there&rsquo;s <a href="https://github.com/commercialhaskell/hindent">hindent</a><sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. <code>hindent</code> can be
-installed through Stack, and <code>vim-hindent</code> is a Vim plugin that shims it.</p>
-
-<p>But I said I&rsquo;m partial to my own style in personal projects. There&rsquo;s another
-Haskell formatter that&rsquo;s much less invasive: <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a>. It basically
-only reformats <code>import</code>s, <code>case</code> branches, and record fields, aligning them
-vertically. And in fact, it&rsquo;s possible to use this alongside <code>hindent</code>.</p>
-
-<p>With these three tools, I can pick the right tool for the job:</p>
-
-<ul>
-<li><strong>Hand saw</strong>: let <code>haskell-vim</code> config control the indentation</li>
-<li><strong>Table saw</strong>: run <code>stylish-haskell</code> only</li>
-<li><strong>Chainsaw</strong>: run <code>hindent</code> only</li>
-<li><strong>Chainsaw, then sand paper</strong>: run <code>hindent</code>, then <code>stylish-haskell</code></li>
-</ul>
-
-
-<p>Getting them to play together requires a bit of config, so I&rsquo;ve included mine at
-the end of the post.</p>
-
-<h2>Quickfix &amp; Sign Columns</h2>
-
-<ul>
-<li><strong>Plugin</strong>: <a href="https://github.com/w0rp/ale">ale</a></li>
-<li><strong>Tool</strong>: <code>stack install hlint</code></li>
-<li><strong>Tool</strong>: <code>stack build ghc-mod</code>
-
-<ul>
-<li>N.B.: This is <em>build</em> not <em>install</em> here<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</li>
-</ul>
-</li>
-</ul>
-
-
-<p>This step requires <em>either</em> Neovim or Vim 8; ALE stands for &ldquo;Asynchronous Lint
-Engine,&rdquo; so it&rsquo;s using the new asynchronous job control features of these two
-editors. It&rsquo;s like an asynchronous Syntastic<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>.</p>
-
-<p>ALE ships with a number of Haskell integrations by default. For example, it can
-show errors if only Stack is installed. I prefer enabling two of ALE&rsquo;s Haskell
-integrations: <code>hlint</code> and <code>ghc-mod</code>.</p>
-
-<ul>
-<li><code>hlint</code> is a linter for Haskell. It warns me when I try to do silly things
-like <code>if x then True else False</code>.</li>
-<li><code>ghc-mod</code> is a tool that can check files for compiler errors.</li>
-</ul>
-
-
-<p>The beauty of ALE is that it works almost entirely out of the box. The only real
-setup is to tell ALE to use only these two integrations explicitly. I&rsquo;ve
-included the one-liner to do this in the config at the bottom.</p>
-
-<h2>Intero: The Pièce de Résistance</h2>
-
-<ul>
-<li><strong>Plugin</strong>: <a href="https://github.com/parsonsmatt/intero-neovim">intero-neovim</a></li>
-</ul>
-
-
-<p>Intero is a complete development program for Haskell. It started as an Emacs
-package, but has been ported almost entirely to Neovim. Probably the best way to
-introduce it is with this asciicast:</p>
-
-<p align="center">
-  <a href="https://asciinema.org/a/128416">
-    <img
-      width="700px"
-      alt="Intero for Neovim asciicast"
-      src="https://asciinema.org/a/128416.png">
-  </a>
-</p>
-
-
-<p>Intero is designed for stack, sets itself up automatically, has point-and-click
-type information, and lets me jump to identifier definitions. On top of it all,
-it uses Neovim to communicate back and forth with a terminal buffer so that I
-get a GHCi buffer <strong>right inside Neovim</strong>. For Emacs users, this is nothing new
-I&rsquo;m sure. But having the REPL in my editor continues to blow my mind 😮.</p>
-
-<p>Developing with the REPL in mind helps me write better code. Only top-level
-bindings are exposed in the REPL, so I write more small, testable functions.
-See here for more reasons <a href="http://chrisdone.com/posts/haskell-repl">why the REPL is awesome</a>.</p>
-
-<p>On top of providing access to the REPL, Intero provides about a dozen
-convenience commands that shell out to the REPL backend asynchronously. Being
-able to reload my code in the REPL&mdash;from Vim, with a single keystroke!&mdash;is a
-huge boon when developing.</p>
-
-<p>Intero takes a little getting used to, so be sure to read the docs for some
-sample workflows. Intero also sets up no mappings by default, so I&rsquo;ve included
-my settings below.</p>
-
-<h2>The Eagerly-Awaited Config</h2>
-
-<p>And without further ado&hellip;</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="c">" ----- neovimhaskell/haskell-vim -----</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" Align 'then' two spaces after 'if'</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_if</span> <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'><span class="c">" Indent 'where' block two spaces under previous body</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_before_where</span> <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'><span class="c">" Allow a second case indent style (see haskell-vim README)</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_case_alternative</span> <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'><span class="c">" Only next under 'let' if there's an equals sign</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_let_no_in</span> <span class="p">=</span> <span class="m">0</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" ----- hindent &amp; stylish-haskell -----</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" Indenting on save is too aggressive for me</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:hindent_on_save</span> <span class="p">=</span> <span class="m">0</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" Helper function, called below with mappings</span>
-</span><span class='line'><span class="k">function</span><span class="p">!</span> HaskellFormat<span class="p">(</span>which<span class="p">)</span> abort
-</span><span class='line'>  <span class="k">if</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'hindent'</span> <span class="p">||</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'both'</span>
-</span><span class='line'>    <span class="p">:</span>Hindent
-</span><span class='line'>  <span class="k">endif</span>
-</span><span class='line'>  <span class="k">if</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'stylish'</span> <span class="p">||</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'both'</span>
-</span><span class='line'>    <span class="k">silent</span><span class="p">!</span> exe <span class="s1">'undojoin'</span>
-</span><span class='line'>    <span class="k">silent</span><span class="p">!</span> exe <span class="s1">'keepjumps %!stylish-haskell'</span>
-</span><span class='line'>  <span class="k">endif</span>
-</span><span class='line'><span class="k">endfunction</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" Key bindings</span>
-</span><span class='line'>augroup haskellStylish
-</span><span class='line'>  <span class="k">au</span><span class="p">!</span>
-</span><span class='line'>  <span class="c">" Just hindent</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">hi</span> <span class="p">:</span>Hindent<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="c">" Just stylish-haskell</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span>hs <span class="p">:</span><span class="k">call</span> HaskellFormat<span class="p">(</span><span class="s1">'stylish'</span><span class="p">)&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="c">" First hindent, then stylish-haskell</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span>hf <span class="p">:</span><span class="k">call</span> HaskellFormat<span class="p">(</span><span class="s1">'both'</span><span class="p">)&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>augroup END
-</span><span class='line'>
-</span><span class='line'><span class="c">" ----- w0rp/ale -----</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:ale_linters</span><span class="p">.</span>haskell <span class="p">=</span> <span class="p">[</span><span class="s1">'stack-ghc-mod'</span><span class="p">,</span> <span class="s1">'hlint'</span><span class="p">]</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" ----- parsonsmatt/intero-neovim -----</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" Prefer starting Intero manually (faster startup times)</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:intero_start_immediately</span> <span class="p">=</span> <span class="m">0</span>
-</span><span class='line'><span class="c">" Use ALE (works even when not using Intero)</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:intero_use_neomake</span> <span class="p">=</span> <span class="m">0</span>
-</span><span class='line'>
-</span><span class='line'>augroup interoMaps
-</span><span class='line'>  <span class="k">au</span><span class="p">!</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>io <span class="p">:</span>InteroOpen<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>iov <span class="p">:</span>InteroOpen<span class="p">&lt;</span>CR<span class="p">&gt;&lt;</span>C<span class="p">-</span>W<span class="p">&gt;</span>H
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>ih <span class="p">:</span>InteroHide<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">is</span> <span class="p">:</span>InteroStart<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>ik <span class="p">:</span>InteroKill<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>wr <span class="p">:</span><span class="k">w</span> \<span class="p">|</span> <span class="p">:</span>InteroReload<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">il</span> <span class="p">:</span>InteroLoadCurrentModule<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">if</span> <span class="p">:</span>InteroLoadCurrentFile<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell map <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">t</span> <span class="p">&lt;</span>Plug<span class="p">&gt;</span>InteroGenericType
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell map <span class="p">&lt;</span>leader<span class="p">&gt;</span>T <span class="p">&lt;</span>Plug<span class="p">&gt;</span>InteroType
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>it <span class="p">:</span>InteroTypeInsert<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>jd <span class="p">:</span>InteroGoToDef<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>iu <span class="p">:</span>InteroUses<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span>ist <span class="p">:</span>InteroSetTargets<span class="p">&lt;</span>SPACE<span class="p">&gt;</span>
-</span><span class='line'>augroup END</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Wrap Up</h2>
-
-<p>With these tools, I feel empowered (rather than hindered) when I sit down to
-work with Haskell.</p>
-
-<ul>
-<li>The entire setup uses Stack, so things Just Work.
-
-<ul>
-<li>As a consequence, everything works with the implicit global Stack project!</li>
-</ul>
-</li>
-<li>It scales up in power:
-
-<ul>
-<li>From simple syntax highlighting and manual indentation&hellip;</li>
-<li>to an indentation chainsaw and a <strong>REPL embeded in the editor</strong>!</li>
-</ul>
-</li>
-<li>I can take full advantage of all my tools working together, leading to cleaner
-code and fewer frustrations.</li>
-</ul>
-
-
-<p>Now that I&rsquo;m finally at a point where I can stop fretting about my Haskell
-setup, I&rsquo;ll have more time to explore the language and write about my
-experience.</p>
-
-<p>Haskell-the-language isn&rsquo;t quite on the same level as SML-the-language, but it&rsquo;s
-far and above when comparing by tooling support. I&rsquo;m looking forward to taking
-advantage of that!</p>
 <div class="footnotes">
 <hr/>
 <ol>
 <li id="fn:1">
-<p>While listed under &ldquo;neovimhaskell&rdquo; on GitHub, this plugin works with normal Vim, too.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>Chris Done explains the appeal of solving style issues with tooling for Haskell well. The moral of the story is that hindent version 5 ships with only the most popular style formatter in an effort to arrive at a singular Haskell style: <a href="http://chrisdone.com/posts/hindent-5">http://chrisdone.com/posts/hindent-5</a><a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>We want to install <code>ghc-mod</code> once in every project. It can be done globally, but it might get out of sync with the current project.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-<li id="fn:4">
-<p>Some people are familiar with Neomake for this task. However, Neomake is much more minimal than ALE. Neomake basically only builds, whereas ALE is more configurable and hackable.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<p>Recall that raising an exception is logically the same as throwing a value to a continuation and carrying out a <a href="https://blog.jez.io/continuations-notes/">proof by contradiction</a>!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 

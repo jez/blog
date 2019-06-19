@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/programming/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-06-14T12:44:20-04:00</updated>
+  <updated>2019-06-19T02:43:18-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,210 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[On Programming Language Choice]]></title>
+    <link href="https://blog.jez.io/on-language-choice/"/>
+    <updated>2019-06-21T23:39:25-04:00</updated>
+    <id>https://blog.jez.io/on-language-choice</id>
+    <content type="html"><![CDATA[<p>My opinion on programming language choice has changed over the years,
+from &ldquo;Java is the only language I know&rdquo; to &ldquo;Standard ML is clearly the
+right answer&rdquo; to something more modest and nuanced now. Still, since
+this post is largely my <strong>opinion</strong>, I withold the right to make claims
+without evidence and say things you&rsquo;ll disagree with. But enough
+qualifiers—let&rsquo;s get into it.</p>
+
+<!-- more -->
+
+
+<p>Earlier in my career, I thought that the answer to &ldquo;which language
+should I use&rdquo; should be constant. That there should be One Best
+Language. And while I still think it makes sense to compare languages on
+the relative merits of their designs, answering the question &ldquo;which
+language is <strong>best</strong> designed&rdquo; is a completely different question. The
+question I&rsquo;ll answer in this post is: &ldquo;Which language should I choose to
+start this new project?&rdquo;<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+
+<p>Answering &ldquo;which language is best designed&rdquo; is better left to
+programming language theorists. To claim that I (or most people reading
+this) have any authority to answer this question is absurd. Language
+design is a well-studied, complex problem, with a wealth of
+peer-reviewed, prior work. One semester studying programming language
+theory in college is not sufficient qualification to answer this
+question.</p>
+
+<p>As it turns out, most people trying to answer &ldquo;which language is best
+designed&rdquo; knowingly or unknowingly end up answering the latter question:
+&ldquo;which language should I choose to start this new project?&rdquo; Luckily,
+this is a much easier question to answer! Because we can narrow the
+choice space by asking questions about the specifics of the project,
+like these:</p>
+
+<ul>
+<li>What languages does the initial team know?</li>
+<li>What languages will future collaborators know?</li>
+<li>What languages have strong package ecosystems? (Especially for our
+domain?)</li>
+<li>What performance properties must our solution have?</li>
+<li>&hellip;</li>
+</ul>
+
+
+<p>But there&rsquo;s one big question missing, and it 100% overshadows all other
+questions. Absolutely the most regret from choosing a programming
+language has come from forgetting to ask this question:</p>
+
+<p><strong>In this language, how easy is it to delete code?</strong></p>
+
+<p>Code is a liability. More code means more to understand, more systems to
+maintain. More moving parts means more points of failure. More failures
+mean more people try to fix old code with new code. Company pressures to
+ship more features mean more code accumulating on top of the old code.</p>
+
+<p>This is a nightmare.</p>
+
+<p>Code is a liability, so regardless of language it must be trivial to
+delete code. That means our language must be easy to statically analyze
+(ideally, though not necessarily, a language with a type system). Static
+analysis means that <strong>when</strong> I delete code, I can know whether other
+code relied on it. Renaming a function, relocating files, deleting
+unused features—I choose languages that make these operations easy.</p>
+
+<p>As a quick aside, I&rsquo;d like to elaborate on what I mean by &ldquo;not
+necessarily&rdquo; a type system. Take for example the case of JavaScript&rsquo;s
+<code>package.json</code> files (specified with JSON) versus Ruby&rsquo;s <code>Gemfile</code>s
+(specified with Ruby code). Neither of these configuration files are
+&ldquo;typed&rdquo; in the traditional sense, but that does not mean they&rsquo;re
+statically unanalyzable:</p>
+
+<ul>
+<li><p><code>package.json</code> files can be (and frequently are) parsed and analyzed
+in any language with a JSON parser. It&rsquo;s easy to check that all
+required keys are passed, that custom config for some specific package
+has been set up correctly, etc.</p></li>
+<li><p>On the other hand, <code>Gemfile</code>s can only be analyzed from Ruby and even
+then only by actually running the code. <code>Gemfile</code>s can have different
+behavior based on the environment (just one tempting <code>ENV[...]</code> call
+away) so even running the code might not be enough to completely
+analyze all of it.</p></li>
+</ul>
+
+
+<p>Even though JSON is untyped<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> it&rsquo;s still statically analyzeable,
+which is better than nothing.</p>
+
+<p>Going back to the case where the language <strong>does</strong> use a type system to
+achieve static analysis, the set of features we get expnads from &ldquo;safely
+delete code&rdquo; to loads of other things:</p>
+
+<ul>
+<li>types are machine-checked documentation</li>
+<li>jump to definition powered by the tool is fast and accurate</li>
+<li>trustworthy autocompletion results mean people use them more</li>
+<li>&hellip;</li>
+</ul>
+
+
+<p>This list is of course longer, but I want to re-iterate: choosing a
+typed language is for me a downstream consequence of choosing a language
+where it&rsquo;s trivial to delete code.</p>
+
+<p>Until now I&rsquo;ve relied on an implicit assumption that only via static
+analysis or type checking can we easily reason about how to delete code.
+The alternative might be to use some sort of dynamic analysis, like
+running tests, rolling out refactors behind feature flags, or using some
+sort of manual QA checklist.</p>
+
+<p>And while these techniques are still valuable, on their own they&rsquo;re a
+poor substitute for static analysis. Why? First: because they&rsquo;re opt in.
+Programmers have to remember to write tests and to choose to use feature
+flags. Static analysis on the other hand is opt out. Having chosen a
+language with static analysis from the beginning, it applies everywhere.
+This also means if we choose a language we&rsquo;re not satisfied with, it&rsquo;s
+easier to change our mind in the future.</p>
+
+<p>Second: because they over-index on the quality of the data they&rsquo;re fed.
+An example of &ldquo;poor data quality&rdquo; might be excessive use of mocks and
+stubs in tests. I&rsquo;ve seen all too many test suites that overuse mocking
+and stubbing to the point where they&rsquo;re really just testing the testing
+framework.</p>
+
+<p>Another common dynamic analysis technique where I work is using &ldquo;soft
+assertions&rdquo; which we define as an assertion that raises an exception in
+tests, but logs to Sentry in production. Before deleting the core code,
+we&rsquo;ll preface all calls to it with soft assertions, and merge to
+production to see whether any assertions fire. Our confidence is
+directly tied to how well the production data in that time represents
+all production data.</p>
+
+<p>How long spent waiting for no soft assertions is enough to get a
+representative sample? A day? A week? What if we have behavior that only
+executes on the first of the month? Or code paths that customers only
+hit when they&rsquo;re computing quarterly accounting statements? Or yearly
+when they&rsquo;re doing taxes? A week of data collected for changing tax code
+might as well be useless if it isn&rsquo;t in March or April.</p>
+
+<p>For these two reasons, dynamic analysis fails us when we need it the
+most: when we&rsquo;re trying to delete the code that&rsquo;s untested, uncommonly
+run, yet critically important. With only dynamic analysis, the code that
+we understand the least is also the code that&rsquo;s the hardest to remove.</p>
+
+<p>So here&rsquo;s my unsubstantiated claim: dynamic analysis techniques
+(anything that involves running the code) are too weak to empower people
+to delete code. If we want to delete code (and we do because code is a
+liability), we want static analysis. Though as <a href="/tests-types-correctness/">I&rsquo;ve written
+before</a>, these techniques are still valuable
+complements.</p>
+
+<p>The next thing to point out is that not all forms of static analysis are
+created equal. Arguably Haskell&rsquo;s static analysis is more powerful than
+C&rsquo;s. And while I&rsquo;ll acknowledge that some languages give <strong>more</strong> static
+guarantees than others, as long as a language can at least reason about
+code that&rsquo;s been mistakenly deleted, I prefer to turn my attention to
+the questions I posed earlier in this article before getting into those
+minutia. Comparing C and Haskell gets back into debating language
+design which, again, is a bit fruitless.</p>
+
+<p>After all that, here&rsquo;s my checklist when choosing a language to start a
+new project:</p>
+
+<ol>
+<li>Rule out languages where we can&rsquo;t easily delete code.</li>
+<li>Narrow the remaining languages to those that fit the circumstances.</li>
+<li>Pick anything that&rsquo;s left, because according to step (2) they all
+fit the circumstances of the project.</li>
+</ol>
+
+
+<p>Optimizing for deleting code minimizes the biggest regret I&rsquo;ve seen stem
+from a language choice, and keeps the door open so we can change our
+mind in the future. As a consequence we usually pick up extra benefits
+in the process (namely those that come from a good type system), but
+choosing a language to fit the circumstances trumps attempting to
+debate which type system is The Best.</p>
+
+<p>&nbsp;</p>
+
+<p><em>If you read this far and were hoping that I declare one winner in the
+end, I&rsquo;m sorry to disappoint. I&rsquo;m happy to indulge you over lunch or
+email, or you can read <a href="https://blog.jez.io/categories/#bash">the rest</a> of <a href="https://blog.jez.io/categories/#haskell">my blog</a> and <a href="https://blog.jez.io/categories/#sml">guess</a> at what I
+might say. Regardless, thanks for your time.</em></p>
+
+<!-- vim:tw=72:fdm=marker
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Fundamentally, I believe language choice <strong>only</strong> applies to new projects. Given an existing project, the question is not &ldquo;which language&rdquo; but instead &ldquo;should we rewrite,&rdquo; to which the answer is overwhelmingly <strong>no</strong>. But that&rsquo;s a topic for another post.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>I&rsquo;m aware that it&rsquo;s possible to use schemas and specs to approximate types for JSON, but this only goes to strengthen my argument: those make it <strong>even easier</strong> to statically analyze JSON.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Case Exhaustiveness in Flow]]></title>
@@ -581,10 +785,10 @@ feel free to reach out and let me know! I&rsquo;m happy to help.</p>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Testing, Types, & Correctness]]></title>
-    <link href="https://blog.jez.io/testing-types/"/>
+    <title type="html"><![CDATA[Tests, Types, & Correctness]]></title>
+    <link href="https://blog.jez.io/tests-types-correctness/"/>
     <updated>2017-09-10T19:50:36-04:00</updated>
-    <id>https://blog.jez.io/testing-types</id>
+    <id>https://blog.jez.io/tests-types-correctness</id>
     <content type="html"><![CDATA[<p>Understanding correctness of code really comes down to <em>proving</em> that
 the code does the right thing. What tools do we have as programmers for
 proving the correctness of our code?</p>
@@ -593,35 +797,46 @@ proving the correctness of our code?</p>
 
 
 <ol>
-<li><strong>Unit tests</strong> prove that the code is correct for specific inputs.</li>
+<li><strong>Tests</strong> prove that the code is correct for specific inputs.</li>
 <li><strong>Type systems</strong> prove the absence of (certain kinds of)
 incorrectness.</li>
 <li><strong>Theorem provers</strong> prove sophisticated claims about our code for
 us.</li>
+<li><strong>Monitoring tools</strong> prove that incorrect behavior hasn&rsquo;t occurred
+<em>yet</em>, or provide us with a concrete counter example when it
+happens.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
 <li><strong>Program authors</strong> can prove the correctness of their code (i.e.,
 with a traditional pen-and-paper proof).</li>
 </ol>
 
 
 <p>The first three are exciting because they involve a computer doing most
-of the work for us! That said, none of the first three are as
-universally applicable as the last: doing the proof ourself.
-Unfortunately, it&rsquo;s also usually the most toilsome.</p>
+of the work for us! The fourth might seem not helpful, but is often
+better than nothing, and in many situations can be leveraged into making
+powerful claims. None of the above are as universally applicable as the
+last: doing the proof ourself, but it&rsquo;s also usually the most error prone.</p>
 
 <p>Note the double negation in (2). Type systems themselves don&rsquo;t prove
 correctness, they prove that there aren&rsquo;t certain kinds of
-incorrectness, namely: type errors. Meanwhile, unit tests are rarely (if
-ever) exhaustive. This is why testing and type systems are
-complementary&mdash;one is not a substitute for the other.</p>
+incorrectness, namely: type errors. Meanwhile, tests are rarely (if
+ever) exhaustive, and frequently allow bugs to pass through to
+production. This is why testing, types, and monitoring are
+complementary&mdash;one is not a substitute for another.</p>
 
-<p>It&rsquo;s important to both have strong testing practices and languages with
-disciplined type systems. The hardest part of writing quality software
-is ensuring that it runs without bugs. The more tools we have in our
-arsenal to combat incorrectness, the easier it is to write code for the
-long term.</p>
+<p>The hardest part of writing high-quality software is ensuring that it
+runs without bugs. The more tools we have in our arsenal to combat
+incorrectness, the easier it is to write code for the long term.</p>
 
 <!-- vim:tw=72
 -->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Recall that raising an exception is logically the same as throwing a value to a continuation and carrying out a <a href="/continuations-notes/">proof by contradiction</a>!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
 
 ]]></content>
   </entry>
@@ -682,40 +897,6 @@ inform how we write clean code.</p>
 <!-- vim:tw=72
 -->
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[The Joys of the Craft]]></title>
-    <link href="https://blog.jez.io/2014/12/13/the-joys-of-the-craft/"/>
-    <updated>2014-12-13T20:52:09-05:00</updated>
-    <id>https://blog.jez.io/2014/12/13/the-joys-of-the-craft</id>
-    <content type="html"><![CDATA[<p>A while ago, I was given the book <em>The Mythical Man-Month</em>, by Frederick P. Brooks, Jr. I finally have some time to sit down and read it, and I&rsquo;m loving it. In the first chapter, this quote on &ldquo;the joys of the craft&rdquo; (i.e., programming) struck me as particularly on point:</p>
-
-<!-- more -->
-
-
-<blockquote><h3>The Joys of the Craft</h3>
-
-<p>Why is programming fun? What delights may its practitioner expect as his reward?</p>
-
-<p>First is the sheer joy of making things. As the child delights in his mud pie, so the adult enjoys building things, especially things of his own design. I think this delight must be an image of God&rsquo;s delight in making things, a delight shown in the distinctness and newness of each leaf and each snowflake.</p>
-
-<p>Second is the pleasure of making things that are useful to other people. Deep within, we want others to use our work and to find it helpful. In this respect the programming system is not essentially different from the child&rsquo;s first clay pencil holder &ldquo;for Daddy&rsquo;s office.&rdquo;</p>
-
-<p>Third is the fascination of fashioning complex puzzle-like objects of interlocking moving parts and watching them work in subtle cycles, playing out the consequences of principles built in from the beginning. The programmed computer has all the fascination of the pinball machine or the jukebox mechanism, carried to the ultimate.</p>
-
-<p>Fourth is the joy of always learning, which springs from the nonrepearing nature of the task. In one way or another the problem is ever new, and its solver learns something: sometimes practical, sometimes theoretical, and sometimes both.</p>
-
-<p>Finally, there is the delight of working in such a tractable medium. The programmer, like the poet, works only slightly removed from pure thought-stuff. He builds his castles in the air, from air, creating by exertion of the imagination. Few media of creation are so flexible, so easy to polish and rework, so readily capable of realizing grand conceptual structures. (As we shall see later, this very tractability has its own problems.)</p>
-
-<p>Yet the program construct, unlike the poet&rsquo;s words, is real in the sense that it moves and works, producing visible outputs separate from the construct itself. It prints results, draws pictures, produces sounds, moves arms. The magic of myth and legend has come true in our time. One types the correct incantation on a keyboard, and a display screen comes to life, showing things that never were nor could be.</p>
-
-<p>Programming then is fun because it gratifies creative longings built deep within us and delights sensibilities we have in common with all men.</p>
-
-<p>&ndash; &ldquo;The Tar Pit&rdquo;, <em>The Mythical Man-Month</em>, Frederick P. Brooks Jr.</p></blockquote>
-
-<p>Brooks of course follows this up with &ldquo;The Woes of the Craft&rdquo;, which is equally on point. I&rsquo;m only a few pages in, but I already feel like, respectfully, I&rsquo;ve learned more than I did in all of Tech Comm (<a href="https://enr-apps.as.cmu.edu/open/SOC/SOCServlet/courseDetails?COURSE=15221&amp;SEMESTER=F14">15-221</a>). I would absolutely recommend it to anyone considering pursing software engineering!</p>
 ]]></content>
   </entry>
   

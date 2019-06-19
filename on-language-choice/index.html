@@ -1,0 +1,340 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>On Programming Language Choice - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="Absolutely the most regret from choosing a programming language has come from forgetting to ask this question:">
+
+<meta name="keywords" content="programming ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/on-language-choice">
+<meta property="og:title" content="On Programming Language Choice">
+<meta property="og:description" content="Absolutely the most regret from choosing a programming language has come from forgetting to ask this question:">
+<meta property="og:image" content="">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/on-language-choice">
+<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+<link href="/favicon@2x.png" rel="icon" sizes="32x32">
+<link href="/favicon.png" rel="icon" sizes="16x16">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">On Programming Language Choice</h1>
+  <h2 class="EntryHeader-subtitle">June 21, 2019</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <p>My opinion on programming language choice has changed over the years,
+from &ldquo;Java is the only language I know&rdquo; to &ldquo;Standard ML is clearly the
+right answer&rdquo; to something more modest and nuanced now. Still, since
+this post is largely my <strong>opinion</strong>, I withold the right to make claims
+without evidence and say things you&rsquo;ll disagree with. But enough
+qualifiers—let&rsquo;s get into it.</p>
+
+<!-- more -->
+
+
+<p>Earlier in my career, I thought that the answer to &ldquo;which language
+should I use&rdquo; should be constant. That there should be One Best
+Language. And while I still think it makes sense to compare languages on
+the relative merits of their designs, answering the question &ldquo;which
+language is <strong>best</strong> designed&rdquo; is a completely different question. The
+question I&rsquo;ll answer in this post is: &ldquo;Which language should I choose to
+start this new project?&rdquo;<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+
+<p>Answering &ldquo;which language is best designed&rdquo; is better left to
+programming language theorists. To claim that I (or most people reading
+this) have any authority to answer this question is absurd. Language
+design is a well-studied, complex problem, with a wealth of
+peer-reviewed, prior work. One semester studying programming language
+theory in college is not sufficient qualification to answer this
+question.</p>
+
+<p>As it turns out, most people trying to answer &ldquo;which language is best
+designed&rdquo; knowingly or unknowingly end up answering the latter question:
+&ldquo;which language should I choose to start this new project?&rdquo; Luckily,
+this is a much easier question to answer! Because we can narrow the
+choice space by asking questions about the specifics of the project,
+like these:</p>
+
+<ul>
+<li>What languages does the initial team know?</li>
+<li>What languages will future collaborators know?</li>
+<li>What languages have strong package ecosystems? (Especially for our
+domain?)</li>
+<li>What performance properties must our solution have?</li>
+<li>&hellip;</li>
+</ul>
+
+
+<p>But there&rsquo;s one big question missing, and it 100% overshadows all other
+questions. Absolutely the most regret from choosing a programming
+language has come from forgetting to ask this question:</p>
+
+<p><strong>In this language, how easy is it to delete code?</strong></p>
+
+<p>Code is a liability. More code means more to understand, more systems to
+maintain. More moving parts means more points of failure. More failures
+mean more people try to fix old code with new code. Company pressures to
+ship more features mean more code accumulating on top of the old code.</p>
+
+<p>This is a nightmare.</p>
+
+<p>Code is a liability, so regardless of language it must be trivial to
+delete code. That means our language must be easy to statically analyze
+(ideally, though not necessarily, a language with a type system). Static
+analysis means that <strong>when</strong> I delete code, I can know whether other
+code relied on it. Renaming a function, relocating files, deleting
+unused features—I choose languages that make these operations easy.</p>
+
+<p>As a quick aside, I&rsquo;d like to elaborate on what I mean by &ldquo;not
+necessarily&rdquo; a type system. Take for example the case of JavaScript&rsquo;s
+<code>package.json</code> files (specified with JSON) versus Ruby&rsquo;s <code>Gemfile</code>s
+(specified with Ruby code). Neither of these configuration files are
+&ldquo;typed&rdquo; in the traditional sense, but that does not mean they&rsquo;re
+statically unanalyzable:</p>
+
+<ul>
+<li><p><code>package.json</code> files can be (and frequently are) parsed and analyzed
+in any language with a JSON parser. It&rsquo;s easy to check that all
+required keys are passed, that custom config for some specific package
+has been set up correctly, etc.</p></li>
+<li><p>On the other hand, <code>Gemfile</code>s can only be analyzed from Ruby and even
+then only by actually running the code. <code>Gemfile</code>s can have different
+behavior based on the environment (just one tempting <code>ENV[...]</code> call
+away) so even running the code might not be enough to completely
+analyze all of it.</p></li>
+</ul>
+
+
+<p>Even though JSON is untyped<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> it&rsquo;s still statically analyzeable,
+which is better than nothing.</p>
+
+<p>Going back to the case where the language <strong>does</strong> use a type system to
+achieve static analysis, the set of features we get expnads from &ldquo;safely
+delete code&rdquo; to loads of other things:</p>
+
+<ul>
+<li>types are machine-checked documentation</li>
+<li>jump to definition powered by the tool is fast and accurate</li>
+<li>trustworthy autocompletion results mean people use them more</li>
+<li>&hellip;</li>
+</ul>
+
+
+<p>This list is of course longer, but I want to re-iterate: choosing a
+typed language is for me a downstream consequence of choosing a language
+where it&rsquo;s trivial to delete code.</p>
+
+<p>Until now I&rsquo;ve relied on an implicit assumption that only via static
+analysis or type checking can we easily reason about how to delete code.
+The alternative might be to use some sort of dynamic analysis, like
+running tests, rolling out refactors behind feature flags, or using some
+sort of manual QA checklist.</p>
+
+<p>And while these techniques are still valuable, on their own they&rsquo;re a
+poor substitute for static analysis. Why? First: because they&rsquo;re opt in.
+Programmers have to remember to write tests and to choose to use feature
+flags. Static analysis on the other hand is opt out. Having chosen a
+language with static analysis from the beginning, it applies everywhere.
+This also means if we choose a language we&rsquo;re not satisfied with, it&rsquo;s
+easier to change our mind in the future.</p>
+
+<p>Second: because they over-index on the quality of the data they&rsquo;re fed.
+An example of &ldquo;poor data quality&rdquo; might be excessive use of mocks and
+stubs in tests. I&rsquo;ve seen all too many test suites that overuse mocking
+and stubbing to the point where they&rsquo;re really just testing the testing
+framework.</p>
+
+<p>Another common dynamic analysis technique where I work is using &ldquo;soft
+assertions&rdquo; which we define as an assertion that raises an exception in
+tests, but logs to Sentry in production. Before deleting the core code,
+we&rsquo;ll preface all calls to it with soft assertions, and merge to
+production to see whether any assertions fire. Our confidence is
+directly tied to how well the production data in that time represents
+all production data.</p>
+
+<p>How long spent waiting for no soft assertions is enough to get a
+representative sample? A day? A week? What if we have behavior that only
+executes on the first of the month? Or code paths that customers only
+hit when they&rsquo;re computing quarterly accounting statements? Or yearly
+when they&rsquo;re doing taxes? A week of data collected for changing tax code
+might as well be useless if it isn&rsquo;t in March or April.</p>
+
+<p>For these two reasons, dynamic analysis fails us when we need it the
+most: when we&rsquo;re trying to delete the code that&rsquo;s untested, uncommonly
+run, yet critically important. With only dynamic analysis, the code that
+we understand the least is also the code that&rsquo;s the hardest to remove.</p>
+
+<p>So here&rsquo;s my unsubstantiated claim: dynamic analysis techniques
+(anything that involves running the code) are too weak to empower people
+to delete code. If we want to delete code (and we do because code is a
+liability), we want static analysis. Though as <a href="/tests-types-correctness/">I&rsquo;ve written
+before</a>, these techniques are still valuable
+complements.</p>
+
+<p>The next thing to point out is that not all forms of static analysis are
+created equal. Arguably Haskell&rsquo;s static analysis is more powerful than
+C&rsquo;s. And while I&rsquo;ll acknowledge that some languages give <strong>more</strong> static
+guarantees than others, as long as a language can at least reason about
+code that&rsquo;s been mistakenly deleted, I prefer to turn my attention to
+the questions I posed earlier in this article before getting into those
+minutia. Comparing C and Haskell gets back into debating language
+design which, again, is a bit fruitless.</p>
+
+<p>After all that, here&rsquo;s my checklist when choosing a language to start a
+new project:</p>
+
+<ol>
+<li>Rule out languages where we can&rsquo;t easily delete code.</li>
+<li>Narrow the remaining languages to those that fit the circumstances.</li>
+<li>Pick anything that&rsquo;s left, because according to step (2) they all
+fit the circumstances of the project.</li>
+</ol>
+
+
+<p>Optimizing for deleting code minimizes the biggest regret I&rsquo;ve seen stem
+from a language choice, and keeps the door open so we can change our
+mind in the future. As a consequence we usually pick up extra benefits
+in the process (namely those that come from a good type system), but
+choosing a language to fit the circumstances trumps attempting to
+debate which type system is The Best.</p>
+
+<p>&nbsp;</p>
+
+<p><em>If you read this far and were hoping that I declare one winner in the
+end, I&rsquo;m sorry to disappoint. I&rsquo;m happy to indulge you over lunch or
+email, or you can read <a href="https://blog.jez.io/categories/#bash">the rest</a> of <a href="https://blog.jez.io/categories/#haskell">my blog</a> and <a href="https://blog.jez.io/categories/#sml">guess</a> at what I
+might say. Regardless, thanks for your time.</em></p>
+
+<!-- vim:tw=72:fdm=marker
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Fundamentally, I believe language choice <strong>only</strong> applies to new projects. Given an existing project, the question is not &ldquo;which language&rdquo; but instead &ldquo;should we rewrite,&rdquo; to which the answer is overwhelmingly <strong>no</strong>. But that&rsquo;s a topic for another post.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>I&rsquo;m aware that it&rsquo;s possible to use schemas and specs to approximate types for JSON, but this only goes to strengthen my argument: those make it <strong>even easier</strong> to statically analyze JSON.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#programming" title="Pages tagged programming">programming</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2019-06-21T23:39:25-04:00">June 21, 2019</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/bash-debugger/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/bash-debugger/" title="A Debugger for Bash in Six Lines of Bash">A Debugger for Bash in Six Lines of Bash</a></h3>
+      <p>I implemented a debugger for Bash in six lines of Bash. <a href="/bash-debugger/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/cli-tty/" title="Improving CLIs with isatty">Improving CLIs with isatty</a></h4>
+            <span>Published on June 11, 2019</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/sml-travis-ci/" title="Standard ML in Travis&nbsp;CI">Standard ML in Travis&nbsp;CI</a></h4>
+            <span>Published on June 4, 2019</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>

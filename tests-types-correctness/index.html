@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Tests, Types, & Correctness - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="It's important to both have strong testing practices and languages with disciplined type systems. The hardest part of writing quality software is &hellip;">
+
+<meta name="keywords" content="programming fragment types ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/tests-types-correctness">
+<meta property="og:title" content="Tests, Types, & Correctness">
+<meta property="og:description" content="It's important to both have strong testing practices and languages with disciplined type systems. The hardest part of writing quality software is &hellip;">
+<meta property="og:image" content="">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/tests-types-correctness">
+<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+<link href="/favicon@2x.png" rel="icon" sizes="32x32">
+<link href="/favicon.png" rel="icon" sizes="16x16">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Tests, Types, & Correctness</h1>
+  <h2 class="EntryHeader-subtitle">September 10, 2017</h2>
+
+  <ul class="Tags">
+    
+      <li class="Tag">
+        <a href="/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <p>Understanding correctness of code really comes down to <em>proving</em> that
+the code does the right thing. What tools do we have as programmers for
+proving the correctness of our code?</p>
+
+<!-- more -->
+
+
+<ol>
+<li><strong>Tests</strong> prove that the code is correct for specific inputs.</li>
+<li><strong>Type systems</strong> prove the absence of (certain kinds of)
+incorrectness.</li>
+<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
+us.</li>
+<li><strong>Monitoring tools</strong> prove that incorrect behavior hasn&rsquo;t occurred
+<em>yet</em>, or provide us with a concrete counter example when it
+happens.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
+<li><strong>Program authors</strong> can prove the correctness of their code (i.e.,
+with a traditional pen-and-paper proof).</li>
+</ol>
+
+
+<p>The first three are exciting because they involve a computer doing most
+of the work for us! The fourth might seem not helpful, but is often
+better than nothing, and in many situations can be leveraged into making
+powerful claims. None of the above are as universally applicable as the
+last: doing the proof ourself, but it&rsquo;s also usually the most error prone.</p>
+
+<p>Note the double negation in (2). Type systems themselves don&rsquo;t prove
+correctness, they prove that there aren&rsquo;t certain kinds of
+incorrectness, namely: type errors. Meanwhile, tests are rarely (if
+ever) exhaustive, and frequently allow bugs to pass through to
+production. This is why testing, types, and monitoring are
+complementary&mdash;one is not a substitute for another.</p>
+
+<p>The hardest part of writing high-quality software is ensuring that it
+runs without bugs. The more tools we have in our arsenal to combat
+incorrectness, the easier it is to write code for the long term.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Recall that raising an exception is logically the same as throwing a value to a continuation and carrying out a <a href="/continuations-notes/">proof by contradiction</a>!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#programming" title="Pages tagged programming">programming</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#fragment" title="Pages tagged fragment">fragment</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#types" title="Pages tagged types">types</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2017-09-10T19:50:36-04:00">September 10, 2017</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/on-language-choice/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/on-language-choice/" title="On Programming Language Choice">On Programming Language Choice</a></h3>
+      <p>Absolutely the most regret from choosing a programming language has come from forgetting to ask this question: <a href="/on-language-choice/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/bash-debugger/" title="A Debugger for Bash in Six Lines of Bash">A Debugger for Bash in Six Lines of Bash</a></h4>
+            <span>Published on June 16, 2019</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/cli-tty/" title="Improving CLIs with isatty">Improving CLIs with isatty</a></h4>
+            <span>Published on June 11, 2019</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>

@@ -7,13 +7,14 @@
 <meta charset="utf-8">
 <meta http-equiv="cleartype" content="on">
 
-<title>Variables in Types - Bits, Bytes, and Words</title>
+<title>Notes on Continuations - Bits, Bytes, and Words</title>
 <meta name="author" content="Jake Zimmerman">
 
 
 
 
-<meta name="description" content="Having variables in our type systems lends a great deal of power to languages using these type systems. We’re going to look at how variables are used &hellip;">
+<meta name="description" content="Some recitation notes on continuations from when I was a teaching assistant for 15-312 at CMU.
+">
 
 <meta name="keywords" content="recitation plt types ">
 
@@ -29,13 +30,14 @@
 <!-- Open Graph -->
 <meta property="og:local" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/variables-in-types">
-<meta property="og:title" content="Variables in Types">
-<meta property="og:description" content="Having variables in our type systems lends a great deal of power to languages using these type systems. We’re going to look at how variables are used &hellip;">
+<meta property="og:url" content="https://blog.jez.io/continuations-notes">
+<meta property="og:title" content="Notes on Continuations">
+<meta property="og:description" content="Some recitation notes on continuations from when I was a teaching assistant for 15-312 at CMU.
+">
 <meta property="og:image" content="">
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/variables-in-types">
+<link rel="canonical" href="https://blog.jez.io/continuations-notes">
 <link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
 <link href="/favicon@2x.png" rel="icon" sizes="32x32">
 <link href="/favicon.png" rel="icon" sizes="16x16">
@@ -79,8 +81,8 @@
 
 
 <div class="EntryHeader">
-  <h1 class="EntryHeader-title">Variables in Types</h1>
-  <h2 class="EntryHeader-subtitle">September 25, 2017</h2>
+  <h1 class="EntryHeader-title">Notes on Continuations</h1>
+  <h2 class="EntryHeader-subtitle">August 18, 2018</h2>
 
   <ul class="Tags">
     
@@ -95,21 +97,27 @@
 
 <div id="main" role="main">
   <article class="Post-content">
-    <p>These are some recitation notes for an ad-hoc recitation I gave for the
-class <a href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles of Programming Languages</a>. It was probably
-my favorite 312 recitation content-wise, because it&rsquo;s the first
-recitation where we&rsquo;ve covered enough stuff to where we can really start
-connecting the dots.</p>
+    <p>These are some notes I gave out at one of my weekly recitations when I
+was teaching <a href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles of Programming Languages</a> at CMU.
+Continuations have a <em>really</em> interesting analogy with proofs by
+contradiction that I might flesh out into a proper post in the future,
+but for now here are some rough recitation notes:</p>
 
 <p><strong>Abstract</strong>:</p>
 
-<blockquote><p>We&rsquo;ve seen a number of examples in class of types which use variables.
-Having variables in our type systems lends a great deal of power to
-languages using these type systems. We&rsquo;re going to look at how
-variables are used in generic programming, inductive &amp; coinductive
-types, and polymorphic types.</p></blockquote>
+<blockquote><p>Continuations allow for lots of things. Intuitively, we can think of
+continuations as &ldquo;functions that never come back.&rdquo; That is,
+continuations transfer control to some other part of your program. In
+a way, continuations are like a much nicer version of <code>goto</code>. But
+they&rsquo;re way more than this—specifically, they reify the concept of a
+&ldquo;proof by contradiction&rdquo; into the type system.</p></blockquote>
 
-<h3>→ <a href="/notes/variables-in-types.pdf">Variables in Types</a></h3>
+<h3>→ <a href="/notes/continuations.pdf">Continuations</a></h3>
+
+<p>They&rsquo;re best understood with Chapter 30 of <a href="http://www.cs.cmu.edu/~rwh/pfpl/">Practical Foundations for
+Programming Languages</a> open. (Unfortunately this chapter isn&rsquo;t
+available in the online preview of the 2nd edition. I&rsquo;m happy to lend
+you my hard copy if I know you IRL.)</p>
 
 <!-- vim:tw=72
 -->
@@ -133,7 +141,7 @@ types, and polymorphic types.</p></blockquote>
           
         </ul>
       </span>
-      <span class="entry-date date published updated"><time datetime="2017-09-25T05:17:31-04:00">September 25, 2017</time></span>
+      <span class="entry-date date published updated"><time datetime="2018-08-18T21:03:13-04:00">August 18, 2018</time></span>
       
     </footer>
   </div>

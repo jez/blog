@@ -4,7 +4,7 @@
   <title><![CDATA[Category: fragment | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/fragment/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-06-14T12:44:20-04:00</updated>
+  <updated>2019-06-19T02:43:18-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -329,10 +329,10 @@ in all, <code>unbound-generics</code> is really pleasant to use!</p>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Testing, Types, & Correctness]]></title>
-    <link href="https://blog.jez.io/testing-types/"/>
+    <title type="html"><![CDATA[Tests, Types, & Correctness]]></title>
+    <link href="https://blog.jez.io/tests-types-correctness/"/>
     <updated>2017-09-10T19:50:36-04:00</updated>
-    <id>https://blog.jez.io/testing-types</id>
+    <id>https://blog.jez.io/tests-types-correctness</id>
     <content type="html"><![CDATA[<p>Understanding correctness of code really comes down to <em>proving</em> that
 the code does the right thing. What tools do we have as programmers for
 proving the correctness of our code?</p>
@@ -341,35 +341,46 @@ proving the correctness of our code?</p>
 
 
 <ol>
-<li><strong>Unit tests</strong> prove that the code is correct for specific inputs.</li>
+<li><strong>Tests</strong> prove that the code is correct for specific inputs.</li>
 <li><strong>Type systems</strong> prove the absence of (certain kinds of)
 incorrectness.</li>
 <li><strong>Theorem provers</strong> prove sophisticated claims about our code for
 us.</li>
+<li><strong>Monitoring tools</strong> prove that incorrect behavior hasn&rsquo;t occurred
+<em>yet</em>, or provide us with a concrete counter example when it
+happens.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
 <li><strong>Program authors</strong> can prove the correctness of their code (i.e.,
 with a traditional pen-and-paper proof).</li>
 </ol>
 
 
 <p>The first three are exciting because they involve a computer doing most
-of the work for us! That said, none of the first three are as
-universally applicable as the last: doing the proof ourself.
-Unfortunately, it&rsquo;s also usually the most toilsome.</p>
+of the work for us! The fourth might seem not helpful, but is often
+better than nothing, and in many situations can be leveraged into making
+powerful claims. None of the above are as universally applicable as the
+last: doing the proof ourself, but it&rsquo;s also usually the most error prone.</p>
 
 <p>Note the double negation in (2). Type systems themselves don&rsquo;t prove
 correctness, they prove that there aren&rsquo;t certain kinds of
-incorrectness, namely: type errors. Meanwhile, unit tests are rarely (if
-ever) exhaustive. This is why testing and type systems are
-complementary&mdash;one is not a substitute for the other.</p>
+incorrectness, namely: type errors. Meanwhile, tests are rarely (if
+ever) exhaustive, and frequently allow bugs to pass through to
+production. This is why testing, types, and monitoring are
+complementary&mdash;one is not a substitute for another.</p>
 
-<p>It&rsquo;s important to both have strong testing practices and languages with
-disciplined type systems. The hardest part of writing quality software
-is ensuring that it runs without bugs. The more tools we have in our
-arsenal to combat incorrectness, the easier it is to write code for the
-long term.</p>
+<p>The hardest part of writing high-quality software is ensuring that it
+runs without bugs. The more tools we have in our arsenal to combat
+incorrectness, the easier it is to write code for the long term.</p>
 
 <!-- vim:tw=72
 -->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Recall that raising an exception is logically the same as throwing a value to a continuation and carrying out a <a href="/continuations-notes/">proof by contradiction</a>!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
 
 ]]></content>
   </entry>
