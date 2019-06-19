@@ -93,8 +93,8 @@
   <article class="Post-content">
     <p>My opinion on programming language choice has changed over the years,
 from &ldquo;Java is the only language I know&rdquo; to &ldquo;Standard ML is clearly the
-right answer&rdquo; to something more modest and nuanced now. Still, since
-this post is largely my <strong>opinion</strong>, I withold the right to make claims
+right answer&rdquo; to something a little more nuanced now. Still, since this
+post is largely my <strong>opinion</strong>, I withold the right to make claims
 without evidence and say things you&rsquo;ll disagree with. But enough
 qualifiers—let&rsquo;s get into it.</p>
 
@@ -102,7 +102,7 @@ qualifiers—let&rsquo;s get into it.</p>
 
 
 <p>Earlier in my career, I thought that the answer to &ldquo;which language
-should I use&rdquo; should be constant. That there should be One Best
+should I use&rdquo; ought to be constant. That there should be One Best
 Language. And while I still think it makes sense to compare languages on
 the relative merits of their designs, answering the question &ldquo;which
 language is <strong>best</strong> designed&rdquo; is a completely different question. The
@@ -117,12 +117,11 @@ peer-reviewed, prior work. One semester studying programming language
 theory in college is not sufficient qualification to answer this
 question.</p>
 
-<p>As it turns out, most people trying to answer &ldquo;which language is best
-designed&rdquo; knowingly or unknowingly end up answering the latter question:
-&ldquo;which language should I choose to start this new project?&rdquo; Luckily,
-this is a much easier question to answer! Because we can narrow the
-choice space by asking questions about the specifics of the project,
-like these:</p>
+<p>As it turns out, most people trying to answer the former question of
+&ldquo;which language is best designed&rdquo; knowingly or unknowingly end up
+answering the latter question: &ldquo;which language should I choose to start
+this new project?&rdquo; Luckily, this is a much easier question to answer,
+because we can narrow the choice space by asking questions like these:</p>
 
 <ul>
 <li>What languages does the initial team know?</li>
@@ -130,7 +129,6 @@ like these:</p>
 <li>What languages have strong package ecosystems? (Especially for our
 domain?)</li>
 <li>What performance properties must our solution have?</li>
-<li>&hellip;</li>
 </ul>
 
 
@@ -140,15 +138,16 @@ language has come from forgetting to ask this question:</p>
 
 <p><strong>In this language, how easy is it to delete code?</strong></p>
 
-<p>Code is a liability. More code means more to understand, more systems to
-maintain. More moving parts means more points of failure. More failures
-mean more people try to fix old code with new code. Company pressures to
-ship more features mean more code accumulating on top of the old code.</p>
+<p>Code is a liability. More code means more to understand and more systems
+to maintain. More moving parts means more points of failure. More
+failures mean more people trying to fix old code with new code. Company
+pressures to ship more features mean new code accumulating on top of old
+code.</p>
 
 <p>This is a nightmare.</p>
 
 <p>Code is a liability, so regardless of language it must be trivial to
-delete code. That means our language must be easy to statically analyze
+delete. And this means our language must be easy to statically analyze
 (ideally, though not necessarily, a language with a type system). Static
 analysis means that <strong>when</strong> I delete code, I can know whether other
 code relied on it. Renaming a function, relocating files, deleting
@@ -167,29 +166,29 @@ in any language with a JSON parser. It&rsquo;s easy to check that all
 required keys are passed, that custom config for some specific package
 has been set up correctly, etc.</p></li>
 <li><p>On the other hand, <code>Gemfile</code>s can only be analyzed from Ruby and even
-then only by actually running the code. <code>Gemfile</code>s can have different
-behavior based on the environment (just one tempting <code>ENV[...]</code> call
-away) so even running the code might not be enough to completely
-analyze all of it.</p></li>
+then only by actually running the code. <code>Gemfile</code>s can even have
+different behavior based on the environment—only a simple <code>ENV[...]</code>
+access away—so even running the code might not be enough to completely
+analyze it.</p></li>
 </ul>
 
 
-<p>Even though JSON is untyped<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> it&rsquo;s still statically analyzeable,
-which is better than nothing.</p>
+<p>My point is that even though JSON is untyped<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> it&rsquo;s still
+statically analyzable, which is better than nothing.</p>
 
 <p>Going back to the case where the language <strong>does</strong> use a type system to
 achieve static analysis, the set of features we get expnads from &ldquo;safely
 delete code&rdquo; to loads of other things:</p>
 
 <ul>
-<li>types are machine-checked documentation</li>
-<li>jump to definition powered by the tool is fast and accurate</li>
-<li>trustworthy autocompletion results mean people use them more</li>
+<li>Types serve as machine-checked documentation.</li>
+<li>Jump-to-def powered by a type system is fast and accurate.</li>
+<li>Types power trustworthy autocompletion results, so people can rely on them.</li>
 <li>&hellip;</li>
 </ul>
 
 
-<p>This list is of course longer, but I want to re-iterate: choosing a
+<p>The full list is of course longer, but I want to re-iterate: choosing a
 typed language is for me a downstream consequence of choosing a language
 where it&rsquo;s trivial to delete code.</p>
 
@@ -200,54 +199,52 @@ running tests, rolling out refactors behind feature flags, or using some
 sort of manual QA checklist.</p>
 
 <p>And while these techniques are still valuable, on their own they&rsquo;re a
-poor substitute for static analysis. Why? First: because they&rsquo;re opt in.
+poor substitute for static analysis. Why? First: they&rsquo;re opt in.
 Programmers have to remember to write tests and to choose to use feature
 flags. Static analysis on the other hand is opt out. Having chosen a
 language with static analysis from the beginning, it applies everywhere.
 This also means if we choose a language we&rsquo;re not satisfied with, it&rsquo;s
 easier to change our mind in the future.</p>
 
-<p>Second: because they over-index on the quality of the data they&rsquo;re fed.
-An example of &ldquo;poor data quality&rdquo; might be excessive use of mocks and
-stubs in tests. I&rsquo;ve seen all too many test suites that overuse mocking
-and stubbing to the point where they&rsquo;re really just testing the testing
+<p>Second: they over-index on the quality of the data they&rsquo;re fed. An
+example of &ldquo;poor data quality&rdquo; might be excessive use of mocks and stubs
+in tests. I&rsquo;ve seen all too many test suites that overuse mocking and
+stubbing to the point where they&rsquo;re really just testing the testing
 framework.</p>
 
-<p>Another common dynamic analysis technique where I work is using &ldquo;soft
-assertions&rdquo; which we define as an assertion that raises an exception in
-tests, but logs to Sentry in production. Before deleting the core code,
-we&rsquo;ll preface all calls to it with soft assertions, and merge to
-production to see whether any assertions fire. Our confidence is
-directly tied to how well the production data in that time represents
-all production data.</p>
+<p>Another common dynamic analysis technique we use where I work is adding
+&ldquo;soft assertions&rdquo; which we define as an assertion that raises an
+exception if it fails in tests, but logs to Sentry in production. Before
+deleting the core code, we&rsquo;ll preface all calls to it with unconditional
+soft assertions, and merge to production to see whether any assertions
+fire. Our confidence is directly tied to how well the production data
+collected in that time represents all production data.</p>
 
 <p>How long spent waiting for no soft assertions is enough to get a
 representative sample? A day? A week? What if we have behavior that only
 executes on the first of the month? Or code paths that customers only
 hit when they&rsquo;re computing quarterly accounting statements? Or yearly
-when they&rsquo;re doing taxes? A week of data collected for changing tax code
-might as well be useless if it isn&rsquo;t in March or April.</p>
+when they&rsquo;re doing taxes? A week of data collected after changing tax
+code might as well be useless if that week wasn&rsquo;t in March or April.</p>
 
 <p>For these two reasons, dynamic analysis fails us when we need it the
 most: when we&rsquo;re trying to delete the code that&rsquo;s untested, uncommonly
-run, yet critically important. With only dynamic analysis, the code that
-we understand the least is also the code that&rsquo;s the hardest to remove.</p>
+run, and yet critically important. With only dynamic analysis, the code
+that we understand the least is also the code that&rsquo;s the hardest to
+remove.</p>
 
 <p>So here&rsquo;s my unsubstantiated claim: dynamic analysis techniques
 (anything that involves running the code) are too weak to empower people
-to delete code. If we want to delete code (and we do because code is a
-liability), we want static analysis. Though as <a href="/tests-types-correctness/">I&rsquo;ve written
-before</a>, these techniques are still valuable
-complements.</p>
+to delete code. If we want to delete code, and we do because code is a
+liability, we want static analysis.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></p>
 
 <p>The next thing to point out is that not all forms of static analysis are
 created equal. Arguably Haskell&rsquo;s static analysis is more powerful than
-C&rsquo;s. And while I&rsquo;ll acknowledge that some languages give <strong>more</strong> static
+C&rsquo;s. While I&rsquo;ll acknowledge that some languages give <strong>more</strong> static
 guarantees than others, as long as a language can at least reason about
 code that&rsquo;s been mistakenly deleted, I prefer to turn my attention to
-the questions I posed earlier in this article before getting into those
-minutia. Comparing C and Haskell gets back into debating language
-design which, again, is a bit fruitless.</p>
+other questions getting into those minutia. Comparing C and Haskell gets
+back into debating language design which, again, is a bit fruitless.</p>
 
 <p>After all that, here&rsquo;s my checklist when choosing a language to start a
 new project:</p>
@@ -255,17 +252,17 @@ new project:</p>
 <ol>
 <li>Rule out languages where we can&rsquo;t easily delete code.</li>
 <li>Narrow the remaining languages to those that fit the circumstances.</li>
-<li>Pick anything that&rsquo;s left, because according to step (2) they all
-fit the circumstances of the project.</li>
+<li>Pick any language that&rsquo;s left, because according to step (2) they
+all fit our project&rsquo;s needs.</li>
 </ol>
 
 
-<p>Optimizing for deleting code minimizes the biggest regret I&rsquo;ve seen stem
-from a language choice, and keeps the door open so we can change our
-mind in the future. As a consequence we usually pick up extra benefits
-in the process (namely those that come from a good type system), but
-choosing a language to fit the circumstances trumps attempting to
-debate which type system is The Best.</p>
+<p>Optimizing for deleting code minimizes the biggest regret I&rsquo;ve seen
+stemming from a language choice and keeps the door open so we can change
+our mind in the future. As a consequence we usually pick up extra
+benefits in the process (namely those that come from a good type
+system), but choosing a language to fit the circumstances trumps
+attempting to debate which type system is The Best.</p>
 
 <p>&nbsp;</p>
 
@@ -284,6 +281,8 @@ might say. Regardless, thanks for your time.</em></p>
 <p>Fundamentally, I believe language choice <strong>only</strong> applies to new projects. Given an existing project, the question is not &ldquo;which language&rdquo; but instead &ldquo;should we rewrite,&rdquo; to which the answer is overwhelmingly <strong>no</strong>. But that&rsquo;s a topic for another post.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 <li id="fn:2">
 <p>I&rsquo;m aware that it&rsquo;s possible to use schemas and specs to approximate types for JSON, but this only goes to strengthen my argument: those make it <strong>even easier</strong> to statically analyze JSON.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>At this point you might think that I don&rsquo;t believe in dynamic analysis techniques at all. That&rsquo;s not the case, as <a href="/tests-types-correctness/">I&rsquo;ve written before</a> about how I value them. I&rsquo;m only saying that relying on running the code to check if code can be deleted safely does not work. Tests are still useful for plenty of other things.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
