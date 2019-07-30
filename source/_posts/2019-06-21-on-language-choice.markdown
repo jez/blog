@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "On Programming Language Choice"
-date: 2019-06-21 20:39:25 -0700
+date: 2019-06-21 9:30:25 -0700
 comments: false
 share: false
 categories: ['programming']

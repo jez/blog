@@ -34,7 +34,7 @@
 <!-- Twitter Cards -->
 {% if site.twitter_user %}
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content"{{ root_url }}/touch-icon.png">
+  <meta name="twitter:image" content="{{ site.url }}{{ root_url }}/touch-icon.png">
   <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title  }}{% endif %}">
   <meta name="twitter:description" content="{{ description | strip_html | condense_spaces | truncate:150 }}">
   <meta name="twitter:creator" content="@{{ site.twitter_user }}">
@@ -46,7 +46,7 @@
 <meta property="og:url" content="{{ canonical }}">
 <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
 <meta property="og:description" content="{{ description | strip_html | condense_spaces | truncate:150 }}">
-<meta property="og:image" content="{{ root_url }}/touch-icon.png">
+<meta property="og:image" content="{{ site.url }}{{ root_url }}/touch-icon.png">
 <meta property="og:site_name" content="{{ site.title }}">
 
 <link rel="canonical" href="{{ canonical }}">
