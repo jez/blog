@@ -93,7 +93,7 @@ statically analyzable, which is better than nothing.
 [^untyped]: I'm aware that it's possible to use schemas and specs to approximate types for JSON, but this only goes to strengthen my argument: those make it **even easier** to statically analyze JSON.
 
 Going back to the case where the language **does** use a type system to
-achieve static analysis, the set of features we get expnads from "safely
+achieve static analysis, the set of features we get expands from "safely
 delete code" to loads of other things:
 
 - Types serve as machine-checked documentation.
