@@ -97,10 +97,11 @@
 
 <div id="main" role="main">
   <article class="Post-content">
-    <p>One problem that comes up all the time for me is needing to manipulate
-files only on specific lines. Like, &ldquo;find and replace this pattern, but
-only on specific lines.&rdquo; In this post, I&rsquo;ll introduce the CLI tools
-I&rsquo;ve made to solve this class of problems with some examples.</p>
+    <p>I frequently need to solve problems like &ldquo;find and replace this pattern,
+but only on specific lines,&rdquo; especially in cases where those lines are
+all the lines with type errors on them. I&rsquo;ve built three new CLI tools
+that fit the need to operate on a specific set of lines in a codebase.
+In this post I&rsquo;ll walk through a couple examples to show them in action.</p>
 
 <!-- more -->
 
@@ -108,58 +109,52 @@ I&rsquo;ve made to solve this class of problems with some examples.</p>
 <p>For the impatient, the tools that I&rsquo;ve built are:</p>
 
 <ul>
-<li><a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a>
+<li><p><a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a></p>
 
-<ul>
-<li>Like <code>grep</code>, but search for a pattern only at the specified
-locations, printing the locations where a match was found.</li>
-</ul>
-</li>
-<li><a href="https://github.com/jez/multi-sub"><code>multi-sub</code></a>
+<p>Like <code>grep</code>, but search for a pattern only at the specified
+locations, printing the locations where a match was found.</p></li>
+<li><p><a href="https://github.com/jez/multi-sub"><code>multi-sub</code></a></p>
 
-<ul>
-<li>Substitute a pattern with a replacement in place only at the
-specified locations.</li>
-</ul>
-</li>
-<li><a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a>
+<p>Substitute a pattern with a replacement at the specified locations,
+editing the file in place.</p></li>
+<li><p><a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a></p>
 
-<ul>
-<li>Convert a unified diff (like the output of <code>git diff</code>) into a list
-of locations affected by that diff.</li>
-</ul>
-</li>
+<p>Convert a unified diff (like the output of <code>git diff</code>) into a list
+of locations affected by that diff.</p></li>
 </ul>
 
 
-<p>Now rather than trying to explain exactly how they work, let&rsquo;s just dive
-into some examples.</p>
+<p>With the quick intros out of the way, let&rsquo;s dive into some examples.</p>
 
 <h2><code>multi-grep</code></h2>
 
-<p>Consider that we have a list of filename:line pairs&mdash;which I call
-&ldquo;locations&rdquo; or &ldquo;locs&rdquo;&mdash;formatted like this:</p>
+<p>Consider this file <code>locs.txt</code> which is a list of <code>filename:line</code>
+pairs:</p>
 
 <figure class='code'><figcaption><span>locs.txt</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>file_a.txt:13
 </span><span class='line'>file_a.txt:22
 </span><span class='line'>file_a.txt:79
-</span><span class='line'>file_c.txt:10
-</span><span class='line'>file_c.txt:11</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>file_b.txt:10
+</span><span class='line'>file_b.txt:11</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Also consider that our project has files <code>file_{a,b,c}.txt</code> in it. If we
-want to filter this list to <strong>only</strong> the lines that contain the pattern
-<code>hello</code>, this is a perfect use case for <code>multi-grep</code>:</p>
+<p>(I call these <code>filename:line</code> pairs &ldquo;locations&rdquo; or &ldquo;locs.&rdquo;)</p>
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ multi-grep 'hello' locs.txt
+<p>Also consider that our project is huge, and has many more files
+than just <code>file_a.txt</code> and <code>file_b.txt</code>. To filter the <code>locs.txt</code> list
+to only the lines that contain the pattern &ldquo;hello&rdquo;, <code>multi-grep</code> shines:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>❯ multi-grep <span class="s1">'hello'</span> locs.txt
 </span><span class='line'>file_a.txt:13
-</span><span class='line'>file_c.txt:10</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>file_b.txt:10</span></code></pre></td></tr></table></div></figure>
 
 
-<p>This output tells us that only line 13 in <code>file_a.txt</code> and line 10 in
-<code>file_c.txt</code> contain <code>hello</code> from our initial set of 5 locs. And the
-search will completely ignore <code>file_b.txt</code>, because it wasn&rsquo;t mentioned
-in any locs in <code>locs.txt</code>.</p>
+<p>From the output we can see that only line 13 in <code>file_a.txt</code> and line 10
+in <code>file_b.txt</code> contain <code>hello</code>, given our initial set of 5 locs. The
+search completely ignored searching in all other files in the project,
+because they weren&rsquo;t mentioned in <code>locs.txt</code>. Searching with
+<code>multi-grep</code> scales with the size of the input list, not with the size
+of the codebase being searched.</p>
 
 <p>This is of course a contrived example, but let&rsquo;s keep plowing forward
 with the basics so we can apply them to a real example.</p>
@@ -171,21 +166,21 @@ the substitute command (<code>s/find/replace/</code>). Taking our previous examp
 <code>multi-sub</code> finds and replaces a pattern on specific input lines:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>❯ multi-sub <span class="s1">'hello'</span> <span class="s1">'goodbye'</span> locs.txt
-</span><span class='line'><span class="c"># ... file_a.txt:13 updated in place -&gt; s/hello/goodbye/ ...</span>
-</span><span class='line'><span class="c"># ... file_c.txt:10 updated in place -&gt; s/hello/goodbye/ ...</span></span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="c"># ... file_a.txt:13 edited: s/hello/goodbye/ ...</span>
+</span><span class='line'><span class="c"># ... file_b.txt:10 edited: s/hello/goodbye/ ...</span></span></code></pre></td></tr></table></div></figure>
 
 
 <p>In our previous example, only locations <code>file_a.txt:13</code> and
-<code>file_c.txt:10</code> matched the pattern <code>hello</code>. So after running
-<code>multi-sub</code>, those two files will be updated in place, with <code>hello</code>
-becoming <code>goodbye</code> only at those two locations.</p>
+<code>file_b.txt:10</code> matched the pattern <code>hello</code>. So after running this
+<code>multi-sub</code> command, those two files will be updated in place. On both
+of those lines, <code>hello</code> will be replace with <code>goodbye</code>.</p>
 
 <h2>A larger example</h2>
 
-<p>Now that we have the basics out of the way, we can get into some meatier
-examples. I work with the output of <a href="https://sorbet.org">Sorbet</a> a lot, so all my examples
-are going to feature it (Sorbet is a type checker for Ruby). When it
-detects errors in a program, it generates output like this:</p>
+<p>With the basics out of the way, let&rsquo;s tackle a real-world problem. I
+work with the output of <a href="https://sorbet.org">Sorbet</a> a lot, so I&rsquo;ve used it for this next
+example (Sorbet is a type checker for Ruby). When Sorbet detects type
+errors in a program, it generates output like this:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>test/payment_methods/update.rb:648: Method `[]` does not exist on `NilClass` component of `T.nilable(T::Hash[T.untyped, T.untyped])` http://go/e/7003
 </span><span class='line'>     648 |   assert_equal(nil, previous['billing_details']['address']['line1'])
@@ -203,6 +198,10 @@ detects errors in a program, it generates output like this:</p>
 </span><span class='line'>
 </span><span class='line'>Errors: 253</span></code></pre></td></tr></table></div></figure>
 
+
+<p>The error messages look a lot better with colors! If you don&rsquo;t believe
+me, you can <a href="https://sorbet.run">try Sorbet in the browser</a> and see for
+yourself.</p>
 
 <p>The example above is inspired by real output that we saw at Stripe while
 iterating on Sorbet. In this specific case, one of my coworkers had
@@ -223,19 +222,22 @@ errors, the output always looks something like this:</p>
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">foo</span><span class="p">[</span><span class="s1">'bar'</span><span class="p">]</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>To silence the errors on these lines, we can modify the line to this:</p>
+<p>To tell Sorbet to silence the errors on these lines, we&rsquo;ll need to wrap
+the variable in a call to <code>T.unsafe(...)</code>:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">T</span><span class="p">.</span><span class="nf">unsafe</span><span class="p">(</span><span class="n">foo</span><span class="p">)[</span><span class="s1">'bar'</span><span class="p">]</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>which will cause Sorbet to <a href="https://sorbet.org/docs/troubleshooting#escape-hatches">forget static type information</a>
-about the variable (thus silencing the error). The key point is that we
-<strong>only</strong> want to change the lines with errors. We&rsquo;d hate to accidentally
-change lines unrelated to the errors, and needlessly lose static types!
-This is why <code>grep</code> is often too coarse-grained of a tool.</p>
+<p>This instructs to Sorbet to <a href="https://sorbet.org/docs/troubleshooting#escape-hatches">forget all static type
+information</a> about the variable, thus silencing the error.
+The key is to only perform this edit on lines with errors&mdash;
+we&rsquo;d hate to needlessly throw away type information by changing
+unrelated lines! For things like this, <code>grep</code> and <code>sed</code> are often too
+coarse-grained, because accessing a hash like this in Ruby is abundantly
+common.</p>
 
-<p>Instead, we can write a really simple regex, but scope it to only the
-lines in the error output:</p>
+<p>With <code>multi-sub</code>, we can write a really simple regex targetting these
+hash lookups, but scope the regex to only lines in the error output:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># (1) Type check the project</span>
 </span><span class='line'>❯ srb tc 2&gt;&amp;1 | <span class="se">\</span>
@@ -247,9 +249,20 @@ lines in the error output:</p>
 </span><span class='line'>  multi-sub <span class="s1">'\([a-zA-Z0-9_]+\)\['</span> <span class="s1">'T.unsafe(\1)['</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>This updates the files in place, performing the substitution only on the
-lines with errors. Altogether in one line, making use of a shell alias
-that I have to abbreviate the inner two steps:</p>
+<p>Take a look through the four steps in the bash oneliner above:</p>
+
+<ol>
+<li>Type check the project, then</li>
+<li>filter out every line that doesn&rsquo;t have a location, then</li>
+<li>chop of the error messages, and finally</li>
+<li>use <code>multi-sub</code> to perform the substitution.</li>
+</ol>
+
+
+<p>The net result is to update the files in place, performing the
+substitution only on the lines with errors. Altogether once more, but on
+one line, making use of a shell alias that I have to abbreviate the
+inner two steps:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>❯ srb tc 2&gt;&amp;1 | onlylocs | multi-sub <span class="s1">'\([a-zA-Z0-9_]+\)\['</span> <span class="s1">'T.unsafe(\1)['</span></span></code></pre></td></tr></table></div></figure>
 
@@ -260,19 +273,18 @@ necessary.</p>
 
 <p>If <code>grep</code> and <code>sed</code> are like chainsaws, I like to think of <code>multi-grep</code>
 and <code>multi-sub</code> like scalpels&mdash;ideal for performing surgery on a
-codebase. Regex are often super imprecise tools for codemods. But by
-scoping down the regex to run only on specific lines, it doesn&rsquo;t
-matter. The added precision from location information makes up for a
-blunt regular expression.</p>
+codebase. Regular expressions are often super imprecise tools for
+codemods. But by scoping down the regex to run only on specific lines,
+it doesn&rsquo;t matter. The added precision from explicit locations makes up
+for how blunt regular expressions are.</p>
 
 <h2><code>diff-locs</code></h2>
 
 <p>I&rsquo;ve built one more command in the same spirit as <code>multi-grep</code> and
 <code>multi-sub</code>, except that instead of consuming locations, it emits them.
 Specifically, given a diff it outputs one <code>filename:line</code> pair for every
-line that was affected by the diff.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> For example, if we committed
-the substitutions made by the example in the previous section, the
-output from <code>diff-locs</code> would look like this:</p>
+line that was affected by the diff.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> It&rsquo;s ideal for consuming the
+output of <code>git show</code> or <code>git diff</code>:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ git show HEAD | diff-locs
 </span><span class='line'>test/payment_methods/update.rb:648
@@ -280,9 +292,10 @@ output from <code>diff-locs</code> would look like this:</p>
 </span><span class='line'>test/payment_methods/webhooks.rb:610</span></code></pre></td></tr></table></div></figure>
 
 
-<p>This command is useful for following up on codemods that have already
-been performed to tweak them in some way. For example, maybe we want to
-go back and add a comment with a TODO to unsilence the error:</p>
+<p><code>diff-locs</code> is useful for following up on codemods that have already
+been performed and committed to tweak them in some way. For example,
+maybe we want to go back and add a TODO comment to each <code>T.unsafe</code> we
+added:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># (1) Generate a diff from git</span>
 </span><span class='line'>❯ git show HEAD | <span class="se">\</span>
@@ -292,10 +305,25 @@ go back and add a comment with a TODO to unsilence the error:</p>
 </span><span class='line'>  multi-sub <span class="s1">'^\( *\)'</span> <span class="s1">$'</span><span class="se">\\</span><span class="s1">1# TODO: Unsilence this error</span><span class="se">\n\\</span><span class="s1">1'</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>This is super handy. After the first codemod, the type errors won&rsquo;t
-exist anymore, so we can&rsquo;t just re-run Sorbet to get it to print the
-locations again. Instead, we can take advantage of the fact that that
-information is already stored in git history to regenerate it on demand.</p>
+<p>Recapping the pipeline above:</p>
+
+<ol>
+<li>Use <code>git show</code> to generate a diff, then</li>
+<li>convert the diff to a list of locations with <code>diff-locs</code>, and finally</li>
+<li>insert a comment before each location with <code>multi-sub</code>.</li>
+</ol>
+
+
+<p><code>diff-locs</code> is particularly handy because after the first codemod, there
+won&rsquo;t be type errors anymore! So to get a list of locations to perform
+the edit on, we&rsquo;d have had to checked out the commit before fixing the
+errors, save the list of errors to a file, go back, and finally do the
+edit we wanted to in the first place.</p>
+
+<p>Instead, we can take advantage of the fact that that information is
+already stored in git history, skipping a bunch of steps (and asking git
+to show a diff is way faster than asking Sorbet to re-typecheck a whole
+project 😅)</p>
 
 <h2>Aside: The implementations</h2>
 
@@ -325,8 +353,8 @@ than a scripting language.</li>
 </ul>
 
 
-<p>Other than that, if you have questions or notice issues, please don&rsquo;t
-hesitate to reach out!</p>
+<p>As always if you have questions or notice issues please don&rsquo;t hesitate
+to reach out!</p>
 
 <!-- vim:tw=72
 -->
