@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/bash/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-09-02T17:34:49-04:00</updated>
+  <updated>2019-09-02T17:46:49-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -19,10 +19,10 @@
     <updated>2019-07-30T09:32:48-07:00</updated>
     <id>https://blog.jez.io/surgery-on-code</id>
     <content type="html"><![CDATA[<p>I&rsquo;m frequently faced wth problems like &ldquo;find and replace this pattern,
-but only on specific lines,&rdquo; especially in cases where those lines are
-all the lines with type errors on them. I&rsquo;ve built three new CLI tools
-that fit the need to operate on a specific set of lines in a codebase.
-In this post I&rsquo;ll walk through a couple examples to show them in action.</p>
+but only on specific lines,&rdquo; especially lines that have type errors on
+them. I&rsquo;ve built three new CLI tools that fit the need to operate on a
+specific set of lines in a codebase. In this post I&rsquo;ll walk through a
+couple examples to show them in action.</p>
 
 <!-- more -->
 
@@ -49,7 +49,7 @@ of locations affected by that diff.</p></li>
 
 <h2><code>multi-grep</code></h2>
 
-<p>Consider this file <code>locs.txt</code> which is a list of <code>filename:line</code>
+<p>Consider the file <code>locs.txt</code> below which is a list of <code>filename:line</code>
 pairs:</p>
 
 <pre><code class="plain locs.txt">file_a.txt:13
@@ -59,26 +59,27 @@ file_b.txt:10
 file_b.txt:11
 </code></pre>
 
-<p>(I call these <code>filename:line</code> pairs &ldquo;locations&rdquo; or &ldquo;locs.&rdquo;)</p>
+<p>(I call such <code>filename:line</code> pairs &ldquo;locations&rdquo; or &ldquo;locs.&rdquo;)</p>
 
 <p>Also consider that our project is huge, and has many more files
 than just <code>file_a.txt</code> and <code>file_b.txt</code>. To filter the <code>locs.txt</code> list
-to only the lines that contain the pattern &ldquo;hello&rdquo;, <code>multi-grep</code> shines:</p>
+to only the lines that contain the pattern &ldquo;hello&rdquo;, we can use
+<code>multi-grep</code>:</p>
 
 <pre><code class="bash">❯ multi-grep 'hello' locs.txt
 file_a.txt:13
 file_b.txt:10
 </code></pre>
 
-<p>From the output we can see that only line 13 in <code>file_a.txt</code> and line 10
-in <code>file_b.txt</code> contain <code>hello</code>, given our initial set of 5 locs. The
-search completely ignored searching in all other files in the project,
-because they weren&rsquo;t mentioned in <code>locs.txt</code>. Searching with
-<code>multi-grep</code> scales with the size of the input list, not with the size
-of the codebase being searched.</p>
+<p>The output means that only line 13 in <code>file_a.txt</code> and line 10 in
+<code>file_b.txt</code> contain <code>hello</code>, given our initial set of 5 locs. The
+search completely ignored all other files in the project because they
+weren&rsquo;t mentioned in <code>locs.txt</code>. Searching with <code>multi-grep</code> scales with
+the size of the input list, not with the size of the codebase being
+searched.</p>
 
-<p>This is of course a contrived example, but let&rsquo;s keep plowing forward
-with the basics so we can apply them to a real example.</p>
+<p>This was a contrived example, but let&rsquo;s keep plowing forward with the
+basics so we can apply them to a real example.</p>
 
 <h2><code>multi-sub</code></h2>
 
@@ -94,7 +95,7 @@ the substitute command (<code>s/find/replace/</code>). Taking our previous examp
 <p>In our previous example, only locations <code>file_a.txt:13</code> and
 <code>file_b.txt:10</code> matched the pattern <code>hello</code>. So after running this
 <code>multi-sub</code> command, those two files will be updated in place. On both
-of those lines, <code>hello</code> will be replace with <code>goodbye</code>.</p>
+lines, <code>hello</code> will be replaced with <code>goodbye</code>.</p>
 
 <h2>A larger example</h2>
 
@@ -138,7 +139,7 @@ codemods like this.</p>
 <p>As seen above, Sorbet error output always looks like
 <code>filename.rb:line:Error message</code>. With a little massaging, this will
 feed directly into <code>multi-sub</code>. Also notice that on the lines with
-errors, the output always looks something like this:</p>
+errors, the file contents always looked something like this:</p>
 
 <pre><code class="ruby">foo['bar']
 </code></pre>
@@ -213,10 +214,9 @@ test/payment_methods/update.rb:649
 test/payment_methods/webhooks.rb:610
 </code></pre>
 
-<p><code>diff-locs</code> is useful for following up on codemods that have already
-been performed and committed to tweak them in some way. For example,
-maybe we want to go back and add a TODO comment to each <code>T.unsafe</code> we
-added:</p>
+<p>I frequently use <code>diff-locs</code> to tweak codemods that I&rsquo;ve already
+committed. For example, we could go back and add a TODO comment above
+each new <code>T.unsafe</code> call:</p>
 
 <pre><code class="bash"># (1) Generate a diff from git
 ❯ git show HEAD | \
@@ -237,14 +237,14 @@ added:</p>
 
 <p><code>diff-locs</code> is particularly handy because after the first codemod, there
 won&rsquo;t be type errors anymore! So to get a list of locations to perform
-the edit on, we&rsquo;d have had to checked out the commit before fixing the
+the edit on, we&rsquo;d have had to check out the commit before fixing the
 errors, save the list of errors to a file, go back, and finally do the
 edit we wanted to in the first place.</p>
 
-<p>Instead, we can take advantage of the fact that that information is
-already stored in git history, skipping a bunch of steps (and asking git
-to show a diff is way faster than asking Sorbet to re-typecheck a whole
-project 😅)</p>
+<p>Instead, we can take advantage of the fact that all that information is
+already stored in git history, skipping a bunch of steps. (And asking
+git to show a diff is way faster than asking Sorbet to re-typecheck a
+whole project 😅)</p>
 
 <h2>Aside: The implementations</h2>
 
