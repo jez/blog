@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-08-31T23:50:51-04:00</updated>
+  <updated>2019-09-02T03:03:07-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,256 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Surgery on codebases from the CLI]]></title>
+    <link href="https://blog.jez.io/surgery-on-code/"/>
+    <updated>2019-07-30T09:32:48-07:00</updated>
+    <id>https://blog.jez.io/surgery-on-code</id>
+    <content type="html"><![CDATA[<p>One problem that comes up all the time for me is needing to manipulate
+files only on specific lines. Like, &ldquo;find and replace this pattern, but
+only on specific lines.&rdquo; In this post, I&rsquo;ll introduce the CLI tools
+I&rsquo;ve made to solve this class of problems with some examples.</p>
+
+<!-- more -->
+
+
+<p>For the impatient, the tools that I&rsquo;ve built are:</p>
+
+<ul>
+<li><a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a>
+
+<ul>
+<li>Like <code>grep</code>, but search for a pattern only at the specified
+locations, printing the locations where a match was found.</li>
+</ul>
+</li>
+<li><a href="https://github.com/jez/multi-sub"><code>multi-sub</code></a>
+
+<ul>
+<li>Substitute a pattern with a replacement in place only at the
+specified locations.</li>
+</ul>
+</li>
+<li><a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a>
+
+<ul>
+<li>Convert a unified diff (like the output of <code>git diff</code>) into a list
+of locations affected by that diff.</li>
+</ul>
+</li>
+</ul>
+
+
+<p>Now rather than trying to explain exactly how they work, let&rsquo;s just dive
+into some examples.</p>
+
+<h2><code>multi-grep</code></h2>
+
+<p>Consider that we have a list of filename:line pairs&mdash;which I call
+&ldquo;locations&rdquo; or &ldquo;locs&rdquo;&mdash;formatted like this:</p>
+
+<figure class='code'><figcaption><span>locs.txt</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>file_a.txt:13
+</span><span class='line'>file_a.txt:22
+</span><span class='line'>file_a.txt:79
+</span><span class='line'>file_c.txt:10
+</span><span class='line'>file_c.txt:11</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Also consider that our project has files <code>file_{a,b,c}.txt</code> in it. If we
+want to filter this list to <strong>only</strong> the lines that contain the pattern
+<code>hello</code>, this is a perfect use case for <code>multi-grep</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ multi-grep 'hello' locs.txt
+</span><span class='line'>file_a.txt:13
+</span><span class='line'>file_c.txt:10</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This output tells us that only line 13 in <code>file_a.txt</code> and line 10 in
+<code>file_c.txt</code> contain <code>hello</code> from our initial set of 5 locs. And the
+search will completely ignore <code>file_b.txt</code>, because it wasn&rsquo;t mentioned
+in any locs in <code>locs.txt</code>.</p>
+
+<p>This is of course a contrived example, but let&rsquo;s keep plowing forward
+with the basics so we can apply them to a real example.</p>
+
+<h2><code>multi-sub</code></h2>
+
+<p>If <code>multi-grep</code> is like <code>grep</code>, <code>multi-sub</code> is like <code>sed</code> but with only
+the substitute command (<code>s/find/replace/</code>). Taking our previous example,
+<code>multi-sub</code> finds and replaces a pattern on specific input lines:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>❯ multi-sub <span class="s1">'hello'</span> <span class="s1">'goodbye'</span> locs.txt
+</span><span class='line'><span class="c"># ... file_a.txt:13 updated in place -&gt; s/hello/goodbye/ ...</span>
+</span><span class='line'><span class="c"># ... file_c.txt:10 updated in place -&gt; s/hello/goodbye/ ...</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>In our previous example, only locations <code>file_a.txt:13</code> and
+<code>file_c.txt:10</code> matched the pattern <code>hello</code>. So after running
+<code>multi-sub</code>, those two files will be updated in place, with <code>hello</code>
+becoming <code>goodbye</code> only at those two locations.</p>
+
+<h2>A larger example</h2>
+
+<p>Now that we have the basics out of the way, we can get into some meatier
+examples. I work with the output of <a href="https://sorbet.org">Sorbet</a> a lot, so all my examples
+are going to feature it (Sorbet is a type checker for Ruby). When it
+detects errors in a program, it generates output like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>test/payment_methods/update.rb:648: Method `[]` does not exist on `NilClass` component of `T.nilable(T::Hash[T.untyped, T.untyped])` http://go/e/7003
+</span><span class='line'>     648 |   assert_equal(nil, previous['billing_details']['address']['line1'])
+</span><span class='line'>                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+</span><span class='line'>
+</span><span class='line'>test/payment_methods/update.rb:649: Method `[]` does not exist on `NilClass` component of `T.nilable(T::Hash[T.untyped, T.untyped])` http://go/e/7003
+</span><span class='line'>     649 |   assert_equal(nil, previous['card']['checks']['address_line1_check'])
+</span><span class='line'>                               ^^^^^^^^^^^^^^^^
+</span><span class='line'>
+</span><span class='line'>test/payment_methods/webhooks.rb:610: Method `[]` does not exist on `NilClass` component of `T.nilable(T::Hash[T.untyped, T.untyped])` http://go/e/7003
+</span><span class='line'>     610 |   assert_equal(2, notification['card']['exp_month'])
+</span><span class='line'>                             ^^^^^^^^^^^^^^^^^^^^
+</span><span class='line'>
+</span><span class='line'>... many more errors ...
+</span><span class='line'>
+</span><span class='line'>Errors: 253</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The example above is inspired by real output that we saw at Stripe while
+iterating on Sorbet. In this specific case, one of my coworkers had
+improved Sorbet to track more information statically, which uncovered a
+bunch of new type errors.</p>
+
+<p>On the Sorbet team, we have a policy that before landing changes like
+this, we modify Stripe&rsquo;s monorepo to preemptively silence the new
+errors. Jordan Brown has a great article on the <a href="https://medium.com/flow-type/upgrading-flow-codebases-40ef8dd3ccd8">Flow blog</a> justifying
+this technique, so I&rsquo;ll skip the why and focus only on how to carry out
+codemods like this.</p>
+
+<p>As seen above, Sorbet error output always looks like
+<code>filename.rb:line:Error message</code>. With a little massaging, this will
+feed directly into <code>multi-sub</code>. Also notice that on the lines with
+errors, the output always looks something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">foo</span><span class="p">[</span><span class="s1">'bar'</span><span class="p">]</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>To silence the errors on these lines, we can modify the line to this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">T</span><span class="p">.</span><span class="nf">unsafe</span><span class="p">(</span><span class="n">foo</span><span class="p">)[</span><span class="s1">'bar'</span><span class="p">]</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>which will cause Sorbet to <a href="https://sorbet.org/docs/troubleshooting#escape-hatches">forget static type information</a>
+about the variable (thus silencing the error). The key point is that we
+<strong>only</strong> want to change the lines with errors. We&rsquo;d hate to accidentally
+change lines unrelated to the errors, and needlessly lose static types!
+This is why <code>grep</code> is often too coarse-grained of a tool.</p>
+
+<p>Instead, we can write a really simple regex, but scope it to only the
+lines in the error output:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># (1) Type check the project</span>
+</span><span class='line'>❯ srb tc 2&gt;&amp;1 | <span class="se">\</span>
+</span><span class='line'>  <span class="c"># (2) Filter the error output to only have the top-level error lines</span>
+</span><span class='line'>  sed -e <span class="s1">'/^ /d; /^$/d; /^Errors:/d'</span> | <span class="se">\</span>
+</span><span class='line'>  <span class="c"># (3) Chop off the error message, keeping only the filename:line</span>
+</span><span class='line'>  cut -d : -f 1-2 | <span class="se">\</span>
+</span><span class='line'>  <span class="c"># (4) Use multi-sub to replace things like foo[ with T.unsafe(foo)[</span>
+</span><span class='line'>  multi-sub <span class="s1">'\([a-zA-Z0-9_]+\)\['</span> <span class="s1">'T.unsafe(\1)['</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>This updates the files in place, performing the substitution only on the
+lines with errors. Altogether in one line, making use of a shell alias
+that I have to abbreviate the inner two steps:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>❯ srb tc 2&gt;&amp;1 | onlylocs | multi-sub <span class="s1">'\([a-zA-Z0-9_]+\)\['</span> <span class="s1">'T.unsafe(\1)['</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>So with a super short bash oneliner, we&rsquo;ve done a mass codemod that
+fixes hundreds of errors at once, without having to silence more than
+necessary.</p>
+
+<p>If <code>grep</code> and <code>sed</code> are like chainsaws, I like to think of <code>multi-grep</code>
+and <code>multi-sub</code> like scalpels&mdash;ideal for performing surgery on a
+codebase. Regex are often super imprecise tools for codemods. But by
+scoping down the regex to run only on specific lines, it doesn&rsquo;t
+matter. The added precision from location information makes up for a
+blunt regular expression.</p>
+
+<h2><code>diff-locs</code></h2>
+
+<p>I&rsquo;ve built one more command in the same spirit as <code>multi-grep</code> and
+<code>multi-sub</code>, except that instead of consuming locations, it emits them.
+Specifically, given a diff it outputs one <code>filename:line</code> pair for every
+line that was affected by the diff.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> For example, if we committed
+the substitutions made by the example in the previous section, the
+output from <code>diff-locs</code> would look like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ git show HEAD | diff-locs
+</span><span class='line'>test/payment_methods/update.rb:648
+</span><span class='line'>test/payment_methods/update.rb:649
+</span><span class='line'>test/payment_methods/webhooks.rb:610</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This command is useful for following up on codemods that have already
+been performed to tweak them in some way. For example, maybe we want to
+go back and add a comment with a TODO to unsilence the error:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># (1) Generate a diff from git</span>
+</span><span class='line'>❯ git show HEAD | <span class="se">\</span>
+</span><span class='line'>  <span class="c"># (2) Convert the diff to a list of locations</span>
+</span><span class='line'>  diff-locs | <span class="se">\</span>
+</span><span class='line'>  <span class="c"># (3) Use multi-sub to insert a comment before each line</span>
+</span><span class='line'>  multi-sub <span class="s1">'^\( *\)'</span> <span class="s1">$'</span><span class="se">\\</span><span class="s1">1# TODO: Unsilence this error</span><span class="se">\n\\</span><span class="s1">1'</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is super handy. After the first codemod, the type errors won&rsquo;t
+exist anymore, so we can&rsquo;t just re-run Sorbet to get it to print the
+locations again. Instead, we can take advantage of the fact that that
+information is already stored in git history to regenerate it on demand.</p>
+
+<h2>Aside: The implementations</h2>
+
+<p>One thing I&rsquo;d like to point out is that I took some care to make sure
+these commands weren&rsquo;t eggregiously slow. I prototyped these commands
+with some hacky scripts, but after doing some rather large codemods I
+got annoyed with them taking minutes to finish.</p>
+
+<p>Some things that make these new commands fast:</p>
+
+<ul>
+<li><code>multi-grep</code> and <code>multi-sed</code> re-use an already opened file to avoid
+reading extra information.</li>
+<li><code>multi-grep</code> is written in Standard ML, <code>multi-sub</code> is written in
+OCaml, and <code>diff-locs</code> is written in Haskell&mdash;all languages which
+have great optimizing compilers. This means much better performance
+than a scripting language.</li>
+</ul>
+
+
+<p>If you&rsquo;re curious, you can read through their implementations on GitHub:</p>
+
+<ul>
+<li><a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a></li>
+<li><a href="https://github.com/jez/multi-sub"><code>multi-sub</code></a></li>
+<li><a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a></li>
+</ul>
+
+
+<p>Other than that, if you have questions or notice issues, please don&rsquo;t
+hesitate to reach out!</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>It defaults to only lines affected after the diff applies, but there&rsquo;s an option to make it show both added and removed lines.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[On Programming Language Choice]]></title>
@@ -3818,63 +4068,6 @@ heavy-handed assumption that you&rsquo;re in the class currently).</p>
 
 <!-- vim:tw=72
 -->
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Tests, Types, & Correctness]]></title>
-    <link href="https://blog.jez.io/tests-types-correctness/"/>
-    <updated>2017-09-10T16:50:36-07:00</updated>
-    <id>https://blog.jez.io/tests-types-correctness</id>
-    <content type="html"><![CDATA[<p>Understanding correctness of code really comes down to <em>proving</em> that
-the code does the right thing. What tools do we have as programmers for
-proving the correctness of our code?</p>
-
-<!-- more -->
-
-
-<ol>
-<li><strong>Tests</strong> prove that the code is correct for specific inputs.</li>
-<li><strong>Type systems</strong> prove the absence of (certain kinds of)
-incorrectness.</li>
-<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
-us.</li>
-<li><strong>Monitoring tools</strong> prove that incorrect behavior hasn&rsquo;t occurred
-<em>yet</em>, or provide us with a concrete counter example when it
-happens.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
-<li><strong>Program authors</strong> can prove the correctness of their code (i.e.,
-with a traditional pen-and-paper proof).</li>
-</ol>
-
-
-<p>The first three are exciting because they involve a computer doing most
-of the work for us! The fourth might seem not helpful, but is often
-better than nothing, and in many situations can be leveraged into making
-powerful claims. None of the above are as universally applicable as the
-last: doing the proof ourself, but it&rsquo;s also usually the most error prone.</p>
-
-<p>Note the double negation in (2). Type systems themselves don&rsquo;t prove
-correctness, they prove that there aren&rsquo;t certain kinds of
-incorrectness, namely: type errors. Meanwhile, tests are rarely (if
-ever) exhaustive, and frequently allow bugs to pass through to
-production. This is why testing, types, and monitoring are
-complementary&mdash;one is not a substitute for another.</p>
-
-<p>The hardest part of writing high-quality software is ensuring that it
-runs without bugs. The more tools we have in our arsenal to combat
-incorrectness, the easier it is to write code for the long term.</p>
-
-<!-- vim:tw=72
--->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>Recall that raising an exception is logically the same as throwing a value to a continuation and carrying out a <a href="https://blog.jez.io/continuations-notes/">proof by contradiction</a>!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
 
 ]]></content>
   </entry>
