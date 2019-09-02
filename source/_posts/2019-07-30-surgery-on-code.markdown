@@ -13,58 +13,68 @@ description: >
 strong_keywords: false
 ---
 
-One problem that comes up all the time for me is needing to manipulate
-files only on specific lines. Like, "find and replace this pattern, but
-only on specific lines." In this post, I'll introduce the CLI tools
-I've made to solve this class of problems with some examples.
+I'm frequently faced wth problems like "find and replace this pattern,
+but only on specific lines," especially lines that have type errors on
+them. I've built three new CLI tools that fit the need to operate on a
+specific set of lines in a codebase. In this post I'll walk through a
+couple examples to show them in action.
 
 <!-- more -->
 
 For the impatient, the tools that I've built are:
 
 - [`multi-grep`]
-  - Like `grep`, but search for a pattern only at the specified
-    locations, printing the locations where a match was found.
-- [`multi-sub`]
-  - Substitute a pattern with a replacement in place only at the
-    specified locations.
-- [`diff-locs`]
-  - Convert a unified diff (like the output of `git diff`) into a list
-    of locations affected by that diff.
 
-Now rather than trying to explain exactly how they work, let's just dive
-into some examples.
+  Like `grep`, but search for a pattern only at the specified
+  locations, printing the locations where a match was found.
+
+- [`multi-sub`]
+
+  Substitute a pattern with a replacement at the specified locations,
+  editing the file in place.
+
+- [`diff-locs`]
+
+  Convert a unified diff (like the output of `git diff`) into a list
+  of locations affected by that diff.
+
+With the quick intros out of the way, let's dive into some examples.
 
 ## `multi-grep`
 
-Consider that we have a list of filename:line pairs---which I call
-"locations" or "locs"---formatted like this:
+Consider the file `locs.txt` below which is a list of `filename:line`
+pairs:
 
 ```plain locs.txt
 file_a.txt:13
 file_a.txt:22
 file_a.txt:79
-file_c.txt:10
-file_c.txt:11
+file_b.txt:10
+file_b.txt:11
 ```
 
-Also consider that our project has files `file_{a,b,c}.txt` in it. If we
-want to filter this list to **only** the lines that contain the pattern
-`hello`, this is a perfect use case for `multi-grep`:
+(I call such `filename:line` pairs "locations" or "locs.")
 
-```
+Also consider that our project is huge, and has many more files
+than just `file_a.txt` and `file_b.txt`. To filter the `locs.txt` list
+to only the lines that contain the pattern "hello", we can use
+`multi-grep`:
+
+```bash
 ❯ multi-grep 'hello' locs.txt
 file_a.txt:13
-file_c.txt:10
+file_b.txt:10
 ```
 
-This output tells us that only line 13 in `file_a.txt` and line 10 in
-`file_c.txt` contain `hello` from our initial set of 5 locs. And the
-search will completely ignore `file_b.txt`, because it wasn't mentioned
-in any locs in `locs.txt`.
+The output means that only line 13 in `file_a.txt` and line 10 in
+`file_b.txt` contain `hello`, given our initial set of 5 locs. The
+search completely ignored all other files in the project because they
+weren't mentioned in `locs.txt`. Searching with `multi-grep` scales with
+the size of the input list, not with the size of the codebase being
+searched.
 
-This is of course a contrived example, but let's keep plowing forward
-with the basics so we can apply them to a real example.
+This was a contrived example, but let's keep plowing forward with the
+basics so we can apply them to a real example.
 
 ## `multi-sub`
 
@@ -74,21 +84,21 @@ the substitute command (`s/find/replace/`). Taking our previous example,
 
 ```bash
 ❯ multi-sub 'hello' 'goodbye' locs.txt
-# ... file_a.txt:13 updated in place -> s/hello/goodbye/ ...
-# ... file_c.txt:10 updated in place -> s/hello/goodbye/ ...
+# ... file_a.txt:13 edited: s/hello/goodbye/ ...
+# ... file_b.txt:10 edited: s/hello/goodbye/ ...
 ```
 
 In our previous example, only locations `file_a.txt:13` and
-`file_c.txt:10` matched the pattern `hello`. So after running
-`multi-sub`, those two files will be updated in place, with `hello`
-becoming `goodbye` only at those two locations.
+`file_b.txt:10` matched the pattern `hello`. So after running this
+`multi-sub` command, those two files will be updated in place. On both
+lines, `hello` will be replaced with `goodbye`.
 
 ## A larger example
 
-Now that we have the basics out of the way, we can get into some meatier
-examples. I work with the output of [Sorbet] a lot, so all my examples
-are going to feature it (Sorbet is a type checker for Ruby). When it
-detects errors in a program, it generates output like this:
+With the basics out of the way, let's tackle a real-world problem. I
+work with the output of [Sorbet] a lot, so I've used it for this next
+example (Sorbet is a type checker for Ruby). When Sorbet detects type
+errors in a program, it generates output like this:
 
 ```
 test/payment_methods/update.rb:648: Method `[]` does not exist on `NilClass` component of `T.nilable(T::Hash[T.untyped, T.untyped])` http://go/e/7003
@@ -108,6 +118,10 @@ test/payment_methods/webhooks.rb:610: Method `[]` does not exist on `NilClass` c
 Errors: 253
 ```
 
+The error messages look a lot better with colors! If you don't believe
+me, you can [try Sorbet in the browser][sorbet.run] and see for
+yourself.
+
 The example above is inspired by real output that we saw at Stripe while
 iterating on Sorbet. In this specific case, one of my coworkers had
 improved Sorbet to track more information statically, which uncovered a
@@ -122,26 +136,29 @@ codemods like this.
 As seen above, Sorbet error output always looks like
 `filename.rb:line:Error message`. With a little massaging, this will
 feed directly into `multi-sub`. Also notice that on the lines with
-errors, the output always looks something like this:
+errors, the file contents always looked something like this:
 
 ```ruby
 foo['bar']
 ```
 
-To silence the errors on these lines, we can modify the line to this:
+To tell Sorbet to silence the errors on these lines, we'll need to wrap
+the variable in a call to `T.unsafe(...)`:
 
 ```ruby
 T.unsafe(foo)['bar']
 ```
 
-which will cause Sorbet to [forget static type information][T.unsafe]
-about the variable (thus silencing the error). The key point is that we
-**only** want to change the lines with errors. We'd hate to accidentally
-change lines unrelated to the errors, and needlessly lose static types!
-This is why `grep` is often too coarse-grained of a tool.
+This instructs to Sorbet to [forget all static type
+information][T.unsafe] about the variable, thus silencing the error.
+The key is to only perform this edit on lines with errors---
+we'd hate to needlessly throw away type information by changing
+unrelated lines! For things like this, `grep` and `sed` are often too
+coarse-grained, because accessing a hash like this in Ruby is abundantly
+common.
 
-Instead, we can write a really simple regex, but scope it to only the
-lines in the error output:
+With `multi-sub`, we can write a really simple regex targetting these
+hash lookups, but scope the regex to only lines in the error output:
 
 ```bash
 # (1) Type check the project
@@ -154,9 +171,17 @@ lines in the error output:
   multi-sub '\([a-zA-Z0-9_]+\)\[' 'T.unsafe(\1)['
 ```
 
-This updates the files in place, performing the substitution only on the
-lines with errors. Altogether in one line, making use of a shell alias
-that I have to abbreviate the inner two steps:
+Take a look through the four steps in the bash oneliner above:
+
+1. Type check the project, then
+2. filter out every line that doesn't have a location, then
+3. chop of the error messages, and finally
+4. use `multi-sub` to perform the substitution.
+
+The net result is to update the files in place, performing the
+substitution only on the lines with errors. Altogether once more, but on
+one line, making use of a shell alias that I have to abbreviate the
+inner two steps:
 
 ```bash
 ❯ srb tc 2>&1 | onlylocs | multi-sub '\([a-zA-Z0-9_]+\)\[' 'T.unsafe(\1)['
@@ -168,10 +193,10 @@ necessary.
 
 If `grep` and `sed` are like chainsaws, I like to think of `multi-grep`
 and `multi-sub` like scalpels---ideal for performing surgery on a
-codebase. Regex are often super imprecise tools for codemods. But by
-scoping down the regex to run only on specific lines, it doesn't
-matter. The added precision from location information makes up for a
-blunt regular expression.
+codebase. Regular expressions are often super imprecise tools for
+codemods. But by scoping down the regex to run only on specific lines,
+it doesn't matter. The added precision from explicit locations makes up
+for how blunt regular expressions are.
 
 
 ## `diff-locs`
@@ -179,9 +204,8 @@ blunt regular expression.
 I've built one more command in the same spirit as `multi-grep` and
 `multi-sub`, except that instead of consuming locations, it emits them.
 Specifically, given a diff it outputs one `filename:line` pair for every
-line that was affected by the diff.[^added] For example, if we committed
-the substitutions made by the example in the previous section, the
-output from `diff-locs` would look like this:
+line that was affected by the diff.[^added] It's ideal for consuming the
+output of `git show` or `git diff`:
 
 [^added]: It defaults to only lines affected after the diff applies, but there's an option to make it show both added and removed lines.
 
@@ -192,9 +216,9 @@ test/payment_methods/update.rb:649
 test/payment_methods/webhooks.rb:610
 ```
 
-This command is useful for following up on codemods that have already
-been performed to tweak them in some way. For example, maybe we want to
-go back and add a comment with a TODO to unsilence the error:
+I frequently use `diff-locs` to tweak codemods that I've already
+committed. For example, we could go back and add a TODO comment above
+each new `T.unsafe` call:
 
 ```bash
 # (1) Generate a diff from git
@@ -205,10 +229,22 @@ go back and add a comment with a TODO to unsilence the error:
   multi-sub '^\( *\)' $'\\1# TODO: Unsilence this error\n\\1'
 ```
 
-This is super handy. After the first codemod, the type errors won't
-exist anymore, so we can't just re-run Sorbet to get it to print the
-locations again. Instead, we can take advantage of the fact that that
-information is already stored in git history to regenerate it on demand.
+Recapping the pipeline above:
+
+1. Use `git show` to generate a diff, then
+2. convert the diff to a list of locations with `diff-locs`, and finally
+3. insert a comment before each location with `multi-sub`.
+
+`diff-locs` is particularly handy because after the first codemod, there
+won't be type errors anymore! So to get a list of locations to perform
+the edit on, we'd have had to check out the commit before fixing the
+errors, save the list of errors to a file, go back, and finally do the
+edit we wanted to in the first place.
+
+Instead, we can take advantage of the fact that all that information is
+already stored in git history, skipping a bunch of steps. (And asking
+git to show a diff is way faster than asking Sorbet to re-typecheck a
+whole project 😅)
 
 
 ## Aside: The implementations
@@ -221,7 +257,7 @@ got annoyed with them taking minutes to finish.
 Some things that make these new commands fast:
 
 - `multi-grep` and `multi-sed` re-use an already opened file to avoid
-  reading extra information. 
+  reading extra information.
 - `multi-grep` is written in Standard ML, `multi-sub` is written in
   OCaml, and `diff-locs` is written in Haskell---all languages which
   have great optimizing compilers. This means much better performance
@@ -233,14 +269,15 @@ If you're curious, you can read through their implementations on GitHub:
 - [`multi-sub`]
 - [`diff-locs`]
 
-Other than that, if you have questions or notice issues, please don't
-hesitate to reach out!
+As always if you have questions or notice issues please don't hesitate
+to reach out!
 
 
 [`multi-grep`]: https://github.com/jez/multi-grep
 [`multi-sub`]: https://github.com/jez/multi-sub
 [`diff-locs`]: https://github.com/jez/diff-locs
 [Sorbet]: https://sorbet.org
+[sorbet.run]: https://sorbet.run
 [Flow blog]: https://medium.com/flow-type/upgrading-flow-codebases-40ef8dd3ccd8
 [T.unsafe]: https://sorbet.org/docs/troubleshooting#escape-hatches
 
