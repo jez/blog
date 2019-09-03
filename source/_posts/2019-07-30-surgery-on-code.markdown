@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Surgery on codebases from the CLI"
+title: "Surgery on Code from the Command Line"
 date: 2019-07-30 09:32:48 -0700
 comments: false
 share: false
