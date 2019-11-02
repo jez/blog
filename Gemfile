@@ -9,7 +9,7 @@ group :development do
   gem 'jekyll-redirect-from'
   gem 'rdiscount', '~> 2.0'
   gem 'RedCloth', '~> 4.2.9'
-  gem 'haml', '~> 4.0'
+  gem 'haml', '~> 5.0'
   gem 'compass', '~> 1.0.1'
   gem 'sass-globbing', '~> 1.0.0'
   gem 'rubypants', '~> 0.2.0'
