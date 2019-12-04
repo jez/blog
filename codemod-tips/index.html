@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Codemod Tips and Tricks - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+
+<meta name="keywords" content=" ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
+  <meta name="twitter:title" content="Codemod Tips and Tricks">
+  <meta name="twitter:description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+  <meta name="twitter:creator" content="@jez_io">
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/codemod-tips">
+<meta property="og:title" content="Codemod Tips and Tricks">
+<meta property="og:description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/codemod-tips">
+<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+<link href="/favicon@2x.png" rel="icon" sizes="32x32">
+<link href="/favicon.png" rel="icon" sizes="16x16">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Codemod Tips and Tricks</h1>
+  <h2 class="EntryHeader-subtitle">August 31, 2019</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <ul>
+<li>Philosophy
+
+<ul>
+<li>replayable / scriptable</li>
+<li>bad heuristics are often not actually bad</li>
+</ul>
+</li>
+<li>Broad overview of classes of tools
+
+<ul>
+<li>manual</li>
+<li>semi-manual</li>
+<li>regex</li>
+<li>AST-based</li>
+<li>type-driven</li>
+</ul>
+</li>
+<li>Interactive investigation with Vim + quickfix</li>
+<li>Examples</li>
+</ul>
+
+
+<p>Alternatively:</p>
+
+<ul>
+<li>Philosophy</li>
+<li>Broad overview of classes of tools</li>
+<li>Comprehensive reference of individual tools / aliases</li>
+</ul>
+
+
+<hr />
+
+<h2>Raw notes</h2>
+
+<ul>
+<li><code>sed</code></li>
+<li>rubocop autocorrect
+
+<ul>
+<li><code>ruby-parse</code> to learn the syntax</li>
+<li><code>binding.pry</code> to see what methods are available on your node type</li>
+</ul>
+</li>
+<li>“be 100% replayable”
+
+<ul>
+<li>key idea: automation is key, but don&rsquo;t need one big hammer that does
+it all (like a Perfect Rubocop)</li>
+<li>3 or 4 heuristic commands based on experimentation can do just as
+well</li>
+</ul>
+</li>
+<li>if it’s too hard to land all at once, consider landing in pieces
+
+<ul>
+<li>but avoid unfinished codemods!</li>
+</ul>
+</li>
+<li><code>remote-script</code></li>
+<li><code>scripts/codemod/</code></li>
+<li><code>git files</code></li>
+<li><code>gsed -i -e</code> <code>'``s/.../.../``'</code></li>
+<li><code>gsed -i -e '/.../d'</code></li>
+<li><a href="http://go/ps/pull/120768">http://go/ps/pull/120768</a> (example script from pt)</li>
+<li>file:line helpers:
+
+<ul>
+<li>starting the pipeline:
+
+<ul>
+<li><code>git grep</code> <code>--``line</code> / <code>fileline</code>
+
+<ul>
+<li>specifically git grep (don&rsquo;t have to worry about ignored files)</li>
+</ul>
+</li>
+<li><code>git diff-review</code></li>
+</ul>
+</li>
+<li>manipulating the pipeline:
+
+<ul>
+<li><code>multi-grep</code></li>
+<li><code>multi-sed</code></li>
+<li><code>nextline</code> / <code>prevline</code></li>
+</ul>
+</li>
+<li>manual intervention:
+
+<ul>
+<li><code>vim -</code> + <code>gF</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>aliases
+
+<ul>
+<li><code>fileline</code></li>
+<li><code>onlyloclines</code></li>
+<li><code>onlylocs</code></li>
+<li><code>nextline</code></li>
+<li><code>prevline</code></li>
+</ul>
+</li>
+<li>make the commit message title be the command (for easy <code>rebase -i</code> with <code>exec</code>)</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>gd | diff-locs | multi-sed - <span class="s1">'s/T.any.TrueClass, FalseClass./Boolean/'</span>
+</span><span class='line'>
+</span><span class='line'>sorbet/scripts/typecheck_devel | onlyloclines | vim -
+</span><span class='line'>
+</span><span class='line'>ag -l <span class="s1">'&lt; Opus::APICore::AbstractAPIResource'</span> | <span class="se">\</span>
+</span><span class='line'>  xargs grep --no-filename <span class="s1">'^# typed:'</span> | <span class="se">\</span>
+</span><span class='line'>  sort | <span class="se">\</span>
+</span><span class='line'>  uniq -c</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- vim:tw=72
+-->
+
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2019-08-31T09:25:11-07:00">August 31, 2019</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/surgery-on-code/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/surgery-on-code/" title="Surgery on Code from the Command Line">Surgery on Code from the Command Line</a></h3>
+      <p>One problem that comes up all the time for me is needing to manipulate files only on specific lines. Like, “find and replace this pattern, but only on specific lines.” In this post, I’ll introduce the CLI tools I’ve made to solve this class of problems with some examples.
+ <a href="/surgery-on-code/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/on-language-choice/" title="On Programming Language Choice">On Programming Language Choice</a></h4>
+            <span>Published on June 21, 2019</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/continuations-notes/" title="Notes on Continuations">Notes on Continuations</a></h4>
+            <span>Published on June 18, 2019</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>

@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-09-02T17:46:49-04:00</updated>
+  <updated>2019-12-04T16:12:58-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -14,7 +14,141 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Surgery on codebases from the CLI]]></title>
+    <title type="html"><![CDATA[Codemod Tips and Tricks]]></title>
+    <link href="https://blog.jez.io/codemod-tips/"/>
+    <updated>2019-08-31T09:25:11-07:00</updated>
+    <id>https://blog.jez.io/codemod-tips</id>
+    <content type="html"><![CDATA[<ul>
+<li>Philosophy
+
+<ul>
+<li>replayable / scriptable</li>
+<li>bad heuristics are often not actually bad</li>
+</ul>
+</li>
+<li>Broad overview of classes of tools
+
+<ul>
+<li>manual</li>
+<li>semi-manual</li>
+<li>regex</li>
+<li>AST-based</li>
+<li>type-driven</li>
+</ul>
+</li>
+<li>Interactive investigation with Vim + quickfix</li>
+<li>Examples</li>
+</ul>
+
+
+<p>Alternatively:</p>
+
+<ul>
+<li>Philosophy</li>
+<li>Broad overview of classes of tools</li>
+<li>Comprehensive reference of individual tools / aliases</li>
+</ul>
+
+
+<hr />
+
+<h2>Raw notes</h2>
+
+<ul>
+<li><code>sed</code></li>
+<li>rubocop autocorrect
+
+<ul>
+<li><code>ruby-parse</code> to learn the syntax</li>
+<li><code>binding.pry</code> to see what methods are available on your node type</li>
+</ul>
+</li>
+<li>“be 100% replayable”
+
+<ul>
+<li>key idea: automation is key, but don&rsquo;t need one big hammer that does
+it all (like a Perfect Rubocop)</li>
+<li>3 or 4 heuristic commands based on experimentation can do just as
+well</li>
+</ul>
+</li>
+<li>if it’s too hard to land all at once, consider landing in pieces
+
+<ul>
+<li>but avoid unfinished codemods!</li>
+</ul>
+</li>
+<li><code>remote-script</code></li>
+<li><code>scripts/codemod/</code></li>
+<li><code>git files</code></li>
+<li><code>gsed -i -e</code> <code>'``s/.../.../``'</code></li>
+<li><code>gsed -i -e '/.../d'</code></li>
+<li><a href="http://go/ps/pull/120768">http://go/ps/pull/120768</a> (example script from pt)</li>
+<li>file:line helpers:
+
+<ul>
+<li>starting the pipeline:
+
+<ul>
+<li><code>git grep</code> <code>--``line</code> / <code>fileline</code>
+
+<ul>
+<li>specifically git grep (don&rsquo;t have to worry about ignored files)</li>
+</ul>
+</li>
+<li><code>git diff-review</code></li>
+</ul>
+</li>
+<li>manipulating the pipeline:
+
+<ul>
+<li><code>multi-grep</code></li>
+<li><code>multi-sed</code></li>
+<li><code>nextline</code> / <code>prevline</code></li>
+</ul>
+</li>
+<li>manual intervention:
+
+<ul>
+<li><code>vim -</code> + <code>gF</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>aliases
+
+<ul>
+<li><code>fileline</code></li>
+<li><code>onlyloclines</code></li>
+<li><code>onlylocs</code></li>
+<li><code>nextline</code></li>
+<li><code>prevline</code></li>
+</ul>
+</li>
+<li>make the commit message title be the command (for easy <code>rebase -i</code> with <code>exec</code>)</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>gd | diff-locs | multi-sed - <span class="s1">'s/T.any.TrueClass, FalseClass./Boolean/'</span>
+</span><span class='line'>
+</span><span class='line'>sorbet/scripts/typecheck_devel | onlyloclines | vim -
+</span><span class='line'>
+</span><span class='line'>ag -l <span class="s1">'&lt; Opus::APICore::AbstractAPIResource'</span> | <span class="se">\</span>
+</span><span class='line'>  xargs grep --no-filename <span class="s1">'^# typed:'</span> | <span class="se">\</span>
+</span><span class='line'>  sort | <span class="se">\</span>
+</span><span class='line'>  uniq -c</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- vim:tw=72
+-->
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Surgery on Code from the Command Line]]></title>
     <link href="https://blog.jez.io/surgery-on-code/"/>
     <updated>2019-07-30T09:32:48-07:00</updated>
     <id>https://blog.jez.io/surgery-on-code</id>
@@ -764,9 +898,14 @@ how it works.</p>
 <!-- more -->
 
 
+<p><a href="https://travis-ci.org/">Travis CI</a> is a service that lets a project run arbitrary code when
+someone commits and pushes a change. This code can do things like make
+sure the tests pass, build and publish releases, and even deploy the
+code somewhere.</p>
+
 <h2>Features</h2>
 
-<p>The way I set up my builds, I can:</p>
+<p>The way I set up my builds for SML with Travis CI, I can:</p>
 
 <ul>
 <li>build and test with both macOS and Linux</li>
@@ -799,6 +938,16 @@ the whole thing up:</p>
 out the <a href="https://docs.travis-ci.com/">Travis CI docs</a> to get a feel for how to actually set things
 up, and where these pieces fit in.</p>
 
+<p>After installing the deps on each box (like SML/NJ and MLton) and
+running the tests, the command which actually builds the the whole
+project is</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>./symbol install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This command is provided by <a href="https://github.com/jez/symbol">Symbol</a>, a build tool I wrote for Standard
+ML. I talk a little bit more about it in the section below.</p>
+
 <h2>Why write a whole build tool?</h2>
 
 <p>I mentioned above that I&rsquo;d written a build tool for Standard ML, called
@@ -810,7 +959,8 @@ any Standard ML project.</p>
 It&rsquo;s useful to be able to build a project with both (SML/NJ for faster
 builds and a REPL, and MLton for faster compiled executables). All
 Symbol really does is put SML/NJ and MLton behind a unified, very
-stripped down interface.</p>
+stripped down interface. It doesn&rsquo;t try to hide that, so that it&rsquo;s still
+possible to fall back to those programs for more complex workflows.</p>
 
 <p>There&rsquo;s more information <a href="https://github.com/jez/symbol">in the README</a>, but some key points:</p>
 
@@ -818,15 +968,14 @@ stripped down interface.</p>
 <li>Symbol makes it easy to build and install executables, even with
 SML/NJ which traditionally uses heap images.</li>
 <li>Symbol is built on <code>make</code>, so if <strong>no</strong> source files change, even
-recompiling with MLton is instant.</li>
+recompiling with MLton is instant (e.g., changing a test and
+re-running the tests doesn&rsquo;t require re-building everything).</li>
 <li>Symbol also supports scaffolding new Standard ML projects, which is
 nicer than starting from scratch.</li>
 </ul>
 
 
-<p>Again, there&rsquo;s way more information <a href="https://github.com/jez/symbol">in the README</a>, so
-definitely check it out if you&rsquo;re thinking about setting up a new
-Standard ML project. The usage looks something like this:</p>
+<p>The usage looks something like this:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># initialize a new project:</span>
 </span><span class='line'>❯ symbol-new hello
@@ -843,10 +992,14 @@ Standard ML project. The usage looks something like this:</p>
 </span><span class='line'>Hello, world!</span></code></pre></td></tr></table></div></figure>
 
 
+<p>Again, there&rsquo;s way more information <a href="https://github.com/jez/symbol">in the README</a>, so
+definitely check it out if you&rsquo;re thinking about setting up a new
+Standard ML project.</p>
+
 <h2>Why Standard ML in the first place?</h2>
 
-<p>I&rsquo;ll probably get around to writing about <a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a> (and related
-tools like <a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a> and <a href="https://github.com/jez/multi-sub"><code>multi-sub</code></a>) but at the end of the day:
+<p>I&rsquo;ll probably get around to <a href="https://blog.jez.io/surgery-on-code/">writing about <code>multi-grep</code></a> (and related
+tools like <code>diff-locs</code> and <code>multi-sub</code>) but at the end of the day:
 SML is a really pleasant language to use in a lot of ways:</p>
 
 <ul>
@@ -4056,43 +4209,6 @@ variables are used in generic programming, inductive &amp; coinductive
 types, and polymorphic types.</p></blockquote>
 
 <h3>→ <a href="https://blog.jez.io/notes/variables-in-types.pdf">Variables in Types</a></h3>
-
-<!-- vim:tw=72
--->
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Recitation Notes]]></title>
-    <link href="https://blog.jez.io/recitation-notes-tag/"/>
-    <updated>2017-09-24T14:40:10-07:00</updated>
-    <id>https://blog.jez.io/recitation-notes-tag</id>
-    <content type="html"><![CDATA[<!-- Empty header to prevent first paragraph from being big -->
-
-
-<p></p>
-
-
-<p>One thing I miss from being a teaching assistant is getting to write up
-recitation and lecture notes for technical topics. Like with teaching
-any other subject, writing up explanations for interesting things I&rsquo;ve
-found helps me round out what concepts are still confusing. I also miss
-getting to make nice LaTeX-typeset PDFs.</p>
-
-<!-- more -->
-
-
-<p>Recitation notes are distinguished from normal blog posts in that
-they&rsquo;ll cover more CS theory-oriented topics and will be more
-<em>instructive</em> than <em>experience-based</em>. All recitation notes are tagged
-with the tag <code>recitation</code>.</p>
-
-<h3>→ <a href="https://blog.jez.io/categories/#recitation">All posts tagged with <code>recitation</code></a></h3>
-
-<p>I might &ldquo;cross post&rdquo; a few of the more interesting existing recitation
-handouts I&rsquo;ve made over the years (though some of them make a
-heavy-handed assumption that you&rsquo;re in the class currently).</p>
 
 <!-- vim:tw=72
 -->
