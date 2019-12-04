@@ -18,9 +18,16 @@ how it works.
 
 <!-- more -->
 
+[Travis CI] is a service that lets a project run arbitrary code when
+someone commits and pushes a change. This code can do things like make
+sure the tests pass, build and publish releases, and even deploy the
+code somewhere.
+
+[Travis CI]: https://travis-ci.org/
+
 ## Features
 
-The way I set up my builds, I can:
+The way I set up my builds for SML with Travis CI, I can:
 
 - build and test with both macOS and Linux
 - build and test with both SML/NJ and MLton
@@ -44,16 +51,26 @@ the whole thing up:
 2.  [Brewfile] (deps for macOS build)
 3.  [tests/travis-install.sh] (deps for Linux build)
 
-If you haven't used Travis CI before, you'll probably also want to check
-out the [Travis CI docs] to get a feel for how to actually set things
-up, and where these pieces fit in.
-
 [.travis.yml]: https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/.travis.yml
 [Brewfile]: https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/Brewfile
 [tests/travis-install.sh]: https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/tests/travis-install.sh
 
+If you haven't used Travis CI before, you'll probably also want to check
+out the [Travis CI docs] to get a feel for how to actually set things
+up, and where these pieces fit in.
+
 [Travis CI docs]: https://docs.travis-ci.com/
 
+After installing the deps on each box (like SML/NJ and MLton) and
+running the tests, the command which actually builds the the whole
+project is
+
+```
+./symbol install
+```
+
+This command is provided by [Symbol], a build tool I wrote for Standard
+ML. I talk a little bit more about it in the section below.
 
 ## Why write a whole build tool?
 
@@ -66,20 +83,20 @@ SML/NJ and MLton are already great compilers with their own build tools.
 It's useful to be able to build a project with both (SML/NJ for faster
 builds and a REPL, and MLton for faster compiled executables). All
 Symbol really does is put SML/NJ and MLton behind a unified, very
-stripped down interface.
+stripped down interface. It doesn't try to hide that, so that it's still
+possible to fall back to those programs for more complex workflows.
 
 There's more information [in the README][Symbol], but some key points:
 
 - Symbol makes it easy to build and install executables, even with
   SML/NJ which traditionally uses heap images.
 - Symbol is built on `make`, so if **no** source files change, even
-  recompiling with MLton is instant.
+  recompiling with MLton is instant (e.g., changing a test and
+  re-running the tests doesn't require re-building everything).
 - Symbol also supports scaffolding new Standard ML projects, which is
   nicer than starting from scratch.
 
-Again, there's way more information [in the README][Symbol], so
-definitely check it out if you're thinking about setting up a new
-Standard ML project. The usage looks something like this:
+The usage looks something like this:
 
 ```bash
 # initialize a new project:
@@ -97,11 +114,14 @@ Hello, world!
 Hello, world!
 ```
 
+Again, there's way more information [in the README][Symbol], so
+definitely check it out if you're thinking about setting up a new
+Standard ML project.
 
 ## Why Standard ML in the first place?
 
-I'll probably get around to writing about [`multi-grep`] (and related
-tools like [`diff-locs`] and [`multi-sub`]) but at the end of the day:
+I'll probably get around to [writing about `multi-grep`] (and related
+tools like `diff-locs` and `multi-sub`) but at the end of the day:
 SML is a really pleasant language to use in a lot of ways:
 
 - Type inference in Standard ML is a breath of fresh air.
@@ -118,6 +138,7 @@ in some way.
 [`diff-locs`]: https://github.com/jez/diff-locs
 [`multi-sub`]: https://github.com/jez/multi-sub
 [Symbol]: https://github.com/jez/symbol
+[writing about `multi-grep`]: /surgery-on-code/
 
 <!-- vim:tw=72
 -->
