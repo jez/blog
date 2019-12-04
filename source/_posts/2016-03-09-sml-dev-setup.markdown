@@ -19,41 +19,49 @@ make editing and developing with SML responsive and interactive.
 
 <!-- more -->
 
-We're going to be walking through a couple easy steps you can take to make
-developing SML feel more fluid, both in and out of your editor. I have a slight
-preference for Vim on OS X, but many of these steps are platform agnostic.
+We're going to be walking through a couple easy steps to make developing SML
+feel more fluid. I have a slight preference for Vim (Neovim) on macOS, but many
+of these steps are platform agnostic.
 
 ## Installing SML Locally
 
 While developing SML in a remote environment like the shared Andrew Unix
-machines makes it easy to dive right in, working with SML for prolonged periods
-of time is best done locally.
+machines makes it easy to dive right in, I prefer doing development on my
+laptop—it doesn't get slow when there are many people logged in, there's no
+nightly reboots, and it doesn't matter whether I have a strong WiFi connection.
 
-On OS X and Ubuntu, the two most popular SML implementations are already
-packaged. Take the time to install a version of SML right now. At CMU, we use
-[SML/NJ][smlnj], which is convenient because it has a REPL that lets you play
-around with SML interactively. If you'd like to play around with compiling and
-distributing programs written in SML, you might want to install [MLton][mlton].
+On macOS and Ubuntu, the two most popular implementations of SML are already
+packaged. Take the time to install a version of SML right now:
+
+- At CMU we use [SML/NJ][smlnj], which is convenient because it has a REPL that
+  for playing around with SML interactively.
+
+- To play around with releasing programs written in SML to other people, install
+  [MLton][mlton]. It has better support for compiling SML programs to standalone
+  executables which can be shared from one machine to another. (I have a
+  separate post on [using SML to release software publically][sml-travis-ci]
+  with more details).
 
 ```bash Install SML from your package manager
-# SML/NJ on OS X
+# macOS -- one or both of:
 brew install smlnj
-# -- or --
-# MLton on OS X
 brew install mlton
 
-# SML/NJ on Ubuntu
+# Ubuntu -- one or both of:
 sudo apt-get install smlnj
-# -- or --
-# MLton on Ubuntu
 sudo apt-get install mlton
 ```
 
-Feel free to install both if you'd like; they'll play nicely with each other and
-each offers advantages over the other.
+Feel free to install both; they'll play nicely with each other, and each offers
+advantages over the other.
 
-Note for OS X users: if you've never used [Homebrew][brew] before, you'll need
+Note for macOS users: if you've never used [Homebrew][brew] before, you'll need
 to [install it first][brew].
+
+Note for Ubuntu users: the versions of these two that ship in the default
+package distribution are frequently out of date. If that matters to you,
+consider following the the [SML/NJ][smlnj] and [MLton][mlton] installation
+instructions directly.
 
 
 ## Getting Comfortable with SML/NJ
@@ -68,16 +76,15 @@ they tell students to run their code like this:
 2. Type `use "foo.sml";` or `CM.make "sources.cm";` at the REPL
 
 Don't get me wrong; this works, but there's a better way. Being responsible
-CLI-citizens, we should always be looking for ways to tab-complete. Let's do
-this by changing our workflow:
+CLI-citizens, we should always be looking for ways to tab-complete. We can
+easily get tab-completion on the filename by changing our workflow:
 
 1. Run `sml foo.sml` or `sml -m sources.cm`
 
 Look at that! We've,
 
 - dropped a step (having to launch the REPL first), and
-- introduced tab completion into our workflow (because the shell has filename
-  completion)
+- introduced tab completion (because the shell has filename completion)
 
 It's the little things, but they add up.
 
@@ -98,12 +105,12 @@ $ sml
 $ rlwrap sml
 ```
 
-`rlwrap` stands for "readline wrap." Readline is a library that simply adds to a
-REPL program all the features mentioned above:
+`rlwrap` stands for "readline wrap." Readline is a library that adds all the
+features mentioned above to any REPL program:
 
-- Command history tracking
+- Command history tracking (up arrow keys)
 - Line editing with arrow keys
-- Configurability through the `~/.inputrc` file
+- Configuration through the `~/.inputrc` file
   - We can use this to get fancy features like Vi keybindings
 
 For more information, see [these lines][inputrc] of my inputrc, a small part of
@@ -125,95 +132,97 @@ No actually, take a second and [walk through it][vim-as-an-ide]. We'll still be
 here when you're done, and you'll appreciate Vim more when you're done.
 
 
-### Syntastic
+### ALE
 
-From the Syntastic documentation:
+[ALE][ale] is a Vim plugin that provides what it calls "asynchronous linting."
+That's a fancy way of saying that it can show little red x's on all the lines
+that have errors. It works for many languages out of the box, including Standard
+ML.
 
-> Syntastic is a syntax checking plugin for Vim that runs files through
-> external syntax checkers and displays any resulting errors to the user. This
-> can be done on demand, or automatically as files are saved. If syntax errors
-> are detected, the user is notified and is happy because they didn't have to
-> compile their code or execute their script to find them.
+It's super simple to set up. The [ALE homepage][ale] should have all the
+instructions.
 
-And the best part? Syntastic ships with a checker for SML by default if you
-have SML/NJ installed.
-
-If you didn't just install [Syntastic][Syntastic] from the Vim as an IDE
-walkthrough, you can [visit their homepage][Syntastic] for installation
-instructions. Go ahead and do this now, then try writing this in a file called
-`test.sml`:
+With ALE set up, try writing this into a file called `test.sml`:
 
 ```sml test.sml
 val foo : string = 42
 ```
 
-You should see an 'x' next to the line and a description of the error from the
-type checker. You can imagine how handy this is.
+While typing, any errors should appear as markers to the left of the line
+numbers. Super handy!
 
+If nothing shows up, check `:ALEInfo` which dumps a bunch of information
+about whether ALE was set up correctly. In particular, SML support requires
+having [SML/NJ][smlnj] installed (i.e., installing it on your laptop or working
+on a server where it's already installed).
 
-### Extra Syntastic Setup
+### Extra ALE Setup
 
-Syntastic has their own set of [recommended settings][syntastic-settings] that
-you can add at your discretion. At the very least, I'd suggest adding these
-lines to your vimrc:
+While the default settings for ALE work well enough, there's plenty of reasons
+to tweak them. For example, here are [all my ALE settings][ale-vimrc].
 
-```vim .vimrc
-...
+The key changes I make:
 
-augroup mySyntastic
-  " tell syntastic to always stick any detected errors into the location-list
-  au FileType sml let g:syntastic_always_populate_loc_list = 1
+- I ask ALE to show a list of all errors if there were any.
+- I ask ALE to only run when the file was saved (not when it was opened or
+  edited).
 
-  " automatically open and/or close the location-list
-  au FileType sml let g:syntastic_auto_loc_list = 1
-augroup END
+(You'll also see a bunch of settings for other languages, but you won't find any
+SML-specific config... it's not needed!)
 
-" press <Leader>S (i.e., \S) to not automatically check for errors
-nnoremap <Leader>S :SyntasticToggleMode<CR>
+Also, a tip for those who've never used Vim's location list: you can close the
+list of errors with `:lclose`.
 
-...
+### Using ALE with CM files
+
+Sometimes a single SML file is self-contained enough to type check on it's own.
+But most of the time, we're working with multi-file SML projects. With SML/NJ,
+multi-file SML projects are managed using CM files (`*.cm` files) which declare
+groups of SML files that must be compiled together to make sense.
+
+ALE's support for SML handles both of these scenarios. When opening an SML file,
+ALE will search up the folder hierarchy for any `*.cm` file, stopping when it
+finds the first one. When there are multiple in a single folder, it takes the
+alphabetically first option.
+
+Usually this works fine but sometimes ALE picks the wrong one. There are
+instructions for how to manually fix this by setting some variables in the ALE
+help:
+
 ```
-
-By default, whenever you save your file, Syntastic will place symbols in Vim's
-_sign column_ next to lines with errors. The first two settings above tell
-Syntastic to also show a summarized list of errors at the bottom of the screen.
-The final setting lets you press `<Leader>S` (which is usually just `\S`) to
-disable all that. This is useful when you're still unfinished and you know your
-SML isn't going to type check. Press it again to re-enable it.
-
-Also, a tip for those who've never used Vim's location list feature before: you
-can close the list with `:lclose`.
-
+:help ale-sml-options
+```
 
 ### `vim-better-sml`
 
-The curious at this point might be wondering if Syntastic is smart enough to
-figure out when the file you're using requires a CM file to compile and uses it
-to show you where the errors are instead. As it turns out: no, [that's not a
-feature Syntastic wants to include][pull-1719] by default. However, the
-functionality isn't hard to implement, and there's already a plugin for it!
+After all that, I still wasn't satisfied with developing SML in Vim, so I wrote
+a plugin to make it even better: [vim-better-sml][vim-better-sml]. Here's a
+quick rundown of its features:
 
-[vim-better-sml][vim-better-sml] is one of my Vim plugins. Here's a quick
-rundown of its features:
-
-- As already mentioned, it will detect when your file requires a CM file to
-  build, and will pass along the information to Syntastic
-- `let` expressions are indented one level under `fun` declarations
-- `*.sig` files are properly detected as SML signature files
-- Apostrophe characters are treated as keywords characters
-- The comment string is properly registered for SML files
+- It supports for embedding a REPL directly inside Vim.
+- It supports asking for the type of a variable under the cursor.
+- It supports jump to definition, even into the Standard Basis Library.
+- `*.sig` files are properly detected as SML signature files.
+- Many small annoyances with syntax highlighting and indentation are fixed.
 
 For more information, including how to install it, check out the homepage:
-[vim-better-sml][vim-better-sml].
+[vim-better-sml][vim-better-sml]. For the most part, the plugin itself will
+guide you through the installation, declaring any dependencies that might be
+missing.
+
+I recorded a screencast of all those features above in action, which you might
+want to check out:
+
+[![thumbnail][demo-thumbnail]](https://youtu.be/Z5FsPZ5cm8Y)
 
 
 ## General Vim Settings
 
 As a quick addendum, one common complaint people have when editing SML is that
-it forces the line to wrap if it extends to 80 characters. Some people don't
-like that it does this, and others don't like that it doesn't do it frequently
-enough (namely, it only wraps the line if your cursor extends past 80
-characters, not the end of the line).
+it forces the line to wrap if it extends past 80 characters. Some people don't
+like that, and others don't like that it doesn't do it frequently enough
+(namely, it only wraps the line if your **cursor** extends past 80 characters,
+not the end of the line).
 
 If you don't want Vim to do any of this wrapping, run this:
 
@@ -224,34 +233,34 @@ setlocal textwidth=0
 If you'd like this change to persist between Vim sessions, add it to
 `~/.vim/after/ftplugin/sml.vim`. These folders and file likely don't exist
 yet; you'll have to create them. The `after` folder in Vim is used to override
-settings loaded from plugins. As you might have guessed, files in here are run
-after plugin code is.
+settings loaded from plugins.
 
-Conversely, if you'd like a little better idea when Vim's going to hard wrap
-your line, you can add this line to your vimrc:
+Alternatively, if you'd like a little better idea when Vim's going to hard wrap
+your line, you can add one of these lines to your vimrc:
 
 ```vim Show a color column
+" Always draw the line at 80 characters
+set colorcolumn=80
+
+" Draw the line at whatever the current value of textwidth is
 set colorcolumn+=0
 ```
 
-Note: this will only work if you're using Vim 7.4 or above. This setting tells
-Vim to draw a solid column at the same width as the value of the `textwidth`
-setting.
+That way, it's easier to see when a line is getting long.
 
 
 ## TL;DR
 
 We covered a lot, so here's a quick recap:
 
-- Install SML locally. It's super easy to do on OS X and Linux (use your package
-  manager), and means you don't have have a Wi-Fi connection to develop SML.
+- Install SML locally. It's super easy to do on macOS and Linux (use your
+  package manager), and means you don't have to have a Wi-Fi connection to
+  develop SML.
 - Invest time into learning Vim. Here's a reference: [Vim as an
   IDE][vim-as-an-ide].
-- Install [Syntastic][Syntastic]. It tells you what lines your errors are on.
-- Install [vim-better-sml][vim-better-sml]. It includes some features Syntastic
-  doesn't by default, and includes a couple extras.
-- Consider using `setlocal textwidth=0` or `set colorcolumn+=0` to deal with the
-  80-character restriction when writing SML files.
+- Install [ALE][ale]. It tells you what lines your errors are on.
+- Install [vim-better-sml][vim-better-sml]. It includes a whole host of added
+  power features.
 
 And as always, you can see even more Vim settings in my [dotfiles
 repo][dotfiles] on GitHub.
@@ -260,10 +269,12 @@ repo][dotfiles] on GitHub.
 [brew]: http://brew.sh
 [smlnj]: http://smlnj.org/
 [mlton]: http://www.mlton.org/
+[sml-travis-ci]: /sml-travis-ci/
 [vim-as-an-ide]: https://github.com/jez/vim-as-an-ide
-[Syntastic]: https://github.com/scrooloose/syntastic
-[syntastic-settings]: https://github.com/scrooloose/syntastic#settings
+[ale]: https://github.com/dense-analysis/ale
+[ale-vimrc]: https://github.com/jez/dotfiles/blob/b942b6336ee968c9d94a9ea363c1cbcdb44b9846/vim/plug-settings.vim#L227-L239
 [pull-1719]: https://github.com/scrooloose/syntastic/pull/1719
 [vim-better-sml]: https://github.com/jez/vim-better-sml
 [dotfiles]: https://github.com/jez/dotfiles
 [inputrc]: https://github.com/jez/dotfiles/blob/ed8e531eebe43a8aef05fc4cb768157d03408cea/inputrc#L12-L14
+[demo-thumbnail]: /images/vim-better-sml-demo-thumbnail.png
