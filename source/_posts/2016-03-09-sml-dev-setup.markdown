@@ -23,6 +23,9 @@ We're going to be walking through a couple easy steps to make developing SML
 feel more fluid. I have a slight preference for Vim (Neovim) on macOS, but many
 of these steps are platform agnostic.
 
+**Note**: I updated this post to more accurately reflect my SML dev setup in
+December 2019.
+
 ## Installing SML Locally
 
 While developing SML in a remote environment like the shared Andrew Unix
