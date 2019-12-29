@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-12-29T12:19:22-05:00</updated>
+  <updated>2019-12-29T15:27:53-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -136,9 +136,9 @@ Each of these languages <strong>forbids</strong> this kind of mutation. (Whether
 because it&rsquo;s hard to implement support for it or because they&rsquo;re making
 a value judgement is beyond me.)</p>
 
-<p>So how can Sorbet can model this? Mostly it just <strong>cheats</strong>.</p>
-
-<p>I can think of three main ways it cheats.</p>
+<p>So how can Sorbet can model this? Mostly it just cheats, err,
+approximates. From my experience working on the Sorbet team, I can think
+of three main ways it cheats.</p>
 
 <p>First, Sorbet assumes that if a class or method might exist, it does
 exist, and universally throughout a project.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> It pretends
@@ -175,8 +175,9 @@ the remaining undiscovered definitions.</p>
 
 <h2>Beyond mutation</h2>
 
-<p>But really, the way Sorbet handles mutation in a codebase is by
-incentivicing people to get rid of it.</p>
+<p>Don&rsquo;t get me wrong, those approximations are really useful and
+effective. But really, the way Sorbet handles mutation in a codebase is
+by incentivicing people to get rid of it.</p>
 
 <ul>
 <li><p>Sorbet can type check a project in seconds, but it takes minutes to
