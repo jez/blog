@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-12-29T02:56:04-05:00</updated>
+  <updated>2019-12-29T12:19:22-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -29,7 +29,7 @@
 <p>Mutation makes typechecking Ruby harder than many other programming
 languages. Most people will immediately think I mean mutation in the
 sense of <code>x += 1</code> or something—that&rsquo;s not what I&rsquo;m referring to. In
-fact, that&rsquo;s the easy, kind of mutation to model in a type system.</p>
+fact, that&rsquo;s the easy kind of mutation to model in a type system.</p>
 
 <p>What I mean is that nearly everything worth knowing statically about a
 Ruby program involves mutation. Defining a class?</p>
@@ -38,8 +38,8 @@ Ruby program involves mutation. Defining a class?</p>
 </span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>That mutates the global namespace: code anywhere can reference that
-class now.</p>
+<p>That mutates the global namespace of constants. After those lines run,
+all code in the project can reference the class <code>A</code>.</p>
 
 <p>Defining a method?</p>
 

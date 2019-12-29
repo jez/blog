@@ -4,7 +4,7 @@
   <title><![CDATA[Category: types | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/types/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2019-12-29T02:56:04-05:00</updated>
+  <updated>2019-12-29T12:19:22-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,291 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[What makes type checking Ruby hard?]]></title>
+    <link href="https://blog.jez.io/ruby-mutation/"/>
+    <updated>2019-12-29T01:29:52-06:00</updated>
+    <id>https://blog.jez.io/ruby-mutation</id>
+    <content type="html"><![CDATA[<p></p>
+
+
+
+
+<!-- more -->
+
+
+<p>Mutation makes typechecking Ruby harder than many other programming
+languages. Most people will immediately think I mean mutation in the
+sense of <code>x += 1</code> or something—that&rsquo;s not what I&rsquo;m referring to. In
+fact, that&rsquo;s the easy kind of mutation to model in a type system.</p>
+
+<p>What I mean is that nearly everything worth knowing statically about a
+Ruby program involves mutation. Defining a class?</p>
+
+<pre><code class="ruby">class A
+end
+</code></pre>
+
+<p>That mutates the global namespace of constants. After those lines run,
+all code in the project can reference the class <code>A</code>.</p>
+
+<p>Defining a method?</p>
+
+<pre><code class="ruby">class A
+  def foo
+    puts 'hello'
+  end
+end
+</code></pre>
+
+<p>The method <code>foo</code> is undefined just before the <code>def</code> block (at runtime!),
+but defined after—mutation again.</p>
+
+<p>Ruby provides things like <code>attr_reader</code> and <code>attr_accessor</code> to define
+getter and setter methods:</p>
+
+<pre><code class="ruby">class B
+  attr_reader :foo
+end
+</code></pre>
+
+<p><code>attr_reader</code> is not a Ruby keyword, contrary to popular belief: it&rsquo;s a
+method on the singleton class which takes an argument. It defines an
+instance method called <code>foo</code> as a side effect by mutating the class <code>B</code>.</p>
+
+<p>It&rsquo;s the same for mixing modules into classes:</p>
+
+<pre><code class="ruby">module M; end
+class C
+  include M
+end
+</code></pre>
+
+<p><code>include</code> is another method disguised like a keyword which mutates the
+class&rsquo;s list of ancestors.</p>
+
+<p>One of my least favorite Ruby features: you can <strong>redefine</strong> (not
+override) a method:</p>
+
+<pre><code class="ruby">class D
+  attr_reader :foo
+  alias_method :old_foo, :foo
+  def foo
+    puts 'Calling D#foo'
+    old_foo
+  end
+end
+</code></pre>
+
+<p>Because <code>D#foo</code> is defined by the <code>attr_reader</code> line, the subsequent
+<code>def</code> overwrites it (akin to mutating a local variable, like <code>x += 1</code>).
+Oh and that <code>alias_method</code>? Another method looking like a keyword which
+mutates the class.</p>
+
+<p>Even the way libraries work in Ruby is powered by mutation:</p>
+
+<pre><code class="ruby">require 'some_gem'
+</code></pre>
+
+<p><code>require</code> is a method (again, not a keyword) that looks up and runs
+arbitrary Ruby code, whose result we discard. It&rsquo;s only convention that
+the primary side effect of the <code>require</code>&rsquo;d code is to mutate the global
+namespace, defining more classes and methods.</p>
+
+<h2>DSLs and metaprogramming</h2>
+
+<p>It would be one thing if Ruby constrained the places where this mutation
+could occur. But instead, it provides first-class support for these
+features anywhere Ruby code runs. Everything we&rsquo;ve seen so far can be
+hidden behind arbitrary computation at runtime:</p>
+
+<ul>
+<li>With <code>Module#const_set</code>, a Ruby program can compute an arbitrary name
+and use it to create new constant at runtime.</li>
+<li><code>Module#define_method</code> does the same for methods.</li>
+<li>Again <code>require</code> is a method, so it can occur wherever other methods
+are called.</li>
+</ul>
+
+
+<p>It&rsquo;s not uncommon to see Ruby libraries embrace this rather than avoid
+it (Rails definitely does). Ruby programs frequently build up large
+abstractions and do tons of computation which at the end of the day
+result in a <code>define_method</code> or a <code>const_set</code>.</p>
+
+<p>Rubyists call this &ldquo;metaprogramming&rdquo; or &ldquo;building DSLs&rdquo; but I call it
+like I see it: mutation.</p>
+
+<h2>Modeling mutation</h2>
+
+<p>Type systems are notoriously bad at modelling this kind of mutation.
+Look at other typed, object-oriented languages: Java, Scala, C++, &hellip;
+Each of these languages <strong>forbids</strong> this kind of mutation. (Whether
+because it&rsquo;s hard to implement support for it or because they&rsquo;re making
+a value judgement is beyond me.)</p>
+
+<p>So how can Sorbet can model this? Mostly it just <strong>cheats</strong>.</p>
+
+<p>I can think of three main ways it cheats.</p>
+
+<p>First, Sorbet assumes that if a class or method might exist, it does
+exist, and universally throughout a project.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> It pretends
+that all <code>include</code>, <code>extend</code>, and <code>alias_method</code> statements in a class
+run first, before all other code at the top-level of that class. It
+restricts method redefinitions—the old and new methods must take the
+same number and kinds of arguments. And it restricts <code>alias_method</code>: you
+can only alias to a method on your class, not to a parent class. Sorbet
+makes no attempt to model <code>undef_method</code> at all (another
+method-not-keyword!).</p>
+
+<p>Second, Sorbet cheats by implementing heuristics for the most common
+DSLs. To support <code>attr_reader</code>, Sorbet says, &ldquo;Hey, this method call
+happens to be to some method named <code>attr_reader</code>. I&rsquo;m not sure if it&rsquo;s
+to <code>Module#attr_reader</code> or to some other <code>attr_reader</code> definition or to
+any definition at all, but it&rsquo;s provided with a single Symbol argument,
+the result is discarded, and it&rsquo;s called at the syntactic top-level of a
+class, so I bet that it is a call to <code>Module#attr_reader</code>.&rdquo; It&rsquo;s similar
+for many other popular DSLs: it makes decent educated guesses.</p>
+
+<p>But after all that, it sort of gives up. Sorbet makes no attempts to
+work backwards from a call to <code>define_method</code> or <code>const_set</code> inside a
+method body to learn that a class or method might have been defined
+somewhere. Instead, it cheats one last time and uses runtime information.</p>
+
+<p>As a part of initializing a Sorbet project, Sorbet <code>require</code>s (read:
+executes) as much code in a project as it can: all the gems listed in
+the Gemfile and all the Ruby files in the current folder. Afterwards, it
+can see the result of all that&rsquo;s been mutated thus far (via reflection)
+and serialize what it sees into <a href="https://sorbet.org/docs/rbi">RBI files</a> to convey what it saw to the
+static checker. This is still imperfect (it completely misses things
+that are defined after <code>require</code> time), but empirically it finds most of
+the remaining undiscovered definitions.</p>
+
+<h2>Beyond mutation</h2>
+
+<p>But really, the way Sorbet handles mutation in a codebase is by
+incentivicing people to get rid of it.</p>
+
+<ul>
+<li><p>Sorbet can type check a project in seconds, but it takes minutes to
+re-generate all RBIs files. When Sorbet can see things statically,
+there&rsquo;s also a canonical place to write a type annotation for it.</p></li>
+<li><p>It&rsquo;s a much better experience to click &ldquo;Go to Definition&rdquo; and jump to
+the actual source definition rather than to an auto-generated RBI
+file.</p></li>
+<li><p>And arguably, if it&rsquo;s easy for Sorbet to understand what&rsquo;s defined and
+where, it&rsquo;s easier for a programmer to understand. Understandable code
+lets people iterate faster, is less brittle, and harder to break by
+accident.</p></li>
+</ul>
+
+
+<p>Programming languages are tools to change and structure the way we
+think. In the long run, all code can be changed. We adopt type systems
+specifically to help guide these changes, which <a href="https://blog.jez.io/on-language-choice/">I&rsquo;ve touched on
+before</a>. When it comes to mutation in Ruby, Sorbet makes a solid effort
+to model the helpful parts, while providing guide rails and suggestions
+to deal with the rest.</p>
+
+<hr />
+
+<h2>Appendix A: By comparison with typed JavaScript</h2>
+
+<p>You might say, &ldquo;the things that you&rsquo;re talking about aren&rsquo;t unique to
+Ruby! It&rsquo;s the same for all dynamic programming languages!&rdquo; But is that
+true in practice?</p>
+
+<p>Let&rsquo;s compare our Ruby snippets from before with JavaScript.</p>
+
+<p>Ruby:</p>
+
+<pre><code class="ruby">class A
+  def self.my_dsl(name)
+    define_method(name) do; end
+  end
+end
+</code></pre>
+
+<p>JavaScript:</p>
+
+<pre><code class="js">class A {
+  static myDsl(name) {
+    this.prototype[name] = function() {}
+  }
+}
+</code></pre>
+
+<p>First I&rsquo;ll point out: the mutation becomes way more obvious in the
+JavaScript program! But second: both TypeScript and Flow report static
+errors on this program. They both complain that there&rsquo;s no type
+annotation declaring that it&rsquo;s ok to treat <code>this.prototype</code> as if it
+were a key-value mapping.</p>
+
+<p>The fact that both Flow and TypeScript report an error here speak to how
+common this idiom is in practice. It&rsquo;s not common, and they&rsquo;d rather not
+encourage programs like this, so they forbid it.</p>
+
+<p>Here&rsquo;s another example, first in Ruby:</p>
+
+<pre><code class="ruby">require 'some_gem'
+
+SomeNamespace::SomeClass.new
+</code></pre>
+
+<p>And then in JavaScript:</p>
+
+<pre><code class="js">import someNamespace from 'some_package';
+
+new someNamespace.SomeClass();
+</code></pre>
+
+<p>With no RBI files declaring whether <code>SomeNamespace::SomeClass</code> exists
+or not, Sorbet will report an error that the class doesn&rsquo;t exist. But in
+TypeScript and Flow, the code is just fine, even if there&rsquo;s no type
+declaration file. Both can still see that whatever vale is imported will
+be bound to the <code>someNamespace</code> variable (even if it&rsquo;s treated as
+<code>any</code>).</p>
+
+<p>Sorbet is thus forced to come up with ways to generate RBI files for all
+new projects, because without them Sorbet would be crippled: it would
+have no way to distinguish between a class name that has actually been
+typoed vs one that is typed correctly but for which there&rsquo;s no visible
+definition. Meanwhile, TypeScript and Flow work completely fine in new
+codebases out of the box.</p>
+
+<p>So my claim is that: no, these problems <strong>are</strong> unique to Ruby, because
+the design of the language and the culture of its use so pervasively
+promote or require mutation.</p>
+
+<h2>Appendix B: More things that are actually mutation</h2>
+
+<ul>
+<li><p><code>freeze</code> (ironic: to prevent mutation on a class or object&hellip; we
+mutate it!)</p></li>
+<li><p><code>private</code> / <code>private_class_method</code> (not keywords! These are methods
+that take a <strong>Symbol</strong>; it just so happens that <code>def foo; end</code> is an
+expression that evaluates to the symbol <code>:foo</code>. Which is why there&rsquo;s
+both <code>private</code> and <code>private_class_method</code>, because <code>def self.foo; end</code>
+also evaluates to <code>:foo</code>, so <code>private def self.foo; end</code> would attempt
+to mark an <strong>instance</strong> method named <code>:foo</code> private, even it didn&rsquo;t
+exist!)</p></li>
+</ul>
+
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Frequently this assumption is backed up by an autoloader. For example, Rails includes an autoloader that loads constants lazily on demand, so that the programmer doesn&rsquo;t have to sprinkle require statements throughout the code. But how do autoloads work? Mutation again 🙂.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Notes on Continuations]]></title>
@@ -818,192 +1103,6 @@ semantics.</p>
 <ol>
 <li id="fn:1">
 <p>I&rsquo;m exaggerating a bit here 😅 To see what I <em>really</em> mean, see <a href="/lens-intuition">this post</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Some Intuition on Lenses]]></title>
-    <link href="https://blog.jez.io/lens-intuition/"/>
-    <updated>2018-02-05T21:09:43-08:00</updated>
-    <id>https://blog.jez.io/lens-intuition</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve been working on a small project in Haskell recently that uses the
-<a href="https://hackage.haskell.org/package/wreq">wreq</a> library. It&rsquo;s an HTTP client library that exposes most of its
-functionality through lenses. Using this library is my first time really
-using lenses pervasively, so I&rsquo;ve spent some time trying to understand
-how lenses really work.</p>
-
-<!-- more -->
-
-
-<p>Lenses try to bring the concept of getters and setters into a functional
-setting. Here, &ldquo;functional&rdquo; means that lenses prioritize composition
-(chaining one lens after another) and immutability (returning a new
-data structure<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> instead of mutating the old one in place).</p>
-
-<p>In a functional setting, if we have a type <code>s</code> and we want to get some
-field of type <code>a</code> from it, a getter is just a function <code>s -&gt; a</code>.</p>
-
-<p>Similarly, a setter that updates that field has the type <code>s -&gt; a -&gt; s</code>
-which takes the old <code>s</code> and slots the <code>a</code> into it, giving us back a new
-<code>s</code>.</p>
-
-<p>Let&rsquo;s see if we can build up some intuition, starting with these types
-and ending with the type of <code>Lens'</code> from the lens library:</p>
-
-<pre><code class="haskell">type Lens' s a = forall f. Functor f =&gt; (a -&gt; f a) -&gt; (s -&gt; f s)
-</code></pre>
-
-<p>In particular, let&rsquo;s start with our getter:</p>
-
-<pre><code class="haskell">fn :: s -&gt; a
-</code></pre>
-
-<p>The first thing we can do is convert it to continuation-passing style
-(CPS). In CPS form, a function throws it&rsquo;s return value to a
-user-specified callback function (or continuation) instead of returning
-its value directly. So our <code>s -&gt; a</code> becomes:</p>
-
-<pre><code class="haskell">fn :: (a -&gt; r) -&gt; s -&gt; r
-</code></pre>
-
-<p>After we&rsquo;re done computing an <code>a</code> from the <code>s</code> we were given, we throw
-it to the continuation of type <code>a -&gt; r</code>. We then take <strong>that</strong> result and
-return it. I like to put parens around the second function:</p>
-
-<pre><code class="haskell">fn :: (a -&gt; r) -&gt; (s -&gt; r)
-</code></pre>
-
-<p>But it&rsquo;s kind of hard to do anything with this, because <code>r</code> is
-completely arbitrary. It&rsquo;s chosen by whoever calls us, so we have no
-information about what can be done on an <code>r</code>. What if we instead require
-that the continuation result be a Functor?</p>
-
-<pre><code class="haskell">fn :: Functor f =&gt; (a -&gt; f r) -&gt; (s -&gt; f r)
-</code></pre>
-
-<p>And while we&rsquo;re at it, it was kind an arbitrary stipulation that the <code>f
-r</code> of the continuation&rsquo;s callback be the same as the <code>f r</code> of our
-function&rsquo;s result type, so let&rsquo;s relax that:</p>
-
-<pre><code class="haskell">fn :: Functor f =&gt; (a -&gt; f b) -&gt; (s -&gt; f t)
-</code></pre>
-
-<p>This relaxation makes sense as long as we know of some function with
-type <code>b -&gt; t</code>, because then we could</p>
-
-<ul>
-<li>take the <code>s</code>,</li>
-<li>apply our <code>s -&gt; a</code> getter to get an <code>a</code>,</li>
-<li>throw this to the <code>a -&gt; f b</code> continuation to get an <code>f b</code>, and</li>
-<li><code>fmap</code> our <code>b -&gt; t</code> function over this to get an <code>f t</code>.</li>
-</ul>
-
-
-<p>In general, we might not know of some <code>b -&gt; t</code> function. But remember
-that we do have our <code>s -&gt; a -&gt; s</code> function! So if we choose <code>b = a</code> and
-<code>s = t</code>, then we get:</p>
-
-<pre><code class="haskell">fn :: Functor f =&gt; (a -&gt; f a) -&gt; (s -&gt; f s)
-</code></pre>
-
-<p>With a function like this, we can</p>
-
-<ul>
-<li>take the <code>s</code>,</li>
-<li>apply our <code>s -&gt; a</code> getter to get an <code>a</code>,</li>
-<li>throw our <code>a</code> to the <code>a -&gt; f a</code> continuation to get an <code>f a</code>,</li>
-<li>partially apply our <code>s -&gt; a -&gt; s</code> setter with the <code>s</code> we were given,
-
-<ul>
-<li>(so we have an <code>a -&gt; s</code> now)</li>
-</ul>
-</li>
-<li><code>fmap</code> this <code>a -&gt; s</code> function over the <code>f a</code> to get an <code>f s</code></li>
-</ul>
-
-
-<p>And we&rsquo;ve arrived at the type of <code>Lens'</code>! What really happened here was
-we marked the interesting<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> part of our data structure with
-a Functor. So if we choose an interesting Functor instance, it&rsquo;ll act on
-that point.</p>
-
-<p>What if the Functor we choose is <code>Const a</code>? Well, then it&rsquo;s on us to
-provide an <code>a -&gt; f a</code> continuation. Since we&rsquo;ve chosen <code>f = Const a</code> we
-have to come up with a function with type <code>a -&gt; Const a a</code>. This is a
-special case of the <code>Const</code> constructor:</p>
-
-<pre><code class="haskell">Const :: forall b. a -&gt; Const a b
-</code></pre>
-
-<p>So our continuation remembers the <code>a</code> it was given. After the last step,
-we&rsquo;ll have a <code>Const a s</code>, which we can call <code>getConst</code> on to give us
-the <code>a</code> we stashed. So by choosing <code>Const</code>, our lens acts like a getter!</p>
-
-<p>What if the Functor we choose is <code>Identity</code>? Now we have to provide a
-function <code>a -&gt; Identity a</code>. At this point, you probably guessed this
-makes our lens a setter. If we&rsquo;re trying to use a setter, then we&rsquo;ll
-also have access to some new <code>y :: a</code> that we want to use to slot into
-our <code>s</code>. Let&rsquo;s see what happens if we make this our continuation:</p>
-
-<pre><code class="haskell">inj :: a -&gt; Identity a
-inj x = Identity y
-</code></pre>
-
-<p>The <code>x :: a</code> is the old value of <code>x</code>. By dropping <code>x</code> on the floor and
-returning <code>y</code> instead, we&rsquo;ve slotted <code>y</code> into our <code>s</code>. Remember
-that above we took the <code>f a</code> and our setter <code>s -&gt; a -&gt; s</code>, partially
-applied it to get <code>a -&gt; s</code>, and <code>fmap</code>&rsquo;d this over the <code>f a</code>. Since our
-continuation now holds a wrapped up <code>y :: a</code>, we&rsquo;ll reconstruct a new
-<code>s</code> using <code>y</code>. Great!</p>
-
-<h2>More Resources</h2>
-
-<p>These are some resources that helped make lenses less intimidating for
-me:</p>
-
-<ul>
-<li><a href="https://www.youtube.com/watch?v=cefnmjtAolY">Lenses, Folds, and
-Traversals</a> (video)
-
-<ul>
-<li>by Edward Kmett, the author of the lens library</li>
-<li>highly technical, long, exhaustive</li>
-</ul>
-</li>
-<li><a href="https://hackage.haskell.org/package/lens-4.16/docs/Control-Lens-Getter.html">Control.Lens.Getter</a> (hackage)
-
-<ul>
-<li>in particular, the first few lines of the intro paragraph</li>
-<li>also: <code>(^.)</code> to see where the <code>f</code> becomes <code>Const a</code></li>
-</ul>
-</li>
-<li><code>#haskell</code> on Freenode
-
-<ul>
-<li>Special thanks to <code>johnw_</code> and <code>dminuoso</code>!</li>
-</ul>
-</li>
-</ul>
-
-
-<p>Lenses seem intimidating at first, but in the end they&rsquo;re just a really
-cool uses of functions. We use nothing more exotic here than the Functor
-type class and a couple of Functor instances, and in return we get such
-concise code!</p>
-
-<!-- vim:tw=72
--->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>It&rsquo;s common to think that &ldquo;immutable&rdquo; means &ldquo;copy the entire thing&rdquo; and then change the parts you care about. But if you start with <strong>all data</strong> being immutable, then you only need to allocate new memory for the subcomponents of your data structure that <strong>actually</strong> changed. Everything else can be shared by the old and the new.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>In the same way that glass lenses focus light on a point, functional lenses focus a data structure on a point! Isn&rsquo;t it neat how that name works out? It&rsquo;s certainly a cooler name than &ldquo;generalized getter/setter <a href="https://www.youtube.com/watch?v=pD_imYhNoQ4">wombo combo</a>&rdquo; (video, language warning).<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 

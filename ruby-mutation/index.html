@@ -13,9 +13,9 @@
 
 
 
-<meta name="description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+<meta name="description" content="Mutation makes typechecking Ruby harder than many other programming languages. Most people will immediately think I mean mutation in the sense of `x &hellip;">
 
-<meta name="keywords" content=" ">
+<meta name="keywords" content="ruby sorbet types ">
 
 
 <!-- http://t.co/dKP3o1e -->
@@ -28,7 +28,7 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
   <meta name="twitter:title" content="What makes type checking Ruby hard?">
-  <meta name="twitter:description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+  <meta name="twitter:description" content="Mutation makes typechecking Ruby harder than many other programming languages. Most people will immediately think I mean mutation in the sense of `x &hellip;">
   <meta name="twitter:creator" content="@jez_io">
 
 
@@ -37,7 +37,7 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.jez.io/ruby-mutation">
 <meta property="og:title" content="What makes type checking Ruby hard?">
-<meta property="og:description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+<meta property="og:description" content="Mutation makes typechecking Ruby harder than many other programming languages. Most people will immediately think I mean mutation in the sense of `x &hellip;">
 <meta property="og:image" content="https://blog.jez.io/touch-icon.png">
 <meta property="og:site_name" content="Bits, Bytes, and Words">
 
@@ -108,7 +108,7 @@
 <p>Mutation makes typechecking Ruby harder than many other programming
 languages. Most people will immediately think I mean mutation in the
 sense of <code>x += 1</code> or something—that&rsquo;s not what I&rsquo;m referring to. In
-fact, that&rsquo;s the easy, kind of mutation to model in a type system.</p>
+fact, that&rsquo;s the easy kind of mutation to model in a type system.</p>
 
 <p>What I mean is that nearly everything worth knowing statically about a
 Ruby program involves mutation. Defining a class?</p>
@@ -117,8 +117,8 @@ Ruby program involves mutation. Defining a class?</p>
 </span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>That mutates the global namespace: code anywhere can reference that
-class now.</p>
+<p>That mutates the global namespace of constants. After those lines run,
+all code in the project can reference the class <code>A</code>.</p>
 
 <p>Defining a method?</p>
 
@@ -378,6 +378,18 @@ exist!)</p></li>
     <footer class="entry-meta">
       <span class="entry-tags">
         <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#ruby" title="Pages tagged ruby">ruby</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#sorbet" title="Pages tagged sorbet">sorbet</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#types" title="Pages tagged types">types</a>
+            </li>
           
         </ul>
       </span>
