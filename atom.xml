@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-01-02T03:50:10-05:00</updated>
+  <updated>2020-01-02T03:56:54-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -13,276 +13,8 @@
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
-  <entry>
-    <title type="html"><![CDATA[How Sorbet Works: An Overview]]></title>
-    <link href="https://blog.jez.io/sorbet-pipeline-overview/"/>
-    <updated>2020-01-01T14:51:50-06:00</updated>
-    <id>https://blog.jez.io/sorbet-pipeline-overview</id>
-    <content type="html"><![CDATA[<p></p>
-
-
-
-
-<!-- more -->
-
-
-<p><a href="https://sorbet.org">Sorbet</a> is the coolest project I&rsquo;ve ever worked on. There&rsquo;s so much that I want to write about, but every time I start I wind up re-explaining the same basic things about how Sorbet works. I could skip explaining it, but then the posts would only be decipherable to people who already know how Sorbet works&hellip; an audience of maybe a dozen.</p>
-
-<p>Instead, I&rsquo;ve factored out a helper post, so to speak. I&rsquo;d like to walk through the struture of Sorbet from a pretty high level with a goal of appealing to a wider audience. It&rsquo;s going to be matter-of-fact, which means kind of boring. I could point out a lot of cool, fun things along the way, but I&rsquo;m afraid that I&rsquo;d digress without end.</p>
-
-<p>If this post gets boring, sorry! In that case, you might want to read one of these posts instead which pack more of a punchline. Just refer back to this one when it assumes you know about how Sorbet works:</p>
-
-<ul>
-<li><a href="https://blog.jez.io/ruby-mutation/">What makes type checking Ruby hard?</a></li>
-<li>&hellip; more coming soon!</li>
-</ul>
-
-
-<!-- TODO(jez) Potential forward reference -->
-
-
-<p>On the other hand, if you&rsquo;re reading this with a hope to eventually make a contribution to Sorbet, we have much more detailed <a href="https://github.com/sorbet/sorbet/tree/master/docs/internals.md">docs on the internals</a> that we use for spinning up new team members. If this post isn&rsquo;t detailed enough for you, try those docs instead!</p>
-
-<p><a href="https://github.com/sorbet/sorbet/tree/master/docs/internals.md">→ internals.md (for Sorbet contributors)</a></p>
-
-<p>With all that out of the way, let&rsquo;s dive in. We&rsquo;ll start with quick crash course in some terms that I use from time to time, and then step through Sorbet&rsquo;s implementation.</p>
-
-<h2>Crash course in compilers</h2>
-
-<p>If you took a programming languages or compilers course in school, the hope is that&rsquo;s more than enough qualification to understand this post. If you didn&rsquo;t, here&rsquo;s a 30 second summary:</p>
-
-<ul>
-<li><p>Sorbet is not a compiler, but the techniques it implements are the same. So most of the terminology that applies to compiler implementations applies to Sorbet&rsquo;s implementation too.</p></li>
-<li><p>IR stands for <strong><a href="https://en.wikipedia.org/wiki/Intermediate_representation">intermediate representation</a></strong>. IRs are basically data structures representing a program the user wrote that a compiler manipulates. A compiler frequently has one or more IRs, depending on the kind of analysis that needs to be done.</p></li>
-<li><p>AST stands for <strong><a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">abstract syntax tree</a></strong>. ASTs are a kind of IR. As IRs go, ASTs usually resemble what the user typed in pretty closely, but as an explicit tree data structure instead of plain text.</p></li>
-<li><p>Compilers typically operate as a pipeline. Data flows from one pass to the next, getting processed and converted through one or more IRs along the way.</p></li>
-<li><p>Compilers emit machine executable code at the end of the pipeline, but Sorbet is not a compiler because it doesn&rsquo;t do that: it just type checks the code. The Ruby VM executes the original program on its own.</p></li>
-</ul>
-
-
-<p>If there&rsquo;s a term or concept in this post that you don&rsquo;t understand, please let me know! Chances are you&rsquo;re not the only one, and I&rsquo;m happy to update my post to make sense to more people.</p>
-
-<h2>How Sorbet works</h2>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/01-pipeline-simple.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/01-pipeline-simple.png">
-</a></p>
-
-<p>Like I said in the compiler crash course above, Sorbet is structured like a compiler. It reads Ruby files in at the start, and then sends them through a series of passes. But because it&rsquo;s just a type checker not a compiler, it doesn&rsquo;t produce an artifact at the end of the pipeline. The only thing left over is the stream of errors reported on standard error.</p>
-
-<p>Sorbet has a lot of passes in its pipeline, but it&rsquo;s convenient to group them into three big phases: <strong>Index</strong>, <strong>Resolve</strong>, and <strong>Typecheck</strong>. Importantly though, it&rsquo;s a pipeline. At this granularity, the arrows in our diagram only point forwards—there are no back edges from a later phase to an earlier phase. (This is true even if we zoomed into these phases to see the individual passes they&rsquo;re made of, which might be the subject of another post.)</p>
-
-<!-- TODO(jez) Potential forward reference -->
-
-
-<p>&hellip; And that&rsquo;s it! That&rsquo;s Sorbet&rsquo;s architecture at a high level.</p>
-
-<p>Of course, you were hoping to learn more, so we&rsquo;ll spend the rest of the article talking about what specifically Index, Resolve, and Typecheck do. Our diagram will get a little more cluttered, but at its core it&rsquo;s these three steps.</p>
-
-<h2>Index</h2>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/02-index.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/02-index.png">
-</a></p>
-
-<p>First up, let&rsquo;s take a look at Index, which is also the first step of the pipeline. One way to think of index is &ldquo;all the bookkeeping needed to turn strings into ASTs.&rdquo; It reads files, parses them into ASTs, and does a little extra processing. In this phase, all the processing is <em>syntax driven</em> and <em>local</em>.</p>
-
-<p>For example:</p>
-
-<ul>
-<li><p>Ruby has <code>if</code>, <code>unless</code>, and <code>case</code>, but Sorbet rewrites all of these in terms of <code>if</code>. It&rsquo;s similar for <code>while</code> and <code>until</code>.</p></li>
-<li><p>Many Ruby syntax constructs (like <code>alias</code>) have equivalent method-based counterparts (like <code>alias_method</code>). Sorbet rewrites these keywords in terms of the methods.</p></li>
-<li><p>Ruby has both <code>class</code> and <code>module</code> definitions. There are hundreds of places in Sorbet that work with classes and modules, but only 9 places where the distinction between class or module is relevant. Sorbet represents them both with a single C++ class that has an enum field to tell the two apart.</p></li>
-</ul>
-
-
-<p>All told, the Ruby parser emits around 100 distinct AST node types, but the IR that comes out of Index has <em>fewer than 30</em>. That means far fewer cases to handle in future phases of the pipeline:</p>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/03-desugar.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/03-desugar.png">
-</a></p>
-
-<p>Again: these transformations are entirely syntactic. Rewriting an <code>unless</code> to an <code>if</code> is as simple as swapping the true and false branches. By comparison, some examples of things that not entirely syntactic:</p>
-
-<ul>
-<li><p>Knowing which class <code>A.new</code> would instantiate. Without doing a lot more work, we can&rsquo;t say for sure that <code>A</code> refers to <code>::A</code> at the top level, or to <code>::SomeClass::SomeModule::A</code>, or any class at all.</p></li>
-<li><p>Knowing whether a method is defined. If we can&rsquo;t even figure out which classes exist yet, certainly we have no hope for methods.</p></li>
-<li><p>Knowing what a type means. Types in Sorbet are almost entirely names of other classes (for example, <code>T.any(A, B)</code> is a <a href="https://sorbet.org/docs/union-types">union type</a> of two <a href="https://sorbet.org/docs/class-types">class types</a>, representing either an instance of the class <code>A</code> or the class <code>B</code>.)</p></li>
-</ul>
-
-
-<p>All of these questions involve some form of global information. Since Index
-only has access to local information, it can&rsquo;t answer any of them. In spite of that, Index is also tasked with understanding <em>DSLs</em> and <em>metaprogramming</em>.</p>
-
-<p>DSLs and metaprogramming in Ruby are super common in Ruby yet near impossible to represent statically (which I talk more about in <a href="https://blog.jez.io/ruby-mutation/">What makes type checking Ruby hard?</a>). In fact, I&rsquo;d argue, that no amount of global static analysis could make it feasible; there&rsquo;d always be something missing.</p>
-
-<p>Rather than make a herculean attempt to solve a hard problem, Sorbet spends nearly zero effort implementing <em>imperfect heuristics</em> to handle various Ruby DSLs at a reasonable degree of fidelity.</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="kp">attr_reader</span> <span class="ss">:foo</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># becomes:</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">foo</span>
-</span><span class='line'>  <span class="vi">@foo</span>
-</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>For example, <code>attr_reader :foo</code> is unconditionally rewritten to <code>def foo; @foo; end</code>, even though Index only sees a method call to &ldquo;some unknown method named <code>attr_reader</code>.&rdquo; Index doesn&rsquo;t know or care whether <code>attr_reader</code> exists, yet it makes this transformation anyways. This could cause real problems,<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> but it comes with plenty of upsides (definitely the subject of another post). For now, just know that&rsquo;s the way things are done.</p>
-
-<p>Other examples of DSLs that are handled by Index:</p>
-
-<ul>
-<li><code>A = Class.new do; end</code> is rewritten to <code>class A; end</code></li>
-<li><code>A = Struct.new(:foo)</code> becomes <code>class A; def foo; @foo; end; end</code></li>
-<li>Sorbet&rsquo;s <a href="https://sorbet.org/docs/tstruct">typed structs</a> (i.e., <code>T::Struct</code>) get rewritten significantly</li>
-</ul>
-
-
-<p>To wrap it all up: Index is in charge of syntactic rewrites that have to work without any global information. The goal is to vastly simplify future phases and to provide best-effort support for DSLs and metaprogramming.</p>
-
-<p>Next up is Resolve, which is charged with sorting out and recording all that global information. Before we can understand Resolve, let&rsquo;s take a quick look at the data structure responsible for holding it all, conveniently called <code>GlobalState</code>.</p>
-
-<h2>GlobalState</h2>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/04-global-state.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/04-global-state.png">
-</a></p>
-
-<p>There&rsquo;s a lot of stuff in <code>GlobalState</code>, but the two most important parts are the name table and the symbol table.</p>
-
-<p>The <strong>name table</strong> is for interning strings. Strings take up lots of space and are slow to compare for equality. Instead of storing strings within parts of the Sorbet&rsquo;s AST, Sorbet interns a copy of the string into a massive array, and stores pointers to that interned string in the AST instead. The implementation is slightly more complicated to save space and present a clean API, but the mental model is the same. Comparing pointers for equality is super fast, and following the pointer recovers the underlying string.</p>
-
-<p>The <strong>symbol table</strong> stores information about Ruby-level definitions in a program. For each class, method, constant, instance variable, type parameter, and generic type member, there&rsquo;s a <code>Symbol</code><sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> in the symbol table. A <code>Symbol</code> tracks a definition&rsquo;s name, the line(s) where it was defined, its owner (usually: the class it&rsquo;s defined in), its type (if can have one), its parent class &amp; ancestors if it&rsquo;s a class, etc. With the symbol table in hand, we can answer any question we need to.</p>
-
-<p>By default these tables are immutable, but within specific passes they can be made mutable. Knowing what&rsquo;s mutable when is key to reasoning about what each phase does, so let&rsquo;s go back and annotate our previous picture of the pipeline:</p>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/05-pipeline-global-state.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/05-pipeline-global-state.png">
-</a></p>
-
-<p>For the case of Index, we see that the symbol table is locked, but the name table is mutable. That&rsquo;s another way of thinking about what &ldquo;entirely syntax driven&rdquo; means: Index can intern strings (purely local), but it can&rsquo;t create <code>Symbol</code>s, which represent global definitions in a program (and since they can&rsquo;t have been created yet, it certainly can&rsquo;t reliably look them up).</p>
-
-<p>This diagram also shows that inspite of its name, <code>GlobalState</code> is threaded as an argument through each individual pass, not stored in a global variable. (This is critical for making Sorbet parallel).</p>
-
-<p>Armed with that knowledge, let&rsquo;s take a look at how Resolve works.</p>
-
-<h2>Resolve</h2>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/06-resolve.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/06-resolve.png">
-</a></p>
-
-<p>The job of Resolve is to <em>populate the symbol table</em>: it&rsquo;s the only time in the entire pipeline that the symbol table is unlocked. There are lots of different kinds of symbols that it creates, but resolving constants is the most complicated and the most fun, so let&rsquo;s look at that first:</p>
-
-<ol>
-<li><p>Create rudimentary symbols for for all class, module, and constant definitions.</p></li>
-<li><p>Given the definitions for those symbols, attempt to resolve as many constant literals as possible, and enqueue one big to-do list of the rest.</p></li>
-<li><p>Loop through the to-do list until it&rsquo;s empty. This is a fixed point computation, because successfully resolving one constant might make another constant resolve.</p></li>
-</ol>
-
-
-<p>Let&rsquo;s take it step by step. First up:</p>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/07-resolve-constants-1.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/07-resolve-constants-1.png">
-</a></p>
-
-<p>I&rsquo;m representing unresolved constants in yellow and resolved constants in green here. Our first job is to do a simple tree traversal of our AST looking for definitions and creating symbols for them. This means that Sorbet now has definitions for <code>::Parent</code>, <code>::Child</code> and <code>::Parent::A</code> in the symbol table. But that&rsquo;s pretty much all it knows. It doesn&rsquo;t yet know that <code>Child</code> has a <code>Parent</code> as a superclass. It doesn&rsquo;t know that <code>puts A</code> isn&rsquo;t a typo. It doesn&rsquo;t know that the type of <code>Parent::A</code> is <code>Integer</code>, etc. It&rsquo;s just names and owners at this point. That&rsquo;s ok, because doing a single tree traversal is fast.</p>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/08-resolve-constants-2.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/08-resolve-constants-2.png">
-</a></p>
-
-<p>Next up, Sorbet looks at the remaining unresolved constant literals (the yellow ones). For each one it asks, &ldquo;Is the rudimentary definition information enough to resolve this constant literal?&rdquo;</p>
-
-<p>For the first <code>puts A</code>, it is. Sorbet can see that line is inside <code>Parent</code>, and there&rsquo;s a <code>Parent::A</code> symbol, so this <code>A</code> refers to <code>Parent::A</code>. This constant gets resolved immediately.</p>
-
-<p>The next one it sees is the <code>Parent</code> in superclass position. All ancestors (superclasses and mixins) need additional processing, they&rsquo;re queued up to be resolved later.</p>
-
-<p>The last one it sees is the <code>puts A</code> in <code>Child</code>. There&rsquo;s no definition for called <code>Child::A</code>, and <code>Child</code> hasn&rsquo;t had it&rsquo;s ancestor information filled out yet, so we can&rsquo;t resolve this constant either. It&rsquo;ll also have to be enqueued.</p>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/09-resolve-constants-3.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/09-resolve-constants-3.png">
-</a></p>
-
-<p>And finally, Sorbet iterates in a fixed point over the to-do items until it can&rsquo;t resolve any more. In our example, the first thing it tries is to resolve the <code>Parent</code> ancestor item. It sees that there&rsquo;s a definition for <code>::Parent</code>, so it marks the <code>Parent</code> in <code>class Child &lt; Parent</code> resolved. Having done that, it also updates the symbol for <code>Child</code> to record that the superclass is resolved now.</p>
-
-<p>The next item in the queue is the <code>A</code> in the second <code>puts A</code>. Now when Sorbet looks for an <code>A</code> in the scope of <code>Child</code> it&rsquo;ll look transitively, so first it&rsquo;ll look for <code>::Child::A</code> (not there). Then it&rsquo;ll know that <code>::Child &lt; ::Parent</code>, so it&rsquo;ll look for <code>::Parent::A</code>, and find something. That&rsquo;s enough to mark this constant literal resolved.</p>
-
-<p>Of all the resposibilities of Resolve, constant resolution is bar far the most complicated because it&rsquo;s so whole-program. As I touched on in <a href="https://blog.jez.io/mutation-imports/">a previous article</a>, Ruby doesn&rsquo;t have imports. Without the luxury of having every ancestor name imported at the top of the file, we have to do constant resolution to resolve all ancestors, but constant resolution involves looking up ancestors, and there&rsquo;s the cycle.</p>
-
-<p>Constants are the hardest; everything else is easier. (Mostly just tree traversals, without the fixed point loop). One additional trick with methods is pairing the method signature with the definition below it. Sorbet extracts type information from the signature and enters it onto the <code>Symbol</code> for the method.</p>
-
-<p>To recap, that&rsquo;s Resolve: a handful of algorithms (tree traversals and fixed point loops) that understand how Ruby definitions work and how to create <code>Symbol</code> entries in the symbol table for them. When Resolve is done, it&rsquo;s like having the answer key to a test: there&rsquo;s not a question in sight we can&rsquo;t look up the answer for. So let&rsquo;s look at Typecheck to close out the pipeline.</p>
-
-<h2>Typecheck</h2>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/10-typecheck.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/10-typecheck.png">
-</a></p>
-
-<p>With Resolve done, <code>GlobalState</code> is entirely frozen: no more mutation. Also, all methods are type checked one-by-one, in parallel. Since <code>GlobalState</code> is frozen and they&rsquo;re all type checked in parallel, we have this really nice property that the result of type checking one method <em>never</em> affects how another method type checks.</p>
-
-<p>Since <code>GlobalState</code> has been populated and we know it can&rsquo;t change, the type inference algorithm can be pretty straight forward. Since all methods are type checked independently, there&rsquo;s no reason to attempt to infer types for a method&rsquo;s arguments: other methods wouldn&rsquo;t be able to use that information. If an arg isn&rsquo;t given a type explicitly, we&rsquo;ll assume the arg is <a href="https://sorbet.org/docs/untyped">untyped</a>. Sorbet takes the types it was given for arguments and flows that knowledge forward, inferring types for local variables along the way.</p>
-
-<p>After all the simplification and resolution that other passes have done, type checking Ruby code is pretty much 4 kinds of operations:</p>
-
-<ul>
-<li>Knowing the types of Ruby literals (e.g., the string literal <code>"hello"</code> has type <code>String</code>)</li>
-<li>Looking up the types of Symbols (e.g., knowing that <code>Parent::A</code> has type <code>Integer</code>)</li>
-<li>Modeling the effect of control flow on the types of variables</li>
-<li>Type checking method calls (very complicated)</li>
-</ul>
-
-
-<p>Modeling control flow sensitivity in Sorbet is really cool, but I don&rsquo;t really think of it as an &ldquo;architectural&rdquo; or &ldquo;pipeline&rdquo; component of Sorbet, so I&rsquo;ll save it for another article.</p>
-
-<p>Type checking method calls is the hardest of the four things in that list for a whole lot of reasons, and unfortunately I probably won&rsquo;t write an article on it. There&rsquo;s a 2k LOC file in Sorbet just for handling method calls. Meanwhile, all of Typecheck takes up 8k. That&rsquo;s 25% just for one Ruby construct.</p>
-
-<p>In Typecheck there&rsquo;s also the implementation of the type system itself. For Sorbet, &ldquo;implementing the type system&rdquo; is mostly a matter of writing a funciton which will say whether one type is a subtype of another. But again, given <code>GlobalState</code> (and a heaping dose of type theory), that&rsquo;s a tractable problem to solve, especially because as Sorbet&rsquo;s type system goes, it&rsquo;s not trying to rock the boat. Most type level constructs have plenty of precedent in other systems.</p>
-
-<h2>Wrap up</h2>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/11-pipeline-final.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/11-pipeline-final.png">
-</a></p>
-
-<p>&hellip; And that&rsquo;s it! For real this time. It&rsquo;s a lot to take in, and the goal wasn&rsquo;t to cover things with the hopes of being productive contributing to the Sorbet codebase. But hopefully it outlines enough of the moving parts that it&rsquo;s possible to start diving into some interesting implications of design decisions.</p>
-
-<p>Again, I haven&rsquo;t written too many such posts, but I&rsquo;m definitely planning on writing more in the future. For now:</p>
-
-<ul>
-<li><a href="https://blog.jez.io/ruby-mutation/">What makes type checking Ruby hard?</a></li>
-<li>&hellip; more coming soon!</li>
-</ul>
-
-
-<!-- TODO(jez) Potential forward reference -->
-
-
-<p>I promise: this post was long so that those don&rsquo;t have to be!</p>
-
-<p>Again, if you have any questions or suggestions after having read this, I&rsquo;m happy to answer them. The best place to reach me is on the Sorbet Slack:</p>
-
-<p><a href="https://sorbet.org/slack">→ Sorbet Slack community</a></p>
-
-<p>Come find me in the <code>#internals</code> channel. Thanks!</p>
-
-<!-- vim:tw=72
--->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>As an exercise, try to come up with a Ruby program which raises a <code>NoMethodError</code> when run, but which Sorbet doesn&rsquo;t report an error on. Similarly, try to write one in which Sorbet reports a &ldquo;method doesn&rsquo;t exist&rdquo; error, but which runs just fine.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>Sorbet&rsquo;s <code>Symbol</code> data structure (what&rsquo;s stored in the symbol table) is completely different from Ruby&rsquo;s <code>Symbol</code> (like <code>:foo</code>). Hopefully the distinction is always clear from context.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
+  
+  
   
   <entry>
     <title type="html"><![CDATA[What makes type checking Ruby hard?]]></title>
@@ -570,6 +302,8 @@ exist!)</p></li>
 ]]></content>
   </entry>
   
+  
+  
   <entry>
     <title type="html"><![CDATA[Surgery on Code from the Command Line]]></title>
     <link href="https://blog.jez.io/surgery-on-code/"/>
@@ -848,6 +582,8 @@ to reach out!</p>
 ]]></content>
   </entry>
   
+  
+  
   <entry>
     <title type="html"><![CDATA[On Programming Language Choice]]></title>
     <link href="https://blog.jez.io/on-language-choice/"/>
@@ -1051,6 +787,8 @@ might say. Regardless, thanks for your time.</em></p>
 ]]></content>
   </entry>
   
+  
+  
   <entry>
     <title type="html"><![CDATA[Notes on Continuations]]></title>
     <link href="https://blog.jez.io/continuations-notes/"/>
@@ -1083,6 +821,8 @@ they&rsquo;re way more than this—specifically, they reify the concept of a
 
 ]]></content>
   </entry>
+  
+  
   
   <entry>
     <title type="html"><![CDATA[A Debugger for Bash in Six Lines of Bash]]></title>
@@ -1199,6 +939,8 @@ about it!</p>
 ]]></content>
   </entry>
   
+  
+  
   <entry>
     <title type="html"><![CDATA[Improving CLIs with isatty]]></title>
     <link href="https://blog.jez.io/cli-tty/"/>
@@ -1307,6 +1049,8 @@ that add up and make certain command-line utilities delightful to use.</p>
 
 ]]></content>
   </entry>
+  
+  
   
   <entry>
     <title type="html"><![CDATA[Standard ML in Travis&nbsp;CI]]></title>
@@ -1443,6 +1187,8 @@ in some way.</p>
 
 ]]></content>
   </entry>
+  
+  
   
   <entry>
     <title type="html"><![CDATA[Profiling in Haskell for a 10x Speedup]]></title>
@@ -1751,6 +1497,8 @@ attempt:</p>
 ]]></content>
   </entry>
   
+  
+  
   <entry>
     <title type="html"><![CDATA[Concurrent Programming in ML: A Race]]></title>
     <link href="https://blog.jez.io/cpml-race/"/>
@@ -1958,6 +1706,8 @@ correct by construction.</p>
 ]]></content>
   </entry>
   
+  
+  
   <entry>
     <title type="html"><![CDATA[Prefer .then() over .catch()]]></title>
     <link href="https://blog.jez.io/prefer-then-over-catch/"/>
@@ -2107,6 +1857,8 @@ should instead ascribe <code>mixed</code> to the result of the callback.</p>
 
 ]]></content>
   </entry>
+  
+  
   
   <entry>
     <title type="html"><![CDATA[Union Types in Flow & Reason]]></title>
@@ -2591,6 +2343,8 @@ representation for the constructor tags.</p>
 ]]></content>
   </entry>
   
+  
+  
   <entry>
     <title type="html"><![CDATA[Case Exhaustiveness in Flow]]></title>
     <link href="https://blog.jez.io/flow-exhaustiveness/"/>
@@ -2803,6 +2557,8 @@ refactors.</p>
 ]]></content>
   </entry>
   
+  
+  
   <entry>
     <title type="html"><![CDATA[Lenses & Composition]]></title>
     <link href="https://blog.jez.io/lens-composition/"/>
@@ -2885,6 +2641,8 @@ semantics.</p>
 
 ]]></content>
   </entry>
+  
+  
   
   <entry>
     <title type="html"><![CDATA[Some Intuition on Lenses]]></title>
@@ -3071,6 +2829,8 @@ concise code!</p>
 
 ]]></content>
   </entry>
+  
+  
   
   <entry>
     <title type="html"><![CDATA[Code Review from the Command Line]]></title>
@@ -3426,6 +3186,8 @@ feel free to reach out and let me know! I&rsquo;m happy to help.</p>
 
 ]]></content>
   </entry>
+  
+  
   
   <entry>
     <title type="html"><![CDATA[Presenting Data & Information: Notes]]></title>
@@ -3811,6 +3573,8 @@ tips and suggestions for what to learn next&mdash;these tips are decidedly
 ]]></content>
   </entry>
   
+  
+  
   <entry>
     <title type="html"><![CDATA[ABTs in Haskell]]></title>
     <link href="https://blog.jez.io/abts-in-haskell/"/>
@@ -3894,6 +3658,8 @@ in all, <code>unbound-generics</code> is really pleasant to use!</p>
 
 ]]></content>
   </entry>
+  
+  
   
   <entry>
     <title type="html"><![CDATA[Variables and Binding]]></title>
@@ -4344,6 +4110,8 @@ absence.<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup></p>
 ]]></content>
   </entry>
   
+  
+  
   <entry>
     <title type="html"><![CDATA[System Fω and Parameterization]]></title>
     <link href="https://blog.jez.io/system-f-param/"/>
@@ -4611,5 +4379,6 @@ that powerful. Functions!</p>
 
 ]]></content>
   </entry>
+  
   
 </feed>
