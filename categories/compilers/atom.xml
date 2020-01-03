@@ -4,7 +4,7 @@
   <title><![CDATA[Category: compilers | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/compilers/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-01-02T03:56:54-05:00</updated>
+  <updated>2020-01-02T23:53:00-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -172,46 +172,61 @@ end
   <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/06-resolve.png">
 </a></p>
 
-<p>The job of Resolve is to <em>populate the symbol table</em>: it&rsquo;s the only time in the entire pipeline that the symbol table is unlocked. There are lots of different kinds of symbols that it creates, but resolving constants is the most complicated and the most fun, so let&rsquo;s look at that first:</p>
+<p>Resolve&rsquo;s job is to <em>populate the symbol table</em>: it&rsquo;s the only time in the entire pipeline that the symbol table can be mutated. Since the symbol table has an entry for every definition in a Ruby project, Resolve does these kinds of things:</p>
+
+<ul>
+<li><p>It creates a <code>Symbol</code> for every class or module definition, and registers what its ancestors (superclass &amp; mixins) are.</p></li>
+<li><p>It creates a <code>Symbol</code> for every instance variable, and records its type if it was given a type annotation (<code>@x = T.let(..., A)</code>).</p></li>
+<li><p>It creates a <code>Symbol</code> for every method definition, registers which class that method was defined in, and records that method&rsquo;s argument and return types using the corresponding signature.</p></li>
+</ul>
+
+
+<p>But the most notable job Resolve has is updating every constant literal in the AST (like the <code>A</code> in <code>A.new</code>) with a reference to the <code>Symbol</code> that constant literal resolves to. This super important; for example, until constant literals are resolved Sorbet can&rsquo;t create or manipulate types. Constant resolution is a pre-requisite to nearly everything further down the pipeline.</p>
+
+<p>The problem is that resolving constants in Ruby is complicated. Ruby resolves constant literals by looking for a definition with that name in the current <em>nesting scope</em> and in <em>any ancestor</em>. But declaring a class&rsquo;s ancestors is done with constant literals, which themselves need to be resolved! To model Ruby, Sorbet is forced to interleave resolving constant literals and populating ancestor information.</p>
+
+<p>Let&rsquo;s consider an example:</p>
+
+<pre><code class="ruby">class Parent
+  module Mixin1
+    module Mixin2; end
+  end
+end
+
+class Child &lt; Parent
+  include Mixin1
+  include Mixin2
+end
+</code></pre>
+
+<p>Sorbet builds up two to-do lists: one list for every part of the AST that could involve updating a class&rsquo;s ancestor information, and one for every constant literal to try to resolve. Then, it alternates processing these two lists.</p>
+
+<pre><code>│ Ancestor resolution items │ Constant resolution items │
+├───────────────────────────┼───────────────────────────┤
+│ - class Child &lt; Parent    │ - class Child &lt; Parent    │
+│               ^^^^^^^^    │                 ^^^^^^    │
+│ - include Mixin1          │ - include Mixin1          │
+│   ^^^^^^^^^^^^^^          │           ^^^^^^          │
+│ - include Mixin2          │ - include Mixin2          │
+│   ^^^^^^^^^^^^^^          │           ^^^^^^          │
+</code></pre>
 
 <ol>
-<li><p>Create rudimentary symbols for for all class, module, and constant definitions.</p></li>
-<li><p>Given the definitions for those symbols, attempt to resolve as many constant literals as possible, and enqueue one big to-do list of the rest.</p></li>
-<li><p>Loop through the to-do list until it&rsquo;s empty. This is a fixed point computation, because successfully resolving one constant might make another constant resolve.</p></li>
+<li><p>First, loop through all the ancestor items. If the constant literal at that part of the AST at that point became resolved, update the ancestor information of the corresponding class.</p></li>
+<li><p>Next, loop through all the constant literals. Updating ancestor information from the previous step might have tipped the scales, allowing Sorbet to resolve some of these. Resolving a constant literal means updating the AST to store a reference to the corresponding <code>Symbol</code> directly.</p></li>
+<li><p>Repeat. Update ancestors again, resolve literals again, etc.</p></li>
 </ol>
 
 
-<p>Let&rsquo;s take it step by step. First up:</p>
+<p>The loop ends when there&rsquo;s nothing left to do, or when neither list gets smaller (the to-do lists never grow after creation, so we know that this loop terminates).</p>
 
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/07-resolve-constants-1.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/07-resolve-constants-1.png">
+<p>Resolve also simplifies the AST, but not by nearly as much as Index does:</p>
+
+<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/08-resolve-node-types.png">
+  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/08-resolve-node-types.png">
 </a></p>
 
-<p>I&rsquo;m representing unresolved constants in yellow and resolved constants in green here. Our first job is to do a simple tree traversal of our AST looking for definitions and creating symbols for them. This means that Sorbet now has definitions for <code>::Parent</code>, <code>::Child</code> and <code>::Parent::A</code> in the symbol table. But that&rsquo;s pretty much all it knows. It doesn&rsquo;t yet know that <code>Child</code> has a <code>Parent</code> as a superclass. It doesn&rsquo;t know that <code>puts A</code> isn&rsquo;t a typo. It doesn&rsquo;t know that the type of <code>Parent::A</code> is <code>Integer</code>, etc. It&rsquo;s just names and owners at this point. That&rsquo;s ok, because doing a single tree traversal is fast.</p>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/08-resolve-constants-2.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/08-resolve-constants-2.png">
-</a></p>
-
-<p>Next up, Sorbet looks at the remaining unresolved constant literals (the yellow ones). For each one it asks, &ldquo;Is the rudimentary definition information enough to resolve this constant literal?&rdquo;</p>
-
-<p>For the first <code>puts A</code>, it is. Sorbet can see that line is inside <code>Parent</code>, and there&rsquo;s a <code>Parent::A</code> symbol, so this <code>A</code> refers to <code>Parent::A</code>. This constant gets resolved immediately.</p>
-
-<p>The next one it sees is the <code>Parent</code> in superclass position. All ancestors (superclasses and mixins) need additional processing, they&rsquo;re queued up to be resolved later.</p>
-
-<p>The last one it sees is the <code>puts A</code> in <code>Child</code>. There&rsquo;s no definition for called <code>Child::A</code>, and <code>Child</code> hasn&rsquo;t had it&rsquo;s ancestor information filled out yet, so we can&rsquo;t resolve this constant either. It&rsquo;ll also have to be enqueued.</p>
-
-<p><a href="https://blog.jez.io/images/sorbet-pipeline-overview/09-resolve-constants-3.png">
-  <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/09-resolve-constants-3.png">
-</a></p>
-
-<p>And finally, Sorbet iterates in a fixed point over the to-do items until it can&rsquo;t resolve any more. In our example, the first thing it tries is to resolve the <code>Parent</code> ancestor item. It sees that there&rsquo;s a definition for <code>::Parent</code>, so it marks the <code>Parent</code> in <code>class Child &lt; Parent</code> resolved. Having done that, it also updates the symbol for <code>Child</code> to record that the superclass is resolved now.</p>
-
-<p>The next item in the queue is the <code>A</code> in the second <code>puts A</code>. Now when Sorbet looks for an <code>A</code> in the scope of <code>Child</code> it&rsquo;ll look transitively, so first it&rsquo;ll look for <code>::Child::A</code> (not there). Then it&rsquo;ll know that <code>::Child &lt; ::Parent</code>, so it&rsquo;ll look for <code>::Parent::A</code>, and find something. That&rsquo;s enough to mark this constant literal resolved.</p>
-
-<p>Of all the resposibilities of Resolve, constant resolution is bar far the most complicated because it&rsquo;s so whole-program. As I touched on in <a href="/mutation-imports/">a previous article</a>, Ruby doesn&rsquo;t have imports. Without the luxury of having every ancestor name imported at the top of the file, we have to do constant resolution to resolve all ancestors, but constant resolution involves looking up ancestors, and there&rsquo;s the cycle.</p>
-
-<p>Constants are the hardest; everything else is easier. (Mostly just tree traversals, without the fixed point loop). One additional trick with methods is pairing the method signature with the definition below it. Sorbet extracts type information from the signature and enters it onto the <code>Symbol</code> for the method.</p>
+<p>All the argument-related things are gone, because all the arguments have been entered into the Symbol table anyways; no need to also have them in the AST. The <code>UnresolvedConstantLit</code> node type is gone, because they&rsquo;ve all been converted to <code>ConstantLit</code> nodes via constant resolution.</p>
 
 <p>To recap, that&rsquo;s Resolve: a handful of algorithms (tree traversals and fixed point loops) that understand how Ruby definitions work and how to create <code>Symbol</code> entries in the symbol table for them. When Resolve is done, it&rsquo;s like having the answer key to a test: there&rsquo;s not a question in sight we can&rsquo;t look up the answer for. So let&rsquo;s look at Typecheck to close out the pipeline.</p>
 
@@ -221,7 +236,10 @@ end
   <img class="fullwidth" src="https://blog.jez.io/images/sorbet-pipeline-overview/10-typecheck.png">
 </a></p>
 
-<p>With Resolve done, <code>GlobalState</code> is entirely frozen: no more mutation. Also, all methods are type checked one-by-one, in parallel. Since <code>GlobalState</code> is frozen and they&rsquo;re all type checked in parallel, we have this really nice property that the result of type checking one method <em>never</em> affects how another method type checks.</p>
+<p>With <code>GlobalState</code> entirely populated, we can lock it: no more mutation.
+All methods are type checked one-by-one, which is easy to parallelize since since <code>GlobalState</code> is frozen.</p>
+
+<p>and they&rsquo;re all type checked in parallel, we have this really nice property that the result of type checking one method <em>never</em> affects how another method type checks.</p>
 
 <p>Since <code>GlobalState</code> has been populated and we know it can&rsquo;t change, the type inference algorithm can be pretty straight forward. Since all methods are type checked independently, there&rsquo;s no reason to attempt to infer types for a method&rsquo;s arguments: other methods wouldn&rsquo;t be able to use that information. If an arg isn&rsquo;t given a type explicitly, we&rsquo;ll assume the arg is <a href="https://sorbet.org/docs/untyped">untyped</a>. Sorbet takes the types it was given for arguments and flows that knowledge forward, inferring types for local variables along the way.</p>
 
