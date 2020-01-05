@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-01-02T23:55:47-05:00</updated>
+  <updated>2020-01-05T03:45:52-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,221 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  
+  <entry>
+    <title type="html"><![CDATA[Intersection Types in Sorbet are Surprisingly Common]]></title>
+    <link href="https://blog.jez.io/intersection-types-common/"/>
+    <updated>2020-01-04T19:50:32-06:00</updated>
+    <id>https://blog.jez.io/intersection-types-common</id>
+    <content type="html"><![CDATA[<p>Conventional knowledge is that union types are common and intersection
+types are rare. But actually that&rsquo;s not the case—intersection types
+show up in nearly every program Sorbet type checks thanks to control
+flow.</p>
+
+<p><a href="https://sorbet.org/docs/union-types">Union types</a> in Sorbet are incredibly common, which should be no
+surprise. In Sorbet, <code>T.nilable(...)</code> is sugar for <code>T.any(NilClass,
+...)</code>. <code>T.nilable</code> shows up all over the place and probably catches more
+bugs than any other feature in Sorbet.</p>
+
+<p>Sorbet also has <a href="https://sorbet.org/docs/intersection-types">intersection types</a>. While union types mean &ldquo;either
+this or that,&rdquo; intersection types mean &ldquo;both this and that.&rdquo; On first
+glance, intersection types seem like some super niche feature which only
+benefits a handful of programs. In Stripe&rsquo;s Ruby monorepo, the strings
+<code>T.any</code> and <code>T.nilable</code> occur nearly 300 times more than <code>T.all</code> does.</p>
+
+<p>But those numbers hide something critical: intersection types power
+Sorbet&rsquo;s <a href="https://sorbet.org/docs/flow-sensitive">control flow-sensitive typing</a>. They&rsquo;re actually present in
+every Ruby program, but just a little hard to spot. Let&rsquo;s look at how
+pervasive they are with a few examples:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># typed: strict</span>
+</span><span class='line'><span class="kp">extend</span> <span class="no">T</span><span class="o">::</span><span class="no">Sig</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Parent</span><span class="p">;</span> <span class="k">end</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Child</span> <span class="o">&lt;</span> <span class="no">Parent</span><span class="p">;</span> <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">sig</span> <span class="p">{</span><span class="n">params</span><span class="p">(</span><span class="ss">x: </span><span class="no">Parent</span><span class="p">).</span><span class="nf">void</span><span class="p">}</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">example1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">case</span> <span class="n">x</span>
+</span><span class='line'>  <span class="k">when</span> <span class="no">Child</span>
+</span><span class='line'>    <span class="no">T</span><span class="p">.</span><span class="nf">reveal_type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="c1"># Revealed type: `Child`</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here <code>x</code> starts out having type <code>Parent</code>, but inside the <code>case</code>
+statement Sorbet treats <code>x</code> as having the more specific type <code>Child</code>.
+There&rsquo;s no <code>T.all</code> in sight, but that&rsquo;s because it&rsquo;s hiding. Sorbet
+doesn&rsquo;t just throw away the fact that it knew <code>x &lt;: Parent</code>. Instead, it
+uses <code>T.all</code> to update its type for <code>x</code> to <code>T.all(Parent, Child)</code>.</p>
+
+<p><code>T.all(Parent, Child)</code> is equivalent to <code>Child</code> because <code>Child</code> is a
+subtype of <code>Parent</code>. If types represent sets of values, then the set of
+values represented by <code>Child</code> is a subset of the set of values
+represented by <code>Parent</code>, so the intersection of those two sets would
+just leave <code>Child</code>.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+
+<p>Sorbet attempts to simplify a large type to a smaller, equivalent type
+when it can for two reasons:</p>
+
+<ul>
+<li><p><strong>Usability</strong> – Most users don&rsquo;t know that <code>T.all</code> means &ldquo;intersection
+type&rdquo; or even what intersection types are. (And even those who do
+still end up drawing Venn diagrams from time to time!) It only gets
+more complicated when <code>T.all</code>s and <code>T.any</code>s nest inside each other.</p>
+
+<p>Meanwhile, <code>Child</code> is a super easy type to understand, and leads to
+nice, short error messages.</p></li>
+<li><p><strong>Performance</strong> – Checking whether one type is a subtype of another is
+a super common operation, so it has to be fast. By collapsing
+<code>T.all(Parent, Child)</code> to <code>Child</code>, Sorbet does at least half as much
+work when checking subtyping (probably more, because of some common
+path optimizations).</p>
+
+<p>When this simplification happens, Sorbet even skips an allocation
+entirely. When constructing <code>T.all(Parent, Child)</code> Sorbet short
+circuits and returns a reference to the already allocated <code>Child</code> type
+it was passed as an argument (with ownership tracked via
+<code>shared_ptr</code><sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>).</p></li>
+</ul>
+
+
+<p>Let&rsquo;s look at another example of control flow:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># typed: strict</span>
+</span><span class='line'><span class="kp">extend</span> <span class="no">T</span><span class="o">::</span><span class="no">Sig</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">A</span><span class="p">;</span> <span class="k">end</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">B</span><span class="p">;</span> <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">sig</span> <span class="p">{</span><span class="n">params</span><span class="p">(</span><span class="ss">a_or_b: </span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">A</span><span class="p">,</span> <span class="no">B</span><span class="p">)).</span><span class="nf">void</span><span class="p">}</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">example2</span><span class="p">(</span><span class="n">a_or_b</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">case</span> <span class="n">a_or_b</span>
+</span><span class='line'>  <span class="k">when</span> <span class="no">A</span>
+</span><span class='line'>    <span class="no">T</span><span class="p">.</span><span class="nf">reveal_type</span><span class="p">(</span><span class="n">a_or_b</span><span class="p">)</span> <span class="c1"># Revealed type: `A`</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>This example method accepts either <code>A</code> or <code>B</code> (<code>T.any(A, B)</code>) and then
+branches on whether <code>a_or_b</code> is an instance of <code>A</code>. Again: Sorbet
+doesn&rsquo;t throw away that it knows <code>a_or_b &lt;: T.any(A, B)</code>. Instead it
+updates its knowledge of the type of <code>a_or_b</code> using <code>T.all</code> to get
+<code>T.all(T.any(A, B), A)</code>. Realizing that this is equivalent to <code>A</code> is a
+bit trickier:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">T</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">A</span><span class="p">,</span> <span class="no">B</span><span class="p">),</span> <span class="no">A</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Distribute</span>
+</span><span class='line'><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span> <span class="no">T</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="no">A</span><span class="p">,</span> <span class="no">A</span><span class="p">)</span> <span class="p">,</span> <span class="no">T</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="no">B</span><span class="p">,</span> <span class="no">A</span><span class="p">)</span> <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># T.all(A, A) is just A (idempotence)</span>
+</span><span class='line'><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span> <span class="no">A</span> <span class="p">,</span> <span class="no">T</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="no">B</span><span class="p">,</span> <span class="no">A</span><span class="p">)</span> <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># A and B are classes (not mixins) and neither inherits the other.</span>
+</span><span class='line'><span class="c1"># It's impossible to have a value of that type, so it's bottom:</span>
+</span><span class='line'><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span> <span class="no">A</span> <span class="p">,</span> <span class="no">T</span><span class="p">.</span><span class="nf">noreturn</span> <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># bottom is the identity of union</span>
+</span><span class='line'><span class="no">A</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can start to see how usability and performance and might get a
+little out of hand if Sorbet didn&rsquo;t keep attempting to simplifying
+things! The cumulative effect of all the control flow in a program would
+result in huge, unweidly types.</p>
+
+<p>Until now you could claim that I&rsquo;ve been hyping up intersection types as
+the solution to self-imposed problems. That if we just invented some
+other method for modeling control flow, it would have been naturally
+usable or naturally performant, and we wouldn&rsquo;t have had problems in the
+first place. So next let&rsquo;s look at some examples to see why intersection
+types really are the most natural solution:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">I1</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">foo1</span><span class="p">;</span> <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="k">module</span> <span class="nn">I2</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">foo2</span><span class="p">;</span> <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">sig</span> <span class="p">{</span><span class="n">params</span><span class="p">(</span><span class="ss">x: </span><span class="no">I1</span><span class="p">).</span><span class="nf">void</span><span class="p">}</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">example3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">x</span><span class="p">.</span><span class="nf">foo1</span>  <span class="c1"># Works outside</span>
+</span><span class='line'>  <span class="k">case</span> <span class="n">x</span>
+</span><span class='line'>  <span class="k">when</span> <span class="no">I2</span>
+</span><span class='line'>    <span class="n">x</span><span class="p">.</span><span class="nf">foo1</span>  <span class="c1"># Should (and does) still work inside</span>
+</span><span class='line'>    <span class="n">x</span><span class="p">.</span><span class="nf">foo2</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>Unlike in the other examples, this is the first example where had we
+tried to implement control-flow-sensitive typing by throwing away the
+old type and using the new type instead it wouldn&rsquo;t have worked. The key
+thing to notice: this example uses modules. Outside the <code>case</code> of course
+calling <code>x.method_from_1</code> works because <code>x</code> starts out at type <code>I1</code>. But
+if we treated <code>x</code> as only <code>I2</code> inside the <code>when I2</code>, we&rsquo;d start
+reporting an error for calling <code>x.method_from_1</code> because it doesn&rsquo;t
+exist on <code>I2</code>.</p>
+
+<p>Unlike intersecting unrelated classes (our <code>T.all(B, A)</code> example from
+earlier), intersecting unrelated modules does&rsquo;t collapse to
+<code>T.noreturn</code>. There&rsquo;s nothing stopping some class from including both
+<code>I1</code> and <code>I2</code>. Instances of that class would be values of type
+<code>T.any(I1, I2)</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">SomeClass</span>
+</span><span class='line'>  <span class="kp">include</span> <span class="no">I1</span>
+</span><span class='line'>  <span class="kp">include</span> <span class="no">I2</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># This type assertion is okay:</span>
+</span><span class='line'><span class="no">T</span><span class="p">.</span><span class="nf">let</span><span class="p">(</span><span class="no">SomeClass</span><span class="p">.</span><span class="nf">new</span><span class="p">,</span> <span class="no">T</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="no">I1</span><span class="p">,</span> <span class="no">I2</span><span class="p">))</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>So at least for implementing certain cases of flow sensitive typing,
+we&rsquo;ll <em>need</em> intersection types anyways. Then for these certain cases
+we&rsquo;d incur the usability and performance problems we discovered earlier
+and have to solve them.</p>
+
+<p>But more than that, intersection types are fundamentally easier to work
+with compared to some ad hoc approach to flow sensitive typing. Type
+system bugs are weird. It&rsquo;s frquently harder to figure out whether the
+current behavior is buggy in the first place than it is to find the
+cause!</p>
+
+<p>In that light, intersection types present a simple, elegant model for
+arriving at what the correct behavior <em>should</em> be, independent of what
+Sorbet&rsquo;s existing behavior is. It&rsquo;s clear how intersection types
+interact with union types, and with subtyping, and with generics, and
+with variance, etc.</p>
+
+<p>By repurposing intersection types to model control flow sensitivity,
+when things go wrong there&rsquo;s a simple framework for discovering what&rsquo;s
+right.</p>
+
+<p>(Speaking of repurposing, intersection types also play an important role
+in how Sorbet <a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Amodule%20M%3B%20end%0Amodule%20N%3B%20end%0A%0Asig%20%7Bparams(m%3A%20M).void%7D%0Adef%20takes_m(m)%3B%20end%0Asig%20%7Bparams(n%3A%20N).void%7D%0Adef%20takes_n(n)%3B%20end%0A%0Adef%20needs_sig(x)%0A%20%20takes_m(x)%0A%20%20takes_n(x)%0Aend">suggests potential method signatures</a>! That&rsquo;s three birds
+with one stone.)</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>If you&rsquo;re not convinced, consider: with <code>T.all(Parent, Child)</code> we should be able to call all the methods on <code>Parent</code> and all the methods on <code>Child</code>. But <code>Child</code> inherits <code>Parent</code>&rsquo;s methods, so any method <code>Parent</code> has will already be on <code>Child</code>. So <code>Child</code> is equivalently good as <code>T.all(Parent, Child)</code>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>If you&rsquo;re looking for a good intro to modern C++ things like <code>shared_ptr</code>, I can&rsquo;t recommend <a href="https://berthub.eu/articles/posts/cpp-intro/">this blog post series</a> enough.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
   
   
   <entry>
@@ -4374,35 +4589,6 @@ that powerful. Functions!</p>
 <p>It&rsquo;s not super relevant to this discussion, but this inference rule is for the judgement defining equality of type constructors. This comes up all over the place when you&rsquo;re writing a compiler for SML. If this sounds interesting, definitely take 15-417 HOT Compilation!<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
-
-]]></content>
-  </entry>
-  
-  
-  
-  <entry>
-    <title type="html"><![CDATA[Variables in Types]]></title>
-    <link href="https://blog.jez.io/variables-in-types/"/>
-    <updated>2017-09-25T02:17:31-07:00</updated>
-    <id>https://blog.jez.io/variables-in-types</id>
-    <content type="html"><![CDATA[<p>These are some recitation notes for an ad-hoc recitation I gave for the
-class <a href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles of Programming Languages</a>. It was probably
-my favorite 312 recitation content-wise, because it&rsquo;s the first
-recitation where we&rsquo;ve covered enough stuff to where we can really start
-connecting the dots.</p>
-
-<p><strong>Abstract</strong>:</p>
-
-<blockquote><p>We&rsquo;ve seen a number of examples in class of types which use variables.
-Having variables in our type systems lends a great deal of power to
-languages using these type systems. We&rsquo;re going to look at how
-variables are used in generic programming, inductive &amp; coinductive
-types, and polymorphic types.</p></blockquote>
-
-<h3>→ <a href="https://blog.jez.io/notes/variables-in-types.pdf">Variables in Types</a></h3>
-
-<!-- vim:tw=72
--->
 
 ]]></content>
   </entry>
