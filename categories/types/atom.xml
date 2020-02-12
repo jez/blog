@@ -4,7 +4,7 @@
   <title><![CDATA[Category: types | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/types/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-01-05T04:04:29-05:00</updated>
+  <updated>2020-02-12T02:33:41-05:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,111 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sorbet Does Not Have FixMe Comments]]></title>
+    <link href="https://blog.jez.io/sorbet-fixme-comment/"/>
+    <updated>2020-02-11T23:18:40-08:00</updated>
+    <id>https://blog.jez.io/sorbet-fixme-comment</id>
+    <content type="html"><![CDATA[<p></p>
+
+
+
+
+<!-- more -->
+
+
+<p>Sorbet has no way to ignore an error on a specific line with a magic
+comment. This is different from all other gradual static type checkers I
+know about:</p>
+
+<ul>
+<li>TypeScript: <code>// @ts-ignore</code></li>
+<li>Flow: <code>// $FlowFixMe</code></li>
+<li>Hack: <code>// HH_FIXME</code></li>
+<li>MyPy: <code># type: ignore</code></li>
+</ul>
+
+
+<p>When I first joined the team, I was skeptical. But having seen it play
+out in practice, it&rsquo;s actually worked great.</p>
+
+<p>Instead of ignore comments, Sorbet has <code>T.unsafe</code>, which accepts
+anything and returns it unchanged (so for example <code>T.unsafe(3)</code>
+evaluates to <code>3</code>). The trick is that it forces Sorbet to forget the
+type of the input statically. This confers the power to silence most
+errors. For example:</p>
+
+<pre><code class="ruby">1 + '1'            # error: Expected `Integer` but found `String`
+T.unsafe(1) + '1'  # no error
+</code></pre>
+
+<p><a href="https://sorbet.run/#%20%20%20%20%20%20%20%20%201%20%20%2B%20'1'%20%20%23%20error%3A%20Expected%20%60Integer%60%20but%20found%20%60String%60%0AT.unsafe(1)%20%2B%20'1'%20%20%23%20no%20error">→ View on sorbet.run</a></p>
+
+<p>In this example, Sorbet knows that calling <code>+</code> on an Integer with a
+String would raise an exception at runtime, and so it reports a static
+type error. But wrapping the <code>1</code> in a call to <code>T.unsafe</code> causes Sorbet
+to think that the expression <code>T.unsafe(1)</code> has type <code>T.untyped</code>. Then,
+like for all untyped code, Sorbet admits the addition.</p>
+
+<p>All Sorbet-typed Ruby programs must grapple with <code>T.untyped</code>. Every
+Sorbet user has to learn how it works and what the tradeoffs of using it
+are. In particular, that <code>T.untyped</code> is viral. Given a variable that&rsquo;s
+<code>T.untyped</code>, all method calls on that variable will also be untyped:</p>
+
+<pre><code class="ruby"># typed: true
+extend T::Sig
+
+sig {params(x: T.untyped).void}
+def foo(x)
+  y = x.even?
+# ^ type: T.untyped
+  z = !y
+# ^ type: T.untyped
+end
+</code></pre>
+
+<p><a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20%7Bparams(x%3A%20T.untyped).void%7D%0Adef%20foo(x)%0A%20%20y%20%3D%20x.even%3F%0A%23%20%5E%20type%3A%20T.untyped%0A%20%20z%20%3D%20!y%0A%23%20%5E%20type%3A%20T.untyped%0Aend">→ View on sorbet.run</a></p>
+
+<p>In this example <code>x</code> enters the method as <code>T.untyped</code>, so calling the
+method <code>.even?</code> propagates the <code>T.untyped</code> to <code>y</code>. Then again because
+<code>y</code> is untyped, calling<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> <code>!</code> on it propgates the <code>T.untyped</code> to
+<code>z</code>. There are plenty of reasons to <a href="https://sorbet.org/docs/gradual">both embrace and avoid</a>
+<code>T.untyped</code> in a type system but the point is: Sorbet&rsquo;s type system
+already has it.</p>
+
+<p>Re-using <code>T.untyped</code> as the way to silence errors plays nicely with
+everything else in Sorbet:</p>
+
+<ul>
+<li><p>Hover and jump to definition become tools to track down the source of
+silenced errors.</p></li>
+<li><p>Errors are effectively silenced at the source of the error. There are
+no errors downstream that only show up because an error was silenced
+earlier.</p></li>
+<li><p>We plan to eventually build a tool to show which parts of a file are
+untyped (to see things like which methods don&rsquo;t have signatures). That
+tool will trivially take suppressed errors into account.</p></li>
+</ul>
+
+
+<p>The <a href="https://sorbet.org/docs/gradual">Sorbet docs</a> bill <code>T.untyped</code> as the way to &ldquo;turn off the
+type system.&rdquo; By reusing <code>T.untyped</code> to supress errors, silencing one
+error means silencing them all, which is a win for simplicity.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Did you know that <code>!x</code> in Ruby is syntactic sugar for <code>x.!()</code>, which means that you can override <code>!</code> to make it do something else?<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Intersection Types in Sorbet are Surprisingly Common]]></title>
@@ -1029,218 +1134,6 @@ representation for the constructor tags.</p>
 <p>Even though TypeScript defines both a language <strong>and</strong> a compiler for that language, in practice it&rsquo;s not much different from Flow here. A goal of the TypeScript compiler is to generate JavaScript that closely resembles the original TypeScript, so it doesn&rsquo;t do compile-time optimizations based on the types.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 <li id="fn:4">
 <p>More than being a nice reminder, it makes it easy to copy / paste our type definition as boilerplate to start writing a new function!<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Case Exhaustiveness in Flow]]></title>
-    <link href="https://blog.jez.io/flow-exhaustiveness/"/>
-    <updated>2018-04-15T20:02:26-07:00</updated>
-    <id>https://blog.jez.io/flow-exhaustiveness</id>
-    <content type="html"><![CDATA[<p>Compared to some other languages, <a href="https://flow.org/">Flow</a>&rsquo;s story around exhaustiveness
-checking within <code>if / else</code> and <code>switch</code> statements leaves something to
-be desired. By default, Flow doesn&rsquo;t do any exhaustiveness checks! But
-we <strong>can</strong> opt-in to exhaustiveness checking one statement at a time.</p>
-
-<!-- more -->
-
-
-<p>In this post, we&rsquo;ll discover from the ground up how Flow&rsquo;s
-exhaustiveness checking behaves. But if you&rsquo;re just looking for the
-result, here&rsquo;s a snippet:</p>
-
-<h2>TL;DR</h2>
-
-<pre><code class="js">type A = {tag: "A"};
-type B = {tag: "B"};
-type AorB = A | B;
-
-const absurd = &lt;T&gt;(x: empty): T =&gt; {
-  throw new Error('This function will never run!');
-}
-
-const allGood = (x: AorB): string =&gt; {
-  if(x.tag === "A") {
-    return "In branch A";
-  } else if (x.tag === "B") {
-    return "In branch B";
-  } else {
-    return absurd(x);
-  }
-}
-
-const forgotTagB = (x: AorB): string =&gt; {
-  if(x.tag === "A") {
-    return "In branch A";
-  } else {
-    // B. This type is incompatible with the expected param type of empty.
-    return absurd(x);
-  }
-}
-</code></pre>
-
-<h2>How Exhaustiveness Behaves in Flow</h2>
-
-<p><a href="https://flow.org/try/#0PTAEAEDMBsHsHcBQiQrACQKYCdOnngBYCGAbnsaAC4CeADngOQCCs2AQo-gJZWHXxYoUsWzdiAOyoBnNIloNQzUAF5QAbyrEA5gC5QAImYGAvgG559PO1Uatew+1MWFeVh1vKAPqHYXEAMawEtJUoJASAIy2ABQAHvru7ACU+qFiEtqqAHwaiKCg3JDxAHT2qipqRgbJ6vkFoLhUAK7YEoYAku0ARtiSAfzGFgUmoJjQ0nh1DY2YLW2dPX0SA74Gw6AmiFtyIErQ0Pjjh5IAJqDasLCnADSg3c1h8CRhRUegxKfnlBKY8KABYiTAD8aFAADE2GM4sQALZ0aCYO4EWaQYgBKhQvgUbqwcjhbiI0AAPWoQmx93GCF0cksigAwrZNDp9AZ6c46W42Ow2Iy1N5fKAfPT-EEQmEIgAmWIJJTc3mpUDpbiZHJ5ApFUrlSpVYzJdUNJqtdoGLr3ZarIb1UbjSYGgpGhampb9fhODZbHaoPYAdWIvA+SswYtuhTCrgBhGDAGtpABCMEAFRejGklMBzTtKMzmG+AOIVAGAFpiAdQIxbZguL1XSVdmAfS9CpB3rDiNG8Jh0fwayt+Jg4gjuAFeKDUGCAKIAJSnAHkp-oZkvl6BADCkgABSQBtpIA4P6VVAy2hKoGT3DTEdPhRWsHhBe43SJ8F4-EkhXh0GHvGgNCLjt+52aEinJgkAqrmdZiqE4QSAAzDKiTytg9KKsqqoqLk0zNlqOgVLqNT2rM8wmmavaWus1pjBMeBvFhWQ6o4eEYQ6czGos5qumsHrbMg3pgAAClG8B3NIQi8KmsywiqpwqlkmbUE2BCMLgoASLAYRBOQB4fGWFKApM0h1nsAAycxiZ85wUr8-yMPSXC6ZgNLjns05zguK5uQUG47nuB5HieZ5WIUaYqkEN5UHeD5Ph87TcG+H5UF+P7MW0uagABQEgX+4HBJBEQACxwXKHAKmk+7SWqGGanEZTYXR1T6oxBEsc6bF9koZEjBRdrUVV2qVPR9X1ExhGsSRbrtZsnVUS2NE4YY7IDTMv4jRa-DspxXrAGCfoBpQkwhiUB1hnuhKHHwKqxnJBattw2iEGES1pcBoGnAmezsI8RyMPi6Uqrw4w0ACeI4ClpanVG+Z6UeuhnRI0bSQA+miAT2fWoCNldKL0swAByoCnCJaZmYG6XEM00BqUCSL3B9QLRhCcD-JioC8XOABqE6XU8eCAhIjBhNocxycDDmbYE2UShIACsBVJMV3llWhBqVdVtF9XV+FLc1o1tR6k3NqAM21U4C2GklREuq17rkZW+uG2r80a2by3sWt1uUfh8T6Jg8K0MkGwFHw2AIMpfygBO2BB9gMSMMQ3TSK0pyMH71pcajyZMIHweWWHEdsFw76-B8uL4o+Za-BpjQAXc3TBqTkxgqJaYqWEdCwNI0jhXgTMQfuzQYoGIjQM0eCwC2EYVj7NCMGCMQGOnSmiHgKnCKWw9Be0FLe3QtBBlQNSox0LYop8sDb3JF50AWVA4O0mAaTQzzA8iVbnJMXeEBeOCR6AsKYO3OiYAbkfPAkA2CXHDEIImFlQ52XCFCekItkA9yggANhlghJCJVNKKwqsUHqNU1Z6kdsNLWK0dZuy6tNfBqsqjG2IU1YiZCrYdRtg1PY9JfIf38ooC8wVryXzCvePAj4+BjEnnWGYnsxHbxoMnGYmd-jZ3DpHaOsd47YETnIzYqceL02DtfA4aZZIGCwDQO4HQ4FpUDPSOMoAADKQgLFBDJqcXmLcg74j4FdM6aZpAiNWPAIE0ISCZjCuQEoBhUbvXDFw0AAjr4LAvNId8t14oA0kCpGgZUmY5mrrXHMYc7GGRVGpfh0B-QhBFqAXIKkiwARzKcIsA46C4HbtwbK+gJyDmDNfb47QgQd20BIX+UhQBQkgABDE7T2iAjLGcS8oQuyv2IP8F8zTWkd2CAZTavpuYvhAnEc+aZugAyRpiTSFJ4k30vEzSgUZoAMGwOESZYVgiILBDHOOCcuAXgsnCbm15YTBC-KlSY5xKyPyUqAp5PjnkrFeRII8kInkDjhAiFGew7pUDoNIXQIASABGjAAkoJBpAdgOCUMBwBL6EoAcAUgsBuCNIAAwlAAOwlEiMAfGARpDAAACIFmIEWVmjLTgkqoLCaAABiUgug1EJzFuKIu6jzhqAADyJmyFIrevt9CJnKvUBRId-jKLYKor5Gik4WHMEg8WUE2XoKKohZCpVULoXqMrXquETZDQYRbUiusbbdRVrNAwdCGqa0YexZhE1g1UNDbVB2kanakJduNG07sU3DQVRo+IWjPSDSXEqnKEgAAcTqeQuqwQrD1Go8GJsIQxItUaA2DAzXrEN3r+r0KdNGy2HbWFFvYZw35AVeFXlCp3HgojN7dIxClS+fRYTUACqPaRtAJGmxzZa04+b1pAA"><strong>Read on flow.org/try/</strong></a></p>
-
-<p>Here we have a type <code>AorB</code> with two variants;</p>
-
-<pre><code class="js">type A = {tag: "A"};
-type B = {tag: "B"};
-type AorB = A | B;
-
-const fn1 = (x: AorB): string =&gt; {
-  if(x.tag === "A"){
-    return "In branch A";
-  } else {
-    return "In branch B";
-  }
-}
-</code></pre>
-
-<p>All well and good, but what if we add a new case?
-For example, what if we take the snippet above and add this:</p>
-
-<pre><code class="js">type C = {tag: "C"};
-type AorBorC = A | B | C;
-
-const fn2 = (x: AorBorC): string =&gt; {
-  if(x.tag === "A") {
-    return "In branch A";
-  } else {
-    return "In branch B";
-  }
-}
-</code></pre>
-
-<p>Wait a second, it type checks!</p>
-
-<p>That&rsquo;s because we used a catch-all <code>else</code> branch. What if we make each
-branch explicit?</p>
-
-<pre><code class="js">// ERROR:                 ┌─▶︎ string. This type is incompatible with an implicitly-returned undefined.
-const fn3 = (x: AorBorC): string =&gt; {
-  if(x.tag === "A") {
-    return "In branch A";
-  } else if (x.tag === "B") {
-    return "In branch B";
-  }
-}
-</code></pre>
-
-<p>Phew, so it&rsquo;s reminding us that we&rsquo;re not covering all the cases.
-Let&rsquo;s add the new <code>C</code> case:</p>
-
-<pre><code class="js">// ERROR:                 ┌─▶︎ string. This type is incompatible with an implicitly-returned undefined.
-const fn4 = (x: AorBorC): string =&gt; {
-  if(x.tag === "A") {
-    return "In branch A";
-  } else if (x.tag === "B") {
-    return "In branch B";
-  } else if (x.tag === "C") {
-    return "In branch C";
-  }
-}
-</code></pre>
-
-<p>Hmm: it still thinks that we might return <code>undefined</code>, even though we&rsquo;ve
-definitely covered all the cases&hellip; 🤔</p>
-
-<p>What we <strong>can</strong> do is add a default case, but ask Flow to <strong>prove</strong> that
-we can&rsquo;t get there, using Flow&rsquo;s <code>empty</code> type:</p>
-
-<pre><code class="js">const fn5 = (x: AorBorC): string =&gt; {
-  if(x.tag === "A") {
-    return "In branch A";
-  } else if (x.tag === "B") {
-    return "In branch B";
-  } else if (x.tag === "C") {
-    return "In branch C";
-  } else {
-    (x: empty);
-    throw new Error('This will never run!');
-  }
-}
-</code></pre>
-
-<p>The <code>throw new Error</code> line above will never run, because it&rsquo;s not
-possible to construct a value of type <code>empty</code>.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> (&ldquo;There are no
-values in the empty set.&rdquo;)</p>
-
-<p>If we adopt this pattern everywhere, we&rsquo;d see this error message if we
-forgot to add the new case for <code>C</code>:</p>
-
-<pre><code class="js">const fn6 = (x: AorBorC): string =&gt; {
-  if(x.tag === "A") {
-    return "In branch A";
-  } else if (x.tag === "B") {
-    return "In branch B";
-  } else {
-    // C. This type is incompatible with empty.
-    (x: empty);
-    throw new Error('absurd');
-  }
-}
-</code></pre>
-
-<p>Flow tells us &ldquo;Hey, I found a C! So I couldn&rsquo;t prove that this switch
-was exhaustive.&rdquo;</p>
-
-<p>But this pattern is slightly annoying to use, because ESLint complains:</p>
-
-<pre><code>no-unused-expressions: Expected an assignment or function call and instead saw an expression.
-</code></pre>
-
-<p>We can fix this by factoring that <code>empty ... throw</code> pattern into a
-helper function:</p>
-
-<pre><code class="js">// 'absurd' is the name commonly used elsewhere for this function. For example:
-// https://hackage.haskell.org/package/void-0.7.1/docs/Data-Void.html#v:absurd
-const absurd = &lt;T&gt;(x: empty): T =&gt; {
-  throw new Error('absurd');
-};
-
-const fn7 = (x: AorBorC): string =&gt; {
-  if(x.tag === "A") {
-    return "In branch A";
-  } else if (x.tag === "B") {
-    return "In branch B";
-  } else if (x.tag === "C") {
-    return "In branch C";
-  } else {
-    return absurd(x);
-  }
-}
-
-const fn8 = (x: AorBorC): string =&gt; {
-  if(x.tag === "A") {
-    return "In branch A";
-  } else if (x.tag === "B") {
-    return "In branch B";
-  } else {
-    // C. This type is incompatible with the expected param type of empty.
-    return absurd(x);
-  }
-}
-</code></pre>
-
-<p>So there you have it! You can put that helper function (<code>absurd</code>) in a
-file somewhere and import it anywhere. You could even give it a
-different name if you want! I&rsquo;ve been using this pattern in all the Flow
-code I write these days and it&rsquo;s been nice to rely on it when doing
-refactors.</p>
-
-<!-- vim:tw=72
--->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>Of course, this presumes that Flow&rsquo;s type system is sound, which it isn&rsquo;t. It&rsquo;s possible to accidentally inhabit <code>empty</code> if you use <code>any</code>! Moral of the story: be <em>very</em> diligent about eradicating <code>any</code>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 

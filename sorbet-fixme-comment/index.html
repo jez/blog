@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Sorbet Does Not Have FixMe Comments - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+
+<meta name="keywords" content="sorbet ruby types ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
+  <meta name="twitter:title" content="Sorbet Does Not Have FixMe Comments">
+  <meta name="twitter:description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+  <meta name="twitter:creator" content="@jez_io">
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/sorbet-fixme-comment">
+<meta property="og:title" content="Sorbet Does Not Have FixMe Comments">
+<meta property="og:description" content="A tech blog by Jake Zimmerman. Updates occasionally with tips, tricks, hacks, and personal projects.">
+<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/sorbet-fixme-comment">
+<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+<link href="/favicon@2x.png" rel="icon" sizes="32x32">
+<link href="/favicon.png" rel="icon" sizes="16x16">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Sorbet Does Not Have FixMe Comments</h1>
+  <h2 class="EntryHeader-subtitle">February 11, 2020</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <p></p>
+
+
+
+
+<!-- more -->
+
+
+<p>Sorbet has no way to ignore an error on a specific line with a magic
+comment. This is different from all other gradual static type checkers I
+know about:</p>
+
+<ul>
+<li>TypeScript: <code>// @ts-ignore</code></li>
+<li>Flow: <code>// $FlowFixMe</code></li>
+<li>Hack: <code>// HH_FIXME</code></li>
+<li>MyPy: <code># type: ignore</code></li>
+</ul>
+
+
+<p>When I first joined the team, I was skeptical. But having seen it play
+out in practice, it&rsquo;s actually worked great.</p>
+
+<p>Instead of ignore comments, Sorbet has <code>T.unsafe</code>, which accepts
+anything and returns it unchanged (so for example <code>T.unsafe(3)</code>
+evaluates to <code>3</code>). The trick is that it forces Sorbet to forget the
+type of the input statically. This confers the power to silence most
+errors. For example:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="mi">1</span> <span class="o">+</span> <span class="s1">'1'</span>            <span class="c1"># error: Expected `Integer` but found `String`</span>
+</span><span class='line'><span class="no">T</span><span class="p">.</span><span class="nf">unsafe</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'1'</span>  <span class="c1"># no error</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="https://sorbet.run/#%20%20%20%20%20%20%20%20%201%20%20%2B%20'1'%20%20%23%20error%3A%20Expected%20%60Integer%60%20but%20found%20%60String%60%0AT.unsafe(1)%20%2B%20'1'%20%20%23%20no%20error">→ View on sorbet.run</a></p>
+
+<p>In this example, Sorbet knows that calling <code>+</code> on an Integer with a
+String would raise an exception at runtime, and so it reports a static
+type error. But wrapping the <code>1</code> in a call to <code>T.unsafe</code> causes Sorbet
+to think that the expression <code>T.unsafe(1)</code> has type <code>T.untyped</code>. Then,
+like for all untyped code, Sorbet admits the addition.</p>
+
+<p>All Sorbet-typed Ruby programs must grapple with <code>T.untyped</code>. Every
+Sorbet user has to learn how it works and what the tradeoffs of using it
+are. In particular, that <code>T.untyped</code> is viral. Given a variable that&rsquo;s
+<code>T.untyped</code>, all method calls on that variable will also be untyped:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># typed: true</span>
+</span><span class='line'><span class="kp">extend</span> <span class="no">T</span><span class="o">::</span><span class="no">Sig</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">sig</span> <span class="p">{</span><span class="n">params</span><span class="p">(</span><span class="ss">x: </span><span class="no">T</span><span class="p">.</span><span class="nf">untyped</span><span class="p">).</span><span class="nf">void</span><span class="p">}</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="nf">even?</span>
+</span><span class='line'><span class="c1"># ^ type: T.untyped</span>
+</span><span class='line'>  <span class="n">z</span> <span class="o">=</span> <span class="o">!</span><span class="n">y</span>
+</span><span class='line'><span class="c1"># ^ type: T.untyped</span>
+</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20%7Bparams(x%3A%20T.untyped).void%7D%0Adef%20foo(x)%0A%20%20y%20%3D%20x.even%3F%0A%23%20%5E%20type%3A%20T.untyped%0A%20%20z%20%3D%20!y%0A%23%20%5E%20type%3A%20T.untyped%0Aend">→ View on sorbet.run</a></p>
+
+<p>In this example <code>x</code> enters the method as <code>T.untyped</code>, so calling the
+method <code>.even?</code> propagates the <code>T.untyped</code> to <code>y</code>. Then again because
+<code>y</code> is untyped, calling<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> <code>!</code> on it propgates the <code>T.untyped</code> to
+<code>z</code>. There are plenty of reasons to <a href="https://sorbet.org/docs/gradual">both embrace and avoid</a>
+<code>T.untyped</code> in a type system but the point is: Sorbet&rsquo;s type system
+already has it.</p>
+
+<p>Re-using <code>T.untyped</code> as the way to silence errors plays nicely with
+everything else in Sorbet:</p>
+
+<ul>
+<li><p>Hover and jump to definition become tools to track down the source of
+silenced errors.</p></li>
+<li><p>Errors are effectively silenced at the source of the error. There are
+no errors downstream that only show up because an error was silenced
+earlier.</p></li>
+<li><p>We plan to eventually build a tool to show which parts of a file are
+untyped (to see things like which methods don&rsquo;t have signatures). That
+tool will trivially take suppressed errors into account.</p></li>
+</ul>
+
+
+<p>The <a href="https://sorbet.org/docs/gradual">Sorbet docs</a> bill <code>T.untyped</code> as the way to &ldquo;turn off the
+type system.&rdquo; By reusing <code>T.untyped</code> to supress errors, silencing one
+error means silencing them all, which is a win for simplicity.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Did you know that <code>!x</code> in Ruby is syntactic sugar for <code>x.!()</code>, which means that you can override <code>!</code> to make it do something else?<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#sorbet" title="Pages tagged sorbet">sorbet</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#ruby" title="Pages tagged ruby">ruby</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#types" title="Pages tagged types">types</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2020-02-11T23:18:40-08:00">February 11, 2020</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/intersection-types-common/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/intersection-types-common/" title="Intersection Types in Sorbet are Surprisingly Common">Intersection Types in Sorbet are Surprisingly Common</a></h3>
+      <p>Conventional knowledge is that union types are common and intersection types are rare. But actually that&#8217;s not the case—intersection types show up in nearly every program Sorbet type checks thanks to control flow.
+ <a href="/intersection-types-common/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/ruby-mutation/" title="What makes type checking Ruby hard?">What makes type checking Ruby hard?</a></h4>
+            <span>Published on December 29, 2019</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/surgery-on-code/" title="Surgery on Code from the Command Line">Surgery on Code from the Command Line</a></h4>
+            <span>Published on July 30, 2019</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>
