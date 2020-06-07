@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Search Down the Stack - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="I've found it useful to search though the source code of things lower in the stack lately.
+">
+
+<meta name="keywords" content="fragment linux debugging ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
+  <meta name="twitter:title" content="Search Down the Stack">
+  <meta name="twitter:description" content="I've found it useful to search though the source code of things lower in the stack lately.
+">
+  <meta name="twitter:creator" content="@jez_io">
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/search-down-the-stack">
+<meta property="og:title" content="Search Down the Stack">
+<meta property="og:description" content="I've found it useful to search though the source code of things lower in the stack lately.
+">
+<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/search-down-the-stack">
+<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+<link href="/favicon@2x.png" rel="icon" sizes="32x32">
+<link href="/favicon.png" rel="icon" sizes="16x16">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Search Down the Stack</h1>
+  <h2 class="EntryHeader-subtitle">June 6, 2020</h2>
+
+  <ul class="Tags">
+    
+      <li class="Tag">
+        <a href="/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <p>I&rsquo;ve found it useful to search though the source code of things lower in
+the stack lately. For example I saw an error something like this at work
+recently:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ rake test
+</span><span class='line'>symbol lookup error: /home/jez/.../foo.so: undefined symbol bar</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I was pretty confused. Modulo the names of commands and files, this was
+pretty much all the output.</p>
+
+<p>So I started searching. First I searched through my codebase for
+<code>"symbol lookup error"</code>, but found nothing. Surely that string exists
+somewhere. That must mean it&rsquo;s coming from lower in the stack?</p>
+
+<p>The next level lower would mean third party Ruby gems. At work we use
+Bundler <a href="https://bundler.io/v2.0/guides/deploying.html#manual-deployment">in a mode</a> where it installs all gems into a single
+convenient folder in the current directory: <code>./vendor/bundle/</code>. But a
+search in that folder turned up nothing again. So&hellip; further down?</p>
+
+<p>If it&rsquo;s not from the app, and not from the gems, then maybe it&rsquo;s in Ruby
+itself? I cloned the <a href="https://github.com/ruby/ruby">Ruby source</a>, checked out the <a href="https://github.com/ruby/ruby/tree/v2_6_5">version tag</a> for
+the Ruby version we&rsquo;re running, and searched for <code>"symbol lookup error"</code>
+once again. And again nothing!</p>
+
+<p>There&rsquo;s still plenty of layers below us, so let&rsquo;s keep peeling them
+back. Ruby is written in C, which means we should check libc next (the C
+standard library). There are multiple libc implementations, but I was
+running this on Linux, so let&rsquo;s check GNU libc (glibc). glibc is <a href="https://www.gnu.org/software/libc/sources.html">isn&rsquo;t
+on GitHub</a>, but that&rsquo;s not a huge deterrant. Here&rsquo;s the search:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ rg -t c 'symbol lookup error'
+</span><span class='line'>dl-lookup.c
+</span><span class='line'>876:      _dl_signal_cexception (0, &exception, N_("symbol lookup error"));</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s a bit of a smoking gun! After all those layers, we found our
+error message in libc itself. (This gave me a lot of leads on the problem
+at hand, e.g., I had definitely ruled out a problem in my app or its
+dependencies, and I was thinking, &ldquo;probably something is wrong about
+how <code>foo.so</code> was compiled.&rdquo; There&rsquo;s a fun story here about how Ruby C
+extensions work, but that&rsquo;s a tangent for another time.)</p>
+
+<p>My point is that <a href="https://livegrep.com/search/linux">searching all the code</a> is a super power, and it
+applies to more than just searching the code we&rsquo;ve written. What a
+blessing that the tools we&rsquo;re building on, like Ruby and GNU libc, are
+all open source!</p>
+
+<p>The next time it looks like a problem is outside the scope of your app&rsquo;s
+code, maybe try searching the code:</p>
+
+<ul>
+<li>inside your gems or packages!</li>
+<li>inside your language&rsquo;s standard library!
+
+<ul>
+<li>Some IDEs will even let you jump-to-def into core libraries 😮</li>
+</ul>
+</li>
+<li>inside your language&rsquo;s runtime
+
+<ul>
+<li>(if you&rsquo;re using a language with a runtime like Ruby or Python or
+even <a href="https://github.com/v8/v8">JavaScript</a>)</li>
+</ul>
+</li>
+<li>powering your operating system kernel! <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
+</ul>
+
+
+<p>For me, I&rsquo;ve already noticed it help save me time and give me more
+context when I&rsquo;m debugging.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>This might sound daunting, but sometimes it can be useful. A good thing to keep in mind: every <strong>system call</strong> like <code>open(2)</code> or <code>write(2)</code> or <code>select(2)</code> (and every other function from section 2 of the man pages) is really just a way for your program to request that the operating system do something; knowing that can be a decent place to start traipsing through code in the operating system.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#fragment" title="Pages tagged fragment">fragment</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#linux" title="Pages tagged linux">linux</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#debugging" title="Pages tagged debugging">debugging</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2020-06-06T19:08:20-05:00">June 6, 2020</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/sorbet-fixme-comment/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/sorbet-fixme-comment/" title="Sorbet Does Not Have FixMe Comments">Sorbet Does Not Have FixMe Comments</a></h3>
+      <p>Sorbet has no way to ignore an error on a specific line with a magic comment, which makes things simple.
+ <a href="/sorbet-fixme-comment/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/intersection-types-common/" title="Intersection Types in Sorbet are Surprisingly Common">Intersection Types in Sorbet are Surprisingly Common</a></h4>
+            <span>Published on January 4, 2020</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/ruby-mutation/" title="What makes type checking Ruby hard?">What makes type checking Ruby hard?</a></h4>
+            <span>Published on December 29, 2019</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>

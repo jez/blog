@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-02-12T02:33:41-05:00</updated>
+  <updated>2020-06-06T22:09:56-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,100 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  
+  <entry>
+    <title type="html"><![CDATA[Search Down the Stack]]></title>
+    <link href="https://blog.jez.io/search-down-the-stack/"/>
+    <updated>2020-06-06T19:08:20-05:00</updated>
+    <id>https://blog.jez.io/search-down-the-stack</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve found it useful to search though the source code of things lower in
+the stack lately. For example I saw an error something like this at work
+recently:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ rake test
+</span><span class='line'>symbol lookup error: /home/jez/.../foo.so: undefined symbol bar</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I was pretty confused. Modulo the names of commands and files, this was
+pretty much all the output.</p>
+
+<p>So I started searching. First I searched through my codebase for
+<code>"symbol lookup error"</code>, but found nothing. Surely that string exists
+somewhere. That must mean it&rsquo;s coming from lower in the stack?</p>
+
+<p>The next level lower would mean third party Ruby gems. At work we use
+Bundler <a href="https://bundler.io/v2.0/guides/deploying.html#manual-deployment">in a mode</a> where it installs all gems into a single
+convenient folder in the current directory: <code>./vendor/bundle/</code>. But a
+search in that folder turned up nothing again. So&hellip; further down?</p>
+
+<p>If it&rsquo;s not from the app, and not from the gems, then maybe it&rsquo;s in Ruby
+itself? I cloned the <a href="https://github.com/ruby/ruby">Ruby source</a>, checked out the <a href="https://github.com/ruby/ruby/tree/v2_6_5">version tag</a> for
+the Ruby version we&rsquo;re running, and searched for <code>"symbol lookup error"</code>
+once again. And again nothing!</p>
+
+<p>There&rsquo;s still plenty of layers below us, so let&rsquo;s keep peeling them
+back. Ruby is written in C, which means we should check libc next (the C
+standard library). There are multiple libc implementations, but I was
+running this on Linux, so let&rsquo;s check GNU libc (glibc). glibc is <a href="https://www.gnu.org/software/libc/sources.html">isn&rsquo;t
+on GitHub</a>, but that&rsquo;s not a huge deterrant. Here&rsquo;s the search:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ rg -t c 'symbol lookup error'
+</span><span class='line'>dl-lookup.c
+</span><span class='line'>876:      _dl_signal_cexception (0, &exception, N_("symbol lookup error"));</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s a bit of a smoking gun! After all those layers, we found our
+error message in libc itself. (This gave me a lot of leads on the problem
+at hand, e.g., I had definitely ruled out a problem in my app or its
+dependencies, and I was thinking, &ldquo;probably something is wrong about
+how <code>foo.so</code> was compiled.&rdquo; There&rsquo;s a fun story here about how Ruby C
+extensions work, but that&rsquo;s a tangent for another time.)</p>
+
+<p>My point is that <a href="https://livegrep.com/search/linux">searching all the code</a> is a super power, and it
+applies to more than just searching the code we&rsquo;ve written. What a
+blessing that the tools we&rsquo;re building on, like Ruby and GNU libc, are
+all open source!</p>
+
+<p>The next time it looks like a problem is outside the scope of your app&rsquo;s
+code, maybe try searching the code:</p>
+
+<ul>
+<li>inside your gems or packages!</li>
+<li>inside your language&rsquo;s standard library!
+
+<ul>
+<li>Some IDEs will even let you jump-to-def into core libraries 😮</li>
+</ul>
+</li>
+<li>inside your language&rsquo;s runtime
+
+<ul>
+<li>(if you&rsquo;re using a language with a runtime like Ruby or Python or
+even <a href="https://github.com/v8/v8">JavaScript</a>)</li>
+</ul>
+</li>
+<li>powering your operating system kernel! <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
+</ul>
+
+
+<p>For me, I&rsquo;ve already noticed it help save me time and give me more
+context when I&rsquo;m debugging.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>This might sound daunting, but sometimes it can be useful. A good thing to keep in mind: every <strong>system call</strong> like <code>open(2)</code> or <code>write(2)</code> or <code>select(2)</code> (and every other function from section 2 of the man pages) is really just a way for your program to request that the operating system do something; knowing that can be a decent place to start traipsing through code in the operating system.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
   
   
   <entry>
@@ -3980,457 +4074,6 @@ in all, <code>unbound-generics</code> is really pleasant to use!</p>
 <ol>
 <li id="fn:1">
 <p>In fact, it&rsquo;s hw1 for 15-312! If you&rsquo;re curious, check out the <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/hws/assn1.pdf">handout</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  
-  
-  <entry>
-    <title type="html"><![CDATA[Variables and Binding]]></title>
-    <link href="https://blog.jez.io/variables-and-binding/"/>
-    <updated>2017-10-28T19:04:01-07:00</updated>
-    <id>https://blog.jez.io/variables-and-binding</id>
-    <content type="html"><![CDATA[<p>Variables are central<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to programming languages, yet they&rsquo;re
-often overlooked. Academic PL theory papers usually take for granted
-having proper implementations of variables. Most popular languages
-butcher variables, <a href="https://existentialtype.wordpress.com/2012/02/01/words-matter/">confusing them with assignables</a>.
-Despite being taken for granted, implementing substitution on variables
-is easy to get wrong.</p>
-
-<!-- more -->
-
-
-<p>There are a number of different solutions for handling variables and
-binding within a programming language implementation. We&rsquo;ll take a look
-at these three:</p>
-
-<ul>
-<li>explicit variables,</li>
-<li>de Bruijn indices, and</li>
-<li>locally nameless terms</li>
-</ul>
-
-
-<p>Before we get to solutions, we need to outline the problem. Implementing
-variables and binding reduces to implementing substitution (because
-variables are giving meaning by substitution!), and the trickiest part of
-substitution is variable capture.</p>
-
-<h2>Variable Capture</h2>
-
-<p>The most common way to get variables and binding wrong is to
-accidentally let variables be <em>captured</em> during substitution. Consider
-this example:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                  <span class="err">◀────────────────┐</span>
-</span><span class='line'>                         <span class="err">┌──────┐</span>  <span class="err">│</span>
-</span><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="n">x</span><span class="o">.</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span> <span class="n">y</span>
-</span><span class='line'>                     <span class="err">└──────┘</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>There are two distinct <code>y</code> variables here:</p>
-
-<ul>
-<li>one which refers to the variable bound by the nested lambda</li>
-<li>one which refers to some <code>y</code> in the surrounding scope</li>
-</ul>
-
-
-<p>For this example, let&rsquo;s say we choose to represent variables as string
-identifiers. If we step the function application, it steps to a
-substitution of <code>y</code> for <code>x</code>:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>  <span class="p">(</span><span class="err">λ</span><span class="n">x</span><span class="o">.</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span> <span class="n">y</span>
-</span><span class='line'>  <span class="c"># Apply the function, giving us:</span>
-</span><span class='line'><span class="err">→</span> <span class="p">[</span><span class="n">y</span> <span class="o">/</span> <span class="n">x</span><span class="p">]</span> <span class="p">(</span><span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
-</span><span class='line'>  <span class="c"># Traverse under the lambda:</span>
-</span><span class='line'><span class="err">→</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="p">[</span><span class="n">y</span> <span class="o">/</span> <span class="n">x</span><span class="p">]</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
-</span><span class='line'>  <span class="c"># Distribute:</span>
-</span><span class='line'><span class="err">→</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="p">([</span><span class="n">y</span> <span class="o">/</span> <span class="n">x</span><span class="p">]</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">([</span><span class="n">y</span> <span class="o">/</span> <span class="n">x</span><span class="p">]</span> <span class="n">y</span><span class="p">)</span>
-</span><span class='line'>  <span class="c"># Substitute y where we found an x:</span>
-</span><span class='line'><span class="err">→</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>Note</strong>: <code>[e₁ / x] e₂</code> is read as &ldquo;substitute <code>e₁</code> for <code>x</code> in <code>e₂</code>.&rdquo;</p>
-
-<p>We started with a function which would take two numbers and sum them.
-After partially applying that function, we&rsquo;ve ended up with a function
-that doubles it&rsquo;s argument. Whoops! We can look at the issue visually in
-this diagram:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>       <span class="err">◀─────┐</span>             <span class="err">┃</span>         <span class="err">┌──┐</span>
-</span><span class='line'>         <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span>         <span class="err">┃</span>        <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span>
-</span><span class='line'>          <span class="err">└──────┘</span>         <span class="err">┃</span>         <span class="err">└──────┘</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>We were expecting to get out the binding structure on the left, but
-instead we got the binding structure on the right. This is called
-&ldquo;variable capture&rdquo; or just <strong>capture</strong> for short. The <code>y</code> that we
-applied to the summing function was captured by the binding site of the
-nested lambda.</p>
-
-<h2>Explicit Variables</h2>
-
-<p>When we&rsquo;re implementing substitution (whether for terms, for types, or
-for any other sort of syntax), our primary goal is to implement
-<strong>capture-avoiding substitution</strong>. There are many internal
-representations we can pick from to achieve this. The strategy above
-where variables were simple strings is called <strong>explicit variables</strong>.</p>
-
-<p>Explicit variables are nice because we can represent them directly with
-an algebraic data type. For example, for the lambda calculus we might
-have this:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">datatype</span> <span class="kt">term</span>
-</span><span class='line'>  <span class="p">=</span> <span class="nc">Var</span> <span class="kr">of</span> <span class="n">string</span>
-</span><span class='line'>  <span class="p">|</span> <span class="nc">Lam</span> <span class="kr">of</span> <span class="n">string</span> <span class="n">*</span> <span class="n">term</span>
-</span><span class='line'>  <span class="p">|</span> <span class="nc">App</span> <span class="kr">of</span> <span class="n">term</span> <span class="n">*</span> <span class="n">term</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Implementing capture-avoiding substitution using this representation
-isn&rsquo;t pleasant, but it is possible. It uses the observation that there&rsquo;s
-no difference between, say <code>λx. x</code> and <code>λy. y</code>. Our choice of variable
-names doesn&rsquo;t matter&mdash;they&rsquo;re both the identity function.</p>
-
-<p>Being able to rename bound variables at will is called <strong>α-varying</strong>,
-and when two terms can be made identical by just α-varying them,
-we say they&rsquo;re <strong>α-equivalent</strong>.</p>
-
-<p>It only makes sense to α-vary bound variables, not free variables. If we
-have two functions like <code>λx. x + y</code> and <code>λx. x + z</code>, we can&rsquo;t safely
-α-vary <code>y</code> to <code>z</code>, because we have no way of knowing whether <code>y</code> and <code>z</code>
-are the same! Their same-ness depends on the context.</p>
-
-<p>We can implement capture-avoiding substitution for the explicit variable
-representation by α-varying whenever we detect that a variable might be
-captured. To revisit our example from earlier:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>  <span class="p">(</span><span class="err">λ</span><span class="n">x</span><span class="o">.</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span> <span class="n">y</span>
-</span><span class='line'><span class="err">→</span> <span class="p">[</span><span class="n">y</span> <span class="o">/</span> <span class="n">x</span><span class="p">]</span> <span class="p">(</span><span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
-</span><span class='line'>  <span class="c"># our free 'y' will get captured by going under</span>
-</span><span class='line'>  <span class="c"># this λ, so let's α-vary the bound 'y' to 'z':</span>
-</span><span class='line'><span class="err">→</span> <span class="p">[</span><span class="n">y</span> <span class="o">/</span> <span class="n">x</span><span class="p">]</span> <span class="p">(</span><span class="err">λ</span><span class="n">z</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">z</span><span class="p">)</span>
-</span><span class='line'><span class="err">→</span> <span class="err">λ</span><span class="n">z</span><span class="o">.</span> <span class="p">[</span><span class="n">y</span> <span class="o">/</span> <span class="n">x</span><span class="p">]</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">z</span><span class="p">)</span>
-</span><span class='line'><span class="err">→</span> <span class="err">λ</span><span class="n">z</span><span class="o">.</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>The trick here is that by picking <code>z</code> we picked a name that doesn&rsquo;t
-collide with any of the free variables with in <code>λy. x + y</code>. Namely,
-we&rsquo;re glad we didn&rsquo;t α-vary <code>y</code> to <code>x</code>! To ensure this, our
-implementation can either</p>
-
-<ul>
-<li>calculate the set of free variables used in a subexpression and make
-sure not to use one of those, or</li>
-<li>generate a globally unique name by incrementing a global
-counter, giving us names like <code>x1</code>, <code>x2</code>, <code>x3</code>, etc.</li>
-</ul>
-
-
-<p>On the surface, explicit variables look rather naïve, and maybe they
-are. However, they work perfectly if you don&rsquo;t need substitution in the
-first place! For example, a compiler never needs to substitute a term
-for a variable in another term because compilers don&rsquo;t evaluate code:
-they translate one intermediate language into another.</p>
-
-<p>On the other hand, interpreters use term substitution heavily, and even
-compilers need to substitute types for variables in other types and in
-terms. We&rsquo;ll now look at some better solutions for implementing
-capture-avoiding substitution.</p>
-
-<h2>De Bruijn Indices</h2>
-
-<p>With explicit variables, we had to keep track of names in use and check
-whether to α-vary before a collision happened. The next representation
-we&rsquo;ll look at sidesteps this problem by not giving names to variables at
-all! Let&rsquo;s take a look at our picture from before:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                         <span class="err">┌──────┐</span>
-</span><span class='line'>                    <span class="err">λ</span><span class="n">x</span><span class="o">.</span> <span class="err">λ</span><span class="n">y</span><span class="o">.</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
-</span><span class='line'>                     <span class="err">└──────┘</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>In this picture, the only thing that&rsquo;s really important to us is the
-binding structure; we don&rsquo;t actually care that <code>x</code> is called <code>x</code>, we
-just care that applying this function sticks the argument everywhere the
-line on the bottom points to. We could omit the names entirely, as long
-as we can still remember where the lines should connect to:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                        <span class="err">┌─────┐</span>
-</span><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">◆</span> <span class="o">+</span> <span class="err">◆</span><span class="p">)</span>
-</span><span class='line'>                     <span class="err">└────┘</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>One way of doing this is to count how many bindings sites up you have to
-go before you arrive at the location the variable is bound. Under this
-representation, variables are indices into a list of the binding sites;
-we call these indices <strong>de Bruijn indices</strong>:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>Note</strong>: I&rsquo;m using circled numbers like <code>⓪</code> for the variable with de
-Bruijn index <code>0</code>.</p>
-
-<p>Under this representation, a de Bruijn index of 1 means &ldquo;skip over one
-lambda&rdquo; and an index of 0 means &ldquo;skip over zero lambdas&rdquo; or simply &ldquo;go
-to the closest lambda.&rdquo; In code, de Bruijn terms can be represented
-with this datatype:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">datatype</span> <span class="kt">term</span>
-</span><span class='line'>  <span class="p">=</span> <span class="nc">Var</span> <span class="kr">of</span> <span class="n">int</span>
-</span><span class='line'>  <span class="p">|</span> <span class="nc">Lam</span> <span class="kr">of</span> <span class="n">term</span>
-</span><span class='line'>  <span class="p">|</span> <span class="nc">App</span> <span class="kr">of</span> <span class="n">term</span> <span class="n">*</span> <span class="n">term</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>Var</code> now takes an <code>int</code> instead of a <code>string</code>. <code>Lam</code> only takes the
-body of the lambda (it used to also take a name for it&rsquo;s argument). To
-refer to argument of a lambda function, we count back the appropriate
-number of <code>Lam</code>s to skip over.</p>
-
-<p>Now that all variables are represented by indices, it&rsquo;s much easier to
-know which variables are free and which are bound: a variable is free if
-its index is larger than the number of lambdas it&rsquo;s under.</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>                  <span class="err">◀───────────────┐</span>
-</span><span class='line'>                        <span class="err">┌──────┐</span>  <span class="err">│</span>
-</span><span class='line'>                   <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span> <span class="err">③</span>
-</span><span class='line'>                     <span class="err">└────┘</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>The <code>③</code> is free because it&rsquo;s under zero lambdas. Put another way, if we
-were keeping a list of the binding sites we&rsquo;d traverse under to reach
-<code>③</code> our list would be empty, so accessing index 3 would be out of
-bounds.</p>
-
-<p>With this representation, capture avoiding substitution becomes much
-more manageable.</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'>  <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">λ</span><span class="o">.</span> <span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span> <span class="err">③</span>
-</span><span class='line'><span class="err">→</span> <span class="p">[</span><span class="err">③</span> <span class="o">/</span> <span class="err">⓪</span><span class="p">]</span> <span class="p">(</span><span class="err">λ</span><span class="o">.</span> <span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span>
-</span><span class='line'><span class="c"># We increment free variables as we descend under binders</span>
-</span><span class='line'><span class="err">→</span> <span class="err">λ</span><span class="o">.</span> <span class="p">[</span><span class="err">④</span> <span class="o">/</span> <span class="err">①</span><span class="p">]</span> <span class="p">(</span><span class="err">①</span> <span class="o">+</span> <span class="err">⓪</span><span class="p">)</span>
-</span><span class='line'><span class="err">→</span> <span class="err">λ</span><span class="o">.</span> <span class="p">([</span><span class="err">④</span> <span class="o">/</span> <span class="err">①</span><span class="p">]</span> <span class="err">①</span><span class="p">)</span> <span class="o">+</span> <span class="p">([</span><span class="err">④</span> <span class="o">/</span> <span class="err">①</span><span class="p">]</span> <span class="err">⓪</span><span class="p">)</span>
-</span><span class='line'><span class="err">→</span> <span class="err">λ</span><span class="o">.</span> <span class="err">④</span> <span class="o">+</span> <span class="err">⓪</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Note how the <code>③</code> changed to a <code>④</code>: its new location in the program lies
-under one extra lambda than before. Thus to refer to the same position
-as at the start of the substitution, we increment to record that we&rsquo;ll
-have to skip over that extra lambda. This process of adding one when
-going under a binder is called <strong>lifting</strong> (or sometimes, <strong>shifting</strong>).</p>
-
-<p>Lifting takes the guesswork out of implementing substitution. As a
-bonus, we&rsquo;ve actually forced α-equivalent terms to have identical
-structure! Checking for α-equivalence is now a straightforward tree
-traversal: we check that both nodes are pairwise equal, then that their
-children are α-equivalent.</p>
-
-<h2>De Bruijn Indices and Lifting</h2>
-
-<p>On the other hand, working with de Bruijn indices can still be tricky.
-It&rsquo;s easy enough to remember to lift variables when substituting, but
-more generally, you have to remember to lift <em>whenever</em> you put a free
-variable into a context different from where it was defined. This can
-get really hairy; spotting when a usage context diverges from a
-definition context is a skill that&rsquo;s often learned the hard way! Namely,
-by forgetting to lift somewhere, pouring over the code and the types for
-hours, then finally spotting the mistake.<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
-
-<p>To make this a little more concrete, I&rsquo;ll use a specific example. It
-comes from the judgement for deciding whether two type constructors are
-equivalent in System F<sub>ω</sub>. Focus on the variables and contexts
-in use (don&rsquo;t pay too much attention to what the judgement actually is):</p>
-
-<p>$$
-\frac{
-\Gamma, \alpha :: \kappa_1 \; \vdash \; c \, \alpha \iff c&#8217; \, \alpha :: \kappa_2
-}{
-\Gamma \; \vdash \; c \iff c&#8217; :: \kappa_1 \to \kappa_2
-}
-$$</p>
-
-<p>In words, &ldquo;to check whether type constructors <code>c</code> and <code>c'</code> are
-equivalent, assume that <code>α</code> is a type constructor of kind <code>κ₁</code>, then
-apply <code>α</code> to <code>c</code> and <code>c'</code> and see if you get the same result in both
-cases.&rdquo; Though again, understanding this judgement is beside the point.</p>
-
-<p>The real tricky part here is obscured by the fact that we&rsquo;re
-representing variables with names instead of de Bruijn indices. If we
-were to take a naive pass at translating  this rule to use de Bruijn
-indices, we might end up with:</p>
-
-<p>$$
-\frac{
-\Gamma, \kappa_1 \; \vdash \; c \, ⓪ \iff c&#8217; \, ⓪ :: \kappa_2
-}{
-\Gamma \; \vdash \; c \iff c&#8217; :: \kappa_1 \to \kappa_2
-}
-$$</p>
-
-<p>Note how <code>Γ</code> became a stack instead of a map because we&rsquo;re mapping
-<em>indices</em> to kinds (instead of string keys to kinds). The element we
-just pushed on (<code>κ₁</code>) is on the top of the stack at index <code>0</code>, and
-everything else in the context can now be found at <code>index + 1</code>. That
-means that above the line, <code>⓪</code> refers to the <code>κ₁</code> in the context.</p>
-
-<p>But <code>⓪</code> might <em>also</em> be in use at the top level of <code>c</code> or <code>c'</code>! In
-either of these terms, <code>⓪</code> at the top level is a free variable referring
-to the first thing in <code>Γ</code>. The problem is that we&rsquo;re checking <code>c ⓪ &lt;=&gt;
-c' ⓪</code> with context <code>Γ, κ₁</code> rather than <code>Γ</code>, so all our indices are off.</p>
-
-<p>To make all the indices in <code>c</code> and <code>c'</code> route to the correct variable in
-the new context, we have to go through <code>c</code> and <code>c'</code> and lift all free
-variables by one to reflect the fact that we just injected something
-into the surrounding context:</p>
-
-<p>$$
-\frac{
-\Gamma, \kappa_1 \; \vdash \; (c \uparrow) \, ⓪ \iff (c&#8217; \uparrow) \, ⓪ :: \kappa_2
-}{
-\Gamma \; \vdash \; c \iff c&#8217; :: \kappa_1 \to \kappa_2
-}
-$$</p>
-
-<p>In this rule, <code>↑</code> is the lifting operator, which traverses through a
-term&rsquo;s free variables and increments them. After it&rsquo;s run, there will be
-no free variables in <code>c</code> or <code>c'</code> with index 0, which gives us room to
-use <code>⓪</code> for our own purposes.</p>
-
-<p>In some sense, this is the opposite problem that we had when we used
-explicit variables. For that, we had to go through and rename <em>bound
-variables</em> so that nothing clashed. Now, we have to lift <em>free
-variables</em> so that nothing clashes. Put another way, explicit variables
-excel at dealing with free variables, while de Bruijn indices excel at
-representing bound variables.</p>
-
-<p>The next representation we&rsquo;ll look at, locally nameless terms,
-effectively steals the best of each, combining them into one
-representation.</p>
-
-<h2>Locally Nameless Terms</h2>
-
-<p>We identified that de Bruijn indices represent bound variables well at
-the expense of free variables. <strong>Locally nameless terms</strong> solve this by
-giving free variables explicit names, but using indices instead of names
-for bound (or &ldquo;local&rdquo;) variables, thus the name.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></p>
-
-<p>Locally nameless terms might be represented by a data type like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="kr">datatype</span> <span class="kt">term</span>
-</span><span class='line'>  <span class="p">=</span> <span class="nc">FV</span> <span class="kr">of</span> <span class="n">string</span>
-</span><span class='line'>  <span class="p">|</span> <span class="nc">BV</span> <span class="kr">of</span> <span class="n">int</span>
-</span><span class='line'>  <span class="p">|</span> <span class="nc">Lam</span> <span class="kr">of</span> <span class="n">term</span>
-</span><span class='line'>  <span class="p">|</span> <span class="nc">App</span> <span class="kr">of</span> <span class="n">term</span> <span class="n">*</span> <span class="n">term</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>FV</code> constructs a free variable, and similarly <code>BV</code> constructs a bound
-variable. <code>FV</code> takes a <code>string</code>, because free variables get names, and
-<code>BV</code> takes an <code>int</code>, because bound variables are nameless de Bruijn
-indices. As before, <code>Lam</code> only takes the body of the lambda function;
-we&rsquo;ll use de Bruijn indices to count back to the appropriate binding
-site of a variable.</p>
-
-<p>In practice, locally nameless terms are best provided through a library,
-where this internal implementation is hidden and the user interacts with
-an abstract interface:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='sml'><span class='line'><span class="c">(*</span><span class="cm"> The actual type of a locally nameless term with *)</span>
-</span><span class='line'><span class="c">(*</span><span class="cm"> a distinction between FV and BV is hidden       *)</span>
-</span><span class='line'><span class="kr">type</span> <span class="kt">term</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">(*</span><span class="cm"> termView is only one level deep: after that, *)</span>
-</span><span class='line'><span class="c">(*</span><span class="cm"> you end up with a term, which is abstract    *)</span>
-</span><span class='line'><span class="kt">datatype</span> <span class="kt">termView</span>
-</span><span class='line'>  <span class="p">=</span> <span class="n">Var</span> <span class="kr">of</span> <span class="n">string</span>
-</span><span class='line'>  <span class="p">|</span> <span class="n">Lam</span> <span class="kr">of</span> <span class="n">string</span> <span class="n">*</span> <span class="n">term</span>
-</span><span class='line'>  <span class="p">|</span> <span class="n">App</span> <span class="kr">of</span> <span class="n">term</span> <span class="n">*</span> <span class="n">term</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">(*</span><span class="cm"> Convert between the abstract and view types *)</span>
-</span><span class='line'><span class="kr">val</span> <span class="n">out</span> <span class="p">:</span> <span class="n">term</span> <span class="p">-&gt;</span> <span class="n">termView</span>
-</span><span class='line'><span class="kr">val</span> <span class="n">into</span> <span class="p">:</span> <span class="n">termView</span> <span class="p">-&gt;</span> <span class="n">term</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">(*</span><span class="cm"> Substitution and alpha equivalence work on abstract terms *)</span>
-</span><span class='line'><span class="kr">val</span> <span class="n">subst</span> <span class="p">:</span> <span class="n">term</span> <span class="p">-&gt;</span> <span class="n">string</span> <span class="p">-&gt;</span> <span class="n">term</span>
-</span><span class='line'><span class="kr">val</span> <span class="n">aeq</span> <span class="p">:</span> <span class="n">term</span> <span class="p">-&gt;</span> <span class="n">term</span> <span class="p">-&gt;</span> <span class="n">bool</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>The fresh name generation from explicit variables is handled under the
-hood by <code>out</code>. Lifting is handled automatically every time we call
-<code>into</code> on a <code>Lam</code>. By only implementing operations like <code>subst</code> and
-<code>aeq</code> on the abstract representations, we&rsquo;ve effectively forced the type
-system to check that we lift and generate fresh names in all the right
-places!</p>
-
-<h2>Closing Considerations</h2>
-
-<p>Locally nameless terms are generally pretty great. They blend the
-strengths of explicit variables and de Bruijn indices into a new
-structure that makes working with variables and binding hard to get
-wrong. That being said, I&rsquo;d be remiss if I didn&rsquo;t point out two
-drawbacks:</p>
-
-<ul>
-<li>Locally nameless terms can be slow.
-
-<ul>
-<li>In most code, we&rsquo;ll find ourselves converting between <code>term</code>s
-and <code>termView</code>s. This brings with it the overhead of the function
-call, allocating new memory for the new structures, and can even
-sometimes make a linear algorithm accidentally quadratic.</li>
-</ul>
-</li>
-<li>It&rsquo;s more annoying to use pattern matching.
-
-<ul>
-<li>Most of the time we&rsquo;ll have things of type <code>term</code>. Since <code>term</code> is
-abstract, we can&rsquo;t pattern match on it directly; we have to instead
-call <code>out</code> and pattern match the result.</li>
-</ul>
-</li>
-</ul>
-
-
-<p>Despite these drawbacks, I still prefer locally nameless terms.</p>
-
-<ul>
-<li><p>I&rsquo;ll gladly trade correctness for performance, and it&rsquo;s definitely
-easier to be correct when working with locally nameless terms. We can
-always optimize for performance later by profiling the code to find
-the slowness!</p></li>
-<li><p>Calling <code>out</code> in a few places is a small ergonomic price to pay for
-correctness. When you forget to call <code>out</code> or <code>into</code>, the type checker
-will remind you. There are also some cool language extensions which
-can make calling <code>out</code> and <code>in</code> syntactically more pleasant, like
-<a href="https://ocharles.org.uk/blog/posts/2014-12-02-view-patterns.html">View Patterns</a> in Haskell.</p></li>
-</ul>
-
-
-<p>Variables show up in the most interesting places, and I always smile
-when I find them being used in new and surprising ways. On the flip
-side, languages that don&rsquo;t implement variables and binding suffer no end
-of trouble and programmers are forced to cope with their
-absence.<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup></p>
-
-<p>I think variables are just so cool!</p>
-
-<!-- vim:tw=72
--->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>Nearly every interesting programming language feature derives its power from variables. Functions wouldn&rsquo;t be functions if not for variables. Modularity and linking reduce to variables and substitution. I&rsquo;ve written in the past about all sorts of cool <a href="https://blog.jez.io/variables-in-types">variables in types</a>, as well as how <a href="https://blog.jez.io/system-f-param">parametric polymorphism in System F</a> is the result of using type variables in two ways within the same system.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>If it wasn&rsquo;t clear, this has happened to me many times, and yes I&rsquo;m still getting over it 😓<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>We could, by analogy, refer to the de Bruijn index representation as the globally nameless representation, which is more descriptive but isn&rsquo;t something you&rsquo;ll hear used anywhere.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-<li id="fn:4">
-<p>It&rsquo;s for this very reason that variables are the first topic we cover in <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles of Programming Languages</a>.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 

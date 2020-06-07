@@ -4,7 +4,7 @@
   <title><![CDATA[Category: fragment | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/fragment/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-02-12T02:33:41-05:00</updated>
+  <updated>2020-06-06T22:09:56-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,98 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Search Down the Stack]]></title>
+    <link href="https://blog.jez.io/search-down-the-stack/"/>
+    <updated>2020-06-06T19:08:20-05:00</updated>
+    <id>https://blog.jez.io/search-down-the-stack</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve found it useful to search though the source code of things lower in
+the stack lately. For example I saw an error something like this at work
+recently:</p>
+
+<pre><code>❯ rake test
+symbol lookup error: /home/jez/.../foo.so: undefined symbol bar
+</code></pre>
+
+<p>I was pretty confused. Modulo the names of commands and files, this was
+pretty much all the output.</p>
+
+<p>So I started searching. First I searched through my codebase for
+<code>"symbol lookup error"</code>, but found nothing. Surely that string exists
+somewhere. That must mean it&rsquo;s coming from lower in the stack?</p>
+
+<p>The next level lower would mean third party Ruby gems. At work we use
+Bundler <a href="https://bundler.io/v2.0/guides/deploying.html#manual-deployment">in a mode</a> where it installs all gems into a single
+convenient folder in the current directory: <code>./vendor/bundle/</code>. But a
+search in that folder turned up nothing again. So&hellip; further down?</p>
+
+<p>If it&rsquo;s not from the app, and not from the gems, then maybe it&rsquo;s in Ruby
+itself? I cloned the <a href="https://github.com/ruby/ruby">Ruby source</a>, checked out the <a href="https://github.com/ruby/ruby/tree/v2_6_5">version tag</a> for
+the Ruby version we&rsquo;re running, and searched for <code>"symbol lookup error"</code>
+once again. And again nothing!</p>
+
+<p>There&rsquo;s still plenty of layers below us, so let&rsquo;s keep peeling them
+back. Ruby is written in C, which means we should check libc next (the C
+standard library). There are multiple libc implementations, but I was
+running this on Linux, so let&rsquo;s check GNU libc (glibc). glibc is <a href="https://www.gnu.org/software/libc/sources.html">isn&rsquo;t
+on GitHub</a>, but that&rsquo;s not a huge deterrant. Here&rsquo;s the search:</p>
+
+<pre><code>❯ rg -t c 'symbol lookup error'
+dl-lookup.c
+876:      _dl_signal_cexception (0, &amp;exception, N_("symbol lookup error"));
+</code></pre>
+
+<p>That&rsquo;s a bit of a smoking gun! After all those layers, we found our
+error message in libc itself. (This gave me a lot of leads on the problem
+at hand, e.g., I had definitely ruled out a problem in my app or its
+dependencies, and I was thinking, &ldquo;probably something is wrong about
+how <code>foo.so</code> was compiled.&rdquo; There&rsquo;s a fun story here about how Ruby C
+extensions work, but that&rsquo;s a tangent for another time.)</p>
+
+<p>My point is that <a href="https://livegrep.com/search/linux">searching all the code</a> is a super power, and it
+applies to more than just searching the code we&rsquo;ve written. What a
+blessing that the tools we&rsquo;re building on, like Ruby and GNU libc, are
+all open source!</p>
+
+<p>The next time it looks like a problem is outside the scope of your app&rsquo;s
+code, maybe try searching the code:</p>
+
+<ul>
+<li>inside your gems or packages!</li>
+<li>inside your language&rsquo;s standard library!
+
+<ul>
+<li>Some IDEs will even let you jump-to-def into core libraries 😮</li>
+</ul>
+</li>
+<li>inside your language&rsquo;s runtime
+
+<ul>
+<li>(if you&rsquo;re using a language with a runtime like Ruby or Python or
+even <a href="https://github.com/v8/v8">JavaScript</a>)</li>
+</ul>
+</li>
+<li>powering your operating system kernel! <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
+</ul>
+
+
+<p>For me, I&rsquo;ve already noticed it help save me time and give me more
+context when I&rsquo;m debugging.</p>
+
+<!-- vim:tw=72
+-->
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>This might sound daunting, but sometimes it can be useful. A good thing to keep in mind: every <strong>system call</strong> like <code>open(2)</code> or <code>write(2)</code> or <code>select(2)</code> (and every other function from section 2 of the man pages) is really just a way for your program to request that the operating system do something; knowing that can be a decent place to start traipsing through code in the operating system.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Prefer .then() over .catch()]]></title>
@@ -381,65 +473,6 @@ incorrectness, the easier it is to write code for the long term.</p>
 <p>Recall that raising an exception is logically the same as throwing a value to a continuation and carrying out a <a href="/continuations-notes/">proof by contradiction</a>!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[If, Else, & Purity]]></title>
-    <link href="https://blog.jez.io/if-else-purity/"/>
-    <updated>2017-08-31T22:38:43-07:00</updated>
-    <id>https://blog.jez.io/if-else-purity</id>
-    <content type="html"><![CDATA[<p>I prefer to let the language I&rsquo;m using think on my behalf as much as
-possible. Ideally, the language is rich enough that the proof of
-correctness is inherent in the code I&rsquo;ve written. Even when I use
-looser languages, these principled languages inform the structure of my
-code. To make this a bit more let&rsquo;s turn our focus to <code>if</code>, <code>else</code>, and
-purity.</p>
-
-<!-- more -->
-
-
-<p>A cool way to understand purity is using what&rsquo;s known as a &ldquo;modal
-separation.&rdquo; This is a really fancy way to say that we have
-<strong>expressions</strong> which are pure and always evaluate to a value, alongside
-<strong>commands</strong> which are impure and are executed for their side effects.
-If you&rsquo;ve ever used Haskell, you&rsquo;re already familiar with this
-notion&mdash;we only need <code>do</code> notation when we need to write impure (or
-&ldquo;monadic&rdquo;) code.</p>
-
-<p>In an expression language, every <code>if</code> <em>must</em> have an <code>else</code>; for the
-entire <code>if</code> expression to be used as a value, both branches must in turn
-evaluate to values. It&rsquo;s only when we move to a language with commands
-where it makes sense to allow omitting the <code>else</code> branch. <code>if</code>
-expressions are not some abstract concept; chances are you&rsquo;ve
-encountered them under the name &ldquo;the ternary operator.&rdquo;</p>
-
-<p>An <code>if</code> <em>statement</em> (as opposed to an <code>if</code> expression) is a command;
-it&rsquo;s useful for running side-effectful code. Sometimes, we don&rsquo;t want
-one of the branches to have any side effects (for example, because the
-state of the world doesn&rsquo;t need to be changed). Languages with commands
-allow omitting the <code>else</code>.</p>
-
-<p>What does this mean for us? Since expression languages form the basis
-for purity, every pure function can be written where the <code>if</code> is matched
-with an <code>else</code>. Put another way, an unmatched <code>if</code> is a likely indicator
-that the code I&rsquo;ve written is impure.</p>
-
-<p>This makes me more aware of when I&rsquo;m dealing with impure code. For
-example, I might want to factor out as much of the pure code into a
-separate helper function. There&rsquo;s a time and a place for impure code.
-But since pure code is more composable and easier to test, it&rsquo;s best to
-factor the impure code out whenever possible.</p>
-
-<p>In a principled language, there&rsquo;s a distinction between <code>if</code> expressions
-and <code>if</code> statements. On the other hand, some language only have one, or
-they blur the line between the two. We can draw upon our experiences
-with languages that are rigorous about minutia like this to better
-inform how we write clean code.</p>
-
-<!-- vim:tw=72
--->
 
 ]]></content>
   </entry>
