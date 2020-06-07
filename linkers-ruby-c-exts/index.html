@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Linkers & Ruby C Extensions - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="I recently learned that linkers are really cool.
+">
+
+<meta name="keywords" content="linux ruby c ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
+  <meta name="twitter:title" content="Linkers & Ruby C Extensions">
+  <meta name="twitter:description" content="I recently learned that linkers are really cool.
+">
+  <meta name="twitter:creator" content="@jez_io">
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/linkers-ruby-c-exts">
+<meta property="og:title" content="Linkers & Ruby C Extensions">
+<meta property="og:description" content="I recently learned that linkers are really cool.
+">
+<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/linkers-ruby-c-exts">
+<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+<link href="/favicon@2x.png" rel="icon" sizes="32x32">
+<link href="/favicon.png" rel="icon" sizes="16x16">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Linkers & Ruby C Extensions</h1>
+  <h2 class="EntryHeader-subtitle">June 7, 2020</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <p>I recently learned that linkers are really cool. It all started when I
+saw an error message that looked something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ rake test
+</span><span class='line'>symbol lookup error: /home/jez/.../foo.so: undefined symbol bar</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I <a href="/search-down-the-stack/">already wrote</a> about finding where this
+error was coming from. The tl;dr is that it was coming from GNU&rsquo;s libc
+implementation:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ rg -t c 'symbol lookup error'
+</span><span class='line'>dl-lookup.c
+</span><span class='line'>876:      _dl_signal_cexception (0, &exception, N_("symbol lookup error"));</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That led me to a fun exploration of how linux linkers work, and how Ruby
+C extensions rely on them.</p>
+
+<p>I always knew that Ruby C extensions existed (that they <a href="https://twitter.com/asolove/status/1261339091485917184">break all the
+time</a> is a constant reminder&hellip;) but I never really connected
+the dots between &ldquo;here&rsquo;s some C code&rdquo; and how Ruby actually runs that
+code.</p>
+
+<p>Ruby C extensions are just shared libraries following certain
+conventions. Specifically, a Ruby C extension might look like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include "ruby.h"
+</span><span class='line'></span>
+</span><span class='line'><span class="n">VALUE</span> <span class="nf">my_foo</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">rb_funcall</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">rb_intern</span><span class="p">(</span><span class="s">"puts"</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// This function's name matters:
+</span><span class='line'></span><span class="kt">void</span> <span class="nf">Init_my_lib</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">rb_cObject</span><span class="p">,</span> <span class="s">"foo"</span><span class="p">,</span> <span class="n">my_foo</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>The important part is that the name of that <code>Init_my_lib</code> function
+matters. When Ruby sees a line like</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require_relative</span> <span class="s1">'./my_lib'</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>it looks for a file called <code>my_lib.so</code> (or <code>my_lib.bundle</code> on macOS),
+asks the operating system to load that file as a shared library, and
+then looks for a function with the name <code>Init_my_lib</code> inside the library
+it just loaded.</p>
+
+<p>When that function runs, it&rsquo;s a chance for the C extension to do
+the same sorts of things that a normal Ruby file might have done if it
+had been <code>require</code>&rsquo;d. In this example, it defines a method <code>foo</code> at the
+top level, almost like the user had written normal Ruby code like this:</p>
+
+<figure class='code'><figcaption><span>my_lib.rb</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">val</span>
+</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s kind of wild! That means:</p>
+
+<ul>
+<li>C programs can load libraries dynamically at runtime, using arbitrary
+user input.</li>
+<li>C programs can then ask if there&rsquo;s a function defined in that library
+with an arbitrary name, and get a function pointer to call it if there
+is!</li>
+</ul>
+
+
+<p>I was pretty shocked to learn this, because my mental model of how
+linking worked was that it split evenly into two parts:</p>
+
+<ul>
+<li><p>&ldquo;My application is statically linked, where all the code and libraries
+my application depends on are compiled into my binary.&rdquo;</p></li>
+<li><p>&ldquo;My application is dynamically linked, which means my binary
+pre-declares some libraries that must be loaded before my program can
+start running.&rdquo;</p></li>
+</ul>
+
+
+<p>There&rsquo;s actually a third option!</p>
+
+<p>Then I looked into what code Ruby actually calls to do this. I found the
+code in <code>dln.c</code>:</p>
+
+<figure class='code'><figcaption><span>dln.c</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/* Load file */</span>
+</span><span class='line'><span class="k">if</span> <span class="p">((</span><span class="n">handle</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">dlopen</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">RTLD_LAZY</span><span class="o">|</span><span class="n">RTLD_GLOBAL</span><span class="p">))</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">error</span> <span class="o">=</span> <span class="n">dln_strerror</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">goto</span> <span class="n">failed</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1341">→ View on github.com</a></p>
+
+<p>Ruby uses the <code>dlopen(3)</code> function in libc to request that an arbitrary
+user library be loaded. From the man page:</p>
+
+<blockquote><p>The function dlopen() loads the dynamic shared object (shared library)
+file named by the null-terminated string filename and returns an
+opaque &ldquo;handle&rdquo; for the loaded object.</p>
+
+<p>&mdash; man dlopen</p></blockquote>
+
+<p>The next thing Ruby does with this opaque <code>handle</code> is to find if the
+thing it just loaded has an <code>Init_&lt;...&gt;</code> function inside it:</p>
+
+<figure class='code'><figcaption><span>dln.c</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">init_fct</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="p">(</span><span class="o">*</span><span class="p">)())(</span><span class="n">VALUE</span><span class="p">)</span><span class="n">dlsym</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="n">init_fct</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">size_t</span> <span class="n">errlen</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">error</span> <span class="o">=</span> <span class="n">dln_strerror</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">error</span> <span class="o">=</span> <span class="n">memcpy</span><span class="p">(</span><span class="n">ALLOCA_N</span><span class="p">(</span><span class="kt">char</span><span class="p">,</span> <span class="n">errlen</span><span class="p">),</span> <span class="n">error</span><span class="p">,</span> <span class="n">errlen</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">dlclose</span><span class="p">(</span><span class="n">handle</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">goto</span> <span class="n">failed</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1363-L1369">→ View on github.com</a></p>
+
+<p>It uses <code>dlsym(3)</code> (again in libc) to look up a method with an arbitrary
+name (<code>buf</code>) inside the library it just opened (<code>handle</code>). That function
+must exist—if it doesn&rsquo;t, it&rsquo;s not a valid Ruby C extension and Ruby
+reports an error.</p>
+
+<p>If <code>dlsym</code> found a function with the right name, it stores a function
+pointer into <code>init_fct</code>, which Ruby immediately dereferences and calls:</p>
+
+<figure class='code'><figcaption><span>dln.c</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/* Call the init code */</span>
+</span><span class='line'><span class="p">(</span><span class="o">*</span><span class="n">init_fct</span><span class="p">)();</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1370-L1371">→ View on github.com</a></p>
+
+<p>It&rsquo;s still kind of mind bending to think that C provides this level of
+&ldquo;dynamism.&rdquo; I had always thought that being a compiled language meant
+that the set of functions a C program could call was fixed at compile
+time, but that&rsquo;s not true at all!</p>
+
+<p>This search led me down a rabbit hole of learning more about linkers,
+and now I think they&rsquo;re super cool—and far less cryptic! I <strong>highly</strong>
+recommend <em>Chapter 7: Linking</em> from <a href="http://www.csapp.cs.cmu.edu/">Computer Systems: A Programmer&rsquo;s
+Perspective</a> if this was interesting to you.</p>
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#linux" title="Pages tagged linux">linux</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#ruby" title="Pages tagged ruby">ruby</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#c" title="Pages tagged c">c</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2020-06-07T12:05:07-05:00">June 7, 2020</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/search-down-the-stack/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/search-down-the-stack/" title="Search Down the Stack">Search Down the Stack</a></h3>
+      <p>I&#8217;ve found it useful to search though the source code of things lower in the stack lately.
+ <a href="/search-down-the-stack/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/sorbet-fixme-comment/" title="Sorbet Does Not Have FixMe Comments">Sorbet Does Not Have FixMe Comments</a></h4>
+            <span>Published on February 11, 2020</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/intersection-types-common/" title="Intersection Types in Sorbet are Surprisingly Common">Intersection Types in Sorbet are Surprisingly Common</a></h4>
+            <span>Published on January 4, 2020</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>

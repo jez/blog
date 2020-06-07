@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/ruby/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-06-06T22:09:56-04:00</updated>
+  <updated>2020-06-07T16:49:46-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,157 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Linkers & Ruby C Extensions]]></title>
+    <link href="https://blog.jez.io/linkers-ruby-c-exts/"/>
+    <updated>2020-06-07T12:05:07-05:00</updated>
+    <id>https://blog.jez.io/linkers-ruby-c-exts</id>
+    <content type="html"><![CDATA[<p>I recently learned that linkers are really cool. It all started when I
+saw an error message that looked something like this:</p>
+
+<pre><code>❯ rake test
+symbol lookup error: /home/jez/.../foo.so: undefined symbol bar
+</code></pre>
+
+<p>I <a href="/search-down-the-stack/">already wrote</a> about finding where this
+error was coming from. The tl;dr is that it was coming from GNU&rsquo;s libc
+implementation:</p>
+
+<pre><code>❯ rg -t c 'symbol lookup error'
+dl-lookup.c
+876:      _dl_signal_cexception (0, &amp;exception, N_("symbol lookup error"));
+</code></pre>
+
+<p>That led me to a fun exploration of how linux linkers work, and how Ruby
+C extensions rely on them.</p>
+
+<p>I always knew that Ruby C extensions existed (that they <a href="https://twitter.com/asolove/status/1261339091485917184">break all the
+time</a> is a constant reminder&hellip;) but I never really connected
+the dots between &ldquo;here&rsquo;s some C code&rdquo; and how Ruby actually runs that
+code.</p>
+
+<p>Ruby C extensions are just shared libraries following certain
+conventions. Specifically, a Ruby C extension might look like this:</p>
+
+<pre><code class="c">#include "ruby.h"
+
+VALUE my_foo(VALUE self, VALUE val) {
+  return rb_funcall(self, rb_intern("puts"), 1, val)
+}
+
+// This function's name matters:
+void Init_my_lib() {
+  rb_define_method(rb_cObject, "foo", my_foo);
+}
+</code></pre>
+
+<p>The important part is that the name of that <code>Init_my_lib</code> function
+matters. When Ruby sees a line like</p>
+
+<pre><code class="ruby">require_relative './my_lib'
+</code></pre>
+
+<p>it looks for a file called <code>my_lib.so</code> (or <code>my_lib.bundle</code> on macOS),
+asks the operating system to load that file as a shared library, and
+then looks for a function with the name <code>Init_my_lib</code> inside the library
+it just loaded.</p>
+
+<p>When that function runs, it&rsquo;s a chance for the C extension to do
+the same sorts of things that a normal Ruby file might have done if it
+had been <code>require</code>&rsquo;d. In this example, it defines a method <code>foo</code> at the
+top level, almost like the user had written normal Ruby code like this:</p>
+
+<pre><code class="ruby my_lib.rb">def foo(val)
+  puts val
+end
+</code></pre>
+
+<p>That&rsquo;s kind of wild! That means:</p>
+
+<ul>
+<li>C programs can load libraries dynamically at runtime, using arbitrary
+user input.</li>
+<li>C programs can then ask if there&rsquo;s a function defined in that library
+with an arbitrary name, and get a function pointer to call it if there
+is!</li>
+</ul>
+
+
+<p>I was pretty shocked to learn this, because my mental model of how
+linking worked was that it split evenly into two parts:</p>
+
+<ul>
+<li><p>&ldquo;My application is statically linked, where all the code and libraries
+my application depends on are compiled into my binary.&rdquo;</p></li>
+<li><p>&ldquo;My application is dynamically linked, which means my binary
+pre-declares some libraries that must be loaded before my program can
+start running.&rdquo;</p></li>
+</ul>
+
+
+<p>There&rsquo;s actually a third option!</p>
+
+<p>Then I looked into what code Ruby actually calls to do this. I found the
+code in <code>dln.c</code>:</p>
+
+<pre><code class="c dln.c">/* Load file */
+if ((handle = (void*)dlopen(file, RTLD_LAZY|RTLD_GLOBAL)) == NULL) {
+    error = dln_strerror();
+    goto failed;
+}
+</code></pre>
+
+<p><a href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1341">→ View on github.com</a></p>
+
+<p>Ruby uses the <code>dlopen(3)</code> function in libc to request that an arbitrary
+user library be loaded. From the man page:</p>
+
+<blockquote><p>The function dlopen() loads the dynamic shared object (shared library)
+file named by the null-terminated string filename and returns an
+opaque &ldquo;handle&rdquo; for the loaded object.</p>
+
+<p>&mdash; man dlopen</p></blockquote>
+
+<p>The next thing Ruby does with this opaque <code>handle</code> is to find if the
+thing it just loaded has an <code>Init_&lt;...&gt;</code> function inside it:</p>
+
+<pre><code class="c dln.c">init_fct = (void(*)())(VALUE)dlsym(handle, buf);
+if (init_fct == NULL) {
+    const size_t errlen = strlen(error = dln_strerror()) + 1;
+    error = memcpy(ALLOCA_N(char, errlen), error, errlen);
+    dlclose(handle);
+    goto failed;
+}
+</code></pre>
+
+<p><a href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1363-L1369">→ View on github.com</a></p>
+
+<p>It uses <code>dlsym(3)</code> (again in libc) to look up a method with an arbitrary
+name (<code>buf</code>) inside the library it just opened (<code>handle</code>). That function
+must exist—if it doesn&rsquo;t, it&rsquo;s not a valid Ruby C extension and Ruby
+reports an error.</p>
+
+<p>If <code>dlsym</code> found a function with the right name, it stores a function
+pointer into <code>init_fct</code>, which Ruby immediately dereferences and calls:</p>
+
+<pre><code class="c dln.c">/* Call the init code */
+(*init_fct)();
+</code></pre>
+
+<p><a href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1370-L1371">→ View on github.com</a></p>
+
+<p>It&rsquo;s still kind of mind bending to think that C provides this level of
+&ldquo;dynamism.&rdquo; I had always thought that being a compiled language meant
+that the set of functions a C program could call was fixed at compile
+time, but that&rsquo;s not true at all!</p>
+
+<p>This search led me down a rabbit hole of learning more about linkers,
+and now I think they&rsquo;re super cool—and far less cryptic! I <strong>highly</strong>
+recommend <em>Chapter 7: Linking</em> from <a href="http://www.csapp.cs.cmu.edu/">Computer Systems: A Programmer&rsquo;s
+Perspective</a> if this was interesting to you.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Sorbet Does Not Have FixMe Comments]]></title>
