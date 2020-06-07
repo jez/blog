@@ -61,7 +61,9 @@ error message in libc itself. (This gave me a lot of leads on the problem
 at hand, e.g., I had definitely ruled out a problem in my app or its
 dependencies, and I was thinking, "probably something is wrong about
 how `foo.so` was compiled." There's a fun story here about how Ruby C
-extensions work, but that's a tangent for another time.)
+extensions work, but that's a [tangent for another time].)
+
+[tangent for another time]: /linkers-ruby-c-exts/
 
 My point is that [searching all the code] is a super power, and it
 applies to more than just searching the code we've written. What a
