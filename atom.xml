@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-06-17T00:02:35-04:00</updated>
+  <updated>2020-07-21T19:33:11-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,115 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  
+  <entry>
+    <title type="html"><![CDATA[Exploring Ruby with clangd]]></title>
+    <link href="https://blog.jez.io/clangd-ruby/"/>
+    <updated>2020-07-21T15:40:23-07:00</updated>
+    <id>https://blog.jez.io/clangd-ruby</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve managed to get LSP-based IDE features powered by <a href="https://clangd.llvm.org/">clangd</a> working
+for the Ruby VM&rsquo;s source code (in my case, in Vim). Here&rsquo;s how I did it!</p>
+
+<!-- more -->
+
+
+<p>I&rsquo;ve been making a point to learn more about <a href="https://blog.jez.io/search-down-the-stack/">things I depend
+on</a> recently. Today, that means learning about
+Ruby. And what better way to learn than to check out the source code,
+and jump around?</p>
+
+<p><a href="https://clangd.llvm.org/">clangd</a> is an editor-agnostic language server that uses the <a href="https://langserver.org/">Language
+Server Protocol</a> to power IDE-like features in
+your preferred text editor. All it needs is a <code>compile_commands.json</code>,
+which is basically a mapping of filename to options to pass to <code>clang</code>
+so that it knows things like which warnings to enable and where to
+search for header files.</p>
+
+<p><a href="https://clangd.llvm.org/">clangd</a> works best for projects built using <code>cmake</code>, but the Ruby VM
+doesn&rsquo;t use <code>cmake</code>. Regardless, we can make a <code>compile_commands.json</code>
+file by using <a href="https://github.com/rizsotto/Bear">Bear</a> to trace the execution of a Ruby build, and use the
+trace information to write out a <code>compile_commands.json</code> file.</p>
+
+<h2>Steps</h2>
+
+<p>I could only get these steps to work for Linux, as the Bear README
+mentions that on macOS you have to disable System Integrity Protection
+to get it to work.</p>
+
+<h3>1. Install <a href="https://github.com/rizsotto/Bear">Bear</a></h3>
+
+<p>I describe how I built Bear from source in the Appendix.</p>
+
+<h3>2. Clone the Ruby source code.</h3>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/ruby/ruby
+</span><span class='line'><span class="nb">cd </span>ruby</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>3. Configure the Ruby build.</h3>
+
+<p>We have to tell the <code>configure</code> script to use Clang to compile (or
+if you&rsquo;re confident that your system compiler toolchain is Clang,
+you can just run <code>./configure</code>).</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Create the ./configure file</span>
+</span><span class='line'>autoconf
+</span><span class='line'><span class="c"># This only works when using clang to build Ruby</span>
+</span><span class='line'>./configure <span class="nv">CC</span><span class="o">=</span>clang</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>4. Use <code>bear</code> to invoke <code>make</code></h3>
+
+<p>Bear will use a dynamically preloaded library to trace system calls
+that exec <code>clang</code> processes, looking at things like the command line
+arguments given to Clang.</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>bear make</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>5. That&rsquo;s it!</h3>
+
+<p>The output is <code>./compile_commands.json</code>, which should be non-empty. If
+it&rsquo;s empty or just has <code>[]</code>, it didn&rsquo;t work. There&rsquo;s some
+troubleshooting in the <a href="https://github.com/rizsotto/Bear">Bear</a> README.</p>
+
+<p>The <code>compile_commands.json</code> file will be consumed by <code>clangd</code> in your
+editor. Check <a href="https://langserver.org">https://langserver.org</a> to find an LSP client for your
+preferred editor, and follow its setup instructions.</p>
+
+<p>Once you&rsquo;ve built the <code>compile_commands.json</code> file and configured your
+editor to use LSP with <code>clangd</code>, you should be able to do things like
+Jump to Definition and Hover on the Ruby source code!</p>
+
+<h2>Appendix: Building Bear from source</h2>
+
+<p>This is probably common knowledge for people who use <code>cmake</code> regularly,
+but this is how I built Bear from source, because I built it on a
+machine where I didn&rsquo;t have root so I couldn&rsquo;t write to <code>/usr/local</code>.</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/rizsotto/Bear
+</span><span class='line'><span class="nb">cd </span>Bear
+</span><span class='line'>mkdir build
+</span><span class='line'><span class="nb">cd </span>build
+</span><span class='line'>
+</span><span class='line'><span class="c"># Install to $HOME/.local/bin instead of /usr/local/bin</span>
+</span><span class='line'>cmake .. <span class="s2">"-DCMAKE_INSTALL_PREFIX=</span><span class="nv">$HOME</span><span class="s2">/.local"</span>
+</span><span class='line'>make -j<span class="k">$(</span>nproc<span class="k">)</span>
+</span><span class='line'>make install
+</span><span class='line'>
+</span><span class='line'><span class="c"># → $HOME/.local/bin/bear exists now</span></span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Appendix: LSP in Neovim with LanguageClient-neovim</h2>
+
+<p>I use Neovim. My preferred LSP client is <a href="https://github.com/autozimu/LanguageClient-neovim">LanguageClient-neovim</a>. Here&rsquo;s
+the parts of my Neovim config files that setup <code>clangd</code>:</p>
+
+<p><a href="https://github.com/jez/dotfiles/blob/865a74d93d8ab1c28713ae0dcd53797b6c26dc6a/vim/plug-settings.vim#L576-L587">→ <code>vim/plug-settings.vim</code> in jez/dotfiles</a></p>
+]]></content>
+  </entry>
+  
   
   
   <entry>
@@ -3757,392 +3866,6 @@ feel free to reach out and let me know! I&rsquo;m happy to help.</p>
 <p>I&rsquo;ve patched the default Solarized colors for Vim so that lines retain their syntax highlighting in the diff mode, while the backgrounds are highlighted. You can see how this works in this commit: <a href="https://github.com/jez/vim-colors-solarized/commit/bca72cc">https://github.com/jez/vim-colors-solarized/commit/bca72cc</a><a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
-
-]]></content>
-  </entry>
-  
-  
-  
-  <entry>
-    <title type="html"><![CDATA[Presenting Data & Information: Notes]]></title>
-    <link href="https://blog.jez.io/tufte-course/"/>
-    <updated>2017-12-05T23:37:08-08:00</updated>
-    <id>https://blog.jez.io/tufte-course</id>
-    <content type="html"><![CDATA[<p>On Monday, December 4th, I went to Edward Tufte&rsquo;s one-day course on
-&ldquo;Presenting Data &amp; Information.&rdquo; I&rsquo;m glad I went, and there were a
-number of things I took away from the day.</p>
-
-<!-- more -->
-
-
-<h3>Key takeaways</h3>
-
-<ol>
-<li>Text, numbers, and visuals should be <strong>woven tightly together</strong>.</li>
-<li>From a small set of principles, we can have a <strong>rigorous, analytical
-framework</strong> for evaluating information designs.</li>
-<li>Information benefits from being shown in <strong>space and time</strong>.</li>
-<li>Effective presentations lead to the <strong>outsized impact</strong> of your work.</li>
-<li><strong>High-density</strong> visualizations trump those of low-density.</li>
-<li>Tufte-the-personality is over-hyped.</li>
-<li>Learning is a lifelong process.</li>
-</ol>
-
-
-<h3>Selected readings</h3>
-
-<p>A lot of the books are broken up into modular components, almost like
-individual essays. This means they&rsquo;re easy to pick up and read a little
-bit of. I&rsquo;m happy to lend you my copies!</p>
-
-<ul>
-<li>&ldquo;Words, Numbers, Images&mdash;Together&rdquo;
-
-<ul>
-<li><em>Beautiful Evidence</em></li>
-</ul>
-</li>
-<li>&ldquo;The Fundamental Principles of Analytical Design&rdquo;
-
-<ul>
-<li><em>Beautiful Evidence</em></li>
-</ul>
-</li>
-<li>&ldquo;Narratives of Space &amp; Time&rdquo;
-
-<ul>
-<li><em>Envisioning Information</em></li>
-</ul>
-</li>
-<li>&ldquo;High Resolution Data Graphics&rdquo;
-
-<ul>
-<li><em>The Visual Display of Quantitative Information</em></li>
-</ul>
-</li>
-<li><em>Tips for Giving Clear Talks</em> (by Kayvon Fatahalian)
-
-<ul>
-<li><a href="https://www.cs.cmu.edu/~kayvonf/misc/cleartalktips.pdf">Slides</a></li>
-</ul>
-</li>
-</ul>
-
-
-<h2>Integrating Visuals with Text</h2>
-
-<blockquote><p>&ldquo;Words, Numbers, Images&mdash;Together&rdquo;</p>
-
-<p>&mdash; <em>Beautiful Evidence</em></p></blockquote>
-
-<p>Fun fact: the word &ldquo;text&rdquo; comes from the Latin word for &ldquo;woven.&rdquo;
-Originally this reflected the visual appearance of the written words:
-letters and words overlapped and flowed like threads in a cloth.</p>
-
-<p>Tufte made the case that we need to weave more than just text; text,
-but also numbers, data graphics, visuals, etc. It&rsquo;s especially bad when
-there&rsquo;s a &ldquo;special place&rdquo; for graphics or numbers, because you lose out
-on the opportunities to connect ideas and expose relationships.</p>
-
-<p>This segregation of data is a recent change. When the pen was the same
-tool to produce text as to produce drawings, text and images abounded!
-This is especially apparent in some of da Vinci&rsquo;s notes, for example,
-about human anatomy. Even consider the difference between content
-produced on a whiteboard (marker) vs in Dropbox Paper (keyboard).
-Graphics will flow when you&rsquo;re white-boarding with someone, not when
-you&rsquo;re collaborating on Paper.</p>
-
-<p>Finally, I think sparklines are really cool. A full-fledged
-visualization can be thought to represent the granularity of an essay.
-A single chart or element of the visualization parallel paragraphs of
-text. Sparklines continue the progression down to the word level. He
-showed some really cool examples of what happens when you can
-weave visualizations with your text at the level of single words.</p>
-
-<h2>Analytical Design Thinking</h2>
-
-<blockquote><p>&ldquo;The Fundamental Principles of Analytical Design&rdquo;</p>
-
-<p>&mdash; <em>Beautiful Evidence</em></p></blockquote>
-
-<p>The key point here was that with a few principles, we can be more
-rigorous in evaluating our designs. The beauty is it parallels similar
-principles from the scientific method, which is a time-tested tool for
-discovering knowledge.</p>
-
-<h3>The principles themselves</h3>
-
-<p>Show comparisons, contrasts, differences.</p>
-
-<p>Show causality, mechanism, explanation.</p>
-
-<p>Show multivariate data, that is, show more than 1 or 2 variables.
-<em>Corollary</em>: All interesting data is multivariate (requires a JOIN of
-sorts on disparate data sources).</p>
-
-<p>Completely integrate words, numbers, images, diagrams, etc.</p>
-
-<p>Thoroughly provide your evidence (title, sources, shortcomings, etc.)
-<em>Corollary</em>: if you&rsquo;re afraid to show your data, you&rsquo;re might be lying</p>
-
-<p>Quality, relevance, and integrity of content counts most of all.</p>
-
-<h3>Some interesting implications</h3>
-
-<ul>
-<li>The credibility of an &ldquo;executive summary&rdquo; depends intimately on the
-quality, relevance, and integrity of the evidence.</li>
-<li>Analytical processes for design rely heavily on mutual respect,
-because criticism is inherent to the process.</li>
-<li>It&rsquo;s easy to default to uni- or bi-variate data (these are what our
-tools are good at). By overcoming the comfort of what our tools do
-well, we can draw stronger conclusions.</li>
-</ul>
-
-
-<h2>Information in Space &amp; Time</h2>
-
-<blockquote><p>&ldquo;Narratives of Space &amp; Time&rdquo;</p>
-
-<p>&mdash; <em>Envisioning Information</em></p></blockquote>
-
-<p>We often neglect to visualize information in space, instead choosing to
-only visualize it in time.</p>
-
-<p>Consider a slide deck: the information is segmented in to discrete
-frames which are then played back over the time of the talk. On the
-other hand, a poster or handout might have the same content laid out on
-one page, so it&rsquo;s all in the field of view at once.</p>
-
-<p>This echoed a similar idea to one Adam brought up in the Frontend
-Learning Group: Sketch effectively converted designing UIs from
-something being seen over time (by showing/hiding various Photoshop
-layers) to being seen over space (artboards or screens).</p>
-
-<p>Often a stronger case can be made by presenting information in both time
-and in space. A general problem with information presented over time is
-that it happens too fast. This isn&rsquo;t to say presenting information in
-time is terrible: it&rsquo;s just shouldn&rsquo;t be the only way.</p>
-
-<h2>Talking &amp; Presenting</h2>
-
-<blockquote><p><em>Tips for Giving Clear Talks</em></p>
-
-<p>&mdash; Kayvon Fatahalian</p></blockquote>
-
-<p>Tufte spent a surprising amount of time talking about effectively
-presenting. I thought many of his ideas about effective presentations
-were out of touch with reality.</p>
-
-<p>Instead, I prefer these resources on giving clear presentations by
-Kayvon Fatahalian:</p>
-
-<ul>
-<li>📈 <a href="https://www.cs.cmu.edu/~kayvonf/misc/cleartalktips.pdf">Slides</a></li>
-<li>📺 <a href="https://www.dropbox.com/s/96t357h8uhf52l6/clear-talk-tips.mp4?dl=0">Video</a></li>
-</ul>
-
-
-<p>The key points are:</p>
-
-<ul>
-<li>An effective talk leads to a <em>non-linear</em> increase in the value of
-your work.</li>
-<li>The audience prefers not to think (much).
-
-<ul>
-<li>They don&rsquo;t want to think about what you left out or what you&rsquo;re
-hinting at.</li>
-<li>They&rsquo;d much rather think about how they can put your work to use.</li>
-</ul>
-</li>
-<li>Every sentence matters.
-
-<ul>
-<li>If it doesn&rsquo;t provide value, strike it out.</li>
-</ul>
-</li>
-<li>Surprises are bad.
-
-<ul>
-<li>Say where you&rsquo;re going and why before you go there.</li>
-</ul>
-</li>
-<li>Titles matter.
-
-<ul>
-<li>Reading nothing but the titles of a slide deck should be a great
-summary of the talk.</li>
-<li>Sometimes this means titles are short sentences!</li>
-</ul>
-</li>
-<li>End on a positive note!
-
-<ul>
-<li>People remember the beginnings and ends.</li>
-<li>You want them to walk out with a rising rather than sinking
-feeling.</li>
-</ul>
-</li>
-</ul>
-
-
-<p>That being said, Tufte did have a few good tips for presentations.
-For example: give handouts with your talks. Handouts overcome the
-low information density of slides. This tip is just a restatement of
-&ldquo;present information in space <em>and</em> time.&rdquo; The handouts might be:</p>
-
-<ul>
-<li>full-on lecture notes</li>
-<li>a simple overview/summary</li>
-<li>a list of key takeaways</li>
-<li>links to further reading</li>
-<li>a graphic you want to refer back to often</li>
-</ul>
-
-
-<h2>High-density vs Low-density Visualizations</h2>
-
-<blockquote><p>&ldquo;High Resolution Data Graphics&rdquo;</p>
-
-<p>&mdash; <em>The Visual Display of Quantitative Information</em></p></blockquote>
-
-<p>Tufte discussed a very clear preference for high-density visualizations
-over low-density. High-density visualizations should present
-multivariate data cohesively, weaving text, numbers, and visuals.</p>
-
-<p>In a high-density visualization, the arrangement and composition is key.
-If you get it wrong, you end up with information overload. But the goal
-is to get it right, and in doing so, you draw richer comparisons and
-conclusions that are otherwise possible.</p>
-
-<p>This was why Tufte had a clear preference for physical paper over
-digital media: the resolution of a piece of paper (or better: two
-side-by-side) is <em>significantly</em> higher than most displays are these
-days. In his books, every two-page spread shows a high-density
-visualization, which is what makes them so powerful.</p>
-
-<p>The flip side: he detested interfaces that presented shallow views into
-the data or sacrificed analytical design for aesthetic design. It&rsquo;s
-common on the web to be scared of information overload, and instead show
-less. We should present more, but <em>thoughtfully</em> and with clear
-relationships between all the elements.</p>
-
-<p>As a closing rebut, he made the claim that we should &ldquo;design forward,
-anticipating higher-resolution devices.&rdquo; I found this hard to reconcile
-with the long tail of users that have <em>terrible</em> resolution devices
-currently, with no hope of improving rapidly.</p>
-
-<h2>Meta</h2>
-
-<p>I was a little disappointed to meet with Tufte-the-personality as
-opposed to Tufte-the-writer.</p>
-
-<p>As a presenter, there seemed to be a stronger focus on bravado and
-showmanship than on learning and growth. Until this event, I hadn&rsquo;t been
-aware of the somewhat cult-ish following Tufte has, and it seemed like
-he was profiting off of that image. Some back-of-the-envelope math
-suggests that he can easily bring in a six-figure salary from the dozen
-one-day courses he runs in a year alone.</p>
-
-<p>His multiple books which revisit the same core set of ideas with slight
-variations suggest that he&rsquo;s producing content to make a living as
-opposed to trying to distill ideas into a small, cohesive set of truths.
-In particular, I think of my favorite programming languages textbook,
-where every chapter is both complementary yet orthogonal to the others.
-The book distills and reduces ideas down to their core essence. Tufte&rsquo;s
-books dance around, giving the effect of after-images of some underlying
-truth which is withheld.</p>
-
-<p>Tufte&rsquo;s speaking style favored shaming and derision to inclusion and
-passion. In the audience, there was a certain amount of, &ldquo;it&rsquo;s okay, as
-long as I laugh along with everyone else I&rsquo;ll belong.&rdquo; This line of
-thinking leads to toxic behavior where people think they need to put
-down others to grow.</p>
-
-<p>Tufte repeatedly made arguments of the form:</p>
-
-<ul>
-<li>Google and the NYTimes do it.</li>
-<li>These two are wildly successful.</li>
-<li>Therefore, it&rsquo;s the correct thing to do.</li>
-</ul>
-
-
-<p>This reasoning ignores confounding variables like survivorship
-bias. It&rsquo;s also possible to succeed <em>in spite of</em> flawed design. While
-we can draw inspiration from what others do, it&rsquo;s important to verify
-them from first principles, rather than blindly follow.</p>
-
-<p>That being said, he mentioned something to the effect of &ldquo;even
-lobbyists can be right.&rdquo; Even in spite of the commercialism of it all,
-we can still learn from what he has to say. I presented the four earlier
-sections before this section because I did take away many valuable
-ideas from the day.</p>
-
-<h2>Open Questions</h2>
-
-<p>How can we scale paper handouts to the digital age?</p>
-
-<ul>
-<li>What we want:
-
-<ul>
-<li>share with others</li>
-<li>collaborate/discuss after</li>
-<li>high-density information</li>
-<li>evergreen vs moment in time</li>
-</ul>
-</li>
-<li>Is something like Dropbox Paper good enough to replace physical
-paper for meeting handouts?</li>
-</ul>
-
-
-<p>What is it about screens that&rsquo;s better than physical paper?</p>
-
-<ul>
-<li>paper has higher resolution + information density</li>
-<li>two, three, four pages of paper at once are the same as 2 x 27&#8221; monitors</li>
-<li>yet, why do we use screens if the information density is so low?</li>
-</ul>
-
-
-<h2>Personal</h2>
-
-<p>I had a couple personal realizations while I was there.</p>
-
-<p>At the first hackathon I ever went to during my freshman year of
-college, the thing we built was a tool to try and visualize geographic
-data on a 3D, interactive globe. I was so proud of this thing we built.
-It was the first time I ever wrote JavaScript (I had literally never
-touched it before). After 36 hours, we had a live, running thing that
-people could <em>actually interact with!</em></p>
-
-<p>During the final expo and initial judging phase, one of the judges (not
-the one assigned to judge us) came by and asked a simple question: &ldquo;oh,
-have you read anything by Edward Tufte about visualizations?&rdquo; I answered
-no, and he quickly rattled off a few obvious in hindsight changes we
-could make to improve our project.</p>
-
-<p>I was so ashamed at the time. &ldquo;Who am I to try and make a data
-visualization, knowing nothing about data visualization?&rdquo; I truly felt
-like an imposter.</p>
-
-<p>This happened 4 years ago: October 2013, my freshman year of college.
-Fast-forward 4 years, and not only have I browsed through his books,
-I&rsquo;ve just heard what Tufte has to say face-to-face. The learning process
-is spread out over the course of a <em>lifetime</em>. Not in an afternoon of
-hackathon judging. Not for the duration of a one-day course.</p>
-
-<p>Reflecting on the &ldquo;childlike&rdquo; pride and enthusiasm I had having built
-something, from knowing nothing, there&rsquo;s little quite as thrilling. By
-that same token, we should have the same attitude when people give us
-tips and suggestions for what to learn next&mdash;these tips are decidedly
-<em>not</em> evidence that we should feel ashamed for knowing too little.</p>
-
-<!-- vim:tw=72
--->
 
 ]]></content>
   </entry>

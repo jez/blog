@@ -4,7 +4,7 @@
   <title><![CDATA[Category: vim | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/vim/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-06-17T00:02:35-04:00</updated>
+  <updated>2020-07-21T19:33:11-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,113 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Exploring Ruby with clangd]]></title>
+    <link href="https://blog.jez.io/clangd-ruby/"/>
+    <updated>2020-07-21T15:40:23-07:00</updated>
+    <id>https://blog.jez.io/clangd-ruby</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve managed to get LSP-based IDE features powered by <a href="https://clangd.llvm.org/">clangd</a> working
+for the Ruby VM&rsquo;s source code (in my case, in Vim). Here&rsquo;s how I did it!</p>
+
+<!-- more -->
+
+
+<p>I&rsquo;ve been making a point to learn more about <a href="/search-down-the-stack/">things I depend
+on</a> recently. Today, that means learning about
+Ruby. And what better way to learn than to check out the source code,
+and jump around?</p>
+
+<p><a href="https://clangd.llvm.org/">clangd</a> is an editor-agnostic language server that uses the <a href="https://langserver.org/">Language
+Server Protocol</a> to power IDE-like features in
+your preferred text editor. All it needs is a <code>compile_commands.json</code>,
+which is basically a mapping of filename to options to pass to <code>clang</code>
+so that it knows things like which warnings to enable and where to
+search for header files.</p>
+
+<p><a href="https://clangd.llvm.org/">clangd</a> works best for projects built using <code>cmake</code>, but the Ruby VM
+doesn&rsquo;t use <code>cmake</code>. Regardless, we can make a <code>compile_commands.json</code>
+file by using <a href="https://github.com/rizsotto/Bear">Bear</a> to trace the execution of a Ruby build, and use the
+trace information to write out a <code>compile_commands.json</code> file.</p>
+
+<h2>Steps</h2>
+
+<p>I could only get these steps to work for Linux, as the Bear README
+mentions that on macOS you have to disable System Integrity Protection
+to get it to work.</p>
+
+<h3>1. Install <a href="https://github.com/rizsotto/Bear">Bear</a></h3>
+
+<p>I describe how I built Bear from source in the Appendix.</p>
+
+<h3>2. Clone the Ruby source code.</h3>
+
+<pre><code class="bash">git clone https://github.com/ruby/ruby
+cd ruby
+</code></pre>
+
+<h3>3. Configure the Ruby build.</h3>
+
+<p>We have to tell the <code>configure</code> script to use Clang to compile (or
+if you&rsquo;re confident that your system compiler toolchain is Clang,
+you can just run <code>./configure</code>).</p>
+
+<pre><code class="bash"># Create the ./configure file
+autoconf
+# This only works when using clang to build Ruby
+./configure CC=clang
+</code></pre>
+
+<h3>4. Use <code>bear</code> to invoke <code>make</code></h3>
+
+<p>Bear will use a dynamically preloaded library to trace system calls
+that exec <code>clang</code> processes, looking at things like the command line
+arguments given to Clang.</p>
+
+<pre><code class="bash">bear make
+</code></pre>
+
+<h3>5. That&rsquo;s it!</h3>
+
+<p>The output is <code>./compile_commands.json</code>, which should be non-empty. If
+it&rsquo;s empty or just has <code>[]</code>, it didn&rsquo;t work. There&rsquo;s some
+troubleshooting in the <a href="https://github.com/rizsotto/Bear">Bear</a> README.</p>
+
+<p>The <code>compile_commands.json</code> file will be consumed by <code>clangd</code> in your
+editor. Check <a href="https://langserver.org">https://langserver.org</a> to find an LSP client for your
+preferred editor, and follow its setup instructions.</p>
+
+<p>Once you&rsquo;ve built the <code>compile_commands.json</code> file and configured your
+editor to use LSP with <code>clangd</code>, you should be able to do things like
+Jump to Definition and Hover on the Ruby source code!</p>
+
+<h2>Appendix: Building Bear from source</h2>
+
+<p>This is probably common knowledge for people who use <code>cmake</code> regularly,
+but this is how I built Bear from source, because I built it on a
+machine where I didn&rsquo;t have root so I couldn&rsquo;t write to <code>/usr/local</code>.</p>
+
+<pre><code class="bash">git clone https://github.com/rizsotto/Bear
+cd Bear
+mkdir build
+cd build
+
+# Install to $HOME/.local/bin instead of /usr/local/bin
+cmake .. "-DCMAKE_INSTALL_PREFIX=$HOME/.local"
+make -j$(nproc)
+make install
+
+# → $HOME/.local/bin/bear exists now
+</code></pre>
+
+<h2>Appendix: LSP in Neovim with LanguageClient-neovim</h2>
+
+<p>I use Neovim. My preferred LSP client is <a href="https://github.com/autozimu/LanguageClient-neovim">LanguageClient-neovim</a>. Here&rsquo;s
+the parts of my Neovim config files that setup <code>clangd</code>:</p>
+
+<p><a href="https://github.com/jez/dotfiles/blob/865a74d93d8ab1c28713ae0dcd53797b6c26dc6a/vim/plug-settings.vim#L576-L587">→ <code>vim/plug-settings.vim</code> in jez/dotfiles</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Code Review from the Command Line]]></title>
@@ -958,286 +1065,6 @@ configuring Vim.</p>
 <p>The steps to set up Vim are platform independent, so now that we&rsquo;ve set up Stack
 correctly, you can head over to <a href="http://www.stephendiehl.com/posts/vim_2016.html">Vim and Haskell in 2016</a> to
 finish things out.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[SML Dev Setup]]></title>
-    <link href="https://blog.jez.io/sml-dev-setup/"/>
-    <updated>2016-03-09T20:06:15-06:00</updated>
-    <id>https://blog.jez.io/sml-dev-setup</id>
-    <content type="html"><![CDATA[<p>When it comes right down to it, SML is a pretty great language. It&rsquo;s clear that
-extensive thought has gone into its design and implementation. I quite enjoy
-programming in SML, due in no small part to my collection of workflow hacks that
-make editing and developing with SML responsive and interactive.</p>
-
-<!-- more -->
-
-
-<p>We&rsquo;re going to be walking through a couple easy steps to make developing SML
-feel more fluid. I have a slight preference for Vim (Neovim) on macOS, but many
-of these steps are platform agnostic.</p>
-
-<p><strong>Note</strong>: I updated this post to more accurately reflect my SML dev setup in
-December 2019.</p>
-
-<h2>Installing SML Locally</h2>
-
-<p>While developing SML in a remote environment like the shared Andrew Unix
-machines makes it easy to dive right in, I prefer doing development on my
-laptop—it doesn&rsquo;t get slow when there are many people logged in, there&rsquo;s no
-nightly reboots, and it doesn&rsquo;t matter whether I have a strong WiFi connection.</p>
-
-<p>On macOS and Ubuntu, the two most popular implementations of SML are already
-packaged. Take the time to install a version of SML right now:</p>
-
-<ul>
-<li><p>At CMU we use <a href="http://smlnj.org/">SML/NJ</a>, which is convenient because it has a REPL that
-for playing around with SML interactively.</p></li>
-<li><p>To play around with releasing programs written in SML to other people, install
-<a href="http://www.mlton.org/">MLton</a>. It has better support for compiling SML programs to standalone
-executables which can be shared from one machine to another. (I have a
-separate post on <a href="/sml-travis-ci/">using SML to release software publically</a>
-with more details).</p></li>
-</ul>
-
-
-<pre><code class="bash Install SML from your package manager"># macOS -- one or both of:
-brew install smlnj
-brew install mlton
-
-# Ubuntu -- one or both of:
-sudo apt-get install smlnj
-sudo apt-get install mlton
-</code></pre>
-
-<p>Feel free to install both; they&rsquo;ll play nicely with each other, and each offers
-advantages over the other.</p>
-
-<p>Note for macOS users: if you&rsquo;ve never used <a href="http://brew.sh">Homebrew</a> before, you&rsquo;ll need
-to <a href="http://brew.sh">install it first</a>.</p>
-
-<p>Note for Ubuntu users: the versions of these two that ship in the default
-package distribution are frequently out of date. If that matters to you,
-consider following the the <a href="http://smlnj.org/">SML/NJ</a> and <a href="http://www.mlton.org/">MLton</a> installation
-instructions directly.</p>
-
-<h2>Getting Comfortable with SML/NJ</h2>
-
-<p>The rest of these steps should apply regardless of whether you&rsquo;re working on SML
-locally or remotely.</p>
-
-<p>One thing that I&rsquo;ve seen far too many times from course documentation is that
-they tell students to run their code like this:</p>
-
-<ol>
-<li>Run <code>sml</code></li>
-<li>Type <code>use "foo.sml";</code> or <code>CM.make "sources.cm";</code> at the REPL</li>
-</ol>
-
-
-<p>Don&rsquo;t get me wrong; this works, but there&rsquo;s a better way. Being responsible
-CLI-citizens, we should always be looking for ways to tab-complete. We can
-easily get tab-completion on the filename by changing our workflow:</p>
-
-<ol>
-<li>Run <code>sml foo.sml</code> or <code>sml -m sources.cm</code></li>
-</ol>
-
-
-<p>Look at that! We&rsquo;ve,</p>
-
-<ul>
-<li>dropped a step (having to launch the REPL first), and</li>
-<li>introduced tab completion (because the shell has filename completion)</li>
-</ul>
-
-
-<p>It&rsquo;s the little things, but they add up.</p>
-
-<h2>Enhancing the REPL</h2>
-
-<p>Speaking of the little things, when using the SML REPL, you don&rsquo;t have access to
-all the usual command line niceties like command history and access to arrow
-keys for editing, let alone Vi-like keybindings. To get started, you&rsquo;ll have to
-change how you launch the SML/NJ REPL. In particular, we&rsquo;re going to preface our
-commands with <code>rlwrap</code>:</p>
-
-<pre><code class="bash"># instead of this...
-$ sml
-
-# use this:
-$ rlwrap sml
-</code></pre>
-
-<p><code>rlwrap</code> stands for &ldquo;readline wrap.&rdquo; Readline is a library that adds all the
-features mentioned above to any REPL program:</p>
-
-<ul>
-<li>Command history tracking (up arrow keys)</li>
-<li>Line editing with arrow keys</li>
-<li>Configuration through the <code>~/.inputrc</code> file
-
-<ul>
-<li>We can use this to get fancy features like Vi keybindings</li>
-</ul>
-</li>
-</ul>
-
-
-<p>For more information, see <a href="https://github.com/jez/dotfiles/blob/ed8e531eebe43a8aef05fc4cb768157d03408cea/inputrc#L12-L14">these lines</a> of my inputrc, a small part of
-my <a href="https://github.com/jez/dotfiles">dotfiles repo</a> on GitHub.</p>
-
-<h2>Setting Up Vim</h2>
-
-<p>Programming is so much more enjoyable when you&rsquo;re not fighting your editor. For
-me, this means striving to get the most out of Vim. In this section, I&rsquo;ll
-outline all the cool tips and tricks I have for developing SML in Vim.</p>
-
-<p>But first, if you&rsquo;ve never taken a look into how to configure Vim, I suggest you
-start out by walking through this quick workshop called <a href="https://github.com/jez/vim-as-an-ide">Vim as an
-IDE</a>. It&rsquo;ll teach you where to start when configuring Vim and get
-you set up with a bunch of standard plugins that improve on the standard Vim
-experience tenfold.</p>
-
-<p>No actually, take a second and <a href="https://github.com/jez/vim-as-an-ide">walk through it</a>. We&rsquo;ll still be
-here when you&rsquo;re done, and you&rsquo;ll appreciate Vim more when you&rsquo;re done.</p>
-
-<h3>ALE</h3>
-
-<p><a href="https://github.com/dense-analysis/ale">ALE</a> is a Vim plugin that provides what it calls &ldquo;asynchronous linting.&rdquo;
-That&rsquo;s a fancy way of saying that it can show little red x&rsquo;s on all the lines
-that have errors. It works for many languages out of the box, including Standard
-ML.</p>
-
-<p>It&rsquo;s super simple to set up. The <a href="https://github.com/dense-analysis/ale">ALE homepage</a> should have all the
-instructions.</p>
-
-<p>With ALE set up, try writing this into a file called <code>test.sml</code>:</p>
-
-<pre><code class="sml test.sml">val foo : string = 42
-</code></pre>
-
-<p>While typing, any errors should appear as markers to the left of the line
-numbers. Super handy!</p>
-
-<p>If nothing shows up, check <code>:ALEInfo</code> which dumps a bunch of information
-about whether ALE was set up correctly. In particular, SML support requires
-having <a href="http://smlnj.org/">SML/NJ</a> installed (i.e., installing it on your laptop or working
-on a server where it&rsquo;s already installed).</p>
-
-<h3>Extra ALE Setup</h3>
-
-<p>While the default settings for ALE work well enough, there&rsquo;s plenty of reasons
-to tweak them. For example, here are <a href="https://github.com/jez/dotfiles/blob/b942b6336ee968c9d94a9ea363c1cbcdb44b9846/vim/plug-settings.vim#L227-L239">all my ALE settings</a>.</p>
-
-<p>The key changes I make:</p>
-
-<ul>
-<li>I ask ALE to show a list of all errors if there were any.</li>
-<li>I ask ALE to only run when the file was saved (not when it was opened or
-edited).</li>
-</ul>
-
-
-<p>(You&rsquo;ll also see a bunch of settings for other languages, but you won&rsquo;t find any
-SML-specific config&hellip; it&rsquo;s not needed!)</p>
-
-<p>Also, a tip for those who&rsquo;ve never used Vim&rsquo;s location list: you can close the
-list of errors with <code>:lclose</code>.</p>
-
-<h3>Using ALE with CM files</h3>
-
-<p>Sometimes a single SML file is self-contained enough to type check on it&rsquo;s own.
-But most of the time, we&rsquo;re working with multi-file SML projects. With SML/NJ,
-multi-file SML projects are managed using CM files (<code>*.cm</code> files) which declare
-groups of SML files that must be compiled together to make sense.</p>
-
-<p>ALE&rsquo;s support for SML handles both of these scenarios. When opening an SML file,
-ALE will search up the folder hierarchy for any <code>*.cm</code> file, stopping when it
-finds the first one. When there are multiple in a single folder, it takes the
-alphabetically first option.</p>
-
-<p>Usually this works fine but sometimes ALE picks the wrong one. There are
-instructions for how to manually fix this by setting some variables in the ALE
-help:</p>
-
-<pre><code>:help ale-sml-options
-</code></pre>
-
-<h3><code>vim-better-sml</code></h3>
-
-<p>After all that, I still wasn&rsquo;t satisfied with developing SML in Vim, so I wrote
-a plugin to make it even better: <a href="https://github.com/jez/vim-better-sml">vim-better-sml</a>. Here&rsquo;s a
-quick rundown of its features:</p>
-
-<ul>
-<li>It supports for embedding a REPL directly inside Vim.</li>
-<li>It supports asking for the type of a variable under the cursor.</li>
-<li>It supports jump to definition, even into the Standard Basis Library.</li>
-<li><code>*.sig</code> files are properly detected as SML signature files.</li>
-<li>Many small annoyances with syntax highlighting and indentation are fixed.</li>
-</ul>
-
-
-<p>For more information, including how to install it, check out the homepage:
-<a href="https://github.com/jez/vim-better-sml">vim-better-sml</a>. For the most part, the plugin itself will
-guide you through the installation, declaring any dependencies that might be
-missing.</p>
-
-<p>I recorded a screencast of all those features above in action, which you might
-want to check out:</p>
-
-<p><a href="https://youtu.be/Z5FsPZ5cm8Y"><img src="/images/vim-better-sml-demo-thumbnail.png" alt="thumbnail" /></a></p>
-
-<h2>General Vim Settings</h2>
-
-<p>As a quick addendum, one common complaint people have when editing SML is that
-it forces the line to wrap if it extends past 80 characters. Some people don&rsquo;t
-like that, and others don&rsquo;t like that it doesn&rsquo;t do it frequently enough
-(namely, it only wraps the line if your <strong>cursor</strong> extends past 80 characters,
-not the end of the line).</p>
-
-<p>If you don&rsquo;t want Vim to do any of this wrapping, run this:</p>
-
-<pre><code class="vim Disable hard line wrapping">setlocal textwidth=0
-</code></pre>
-
-<p>If you&rsquo;d like this change to persist between Vim sessions, add it to
-<code>~/.vim/after/ftplugin/sml.vim</code>. These folders and file likely don&rsquo;t exist
-yet; you&rsquo;ll have to create them. The <code>after</code> folder in Vim is used to override
-settings loaded from plugins.</p>
-
-<p>Alternatively, if you&rsquo;d like a little better idea when Vim&rsquo;s going to hard wrap
-your line, you can add one of these lines to your vimrc:</p>
-
-<pre><code class="vim Show a color column">" Always draw the line at 80 characters
-set colorcolumn=80
-
-" Draw the line at whatever the current value of textwidth is
-set colorcolumn+=0
-</code></pre>
-
-<p>That way, it&rsquo;s easier to see when a line is getting long.</p>
-
-<h2>TL;DR</h2>
-
-<p>We covered a lot, so here&rsquo;s a quick recap:</p>
-
-<ul>
-<li>Install SML locally. It&rsquo;s super easy to do on macOS and Linux (use your
-package manager), and means you don&rsquo;t have to have a Wi-Fi connection to
-develop SML.</li>
-<li>Invest time into learning Vim. Here&rsquo;s a reference: <a href="https://github.com/jez/vim-as-an-ide">Vim as an
-IDE</a>.</li>
-<li>Install <a href="https://github.com/dense-analysis/ale">ALE</a>. It tells you what lines your errors are on.</li>
-<li>Install <a href="https://github.com/jez/vim-better-sml">vim-better-sml</a>. It includes a whole host of added
-power features.</li>
-</ul>
-
-
-<p>And as always, you can see even more Vim settings in my <a href="https://github.com/jez/dotfiles">dotfiles
-repo</a> on GitHub.</p>
 ]]></content>
   </entry>
   

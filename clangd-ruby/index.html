@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+
+<head>
+
+
+<meta charset="utf-8">
+<meta http-equiv="cleartype" content="on">
+
+<title>Exploring Ruby with clangd - Bits, Bytes, and Words</title>
+<meta name="author" content="Jake Zimmerman">
+
+
+
+
+<meta name="description" content="I've managed to get LSP-based IDE features powered by [clangd] working for the Ruby VM's source code (in my case, in Vim). Here's how I did it!
+">
+
+<meta name="keywords" content="ruby vim debugging ">
+
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Twitter Cards -->
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
+  <meta name="twitter:title" content="Exploring Ruby with clangd">
+  <meta name="twitter:description" content="I've managed to get LSP-based IDE features powered by [clangd] working for the Ruby VM's source code (in my case, in Vim). Here's how I did it!
+">
+  <meta name="twitter:creator" content="@jez_io">
+
+
+<!-- Open Graph -->
+<meta property="og:local" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.jez.io/clangd-ruby">
+<meta property="og:title" content="Exploring Ruby with clangd">
+<meta property="og:description" content="I've managed to get LSP-based IDE features powered by [clangd] working for the Ruby VM's source code (in my case, in Vim). Here's how I did it!
+">
+<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
+<meta property="og:site_name" content="Bits, Bytes, and Words">
+
+<link rel="canonical" href="https://blog.jez.io/clangd-ruby">
+<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+<link href="/favicon@2x.png" rel="icon" sizes="32x32">
+<link href="/favicon.png" rel="icon" sizes="16x16">
+<link href="/fonts/concourse.css" rel="stylesheet">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+
+
+
+</head>
+
+<body id="post" class="">
+
+<nav class="Navigation">
+  <ul class="Tags">
+    
+      <li class="Tag">
+        
+          <a href="/">Home</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="/categories/">Categories</a>
+        
+      </li>
+    
+      <li class="Tag">
+        
+          <a href="https://jez.io">About</a>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+
+
+
+<div class="EntryHeader">
+  <h1 class="EntryHeader-title">Exploring Ruby with clangd</h1>
+  <h2 class="EntryHeader-subtitle">July 21, 2020</h2>
+
+  <ul class="Tags">
+    
+  </ul>
+</div>
+
+
+
+<div id="main" role="main">
+  <article class="Post-content">
+    <p>I&rsquo;ve managed to get LSP-based IDE features powered by <a href="https://clangd.llvm.org/">clangd</a> working
+for the Ruby VM&rsquo;s source code (in my case, in Vim). Here&rsquo;s how I did it!</p>
+
+<!-- more -->
+
+
+<p>I&rsquo;ve been making a point to learn more about <a href="/search-down-the-stack/">things I depend
+on</a> recently. Today, that means learning about
+Ruby. And what better way to learn than to check out the source code,
+and jump around?</p>
+
+<p><a href="https://clangd.llvm.org/">clangd</a> is an editor-agnostic language server that uses the <a href="https://langserver.org/">Language
+Server Protocol</a> to power IDE-like features in
+your preferred text editor. All it needs is a <code>compile_commands.json</code>,
+which is basically a mapping of filename to options to pass to <code>clang</code>
+so that it knows things like which warnings to enable and where to
+search for header files.</p>
+
+<p><a href="https://clangd.llvm.org/">clangd</a> works best for projects built using <code>cmake</code>, but the Ruby VM
+doesn&rsquo;t use <code>cmake</code>. Regardless, we can make a <code>compile_commands.json</code>
+file by using <a href="https://github.com/rizsotto/Bear">Bear</a> to trace the execution of a Ruby build, and use the
+trace information to write out a <code>compile_commands.json</code> file.</p>
+
+<h2>Steps</h2>
+
+<p>I could only get these steps to work for Linux, as the Bear README
+mentions that on macOS you have to disable System Integrity Protection
+to get it to work.</p>
+
+<h3>1. Install <a href="https://github.com/rizsotto/Bear">Bear</a></h3>
+
+<p>I describe how I built Bear from source in the Appendix.</p>
+
+<h3>2. Clone the Ruby source code.</h3>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/ruby/ruby
+</span><span class='line'><span class="nb">cd </span>ruby</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>3. Configure the Ruby build.</h3>
+
+<p>We have to tell the <code>configure</code> script to use Clang to compile (or
+if you&rsquo;re confident that your system compiler toolchain is Clang,
+you can just run <code>./configure</code>).</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Create the ./configure file</span>
+</span><span class='line'>autoconf
+</span><span class='line'><span class="c"># This only works when using clang to build Ruby</span>
+</span><span class='line'>./configure <span class="nv">CC</span><span class="o">=</span>clang</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>4. Use <code>bear</code> to invoke <code>make</code></h3>
+
+<p>Bear will use a dynamically preloaded library to trace system calls
+that exec <code>clang</code> processes, looking at things like the command line
+arguments given to Clang.</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>bear make</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>5. That&rsquo;s it!</h3>
+
+<p>The output is <code>./compile_commands.json</code>, which should be non-empty. If
+it&rsquo;s empty or just has <code>[]</code>, it didn&rsquo;t work. There&rsquo;s some
+troubleshooting in the <a href="https://github.com/rizsotto/Bear">Bear</a> README.</p>
+
+<p>The <code>compile_commands.json</code> file will be consumed by <code>clangd</code> in your
+editor. Check <a href="https://langserver.org">https://langserver.org</a> to find an LSP client for your
+preferred editor, and follow its setup instructions.</p>
+
+<p>Once you&rsquo;ve built the <code>compile_commands.json</code> file and configured your
+editor to use LSP with <code>clangd</code>, you should be able to do things like
+Jump to Definition and Hover on the Ruby source code!</p>
+
+<h2>Appendix: Building Bear from source</h2>
+
+<p>This is probably common knowledge for people who use <code>cmake</code> regularly,
+but this is how I built Bear from source, because I built it on a
+machine where I didn&rsquo;t have root so I couldn&rsquo;t write to <code>/usr/local</code>.</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone https://github.com/rizsotto/Bear
+</span><span class='line'><span class="nb">cd </span>Bear
+</span><span class='line'>mkdir build
+</span><span class='line'><span class="nb">cd </span>build
+</span><span class='line'>
+</span><span class='line'><span class="c"># Install to $HOME/.local/bin instead of /usr/local/bin</span>
+</span><span class='line'>cmake .. <span class="s2">"-DCMAKE_INSTALL_PREFIX=</span><span class="nv">$HOME</span><span class="s2">/.local"</span>
+</span><span class='line'>make -j<span class="k">$(</span>nproc<span class="k">)</span>
+</span><span class='line'>make install
+</span><span class='line'>
+</span><span class='line'><span class="c"># → $HOME/.local/bin/bear exists now</span></span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Appendix: LSP in Neovim with LanguageClient-neovim</h2>
+
+<p>I use Neovim. My preferred LSP client is <a href="https://github.com/autozimu/LanguageClient-neovim">LanguageClient-neovim</a>. Here&rsquo;s
+the parts of my Neovim config files that setup <code>clangd</code>:</p>
+
+<p><a href="https://github.com/jez/dotfiles/blob/865a74d93d8ab1c28713ae0dcd53797b6c26dc6a/vim/plug-settings.vim#L576-L587">→ <code>vim/plug-settings.vim</code> in jez/dotfiles</a></p>
+
+    <footer class="entry-meta">
+      <span class="entry-tags">
+        <ul class="Tags">
+          
+            <li class="Tag">
+              <a href="/categories/#ruby" title="Pages tagged ruby">ruby</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#vim" title="Pages tagged vim">vim</a>
+            </li>
+          
+            <li class="Tag">
+              <a href="/categories/#debugging" title="Pages tagged debugging">debugging</a>
+            </li>
+          
+        </ul>
+      </span>
+      <span class="entry-date date published updated"><time datetime="2020-07-21T15:40:23-07:00">July 21, 2020</time></span>
+      
+    </footer>
+  </div>
+  
+  <div class="read-more">
+    
+      <div class="read-more-header">
+        <a href="/linkers-ruby-c-exts/" class="Button">Read More</a>
+      </div><!-- /.read-more-header -->
+      <div class="read-more-content">
+        <h3><a href="/linkers-ruby-c-exts/" title="Linkers & Ruby C Extensions">Linkers & Ruby C Extensions</a></h3>
+      <p>I recently learned that linkers are really cool.
+ <a href="/linkers-ruby-c-exts/"> Continue reading</a></p>
+        </div><!-- /.read-more-content -->
+      
+      <div class="read-more-list">
+        
+          <div class="list-item">
+            <h4><a href="/search-down-the-stack/" title="Search Down the Stack">Search Down the Stack</a></h4>
+            <span>Published on June 6, 2020</span>
+          </div><!-- /.list-item -->
+        
+          <div class="list-item">
+            <h4><a href="/sorbet-fixme-comment/" title="Sorbet Does Not Have FixMe Comments">Sorbet Does Not Have FixMe Comments</a></h4>
+            <span>Published on February 11, 2020</span>
+          </div><!-- /.list-item -->
+        
+      </div><!-- /.read-more-list -->
+  </div><!-- /.read-more -->
+
+
+</div>
+
+<div class="footer-wrapper">
+  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
+
+</div>
+
+</body>
+</html>
