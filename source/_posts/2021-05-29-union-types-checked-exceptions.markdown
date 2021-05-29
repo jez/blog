@@ -27,7 +27,7 @@ it ever should.
 
 Before I dive in: chances are you're reading this because you asked the
 question above and someone linked you this. Or maybe you saw the title
-and just happpened to click. Either way, I'm going to take for granted
+and just happened to click. Either way, I'm going to take for granted
 that you know what I mean by "checked exceptions." If you want a quick
 refresher, jump down to the [Appendix](#appendix) and then come back.
 
@@ -101,11 +101,11 @@ Currency parseCurrency(String currencyStr) throws ParseException {
 }
 ```
 
-This is a somewhat contrived Java method, but it'll be good enought to
+This is a somewhat contrived Java method, but it'll be good enough to
 demonstrate the concepts.
 
 If `parseCurrency` is given a string it can't handle, it raises a
-`ParseException`. It's declares this with `throws` because
+`ParseException`. It declares this with `throws` because
 `ParseException` is a checked exception. If the currency string is
 recognized, it returns some `Currency` object.
 
