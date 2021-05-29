@@ -4,7 +4,7 @@
   <title><![CDATA[Category: types | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/types/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2021-05-29T05:01:39-04:00</updated>
+  <updated>2021-05-29T05:11:34-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -167,7 +167,7 @@ caller side changes:</p>
 <p>With Sorbet, this Java snippet becomes:</p>
 
 <pre><code class="ruby">sig do
-  params(amouunt: Integer, currency_str: String)
+  params(amount: Integer, currency_str: String)
     .returns(T.any(Charge, ParseError))
 end
 def create_charge(amount, currency_str)
@@ -232,7 +232,7 @@ mean all of them should be.</p></li>
 </ul>
 
 
-<p>And finally, let me get out ahead of some common counterarguments.</p>
+<p>And finally, let me get out ahead of some common counter arguments.</p>
 
 <blockquote><p>The union types approach requires more typing at the call site!</p></blockquote>
 

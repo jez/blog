@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2021-05-29T05:01:39-04:00</updated>
+  <updated>2021-05-29T05:11:34-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -168,7 +168,7 @@ caller side changes:</p>
 <p>With Sorbet, this Java snippet becomes:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">sig</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">params</span><span class="p">(</span><span class="ss">amouunt: </span><span class="no">Integer</span><span class="p">,</span> <span class="ss">currency_str: </span><span class="no">String</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">params</span><span class="p">(</span><span class="ss">amount: </span><span class="no">Integer</span><span class="p">,</span> <span class="ss">currency_str: </span><span class="no">String</span><span class="p">)</span>
 </span><span class='line'>    <span class="p">.</span><span class="nf">returns</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">Charge</span><span class="p">,</span> <span class="no">ParseError</span><span class="p">))</span>
 </span><span class='line'><span class="k">end</span>
 </span><span class='line'><span class="k">def</span> <span class="nf">create_charge</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="n">currency_str</span><span class="p">)</span>
@@ -233,7 +233,7 @@ mean all of them should be.</p></li>
 </ul>
 
 
-<p>And finally, let me get out ahead of some common counterarguments.</p>
+<p>And finally, let me get out ahead of some common counter arguments.</p>
 
 <blockquote><p>The union types approach requires more typing at the call site!</p></blockquote>
 
