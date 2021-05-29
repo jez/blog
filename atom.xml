@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-07-21T19:33:11-04:00</updated>
+  <updated>2021-05-29T04:52:10-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,311 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  
+  <entry>
+    <title type="html"><![CDATA[Sorbet Does Not Have Checked Exceptions]]></title>
+    <link href="https://blog.jez.io/union-types-checked-exceptions/"/>
+    <updated>2021-05-29T01:21:41-07:00</updated>
+    <id>https://blog.jez.io/union-types-checked-exceptions</id>
+    <content type="html"><![CDATA[<p>People new to Sorbet ask this all the time:</p>
+
+<blockquote><p>Does Sorbet support checked exceptions, like Java?</p></blockquote>
+
+<p>(In fact, this was the <a href="https://youtu.be/odmlf_ezsBo?t=1921">first ever question</a> I was asked at my <a href="https://jez.io/talks/state-of-sorbet-2019/">first
+ever conference talk</a>.)</p>
+
+<p>The answer: Sorbet doesn&rsquo;t support checked exceptions, and I don&rsquo;t think
+it ever should.</p>
+
+<!-- more -->
+
+
+<p>Before I dive in: chances are you&rsquo;re reading this because you asked the
+question above and someone linked you this. Or maybe you saw the title
+and just happpened to click. Either way, I&rsquo;m going to take for granted
+that you know what I mean by &ldquo;checked exceptions.&rdquo; If you want a quick
+refresher, jump down to the <a href="#appendix">Appendix</a> and then come back.</p>
+
+<p>My claim is that checked exceptions are a poor man&rsquo;s ad hoc union types,
+that Sorbet has ad hoc union types, and thus that Sorbet doesn&rsquo;t need
+checked exceptions.</p>
+
+<p>I&rsquo;ll discuss this claim in three parts:</p>
+
+<ul>
+<li>I&rsquo;ll give some background on a key feature of Sorbet&rsquo;s union types,
+which are unique compared with union types in many other languages.</li>
+<li>I&rsquo;ll describe a translation from checked exceptions in Java to
+union-typed returns in Ruby with a concrete example.</li>
+<li>I&rsquo;ll give evidence for why the union types approach is better.</li>
+</ul>
+
+
+<p>(I won&rsquo;t hold it against you if you skip to the conclusion and come back
+for the lead up. It&rsquo;s what I know I&rsquo;d do too.)</p>
+
+<h2>Background: Sorbet&rsquo;s union types</h2>
+
+<blockquote><p>The throws clause is the only point in the entire Java language that
+allows union types. You can tack &ldquo;throws A,B,C&rdquo; onto a method
+signature meaning it might throw A or B or C, but outside of the
+throws clause you cannot say &ldquo;type A or B or C&rdquo; in Java.</p>
+
+<p>— James Iry, <em><a href="http://james-iry.blogspot.com/2012/02/checked-exceptions-might-have-their.html">Checked Exceptions Might Have Their Place, But It Isn&rsquo;t
+In Java</a></em> (2012)</p></blockquote>
+
+<p>Sorbet supports <a href="https://sorbet.org/docs/union-types">union types</a>. More specifically, Sorbet&rsquo;s union types
+are ad hoc: any number of types can be unioned together on demand:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">sig</span> <span class="p">{</span><span class="n">returns</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">A</span><span class="p">,</span> <span class="no">B</span><span class="p">,</span> <span class="no">C</span><span class="p">))}</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">foo</span><span class="p">;</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span><span class="p">;</span> <span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>By contrast, many languages with union types require predeclaring a
+union&rsquo;s variants, for example in Rust:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='rust'><span class='line'><span class="k">enum</span> <span class="n">AorBorC</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nf">A</span><span class="p">(</span><span class="n">A</span><span class="p">),</span>
+</span><span class='line'>    <span class="nf">B</span><span class="p">(</span><span class="n">B</span><span class="p">),</span>
+</span><span class='line'>    <span class="nf">C</span><span class="p">(</span><span class="n">C</span><span class="p">),</span>
+</span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>(Rust is not alone here. There are benefits to having an explicit name.
+Requiring a name makes it <a href="https://www.parsonsmatt.org/2018/11/03/trouble_with_typed_errors.html">harder to use union types to use for
+errors</a>. This article is not about Rust, please
+don&rsquo;t @ me.)</p>
+
+<p>This &ldquo;on demand&rdquo; characteristic of union types is similar to Java&rsquo;s
+<code>throws</code> clause, but more powerful: <code>throws A, B, C</code> is not a type,
+while <code>T.any(A, B, C)</code> is. We&rsquo;ll see why that matters below.</p>
+
+<h2>Example: From checked exceptions to union types</h2>
+
+<p>Using Sorbet&rsquo;s ad hoc union types, it&rsquo;s mechanical to convert Java-style
+checked exceptions to Sorbet-annotated Ruby. To demonstrate:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Currency</span> <span class="nf">parseCurrency</span><span class="o">(</span><span class="n">String</span> <span class="n">currencyStr</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ParseException</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Currency</span> <span class="n">currency</span> <span class="o">=</span> <span class="n">KNOWN_CURRENCIES</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">currencyStr</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">currency</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">throw</span> <span class="k">new</span> <span class="nf">ParseException</span><span class="o">(</span>
+</span><span class='line'>          <span class="s">"'"</span> <span class="n">currencyStr</span> <span class="o">+</span> <span class="s">"' is not a valid currency"</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">currency</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is a somewhat contrived Java method, but it&rsquo;ll be good enought to
+demonstrate the concepts.</p>
+
+<p>If <code>parseCurrency</code> is given a string it can&rsquo;t handle, it raises a
+<code>ParseException</code>. It&rsquo;s declares this with <code>throws</code> because
+<code>ParseException</code> is a checked exception. If the currency string is
+recognized, it returns some <code>Currency</code> object.</p>
+
+<p>Here&rsquo;s how we&rsquo;d write that in Sorbet:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># (0) Ruby's standard library doesn't have `ParseException`,</span>
+</span><span class='line'><span class="c1"># so I've re-implemented it.</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">ParseError</span> <span class="o">&lt;</span> <span class="no">T</span><span class="o">::</span><span class="no">Struct</span>
+</span><span class='line'>  <span class="n">const</span> <span class="ss">:message</span><span class="p">,</span> <span class="no">String</span>
+</span><span class='line'>  <span class="n">const</span> <span class="ss">:offset</span><span class="p">,</span> <span class="no">Integer</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># (1) return type + `throws` becomes just `returns`</span>
+</span><span class='line'><span class="c1"># (2) Return type uses `T.any`</span>
+</span><span class='line'><span class="n">sig</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">params</span><span class="p">(</span><span class="ss">currency_str: </span><span class="no">String</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nf">returns</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">Currency</span><span class="p">,</span> <span class="no">ParseError</span><span class="p">))</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">parse_currency</span><span class="p">(</span><span class="n">currency_str</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">currency</span> <span class="o">=</span> <span class="no">KNOWN_CURRENCIES</span><span class="p">[</span><span class="n">currency_str</span><span class="p">]</span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">currency</span><span class="p">.</span><span class="nf">nil?</span>
+</span><span class='line'>    <span class="c1"># (3) `throw` becomes `return`</span>
+</span><span class='line'>    <span class="k">return</span> <span class="no">ParseError</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span>
+</span><span class='line'>      <span class="ss">message: </span><span class="s2">"'</span><span class="si">#{</span><span class="n">currency_str</span><span class="si">}</span><span class="s2">' is not a valid currency"</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">offset: </span><span class="mi">0</span>
+</span><span class='line'>    <span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">currency</span>
+</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>The important changes:</p>
+
+<ol>
+<li>Where Java had a return type and a <code>throws</code> clause, Sorbet just has a
+return type.</li>
+<li>Sorbet&rsquo;s return type is a union type (<code>T.any(...)</code>). It mentions the Java
+method&rsquo;s return type and all the exceptions mentioned in the <code>throws</code>.</li>
+<li>Where the Java example uses <code>throw</code>, the Ruby example uses <code>return</code>.</li>
+</ol>
+
+
+<p>The translation isn&rsquo;t complete until we see how the <code>parseCurrency</code>
+caller side changes:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Charge</span> <span class="nf">createCharge</span><span class="o">(</span><span class="kt">int</span> <span class="n">amount</span><span class="o">,</span> <span class="n">String</span> <span class="n">currencyStr</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ParseException</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Currency</span> <span class="n">currency</span> <span class="o">=</span> <span class="n">parseCurrency</span><span class="o">(</span><span class="n">currencyStr</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="k">new</span> <span class="nf">Charge</span><span class="o">(</span><span class="n">amount</span><span class="o">,</span> <span class="n">currency</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>With Sorbet, this Java snippet becomes:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">sig</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">params</span><span class="p">(</span><span class="ss">amouunt: </span><span class="no">Integer</span><span class="p">,</span> <span class="ss">currency_str: </span><span class="no">String</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nf">returns</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">Charge</span><span class="p">,</span> <span class="no">ParseError</span><span class="p">))</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">create_charge</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="n">currency_str</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">currency</span> <span class="o">=</span> <span class="n">parse_currency</span><span class="p">(</span><span class="n">currency_str</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">currency</span> <span class="k">unless</span> <span class="n">currency</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Currency</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="no">Charge</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">amount: </span><span class="n">amount</span><span class="p">,</span> <span class="ss">currency: </span><span class="n">currency</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>As before, the <code>throws</code> clause in Java becomes a union-typed return in Ruby.</p>
+
+<p>The new bit is the explicit <code>return ... unless ...</code>. Whereas uncaught
+exceptions implicitly bubble up to the caller, return values only bubble
+up if explicitly returned. This is a key benefit of the union types
+approach, which brings us to our next section.</p>
+
+<h2>Analysis: Why the union types approach is better</h2>
+
+<p>To recap, Sorbet&rsquo;s union types are ad hoc, much in the same sense as the
+classes mentioned in Java&rsquo;s <code>throws</code> clause. When converting from <code>Java</code> to
+<code>Ruby</code>, a single, union-typed return takes the place of a separate return
+type and <code>throws</code> clause.</p>
+
+<p>First off, this translation preserves the best parts of checked
+exceptions:</p>
+
+<ul>
+<li><p>A method&rsquo;s failure modes still appear in an <strong>explicit, public API</strong>.</p>
+
+<p>In both Java and Ruby, the method signature behaves as machine-checked
+error documentation.</p></li>
+<li><p>Ad hoc error specifications enable <strong>low-friction composition</strong>.</p>
+
+<p>In both Java and Ruby, if our method is the first to combine two
+methods with unrelated failure modes, there&rsquo;s no ceremony to
+predeclare that combination.  Instead, we just mention one more class
+in the method&rsquo;s signature.</p></li>
+</ul>
+
+
+<p>What&rsquo;s more, the union types approach has a couple unique benefits:</p>
+
+<ul>
+<li><p>As a language feature, <strong>union types are not special</strong>.</p>
+
+<p>Union types are types. Like other types, we can store them in
+variables. We can factor common error recovery code into helper
+functions. We can map functions returning union types over lists. We
+can write type aliases that abbreviate commonly-grouped error classes.
+We can&rsquo;t do any of this with checked exceptions, and this is the most
+common complaint against them.</p></li>
+<li><p>Union types have <strong>call-site granularity</strong>, not method-body
+granularity.</p>
+
+<p>The union types approach forces a choice of how to handle errors at
+each call site. This is more robust in the face of changing code,
+because new call sites should not necessarily inherit the error
+handling logic of existing call sites. Just because one
+<code>ParseException</code> was uncaught and mentioned in the <code>throws</code> does not
+mean all of them should be.</p></li>
+</ul>
+
+
+<p>And finally, let me get out ahead of some common counterarguments.</p>
+
+<blockquote><p>The union types approach requires more typing at the call site!</p></blockquote>
+
+<p>Yep. But I&rsquo;ve already counted this as a blessing, not a curse.</p>
+
+<blockquote><p>But real-world Ruby code already uses exceptions!</p></blockquote>
+
+<p>Yep. But in Java too, the world is already split into checked and
+unchecked exceptions. In both Java and Ruby, exceptions are a fact of
+life, and you&rsquo;ll always need a way to deal with unexpected exceptions
+(e.g., comprehensive tests, automated production alerting, etc.).</p>
+
+<blockquote><p>With checked exceptions, I could handle all the failures at once!</p></blockquote>
+
+<p>That&rsquo;s true; with checked exceptions, it&rsquo;s easy to write a single
+<code>catch</code> statement that handles all failures due to, say, a
+<code>ParseException</code> in a whole region of code, avoiding the need for code
+repetition.</p>
+
+<p>The upshot is that with union types, we can just use functions. Take
+everything in the <code>catch</code> body, put it in a helper function, and call it
+at each call site.  This cuts down on duplication, and I already
+mentioned how call-site granularity is a win.</p>
+
+<h2>I love union types</h2>
+
+<p>That&rsquo;s it, that&rsquo;s the whole take. Sorbet doesn&rsquo;t need checked exceptions, it
+already has ad hoc union types.</p>
+
+<hr />
+
+<h2 id="appendix">Appendix: Checked Exceptions</h2>
+
+
+<p>As a quick refresher, <a href="https://en.wikibooks.org/wiki/Java_Programming/Checked_Exceptions">checked exceptions</a> are a feature popularized by
+Java.  The syntax looks like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kt">void</span> <span class="nf">doThing</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">MyException</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// ...</span>
+</span><span class='line'><span class="o">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>throws</code> keyword declares that in addition to the method&rsquo;s argument
+types and return type, it might also throw <code>MyException</code>. If a method
+throws multiple classes of exceptions, they can all be listed:</p>
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kt">void</span> <span class="nf">doThing</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">MyException</span><span class="o">,</span> <span class="n">YourException</span><span class="o">,</span> <span class="n">AnotherException</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// ...</span>
+</span><span class='line'><span class="o">}</span></span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>throws</code> keyword is checked at all call sites, just like argument
+and return types. A method containing calls to <code>doThing</code> must either
+<code>catch</code> all mentioned exceptions or repeat the <code>throws</code> clause in its
+own signature.</p>
+
+<p>The argument in favor of checked exceptions is that it&rsquo;s explicit and
+machine-checked. Users don&rsquo;t have to guess at what a method might throw,
+or hope that there&rsquo;s accurate documentation—all benefits shared by
+static typing in general, which is a sympathetic goal.</p>
+
+<p>Checked exceptions seem like a good feature on paper. In practice,
+they&rsquo;re generally regretted. I&rsquo;m nowhere near the first person to come
+to this conclusion, so instead I&rsquo;ll link you to some previous
+discussions:</p>
+
+<ul>
+<li><a href="https://www.artima.com/articles/the-trouble-with-checked-exceptions">The Trouble with Checked Exceptions</a>, A Conversation
+with Anders Hejlsberg</li>
+<li><a href="http://james-iry.blogspot.com/2012/02/checked-exceptions-might-have-their.html">Checked Exceptions Might Have Their Place, But It Isn&rsquo;t In
+Java</a>, by James Iry</li>
+<li><a href="https://ericlippert.com/2008/09/10/vexing-exceptions/">Vexing Exceptions</a>, by Eric Lippert</li>
+</ul>
+
+
+<p>(The last one isn&rsquo;t actually about checked exceptions: it&rsquo;s just about
+exceptions and I like it, so I included it.)</p>
+
+<p>Java has been copied and imitated for decades. Among all the features we
+see other languages copy from Java, checked exceptions are absent.</p>
+]]></content>
+  </entry>
+  
   
   
   <entry>
@@ -3507,363 +3812,6 @@ concise code!</p>
 <p>It&rsquo;s common to think that &ldquo;immutable&rdquo; means &ldquo;copy the entire thing&rdquo; and then change the parts you care about. But if you start with <strong>all data</strong> being immutable, then you only need to allocate new memory for the subcomponents of your data structure that <strong>actually</strong> changed. Everything else can be shared by the old and the new.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 <li id="fn:2">
 <p>In the same way that glass lenses focus light on a point, functional lenses focus a data structure on a point! Isn&rsquo;t it neat how that name works out? It&rsquo;s certainly a cooler name than &ldquo;generalized getter/setter <a href="https://www.youtube.com/watch?v=pD_imYhNoQ4">wombo combo</a>&rdquo; (video, language warning).<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  
-  
-  <entry>
-    <title type="html"><![CDATA[Code Review from the Command Line]]></title>
-    <link href="https://blog.jez.io/cli-code-review/"/>
-    <updated>2018-01-13T13:14:24-08:00</updated>
-    <id>https://blog.jez.io/cli-code-review</id>
-    <content type="html"><![CDATA[<p>I do the bulk of my code reviews from the command line, especially when
-reviewing larger changes. I&rsquo;ve built up a number of tools and config
-settings that help me dig into the nuances of the code I&rsquo;m reviewing, so
-that I can understand it better than if I were just browsing online.</p>
-
-<!-- more -->
-
-
-<p>In particular, I&rsquo;ll walk through how I&hellip;</p>
-
-<ul>
-<li>check out the code in the first place,</li>
-<li>get a feel for what changed,</li>
-<li>visualize the relationships between the files that changed,</li>
-<li>bring up the code diffs in Vim,</li>
-<li>leverage the unique power of the editor and the terminal.</li>
-</ul>
-
-
-<p>But first, let&rsquo;s talk briefly about the point of code review in the
-first place.</p>
-
-<h2>Code review philosophy</h2>
-
-<p>When I ask that other people review my code, it&rsquo;s an opportunity for me
-to teach them about the change I&rsquo;ve just made. When I review someone
-else&rsquo;s code, it&rsquo;s to learn something from them. Some other benefits of
-code review include:</p>
-
-<ul>
-<li>Team awareness (to keep a pulse on what else is going on within your
-team).</li>
-<li>Finding alternative solutions (maybe there&rsquo;s a small change that lets
-us kill two birds with one stone).</li>
-</ul>
-
-
-<p>If this is different from how you think about code review, <a href="https://www.youtube.com/watch?v=PJjmw9TRB7s">check out
-this talk</a>. Code review is a powerful tool for
-learning and growing a team.</p>
-
-<p>With that out of the way, let&rsquo;s dive into the tools I use to maximize
-benefit I get from code review.</p>
-
-<h2>Checking out the code</h2>
-
-<p>The first step to reviewing code in the terminal is to check out the
-code in the first place. One option is to simply to <code>git pull</code> and then
-<code>git checkout &lt;branch&gt;</code>. But if you happen to be using GitHub, we can
-get this down to just one command:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>hub pr checkout &lt;pr-number&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It works using <a href="https://github.com/github/hub">hub</a>, which is a tool that exposes various features of
-GitHub from the command line. If the pull request is from someone else&rsquo;s
-fork, <code>hub</code> is even smart enough to add their fork as a remote and fetch
-it.</p>
-
-<h2>At first glance</h2>
-
-<p>With the branch checked out locally, usually my next step is to get a
-feel for what changed. For this, I&rsquo;ve written a git alias that shows:</p>
-
-<ul>
-<li>which files changed</li>
-<li>how many lines changed in each file (additions and deletions)</li>
-<li>how many lines changed overall</li>
-</ul>
-
-
-<p><a class="image-link" href="https://blog.jez.io/images/git-stat.png"><img class="fullwidth" src="https://blog.jez.io/images/git-stat.png" title="git stat" ></a></p>
-
-<p>Here&rsquo;s the definition of <code>git stat</code> from my <code>~/.gitconfig</code>:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span><span class="nb">alias</span><span class="o">]</span>
-</span><span class='line'>  <span class="c"># list files which have changed since REVIEW_BASE</span>
-</span><span class='line'>  <span class="c"># (REVIEW_BASE defaults to 'master' in my zshrc)</span>
-</span><span class='line'>  files <span class="o">=</span> !git diff --name-only <span class="k">$(</span>git merge-base HEAD <span class="se">\"</span><span class="nv">$REVIEW_BASE</span><span class="se">\"</span><span class="k">)</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># Same as above, but with a diff stat instead of just names</span>
-</span><span class='line'>  <span class="c"># (better for interactive use)</span>
-</span><span class='line'>  stat <span class="o">=</span> !git diff --stat <span class="k">$(</span>git merge-base HEAD <span class="se">\"</span><span class="nv">$REVIEW_BASE</span><span class="se">\"</span><span class="k">)</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Under the hood, it just works using <code>git diff</code>, <code>git merge-base</code>, and a
-personal environment variable <code>REVIEW_BASE</code>.</p>
-
-<p><code>REVIEW_BASE</code> lets us choose which branch to review relative to. Most of
-the time, <code>REVIEW_BASE</code> is <code>master</code>, but this isn&rsquo;t always the case! Some
-repos branch off of <code>gh-pages</code>. Sometimes I like to review the most
-recent commit as if it were its own branch.</p>
-
-<p>To review the code relative so some other base, set <code>REVIEW_BASE</code> before
-running <code>git stat</code>:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Review between 'gh-pages' and the current branch</span>
-</span><span class='line'><span class="nv">REVIEW_BASE</span><span class="o">=</span>gh-pages git stat
-</span><span class='line'>
-</span><span class='line'><span class="c"># Review changes made by the last commit of this branch:</span>
-</span><span class='line'><span class="nv">REVIEW_BASE</span><span class="o">=</span>HEAD^ git stat</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I have <code>export REVIEW_BASE=master</code> in my <code>~/.bashrc</code>, because most
-projects branch off of <code>master</code>.</p>
-
-<p>Nothing too crazy yet&mdash;GitHub can already do everything we&rsquo;ve seen so
-far. Let&rsquo;s start to up the ante.</p>
-
-<h2>Visualizing file change frequency</h2>
-
-<p>I&rsquo;ve written a short script that shows me a visualization of how
-frequently the files involved in this branch change over time:</p>
-
-<p><a class="image-link" href="https://blog.jez.io/images/git-heatmap.png"><img class="fullwidth" src="https://blog.jez.io/images/git-heatmap.png" title="git heatmap" ></a></p>
-
-<p>This command identifies two main things:</p>
-
-<ul>
-<li><p><strong>Files with lots of changes</strong>.</p>
-
-<p>Files that have changed a lot in the past are likely to change in the
-future. I review these files with an eye towards what the <em>next</em>
-change will bring.</p>
-
-<p><em>&ldquo;Is this change robust enough to still be useful in the future?
-Will we throw this out soon after merging it?&rdquo;</em></p></li>
-<li><p><strong>Files with few changes</strong>.</p>
-
-<p>Files that aren&rsquo;t changed frequently are more likely to be brittle.
-Alternatively, it&rsquo;s often the case that infrequently changed files
-stay unchanged because the change is better made elsewhere.</p>
-
-<p><em>&ldquo;Does this change challenge an implicit assumption so that some other
-part of the code was relying on? Is there a better place for this
-change?&rdquo;</em></p></li>
-</ul>
-
-
-<p>Those two commands (<code>git stat</code> and <code>git heatmap</code>) are how I kick off my
-code review: getting a birds-eye view of the change and some historical
-context for what I&rsquo;m dealing with. Next, I drill down into the
-relationships between the files that changed.</p>
-
-<h2>Visualizing relationships between files</h2>
-
-<p>At work I review JavaScript files, so I&rsquo;ve built out this next bit of
-tooling specifically for JavaScript.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> It helps to understand
-which files import others, so I have a command that computes the
-dependency graph of the files changed on this branch:</p>
-
-<p><a class="image-link" href="https://blog.jez.io/images/git-depgraph.png"><img class="fullwidth" src="https://blog.jez.io/images/git-depgraph.png" title="git depgraph" ></a></p>
-
-<p>This is where we start to see some distinct advantages over what GitHub
-provides. As you see above, the <code>git depgraph</code> alias calculates the
-dependency graph for files changed by this branch. Why is this useful?</p>
-
-<ul>
-<li><p>Maybe we want to start reviewing from <code>Provider.js</code>, since it doesn&rsquo;t
-depend on any other files that have changed.</p></li>
-<li><p>Maybe we want to work the other way: start with <code>Elements.js</code> so we
-know the motivation for why <code>Provider.js</code> had to changed in the first
-place.</p></li>
-</ul>
-
-
-<p>In either case, we can see the structure of the change. Three files
-depend on <code>Elements.js</code>, so it&rsquo;s serving the needs of many modules.
-<code>Element.js</code> only has one dependency, etc. Each branch&rsquo;s dependency
-graph shows different information; it can be surprising what turns up.</p>
-
-<p>I have the <code>git depgraph</code> alias defined like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span><span class="nb">alias</span><span class="o">]</span>
-</span><span class='line'>  depgraph <span class="o">=</span> !git madge image --webpack-config webpack.config.js --basedir . --style solarized-dark src</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Some notes about this definition:</p>
-
-<ul>
-<li><p>It depends on the <code>git-madge</code> command, which you can <a href="https://github.com/jez/git-madge">download
-and install here</a>.</p></li>
-<li><p>It&rsquo;s using <em>this project&rsquo;s</em> <code>webpack.config.js</code> file, so I&rsquo;ve made
-this alias local to the repo, rather than available globally.</p></li>
-<li><p>It dumps the image to stdout. Above, we used iTerm2&rsquo;s <a href="https://iterm2.com/documentation-images.html">imgcat</a>
-program to pipe stdin and dump a raster image to the terminal.</p>
-
-<p>If you don&rsquo;t use iTerm2 or don&rsquo;t want to install <code>imgcat</code>, you can
-pipe it to Preview using open<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> (<code>open -f -a Preview</code>) or just
-redirect the PNG to a file.</p></li>
-</ul>
-
-
-<p>The <code>git depgraph</code> alias is a game changer. It makes it easier to get spun
-up in new code bases, helps make sense of large changes, and just looks
-plain cool. But at the end of the day, we came here to review some code,
-so let&rsquo;s take a look at how we can actually view the diffs of the files
-that changed.</p>
-
-<h2>Reviewing the diffs</h2>
-
-<p>To review the diffs, the simplest option is to just run <code>git diff
-master..HEAD</code>. This has a bunch of downsides:</p>
-
-<ul>
-<li><p>No syntax highlighting (everything is either green or red).</p></li>
-<li><p>No surrounding context (for example, GitHub lets you click to expand
-lines above or below a diff hunk).</p></li>
-<li><p>The diff is &ldquo;unified,&rdquo; instead of split into two columns.</p></li>
-<li><p>No way to exclude a specific file (the 300 line diff to your
-<code>yarn.lock</code> file is sometimes nice to hide).</p></li>
-</ul>
-
-
-<p>My solution to all of these problems is to view the diffs in Vim, with
-the help of two Vim plugins and two git aliases. Before we get to
-that, here&rsquo;s a screenshot:</p>
-
-<p><a class="image-link" href="https://blog.jez.io/images/git-review.png"><img class="fullwidth" src="https://blog.jez.io/images/git-review.png" title="git review" ></a></p>
-
-<p>Looks pretty similar to GitHub&rsquo;s interface, with the added bonus that
-it&rsquo;s using my favorite colorscheme! The Vim plugins featured are:</p>
-
-<ul>
-<li><a href="https://github.com/tpope/vim-fugitive">tpope/vim-fugitive</a> for showing the side-by-side diff (<code>:Gdiff</code>).</li>
-<li><a href="https://github.com/airblade/vim-gitgutter">airblade/vim-gitgutter</a> for showing the <code>+/-</code> signs.</li>
-<li><a href="https://github.com/jez/vim-colors-solarized">jez/vim-colors-solarized</a> for tweaking the diff highlight
-colors.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></li>
-</ul>
-
-
-<p>And to orchestrate the whole thing, I&rsquo;ve set up these two aliases:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span><span class="nb">alias</span><span class="o">]</span>
-</span><span class='line'>  <span class="c"># NOTE: These aliases depend on the `git files` alias from</span>
-</span><span class='line'>  <span class="c"># a few sections ago!</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># Open all files changed since REVIEW_BASE in Vim tabs</span>
-</span><span class='line'>  <span class="c"># Then, run fugitive's :Gdiff in each tab, and finally</span>
-</span><span class='line'>  <span class="c"># tell vim-gitgutter to show +/- for changes since REVIEW_BASE</span>
-</span><span class='line'>  review <span class="o">=</span> !vim -p <span class="k">$(</span>git files<span class="k">)</span> +<span class="se">\"</span>tabdo Gdiff <span class="nv">$REVIEW_BASE</span><span class="se">\"</span> +<span class="se">\"</span><span class="nb">let </span>g:gitgutter_diff_base <span class="o">=</span> <span class="s1">'$REVIEW_BASE'</span><span class="se">\"</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># Same as the above, except specify names of files as arguments,</span>
-</span><span class='line'>  <span class="c"># instead of opening all files:</span>
-</span><span class='line'>  <span class="c"># git reviewone foo.js bar.js</span>
-</span><span class='line'>  reviewone <span class="o">=</span> !vim -p +<span class="se">\"</span>tabdo Gdiff <span class="nv">$REVIEW_BASE</span><span class="se">\"</span> +<span class="se">\"</span><span class="nb">let </span>g:gitgutter_diff_base <span class="o">=</span> <span class="s1">'$REVIEW_BASE'</span><span class="se">\"</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Here&rsquo;s how they work:</p>
-
-<ul>
-<li><p><code>git review</code> opens each file changed by this branch as a tab in Vim.
-Then <code>:Gdiff</code> from vim-fugitive shows the diff in each tab.</p></li>
-<li><p><code>git reviewone</code> is like <code>git review</code>, but you specify which
-files to open (in case you only want to diff a few).</p></li>
-</ul>
-
-
-<p>Like with the <code>git stat</code> alias, these aliases respect the <code>REVIEW_BASE</code>
-environment variable I&rsquo;ve set up in my <code>~/.bashrc</code>. (Scroll back up for
-a refresher.) For example, to review all files relative to <code>master</code>:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">REVIEW_BASE</span><span class="o">=</span>master git review</span></code></pre></td></tr></table></div></figure>
-
-
-<p>At this point, you might think that all we&rsquo;ve done is re-create the
-GitHub code review experience in Vim. But actually what we&rsquo;ve done is so
-much more powerful.</p>
-
-<h2>Interactive Code Review</h2>
-
-<p>When reviewing on GitHub, the code is completely static&mdash;you can&rsquo;t
-change it. Also, because the code is coming from GitHub&rsquo;s servers,
-it&rsquo;s laggy when you click around to view related files. By switching our
-code review to the terminal, we can now edit files, jump to other files,
-and run arbitrary commands at no cost.</p>
-
-<p>It might not be obvious how huge of a win this is, so let&rsquo;s see some
-examples. Take this screenshot of the <code>requireElement</code> function. It
-moved from <em>above</em> the <code>findElement</code> function to <em>below</em> it (probably
-because the former calls the latter):</p>
-
-<p><a class="image-link" href="https://blog.jez.io/images/requireElement01.png"><img class="fullwidth" src="https://blog.jez.io/images/requireElement01.png" title="diff" ></a></p>
-
-<p>But is the location of the <code>requireElement</code> function the only thing
-that&rsquo;s changed? By editing the file to move the function back to its
-original location, vim-fugitive will automatically recompute the diff.
-And in fact, we can see that the <em>type of the argument</em> has changed too,
-from <code>string</code> to <code>ElementType</code>:</p>
-
-<p><a class="image-link" href="https://blog.jez.io/images/requireElement02.png"><img class="fullwidth" src="https://blog.jez.io/images/requireElement02.png" title="diff" ></a></p>
-
-<p>If we had been viewing this on GitHub, we might have taken for granted
-that the function didn&rsquo;t change. But since we&rsquo;re in our editor, we can
-interactively play around with our code and discover things we might
-have missed otherwise. The advantages of interactive code review go well
-beyond this example:</p>
-
-<ul>
-<li><p>In a Flow project, we can ask for the type of a variable.</p></li>
-<li><p>In a test file, we can change the test and see if it still passes or
-if it now fails.</p></li>
-<li><p>We can <code>grep</code> the project for all uses of a function (including files
-<em>not</em> changed by this branch).</p></li>
-<li><p>We can open up related files for cross-referencing.</p></li>
-<li><p>We can run the code in a debugger and see how it behaves.</p></li>
-</ul>
-
-
-<p>By having the full power of our editor, we can literally retrace the
-steps that the author went through to create the pull request. If our
-goal is to understand and learn from code review, there&rsquo;s no better way
-than walking in the author&rsquo;s shoes.</p>
-
-<h2>Recap</h2>
-
-<p>To recap, here&rsquo;s a list of the tools I use to review code at the command
-line:</p>
-
-<ul>
-<li><code>hub pr checkout</code></li>
-<li><code>git stat</code> to list files that have changed</li>
-<li><code>git heatmap</code> to show how frequently these files change</li>
-<li><code>git depgraph</code> to show a graph of which files depend on which</li>
-<li><code>git review</code> to open diffs of all the files in Vim</li>
-<li><code>git reviewone</code> to open diffs for a specific handful of files</li>
-</ul>
-
-
-<p>If you&rsquo;re having trouble incorporating any of these into your workflow,
-feel free to reach out and let me know! I&rsquo;m happy to help.</p>
-
-<!-- vim:tw=72
--->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>The techniques here apply to any language that you can statically analyze. In particular, I have a rough prototype of everything JavaScript-specific you see here that works with Standard ML instead. If you can find me the dependency information for your favorite language, I&rsquo;d be happy to help you turn it into a visualization.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>The <code>open</code> command is macOS-specific. On Linux, you might want to look at the <code>display</code> command from ImageMagick.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>I&rsquo;ve patched the default Solarized colors for Vim so that lines retain their syntax highlighting in the diff mode, while the backgrounds are highlighted. You can see how this works in this commit: <a href="https://github.com/jez/vim-colors-solarized/commit/bca72cc">https://github.com/jez/vim-colors-solarized/commit/bca72cc</a><a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 

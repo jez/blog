@@ -4,7 +4,7 @@
   <title><![CDATA[Category: types | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/types/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2020-07-21T19:33:11-04:00</updated>
+  <updated>2021-05-29T04:52:10-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -12,6 +12,309 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sorbet Does Not Have Checked Exceptions]]></title>
+    <link href="https://blog.jez.io/union-types-checked-exceptions/"/>
+    <updated>2021-05-29T01:21:41-07:00</updated>
+    <id>https://blog.jez.io/union-types-checked-exceptions</id>
+    <content type="html"><![CDATA[<p>People new to Sorbet ask this all the time:</p>
+
+<blockquote><p>Does Sorbet support checked exceptions, like Java?</p></blockquote>
+
+<p>(In fact, this was the <a href="https://youtu.be/odmlf_ezsBo?t=1921">first ever question</a> I was asked at my <a href="https://jez.io/talks/state-of-sorbet-2019/">first
+ever conference talk</a>.)</p>
+
+<p>The answer: Sorbet doesn&rsquo;t support checked exceptions, and I don&rsquo;t think
+it ever should.</p>
+
+<!-- more -->
+
+
+<p>Before I dive in: chances are you&rsquo;re reading this because you asked the
+question above and someone linked you this. Or maybe you saw the title
+and just happpened to click. Either way, I&rsquo;m going to take for granted
+that you know what I mean by &ldquo;checked exceptions.&rdquo; If you want a quick
+refresher, jump down to the <a href="#appendix">Appendix</a> and then come back.</p>
+
+<p>My claim is that checked exceptions are a poor man&rsquo;s ad hoc union types,
+that Sorbet has ad hoc union types, and thus that Sorbet doesn&rsquo;t need
+checked exceptions.</p>
+
+<p>I&rsquo;ll discuss this claim in three parts:</p>
+
+<ul>
+<li>I&rsquo;ll give some background on a key feature of Sorbet&rsquo;s union types,
+which are unique compared with union types in many other languages.</li>
+<li>I&rsquo;ll describe a translation from checked exceptions in Java to
+union-typed returns in Ruby with a concrete example.</li>
+<li>I&rsquo;ll give evidence for why the union types approach is better.</li>
+</ul>
+
+
+<p>(I won&rsquo;t hold it against you if you skip to the conclusion and come back
+for the lead up. It&rsquo;s what I know I&rsquo;d do too.)</p>
+
+<h2>Background: Sorbet&rsquo;s union types</h2>
+
+<blockquote><p>The throws clause is the only point in the entire Java language that
+allows union types. You can tack &ldquo;throws A,B,C&rdquo; onto a method
+signature meaning it might throw A or B or C, but outside of the
+throws clause you cannot say &ldquo;type A or B or C&rdquo; in Java.</p>
+
+<p>— James Iry, <em><a href="http://james-iry.blogspot.com/2012/02/checked-exceptions-might-have-their.html">Checked Exceptions Might Have Their Place, But It Isn&rsquo;t
+In Java</a></em> (2012)</p></blockquote>
+
+<p>Sorbet supports <a href="https://sorbet.org/docs/union-types">union types</a>. More specifically, Sorbet&rsquo;s union types
+are ad hoc: any number of types can be unioned together on demand:</p>
+
+<pre><code class="ruby">sig {returns(T.any(A, B, C))}
+def foo; ...; end
+</code></pre>
+
+<p>By contrast, many languages with union types require predeclaring a
+union&rsquo;s variants, for example in Rust:</p>
+
+<pre><code class="rust">enum AorBorC {
+    A(A),
+    B(B),
+    C(C),
+}
+</code></pre>
+
+<p>(Rust is not alone here. There are benefits to having an explicit name.
+Requiring a name makes it <a href="https://www.parsonsmatt.org/2018/11/03/trouble_with_typed_errors.html">harder to use union types to use for
+errors</a>. This article is not about Rust, please
+don&rsquo;t @ me.)</p>
+
+<p>This &ldquo;on demand&rdquo; characteristic of union types is similar to Java&rsquo;s
+<code>throws</code> clause, but more powerful: <code>throws A, B, C</code> is not a type,
+while <code>T.any(A, B, C)</code> is. We&rsquo;ll see why that matters below.</p>
+
+<h2>Example: From checked exceptions to union types</h2>
+
+<p>Using Sorbet&rsquo;s ad hoc union types, it&rsquo;s mechanical to convert Java-style
+checked exceptions to Sorbet-annotated Ruby. To demonstrate:</p>
+
+<pre><code class="java">Currency parseCurrency(String currencyStr) throws ParseException {
+    Currency currency = KNOWN_CURRENCIES.get(currencyStr);
+    if (currency == null) {
+        throw new ParseException(
+          "'" currencyStr + "' is not a valid currency", 0);
+    }
+
+    return currency;
+}
+</code></pre>
+
+<p>This is a somewhat contrived Java method, but it&rsquo;ll be good enought to
+demonstrate the concepts.</p>
+
+<p>If <code>parseCurrency</code> is given a string it can&rsquo;t handle, it raises a
+<code>ParseException</code>. It&rsquo;s declares this with <code>throws</code> because
+<code>ParseException</code> is a checked exception. If the currency string is
+recognized, it returns some <code>Currency</code> object.</p>
+
+<p>Here&rsquo;s how we&rsquo;d write that in Sorbet:</p>
+
+<pre><code class="ruby"># (0) Ruby's standard library doesn't have `ParseException`,
+# so I've re-implemented it.
+class ParseError &lt; T::Struct
+  const :message, String
+  const :offset, Integer
+end
+
+# (1) return type + `throws` becomes just `returns`
+# (2) Return type uses `T.any`
+sig do
+  params(currency_str: String)
+    .returns(T.any(Currency, ParseError))
+end
+def parse_currency(currency_str)
+  currency = KNOWN_CURRENCIES[currency_str]
+  if currency.nil?
+    # (3) `throw` becomes `return`
+    return ParseError.new(
+      message: "'#{currency_str}' is not a valid currency",
+      offset: 0
+    )
+  end
+
+  currency
+end
+</code></pre>
+
+<p>The important changes:</p>
+
+<ol>
+<li>Where Java had a return type and a <code>throws</code> clause, Sorbet just has a
+return type.</li>
+<li>Sorbet&rsquo;s return type is a union type (<code>T.any(...)</code>). It mentions the Java
+method&rsquo;s return type and all the exceptions mentioned in the <code>throws</code>.</li>
+<li>Where the Java example uses <code>throw</code>, the Ruby example uses <code>return</code>.</li>
+</ol>
+
+
+<p>The translation isn&rsquo;t complete until we see how the <code>parseCurrency</code>
+caller side changes:</p>
+
+<pre><code class="java">Charge createCharge(int amount, String currencyStr) throws ParseException {
+    Currency currency = parseCurrency(currencyStr);
+    return new Charge(amount, currency);
+}
+</code></pre>
+
+<p>With Sorbet, this Java snippet becomes:</p>
+
+<pre><code class="ruby">sig do
+  params(amouunt: Integer, currency_str: String)
+    .returns(T.any(Charge, ParseError))
+end
+def create_charge(amount, currency_str)
+  currency = parse_currency(currency_str)
+  return currency unless currency.is_a?(Currency)
+
+  Charge.new(amount: amount, currency: currency)
+end
+</code></pre>
+
+<p>As before, the <code>throws</code> clause in Java becomes a union-typed return in Ruby.</p>
+
+<p>The new bit is the explicit <code>return ... unless ...</code>. Whereas uncaught
+exceptions implicitly bubble up to the caller, return values only bubble
+up if explicitly returned. This is a key benefit of the union types
+approach, which brings us to our next section.</p>
+
+<h2>Analysis: Why the union types approach is better</h2>
+
+<p>To recap, Sorbet&rsquo;s union types are ad hoc, much in the same sense as the
+classes mentioned in Java&rsquo;s <code>throws</code> clause. When converting from <code>Java</code> to
+<code>Ruby</code>, a single, union-typed return takes the place of a separate return
+type and <code>throws</code> clause.</p>
+
+<p>First off, this translation preserves the best parts of checked
+exceptions:</p>
+
+<ul>
+<li><p>A method&rsquo;s failure modes still appear in an <strong>explicit, public API</strong>.</p>
+
+<p>In both Java and Ruby, the method signature behaves as machine-checked
+error documentation.</p></li>
+<li><p>Ad hoc error specifications enable <strong>low-friction composition</strong>.</p>
+
+<p>In both Java and Ruby, if our method is the first to combine two
+methods with unrelated failure modes, there&rsquo;s no ceremony to
+predeclare that combination.  Instead, we just mention one more class
+in the method&rsquo;s signature.</p></li>
+</ul>
+
+
+<p>What&rsquo;s more, the union types approach has a couple unique benefits:</p>
+
+<ul>
+<li><p>As a language feature, <strong>union types are not special</strong>.</p>
+
+<p>Union types are types. Like other types, we can store them in
+variables. We can factor common error recovery code into helper
+functions. We can map functions returning union types over lists. We
+can write type aliases that abbreviate commonly-grouped error classes.
+We can&rsquo;t do any of this with checked exceptions, and this is the most
+common complaint against them.</p></li>
+<li><p>Union types have <strong>call-site granularity</strong>, not method-body
+granularity.</p>
+
+<p>The union types approach forces a choice of how to handle errors at
+each call site. This is more robust in the face of changing code,
+because new call sites should not necessarily inherit the error
+handling logic of existing call sites. Just because one
+<code>ParseException</code> was uncaught and mentioned in the <code>throws</code> does not
+mean all of them should be.</p></li>
+</ul>
+
+
+<p>And finally, let me get out ahead of some common counterarguments.</p>
+
+<blockquote><p>The union types approach requires more typing at the call site!</p></blockquote>
+
+<p>Yep. But I&rsquo;ve already counted this as a blessing, not a curse.</p>
+
+<blockquote><p>But real-world Ruby code already uses exceptions!</p></blockquote>
+
+<p>Yep. But in Java too, the world is already split into checked and
+unchecked exceptions. In both Java and Ruby, exceptions are a fact of
+life, and you&rsquo;ll always need a way to deal with unexpected exceptions
+(e.g., comprehensive tests, automated production alerting, etc.).</p>
+
+<blockquote><p>With checked exceptions, I could handle all the failures at once!</p></blockquote>
+
+<p>That&rsquo;s true; with checked exceptions, it&rsquo;s easy to write a single
+<code>catch</code> statement that handles all failures due to, say, a
+<code>ParseException</code> in a whole region of code, avoiding the need for code
+repetition.</p>
+
+<p>The upshot is that with union types, we can just use functions. Take
+everything in the <code>catch</code> body, put it in a helper function, and call it
+at each call site.  This cuts down on duplication, and I already
+mentioned how call-site granularity is a win.</p>
+
+<h2>I love union types</h2>
+
+<p>That&rsquo;s it, that&rsquo;s the whole take. Sorbet doesn&rsquo;t need checked exceptions, it
+already has ad hoc union types.</p>
+
+<hr />
+
+<h2 id="appendix">Appendix: Checked Exceptions</h2>
+
+
+<p>As a quick refresher, <a href="https://en.wikibooks.org/wiki/Java_Programming/Checked_Exceptions">checked exceptions</a> are a feature popularized by
+Java.  The syntax looks like this:</p>
+
+<pre><code class="java">void doThing() throws MyException {
+    // ...
+}
+</code></pre>
+
+<p>The <code>throws</code> keyword declares that in addition to the method&rsquo;s argument
+types and return type, it might also throw <code>MyException</code>. If a method
+throws multiple classes of exceptions, they can all be listed:</p>
+
+<pre><code class="java">void doThing() throws MyException, YourException, AnotherException {
+    // ...
+}
+</code></pre>
+
+<p>The <code>throws</code> keyword is checked at all call sites, just like argument
+and return types. A method containing calls to <code>doThing</code> must either
+<code>catch</code> all mentioned exceptions or repeat the <code>throws</code> clause in its
+own signature.</p>
+
+<p>The argument in favor of checked exceptions is that it&rsquo;s explicit and
+machine-checked. Users don&rsquo;t have to guess at what a method might throw,
+or hope that there&rsquo;s accurate documentation—all benefits shared by
+static typing in general, which is a sympathetic goal.</p>
+
+<p>Checked exceptions seem like a good feature on paper. In practice,
+they&rsquo;re generally regretted. I&rsquo;m nowhere near the first person to come
+to this conclusion, so instead I&rsquo;ll link you to some previous
+discussions:</p>
+
+<ul>
+<li><a href="https://www.artima.com/articles/the-trouble-with-checked-exceptions">The Trouble with Checked Exceptions</a>, A Conversation
+with Anders Hejlsberg</li>
+<li><a href="http://james-iry.blogspot.com/2012/02/checked-exceptions-might-have-their.html">Checked Exceptions Might Have Their Place, But It Isn&rsquo;t In
+Java</a>, by James Iry</li>
+<li><a href="https://ericlippert.com/2008/09/10/vexing-exceptions/">Vexing Exceptions</a>, by Eric Lippert</li>
+</ul>
+
+
+<p>(The last one isn&rsquo;t actually about checked exceptions: it&rsquo;s just about
+exceptions and I like it, so I included it.)</p>
+
+<p>Java has been copied and imitated for decades. Among all the features we
+see other languages copy from Java, checked exceptions are absent.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Sorbet Does Not Have FixMe Comments]]></title>
@@ -653,489 +956,6 @@ they&rsquo;re way more than this—specifically, they reify the concept of a
 
 <!-- vim:tw=72
 -->
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Union Types in Flow & Reason]]></title>
-    <link href="https://blog.jez.io/union-types-flow-reason/"/>
-    <updated>2018-04-18T22:43:26-07:00</updated>
-    <id>https://blog.jez.io/union-types-flow-reason</id>
-    <content type="html"><![CDATA[<p>Union types are powerful yet often overlooked. At work, I&rsquo;ve been using
-Flow which <a href="https://flow.org/en/docs/types/unions/">thankfully supports union types</a>. But as I&rsquo;ve
-refactored more of our code to use union types, I&rsquo;ve noticed that our
-bundle size has been steadily increasing!</p>
-
-<!-- more -->
-
-
-<p>In this post, we&rsquo;re going to explore why that&rsquo;s the case. We&rsquo;ll start
-with a problem which union types can solve, flesh out the problem to
-motivate why union types are definitely the solution, then examine the
-resulting cost of introducing them. In the end, we&rsquo;ll compare Flow to
-other compile-to-JS languages on the basis of how they represent union
-types in the compiled output. I&rsquo;m especially excited about <a href="https://reasonml.github.io/">Reason</a>, so
-we&rsquo;ll talk about it the most.</p>
-
-<h2>Setup: Union Types in a React Component</h2>
-
-<p>Let&rsquo;s consider we&rsquo;re writing a simple React 2FA<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> modal.
-We&rsquo;ll be using Flow, but you can pretend it&rsquo;s TypeScript if you want.
-The mockup we were given looks like this:</p>
-
-<p><a href="/images/2fa-mockup.jpeg"><img src="/images/2fa-mockup.jpeg" alt="A sample mockup for a two-factor authenticaion modal" /></a></p>
-
-<p>In this mockup:</p>
-
-<ul>
-<li>There&rsquo;s a loading state while we send the text message.</li>
-<li>We&rsquo;ll show an input for the code after the message is sent.</li>
-<li>There&rsquo;s no failure screen (it hasn&rsquo;t been drawn up yet).</li>
-</ul>
-
-
-<p>We&rsquo;ll need some way for our component to know which of the three screens
-is visible. Let&rsquo;s use a <a href="https://flow.org/en/docs/types/unions/">union type</a> in Flow:</p>
-
-<pre><code class="js">type Screen =
-  | 'LoadingScreen'
-  | 'CodeEntryScreen'
-  | 'SuccessScreen';
-</code></pre>
-
-<p>Union types are a perfect fit! 🎉  Union types document intent and can
-help guard against mistakes. Fellow developers and our compiler can
-know &ldquo;these are all the cases.&rdquo; In particular, Flow can warn us when
-we&rsquo;ve <a href="/flow-exhaustiveness/">forgotten a case</a>.</p>
-
-<p>Our initial implementation is working great. After sharing it with the
-team, someone suggests adding a &ldquo;cancel&rdquo; button in the top corner. It
-doesn&rsquo;t make sense to cancel when the flow has already succeeded, so
-we&rsquo;ll exclude it from the last screen:</p>
-
-<p><a href="/images/2fa-close-btn.jpeg"><img src="/images/2fa-close-btn.jpeg" alt="Adding a close button to our modal" /></a></p>
-
-<p>No problem: let&rsquo;s write a function called <code>needsCancelButton</code> to
-determine if we need to put a cancel button in the header of a
-particular screen:</p>
-
-<pre><code class="js">const needsCancelButton = (screen: Screen): boolean =&gt; {
-  // Recall: 'SuccessScreen' is the last screen,
-  // so it shouldn't have a cancel button.
-  return screen !== 'SuccessScreen';
-};
-</code></pre>
-
-<p>Short and sweet. 👌 Everything seems to be working great, until&hellip;</p>
-
-<h2><code>switch</code>: Optimizing for Exhaustiveness</h2>
-
-<p>The next day, we get some updated mocks from the design team. This time,
-they&rsquo;ve also drawn up a &ldquo;failure&rdquo; screen for when the customer has
-entered the wrong code too many times:</p>
-
-<p><a href="/images/2fa-failure-screen.jpeg"><img src="/images/2fa-failure-screen.jpeg" alt="The failure screen for our modal" /></a></p>
-
-<p>We can handle this&mdash;we&rsquo;ll just add a case to our <code>Screen</code> type:</p>
-
-<pre><code class="js">type Screen =
-  | 'LoadingScreen'
-  | 'CodeEntryScreen'
-  | 'SuccessScreen'
-  // New case to handle too many wrong attempts:
-  | 'FailureScreen';
-</code></pre>
-
-<p>But now <strong>there&rsquo;s a bug</strong> in our <code>needsCancelButton</code> function. 😧 We
-should only show a close button on screens where it makes sense, and
-<code>'FailureScreen'</code> is not one of those screens. Our first reaction after
-discovering the bug would be to just blacklist <code>'FailureScreen'</code> too:</p>
-
-<pre><code class="js">const needsCancelButton = (screen: Screen): boolean =&gt; {
-  return (
-    screen !== 'SuccessScreen' ||
-    screen !== 'FailureScreen'
-  );
-};
-</code></pre>
-
-<p>But we can do better than just fixing the <strong>current</strong> bug. We should
-write code so that when we add a new case to a union type, our type
-checker alerts us before a <strong>future</strong> bug even happens. What if instead
-of a silent bug, we got this cheery message from our type checker?</p>
-
-<blockquote><p>Hey, you forgot to add a case to <code>needsCancelButton</code> for the new
-screen you added. <em>🙂</em></p>
-
-<p>&mdash; your friendly, neighborhood type checker</p></blockquote>
-
-<p>Let&rsquo;s go back and rewrite <code>needsCancelButton</code> so that it <strong>will</strong> tell
-us this when adding new cases. We&rsquo;ll use a <code>switch</code> statement with
-<a href="/flow-exhaustiveness/">something special in the <code>default</code> case</a>:</p>
-
-<pre><code class="js">const impossible = &lt;T&gt;(x: empty): T =&gt; {
-  throw new Error('This case is impossible.');
-}
-
-const needsCancelButton = (screen: Screen): boolean =&gt; {
-  switch (screen) {
-    case 'LoadingScreen':
-      return true;
-    case 'CodeEntryScreen':
-      return true;
-    case 'SuccessScreen':
-      return false;
-    default:
-      // (I named this function 'absurd' in my earlier post:
-      // https://blog.jez.io/flow-exhaustiveness/)
-      // This function asks Flow to check for exhaustiveness.
-      //
-      // [flow]: Error: Cannot call `impossible` with `screen` bound to `x` because string literal `FailureScreen` [1] is incompatible with empty [2].
-      return impossible(screen);
-  }
-}
-</code></pre>
-
-<p><a href="https://flow.org/try/#0PTAEAEDMBsHsHcBQiAuBPADgU1AZQMYBOWWAdqALyKigA+oA5ADKwCGAJgJakDmBxZBtTqMAwrHZYAoqRSE0-EqSE16DXAFd8+LAGddiwcLUAxVp2gbih5QG5k+WKV0pQnALYZY+zgCNoOBSgADwAKgB8ABQAHgBcoFie6ACU8aGU4aAA3sIoABaECKCkWPCgUoSFhJEMoXmcuqD4rLo4DW6e3rp+AQB0DMn2AL4OTi7FJOy6oqykOtAAQhooKE6UoJG6RErxNqmgvrCwAbMZ2cK68Jwo+HkbWwKkyec0NM2tjCwc3HzbgrHCV6gYgoKzkOQaLD2IHvHAMcSSGRyBR-ZQAoE0EFg0AQqGApotOGabR6AyohjojFYwjkSCsaCtaGvECgACqc1g7ncZFcq1AkE40RxeRwJjgZSwlVghHxLNhjDMFisWBsFNlYGBWFBNP59MZ+MkdI00BQlKB1PIHi8Pn8WE2qMGwhGQyAA"><strong>(Play with it on Try Flow →)</strong></a></p>
-
-<p>Now Flow is smart enough to give us an error! Making our code safer, one
-<code>switch</code> statement at a time. 😅 Union types in Flow are a powerful way
-to use types to guarantee correctness. But to get the most out of union
-types, <strong>always<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> access them</strong> through a <code>switch</code> statement.
-Every time we use a union type without an exhaustive switch statement,
-we make it harder for Flow to tell us where we&rsquo;ve missed something.</p>
-
-<h2>Correctness, but at what cost?</h2>
-
-<p>You might not have noticed, but we paid a subtle cost in rewriting
-our <code>needsCancelButton</code> function. Let&rsquo;s compare our two functions:</p>
-
-<pre><code class="js">// ----- before: 62 bytes (minified) -----
-
-const needsCancelButton = (screen) =&gt; {
-  return screen !== 'SuccessScreen';
-};
-
-// ----- after: 240 bytes (minified) -----
-
-const impossible = (x) =&gt; {
-  throw new Error('This case is impossible.');
-};
-
-const needsCancelButton = (screen) =&gt; {
-  switch (screen) {
-    case 'LoadingScreen':
-      return true;
-    case 'CodeEntryScreen':
-      return true;
-    case 'SuccessScreen':
-      return false;
-    default:
-      return impossible(screen);
-  }
-};
-</code></pre>
-
-<p>With just an equality check, our function was small: 62 bytes minified.
-But when we refactored to use a <code>switch</code> statement, its size shot up to
-240 bytes! That&rsquo;s a 4x increase, just to get exhaustiveness. Admittedly,
-<code>needsCancelButton</code> is a bit of a pathological case. But in general: as
-we make our code bases <strong>more safe</strong> using Flow&rsquo;s union types of string
-literals, our <strong>bundle size bloats</strong>!</p>
-
-<h2>Types and Optimizing Compilers</h2>
-
-<p>One of the many overlooked promises of types is the claim that by
-writing our code with <strong>higher-level abstractions</strong>, we give more
-information to the compiler. The compiler can then generate code that
-captures our original intent, but as efficiently as possible.</p>
-
-<p>Flow is decidedly <strong>not</strong> a compiler: it&rsquo;s only a type checker. To run
-JavaScript annotated with Flow types, we first strip the types (with
-something like Babel). All information about the types vanishes when we
-run the code.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> What can we achieve if we were to <strong>keep the
-types around</strong> all the way through compilation?</p>
-
-<p><a href="https://reasonml.github.io/">Reason</a> (i.e., ReasonML) is an exciting effort to bring all the
-benefits of the OCaml tool chain to the web. In particular, Reason
-works using OCaml&rsquo;s mature optimizing compiler alongside BuckleScript
-(which turns OCaml to JavaScript) to emit great code.</p>
-
-<p>To see what I mean, let&rsquo;s re-implement our <code>Screen</code> type and
-<code>needsCancelButton</code> function, this time in Reason:</p>
-
-<pre><code class="js">type screen =
-  | LoadingScreen
-  | CodeEntryScreen
-  | SuccessScreen;
-
-let needsCancelButton = (screen: screen): bool =&gt; {
-  switch (screen) {
-  | LoadingScreen =&gt; true;
-  | CodeEntryScreen =&gt; true;
-  | SuccessScreen =&gt; false;
-  }
-};
-</code></pre>
-
-<p>Looks pretty close to JavaScript with Flow types, doesn&rsquo;t it? The
-biggest difference is that the <code>case</code> keyword was replaced with the <code>|</code>
-character. Making the way we define and use union types look the same is
-a subtle reminder to always pair union types with <code>switch</code> statements!
-<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup> Another difference: Reason handles exhaustiveness checking
-out of the box. 🙂</p>
-
-<p>What does the Reason output look like?</p>
-
-<pre><code class="js">// Generated by BUCKLESCRIPT VERSION 3.0.1, PLEASE EDIT WITH CARE
-'use strict';
-
-function needsCancelButton(screen) {
-  if (screen &gt;= 2) {
-    return false;
-  } else {
-    return true;
-  }
-}
-</code></pre>
-
-<p><a href="https://reasonml.github.io/en/try.html?rrjsx=true&amp;reason=C4TwDgpgBAzgxgJwhAdlAvAKClAPlAGQHsBDAEwEsUBzAZUWRWzygGEiyIBRFYBEeklTN8tAK5w4EGDEGMA3JkwAbCMCgpkZGKxIopygEJjgwImnRQAFPCEoAXLAaoAlI4BGRIsowA+KADezDAA7hTAcAAW1raMLoEihKSUNHKoflB8YhCKOPjsnDx8As4W-lk5ieKS0rKlGQBmJMowlTgAvpjtikA"><strong>(Play with it on Try Reason →)</strong></a></p>
-
-<p>Not bad! Telling Reason that our function was exhaustive let it optimize
-the entire <code>switch</code> statement back down to a single <code>if</code> statement. In
-fact, it gets even better: when we run this through <code>uglifyjs</code>, it
-removes the redundant <code>true</code> / <code>false</code>:</p>
-
-<pre><code class="js">"use strict";
-function needsCancelButton(n){
-  return !(n&gt;=2)
-}
-</code></pre>
-
-<p>Wow! This is actually <strong>better</strong> than our initial, hand-written <code>if</code>
-statement. Reason compiled what used to be a string literal
-<code>'SuccessScreen'</code> to just the number <code>2</code>. Reason can do this safely
-because custom-defined types in Reason <strong>aren&rsquo;t</strong> strings, so it doesn&rsquo;t
-matter if the names get mangled.</p>
-
-<p>Taking a step back, Reason&rsquo;s type system delivered on the promise of
-types in a way Flow couldn&rsquo;t:</p>
-
-<ul>
-<li>We wrote high-level, expressive code.</li>
-<li>The type checker gave us strong guarantees about our code&rsquo;s
-correctness via exhaustiveness.</li>
-<li>The compiler translated that all to tiny, performant output.</li>
-</ul>
-
-
-<p>I&rsquo;m really excited about Reason. 😄 It has a delightful type system and
-is backed by a decades-old optimizing compiler tool chain. I&rsquo;d love to
-see more people take advantage of improvements in type systems to write
-better code!</p>
-
-<hr />
-
-<h2>Appendix: Other Compile-to-JS Runtimes</h2>
-
-<p>The above analysis only considered Flow + Babel and Reason. But then I
-got curious about how other typed languages that compile to JavaScript
-compare on the optimizations front:</p>
-
-<h3>TypeScript</h3>
-
-<p>Despite being a language <strong>and</strong> compiler, TypeScript maintains a
-goal of compiling to JavaScript that closely resembles the source
-TypesScript code. TypeScript has three language constructs for working
-with exhaustiveness:</p>
-
-<ol>
-<li>union types (identical to the Flow unions that we&rsquo;ve been talking
-about),</li>
-<li><code>enum</code>s, which are sort of like definition a group of variable
-constants all at once, and</li>
-<li><code>const enum</code>s which are like <code>enum</code>s except that they&rsquo;re represented
-more succinctly in the compiled output.</li>
-</ol>
-
-
-<p>TypeScript&rsquo;s union type over string literals are represented the same
-way as Flow, so I&rsquo;m going to skip (1) and focus instead on (2) and (3).</p>
-
-<p>TypeScript&rsquo;s <code>enum</code> and <code>const enum</code> are subtly different. Not having
-used the language much, I&rsquo;ll refer you to <a href="https://www.typescriptlang.org/docs/handbook/enums.html">the TypeScript
-documentation</a> to learn more about the differences. But for
-sure, <code>const enum</code>s compile much better than normal <code>enum</code>s.</p>
-
-<p>Here&rsquo;s what normal <code>enum</code>s look like in TypeScript&mdash;they&rsquo;re <strong>even
-worse</strong> than unions of string literals:</p>
-
-<pre><code class="js">var Screen_;
-(function (Screen_) {
-    Screen_[Screen_["LoadingScreen"] = 0] = "LoadingScreen";
-    Screen_[Screen_["CodeEntryScreen"] = 1] = "CodeEntryScreen";
-    Screen_[Screen_["SuccessScreen"] = 2] = "SuccessScreen";
-})(Screen_ || (Screen_ = {}));
-var impossible = function (x) {
-    throw new Error('This case is impossible.');
-};
-var needsCancelButton = function (screen) {
-    switch (screen) {
-        case Screen_.LoadingScreen:
-            return true;
-        case Screen_.CodeEntryScreen:
-            return true;
-        case Screen_.SuccessScreen:
-            return false;
-        default:
-            return impossible(screen);
-    }
-};
-</code></pre>
-
-<p><a href="https://www.typescriptlang.org/play/#src=enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error('This%20case%20is%20impossible.')%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D"><strong>TypeScript Playground →</strong></a></p>
-
-<p>So for normal <code>enum</code>s:</p>
-
-<ul>
-<li>It&rsquo;s not smart enough to optimize away the <code>impossible</code> call.</li>
-<li>It keeps around a JavaScript object representing the collection of
-enum values at run time, in a format that doesn&rsquo;t minify well.</li>
-</ul>
-
-
-<p>And then here&rsquo;s what <code>const enum</code>s look like&mdash;you can see that
-TypeScript represents them under the hood without any sort of <code>Screen_</code>
-object:</p>
-
-<pre><code class="js">var impossible = function (x) {
-    throw new Error('This case is impossible.');
-};
-var needsCancelButton = function (screen) {
-    switch (screen) {
-        case 0 /* LoadingScreen */:
-            return true;
-        case 1 /* CodeEntryScreen */:
-            return true;
-        case 2 /* SuccessScreen */:
-            return false;
-        default:
-            return impossible(screen);
-    }
-};
-</code></pre>
-
-<p><a href="https://www.typescriptlang.org/play/#src=const%20enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error('This%20case%20is%20impossible.')%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D"><strong>TypeScript Playground →</strong></a></p>
-
-<ul>
-<li>It uses numbers instead of strings.</li>
-<li>It still uses a switch statement, instead of reducing to just an <code>if</code>
-statement.</li>
-</ul>
-
-
-<h2>PureScript</h2>
-
-<p>PureScript is another high-level language like Reason. Both Reason and
-PureScript have data types where we can define unions with custom
-constructor names. Despite that, PureScript&rsquo;s generated code is
-significantly worse than Reason&rsquo;s.</p>
-
-<pre><code class="js">"use strict";
-var LoadingScreen = (function () {
-    function LoadingScreen() {};
-    LoadingScreen.value = new LoadingScreen();
-    return LoadingScreen;
-})();
-var CodeEntryScreen = (function () {
-    function CodeEntryScreen() {};
-    CodeEntryScreen.value = new CodeEntryScreen();
-    return CodeEntryScreen;
-})();
-var SuccessScreen = (function () {
-    function SuccessScreen() {};
-    SuccessScreen.value = new SuccessScreen();
-    return SuccessScreen;
-})();
-var needsCancelButton = function (v) {
-    if (v instanceof LoadingScreen) {
-        return true;
-    };
-    if (v instanceof CodeEntryScreen) {
-        return true;
-    };
-    if (v instanceof SuccessScreen) {
-        return false;
-    };
-    throw new Error("Failed pattern match at Main line 10, column 1 - line 10, column 39: " + [ v.constructor.name ]);
-};
-</code></pre>
-
-<ul>
-<li>It&rsquo;s generating ES5 classes for each data constructor.</li>
-<li>It compiles pattern matching to a series of <code>instanceof</code> checks.</li>
-<li>Even though it <strong>knows</strong> the match is exhaustive, it still emits a
-<code>throw</code> statement in case the pattern match fails!</li>
-</ul>
-
-
-<p>Admittedly, I didn&rsquo;t try that hard to turn on optimizations in the
-compiler. Maybe there&rsquo;s a flag I can pass to get this <code>Error</code> to go
-away. But that&rsquo;s pretty disappointing, compared to how small Reason&rsquo;s
-generated code was!</p>
-
-<h2>Elm</h2>
-
-<p>I list Elm in the same class as Reason and PureScript. Like the other
-two, it lets us define custom data types, and will automatically warn
-when us pattern matches aren&rsquo;t exhaustive. Here&rsquo;s the code Elm
-generates:</p>
-
-<pre><code class="js">var _user$project$Main$needsCancelButton = function (page) {
-  var _p0 = page;
-  switch (_p0.ctor) {
-    case 'LoadingScreen':
-      return true;
-    case 'CodeEntryScreen':
-      return true;
-    default:
-      return false;
-  }
-};
-var _user$project$Main$SuccessScreen = {ctor: 'SuccessScreen'};
-var _user$project$Main$CodeEntryScreen = {ctor: 'CodeEntryScreen'};
-var _user$project$Main$LoadingScreen = {ctor: 'LoadingScreen'};
-</code></pre>
-
-<ul>
-<li>It&rsquo;s using string literals, much like Flow and TypeScript.</li>
-<li>It&rsquo;s smart enough to collapse the last case to just use <code>default</code>
-(at least it doesn&rsquo;t <code>throw</code> in the <code>default</code> case!)</li>
-<li>The variable names are long, but these would still minify well.</li>
-</ul>
-
-
-<p>It&rsquo;s interesting to see that even though Reason, PureScript, and Elm all
-have ML-style datatypes, Reason is the only one that uses an integer
-representation for the constructor tags.</p>
-
-<!-- vim:tw=72
--->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>2FA: two-factor authentication<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>&ldquo;Always&rdquo; is a very strong statement. Please use your best judgement. But know that if you&rsquo;re not using a <code>switch</code>, you&rsquo;re trading off the burden of exhaustiveness &amp; correctness from the type checker to the programmer!<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>Even though TypeScript defines both a language <strong>and</strong> a compiler for that language, in practice it&rsquo;s not much different from Flow here. A goal of the TypeScript compiler is to generate JavaScript that closely resembles the original TypeScript, so it doesn&rsquo;t do compile-time optimizations based on the types.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-<li id="fn:4">
-<p>More than being a nice reminder, it makes it easy to copy / paste our type definition as boilerplate to start writing a new function!<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
 
 ]]></content>
   </entry>
