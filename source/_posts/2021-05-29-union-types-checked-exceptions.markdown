@@ -161,7 +161,7 @@ With Sorbet, this Java snippet becomes:
 
 ```ruby
 sig do
-  params(amouunt: Integer, currency_str: String)
+  params(amount: Integer, currency_str: String)
     .returns(T.any(Charge, ParseError))
 end
 def create_charge(amount, currency_str)
@@ -222,7 +222,7 @@ What's more, the union types approach has a couple unique benefits:
   `ParseException` was uncaught and mentioned in the `throws` does not
   mean all of them should be.
 
-And finally, let me get out ahead of some common counterarguments.
+And finally, let me get out ahead of some common counter arguments.
 
 > The union types approach requires more typing at the call site!
 
