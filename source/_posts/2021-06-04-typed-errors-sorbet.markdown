@@ -22,7 +22,7 @@ but if you can grok Haskell syntax, it's worth the read because the
 lessons apply broadly to most statically typed programming languages.
 
 If you haven't read it (or it's been a while) the setup is basically:
-typing errors is hard, and nearly ever solution is either brittle,
+typing errors is hard, and nearly every solution is either brittle,
 clunky, verbose, or uses powerful type system features that we didn't
 want to have to reach for.
 
