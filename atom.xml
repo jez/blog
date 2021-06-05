@@ -4,7 +4,7 @@
   <title><![CDATA[Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2021-05-29T05:11:34-04:00</updated>
+  <updated>2021-06-05T00:42:05-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -15,16 +15,44 @@
   
   
   <entry>
+    <title type="html"><![CDATA[Typed Errors in Sorbet]]></title>
+    <link href="https://blog.jez.io/typed-errors-sorbet/"/>
+    <updated>2021-05-30T22:12:37-07:00</updated>
+    <id>https://blog.jez.io/typed-errors-sorbet</id>
+    <content type="html"><![CDATA[<p>Let&rsquo;s answer another question about how best to use Sorbet:</p>
+
+<blockquote><p>How should I type methods that might fail?</p></blockquote>
+
+<p>Let&rsquo;s take a look at an example.</p>
+
+<!-- more -->
+
+
+
+
+<!-- This could work, but might be verbose -->
+
+
+<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">create_customer</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">card_number</span><span class="p">,</span> <span class="n">exp_month</span><span class="p">,</span> <span class="n">exp_year</span><span class="p">);</span> <span class="k">end</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">create_charge</span><span class="p">(</span><span class="n">customer</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">currency</span><span class="p">);</span> <span class="k">end</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">handle_create_charge_request</span><span class="p">(</span><span class="n">req</span><span class="p">);</span> <span class="k">end</span></span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  
+  
+  <entry>
     <title type="html"><![CDATA[Sorbet Does Not Have Checked Exceptions]]></title>
     <link href="https://blog.jez.io/union-types-checked-exceptions/"/>
     <updated>2021-05-29T01:21:41-07:00</updated>
     <id>https://blog.jez.io/union-types-checked-exceptions</id>
-    <content type="html"><![CDATA[<p>People new to Sorbet ask this all the time:</p>
+    <content type="html"><![CDATA[<p>Here&rsquo;s a common question I get asked about Sorbet:</p>
 
 <blockquote><p>Does Sorbet support checked exceptions, like Java?</p></blockquote>
 
-<p>(In fact, this was the <a href="https://youtu.be/odmlf_ezsBo?t=1921">first ever question</a> I was asked at my <a href="https://jez.io/talks/state-of-sorbet-2019/">first
-ever conference talk</a>.)</p>
+<p>(In fact, this was the <a href="https://youtu.be/odmlf_ezsBo?t=1921">first question</a> I was asked at my <a href="https://jez.io/talks/state-of-sorbet-2019/">first
+conference talk</a>.)</p>
 
 <p>The answer: Sorbet doesn&rsquo;t support checked exceptions, and I don&rsquo;t think
 it ever should.</p>
@@ -32,29 +60,28 @@ it ever should.</p>
 <!-- more -->
 
 
-<p>Before I dive in: chances are you&rsquo;re reading this because you asked the
-question above and someone linked you this. Or maybe you saw the title
-and just happened to click. Either way, I&rsquo;m going to take for granted
-that you know what I mean by &ldquo;checked exceptions.&rdquo; If you want a quick
-refresher, jump down to the <a href="#appendix">Appendix</a> and then come back.</p>
+<p>Before I dive in, there are two pretexts I&rsquo;m assuming: either you asked
+this question and someone linked you this post, or the post title was
+enough to catch your attention. Either way, I&rsquo;m going to take for
+granted that you know what I mean by &ldquo;checked exceptions.&rdquo; If you want a
+quick refresher, jump down to the <a href="#appendix">Appendix</a> and then come
+back.</p>
 
 <p>My claim is that checked exceptions are a poor man&rsquo;s ad hoc union types,
-that Sorbet has ad hoc union types, and thus that Sorbet doesn&rsquo;t need
-checked exceptions.</p>
-
-<p>I&rsquo;ll discuss this claim in three parts:</p>
+that since Sorbet has ad hoc union types it doesn&rsquo;t need checked
+exceptions. I&rsquo;ll discuss this claim in three parts:</p>
 
 <ul>
-<li>I&rsquo;ll give some background on a key feature of Sorbet&rsquo;s union types,
-which are unique compared with union types in many other languages.</li>
+<li>I&rsquo;ll give some background on what it means for union types to be &ldquo;ad
+hoc,&rdquo; which applies to Sorbet&rsquo;s union types but are somewhat rare.</li>
 <li>I&rsquo;ll describe a translation from checked exceptions in Java to
 union-typed returns in Ruby with a concrete example.</li>
 <li>I&rsquo;ll give evidence for why the union types approach is better.</li>
 </ul>
 
 
-<p>(I won&rsquo;t hold it against you if you skip to the conclusion and come back
-for the lead up. It&rsquo;s what I know I&rsquo;d do too.)</p>
+<p>(If you want to skip straight to the good stuff, the analysis <a href="#analysis">is down
+here</a>.)</p>
 
 <h2>Background: Sorbet&rsquo;s union types</h2>
 
@@ -83,12 +110,7 @@ union&rsquo;s variants, for example in Rust:</p>
 </span><span class='line'><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>(Rust is not alone here. There are benefits to having an explicit name.
-Requiring a name makes it <a href="https://www.parsonsmatt.org/2018/11/03/trouble_with_typed_errors.html">harder to use union types to use for
-errors</a>. This article is not about Rust, please
-don&rsquo;t @ me.)</p>
-
-<p>This &ldquo;on demand&rdquo; characteristic of union types is similar to Java&rsquo;s
+<p>That Sorbet allows defining union types on demand is similar to Java&rsquo;s
 <code>throws</code> clause, but more powerful: <code>throws A, B, C</code> is not a type,
 while <code>T.any(A, B, C)</code> is. We&rsquo;ll see why that matters below.</p>
 
@@ -156,8 +178,8 @@ method&rsquo;s return type and all the exceptions mentioned in the <code>throws<
 </ol>
 
 
-<p>The translation isn&rsquo;t complete until we see how the <code>parseCurrency</code>
-caller side changes:</p>
+<p>Our translation isn&rsquo;t complete until we see how the <code>parseCurrency</code>
+caller side changes. In Java, we call <code>parseCurrency</code> like this:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Charge</span> <span class="nf">createCharge</span><span class="o">(</span><span class="kt">int</span> <span class="n">amount</span><span class="o">,</span> <span class="n">String</span> <span class="n">currencyStr</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ParseException</span> <span class="o">{</span>
 </span><span class='line'>    <span class="n">Currency</span> <span class="n">currency</span> <span class="o">=</span> <span class="n">parseCurrency</span><span class="o">(</span><span class="n">currencyStr</span><span class="o">);</span>
@@ -165,7 +187,7 @@ caller side changes:</p>
 </span><span class='line'><span class="o">}</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>With Sorbet, this Java snippet becomes:</p>
+<p>With Sorbet, this snippet becomes:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">sig</span> <span class="k">do</span>
 </span><span class='line'>  <span class="n">params</span><span class="p">(</span><span class="ss">amount: </span><span class="no">Integer</span><span class="p">,</span> <span class="ss">currency_str: </span><span class="no">String</span><span class="p">)</span>
@@ -186,7 +208,8 @@ exceptions implicitly bubble up to the caller, return values only bubble
 up if explicitly returned. This is a key benefit of the union types
 approach, which brings us to our next section.</p>
 
-<h2>Analysis: Why the union types approach is better</h2>
+<h2 id="analysis">Analysis: Why the union types approach is better</h2>
+
 
 <p>To recap, Sorbet&rsquo;s union types are ad hoc, much in the same sense as the
 classes mentioned in Java&rsquo;s <code>throws</code> clause. When converting from <code>Java</code> to
@@ -205,12 +228,12 @@ error documentation.</p></li>
 
 <p>In both Java and Ruby, if our method is the first to combine two
 methods with unrelated failure modes, there&rsquo;s no ceremony to
-predeclare that combination.  Instead, we just mention one more class
+predeclare that combination. Instead, we just mention one more class
 in the method&rsquo;s signature.</p></li>
 </ul>
 
 
-<p>What&rsquo;s more, the union types approach has a couple unique benefits:</p>
+<p>But this approach is not only as good, it&rsquo;s better, because:</p>
 
 <ul>
 <li><p>As a language feature, <strong>union types are not special</strong>.</p>
@@ -260,7 +283,7 @@ mentioned how call-site granularity is a win.</p>
 
 <h2>I love union types</h2>
 
-<p>That&rsquo;s it, that&rsquo;s the whole take. Sorbet doesn&rsquo;t need checked exceptions, it
+<p>That&rsquo;s pretty much it. Sorbet doesn&rsquo;t need checked exceptions, it
 already has ad hoc union types.</p>
 
 <hr />
@@ -269,28 +292,32 @@ already has ad hoc union types.</p>
 
 
 <p>As a quick refresher, <a href="https://en.wikibooks.org/wiki/Java_Programming/Checked_Exceptions">checked exceptions</a> are a feature popularized by
-Java.  The syntax looks like this:</p>
+Java. The syntax looks like this:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kt">void</span> <span class="nf">doThing</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">MyException</span> <span class="o">{</span>
 </span><span class='line'>    <span class="c1">// ...</span>
 </span><span class='line'><span class="o">}</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>The <code>throws</code> keyword declares that in addition to the method&rsquo;s argument
-types and return type, it might also throw <code>MyException</code>. If a method
-throws multiple classes of exceptions, they can all be listed:</p>
+<p>The <code>throws</code> keyword is a part of the method&rsquo;s signature, just like
+argument and return types. It declares that this method might throw
+<code>MyException</code>.</p>
+
+<p>Since it&rsquo;s a part of this method&rsquo;s signature the <code>throws</code> annotation
+will be checked at all call sites (just like argument and return types).
+A method containing calls to <code>doThing</code> must either <code>catch</code> all mentioned
+exceptions or repeat any maybe-thrown-but-uncaught exceptions in its own
+<code>throws</code> clause.</p>
+
+<p>If a method throws multiple classes of exceptions, they can all be
+listed:</p>
 
 <figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kt">void</span> <span class="nf">doThing</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">MyException</span><span class="o">,</span> <span class="n">YourException</span><span class="o">,</span> <span class="n">AnotherException</span> <span class="o">{</span>
 </span><span class='line'>    <span class="c1">// ...</span>
 </span><span class='line'><span class="o">}</span></span></code></pre></td></tr></table></div></figure>
 
 
-<p>The <code>throws</code> keyword is checked at all call sites, just like argument
-and return types. A method containing calls to <code>doThing</code> must either
-<code>catch</code> all mentioned exceptions or repeat the <code>throws</code> clause in its
-own signature.</p>
-
-<p>The argument in favor of checked exceptions is that it&rsquo;s explicit and
+<p>The argument in favor of checked exceptions is that they&rsquo;re explicit and
 machine-checked. Users don&rsquo;t have to guess at what a method might throw,
 or hope that there&rsquo;s accurate documentation—all benefits shared by
 static typing in general, which is a sympathetic goal.</p>
@@ -3624,194 +3651,6 @@ semantics.</p>
 <ol>
 <li id="fn:1">
 <p>I&rsquo;m exaggerating a bit here 😅 To see what I <em>really</em> mean, see <a href="https://blog.jez.io/lens-intuition">this post</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  
-  
-  <entry>
-    <title type="html"><![CDATA[Some Intuition on Lenses]]></title>
-    <link href="https://blog.jez.io/lens-intuition/"/>
-    <updated>2018-02-05T21:09:43-08:00</updated>
-    <id>https://blog.jez.io/lens-intuition</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve been working on a small project in Haskell recently that uses the
-<a href="https://hackage.haskell.org/package/wreq">wreq</a> library. It&rsquo;s an HTTP client library that exposes most of its
-functionality through lenses. Using this library is my first time really
-using lenses pervasively, so I&rsquo;ve spent some time trying to understand
-how lenses really work.</p>
-
-<!-- more -->
-
-
-<p>Lenses try to bring the concept of getters and setters into a functional
-setting. Here, &ldquo;functional&rdquo; means that lenses prioritize composition
-(chaining one lens after another) and immutability (returning a new
-data structure<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> instead of mutating the old one in place).</p>
-
-<p>In a functional setting, if we have a type <code>s</code> and we want to get some
-field of type <code>a</code> from it, a getter is just a function <code>s -&gt; a</code>.</p>
-
-<p>Similarly, a setter that updates that field has the type <code>s -&gt; a -&gt; s</code>
-which takes the old <code>s</code> and slots the <code>a</code> into it, giving us back a new
-<code>s</code>.</p>
-
-<p>Let&rsquo;s see if we can build up some intuition, starting with these types
-and ending with the type of <code>Lens'</code> from the lens library:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">type</span> <span class="kt">Lens'</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="n">forall</span> <span class="n">f</span><span class="o">.</span> <span class="kt">Functor</span> <span class="n">f</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">s</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">s</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>In particular, let&rsquo;s start with our getter:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">fn</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">a</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>The first thing we can do is convert it to continuation-passing style
-(CPS). In CPS form, a function throws it&rsquo;s return value to a
-user-specified callback function (or continuation) instead of returning
-its value directly. So our <code>s -&gt; a</code> becomes:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">fn</span> <span class="o">::</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">r</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>After we&rsquo;re done computing an <code>a</code> from the <code>s</code> we were given, we throw
-it to the continuation of type <code>a -&gt; r</code>. We then take <strong>that</strong> result and
-return it. I like to put parens around the second function:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">fn</span> <span class="o">::</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">s</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>But it&rsquo;s kind of hard to do anything with this, because <code>r</code> is
-completely arbitrary. It&rsquo;s chosen by whoever calls us, so we have no
-information about what can be done on an <code>r</code>. What if we instead require
-that the continuation result be a Functor?</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">fn</span> <span class="o">::</span> <span class="kt">Functor</span> <span class="n">f</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">r</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">s</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">r</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>And while we&rsquo;re at it, it was kind an arbitrary stipulation that the <code>f
-r</code> of the continuation&rsquo;s callback be the same as the <code>f r</code> of our
-function&rsquo;s result type, so let&rsquo;s relax that:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">fn</span> <span class="o">::</span> <span class="kt">Functor</span> <span class="n">f</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">s</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">t</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>This relaxation makes sense as long as we know of some function with
-type <code>b -&gt; t</code>, because then we could</p>
-
-<ul>
-<li>take the <code>s</code>,</li>
-<li>apply our <code>s -&gt; a</code> getter to get an <code>a</code>,</li>
-<li>throw this to the <code>a -&gt; f b</code> continuation to get an <code>f b</code>, and</li>
-<li><code>fmap</code> our <code>b -&gt; t</code> function over this to get an <code>f t</code>.</li>
-</ul>
-
-
-<p>In general, we might not know of some <code>b -&gt; t</code> function. But remember
-that we do have our <code>s -&gt; a -&gt; s</code> function! So if we choose <code>b = a</code> and
-<code>s = t</code>, then we get:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">fn</span> <span class="o">::</span> <span class="kt">Functor</span> <span class="n">f</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">s</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">s</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>With a function like this, we can</p>
-
-<ul>
-<li>take the <code>s</code>,</li>
-<li>apply our <code>s -&gt; a</code> getter to get an <code>a</code>,</li>
-<li>throw our <code>a</code> to the <code>a -&gt; f a</code> continuation to get an <code>f a</code>,</li>
-<li>partially apply our <code>s -&gt; a -&gt; s</code> setter with the <code>s</code> we were given,
-
-<ul>
-<li>(so we have an <code>a -&gt; s</code> now)</li>
-</ul>
-</li>
-<li><code>fmap</code> this <code>a -&gt; s</code> function over the <code>f a</code> to get an <code>f s</code></li>
-</ul>
-
-
-<p>And we&rsquo;ve arrived at the type of <code>Lens'</code>! What really happened here was
-we marked the interesting<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> part of our data structure with
-a Functor. So if we choose an interesting Functor instance, it&rsquo;ll act on
-that point.</p>
-
-<p>What if the Functor we choose is <code>Const a</code>? Well, then it&rsquo;s on us to
-provide an <code>a -&gt; f a</code> continuation. Since we&rsquo;ve chosen <code>f = Const a</code> we
-have to come up with a function with type <code>a -&gt; Const a a</code>. This is a
-special case of the <code>Const</code> constructor:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kt">Const</span> <span class="o">::</span> <span class="n">forall</span> <span class="n">b</span><span class="o">.</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">Const</span> <span class="n">a</span> <span class="n">b</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>So our continuation remembers the <code>a</code> it was given. After the last step,
-we&rsquo;ll have a <code>Const a s</code>, which we can call <code>getConst</code> on to give us
-the <code>a</code> we stashed. So by choosing <code>Const</code>, our lens acts like a getter!</p>
-
-<p>What if the Functor we choose is <code>Identity</code>? Now we have to provide a
-function <code>a -&gt; Identity a</code>. At this point, you probably guessed this
-makes our lens a setter. If we&rsquo;re trying to use a setter, then we&rsquo;ll
-also have access to some new <code>y :: a</code> that we want to use to slot into
-our <code>s</code>. Let&rsquo;s see what happens if we make this our continuation:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">inj</span> <span class="o">::</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">Identity</span> <span class="n">a</span>
-</span><span class='line'><span class="n">inj</span> <span class="n">x</span> <span class="o">=</span> <span class="kt">Identity</span> <span class="n">y</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>The <code>x :: a</code> is the old value of <code>x</code>. By dropping <code>x</code> on the floor and
-returning <code>y</code> instead, we&rsquo;ve slotted <code>y</code> into our <code>s</code>. Remember
-that above we took the <code>f a</code> and our setter <code>s -&gt; a -&gt; s</code>, partially
-applied it to get <code>a -&gt; s</code>, and <code>fmap</code>&rsquo;d this over the <code>f a</code>. Since our
-continuation now holds a wrapped up <code>y :: a</code>, we&rsquo;ll reconstruct a new
-<code>s</code> using <code>y</code>. Great!</p>
-
-<h2>More Resources</h2>
-
-<p>These are some resources that helped make lenses less intimidating for
-me:</p>
-
-<ul>
-<li><a href="https://www.youtube.com/watch?v=cefnmjtAolY">Lenses, Folds, and
-Traversals</a> (video)
-
-<ul>
-<li>by Edward Kmett, the author of the lens library</li>
-<li>highly technical, long, exhaustive</li>
-</ul>
-</li>
-<li><a href="https://hackage.haskell.org/package/lens-4.16/docs/Control-Lens-Getter.html">Control.Lens.Getter</a> (hackage)
-
-<ul>
-<li>in particular, the first few lines of the intro paragraph</li>
-<li>also: <code>(^.)</code> to see where the <code>f</code> becomes <code>Const a</code></li>
-</ul>
-</li>
-<li><code>#haskell</code> on Freenode
-
-<ul>
-<li>Special thanks to <code>johnw_</code> and <code>dminuoso</code>!</li>
-</ul>
-</li>
-</ul>
-
-
-<p>Lenses seem intimidating at first, but in the end they&rsquo;re just a really
-cool uses of functions. We use nothing more exotic here than the Functor
-type class and a couple of Functor instances, and in return we get such
-concise code!</p>
-
-<!-- vim:tw=72
--->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>It&rsquo;s common to think that &ldquo;immutable&rdquo; means &ldquo;copy the entire thing&rdquo; and then change the parts you care about. But if you start with <strong>all data</strong> being immutable, then you only need to allocate new memory for the subcomponents of your data structure that <strong>actually</strong> changed. Everything else can be shared by the old and the new.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>In the same way that glass lenses focus light on a point, functional lenses focus a data structure on a point! Isn&rsquo;t it neat how that name works out? It&rsquo;s certainly a cooler name than &ldquo;generalized getter/setter <a href="https://www.youtube.com/watch?v=pD_imYhNoQ4">wombo combo</a>&rdquo; (video, language warning).<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 

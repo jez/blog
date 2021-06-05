@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Bits, Bytes, and Words]]></title>
   <link href="https://blog.jez.io/categories/ruby/atom.xml" rel="self"/>
   <link href="https://blog.jez.io/"/>
-  <updated>2021-05-29T05:11:34-04:00</updated>
+  <updated>2021-06-05T00:42:05-04:00</updated>
   <id>https://blog.jez.io/</id>
   <author>
     <name><![CDATA[Jake Zimmerman]]></name>
@@ -14,16 +14,42 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Typed Errors in Sorbet]]></title>
+    <link href="https://blog.jez.io/typed-errors-sorbet/"/>
+    <updated>2021-05-30T22:12:37-07:00</updated>
+    <id>https://blog.jez.io/typed-errors-sorbet</id>
+    <content type="html"><![CDATA[<p>Let&rsquo;s answer another question about how best to use Sorbet:</p>
+
+<blockquote><p>How should I type methods that might fail?</p></blockquote>
+
+<p>Let&rsquo;s take a look at an example.</p>
+
+<!-- more -->
+
+
+
+
+<!-- This could work, but might be verbose -->
+
+
+<pre><code class="ruby">def create_customer(email, card_number, exp_month, exp_year); end
+def create_charge(customer, amount, currency); end
+def handle_create_charge_request(req); end
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Sorbet Does Not Have Checked Exceptions]]></title>
     <link href="https://blog.jez.io/union-types-checked-exceptions/"/>
     <updated>2021-05-29T01:21:41-07:00</updated>
     <id>https://blog.jez.io/union-types-checked-exceptions</id>
-    <content type="html"><![CDATA[<p>People new to Sorbet ask this all the time:</p>
+    <content type="html"><![CDATA[<p>Here&rsquo;s a common question I get asked about Sorbet:</p>
 
 <blockquote><p>Does Sorbet support checked exceptions, like Java?</p></blockquote>
 
-<p>(In fact, this was the <a href="https://youtu.be/odmlf_ezsBo?t=1921">first ever question</a> I was asked at my <a href="https://jez.io/talks/state-of-sorbet-2019/">first
-ever conference talk</a>.)</p>
+<p>(In fact, this was the <a href="https://youtu.be/odmlf_ezsBo?t=1921">first question</a> I was asked at my <a href="https://jez.io/talks/state-of-sorbet-2019/">first
+conference talk</a>.)</p>
 
 <p>The answer: Sorbet doesn&rsquo;t support checked exceptions, and I don&rsquo;t think
 it ever should.</p>
@@ -31,29 +57,28 @@ it ever should.</p>
 <!-- more -->
 
 
-<p>Before I dive in: chances are you&rsquo;re reading this because you asked the
-question above and someone linked you this. Or maybe you saw the title
-and just happened to click. Either way, I&rsquo;m going to take for granted
-that you know what I mean by &ldquo;checked exceptions.&rdquo; If you want a quick
-refresher, jump down to the <a href="#appendix">Appendix</a> and then come back.</p>
+<p>Before I dive in, there are two pretexts I&rsquo;m assuming: either you asked
+this question and someone linked you this post, or the post title was
+enough to catch your attention. Either way, I&rsquo;m going to take for
+granted that you know what I mean by &ldquo;checked exceptions.&rdquo; If you want a
+quick refresher, jump down to the <a href="#appendix">Appendix</a> and then come
+back.</p>
 
 <p>My claim is that checked exceptions are a poor man&rsquo;s ad hoc union types,
-that Sorbet has ad hoc union types, and thus that Sorbet doesn&rsquo;t need
-checked exceptions.</p>
-
-<p>I&rsquo;ll discuss this claim in three parts:</p>
+that since Sorbet has ad hoc union types it doesn&rsquo;t need checked
+exceptions. I&rsquo;ll discuss this claim in three parts:</p>
 
 <ul>
-<li>I&rsquo;ll give some background on a key feature of Sorbet&rsquo;s union types,
-which are unique compared with union types in many other languages.</li>
+<li>I&rsquo;ll give some background on what it means for union types to be &ldquo;ad
+hoc,&rdquo; which applies to Sorbet&rsquo;s union types but are somewhat rare.</li>
 <li>I&rsquo;ll describe a translation from checked exceptions in Java to
 union-typed returns in Ruby with a concrete example.</li>
 <li>I&rsquo;ll give evidence for why the union types approach is better.</li>
 </ul>
 
 
-<p>(I won&rsquo;t hold it against you if you skip to the conclusion and come back
-for the lead up. It&rsquo;s what I know I&rsquo;d do too.)</p>
+<p>(If you want to skip straight to the good stuff, the analysis <a href="#analysis">is down
+here</a>.)</p>
 
 <h2>Background: Sorbet&rsquo;s union types</h2>
 
@@ -82,12 +107,7 @@ union&rsquo;s variants, for example in Rust:</p>
 }
 </code></pre>
 
-<p>(Rust is not alone here. There are benefits to having an explicit name.
-Requiring a name makes it <a href="https://www.parsonsmatt.org/2018/11/03/trouble_with_typed_errors.html">harder to use union types to use for
-errors</a>. This article is not about Rust, please
-don&rsquo;t @ me.)</p>
-
-<p>This &ldquo;on demand&rdquo; characteristic of union types is similar to Java&rsquo;s
+<p>That Sorbet allows defining union types on demand is similar to Java&rsquo;s
 <code>throws</code> clause, but more powerful: <code>throws A, B, C</code> is not a type,
 while <code>T.any(A, B, C)</code> is. We&rsquo;ll see why that matters below.</p>
 
@@ -155,8 +175,8 @@ method&rsquo;s return type and all the exceptions mentioned in the <code>throws<
 </ol>
 
 
-<p>The translation isn&rsquo;t complete until we see how the <code>parseCurrency</code>
-caller side changes:</p>
+<p>Our translation isn&rsquo;t complete until we see how the <code>parseCurrency</code>
+caller side changes. In Java, we call <code>parseCurrency</code> like this:</p>
 
 <pre><code class="java">Charge createCharge(int amount, String currencyStr) throws ParseException {
     Currency currency = parseCurrency(currencyStr);
@@ -164,7 +184,7 @@ caller side changes:</p>
 }
 </code></pre>
 
-<p>With Sorbet, this Java snippet becomes:</p>
+<p>With Sorbet, this snippet becomes:</p>
 
 <pre><code class="ruby">sig do
   params(amount: Integer, currency_str: String)
@@ -185,7 +205,8 @@ exceptions implicitly bubble up to the caller, return values only bubble
 up if explicitly returned. This is a key benefit of the union types
 approach, which brings us to our next section.</p>
 
-<h2>Analysis: Why the union types approach is better</h2>
+<h2 id="analysis">Analysis: Why the union types approach is better</h2>
+
 
 <p>To recap, Sorbet&rsquo;s union types are ad hoc, much in the same sense as the
 classes mentioned in Java&rsquo;s <code>throws</code> clause. When converting from <code>Java</code> to
@@ -204,12 +225,12 @@ error documentation.</p></li>
 
 <p>In both Java and Ruby, if our method is the first to combine two
 methods with unrelated failure modes, there&rsquo;s no ceremony to
-predeclare that combination.  Instead, we just mention one more class
+predeclare that combination. Instead, we just mention one more class
 in the method&rsquo;s signature.</p></li>
 </ul>
 
 
-<p>What&rsquo;s more, the union types approach has a couple unique benefits:</p>
+<p>But this approach is not only as good, it&rsquo;s better, because:</p>
 
 <ul>
 <li><p>As a language feature, <strong>union types are not special</strong>.</p>
@@ -259,7 +280,7 @@ mentioned how call-site granularity is a win.</p>
 
 <h2>I love union types</h2>
 
-<p>That&rsquo;s it, that&rsquo;s the whole take. Sorbet doesn&rsquo;t need checked exceptions, it
+<p>That&rsquo;s pretty much it. Sorbet doesn&rsquo;t need checked exceptions, it
 already has ad hoc union types.</p>
 
 <hr />
@@ -268,28 +289,32 @@ already has ad hoc union types.</p>
 
 
 <p>As a quick refresher, <a href="https://en.wikibooks.org/wiki/Java_Programming/Checked_Exceptions">checked exceptions</a> are a feature popularized by
-Java.  The syntax looks like this:</p>
+Java. The syntax looks like this:</p>
 
 <pre><code class="java">void doThing() throws MyException {
     // ...
 }
 </code></pre>
 
-<p>The <code>throws</code> keyword declares that in addition to the method&rsquo;s argument
-types and return type, it might also throw <code>MyException</code>. If a method
-throws multiple classes of exceptions, they can all be listed:</p>
+<p>The <code>throws</code> keyword is a part of the method&rsquo;s signature, just like
+argument and return types. It declares that this method might throw
+<code>MyException</code>.</p>
+
+<p>Since it&rsquo;s a part of this method&rsquo;s signature the <code>throws</code> annotation
+will be checked at all call sites (just like argument and return types).
+A method containing calls to <code>doThing</code> must either <code>catch</code> all mentioned
+exceptions or repeat any maybe-thrown-but-uncaught exceptions in its own
+<code>throws</code> clause.</p>
+
+<p>If a method throws multiple classes of exceptions, they can all be
+listed:</p>
 
 <pre><code class="java">void doThing() throws MyException, YourException, AnotherException {
     // ...
 }
 </code></pre>
 
-<p>The <code>throws</code> keyword is checked at all call sites, just like argument
-and return types. A method containing calls to <code>doThing</code> must either
-<code>catch</code> all mentioned exceptions or repeat the <code>throws</code> clause in its
-own signature.</p>
-
-<p>The argument in favor of checked exceptions is that it&rsquo;s explicit and
+<p>The argument in favor of checked exceptions is that they&rsquo;re explicit and
 machine-checked. Users don&rsquo;t have to guess at what a method might throw,
 or hope that there&rsquo;s accurate documentation—all benefits shared by
 static typing in general, which is a sympathetic goal.</p>
@@ -673,226 +698,6 @@ error means silencing them all, which is a win for simplicity.</p>
 <ol>
 <li id="fn:1">
 <p>Did you know that <code>!x</code> in Ruby is syntactic sugar for <code>x.!()</code>, which means that you can override <code>!</code> to make it do something else?<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Intersection Types in Sorbet are Surprisingly Common]]></title>
-    <link href="https://blog.jez.io/intersection-types-common/"/>
-    <updated>2020-01-04T19:50:32-06:00</updated>
-    <id>https://blog.jez.io/intersection-types-common</id>
-    <content type="html"><![CDATA[<p>Conventional knowledge is that union types are common and intersection
-types are rare. But actually that&rsquo;s not the case—intersection types
-show up in nearly every program Sorbet type checks thanks to control
-flow.</p>
-
-<p><a href="https://sorbet.org/docs/union-types">Union types</a> in Sorbet are incredibly common, which should be no
-surprise. In Sorbet, <code>T.nilable(...)</code> is sugar for <code>T.any(NilClass,
-...)</code>. <code>T.nilable</code> shows up all over the place and probably catches more
-bugs than any other feature in Sorbet.</p>
-
-<p>Sorbet also has <a href="https://sorbet.org/docs/intersection-types">intersection types</a>. While union types mean &ldquo;either
-this or that,&rdquo; intersection types mean &ldquo;both this and that.&rdquo; On first
-glance, intersection types seem like some super niche feature which only
-benefits a handful of programs. In Stripe&rsquo;s Ruby monorepo, the strings
-<code>T.any</code> and <code>T.nilable</code> occur nearly 300 times more than <code>T.all</code> does.</p>
-
-<p>But those numbers hide something critical: intersection types power
-Sorbet&rsquo;s <a href="https://sorbet.org/docs/flow-sensitive">control flow-sensitive typing</a>. They&rsquo;re actually present in
-every Ruby program, but just a little hard to spot. Let&rsquo;s look at how
-pervasive they are with a few examples:</p>
-
-<pre><code class="ruby"># typed: strict
-extend T::Sig
-
-class Parent; end
-class Child &lt; Parent; end
-
-sig {params(x: Parent).void}
-def example1(x)
-  case x
-  when Child
-    T.reveal_type(x) # Revealed type: `Child`
-  end
-end
-</code></pre>
-
-<p><a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Aclass%20Parent%3B%20end%0Aclass%20Child%20%3C%20Parent%3B%20end%0A%0Asig%20%7Bparams(x%3A%20Parent).void%7D%0Adef%20example1(x)%0A%20%20case%20x%0A%20%20when%20Child%0A%20%20%20%20T.reveal_type(x)%20%23%20Revealed%20type%3A%20%60Child%60%0A%20%20end%0Aend">→ View on sorbet.run</a></p>
-
-<p>Here <code>x</code> starts out having type <code>Parent</code>, but inside the <code>case</code>
-statement Sorbet treats <code>x</code> as having the more specific type <code>Child</code>.
-There&rsquo;s no <code>T.all</code> in sight, but that&rsquo;s because it&rsquo;s hiding. Sorbet
-doesn&rsquo;t just throw away the fact that it knew <code>x &lt;: Parent</code>. Instead, it
-uses <code>T.all</code> to update its type for <code>x</code> to <code>T.all(Parent, Child)</code>.</p>
-
-<p><code>T.all(Parent, Child)</code> is equivalent to <code>Child</code> because <code>Child</code> is a
-subtype of <code>Parent</code>. If types represent sets of values, then the set of
-values represented by <code>Child</code> is a subset of the set of values
-represented by <code>Parent</code>, so the intersection of those two sets would
-just leave <code>Child</code>.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
-
-<p>Sorbet attempts to simplify a large type to a smaller, equivalent type
-when it can for two reasons:</p>
-
-<ul>
-<li><p><strong>Usability</strong> – Most users don&rsquo;t know that <code>T.all</code> means &ldquo;intersection
-type&rdquo; or even what intersection types are. (And even those who do
-still end up drawing Venn diagrams from time to time!) It only gets
-more complicated when <code>T.all</code>s and <code>T.any</code>s nest inside each other.</p>
-
-<p>Meanwhile, <code>Child</code> is a super easy type to understand, and leads to
-nice, short error messages.</p></li>
-<li><p><strong>Performance</strong> – Checking whether one type is a subtype of another is
-a super common operation, so it has to be fast. By collapsing
-<code>T.all(Parent, Child)</code> to <code>Child</code>, Sorbet does at least half as much
-work when checking subtyping (probably more, because of some common
-path optimizations).</p>
-
-<p>When this simplification happens, Sorbet even skips an allocation
-entirely. Cnstructing <code>T.all(Parent, Child)</code> in Sorbet short
-circuits and returns a reference to the already allocated <code>Child</code> type
-that was passed as an argument (with ownership tracked via
-<code>std::shared_ptr</code><sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>).</p></li>
-</ul>
-
-
-<p>Let&rsquo;s look at another example of control flow:</p>
-
-<pre><code class="ruby"># typed: strict
-extend T::Sig
-
-class A; end
-class B; end
-
-sig {params(a_or_b: T.any(A, B)).void}
-def example2(a_or_b)
-  case a_or_b
-  when A
-    T.reveal_type(a_or_b) # Revealed type: `A`
-  end
-end
-</code></pre>
-
-<p><a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Aclass%20A%3B%20end%0Aclass%20B%3B%20end%0A%0Asig%20%7Bparams(a_or_b%3A%20T.any(A%2C%20B)).void%7D%0Adef%20example2(a_or_b)%0A%20%20case%20a_or_b%0A%20%20when%20A%0A%20%20%20%20T.reveal_type(a_or_b)%20%23%20Revealed%20type%3A%20%60A%60%0A%20%20end%0Aend">→ View on sorbet.run</a></p>
-
-<p>This example method accepts either <code>A</code> or <code>B</code> (<code>T.any(A, B)</code>) and then
-branches on whether <code>a_or_b</code> is an instance of <code>A</code>. Again: Sorbet
-doesn&rsquo;t throw away that it knows <code>a_or_b &lt;: T.any(A, B)</code>. Instead it
-updates its knowledge of the type of <code>a_or_b</code> using <code>T.all</code> to get
-<code>T.all(T.any(A, B), A)</code>. Realizing that this is equivalent to <code>A</code> is a
-bit trickier:</p>
-
-<pre><code class="ruby">T.all(T.any(A, B), A)
-
-# Distribute
-T.any( T.all(A, A) , T.all(B, A) )
-
-# T.all(A, A) is just A (idempotence)
-T.any( A , T.all(B, A) )
-
-# A and B are classes (not mixins) and neither inherits the other.
-# It's impossible to have a value of that type, so it's bottom:
-T.any( A , T.noreturn )
-
-# bottom is the identity of union
-A
-</code></pre>
-
-<p>You can start to see how usability and performance and might get a
-little out of hand if Sorbet didn&rsquo;t keep attempting to simplify things!
-The cumulative effect of all the control flow in a program would result
-in huge, unweidly types.</p>
-
-<p>Until now you could claim that I&rsquo;ve been hyping up intersection types as
-the solution to problems that were self-imposed. That if we just
-invented some other method for modeling control flow, it would have been
-naturally usable or naturally performant, and we wouldn&rsquo;t have had
-problems in the first place. So next let&rsquo;s look at some examples to see
-why intersection types really are the most natural solution:</p>
-
-<pre><code class="ruby">module I1
-  def foo1; end
-end
-module I2
-  def foo2; end
-end
-
-sig {params(x: I1).void}
-def example3(x)
-  x.foo1  # Works outside
-  case x
-  when I2
-    x.foo1  # Should (and does) still work inside
-    x.foo2
-  end
-end
-</code></pre>
-
-<p><a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Amodule%20I1%0A%20%20def%20foo1%3B%20end%0Aend%0Amodule%20I2%0A%20%20def%20foo2%3B%20end%0Aend%0A%0Asig%20%7Bparams(x%3A%20I1).void%7D%0Adef%20example3(x)%0A%20%20x.foo1%20%20%23%20Works%20outside%0A%20%20case%20x%0A%20%20when%20I2%0A%20%20%20%20x.foo1%20%20%23%20Should%20(and%20does)%20still%20work%20inside%0A%20%20%20%20x.foo2%0A%20%20end%0Aend%0A">→ View on sorbet.run</a></p>
-
-<p>Unlike in the other examples, this is the first example where had we
-tried to implement control-flow-sensitive typing by throwing away the
-old type and using the new type instead it wouldn&rsquo;t have worked. The key
-thing to notice: this example uses modules. Outside the <code>case</code> of course
-calling <code>x.method_from_1</code> works because <code>x</code> starts out at type <code>I1</code>. But
-if we treated <code>x</code> as only <code>I2</code> inside the <code>when I2</code>, we&rsquo;d start
-reporting an error for calling <code>x.method_from_1</code> because it doesn&rsquo;t
-exist on <code>I2</code>.</p>
-
-<p>Unlike intersecting unrelated classes (our <code>T.all(B, A)</code> example from
-earlier), intersecting unrelated modules does&rsquo;t collapse to
-<code>T.noreturn</code>. There&rsquo;s nothing stopping some class from including both
-<code>I1</code> and <code>I2</code>. Instances of that class would be values of type
-<code>T.any(I1, I2)</code>:</p>
-
-<pre><code class="ruby">class SomeClass
-  include I1
-  include I2
-end
-
-# This type assertion is okay:
-T.let(SomeClass.new, T.all(I1, I2))
-</code></pre>
-
-<p><a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Amodule%20I1%0A%20%20def%20foo1%3B%20end%0Aend%0Amodule%20I2%0A%20%20def%20foo2%3B%20end%0Aend%0A%0Asig%20%7Bparams(x%3A%20I1).void%7D%0Adef%20example3(x)%0A%20%20x.foo1%20%20%23%20Works%20outside%0A%20%20case%20x%0A%20%20when%20I2%0A%20%20%20%20x.foo1%20%20%23%20Should%20(and%20does)%20still%20work%20inside%0A%20%20%20%20x.foo2%0A%20%20end%0Aend%0A%0Aclass%20SomeClass%0A%20%20include%20I1%0A%20%20include%20I2%0Aend%0A%0A%23%20This%20type%20assertion%20is%20okay%3A%0AT.let(SomeClass.new%2C%20T.all(I1%2C%20I2))">→ View on sorbet.run</a></p>
-
-<p>So at least for implementing certain cases of flow sensitive typing,
-we&rsquo;ll <em>need</em> intersection types anyways. Then for these certain cases
-we&rsquo;d incur the usability and performance problems we discovered earlier
-and have to solve them.</p>
-
-<p>But more than that, intersection types are fundamentally easier to work
-with compared to some ad hoc approach to flow sensitive typing. Type
-system bugs are weird. It&rsquo;s frquently harder to figure out whether the
-current behavior is buggy in the first place than it is to find the
-cause!</p>
-
-<p>In that light, intersection types present an elegant, robust model for
-arriving at what the correct behavior <em>should</em> be, independent of what
-Sorbet&rsquo;s existing behavior is. It&rsquo;s clear how intersection types
-interact with union types, and with subtyping, and with generics, and
-with variance, etc.</p>
-
-<p>By repurposing intersection types to model control flow sensitivity,
-when things go wrong there&rsquo;s a framework for discovering what&rsquo;s right.</p>
-
-<p>(Speaking of repurposing, intersection types also play an important role
-in how Sorbet <a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Amodule%20M%3B%20end%0Amodule%20N%3B%20end%0A%0Asig%20%7Bparams(m%3A%20M).void%7D%0Adef%20takes_m(m)%3B%20end%0Asig%20%7Bparams(n%3A%20N).void%7D%0Adef%20takes_n(n)%3B%20end%0A%0Adef%20needs_sig(x)%0A%20%20takes_m(x)%0A%20%20takes_n(x)%0Aend">suggests potential method signatures</a>! That&rsquo;s three birds
-with one stone.)</p>
-
-<!-- vim:tw=72
--->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>If you&rsquo;re not convinced, consider: with <code>T.all(Parent, Child)</code> we should be able to call all the methods on <code>Parent</code> and all the methods on <code>Child</code>. But <code>Child</code> inherits <code>Parent</code>&rsquo;s methods, so any method <code>Parent</code> has will already be on <code>Child</code>. So <code>Child</code> is equivalently good as <code>T.all(Parent, Child)</code>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>If you&rsquo;re looking for a good intro to modern C++ things like <code>shared_ptr</code>, I can&rsquo;t recommend <a href="https://berthub.eu/articles/posts/cpp-intro/">this blog post series</a> enough.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
