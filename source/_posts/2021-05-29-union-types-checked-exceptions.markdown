@@ -10,41 +10,40 @@ description: "Sorbet does not support checked exceptions, and I don't think it e
 strong_keywords: false
 ---
 
-People new to Sorbet ask this all the time:
+Here's a common question I get asked about Sorbet:
 
 > Does Sorbet support checked exceptions, like Java?
 
-(In fact, this was the [first ever question] I was asked at my [first
-ever conference talk].)
+(In fact, this was the [first question] I was asked at my [first
+conference talk].)
 
-[first ever question]: https://youtu.be/odmlf_ezsBo?t=1921
-[first ever conference talk]: https://jez.io/talks/state-of-sorbet-2019/
+[first question]: https://youtu.be/odmlf_ezsBo?t=1921
+[first conference talk]: https://jez.io/talks/state-of-sorbet-2019/
 
 The answer: Sorbet doesn't support checked exceptions, and I don't think
 it ever should.
 
 <!-- more -->
 
-Before I dive in: chances are you're reading this because you asked the
-question above and someone linked you this. Or maybe you saw the title
-and just happened to click. Either way, I'm going to take for granted
-that you know what I mean by "checked exceptions." If you want a quick
-refresher, jump down to the [Appendix](#appendix) and then come back.
+Before I dive in, there are two pretexts I'm assuming: either you asked
+this question and someone linked you this post, or the post title was
+enough to catch your attention. Either way, I'm going to take for
+granted that you know what I mean by "checked exceptions." If you want a
+quick refresher, jump down to the [Appendix](#appendix) and then come
+back.
 
 My claim is that checked exceptions are a poor man's ad hoc union types,
-that Sorbet has ad hoc union types, and thus that Sorbet doesn't need
-checked exceptions.
+that since Sorbet has ad hoc union types it doesn't need checked
+exceptions. I'll discuss this claim in three parts:
 
-I'll discuss this claim in three parts:
-
-- I'll give some background on a key feature of Sorbet's union types,
-  which are unique compared with union types in many other languages.
+- I'll give some background on what it means for union types to be "ad
+  hoc," which applies to Sorbet's union types but are somewhat rare.
 - I'll describe a translation from checked exceptions in Java to
   union-typed returns in Ruby with a concrete example.
 - I'll give evidence for why the union types approach is better.
 
-(I won't hold it against you if you skip to the conclusion and come back
-for the lead up. It's what I know I'd do too.)
+(If you want to skip straight to the good stuff, the analysis [is down
+here](#analysis).)
 
 ## Background: Sorbet's union types
 
@@ -75,12 +74,7 @@ enum AorBorC {
 }
 ```
 
-(Rust is not alone here. There are benefits to having an explicit name.
-Requiring a name makes it [harder to use union types to use for
-errors][trouble-typed-errors]. This article is not about Rust, please
-don't @ me.)
-
-This "on demand" characteristic of union types is similar to Java's
+That Sorbet allows defining union types on demand is similar to Java's
 `throws` clause, but more powerful: `throws A, B, C` is not a type,
 while `T.any(A, B, C)` is. We'll see why that matters below.
 
@@ -147,8 +141,8 @@ The important changes:
    method's return type and all the exceptions mentioned in the `throws`.
 1. Where the Java example uses `throw`, the Ruby example uses `return`.
 
-The translation isn't complete until we see how the `parseCurrency`
-caller side changes:
+Our translation isn't complete until we see how the `parseCurrency`
+caller side changes. In Java, we call `parseCurrency` like this:
 
 ```java
 Charge createCharge(int amount, String currencyStr) throws ParseException {
@@ -157,7 +151,7 @@ Charge createCharge(int amount, String currencyStr) throws ParseException {
 }
 ```
 
-With Sorbet, this Java snippet becomes:
+With Sorbet, this snippet becomes:
 
 ```ruby
 sig do
@@ -179,7 +173,7 @@ exceptions implicitly bubble up to the caller, return values only bubble
 up if explicitly returned. This is a key benefit of the union types
 approach, which brings us to our next section.
 
-## Analysis: Why the union types approach is better
+<h2 id="analysis">Analysis: Why the union types approach is better</h2>
 
 To recap, Sorbet's union types are ad hoc, much in the same sense as the
 classes mentioned in Java's `throws` clause. When converting from `Java` to
@@ -198,10 +192,10 @@ exceptions:
 
   In both Java and Ruby, if our method is the first to combine two
   methods with unrelated failure modes, there's no ceremony to
-  predeclare that combination.  Instead, we just mention one more class
+  predeclare that combination. Instead, we just mention one more class
   in the method's signature.
 
-What's more, the union types approach has a couple unique benefits:
+But this approach is not only as good, it's better, because:
 
 - As a language feature, **union types are not special**.
 
@@ -249,7 +243,7 @@ mentioned how call-site granularity is a win.
 
 ## I love union types
 
-That's it, that's the whole take. Sorbet doesn't need checked exceptions, it
+That's pretty much it. Sorbet doesn't need checked exceptions, it
 already has ad hoc union types.
 
 
@@ -258,7 +252,7 @@ already has ad hoc union types.
 <h2 id="appendix">Appendix: Checked Exceptions</h2>
 
 As a quick refresher, [checked exceptions] are a feature popularized by
-Java.  The syntax looks like this:
+Java. The syntax looks like this:
 
 ```java
 void doThing() throws MyException {
@@ -266,9 +260,18 @@ void doThing() throws MyException {
 }
 ```
 
-The `throws` keyword declares that in addition to the method's argument
-types and return type, it might also throw `MyException`. If a method
-throws multiple classes of exceptions, they can all be listed:
+The `throws` keyword is a part of the method's signature, just like
+argument and return types. It declares that this method might throw
+`MyException`.
+
+Since it's a part of this method's signature the `throws` annotation
+will be checked at all call sites (just like argument and return types).
+A method containing calls to `doThing` must either `catch` all mentioned
+exceptions or repeat any maybe-thrown-but-uncaught exceptions in its own
+`throws` clause.
+
+If a method throws multiple classes of exceptions, they can all be
+listed:
 
 ```java
 void doThing() throws MyException, YourException, AnotherException {
@@ -276,12 +279,7 @@ void doThing() throws MyException, YourException, AnotherException {
 }
 ```
 
-The `throws` keyword is checked at all call sites, just like argument
-and return types. A method containing calls to `doThing` must either
-`catch` all mentioned exceptions or repeat the `throws` clause in its
-own signature.
-
-The argument in favor of checked exceptions is that it's explicit and
+The argument in favor of checked exceptions is that they're explicit and
 machine-checked. Users don't have to guess at what a method might throw,
 or hope that there's accurate documentation—all benefits shared by
 static typing in general, which is a sympathetic goal.
