@@ -9,6 +9,7 @@ description: >
   Old habits die hard; I'm still pretending to be a teaching assistant
   even though I'm not anymore.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 <!-- Empty header to prevent first paragraph from being big -->

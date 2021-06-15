@@ -9,6 +9,7 @@ categories: ['linux', 'ruby', 'c']
 description: >
   I recently learned that linkers are really cool.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 I recently learned that linkers are really cool. It all started when I

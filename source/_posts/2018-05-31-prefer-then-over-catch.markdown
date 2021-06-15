@@ -11,6 +11,7 @@ description: >
   relatively unsafe library definition for the `.catch` method, so it's
   best to avoid it if you can.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 When designing asynchronous APIs that could error in Flow, prefer using

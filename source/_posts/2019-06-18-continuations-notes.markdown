@@ -9,6 +9,7 @@ description: >
   Some recitation notes on continuations from when I was a teaching
   assistant for 15-312 at CMU.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 These are some notes I gave out at one of my weekly recitations when I

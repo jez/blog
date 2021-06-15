@@ -11,6 +11,7 @@ description: >
   show up in nearly every program Sorbet type checks thanks to control
   flow.
 strong_keywords: true
+fancy_blockquotes: true
 ---
 
 Conventional knowledge is that union types are common and intersection

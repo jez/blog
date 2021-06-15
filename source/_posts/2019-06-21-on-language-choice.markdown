@@ -7,6 +7,7 @@ share: false
 categories: ['programming']
 description: "Absolutely the most regret from choosing a programming language has come from forgetting to ask this question:"
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 My opinion on programming language choice has changed over the years,

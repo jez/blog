@@ -10,6 +10,7 @@ description: >
   'Presenting Data & Information.' I'm glad I went, and there were a
   number of things I took away from the day.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 On Monday, December 4th, I went to Edward Tufte's one-day course on

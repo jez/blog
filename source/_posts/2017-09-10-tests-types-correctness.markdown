@@ -12,6 +12,7 @@ description: >
   and type systems are complementary---they're distinct tools to help us
   write better code.
 strong_keywords: false
+fancy_blockquotes: true
 redirect_from:
 - /testing-types/
 ---

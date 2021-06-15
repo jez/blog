@@ -11,6 +11,7 @@ description: >
   more of our code to use union types, I've noticed that our bundle size
   has been steadily increasing!
 strong_keywords: false
+fancy_blockquotes: true
 pinned: true
 ---
 

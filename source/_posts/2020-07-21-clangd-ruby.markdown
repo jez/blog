@@ -11,6 +11,7 @@ description: >
   I've managed to get LSP-based IDE features powered by [clangd] working
   for the Ruby VM's source code (in my case, in Vim). Here's how I did it!
 strong_keywords: false
+fancy_blockquotes: true
 # }}}
 ---
 

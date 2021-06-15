@@ -14,6 +14,7 @@ description: >
   is the result of using type variables in two ways within the same
   system.
 strong_keywords: true
+fancy_blockquotes: true
 mathjax: true
 pinned: true
 ---

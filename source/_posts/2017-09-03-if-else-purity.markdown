@@ -12,6 +12,7 @@ description: >
   looser languages, these principled languages inform the structure of
   my code.
 strong_keywords: true
+fancy_blockquotes: true
 ---
 
 I prefer to let the language I'm using think on my behalf as much as

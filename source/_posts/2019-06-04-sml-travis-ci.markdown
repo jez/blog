@@ -9,6 +9,7 @@ description: >
   For one of my recent projects I went through the work to get Standard
   ML building in Travis CI.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 For one of my recent projects ([`multi-grep`]) I went through the work to

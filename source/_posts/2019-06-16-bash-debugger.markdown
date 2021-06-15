@@ -7,6 +7,7 @@ share: false
 categories: ['bash']
 description: I implemented a debugger for Bash in six lines of Bash.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 I implemented a "debugger" for Bash in six lines of Bash. It kind of

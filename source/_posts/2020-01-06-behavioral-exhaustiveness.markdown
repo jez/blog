@@ -7,6 +7,7 @@ share: false
 categories: 
 description: 
 strong_keywords: true
+fancy_blockquotes: true
 published: false
 ---
 

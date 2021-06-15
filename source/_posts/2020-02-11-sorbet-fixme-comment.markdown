@@ -9,6 +9,7 @@ description: >
   Sorbet has no way to ignore an error on a specific line with a magic
   comment, which makes things simple.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 <p></p>

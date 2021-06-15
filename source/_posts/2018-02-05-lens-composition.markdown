@@ -8,6 +8,7 @@ categories: ['haskell', 'types', 'fragment']
 description: >
   It's really cool how composition works with lenses!
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 <p></p>

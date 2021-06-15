@@ -13,6 +13,7 @@ description: >
   In this post, we'll discover from the ground up how Flow's
   exhaustiveness checking behaves.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 Compared to some other languages, [Flow]'s story around exhaustiveness

@@ -9,6 +9,7 @@ description: >
   I've been working with lenses on a small project recently, and I
   thought I'd write up some of my intuition about how they work.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 I've been working on a small project in Haskell recently that uses the

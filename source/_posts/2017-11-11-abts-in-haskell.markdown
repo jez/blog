@@ -12,6 +12,7 @@ description: >
   nameless terms. Recently though, I found unbound-generics, which
   checks all my previously unfilled boxes.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 I've been learning and using Haskell on-and-off for the past couple

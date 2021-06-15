@@ -11,6 +11,7 @@ description: >
   sense of `x += 1` or something—that's not what I'm referring to. In
   fact, that's the easy kind of mutation to model in a type system.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 <p></p>

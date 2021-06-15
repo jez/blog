@@ -11,6 +11,7 @@ description: >
   variables are used in generic programming, inductive & coinductive
   types, and polymorphic types.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 These are some recitation notes for an ad-hoc recitation I gave for the

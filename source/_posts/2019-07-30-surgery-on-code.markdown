@@ -11,6 +11,7 @@ description: >
   but only on specific lines.” In this post, I’ll introduce the CLI
   tools I’ve made to solve this class of problems with some examples.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 I'm frequently faced wth problems like "find and replace this pattern,

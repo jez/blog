@@ -10,6 +10,7 @@ description: >
   I used to not know the difference between ∀(t.τ) and λ(u.c). Turns
   out, there's a huge difference!
 strong_keywords: false
+fancy_blockquotes: true
 mathjax: true
 ---
 

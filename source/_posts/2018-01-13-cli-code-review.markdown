@@ -12,6 +12,7 @@ description: >
   reviewing, so that I can understand it better than if I were just
   browsing online.
 strong_keywords: false
+fancy_blockquotes: true
 pinned: true
 ---
 

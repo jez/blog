@@ -10,6 +10,7 @@ description: >
   Haskell's profiling tools and about profiling code in general.
   Profiling in Haskell with Stack is super easy...
 strong_keywords: false
+fancy_blockquotes: true
 pinned: true
 ---
 

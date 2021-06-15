@@ -10,6 +10,7 @@ description: >
   Sorbet's union types in method returns provide a low-friction, high
   value way to model how methods can fail.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 <!-- more -->

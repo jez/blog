@@ -9,6 +9,7 @@ description: >
   I've found it useful to search though the source code of things
   lower in the stack lately.
 strong_keywords: false
+fancy_blockquotes: true
 ---
 
 I've found it useful to search though the source code of things lower in
