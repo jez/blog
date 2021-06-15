@@ -8,7 +8,7 @@ share: false
 categories: ['ruby', 'sorbet', 'types']
 description: "Sorbet does not support checked exceptions, and I don't think it ever should."
 strong_keywords: false
-fancy_blockquotes: true
+fancy_blockquotes: false
 ---
 
 Here's a common question I get asked about Sorbet:
