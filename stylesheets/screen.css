@@ -322,18 +322,26 @@ figcaption {
 }
 
 blockquote {
-  margin-left: 40px;
   font-style: italic;
 }
 blockquote em {
   font-style: normal;
 }
 
-blockquote > *:first-child {
+body:not(.fancy-blockquotes) blockquote {
+  padding-left: 2rem;
+  border-left: 1px solid black;
+}
+
+body.fancy-blockquotes blockquote {
+  margin-left: 40px;
+}
+
+body.fancy-blockquotes blockquote > *:first-child {
   position: relative;
 }
 
-blockquote > *:first-child::before {
+body.fancy-blockquotes blockquote > *:first-child::before {
   content: "“";
   display: block;
   position: absolute;
