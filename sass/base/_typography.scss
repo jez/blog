@@ -67,19 +67,28 @@ figcaption {
 
 // Blockquotes
 // --------------------------------------------------
-// Style the blockquotes with a fancy quote character
 blockquote {
-  margin-left: 40px;
   font-style: italic;
 
   & em {
     font-style: normal;
   }
 }
-blockquote > *:first-child {
+
+// Style the blockquotes with a fancy quote character,
+// unless post requested simple quotes.
+body:not(.fancy-blockquotes) blockquote {
+  padding-left: 2rem;
+  border-left: 1px solid black;
+}
+
+body.fancy-blockquotes blockquote {
+  margin-left: 40px;
+}
+body.fancy-blockquotes blockquote > *:first-child {
   position: relative;
 }
-blockquote > *:first-child::before {
+body.fancy-blockquotes blockquote > *:first-child::before {
   content: "“";
   display: block;
   position: absolute;

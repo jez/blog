@@ -119,6 +119,7 @@ task :new_post, :title do |t, args|
     post.puts "categories: "
     post.puts "description: "
     post.puts "strong_keywords: false"
+    post.puts "fancy_blockquotes: false"
     post.puts "---"
     post.puts ""
     post.puts ""
