@@ -9,7 +9,8 @@ description: >-
 baseurl: ""
 url: "https://blog.jez.io"
 future: false
-timezone: America/Los_Angeles
+# Has to be this to not break some links
+timezone: America/New_York
 
 permalink: '/:slug/'
 
@@ -51,6 +52,9 @@ exclude:
 
 include:
   - .nojekyll
+
+feed:
+  path: atom.xml
 
 # Octopress configuration
 

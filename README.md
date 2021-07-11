@@ -24,4 +24,6 @@ bundle exec jekyll build
 bundle exec octopress publish
 
 bundle exec octopress new page
+
+bundle exec jekyll build && bundle exec octopress deploy
 ```
