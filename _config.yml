@@ -1,0 +1,70 @@
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+
+title: Jake Zimmerman
+author: Jake Zimmerman
+description: >-
+  A collection of blog posts about programming, software, types, programming
+  languages, Sorbet, Vim, Markdown, and more.
+baseurl: ""
+url: "https://blog.jez.io"
+future: false
+timezone: America/Los_Angeles
+
+permalink: '/:slug/'
+
+theme: 'pandoc-markdown-jekyll-theme'
+markdown: Pandoc
+pandoc:
+  extensions:
+    - from: 'markdown+smart+tex_math_single_backslash'
+    - filter: 'pandoc-sidenote'
+    - template: '_template'
+    - katex
+    - toc
+    - M: 'site__baseurl=/'
+
+# HACK(jez): We have to hard code the site.baseurl here
+header_includes:
+  - '<link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">'
+  - '<link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">'
+  - '<link rel="icon" sizes="16x16" href="/assets/img/favicon.png">'
+
+# Build settings
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-redirect-from
+
+gems:
+  - jekyll-feed
+  - jekyll-pandoc
+  - jekyll-sitemap
+  - jekyll-redirect-from
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - .gitignore
+  - tags
+
+include:
+  - .nojekyll
+
+# Octopress configuration
+
+post_ext: md
+page_ext: md
+
+# Default templates for posts and pages
+post_layout: post
+page_layout: page
+
+# Format titles with titlecase?
+titlecase: true
+
+# Change default template file (in _templates/)
+post_template: post
+page_template: page
+draft_template: post
