@@ -148,6 +148,28 @@ chapter as easy as using a "`#`" Markdown header.
 
 [![book writeup template](/assets/img/pandoc-starter-book-writeup.png)][ps-book-writeup-pdf]
 
+# Other projects for using Pandoc
+
+In addition to the [`pandoc-starter`][pandoc-starter] repo, which focuses mostly
+on building papers and presentations, I've also put together a couple other
+Pandoc-related projects for targetting HTML & CSS.
+
+## [`tufte-pandoc-css`]
+
+[Tufte Pandoc CSS][`tufte-pandoc-css`] is an attempt to make it as easy as
+possible to get started using [Tufte CSS][tufte-css] to write content. It does
+this by leveraging Pandoc Markdown’s existing features.
+
+[![`tufte-pandoc-css`](/assets/img/tufte-pandoc-css.png)][`tufte-pandoc-css`]
+
+## [`pandoc-markdown-css-theme`]
+
+This project provides CSS files and a template for using Pandoc to generate
+standalone HTML files. It supports most features Pandoc Markdown has to offer,
+and some extras. The default look can be tweaked via CSS variables, and it does
+not need JavaScript, even for side notes.
+
+[![`pandoc-markdown-css-theme`](/assets/img/pandoc-markdown-css-theme.png)][`pandoc-markdown-css-theme`]
 
 # Writing Plugins for Vim
 
@@ -194,3 +216,7 @@ for us, so the [only thing left to do is start][pandoc-starter].
 [ps-beamer-pdf]: https://github.com/jez/pandoc-starter/blob/master/beamer/src/sample.pdf
 [ps-beamer-solarized-pdf]: https://github.com/jez/pandoc-starter/blob/master/beamer-solarized/src/sample.pdf
 [ps-book-writeup-pdf]: https://github.com/jez/pandoc-starter/blob/master/book-writeup/src/sample.pdf
+
+[`tufte-pandoc-css`]: https://github.com/jez/tufte-pandoc-css
+[tufte-css]: https://edwardtufte.github.io/tufte-css/
+[`pandoc-markdown-css-theme`]: https://github.com/jez/pandoc-markdown-css-theme
