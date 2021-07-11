@@ -1,263 +1,168 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Google Chrome: A Memory Hog - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
-
-
-
-
+<meta name="dcterms.date" content="2014-12-29 15:00:00 -0800">
 <meta name="description" content="A bash oneliner to determine how much memory Chrome is using.">
+<title>Google Chrome: A Memory Hog – Jake Zimmerman</title>
 
-<meta name="keywords" content="unix bash ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Google Chrome: A Memory Hog">
-  <meta name="twitter:description" content="A bash oneliner to determine how much memory Chrome is using.">
-  <meta name="twitter:creator" content="@jez_io">
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/2014/12/29/google-chrome-a-memory-hog">
-<meta property="og:title" content="Google Chrome: A Memory Hog">
-<meta property="og:description" content="A bash oneliner to determine how much memory Chrome is using.">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/2014/12/29/google-chrome-a-memory-hog">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" ">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
+
+
+  <header>
+    <h1 class="title">Google Chrome: A Memory Hog</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2014-12-29 15:00:00 -0800">December 29, 2014</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#why-does-chrome-hog-memory">Why does Chrome Hog Memory?</a></li>
+  <li><a href="#the-oneliner">The Oneliner</a></li>
+  <li><a href="#explanation">Explanation</a></li>
+  <li><a href="#update">Update</a></li>
   </ul>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Google Chrome: A Memory Hog</h1>
-  <h2 class="EntryHeader-subtitle">December 29, 2014</h2>
-
-  <ul class="Tags">
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p>Whenever someone complains about a slow computer, the first thing I check is
-how many Chrome tabs they have open. Chrome hogs memory like no other. For
-users, this means Chrome is snappy and responsive, but oftentimes it comes at
-the expense of crowding out other programs. To get an idea of how much memory
-Chrome is really using, I wrote a quick bash oneliner.</p>
-
+<main>
+<p>Whenever someone complains about a slow computer, the first thing I check is how many Chrome tabs they have open. Chrome hogs memory like no other. For users, this means Chrome is snappy and responsive, but oftentimes it comes at the expense of crowding out other programs. To get an idea of how much memory Chrome is really using, I wrote a quick bash oneliner.</p>
 <!-- more -->
-
-
-<h2>Why does Chrome Hog Memory?</h2>
-
-<p><a href="http://mobile.extremetech.com/latest/221392-iframe-irony-adblock-plus-is-probably-the-reason-firefox-and-chrome-are-such-memory-hogs">An article posted to Hacker News</a> recently brought some light to
-the question of why Chrome and Firefox suck up so much memory: Adblock Plus. The
-general idea is that the excessive use of iframes in most websites today ramps
-up the amount of processing that Adblock Plus has to do, driving memory usage
-through the roof. For more specifics, check out the rest of of the article.</p>
-
-<h2>The Oneliner</h2>
-
-<p>For the impatient, here&rsquo;s the code. It uses standard Unix tools:</p>
-
-<figure class='code'><figcaption><span>Chrome Memory Usage</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -ev | grep -i chrome | awk <span class="s1">'{print $12}'</span> | awk <span class="s1">'{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}'</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Pretty isn&rsquo;t it? If you want to save this as an alias for handy use, add this
-line to your ~/.bashrc (or appropriate configuration file):</p>
-
-<figure class='code'><figcaption><span>Add as an alias</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">alias </span><span class="nv">chromemem</span><span class="o">=</span><span class="s2">"ps -ev | grep -i chrome | awk '{print </span><span class="se">\$</span><span class="s2">12}' | awk '{for(i=1;i&lt;=NF;i++)s+=</span><span class="se">\$</span><span class="s2">i}END{print s}'"</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>It outputs a percentage. Here&rsquo;s the alias in action:</p>
-
-<figure class='code'><figcaption><span>Usage</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>chromemem
-</span><span class='line'>60</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Explanation</h2>
-
-<p>There&rsquo;s a lot of good stuff going on here, so let&rsquo;s take it step-by-step.</p>
-
-<p>First, we&rsquo;ll need a program that tells us memory usage. I&rsquo;m sure there are many,
-but I&rsquo;m familiar with <code>ps</code>. After checking out the man page for a few options, I
-came up with <code>ps -ev</code>, to show all information about all processes. Maybe
-wasteful, but it works.</p>
-
-<figure class='code'><figcaption><span>ps -ev</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -ev
-</span><span class='line'>  PID STAT      TIME  SL  RE PAGEIN      VSZ    RSS   LIM     TSIZ  %CPU %MEM COMMAND
-</span><span class='line'> 3473 S      0:54.92   0   0      0  3579092 301244     -        0   6.7  7.2 /Applications/Google C
-</span><span class='line'>  365 S      3:03.17   0   0      0  3920732 206808     -        0   0.3  4.9 /Applications/Google C
-</span><span class='line'>  983 S      1:29.23   0   0      0  3560272 193860     -        0   0.1  4.6 /Applications/Google C
-</span><span class='line'>  395 S      0:13.11   0   0      0  2824936 141644     -        0   0.0  3.4 /Applications/Google C
-</span><span class='line'>  422 S      0:27.22   0   0      0  3345796 130796     -        0   0.0  3.1 /Applications/Google C
-</span><span class='line'>  ...</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Notice that there&rsquo;s a convenient column describing memory usage as a percentage
-of total available memory, as well as what command is being run in that
-process. Let&rsquo;s make sure that we&rsquo;re looking at only the processes running
-some sort of Chrome service before totaling up the memory. We can find these
-lines with <code>ps -ev | grep -i chrome</code> (the -i means case-insensitive). Due to the
-way I clipped the previous sample output, nothing changes in the first five
-lines, but rest assured: we&rsquo;re only looking at Chrome processes now.</p>
-
-<p>Now it&rsquo;s time to get rid of all the other nonsense that we included with <code>ps
--ev</code>. Luckily, there&rsquo;s a handy tool called <code>awk</code> that makes parsing text by
-column easy. If we want to print the 12th column (which just so happens to
-contain the memory consumption!) we can do <code>awk '{print $12}'</code>:</p>
-
-<figure class='code'><figcaption><span>ps -ev | grep -i chrome | awk &#8216;{print $12}&#8217;</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -ev | grep -i chrome | awk <span class="s1">'{print $12}'</span>
-</span><span class='line'>7.2
-</span><span class='line'>5.1
-</span><span class='line'>4.6
-</span><span class='line'>3.4
-</span><span class='line'>3.2
-</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Finally, I found myself needing a way to add up a column of numbers. A quick
-Google search led me to <a href="http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers">this StackOverflow question</a>, and I picked the
-<code>awk</code> solution because I knew I could just pipe the input to awk (as opposed to
-having to do weird hacks to get it to work with a bash for loop):</p>
-
-<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -emv | grep -i chrome | awk <span class="s1">'{print $12}'</span> | awk <span class="s1">'{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}'</span>
-</span><span class='line'>60.4</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Of course, you could change the last <code>awk</code> command to print out something
-fancier like</p>
-
-<figure class='code'><figcaption><span>Final Solution</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="gp">$ </span>ps -emv | grep -i chrome | awk <span class="s1">'{print $12}'</span> | awk <span class="s1">'{for(i=1;i&lt;=NF;i++)s+=$i}END{print "Chrome is using "s"% of total memory."}'</span>
-</span><span class='line'>Chrome is using 60.4% of total memory.</span></code></pre></td></tr></table></div></figure>
-
-
+<h1 id="why-does-chrome-hog-memory">Why does Chrome Hog Memory?</h1>
+<p><a href="http://mobile.extremetech.com/latest/221392-iframe-irony-adblock-plus-is-probably-the-reason-firefox-and-chrome-are-such-memory-hogs">An article posted to Hacker News</a> recently brought some light to the question of why Chrome and Firefox suck up so much memory: Adblock Plus. The general idea is that the excessive use of iframes in most websites today ramps up the amount of processing that Adblock Plus has to do, driving memory usage through the roof. For more specifics, check out the rest of of the article.</p>
+<h1 id="the-oneliner">The Oneliner</h1>
+<p>For the impatient, here’s the code. It uses standard Unix tools:</p>
+<figure>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="ex">$</span> ps <span class="at">-ev</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span></span></code></pre></div>
+<figcaption>
+Chrome Memory Usage
+</figcaption>
+</figure>
+<p>Pretty isn’t it? If you want to save this as an alias for handy use, add this line to your ~/.bashrc (or appropriate configuration file):</p>
+<figure>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="bu">alias</span> chromemem=<span class="st">&quot;ps -ev | grep -i chrome | awk &#39;{print </span><span class="dt">\$</span><span class="st">12}&#39; | awk &#39;{for(i=1;i&lt;=NF;i++)s+=</span><span class="dt">\$</span><span class="st">i}END{print s}&#39;&quot;</span></span></code></pre></div>
+<figcaption>
+Add as an alias
+</figcaption>
+</figure>
+<p>It outputs a percentage. Here’s the alias in action:</p>
+<figure>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">$</span> chromemem</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="ex">60</span></span></code></pre></div>
+<figcaption>
+Usage
+</figcaption>
+</figure>
+<h1 id="explanation">Explanation</h1>
+<p>There’s a lot of good stuff going on here, so let’s take it step-by-step.</p>
+<p>First, we’ll need a program that tells us memory usage. I’m sure there are many, but I’m familiar with <code>ps</code>. After checking out the man page for a few options, I came up with <code>ps -ev</code>, to show all information about all processes. Maybe wasteful, but it works.</p>
+<figure class="wide extra-wide">
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">$</span> ps <span class="at">-ev</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="ex">PID</span> STAT      TIME  SL  RE PAGEIN      VSZ    RSS   LIM     TSIZ  %CPU %MEM COMMAND</span>
+<span id="cb4-3"><a href="#cb4-3"></a> <span class="ex">3473</span> S      0:54.92   0   0      0  3579092 301244     <span class="at">-</span>        0   6.7  7.2 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="ex">365</span> S      3:03.17   0   0      0  3920732 206808     <span class="at">-</span>        0   0.3  4.9 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="ex">983</span> S      1:29.23   0   0      0  3560272 193860     <span class="at">-</span>        0   0.1  4.6 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="ex">395</span> S      0:13.11   0   0      0  2824936 141644     <span class="at">-</span>        0   0.0  3.4 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="ex">422</span> S      0:27.22   0   0      0  3345796 130796     <span class="at">-</span>        0   0.0  3.1 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
+<span id="cb4-8"><a href="#cb4-8"></a>  <span class="ex">...</span></span></code></pre></div>
+<figcaption>
+ps -ev
+</figcaption>
+</figure>
+<p>Notice that there’s a convenient column describing memory usage as a percentage of total available memory, as well as what command is being run in that process. Let’s make sure that we’re looking at only the processes running some sort of Chrome service before totaling up the memory. We can find these lines with <code>ps -ev | grep -i chrome</code> (the -i means case-insensitive). Due to the way I clipped the previous sample output, nothing changes in the first five lines, but rest assured: we’re only looking at Chrome processes now.</p>
+<p>Now it’s time to get rid of all the other nonsense that we included with <code>ps -ev</code>. Luckily, there’s a handy tool called <code>awk</code> that makes parsing text by column easy. If we want to print the 12th column (which just so happens to contain the memory consumption!) we can do <code>awk '{print $12}'</code>:</p>
+<figure>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="ex">$</span> ps <span class="at">-ev</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="ex">7.2</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="ex">5.1</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="ex">4.6</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="ex">3.4</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="ex">3.2</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="ex">...</span></span></code></pre></div>
+<figcaption>
+ps -ev | grep -i chrome | awk ‘{print $12}’
+</figcaption>
+</figure>
+<p>Finally, I found myself needing a way to add up a column of numbers. A quick Google search led me to <a href="http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers">this StackOverflow question</a>, and I picked the <code>awk</code> solution because I knew I could just pipe the input to awk (as opposed to having to do weird hacks to get it to work with a bash for loop):</p>
+<figure>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="ex">$</span> ps <span class="at">-emv</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="ex">60.4</span></span></code></pre></div>
+<figcaption>
+Final Solution
+</figcaption>
+</figure>
+<p>Of course, you could change the last <code>awk</code> command to print out something fancier like</p>
+<figure>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="ex">$</span> ps <span class="at">-emv</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print &quot;Chrome is using &quot;s&quot;% of total memory.&quot;}&#39;</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="ex">Chrome</span> is using 60.4% of total memory.</span></code></pre></div>
+<figcaption>
+Final Solution
+</figcaption>
+</figure>
 <p>There you have it! Bash oneliners save the day yet again.</p>
+<h1 id="update">Update</h1>
+<p>After writing this article, I stopped using Ad Block Plus, and I noticed a significant drop in Chrome’s memory usage. Obviously, though, that came at the cost of not blocking ads! Also, from time to time I would encounter a site that seemed sluggish, presumably because of all the ads attempting to be loaded. My simple solution to this was just to disable JavaScript on that page (I use an extension called Quick JavaScript Switcher), but this wasn’t an automated solution.</p>
+<p>Then I discovered <a href="https://github.com/gorhill/uBlock">μBlock</a>, an “efficient blocker for Chromium and Firefox.” The fancy graphs on it’s homepage convinced me to give it a shot, and from what I can tell so far it’s responsive and effective.</p>
+</main>
 
-<h2>Update</h2>
 
-<p>After writing this article, I stopped using Ad Block Plus, and I noticed a
-significant drop in Chrome&rsquo;s memory usage. Obviously, though, that came at the
-cost of not blocking ads! Also, from time to time I would encounter a site that
-seemed sluggish, presumably because of all the ads attempting to be loaded. My
-simple solution to this was just to disable JavaScript on that page (I use an
-extension called Quick JavaScript Switcher), but this wasn&rsquo;t an automated
-solution.</p>
-
-<p>Then I discovered <a href="https://github.com/gorhill/uBlock">μBlock</a>, an &ldquo;efficient blocker for Chromium and
-Firefox.&rdquo; The fancy graphs on it&rsquo;s homepage convinced me to give it a shot, and
-from what I can tell so far it&rsquo;s responsive and effective.</p>
-
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#unix" title="Pages tagged unix">unix</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#bash" title="Pages tagged bash">bash</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2014-12-29T17:00:00-06:00">December 29, 2014</time></span>
-      
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#unix">unix</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#bash">bash</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

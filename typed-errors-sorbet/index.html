@@ -1,318 +1,172 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Typed Errors in Sorbet - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
-
-
-
-
+<meta name="dcterms.date" content="2021-06-04 22:12:37 -0700">
 <meta name="description" content="Sorbet's union types in method returns provide a low-friction, high value way to model how methods can fail.
 ">
+<title>Typed Errors in Sorbet – Jake Zimmerman</title>
 
-<meta name="keywords" content="ruby sorbet types ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Typed Errors in Sorbet">
-  <meta name="twitter:description" content="Sorbet's union types in method returns provide a low-friction, high value way to model how methods can fail.
-">
-  <meta name="twitter:creator" content="@jez_io">
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/typed-errors-sorbet">
-<meta property="og:title" content="Typed Errors in Sorbet">
-<meta property="og:description" content="Sorbet's union types in method returns provide a low-friction, high value way to model how methods can fail.
-">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/typed-errors-sorbet">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" ">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
-  </ul>
+
+
+  <header>
+    <h1 class="title">Typed Errors in Sorbet</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2021-06-04 22:12:37 -0700">June 4, 2021</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">← Return home</a><br>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Typed Errors in Sorbet</h1>
-  <h2 class="EntryHeader-subtitle">June 4, 2021</h2>
-
-  <ul class="Tags">
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <!-- more -->
-
-
-
-
-<p></p>
-
-
-<p>I really like this post from Matt Parsons, <a href="https://www.parsonsmatt.org/2018/11/03/trouble_with_typed_errors.html">The Trouble with Typed
-Errors</a>. It&rsquo;s written for an audience writing Haskell,
-but if you can grok Haskell syntax, it&rsquo;s worth the read because the
-lessons apply broadly to most statically typed programming languages.</p>
-
-<p>If you haven&rsquo;t read it (or it&rsquo;s been a while) the setup is basically:
-typing errors is hard, and nearly every solution is either brittle,
-clunky, verbose, or uses powerful type system features that we didn&rsquo;t
-want to have to reach for.</p>
-
+<main>
+<p>I really like this post from Matt Parsons, <a href="https://www.parsonsmatt.org/2018/11/03/trouble_with_typed_errors.html">The Trouble with Typed Errors</a>. It’s written for an audience writing Haskell, but if you can grok Haskell syntax, it’s worth the read because the lessons apply broadly to most statically typed programming languages.</p>
+<p>If you haven’t read it (or it’s been a while) the setup is basically: typing errors is hard, and nearly every solution is either brittle, clunky, verbose, or uses powerful type system features that we didn’t want to have to reach for.</p>
 <p>Hidden towards the bottom of the post, we find:</p>
-
-<blockquote><p>In PureScript or OCaml, you can use open variant types to do this
-flawlessly. Haskell doesn&rsquo;t have open variants, and the attempts to
-mock them end up quite clumsy to use in practice.</p></blockquote>
-
-<p>What Matt calls &ldquo;open variant types&rdquo; I call <strong>ad hoc union types</strong> (see
-my previous post about <a href="https://blog.jez.io/union-types-checked-exceptions/">checked exceptions and
-Sorbet</a>). Naming aside, Sorbet has them! We don&rsquo;t
-have to suffer from clunky error handling!</p>
-
-<p>I thought it&rsquo;d be interesting to show what Matt meant in this quote by
-translating his example to Sorbet.</p>
-
-<p>I wrote a complete, working example, but rather than repeat the whole
-thing here, I&rsquo;m just going to excerpt the good stuff. If you&rsquo;re wondering
-how something is defined in full, check the full example:</p>
-
-<p><a href="https://sorbet.run/#%23%20typed%3A%20strict%0A%0A%23%20This%20is%20a%20re-implementation%20of%20Matt%20Parsons's%20%22The%20Trouble%20with%20Typed%0A%23%20Errors%22%20in%20Sorbet%20(Ruby)%20because%20I%20think%20Sorbet%20happens%20to%20handle%20it%0A%23%20pretty%20well%20all%20things%20considered.%0A%23%0A%23%20%20%20%20%20%3Chttps%3A%2F%2Fwww.parsonsmatt.org%2F2018%2F11%2F03%2Ftrouble_with_typed_errors.html%3E%0A%23%0A%23%20Specifically%2C%20he%20mentions%0A%23%0A%23%20%20%20%20%20In%20PureScript%20or%20OCaml%2C%20you%20can%20use%20open%20variant%20types%20to%20do%20this%0A%23%20%20%20%20%20flawlessly.%0A%23%0A%23%20and%20Sorbet%20more%20or%20less%20has%20those%20(untagged%20unions).%20It's%20interesting%0A%23%20to%20see%20what%20that%20means%20for%20being%20able%20to%20track%20errors%2C%20because%20we%0A%23%20actually%20use%20Sorbet%20in%20a%20huge%20codebase%20at%20work.%20Tracking%20all%20the%20kinds%0A%23%20of%20errors%20that%20could%20happen--and%20no%20more--can%20make%20code%20far%20easier%20to%0A%23%20understand.%0A%0A%23%20To%20run%20this%20file%3A%0A%23%0A%23%20%20%20gem%20install%20sorbet-runtime%0A%23%20%20%20ruby%20typed-errors.rb%0A%0Arequire%20'sorbet-runtime'%0A%0A%23%20There's%20a%20bug%20in%20Sorbet%20that%20forces%20us%20to%20wrap%20all%20this%20code%20in%20a%0A%23%20class%2C%20but%20I%20have%20a%20PR%20open%20to%20fix%20it.%20For%20now%2C%20we%20tolerate%20it.%0Aclass%20Main%0A%20%20extend%20T%3A%3ASig%0A%0A%20%20%23%20-----%20Custom%20error%20types%20-----%0A%0A%20%20%23%20Defining%20custom%20data%20types%20is%20a%20little%20clunky%20in%20Ruby%20%2F%20Sorbet.%20You%0A%20%20%23%20have%20to%20chose%20whether%20you%20want%20a%20plain%20class%2C%20an%20enum%2C%20a%20sealed%0A%20%20%23%20class%20hierarchy%2C%20etc.%20In%20a%20real%20codebase%2C%20I%20think%20if%20you%20were%20going%0A%20%20%23%20to%20this%20length%20to%20care%20for%20errors%20the%20kinds%20of%20errors%20that%20you%20have%0A%20%20%23%20are%20usually%20pretty%20rich%20(e.g.%2C%20there's%20a%20message%20and%20context%20with%0A%20%20%23%20the%20failures)%2C%20so%20you'd%20probably%20go%20with%20the%20sealed%20class%20hierarchy.%0A%20%20%23%0A%20%20%23%20For%20this%20example%2C%20I%20chose%20three%20different%20ways%20to%20just%20show%20them%20all.%0A%0A%20%20class%20HeadError%0A%20%20end%0A%0A%20%20class%20LookupError%20%3C%20T%3A%3AEnum%0A%20%20%20%20enums%20do%0A%20%20%20%20%20%20KeyWasNotPresent%20%3D%20new%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20module%20ParseError%0A%20%20%20%20extend%20T%3A%3AHelpers%0A%20%20%20%20sealed!%0A%0A%20%20%20%20class%20UnexpectedChar%20%3C%20T%3A%3AStruct%0A%20%20%20%20%20%20include%20ParseError%0A%20%20%20%20%20%20prop%20%3Amessage%2C%20String%0A%20%20%20%20end%0A%0A%20%20%20%20class%20RanOutOfInput%0A%20%20%20%20%20%20include%20ParseError%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20%23%20-----%20Helper%20methods%20-----%0A%0A%20%20%23%20Again%2C%20concise%20syntax%20is%20not%20Sorbet's%20strong%20suit.%20The%20signature%0A%20%20%23%20annotations%20are%20pretty%20verbose%20here%20(especially%20generics)%20but%20they%0A%20%20%23%20pretty%20much%20exactly%20map%20to%20the%20Haskell%20functions%20in%20the%20post.%0A%0A%20%20sig%20do%0A%20%20%20%20%20%20params(xs%3A%20String)%0A%20%20%20%20%20%20.returns(T.any(String%2C%20HeadError))%0A%20%20end%0A%20%20def%20self.head(xs)%0A%20%20%20%20case%20xs.size%0A%20%20%20%20when%200%20then%20HeadError.new%0A%20%20%20%20else%20T.must(xs%5B0%5D)%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20sig%20do%0A%20%20%20%20type_parameters(%3AK%2C%20%3AV)%0A%20%20%20%20%20%20.params(%0A%20%20%20%20%20%20%20%20hash%3A%20T%3A%3AHash%5BT.type_parameter(%3AK)%2C%20T.type_parameter(%3AV)%5D%2C%0A%20%20%20%20%20%20%20%20key%3A%20T.type_parameter(%3AK)%0A%20%20%20%20%20%20)%0A%20%20%20%20%20%20.returns(T.any(T.type_parameter(%3AV)%2C%20LookupError))%0A%20%20end%0A%20%20def%20self.lookup(hash%2C%20key)%0A%20%20%20%20if%20hash.key%3F(key)%0A%20%20%20%20%20%20hash.fetch(key)%0A%20%20%20%20else%0A%20%20%20%20%20%20LookupError%3A%3AKeyWasNotPresent%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20sig%20do%0A%20%20%20%20params(source%3A%20String).returns(T.any(Integer%2C%20ParseError))%0A%20%20end%0A%20%20def%20self.parse(source)%0A%20%20%20%20case%20source%0A%20%20%20%20when%20%22%22%20then%20ParseError%3A%3ARanOutOfInput.new%0A%20%20%20%20else%0A%20%20%20%20%20%20begin%0A%20%20%20%20%20%20%20%20Integer(source%2C%2010)%0A%20%20%20%20%20%20rescue%20ArgumentError%20%3D%3E%20exn%0A%20%20%20%20%20%20%20%20ParseError%3A%3AUnexpectedChar.new(message%3A%20exn.message)%0A%20%20%20%20%20%20end%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20%23%20-----%20Composing%20errors%20-----%0A%0A%20%20STR_MAP%20%3D%20T.let(%7B%0A%20%20%20%20%224__%22%20%3D%3E%20%222%22%0A%20%20%7D%2C%20T%3A%3AHash%5BString%2C%20String%5D)%0A%0A%20%20sig%20do%0A%20%20%20%20params(str%3A%20String)%0A%20%20%20%20%20%20.returns(T.any(Integer%2C%20HeadError%2C%20LookupError%2C%20ParseError))%0A%20%20end%0A%20%20def%20self.foo(str)%0A%20%20%20%20%23%20These%20%60return%60%20lines%20are%20definitely%20not%20as%20convenient%20as%20do%0A%20%20%20%20%23%20notation%20in%20Haskell%2C%20but%20the%20interesting%20thing%20is%20that%20they're%0A%20%20%20%20%23%20still%20pretty%20nice%3A%20because%20of%20flow-sensitive%20typing%2C%20the%20type%20of%0A%20%20%20%20%23%20%60c%60%20changes%2C%20as%20commented%3A%0A%20%20%20%20c%20%3D%20head(str)%20%23%20%3D%3E%20c%20%3A%20T.any(String%2C%20HeadError)%0A%20%20%20%20return%20c%20unless%20c.is_a%3F(String)%0A%20%20%20%20%23%20%3D%3E%20c%20%3A%20String%0A%20%20%20%20r%20%3D%20lookup(STR_MAP%2C%20str)%0A%20%20%20%20return%20r%20unless%20r.is_a%3F(String)%0A%20%20%20%20parse(%22%23%7Bc%7D%23%7Br%7D%22)%0A%20%20end%0A%0A%20%20%23%20This%20method%20doesn't%20call%20%60head%60%20like%20before%2C%20so%20it%20doesn't%20need%20to%0A%20%20%23%20have%20%60HeadError%60%20in%20the%20return%20type.%0A%20%20sig%20do%0A%20%20%20%20params(str%3A%20String)%0A%20%20%20%20%20%20.returns(T.any(Integer%2C%20LookupError%2C%20ParseError))%0A%20%20end%0A%20%20def%20self.bar(str)%0A%20%20%20%20r%20%3D%20lookup(STR_MAP%2C%20str)%0A%20%20%20%20return%20r%20unless%20r.is_a%3F(String)%0A%20%20%20%20parse(r)%0A%20%20end%0A%0A%20%20p%20foo(%224__%22)%0A%20%20p%20bar(%224__%22)%0Aend%0A%0A%23%20Because%20%60T.any%60%20can%20create%20ad%20hoc%2C%20untagged%20union%20types%20anywhere%2C%0A%23%20there's%20no%20need%20to%20define%20an%20%60AllErrorsEver%60%20data%20type%20like%20the%20reader%0A%23%20was%20tempted%20to%20in%20the%20Typed%20Errors%20blog%20post.%0A%23%0A%23%20If%20you%20find%20that%20a%20particular%20set%20of%20errors%20are%20showing%20up%20super%0A%23%20frequently%2C%20you%20can%20lurk%20them%20into%20a%20type%20alias%3A%0A%23%0A%23%20%20%20%20%20MostCommonErrors%20%3D%20T.type_alias%20%7BT.any(LookupError%2C%20ParseError)%7D%0A%23%0A%23%20and%20then%20use%20this%20alias%20in%20various%20places.%0A%23%0A%23%20One%20other%20note%3A%20to%20make%20this%20pattern%20nicer%2C%20code%20might%20want%20to%0A%23%20explicitly%20box%20up%20successful%20results%2C%20with%20a%20type%20like%0A%23%0A%23%20%20%20%20%20class%20Ok%20%3C%20T%3A%3AStruct%0A%23%20%20%20%20%20%20%20extend%20T%3A%3AGeneric%0A%23%20%20%20%20%20%20%20Type%20%3D%20type_member%0A%23%20%20%20%20%20%20%20prop%20%3Aval%2C%20Type%0A%23%20%20%20%20%20end%0A%23%0A%23%20So%20then%20you'd%20have%0A%23%20%20%20%20%20T.any(Ok%5BString%5D%2C%20MostCommonErrors)%0A%23%20and%20you%20could%20do%20make%20all%20the%20%60return%60%20lines%20always%20look%20the%20same%3A%0A%23%20%20%20%20%20return%20x%20unless%20x.is_a%3F(Ok)%0A%23%20but%20the%20flipside%20would%20mean%20that%20you'd%20have%20to%20use%20%60.val%60%20at%20all%20the%0A%23%20places%20that%20you%20would%20have%20normally%20used%20%60x%60%3A%0A%23%20%20%20%20%20parse(x.val)%0A%23%20so%20it's%20maybe%20not%20worth%20it.%0A%0A">→ View on sorbet.run</a></p>
-
-<p>First, here&rsquo;s how we&rsquo;d type the three running helper methods from Matt&rsquo;s
-post:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Returns the first letter of the input,</span>
-</span><span class='line'><span class="c1"># or returns `HeadError` if empty</span>
-</span><span class='line'><span class="n">sig</span> <span class="p">{</span><span class="n">params</span><span class="p">(</span><span class="ss">xs: </span><span class="no">String</span><span class="p">).</span><span class="nf">returns</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">String</span><span class="p">,</span> <span class="no">HeadError</span><span class="p">))}</span>
-</span><span class='line'><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">head</span><span class="p">(</span><span class="n">xs</span><span class="p">);</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span><span class="p">;</span> <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># Gets the value for `key` in `hash`, or returns LookupError.</span>
-</span><span class='line'><span class="c1">#</span>
-</span><span class='line'><span class="c1"># This is normally defined in the stdlib, and in trying to</span>
-</span><span class='line'><span class="c1"># match Matt's post, it ends up not being super idiomatic,</span>
-</span><span class='line'><span class="c1"># but the types still work out.</span>
-</span><span class='line'><span class="n">sig</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">type_parameters</span><span class="p">(</span><span class="ss">:K</span><span class="p">,</span> <span class="ss">:V</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nf">params</span><span class="p">(</span>
-</span><span class='line'>      <span class="ss">hash: </span><span class="no">T</span><span class="o">::</span><span class="no">Hash</span><span class="p">[</span><span class="no">T</span><span class="p">.</span><span class="nf">type_parameter</span><span class="p">(</span><span class="ss">:K</span><span class="p">),</span> <span class="no">T</span><span class="p">.</span><span class="nf">type_parameter</span><span class="p">(</span><span class="ss">:V</span><span class="p">)],</span>
-</span><span class='line'>      <span class="ss">key: </span><span class="no">T</span><span class="p">.</span><span class="nf">type_parameter</span><span class="p">(</span><span class="ss">:K</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nf">returns</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">type_parameter</span><span class="p">(</span><span class="ss">:V</span><span class="p">),</span> <span class="no">LookupError</span><span class="p">))</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">lookup</span><span class="p">(</span><span class="nb">hash</span><span class="p">,</span> <span class="n">key</span><span class="p">);</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span><span class="p">;</span> <span class="n">en</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># Convert a String to an integer, or return ParseError.</span>
-</span><span class='line'><span class="n">sig</span> <span class="p">{</span><span class="n">params</span><span class="p">(</span><span class="ss">source: </span><span class="no">String</span><span class="p">).</span><span class="nf">returns</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">Integer</span><span class="p">,</span> <span class="no">ParseError</span><span class="p">))}</span>
-</span><span class='line'><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">parse</span><span class="p">(</span><span class="n">source</span><span class="p">);</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span><span class="p">;</span> <span class="k">end</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Notice how in all three cases, we use a normal <a href="https://sorbet.org/docs/union-types">Sorbet union type</a> in
-the return, like <code>T.any(String, HeadError)</code>. All of the error types are
-just user-defined classes. For example, <code>HeadError</code> is just defined like
-this:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">HeadError</span><span class="p">;</span> <span class="k">end</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>And <code>ParseError</code> is defined using <a href="https://sorbet.org/docs/sealed">sealed classes</a> and <a href="https://sorbet.org/docs/tstruct">typed structs</a>
-to approximate algebraic data types in other typed languages:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">ParseError</span>
-</span><span class='line'>  <span class="kp">extend</span> <span class="no">T</span><span class="o">::</span><span class="no">Helpers</span>
-</span><span class='line'>  <span class="n">sealed!</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">UnexpectedChar</span> <span class="o">&lt;</span> <span class="no">T</span><span class="o">::</span><span class="no">Struct</span>
-</span><span class='line'>    <span class="kp">include</span> <span class="no">ParseError</span>
-</span><span class='line'>    <span class="n">prop</span> <span class="ss">:message</span><span class="p">,</span> <span class="no">String</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">RanOutOfInput</span>
-</span><span class='line'>    <span class="kp">include</span> <span class="no">ParseError</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then at the caller side, it&rsquo;s simple to handle the errors:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">sig</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">params</span><span class="p">(</span><span class="ss">str: </span><span class="no">String</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nf">returns</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">Integer</span><span class="p">,</span> <span class="no">HeadError</span><span class="p">,</span> <span class="no">LookupError</span><span class="p">,</span> <span class="no">ParseError</span><span class="p">))</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">foo</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">c</span> <span class="o">=</span> <span class="n">head</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1"># =&gt; c : T.any(String, HeadError)</span>
-</span><span class='line'>  <span class="k">return</span> <span class="n">c</span> <span class="k">unless</span> <span class="n">c</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">String</span><span class="p">)</span>
-</span><span class='line'>  <span class="c1"># =&gt; c : String</span>
-</span><span class='line'>  <span class="n">r</span> <span class="o">=</span> <span class="n">lookup</span><span class="p">(</span><span class="no">STR_MAP</span><span class="p">,</span> <span class="n">str</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">return</span> <span class="n">r</span> <span class="k">unless</span> <span class="n">r</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">String</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">parse</span><span class="p">(</span><span class="s2">"</span><span class="si">#{</span><span class="n">c</span><span class="si">}#{</span><span class="n">r</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>The idea is that the return type includes the possible errors, so we
-have to handle them. This example handles the errors by checking for
-success and returning early with the error otherwise. This manifests in
-the return type of <code>foo</code>, which mentions four outcomes:</p>
-
+<blockquote>
+<p>In PureScript or OCaml, you can use open variant types to do this flawlessly. Haskell doesn’t have open variants, and the attempts to &gt; mock them end up quite clumsy to use in practice.</p>
+</blockquote>
+<p>What Matt calls “open variant types” I call <strong>ad hoc union types</strong> (see my previous post about <a href="https://blog.jez.io/union-types-checked-exceptions/">checked exceptions and Sorbet</a>). Naming aside, Sorbet has them! We don’t have to suffer from clunky error handling!</p>
+<p>I thought it’d be interesting to show what Matt meant in this quote by translating his example to Sorbet.</p>
+<p>I wrote a complete, working example, but rather than repeat the whole thing here, I’m just going to excerpt the good stuff. If you’re wondering how something is defined in full, check the full example:</p>
+<p><a href="https://sorbet.run/#%23%20typed%3A%20strict%0A%0A%23%20This%20is%20a%20re-implementation%20of%20Matt%20Parsons&#39;s%20%22The%20Trouble%20with%20Typed%0A%23%20Errors%22%20in%20Sorbet%20(Ruby)%20because%20I%20think%20Sorbet%20happens%20to%20handle%20it%0A%23%20pretty%20well%20all%20things%20considered.%0A%23%0A%23%20%20%20%20%20%3Chttps%3A%2F%2Fwww.parsonsmatt.org%2F2018%2F11%2F03%2Ftrouble_with_typed_errors.html%3E%0A%23%0A%23%20Specifically%2C%20he%20mentions%0A%23%0A%23%20%20%20%20%20In%20PureScript%20or%20OCaml%2C%20you%20can%20use%20open%20variant%20types%20to%20do%20this%0A%23%20%20%20%20%20flawlessly.%0A%23%0A%23%20and%20Sorbet%20more%20or%20less%20has%20those%20(untagged%20unions).%20It&#39;s%20interesting%0A%23%20to%20see%20what%20that%20means%20for%20being%20able%20to%20track%20errors%2C%20because%20we%0A%23%20actually%20use%20Sorbet%20in%20a%20huge%20codebase%20at%20work.%20Tracking%20all%20the%20kinds%0A%23%20of%20errors%20that%20could%20happen--and%20no%20more--can%20make%20code%20far%20easier%20to%0A%23%20understand.%0A%0A%23%20To%20run%20this%20file%3A%0A%23%0A%23%20%20%20gem%20install%20sorbet-runtime%0A%23%20%20%20ruby%20typed-errors.rb%0A%0Arequire%20&#39;sorbet-runtime&#39;%0A%0A%23%20There&#39;s%20a%20bug%20in%20Sorbet%20that%20forces%20us%20to%20wrap%20all%20this%20code%20in%20a%0A%23%20class%2C%20but%20I%20have%20a%20PR%20open%20to%20fix%20it.%20For%20now%2C%20we%20tolerate%20it.%0Aclass%20Main%0A%20%20extend%20T%3A%3ASig%0A%0A%20%20%23%20-----%20Custom%20error%20types%20-----%0A%0A%20%20%23%20Defining%20custom%20data%20types%20is%20a%20little%20clunky%20in%20Ruby%20%2F%20Sorbet.%20You%0A%20%20%23%20have%20to%20chose%20whether%20you%20want%20a%20plain%20class%2C%20an%20enum%2C%20a%20sealed%0A%20%20%23%20class%20hierarchy%2C%20etc.%20In%20a%20real%20codebase%2C%20I%20think%20if%20you%20were%20going%0A%20%20%23%20to%20this%20length%20to%20care%20for%20errors%20the%20kinds%20of%20errors%20that%20you%20have%0A%20%20%23%20are%20usually%20pretty%20rich%20(e.g.%2C%20there&#39;s%20a%20message%20and%20context%20with%0A%20%20%23%20the%20failures)%2C%20so%20you&#39;d%20probably%20go%20with%20the%20sealed%20class%20hierarchy.%0A%20%20%23%0A%20%20%23%20For%20this%20example%2C%20I%20chose%20three%20different%20ways%20to%20just%20show%20them%20all.%0A%0A%20%20class%20HeadError%0A%20%20end%0A%0A%20%20class%20LookupError%20%3C%20T%3A%3AEnum%0A%20%20%20%20enums%20do%0A%20%20%20%20%20%20KeyWasNotPresent%20%3D%20new%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20module%20ParseError%0A%20%20%20%20extend%20T%3A%3AHelpers%0A%20%20%20%20sealed!%0A%0A%20%20%20%20class%20UnexpectedChar%20%3C%20T%3A%3AStruct%0A%20%20%20%20%20%20include%20ParseError%0A%20%20%20%20%20%20prop%20%3Amessage%2C%20String%0A%20%20%20%20end%0A%0A%20%20%20%20class%20RanOutOfInput%0A%20%20%20%20%20%20include%20ParseError%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20%23%20-----%20Helper%20methods%20-----%0A%0A%20%20%23%20Again%2C%20concise%20syntax%20is%20not%20Sorbet&#39;s%20strong%20suit.%20The%20signature%0A%20%20%23%20annotations%20are%20pretty%20verbose%20here%20(especially%20generics)%20but%20they%0A%20%20%23%20pretty%20much%20exactly%20map%20to%20the%20Haskell%20functions%20in%20the%20post.%0A%0A%20%20sig%20do%0A%20%20%20%20%20%20params(xs%3A%20String)%0A%20%20%20%20%20%20.returns(T.any(String%2C%20HeadError))%0A%20%20end%0A%20%20def%20self.head(xs)%0A%20%20%20%20case%20xs.size%0A%20%20%20%20when%200%20then%20HeadError.new%0A%20%20%20%20else%20T.must(xs%5B0%5D)%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20sig%20do%0A%20%20%20%20type_parameters(%3AK%2C%20%3AV)%0A%20%20%20%20%20%20.params(%0A%20%20%20%20%20%20%20%20hash%3A%20T%3A%3AHash%5BT.type_parameter(%3AK)%2C%20T.type_parameter(%3AV)%5D%2C%0A%20%20%20%20%20%20%20%20key%3A%20T.type_parameter(%3AK)%0A%20%20%20%20%20%20)%0A%20%20%20%20%20%20.returns(T.any(T.type_parameter(%3AV)%2C%20LookupError))%0A%20%20end%0A%20%20def%20self.lookup(hash%2C%20key)%0A%20%20%20%20if%20hash.key%3F(key)%0A%20%20%20%20%20%20hash.fetch(key)%0A%20%20%20%20else%0A%20%20%20%20%20%20LookupError%3A%3AKeyWasNotPresent%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20sig%20do%0A%20%20%20%20params(source%3A%20String).returns(T.any(Integer%2C%20ParseError))%0A%20%20end%0A%20%20def%20self.parse(source)%0A%20%20%20%20case%20source%0A%20%20%20%20when%20%22%22%20then%20ParseError%3A%3ARanOutOfInput.new%0A%20%20%20%20else%0A%20%20%20%20%20%20begin%0A%20%20%20%20%20%20%20%20Integer(source%2C%2010)%0A%20%20%20%20%20%20rescue%20ArgumentError%20%3D%3E%20exn%0A%20%20%20%20%20%20%20%20ParseError%3A%3AUnexpectedChar.new(message%3A%20exn.message)%0A%20%20%20%20%20%20end%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20%23%20-----%20Composing%20errors%20-----%0A%0A%20%20STR_MAP%20%3D%20T.let(%7B%0A%20%20%20%20%224__%22%20%3D%3E%20%222%22%0A%20%20%7D%2C%20T%3A%3AHash%5BString%2C%20String%5D)%0A%0A%20%20sig%20do%0A%20%20%20%20params(str%3A%20String)%0A%20%20%20%20%20%20.returns(T.any(Integer%2C%20HeadError%2C%20LookupError%2C%20ParseError))%0A%20%20end%0A%20%20def%20self.foo(str)%0A%20%20%20%20%23%20These%20%60return%60%20lines%20are%20definitely%20not%20as%20convenient%20as%20do%0A%20%20%20%20%23%20notation%20in%20Haskell%2C%20but%20the%20interesting%20thing%20is%20that%20they&#39;re%0A%20%20%20%20%23%20still%20pretty%20nice%3A%20because%20of%20flow-sensitive%20typing%2C%20the%20type%20of%0A%20%20%20%20%23%20%60c%60%20changes%2C%20as%20commented%3A%0A%20%20%20%20c%20%3D%20head(str)%20%23%20%3D%3E%20c%20%3A%20T.any(String%2C%20HeadError)%0A%20%20%20%20return%20c%20unless%20c.is_a%3F(String)%0A%20%20%20%20%23%20%3D%3E%20c%20%3A%20String%0A%20%20%20%20r%20%3D%20lookup(STR_MAP%2C%20str)%0A%20%20%20%20return%20r%20unless%20r.is_a%3F(String)%0A%20%20%20%20parse(%22%23%7Bc%7D%23%7Br%7D%22)%0A%20%20end%0A%0A%20%20%23%20This%20method%20doesn&#39;t%20call%20%60head%60%20like%20before%2C%20so%20it%20doesn&#39;t%20need%20to%0A%20%20%23%20have%20%60HeadError%60%20in%20the%20return%20type.%0A%20%20sig%20do%0A%20%20%20%20params(str%3A%20String)%0A%20%20%20%20%20%20.returns(T.any(Integer%2C%20LookupError%2C%20ParseError))%0A%20%20end%0A%20%20def%20self.bar(str)%0A%20%20%20%20r%20%3D%20lookup(STR_MAP%2C%20str)%0A%20%20%20%20return%20r%20unless%20r.is_a%3F(String)%0A%20%20%20%20parse(r)%0A%20%20end%0A%0A%20%20p%20foo(%224__%22)%0A%20%20p%20bar(%224__%22)%0Aend%0A%0A%23%20Because%20%60T.any%60%20can%20create%20ad%20hoc%2C%20untagged%20union%20types%20anywhere%2C%0A%23%20there&#39;s%20no%20need%20to%20define%20an%20%60AllErrorsEver%60%20data%20type%20like%20the%20reader%0A%23%20was%20tempted%20to%20in%20the%20Typed%20Errors%20blog%20post.%0A%23%0A%23%20If%20you%20find%20that%20a%20particular%20set%20of%20errors%20are%20showing%20up%20super%0A%23%20frequently%2C%20you%20can%20lurk%20them%20into%20a%20type%20alias%3A%0A%23%0A%23%20%20%20%20%20MostCommonErrors%20%3D%20T.type_alias%20%7BT.any(LookupError%2C%20ParseError)%7D%0A%23%0A%23%20and%20then%20use%20this%20alias%20in%20various%20places.%0A%23%0A%23%20One%20other%20note%3A%20to%20make%20this%20pattern%20nicer%2C%20code%20might%20want%20to%0A%23%20explicitly%20box%20up%20successful%20results%2C%20with%20a%20type%20like%0A%23%0A%23%20%20%20%20%20class%20Ok%20%3C%20T%3A%3AStruct%0A%23%20%20%20%20%20%20%20extend%20T%3A%3AGeneric%0A%23%20%20%20%20%20%20%20Type%20%3D%20type_member%0A%23%20%20%20%20%20%20%20prop%20%3Aval%2C%20Type%0A%23%20%20%20%20%20end%0A%23%0A%23%20So%20then%20you&#39;d%20have%0A%23%20%20%20%20%20T.any(Ok%5BString%5D%2C%20MostCommonErrors)%0A%23%20and%20you%20could%20do%20make%20all%20the%20%60return%60%20lines%20always%20look%20the%20same%3A%0A%23%20%20%20%20%20return%20x%20unless%20x.is_a%3F(Ok)%0A%23%20but%20the%20flipside%20would%20mean%20that%20you&#39;d%20have%20to%20use%20%60.val%60%20at%20all%20the%0A%23%20places%20that%20you%20would%20have%20normally%20used%20%60x%60%3A%0A%23%20%20%20%20%20parse(x.val)%0A%23%20so%20it&#39;s%20maybe%20not%20worth%20it.%0A%0A">→ View on sorbet.run</a></p>
+<p>First, here’s how we’d type the three running helper methods from Matt’s post:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns the first letter of the input,</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># or returns `HeadError` if empty</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span>params(<span class="wa">xs: </span><span class="dt">String</span>)<span class="at">.returns</span>(T<span class="at">.any</span>(<span class="dt">String</span>, <span class="dt">HeadError</span>))<span class="kw">}</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.head</span>(xs); <span class="kw">...</span>; <span class="cf">end</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets the value for `key` in `hash`, or returns LookupError.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># This is normally defined in the stdlib, and in trying to</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># match Matt&#39;s post, it ends up not being super idiomatic,</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># but the types still work out.</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:K</span>, <span class="wa">:V</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      <span class="wa">hash: </span>T<span class="kw">::</span><span class="dt">Hash</span><span class="kw">[</span>T<span class="at">.type_parameter</span>(<span class="wa">:K</span>), T<span class="at">.type_parameter</span>(<span class="wa">:V</span>)<span class="kw">]</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>      <span class="wa">key: </span>T<span class="at">.type_parameter</span>(<span class="wa">:K</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(T<span class="at">.type_parameter</span>(<span class="wa">:V</span>), <span class="dt">LookupError</span>))</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.lookup</span>(hash, key); <span class="kw">...</span>; en</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert a String to an integer, or return ParseError.</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span>params(<span class="wa">source: </span><span class="dt">String</span>)<span class="at">.returns</span>(T<span class="at">.any</span>(<span class="dt">Integer</span>, <span class="dt">ParseError</span>))<span class="kw">}</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.parse</span>(source); <span class="kw">...</span>; <span class="cf">end</span></span></code></pre></div>
+<p>Notice how in all three cases, we use a normal <a href="https://sorbet.org/docs/union-types">Sorbet union type</a> in the return, like <code>T.any(String, HeadError)</code>. All of the error types are just user-defined classes. For example, <code>HeadError</code> is just defined like this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">HeadError</span>; <span class="cf">end</span></span></code></pre></div>
+<p>And <code>ParseError</code> is defined using <a href="https://sorbet.org/docs/sealed">sealed classes</a> and <a href="https://sorbet.org/docs/tstruct">typed structs</a> to approximate algebraic data types in other typed languages:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">ParseError</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Helpers</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  sealed!</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> <span class="dt">UnexpectedChar</span> <span class="kw">&lt;</span> T<span class="kw">::</span><span class="dt">Struct</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">include</span> <span class="dt">ParseError</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    prop <span class="wa">:message</span>, <span class="dt">String</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> <span class="dt">RanOutOfInput</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">include</span> <span class="dt">ParseError</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>Then at the caller side, it’s simple to handle the errors:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  params(<span class="wa">str: </span><span class="dt">String</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(<span class="dt">Integer</span>, <span class="dt">HeadError</span>, <span class="dt">LookupError</span>, <span class="dt">ParseError</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.foo</span>(str)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  c <span class="kw">=</span> head(str) <span class="co"># =&gt; c : T.any(String, HeadError)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c <span class="cf">unless</span> c<span class="at">.is_a?</span>(<span class="dt">String</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># =&gt; c : String</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  r <span class="kw">=</span> lookup(<span class="cn">STR_MAP</span>, str)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> r <span class="cf">unless</span> r<span class="at">.is_a?</span>(<span class="dt">String</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  parse(<span class="st">&quot;</span><span class="sc">#{</span>c<span class="sc">}#{</span>r<span class="sc">}</span><span class="st">&quot;</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>The idea is that the return type includes the possible errors, so we have to handle them. This example handles the errors by checking for success and returning early with the error otherwise. This manifests in the return type of <code>foo</code>, which mentions four outcomes:</p>
 <ul>
 <li>a successful result (<code>Integer</code>)</li>
 <li>three kinds of failures (<code>HeadError</code>, <code>LookupError</code>, and <code>ParseError</code>)</li>
 </ul>
+<p>It would have worked equally well to handle and recover from any or all of the errors: Sorbet knows exactly which error is returned by which method, so there’s never a burden of handling more errors than are possible.</p>
+<p>It’s fun that what makes this work is Sorbet’s natural <a href="https://sorbet.org/docs/flow-sensitive">flow-sensitive typing</a>, not some special language feature. Notice how before and after the first early return, Sorbet updates its knowledge of the type of <code>c</code> (shown in the comments) because it knows how <code>is_a?</code> works.</p>
+<p>Another example: if some other method only calls <code>lookup</code> and <code>parse</code> (but not <code>head</code>), it doesn’t have to mention <code>HeadError</code> in its return:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  params(<span class="wa">str: </span><span class="dt">String</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># does need to mention HeadError</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(<span class="dt">Integer</span>, <span class="dt">LookupError</span>, <span class="dt">ParseError</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.bar</span>(str)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  r <span class="kw">=</span> lookup(<span class="cn">STR_MAP</span>, str)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> r <span class="cf">unless</span> r<span class="at">.is_a?</span>(<span class="dt">String</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  parse(r)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>And while there’s never a <strong>need</strong> to predeclare one monolithic error type (like <code>AllErrorsEver</code> in Matt’s post), if it happens to be convenient, Sorbet still lets you, using type aliases. For example, maybe there are a bunch of methods that all return <code>LookupError</code> and <code>ParseError</code>. We can factor that out into a type alias:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">MostCommonErrors</span> <span class="kw">=</span> T<span class="at">.type_alias</span> <span class="kw">{</span>T<span class="at">.any</span>(<span class="dt">LookupError</span>, <span class="dt">ParseError</span>)<span class="kw">}</span></span></code></pre></div>
+<p>That’s it! Sorbet’s union types in method returns provide a low-friction, high value way to model how methods can fail.</p>
+</main>
 
 
-<p>It would have worked equally well to handle and recover from any or all
-of the errors: Sorbet knows exactly which error is returned by which
-method, so there&rsquo;s never a burden of handling more errors than are
-possible.</p>
-
-<p>It&rsquo;s fun that what makes this work is Sorbet&rsquo;s natural <a href="https://sorbet.org/docs/flow-sensitive">flow-sensitive
-typing</a>, not some special language feature. Notice how before and after
-the first early return, Sorbet updates its knowledge of the type of <code>c</code>
-(shown in the comments) because it knows how <code>is_a?</code> works.</p>
-
-<p>Another example: if some other method only calls <code>lookup</code> and <code>parse</code>
-(but not <code>head</code>), it doesn&rsquo;t have to mention <code>HeadError</code> in its return:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">sig</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">params</span><span class="p">(</span><span class="ss">str: </span><span class="no">String</span><span class="p">)</span>
-</span><span class='line'>    <span class="c1"># does need to mention HeadError</span>
-</span><span class='line'>    <span class="p">.</span><span class="nf">returns</span><span class="p">(</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">Integer</span><span class="p">,</span> <span class="no">LookupError</span><span class="p">,</span> <span class="no">ParseError</span><span class="p">))</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">bar</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">r</span> <span class="o">=</span> <span class="n">lookup</span><span class="p">(</span><span class="no">STR_MAP</span><span class="p">,</span> <span class="n">str</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">return</span> <span class="n">r</span> <span class="k">unless</span> <span class="n">r</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">String</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">parse</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>And while there&rsquo;s never a <strong>need</strong> to predeclare one monolithic error type
-(like <code>AllErrorsEver</code> in Matt&rsquo;s post), if it happens to be convenient,
-Sorbet still lets you, using type aliases. For example, maybe there are
-a bunch of methods that all return <code>LookupError</code> and <code>ParseError</code>. We
-can factor that out into a type alias:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">MostCommonErrors</span> <span class="o">=</span> <span class="no">T</span><span class="p">.</span><span class="nf">type_alias</span> <span class="p">{</span><span class="no">T</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="no">LookupError</span><span class="p">,</span> <span class="no">ParseError</span><span class="p">)}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>That&rsquo;s it! Sorbet&rsquo;s union types in method returns provide a
-low-friction, high value way to model how methods can fail.</p>
-
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#ruby" title="Pages tagged ruby">ruby</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#sorbet" title="Pages tagged sorbet">sorbet</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#types" title="Pages tagged types">types</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2021-06-04T22:12:37-07:00">June 4, 2021</time></span>
-      
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#ruby">ruby</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#sorbet">sorbet</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#types">types</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/union-types-checked-exceptions/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h3>
-      <p>Sorbet does not support checked exceptions, and I don&#8217;t think it ever should. <a href="/union-types-checked-exceptions/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/linkers-ruby-c-exts/" title="Linkers & Ruby C Extensions">Linkers & Ruby C Extensions</a></h4>
-            <span>Published on June 7, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

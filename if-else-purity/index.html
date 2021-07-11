@@ -1,214 +1,96 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>If, Else, & Purity - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2017-08-31 22:38:43 -0700">
+<meta name="description" content="I prefer to let the language I'm using think on my behalf as much as possible. Ideally, the language is rich enough that the proof of correctness is inherent in the code I've written. Even when I use looser languages, these principled languages inform the structure of my code.
+">
+<title>If, Else, & Purity – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
 
 
-<meta name="description" content="I prefer to let the language I'm using think on my behalf as much as possible. Ideally, the language is rich enough that the proof of correctness is &hellip;">
-
-<meta name="keywords" content="programming fragment types ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="If, Else, & Purity">
-  <meta name="twitter:description" content="I prefer to let the language I'm using think on my behalf as much as possible. Ideally, the language is rich enough that the proof of correctness is &hellip;">
-  <meta name="twitter:creator" content="@jez_io">
-
-
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/if-else-purity">
-<meta property="og:title" content="If, Else, & Purity">
-<meta property="og:description" content="I prefer to let the language I'm using think on my behalf as much as possible. Ideally, the language is rich enough that the proof of correctness is &hellip;">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
-
-<link rel="canonical" href="https://blog.jez.io/if-else-purity">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class="strong-keywords fancy-blockquotes">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
-  </ul>
+
+
+  <header>
+    <h1 class="title">If, Else, & Purity</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2017-08-31 22:38:43 -0700">August 31, 2017</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">← Return home</a><br>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">If, Else, & Purity</h1>
-  <h2 class="EntryHeader-subtitle">August 31, 2017</h2>
-
-  <ul class="Tags">
-    
-      <li class="Tag">
-        <a href="/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
-      </li>
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p>I prefer to let the language I&rsquo;m using think on my behalf as much as
-possible. Ideally, the language is rich enough that the proof of
-correctness is inherent in the code I&rsquo;ve written. Even when I use
-looser languages, these principled languages inform the structure of my
-code. To make this a bit more let&rsquo;s turn our focus to <code>if</code>, <code>else</code>, and
-purity.</p>
-
+<main>
+<p>I prefer to let the language I’m using think on my behalf as much as possible. Ideally, the language is rich enough that the proof of correctness is inherent in the code I’ve written. Even when I use looser languages, these principled languages inform the structure of my code. To make this a bit more let’s turn our focus to <code>if</code>, <code>else</code>, and purity.</p>
 <!-- more -->
-
-
-<p>A cool way to understand purity is using what&rsquo;s known as a &ldquo;modal
-separation.&rdquo; This is a really fancy way to say that we have
-<strong>expressions</strong> which are pure and always evaluate to a value, alongside
-<strong>commands</strong> which are impure and are executed for their side effects.
-If you&rsquo;ve ever used Haskell, you&rsquo;re already familiar with this
-notion&mdash;we only need <code>do</code> notation when we need to write impure (or
-&ldquo;monadic&rdquo;) code.</p>
-
-<p>In an expression language, every <code>if</code> <em>must</em> have an <code>else</code>; for the
-entire <code>if</code> expression to be used as a value, both branches must in turn
-evaluate to values. It&rsquo;s only when we move to a language with commands
-where it makes sense to allow omitting the <code>else</code> branch. <code>if</code>
-expressions are not some abstract concept; chances are you&rsquo;ve
-encountered them under the name &ldquo;the ternary operator.&rdquo;</p>
-
-<p>An <code>if</code> <em>statement</em> (as opposed to an <code>if</code> expression) is a command;
-it&rsquo;s useful for running side-effectful code. Sometimes, we don&rsquo;t want
-one of the branches to have any side effects (for example, because the
-state of the world doesn&rsquo;t need to be changed). Languages with commands
-allow omitting the <code>else</code>.</p>
-
-<p>What does this mean for us? Since expression languages form the basis
-for purity, every pure function can be written where the <code>if</code> is matched
-with an <code>else</code>. Put another way, an unmatched <code>if</code> is a likely indicator
-that the code I&rsquo;ve written is impure.</p>
-
-<p>This makes me more aware of when I&rsquo;m dealing with impure code. For
-example, I might want to factor out as much of the pure code into a
-separate helper function. There&rsquo;s a time and a place for impure code.
-But since pure code is more composable and easier to test, it&rsquo;s best to
-factor the impure code out whenever possible.</p>
-
-<p>In a principled language, there&rsquo;s a distinction between <code>if</code> expressions
-and <code>if</code> statements. On the other hand, some language only have one, or
-they blur the line between the two. We can draw upon our experiences
-with languages that are rigorous about minutia like this to better
-inform how we write clean code.</p>
-
+<p>A cool way to understand purity is using what’s known as a “modal separation.” This is a really fancy way to say that we have <span class="smallcaps"><strong>expressions</strong></span> which are pure and always evaluate to a value, alongside <span class="smallcaps"><strong>commands</strong></span> which are impure and are executed for their side effects. If you’ve ever used Haskell, you’re already familiar with this notion—we only need <code>do</code> notation when we need to write impure (or “monadic”) code.</p>
+<p>In an expression language, every <code>if</code> <strong>must</strong> have an <code>else</code>; for the entire <code>if</code> expression to be used as a value, both branches must in turn evaluate to values. It’s only when we move to a language with commands where it makes sense to allow omitting the <code>else</code> branch. <code>if</code> expressions are not some abstract concept; chances are you’ve encountered them under the name “the ternary operator.”</p>
+<p>An <code>if</code> <strong>statement</strong> (as opposed to an <code>if</code> expression) is a command; it’s useful for running side-effectful code. Sometimes, we don’t want one of the branches to have any side effects (for example, because the state of the world doesn’t need to be changed). Languages with commands allow omitting the <code>else</code>.</p>
+<p>What does this mean for us? Since expression languages form the basis for purity, every pure function can be written where the <code>if</code> is matched with an <code>else</code>. Put another way, an unmatched <code>if</code> is a likely indicator that the code I’ve written is impure.</p>
+<p>This makes me more aware of when I’m dealing with impure code. For example, I might want to factor out as much of the pure code into a separate helper function. There’s a time and a place for impure code. But since pure code is more composable and easier to test, it’s best to factor the impure code out whenever possible.</p>
+<p>In a principled language, there’s a distinction between <code>if</code> expressions and <code>if</code> statements. On the other hand, some language only have one, or they blur the line between the two. We can draw upon our experiences with languages that are rigorous about minutia like this to better inform how we write clean code.</p>
 <!-- vim:tw=72
 -->
+</main>
 
 
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#programming" title="Pages tagged programming">programming</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#fragment" title="Pages tagged fragment">fragment</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#types" title="Pages tagged types">types</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2017-08-31T22:38:43-07:00">August 31, 2017</time></span>
-      
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#programming">programming</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#fragment">fragment</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#types">types</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

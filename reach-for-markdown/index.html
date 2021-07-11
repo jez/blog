@@ -1,324 +1,173 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Reach for Markdown, not LaTeX - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2017-02-26 18:26:53 -0800">
+<meta name="description" content="Writing should be a pleasant experience. With the right tools, it can be. LaTeX is powerful but cumbersome to use. With Markdown, we can focus on our writing, and worry about the presentation later. Pandoc can take care of the presentation for us, so the only thing left to do is start.
+">
+<title>Reach for Markdown, not LaTeX – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
 
 
-<meta name="description" content="Writing should be a pleasant experience. With the right tools, it can be. LaTeX is powerful but cumbersome to use. With Markdown, we can focus on our &hellip;">
-
-<meta name="keywords" content="markdown latex vim ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Reach for Markdown, not LaTeX">
-  <meta name="twitter:description" content="Writing should be a pleasant experience. With the right tools, it can be. LaTeX is powerful but cumbersome to use. With Markdown, we can focus on our &hellip;">
-  <meta name="twitter:creator" content="@jez_io">
-
-
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/reach-for-markdown">
-<meta property="og:title" content="Reach for Markdown, not LaTeX">
-<meta property="og:description" content="Writing should be a pleasant experience. With the right tools, it can be. LaTeX is powerful but cumbersome to use. With Markdown, we can focus on our &hellip;">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
-
-<link rel="canonical" href="https://blog.jez.io/reach-for-markdown">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" ">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
+
+
+  <header>
+    <h1 class="title">Reach for Markdown, not LaTeX</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2017-02-26 18:26:53 -0800">February 26, 2017</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#writing-at-the-command-line">Writing at the Command Line</a></li>
+  <li><a href="#pandoc-starter">Pandoc Starter</a>
+  <ul>
+  <li><a href="#articleps-article"><span><code>article</code></span></a></li>
+  <li><a href="#tufte-handoutps-tufte-handout"><span><code>tufte-handout</code></span></a></li>
+  <li><a href="#homeworkps-homework"><span><code>homework</code></span></a></li>
+  <li><a href="#beamerps-beamer"><span><code>beamer</code></span></a></li>
+  <li><a href="#beamer-solarizedps-beamer-solarized"><span><code>beamer-solarized</code></span></a></li>
+  <li><a href="#book-writeupps-book-writeup"><span><code>book-writeup</code></span></a></li>
+  </ul></li>
+  <li><a href="#writing-plugins-for-vim">Writing Plugins for Vim</a></li>
+  <li><a href="#reach-for-markdown">Reach for Markdown</a></li>
   </ul>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Reach for Markdown, not LaTeX</h1>
-  <h2 class="EntryHeader-subtitle">February 26, 2017</h2>
-
-  <ul class="Tags">
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p>I&rsquo;ve written <a href="/2014/10/06/offline-latex-development/">in the past</a> (<a href="/2015/01/10/offline-latex-development-part-2/">twice</a>) about how to
-streamline the writing process when using LaTeX. Since then, I&rsquo;ve found that I
-enjoy writing even more when I don&rsquo;t have to reach for LaTeX at all. By reaching
-first for Markdown, then for LaTeX when necessary, writing is easier and more
-enjoyable.</p>
-
+<main>
+<p>I’ve written <a href="/2014/10/06/offline-latex-development/">in the past</a> (<a href="/2015/01/10/offline-latex-development-part-2/">twice</a>) about how to streamline the writing process when using LaTeX. Since then, I’ve found that I enjoy writing even more when I don’t have to reach for LaTeX at all. By reaching first for Markdown, then for LaTeX when necessary, writing is easier and more enjoyable.</p>
 <!-- more -->
-
-
-<h2>Writing at the Command Line</h2>
-
-<p>Last year, I <a href="https://jez.io/talks/writing-at-the-command-line/">gave a talk</a> about the merits of writing primarily at
-the command line. My main claims were that when writing we want:</p>
-
+<h1 id="writing-at-the-command-line">Writing at the Command Line</h1>
+<p>Last year, I <a href="https://jez.io/talks/writing-at-the-command-line/">gave a talk</a> about the merits of writing primarily at the command line. My main claims were that when writing we want:</p>
 <ul>
 <li>an open document format (so that our writings are future proof)</li>
 <li>to be using open source software (for considerations of privacy and cost)</li>
-<li>to optimize for the &ldquo;common case&rdquo;</li>
+<li>to optimize for the “common case”</li>
 <li>to be able to write for print and digital (PDFs, web pages, etc.)</li>
 </ul>
-
-
 <p>Markdown solves these constraints nicely:</p>
-
 <ul>
-<li>It&rsquo;s a plain text format&mdash;plain text has been around for decades and will
-be for decades more.</li>
+<li>It’s a plain text format—plain text has been around for decades and will be for decades more.</li>
 <li>Given a plain text format, we can bring our own text editor.</li>
 <li>Plenty of open source programs manipulate Markdown.</li>
 <li>When we need advanced features, we can mix LaTeX into our Markdown documents.</li>
 </ul>
-
-
-<p>For those unfamiliar with Markdown, it&rsquo;s super quick to pick up. If you only
-look at one guide, see this one:</p>
-
+<p>For those unfamiliar with Markdown, it’s super quick to pick up. If you only look at one guide, see this one:</p>
 <ul>
 <li><a href="http://commonmark.org/help/">CommonMark</a></li>
 </ul>
-
-
-<p>If you want to start comparing features available in certain implementations of
-Markdown:</p>
-
+<p>If you want to start comparing features available in certain implementations of Markdown:</p>
 <ul>
 <li><a href="https://guides.github.com/features/mastering-markdown/">GitHub Flavored Markdown</a></li>
 <li><a href="https://daringfireball.net/projects/markdown/">Markdown.pl</a></li>
 <li><a href="http://pandoc.org/MANUAL.html#pandocs-markdown">Pandoc Markdown</a></li>
 </ul>
-
-
-<p>For more on why you should want to be writing at the command line, you can
-<a href="https://jez.io/talks/writing-at-the-command-line/">check out the talk slides</a>.</p>
-
-<h2>Pandoc Starter</h2>
-
-<p>The central tool I spoke about in <em>Writing at the Command Line</em> is <a href="https://pandoc.org/">Pandoc</a>.
-Pandoc is an amazingly simple command line program that takes in Markdown files
-and spits out really anything you can think of.</p>
-
-<p>To make using Pandoc even easier than it already is, I put together a
-<a href="https://github.com/jez/pandoc-starter">collection of starter templates</a>. They&rsquo;re all available <a href="https://github.com/jez/pandoc-starter">on
-Github</a> if you&rsquo;d prefer to dive right in.</p>
-
-<p>There are currently six different templates, specialized for the kind of
-document you&rsquo;d like to create. Each has a <code>README</code> for installation and usage
-instructions, as well as a <code>Makefile</code> for invoking <code>pandoc</code> correctly.</p>
-
-<p>All the templates generate PDFs from Markdown by way of LaTeX. In addition to
-Pandoc, you&rsquo;ll also need LaTeX installed locally.</p>
-
-<h3><a href="https://github.com/jez/pandoc-starter/tree/master/article"><code>article</code></a></h3>
-
-<p>This template uses the standard LaTeX <code>article</code> document class. It&rsquo;s a
-no frills, no nonsense choice.</p>
-
-<p><a href="https://github.com/jez/pandoc-starter/blob/master/article/src/sample.pdf"><img src="/images/pandoc-starter-article.png" alt="article template" /></a></p>
-
-<h3><a href="https://github.com/jez/pandoc-starter/tree/master/tufte-handout"><code>tufte-handout</code></a></h3>
-
-<p>As an alternative to the <code>article</code> document class, there&rsquo;s also the
-<code>tufte-handout</code> document class. It originates from the style Edward Tufte
-popularized in his books and articles on visualization and design.</p>
-
-<p>Apart from a different font (it uses Palatino instead of the default Computer
-Modern), this template features the ability add side notes to your documents. I
-often find myself reaching for this template when I want to disguise the fact
-that I&rsquo;m secretly using LaTeX.</p>
-
-<p><a href="https://github.com/jez/pandoc-starter/blob/master/tufte-handout/src/sample.pdf"><img src="/images/pandoc-starter-tufte-handout.png" alt="tufte-handout template" /></a></p>
-
-<h3><a href="https://github.com/jez/pandoc-starter/tree/master/homework"><code>homework</code></a></h3>
-
-<p>A second alternative to the <code>article</code> document class is the <code>homework</code> document
-class. It works nicely for homework assignments and problem sets. The class
-itself has a number of handy features, like:</p>
-
+<p>For more on why you should want to be writing at the command line, you can <a href="https://jez.io/talks/writing-at-the-command-line/">check out the talk slides</a>.</p>
+<h1 id="pandoc-starter">Pandoc Starter</h1>
+<p>The central tool I spoke about in <em>Writing at the Command Line</em> is <a href="https://pandoc.org/">Pandoc</a>. Pandoc is an amazingly simple command line program that takes in Markdown files and spits out really anything you can think of.</p>
+<p>To make using Pandoc even easier than it already is, I put together a <a href="https://github.com/jez/pandoc-starter">collection of starter templates</a>. They’re all available <a href="https://github.com/jez/pandoc-starter">on Github</a> if you’d prefer to dive right in.</p>
+<p>There are currently six different templates, specialized for the kind of document you’d like to create. Each has a <code>README</code> for installation and usage instructions, as well as a <code>Makefile</code> for invoking <code>pandoc</code> correctly.</p>
+<p>All the templates generate PDFs from Markdown by way of LaTeX. In addition to Pandoc, you’ll also need LaTeX installed locally.</p>
+<h2 id="articleps-article"><a href="https://github.com/jez/pandoc-starter/tree/master/article"><code>article</code></a></h2>
+<p>This template uses the standard LaTeX <code>article</code> document class. It’s a no frills, no nonsense choice.</p>
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/article/src/sample.pdf"><img src="/assets/img/pandoc-starter-article.png" alt="article template" /></a></p>
+<h2 id="tufte-handoutps-tufte-handout"><a href="https://github.com/jez/pandoc-starter/tree/master/tufte-handout"><code>tufte-handout</code></a></h2>
+<p>As an alternative to the <code>article</code> document class, there’s also the <code>tufte-handout</code> document class. It originates from the style Edward Tufte popularized in his books and articles on visualization and design.</p>
+<p>Apart from a different font (it uses Palatino instead of the default Computer Modern), this template features the ability add side notes to your documents. I often find myself reaching for this template when I want to disguise the fact that I’m secretly using LaTeX.</p>
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/tufte-handout/src/sample.pdf"><img src="/assets/img/pandoc-starter-tufte-handout.png" alt="tufte-handout template" /></a></p>
+<h2 id="homeworkps-homework"><a href="https://github.com/jez/pandoc-starter/tree/master/homework"><code>homework</code></a></h2>
+<p>A second alternative to the <code>article</code> document class is the <code>homework</code> document class. It works nicely for homework assignments and problem sets. The class itself has a number of handy features, like:</p>
 <ul>
 <li>the option to put your name on every page, or only on the first page</li>
 <li>an option to use wide or narrow margins</li>
-<li>most of the AMS Math packages you&rsquo;d include in the process of typesetting a
-math assignment</li>
+<li>most of the AMS Math packages you’d include in the process of typesetting a math assignment</li>
 <li>a convenient environment for typesetting induction proofs</li>
 </ul>
-
-
-<p>For more features and usage information, check out <a href="/2015/01/10/the-latex-homework-document-class/">this blog post</a> or
-<a href="https://github.com/jez/latex-homework-class">the source</a> on GitHub.</p>
-
-<p><a href="https://github.com/jez/pandoc-starter/blob/master/homework/src/sample.pdf"><img src="/images/pandoc-starter-homework.png" alt="homework template" /></a></p>
-
-<h3><a href="https://github.com/jez/pandoc-starter/tree/master/beamer"><code>beamer</code></a></h3>
-
-<p>LaTeX provides the <code>beamer</code> document class for creating slides; this template
-makes it even easier to use:</p>
-
+<p>For more features and usage information, check out <a href="/2015/01/10/the-latex-homework-document-class/">this blog post</a> or <a href="https://github.com/jez/latex-homework-class">the source</a> on GitHub.</p>
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/homework/src/sample.pdf"><img src="/assets/img/pandoc-starter-homework.png" alt="homework template" /></a></p>
+<h2 id="beamerps-beamer"><a href="https://github.com/jez/pandoc-starter/tree/master/beamer"><code>beamer</code></a></h2>
+<p>LaTeX provides the <code>beamer</code> document class for creating slides; this template makes it even easier to use:</p>
 <ul>
-<li>Make a new slide with a &ldquo;<code>##</code>&rdquo; header</li>
-<li>Make a section divider with a &ldquo;<code>#</code>&rdquo; header</li>
-<li>Mix lists, links, code, and other Markdown features you&rsquo;re familiar with to
-create the content for a slide.</li>
+<li>Make a new slide with a “<code>##</code>” header</li>
+<li>Make a section divider with a “<code>#</code>” header</li>
+<li>Mix lists, links, code, and other Markdown features you’re familiar with to create the content for a slide.</li>
 </ul>
+<p>So basically, just write the outline for your talk, and Pandoc takes care of making the slides—it doesn’t get much simpler.</p>
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/beamer/src/sample.pdf"><img src="/assets/img/pandoc-starter-beamer.png" alt="beamer template" /></a></p>
+<h2 id="beamer-solarizedps-beamer-solarized"><a href="https://github.com/jez/pandoc-starter/tree/master/beamer-solarized"><code>beamer-solarized</code></a></h2>
+<p>The default beamer styles are pretty boring. To add a bit of flair and personality to my slide decks, I made a Solarized theme for beamer.</p>
+<p>In addition to the screenshot below, the <a href="https://jez.io/talks/writing-at-the-command-line/">Writing at the Command Line</a> slides I linked to earlier also use this theme, if you want to see a less contrived example.</p>
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/beamer-solarized/src/sample.pdf"><img src="/assets/img/pandoc-starter-beamer-solarized.png" alt="beamer solarized template" /></a></p>
+<h2 id="book-writeupps-book-writeup"><a href="https://github.com/jez/pandoc-starter/tree/master/book-writeup"><code>book-writeup</code></a></h2>
+<p>Finally, sometimes a simple article or slide deck doesn’t cut it. Usually this means I’d like to group the writing into chapters. This template makes writing a chapter as easy as using a “<code>#</code>” Markdown header.</p>
+<p><a href="https://github.com/jez/pandoc-starter/blob/master/book-writeup/src/sample.pdf"><img src="/assets/img/pandoc-starter-book-writeup.png" alt="book writeup template" /></a></p>
+<h1 id="writing-plugins-for-vim">Writing Plugins for Vim</h1>
+<p>If you happen to use Vim, I’d highly recommend installing <a href="https://github.com/junegunn/goyo.vim">goyo.vim</a> for writing. It removes all the visual frills Vim includes to make writing code easier so you can focus on your writing without distractions.</p>
+<p>I also really enjoy <a href="https://github.com/vim-pandoc/vim-pandoc">vim-pandoc</a> and <a href="https://github.com/vim-pandoc/vim-pandoc-syntax">vim-pandoc-syntax</a>. They’re a pair of complementary plugins for highlighting and working with Pandoc Markdown-flavored documents. They work so well that I use them for Markdown documents even when not using Pandoc.</p>
+<h1 id="reach-for-markdown">Reach for Markdown</h1>
+<p>Writing should be a pleasant experience. With the right tools, it can be. LaTeX is powerful but cumbersome to use. With Markdown, we can focus on our writing, and worry about the presentation later. Pandoc can take care of the presentation for us, so the <a href="https://github.com/jez/pandoc-starter">only thing left to do is start</a>.</p>
+</main>
 
 
-<p>So basically, just write the outline for your talk, and Pandoc takes care of
-making the slides&mdash;it doesn&rsquo;t get much simpler.</p>
-
-<p><a href="https://github.com/jez/pandoc-starter/blob/master/beamer/src/sample.pdf"><img src="/images/pandoc-starter-beamer.png" alt="beamer template" /></a></p>
-
-<h3><a href="https://github.com/jez/pandoc-starter/tree/master/beamer-solarized"><code>beamer-solarized</code></a></h3>
-
-<p>The default beamer styles are pretty boring. To add a bit of flair and
-personality to my slide decks, I made a Solarized theme for beamer.</p>
-
-<p>In addition to the screenshot below, the <a href="https://jez.io/talks/writing-at-the-command-line/">Writing at the Command
-Line</a> slides I linked to earlier also use this theme, if you want
-to see a less contrived example.</p>
-
-<p><a href="https://github.com/jez/pandoc-starter/blob/master/beamer-solarized/src/sample.pdf"><img src="/images/pandoc-starter-beamer-solarized.png" alt="beamer solarized template" /></a></p>
-
-<h3><a href="https://github.com/jez/pandoc-starter/tree/master/book-writeup"><code>book-writeup</code></a></h3>
-
-<p>Finally, sometimes a simple article or slide deck doesn&rsquo;t cut it. Usually this
-means I&rsquo;d like to group the writing into chapters. This template makes writing a
-chapter as easy as using a &ldquo;<code>#</code>&rdquo; Markdown header.</p>
-
-<p><a href="https://github.com/jez/pandoc-starter/blob/master/book-writeup/src/sample.pdf"><img src="/images/pandoc-starter-book-writeup.png" alt="book writeup template" /></a></p>
-
-<h2>Writing Plugins for Vim</h2>
-
-<p>If you happen to use Vim, I&rsquo;d highly recommend installing <a href="https://github.com/junegunn/goyo.vim">goyo.vim</a> for
-writing. It removes all the visual frills Vim includes to make writing code
-easier so you can focus on your writing without distractions.</p>
-
-<p>I also really enjoy <a href="https://github.com/vim-pandoc/vim-pandoc">vim-pandoc</a> and <a href="https://github.com/vim-pandoc/vim-pandoc-syntax">vim-pandoc-syntax</a>. They&rsquo;re a pair of
-complementary plugins for highlighting and working with Pandoc Markdown-flavored
-documents. They work so well that I use them for Markdown documents even when
-not using Pandoc.</p>
-
-<h2>Reach for Markdown</h2>
-
-<p>Writing should be a pleasant experience. With the right tools, it can be. LaTeX
-is powerful but cumbersome to use. With Markdown, we can focus on our writing,
-and worry about the presentation later. Pandoc can take care of the presentation
-for us, so the <a href="https://github.com/jez/pandoc-starter">only thing left to do is start</a>.</p>
-
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#markdown" title="Pages tagged markdown">markdown</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#latex" title="Pages tagged latex">latex</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#vim" title="Pages tagged vim">vim</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2017-02-26T21:26:53-05:00">February 26, 2017</time></span>
-      
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#markdown">markdown</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#latex">latex</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#vim">vim</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

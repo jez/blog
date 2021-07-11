@@ -1,220 +1,129 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Setting up MobaXterm for SSH on Windows - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
-
-
-
-
+<meta name="dcterms.date" content="2014-09-28 11:11:05 -0700">
 <meta name="description" content="How to set up MobaXterm and why you should">
+<title>Setting up MobaXterm for SSH on Windows – Jake Zimmerman</title>
 
-<meta name="keywords" content="terminal ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Setting up MobaXterm for SSH on Windows">
-  <meta name="twitter:description" content="How to set up MobaXterm and why you should">
-  <meta name="twitter:creator" content="@jez_io">
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows">
-<meta property="og:title" content="Setting up MobaXterm for SSH on Windows">
-<meta property="og:description" content="How to set up MobaXterm and why you should">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" ">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
+
+
+  <header>
+    <h1 class="title">Setting up MobaXterm for SSH on Windows</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2014-09-28 11:11:05 -0700">September 28, 2014</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#download-and-install">Download and Install</a>
+  <ul>
+  <li><a href="#navigate-to-mobaxterms-site">1. Navigate to MobaXterm’s Site</a></li>
+  <li><a href="#install">2. Install</a></li>
+  <li><a href="#configure-your-ssh-session">3. Configure Your SSH Session</a></li>
+  </ul></li>
+  <li><a href="#cool-mobaxterm-features">Cool MobaXterm Features</a></li>
+  <li><a href="#shameless-plug">Shameless Plug</a></li>
   </ul>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Setting up MobaXterm for SSH on Windows</h1>
-  <h2 class="EntryHeader-subtitle">September 28, 2014</h2>
-
-  <ul class="Tags">
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p>For an optimal SSH experience, your best best is to use Linux or Mac OS X. However, if you&rsquo;re dead-set on using Windows, MobaXterm has the best overall experience. This post guides you through setting it up and outlines some of its coolest features.</p>
-
+<main>
+<p>For an optimal SSH experience, your best best is to use Linux or Mac OS X. However, if you’re dead-set on using Windows, MobaXterm has the best overall experience. This post guides you through setting it up and outlines some of its coolest features.</p>
 <!-- more -->
-
-
-<h2>Download and Install</h2>
-
+<h1 id="download-and-install">Download and Install</h1>
 <p>The download and installation procedure for MobaXterm is pretty standard.</p>
-
-<h3>1. Navigate to MobaXterm&rsquo;s Site</h3>
-
-<p>You&rsquo;ll want to download the Home Edition, so find its link on the download page, or just go <a href="http://mobaxterm.mobatek.net/download-home-edition.html">here</a>. You&rsquo;ll see two options: one to install as a system-wide application (labelled &ldquo;installer&rdquo;), and one for installing to a flash drive (labelled &ldquo;portable edition&rdquo;). Unless you&rsquo;d really like to install to a flash drive, click the former and run the file once it&rsquo;s downloaded.</p>
-
-<h3>2. Install</h3>
-
-<p>I had trouble running the installer when I first downloaded it; Windows complained that the app was from an unrecognized publisher, so I had to click &ldquo;More info&rdquo; and then &ldquo;Run anyway&rdquo; to get the installer to run (this was on Windows 8, the process might be different if you run into this issue).</p>
-
+<h2 id="navigate-to-mobaxterms-site">1. Navigate to MobaXterm’s Site</h2>
+<p>You’ll want to download the Home Edition, so find its link on the download page, or just go <a href="http://mobaxterm.mobatek.net/download-home-edition.html">here</a>. You’ll see two options: one to install as a system-wide application (labelled “installer”), and one for installing to a flash drive (labelled “portable edition”). Unless you’d really like to install to a flash drive, click the former and run the file once it’s downloaded.</p>
+<h2 id="install">2. Install</h2>
+<p>I had trouble running the installer when I first downloaded it; Windows complained that the app was from an unrecognized publisher, so I had to click “More info” and then “Run anyway” to get the installer to run (this was on Windows 8, the process might be different if you run into this issue).</p>
 <p>Installing MobaXterm is simple. Just click through all the menus; no special setup is required here.</p>
-
-<h3>3. Configure Your SSH Session</h3>
-
-<p>When you first log in, you&rsquo;ll see a prompt where you can directly SSH as you would on a normal terminal.</p>
-
-<p><a class="image-link" href="/images/mobaxterm-ssh.png"><img src="/images/mobaxterm-ssh.png" title="SSH Prompt" ></a></p>
-
-<p>If you type <code>ssh &lt;andrewid&gt;@unix.andrew.cmu.edu</code>, it will prompt you for your CMU password and then log you in. The program will also ask if you want to save your password. In the free version, it doesn&rsquo;t allow you to encrypt your stored passwords with a master password, so they&rsquo;re stored in the clear (this means anyone can read these if they got control of your computer). With this in mind, it&rsquo;s not a good idea to allow it to save your password, but I suppose no one&rsquo;s stopping you.</p>
-
-<p><a class="image-link" href="/images/mobaxterm-password.png"><img src="/images/mobaxterm-password.png" title="Save Password Prompt" ></a></p>
-
+<h2 id="configure-your-ssh-session">3. Configure Your SSH Session</h2>
+<p>When you first log in, you’ll see a prompt where you can directly SSH as you would on a normal terminal.</p>
+<p><a href="/assets/img/mobaxterm-ssh.png"><img src="/assets/img/mobaxterm-ssh.png" alt="SSH Prompt" /></a></p>
+<p>If you type <code>ssh &lt;andrewid&gt;@unix.andrew.cmu.edu</code>, it will prompt you for your CMU password and then log you in. The program will also ask if you want to save your password. In the free version, it doesn’t allow you to encrypt your stored passwords with a master password, so they’re stored in the clear (this means anyone can read these if they got control of your computer). With this in mind, it’s not a good idea to allow it to save your password, but I suppose no one’s stopping you.</p>
+<p><a href="/assets/img/mobaxterm-password.png"><img src="/assets/img/mobaxterm-password.png" alt="Save Password Prompt" /></a></p>
 <p>This process of typing out your username and hostname every time you want to SSH can get annoying, though. MobaXterm allows you to save sessions so that you can easily log in without typing <code>ssh &lt;andrewid&gt;@unix.andrew.cmu.edu</code> each time.</p>
-
-<p>To create a new session, click the &ldquo;Session&rdquo; button in the top left.</p>
-
-<p><a class="image-link" href="/images/mobaxterm-new-session.png"><img src="/images/mobaxterm-new-session.png" title="New Session" ></a></p>
-
-<p>Then you&rsquo;ll see a screen that allows you to enter the settings for that session.</p>
-
-<p><a class="image-link" href="/images/mobaxterm-configure-session.png"><img src="/images/mobaxterm-configure-session.png" title="Configure New Session" ></a></p>
-
-<p>The fields and values you&rsquo;ll need to populate are:</p>
-
+<p>To create a new session, click the “Session” button in the top left.</p>
+<p><a href="/assets/img/mobaxterm-new-session.png"><img src="/assets/img/mobaxterm-new-session.png" alt="New Session" /></a></p>
+<p>Then you’ll see a screen that allows you to enter the settings for that session.</p>
+<p><a href="/assets/img/mobaxterm-configure-session.png"><img src="/assets/img/mobaxterm-configure-session.png" alt="Configure New Session" /></a></p>
+<p>The fields and values you’ll need to populate are:</p>
 <ul>
 <li><strong>Remote host</strong>: <code>unix.andrew.cmu.edu</code></li>
 <li><strong>Specify username</strong>: check the box, then <code>&lt;Your-AndrewID&gt;</code></li>
 <li><strong>Port</strong>: 22</li>
 </ul>
-
-
-<p>You can also choose a bunch of other settings for this session. Feel free to peruse them and see if there&rsquo;s something you want to change (note that these settings will only be used when you use this session to log in). You might want to change the &ldquo;Session name&rdquo; to something more concise.</p>
-
-<p>After that, click &ldquo;OK&rdquo; and your session will appear in the panel on the left under &ldquo;Saved sessions&rdquo;.</p>
-
-<h2>Cool MobaXterm Features</h2>
-
+<p>You can also choose a bunch of other settings for this session. Feel free to peruse them and see if there’s something you want to change (note that these settings will only be used when you use this session to log in). You might want to change the “Session name” to something more concise.</p>
+<p>After that, click “OK” and your session will appear in the panel on the left under “Saved sessions”.</p>
+<h1 id="cool-mobaxterm-features">Cool MobaXterm Features</h1>
 <p>This section lists a few features that MobaXterm does better than other SSH options like PuTTY.</p>
-
 <p>First, MobaXterm has tabs and splits, which make managing your connections to a remote server much more enjoyable.</p>
-
-<p>MobaXterm also has more sophisticated color options. Granted, it&rsquo;s still not as good as most Linux or Mac OS X terminal emulators. Out of the box, the colors are more pleasant than the default PuTTY color scheme. There are also 4 other pre-installed colors schemes, including <a href="http://ethanschoonover.com/solarized">Solarized Light and Solarized Dark</a>.</p>
-
-<p>I can&rsquo;t emphasize enough how much of a different having a &ldquo;pretty&rdquo; terminal is. Given the amount of time you&rsquo;ll be spending in your terminal, being able to read its text is a must. Also check out the rest of the settings. There will very likely be a few things you&rsquo;d like to tweak that make the interface make more sense to you, which in turn will make you less frustrated when trying to get work done.</p>
-
-<p>MobaXterm comes with a built in SCP client. This means you can transfer files between your remote server (like Andrew Unix) and your personal computer with the simplicity of a graphical, click and drag interface if you prefer. This is an alternative to WinSCP that&rsquo;s built into MobaXterm.</p>
-
+<p>MobaXterm also has more sophisticated color options. Granted, it’s still not as good as most Linux or Mac OS X terminal emulators. Out of the box, the colors are more pleasant than the default PuTTY color scheme. There are also 4 other pre-installed colors schemes, including <a href="http://ethanschoonover.com/solarized">Solarized Light and Solarized Dark</a>.</p>
+<p>I can’t emphasize enough how much of a different having a “pretty” terminal is. Given the amount of time you’ll be spending in your terminal, being able to read its text is a must. Also check out the rest of the settings. There will very likely be a few things you’d like to tweak that make the interface make more sense to you, which in turn will make you less frustrated when trying to get work done.</p>
+<p>MobaXterm comes with a built in SCP client. This means you can transfer files between your remote server (like Andrew Unix) and your personal computer with the simplicity of a graphical, click and drag interface if you prefer. This is an alternative to WinSCP that’s built into MobaXterm.</p>
 <p>It also has a built in X server, which means that you can start programs on the remote host that have graphical displays. For example, this is useful if you have an assignment that requires you to write a program that manipulates images and view the results.</p>
-
-<h2>Shameless Plug</h2>
-
+<h1 id="shameless-plug">Shameless Plug</h1>
 <p>While all these features are great, ssh is a program that was meant to be used on Unix-based systems. I personally switched from Windows + Ubuntu to Mac OS X before coming to college, and it was one of the best decisions I made. If Mac OS X is a bit much for you, though, I strongly encourage you to install Linux, using either a VM or a dual-boot configuration. Doing programming and development work in a Linux environment makes nearly every task simpler than trying to do it on Windows.</p>
+</main>
 
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#terminal" title="Pages tagged terminal">terminal</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2014-09-28T14:11:05-04:00">September 28, 2014</time></span>
-      
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#terminal">terminal</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

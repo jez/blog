@@ -1,241 +1,119 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Lenses & Composition - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
-
-
-
-
+<meta name="dcterms.date" content="2018-02-05 23:07:37 -0800">
 <meta name="description" content="It's really cool how composition works with lenses!
 ">
+<title>Lenses & Composition – Jake Zimmerman</title>
 
-<meta name="keywords" content="haskell types fragment ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Lenses & Composition">
-  <meta name="twitter:description" content="It's really cool how composition works with lenses!
-">
-  <meta name="twitter:creator" content="@jez_io">
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/lens-composition">
-<meta property="og:title" content="Lenses & Composition">
-<meta property="og:description" content="It's really cool how composition works with lenses!
-">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/lens-composition">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" fancy-blockquotes">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
-  </ul>
+
+
+  <header>
+    <h1 class="title">Lenses & Composition</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2018-02-05 23:07:37 -0800">February 5, 2018</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">← Return home</a><br>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Lenses & Composition</h1>
-  <h2 class="EntryHeader-subtitle">February 5, 2018</h2>
-
-  <ul class="Tags">
-    
-      <li class="Tag">
-        <a href="/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
-      </li>
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p></p>
-
-
-
-
+<main>
+<p>
+</p>
 <!-- more -->
-
-
-<p>A lens is really just a function <code>a -&gt; b</code> that we represent
-backwards<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> and with an extra <code>Functor f</code> parameter lying
-around:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>type Lens' a b = Functor f =&gt; (b -&gt; f b) -&gt; (a -&gt; f a)</span></code></pre></td></tr></table></div></figure>
-
-
+<p>A lens is really just a function <code>a -&gt; b</code> that we represent backwards<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">I’m exaggerating a bit here 😅 To see what I <em>really</em> mean, see <a href="/lens-intuition">this post</a>.<br />
+<br />
+</span></span> and with an extra <code>Functor f</code> parameter lying around:</p>
+<pre><code>type Lens&#39; a b = Functor f =&gt; (b -&gt; f b) -&gt; (a -&gt; f a)</code></pre>
 <p><strong>What does this mean for function composition?</strong></p>
-
 <!-- more -->
-
-
 <p>Normal function composition looks like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="p">(</span><span class="o">.</span><span class="p">)</span> <span class="o">::</span> <span class="p">(</span><span class="n">b</span> <span class="o">-&gt;</span> <span class="n">c</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">c</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">f</span> <span class="o">::</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">b</span>
-</span><span class='line'><span class="n">g</span> <span class="o">::</span> <span class="n">b</span> <span class="o">-&gt;</span> <span class="n">c</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">g</span> <span class="o">.</span> <span class="n">f</span> <span class="o">::</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">c</span><span class="p">)</span></span></code></pre></td></tr></table></div></figure>
-
-
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(.) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> c)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> a <span class="ot">-&gt;</span> b</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ot">g ::</span> b <span class="ot">-&gt;</span> c</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>g <span class="op">.</span><span class="ot"> f ::</span> (a <span class="ot">-&gt;</span> c)</span></code></pre></div>
 <p>We often have to read code that looks like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">g</span> <span class="o">.</span> <span class="n">f</span> <span class="o">$</span> <span class="n">x</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>This means &ldquo;start with <code>x</code>, then run <code>f</code> on it, and run <code>g</code> after that.&rdquo;
-This sentence reads opposite from how the code reads!</p>
-
-<p>What about for lenses? Here we have <code>f'</code> and <code>g'</code> which behave similarly
-in some sense to <code>f</code> and <code>g</code> from before:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">f'</span> <span class="o">::</span> <span class="kt">Functor</span> <span class="n">f</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">b</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">a</span><span class="p">)</span>
-</span><span class='line'><span class="c1">--  ≈ a -&gt; b</span>
-</span><span class='line'><span class="n">g'</span> <span class="o">::</span> <span class="kt">Functor</span> <span class="n">f</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">c</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">c</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">b</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">b</span><span class="p">)</span>
-</span><span class='line'><span class="c1">--  ≈ b -&gt; c</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">f'</span> <span class="o">.</span> <span class="n">g'</span> <span class="o">::</span> <span class="kt">Functor</span> <span class="n">f</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">c</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">c</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">a</span><span class="p">)</span>
-</span><span class='line'><span class="c1">--       ≈ a -&gt; c</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>In the lens world, <code>^.</code> behaves kind of like a flipped <code>$</code> that turns
-lenses into getters, which lets us write code like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="n">x</span> <span class="o">^.</span> <span class="n">f'</span> <span class="o">.</span> <span class="n">g'</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>This means &ldquo;start with <code>x</code>, then get <code>f'</code> from it, then get <code>g'</code> after
-that.&rdquo; The sentence reads just like the code!</p>
-
-<p>This is pretty cool, because it means that lenses (which are
-&ldquo;functional&rdquo; getters) read almost exactly like property access (which
-are &ldquo;imperative&rdquo; getters). Same concise syntax, but with an elegant
-semantics.</p>
-
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">.</span> f <span class="op">$</span> x</span></code></pre></div>
+<p>This means “start with <code>x</code>, then run <code>f</code> on it, and run <code>g</code> after that.” This sentence reads opposite from how the code reads!</p>
+<p>What about for lenses? Here we have <code>f'</code> and <code>g'</code> which behave similarly in some sense to <code>f</code> and <code>g</code> from before:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f&#39; ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (b <span class="ot">-&gt;</span> f b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> f a)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">--  ≈ a -&gt; b</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ot">g&#39; ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (c <span class="ot">-&gt;</span> f c) <span class="ot">-&gt;</span> (b <span class="ot">-&gt;</span> f b)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">--  ≈ b -&gt; c</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>f&#39; <span class="op">.</span><span class="ot"> g&#39; ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (c <span class="ot">-&gt;</span> f c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> f a)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">--       ≈ a -&gt; c</span></span></code></pre></div>
+<p>In the lens world, <code>^.</code> behaves kind of like a flipped <code>$</code> that turns lenses into getters, which lets us write code like this:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">^.</span> f&#39; <span class="op">.</span> g&#39;</span></code></pre></div>
+<p>This means “start with <code>x</code>, then get <code>f'</code> from it, then get <code>g'</code> after that.” The sentence reads just like the code!</p>
+<p>This is pretty cool, because it means that lenses (which are “functional” getters) read almost exactly like property access (which are “imperative” getters). Same concise syntax, but with an elegant semantics.</p>
 <!-- vim:tw=72
 -->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>I&rsquo;m exaggerating a bit here 😅 To see what I <em>really</em> mean, see <a href="/lens-intuition">this post</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
+</main>
 
 
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#haskell" title="Pages tagged haskell">haskell</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#types" title="Pages tagged types">types</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#fragment" title="Pages tagged fragment">fragment</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2018-02-05T23:07:37-08:00">February 5, 2018</time></span>
-      
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#haskell">haskell</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#types">types</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#fragment">fragment</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

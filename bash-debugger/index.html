@@ -1,258 +1,139 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>A Debugger for Bash in Six Lines of Bash - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
-
-
-
-
+<meta name="dcterms.date" content="2019-06-16 09:25:06 -0700">
 <meta name="description" content="I implemented a debugger for Bash in six lines of Bash.">
+<title>A Debugger for Bash in Six Lines of Bash – Jake Zimmerman</title>
 
-<meta name="keywords" content="bash ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="A Debugger for Bash in Six Lines of Bash">
-  <meta name="twitter:description" content="I implemented a debugger for Bash in six lines of Bash.">
-  <meta name="twitter:creator" content="@jez_io">
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/bash-debugger">
-<meta property="og:title" content="A Debugger for Bash in Six Lines of Bash">
-<meta property="og:description" content="I implemented a debugger for Bash in six lines of Bash.">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/bash-debugger">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" fancy-blockquotes">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
+
+
+  <header>
+    <h1 class="title">A Debugger for Bash in Six Lines of Bash</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2019-06-16 09:25:06 -0700">June 16, 2019</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#stopping-on-failures">Stopping on failures</a></li>
+  <li><a href="#future-work">Future work</a></li>
   </ul>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">A Debugger for Bash in Six Lines of Bash</h1>
-  <h2 class="EntryHeader-subtitle">June 16, 2019</h2>
-
-  <ul class="Tags">
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p>I implemented a &ldquo;debugger&rdquo; for Bash in six lines of Bash. It kind of
-behaves like JavaScript&rsquo;s <code>debugger</code> keyword. Here&rsquo;s how it works:</p>
-
+<main>
+<p>I implemented a “debugger” for Bash in six lines of Bash. It kind of behaves like JavaScript’s <code>debugger</code> keyword. Here’s how it works:</p>
 <!-- more -->
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'>debugger<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nb">echo</span> <span class="s2">"Stopped in REPL. Press ^D to resume, or ^C to abort."</span>
-</span><span class='line'>  <span class="nb">local </span>line
-</span><span class='line'>  <span class="k">while </span><span class="nb">read</span> -r -p <span class="s2">"&gt; "</span> line; <span class="k">do
-</span><span class='line'>    </span><span class="nb">eval</span> <span class="s2">"</span><span class="nv">$line</span><span class="s2">"</span>
-</span><span class='line'>  <span class="k">done
-</span><span class='line'>  </span><span class="nb">echo</span>
-</span><span class='line'><span class="o">}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>And there it is. Add this to a script, insert a call to <code>debugger</code>
-somewhere, and run the script. It&rsquo;ll pause right execution right there.
-Once paused, we can do things like:</p>
-
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">debugger()</span> <span class="kw">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Stopped in REPL. Press ^D to resume, or ^C to abort.&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">local</span> <span class="va">line</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="bu">read</span> <span class="at">-r</span> <span class="at">-p</span> <span class="st">&quot;&gt; &quot;</span> <span class="va">line</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">eval</span> <span class="st">&quot;</span><span class="va">$line</span><span class="st">&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">done</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<p>And there it is. Add this to a script, insert a call to <code>debugger</code> somewhere, and run the script. It’ll pause right execution right there. Once paused, we can do things like:</p>
 <ul>
 <li>print the contents of variables with <code>echo</code></li>
-<li>run commands that are on our <code>PATH</code> (e.g., <code>pwd</code>, <code>ls</code>, &hellip;)</li>
+<li>run commands that are on our <code>PATH</code> (e.g., <code>pwd</code>, <code>ls</code>, …)</li>
 <li>call functions defined in the script</li>
 </ul>
-
-
-<p>&hellip; and pretty much everything that we could have done if we were
-editing the script directly. Here&rsquo;s a short session demonstrating how it
-can be used:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
-</span><span class='line'>
-</span><span class='line'>debugger<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  <span class="c"># ... implemented above ...</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">foo</span><span class="o">=</span>1
-</span><span class='line'>debugger
-</span><span class='line'><span class="nb">echo</span> <span class="s2">"foo: </span><span class="nv">$foo</span><span class="s2">"</span></span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>❯ foo.sh
-</span><span class='line'>Stopped in REPL. Press ^D to resume, or ^C to abort.
-</span><span class='line'>&gt; pwd
-</span><span class='line'>/Users/jez
-</span><span class='line'>&gt; echo $foo
-</span><span class='line'>1
-</span><span class='line'>&gt; foo=42
-</span><span class='line'>&gt; ^D
-</span><span class='line'>foo: 42</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Stopping on failures</h2>
-
-<p>I find that most of the time this is useful when a script is failing for
-some reason. Rather than put a <code>debugger</code> call right before the failing
-command, I can just add this at the top of the file:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">trap</span> <span class="s1">'debugger'</span> ERR</span></code></pre></td></tr></table></div></figure>
-
-
-<p>When any command has a non-zero exit code, Bash will run <code>debugger</code> and
-pause the program.</p>
-
-<p>I&rsquo;ve been keeping this function and <code>trap</code> call commented out at the top
-of my scripts and uncommenting them when needed (It uses <code>eval</code>, which
-is not the best from a security perspective, which is why it&rsquo;s commented
-by default).</p>
-
-<h2>Future work</h2>
-
-<p>Of course, I said &ldquo;debugger&rdquo; in quotes earlier because it&rsquo;s not
-<strong>really</strong> a debugger:</p>
-
+<p>… and pretty much everything that we could have done if we were editing the script directly. Here’s a short session demonstrating how it can be used:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">debugger()</span> <span class="kw">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ... implemented above ...</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="va">foo=</span>1</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">debugger</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;foo: </span><span class="va">$foo</span><span class="st">&quot;</span></span></code></pre></div>
+<pre><code>❯ foo.sh
+Stopped in REPL. Press ^D to resume, or ^C to abort.
+&gt; pwd
+/Users/jez
+&gt; echo $foo
+1
+&gt; foo=42
+&gt; ^D
+foo: 42</code></pre>
+<h1 id="stopping-on-failures">Stopping on failures</h1>
+<p>I find that most of the time this is useful when a script is failing for some reason. Rather than put a <code>debugger</code> call right before the failing command, I can just add this at the top of the file:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">trap</span> <span class="st">&#39;debugger&#39;</span> ERR</span></code></pre></div>
+<p>When any command has a non-zero exit code, Bash will run <code>debugger</code> and pause the program.</p>
+<p>I’ve been keeping this function and <code>trap</code> call commented out at the top of my scripts and uncommenting them when needed (It uses <code>eval</code>, which is not the best from a security perspective, which is why it’s commented by default).</p>
+<h1 id="future-work">Future work</h1>
+<p>Of course, I said “debugger” in quotes earlier because it’s not <strong>really</strong> a debugger:</p>
 <ul>
-<li><p>Using it requires editing the script we want to debug to include these
-lines, and then calling <code>debugger</code> somewhere. It doesn&rsquo;t launch an
-inferior process and control it, like <code>gdb</code> or <code>lldb</code> would.</p></li>
-<li><p>There&rsquo;s no <code>break</code> command to edit breakpoints while stopped. All
-breakpoints must have been written into the program up front.</p></li>
-<li><p>There&rsquo;s also no <code>step</code> or <code>next</code> commands for stepping into or over
-the next function or command.</p></li>
-<li><p>When it stops, it doesn&rsquo;t show the text content of the last line that
-executed, or even the line number.</p></li>
+<li><p>Using it requires editing the script we want to debug to include these lines, and then calling <code>debugger</code> somewhere. It doesn’t launch an inferior process and control it, like <code>gdb</code> or <code>lldb</code> would.</p></li>
+<li><p>There’s no <code>break</code> command to edit breakpoints while stopped. All breakpoints must have been written into the program up front.</p></li>
+<li><p>There’s also no <code>step</code> or <code>next</code> commands for stepping into or over the next function or command.</p></li>
+<li><p>When it stops, it doesn’t show the text content of the last line that executed, or even the line number.</p></li>
 </ul>
-
-
-<p>But I have some thoughts on how to implement these, too&hellip; Bash&rsquo;s <code>trap</code>
-builtin has a way to trap <code>DEBUG</code>, which runs after every command. I
-think I could make clever use of <code>trap</code>s to implementat least one of
-<code>step</code> or <code>next</code>, and definitely something that says &ldquo;stopped on line X&rdquo;
-and maybe even use that to print the source text of that line.
-Implementing <code>break</code> seems to be the hardest—I don&rsquo;t have any ideas for
-that one right now.</p>
-
-<p>I&rsquo;m releasing this code into the public domain. If you want to change it
-to implement any of these features, I&rsquo;d be more than interested to hear
-about it!</p>
-
+<p>But I have some thoughts on how to implement these, too… Bash’s <code>trap</code> builtin has a way to trap <code>DEBUG</code>, which runs after every command. I think I could make clever use of <code>trap</code>s to implementat least one of <code>step</code> or <code>next</code>, and definitely something that says “stopped on line X” and maybe even use that to print the source text of that line. Implementing <code>break</code> seems to be the hardest—I don’t have any ideas for that one right now.</p>
+<p>I’m releasing this code into the public domain. If you want to change it to implement any of these features, I’d be more than interested to hear about it!</p>
 <!-- vim:tw=72
 -->
+</main>
 
 
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#bash" title="Pages tagged bash">bash</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2019-06-16T09:25:06-07:00">June 16, 2019</time></span>
-      
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#bash">bash</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

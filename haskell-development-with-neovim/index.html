@@ -1,456 +1,270 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Haskell Development with Neovim - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2017-07-16 11:45:31 -0700">
+<meta name="description" content="After a year and a half of using Haskell on and off, I've finally settled on a set of high-quality development and editor tools, using Stack and Neovim.
+">
+<title>Haskell Development with Neovim – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
 
 
-<meta name="description" content="After a year and a half of using Haskell on and off, I've finally settled on a set of high-quality development and editor tools, using Stack and &hellip;">
-
-<meta name="keywords" content="haskell vim ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Haskell Development with Neovim">
-  <meta name="twitter:description" content="After a year and a half of using Haskell on and off, I've finally settled on a set of high-quality development and editor tools, using Stack and &hellip;">
-  <meta name="twitter:creator" content="@jez_io">
-
-
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/haskell-development-with-neovim">
-<meta property="og:title" content="Haskell Development with Neovim">
-<meta property="og:description" content="After a year and a half of using Haskell on and off, I've finally settled on a set of high-quality development and editor tools, using Stack and &hellip;">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
-
-<link rel="canonical" href="https://blog.jez.io/haskell-development-with-neovim">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" ">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
+
+
+  <header>
+    <h1 class="title">Haskell Development with Neovim</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2017-07-16 11:45:31 -0700">July 16, 2017</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#requirements">Requirements</a></li>
+  <li><a href="#overview">Overview</a></li>
+  <li><a href="#syntax-highlighting-indentation">Syntax Highlighting &amp; Indentation</a></li>
+  <li><a href="#auto-formatting-and-indentation">Auto-formatting and Indentation</a></li>
+  <li><a href="#quickfix-sign-columns">Quickfix &amp; Sign Columns</a></li>
+  <li><a href="#intero-the-pièce-de-résistance">Intero: The Pièce de Résistance</a></li>
+  <li><a href="#the-eagerly-awaited-config">The Eagerly-Awaited Config</a></li>
+  <li><a href="#wrap-up">Wrap Up</a></li>
   </ul>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Haskell Development with Neovim</h1>
-  <h2 class="EntryHeader-subtitle">July 16, 2017</h2>
-
-  <ul class="Tags">
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p>Configuring an editor for a new language is a double-edged sword: it&rsquo;s intensely
-satisfying when done, but takes time away from diving into the language itself!
-After using Haskell for a little over a year, I&rsquo;ve settled on a high-quality set
-of editor plugins. They&rsquo;re simple, powerful, and all play nicely together.</p>
-
+<main>
+<p>Configuring an editor for a new language is a double-edged sword: it’s intensely satisfying when done, but takes time away from diving into the language itself! After using Haskell for a little over a year, I’ve settled on a high-quality set of editor plugins. They’re simple, powerful, and all play nicely together.</p>
 <!-- more -->
-
-
-<h2>Requirements</h2>
-
-<p>I use <a href="https://www.haskellstack.org/">Haskell Stack</a> exclusively. Stack&rsquo;s goal is reproducible builds,
-which means that in general, things Just Work.</p>
-
-<p>I also use <a href="https://github.com/neovim/neovim">Neovim</a>, rather than normal Vim. Usually, my justification
-is ideological rather than technical. However, for Haskell my setup <strong>requires</strong>
-Neovim. Fear not! Neovim is feature-packed and also very stable. I love Neovim,
-and I&rsquo;ll be writing more about why in a future post.</p>
-
-<p>By the way, new to Vim plugins? I happen to have <a href="https://github.com/jez/vim-as-an-ide">just the post for
-you</a>!</p>
-
+<h1 id="requirements">Requirements</h1>
+<p>I use <a href="https://www.haskellstack.org/">Haskell Stack</a> exclusively. Stack’s goal is reproducible builds, which means that in general, things Just Work.</p>
+<p>I also use <a href="https://github.com/neovim/neovim">Neovim</a>, rather than normal Vim. Usually, my justification is ideological rather than technical. However, for Haskell my setup <strong>requires</strong> Neovim. Fear not! Neovim is feature-packed and also very stable. I love Neovim, and I’ll be writing more about why in a future post.</p>
+<p>By the way, new to Vim plugins? I happen to have <a href="https://github.com/jez/vim-as-an-ide">just the post for you</a>!</p>
 <!-- TODO(jez): Update with link to Neovim post -->
-
-
-<h2>Overview</h2>
-
-<p>We&rsquo;re going to move in order of increasing complexity. That said, even the most
-&ldquo;complex&rdquo; plugin here is actually quite painless to set up. By the end, we&rsquo;ll
-have a complete development experience! Coming up:</p>
-
+<h1 id="overview">Overview</h1>
+<p>We’re going to move in order of increasing complexity. That said, even the most “complex” plugin here is actually quite painless to set up. By the end, we’ll have a complete development experience! Coming up:</p>
 <ul>
 <li>syntax highlighting &amp; indentation (<strong><a href="https://github.com/neovimhaskell/haskell-vim">haskell-vim</a></strong>)</li>
 <li>auto-formatting &amp; style (<strong><a href="https://github.com/commercialhaskell/hindent">hindent</a>, <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a></strong>)</li>
 <li>quickfix and sign column support (<strong>using <a href="https://github.com/w0rp/ale">ale</a></strong>) for:
-
 <ul>
 <li>linter style suggestions (<strong>hlint</strong>)</li>
 <li>compiler errors and warnings (<strong>ghc-mod</strong>)</li>
-</ul>
-</li>
+</ul></li>
 <li>Type inspection, REPL integration, and more! (<strong><a href="https://github.com/parsonsmatt/intero-neovim">intero-neovim</a></strong>)</li>
 </ul>
-
-
-<p>To keep things concise, I&rsquo;ve moved all the relevant configuration to the end of
-the post. For now, let&rsquo;s start at the top.</p>
-
+<p>To keep things concise, I’ve moved all the relevant configuration to the end of the post. For now, let’s start at the top.</p>
 <!-- TODO(jez) Demonstrate everything with an asciicast -->
-
-
-<h2>Syntax Highlighting &amp; Indentation</h2>
-
+<h1 id="syntax-highlighting-indentation">Syntax Highlighting &amp; Indentation</h1>
 <ul>
-<li><strong>Plugin</strong>: <a href="https://github.com/neovimhaskell/haskell-vim">haskell-vim</a><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
+<li><strong>Plugin</strong>: <a href="https://github.com/neovimhaskell/haskell-vim">haskell-vim</a><span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">While listed under “neovimhaskell” on GitHub, this plugin works with normal Vim, too.<br />
+<br />
+</span></span></li>
 </ul>
-
-
-<p>Vim&rsquo;s default Haskell filetype plugin is pretty lack luster. Everything is blue,
-except for strings which are colored like comments, and keywords which are
-colored like constants. Indentation is wonky in some cases, and isn&rsquo;t
-configurable.</p>
-
-<p>This plugin corrects all that. It&rsquo;s the filetype plugin for Haskell that
-<strong>should</strong> ship with Vim.</p>
-
-<p>Not only does it come with saner defaults, it also comes with more config
-options, especially for indentation. This is important because it lets me
-tweak the automatic indentation to my own personal style.</p>
-
+<p>Vim’s default Haskell filetype plugin is pretty lack luster. Everything is blue, except for strings which are colored like comments, and keywords which are colored like constants. Indentation is wonky in some cases, and isn’t configurable.</p>
+<p>This plugin corrects all that. It’s the filetype plugin for Haskell that <strong>should</strong> ship with Vim.</p>
+<p>Not only does it come with saner defaults, it also comes with more config options, especially for indentation. This is important because it lets me tweak the automatic indentation to my own personal style.</p>
 <p>(Remember: all the config is at the end of the post.)</p>
-
-<h2>Auto-formatting and Indentation</h2>
-
+<h1 id="auto-formatting-and-indentation">Auto-formatting and Indentation</h1>
 <ul>
 <li><strong>Plugin</strong>: <a href="https://github.com/alx741/vim-hindent">vim-hindent</a></li>
 <li><strong>Tool</strong>: <code>stack install hindent</code></li>
 <li><strong>Tool</strong>: <code>stack install stylish-haskell</code></li>
 </ul>
-
-
-<p>For small projects, I have an idea of what style I like best. However, for
-larger projects it&rsquo;s unfair to ask contributors that they learn the ins and outs
-of my style. Situations like these call for automated solutions.</p>
-
-<p><code>go fmt</code> famously solved this problem for Golang by building the formatting tool
-into the compiler. For Haskell, there&rsquo;s <a href="https://github.com/commercialhaskell/hindent">hindent</a><sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. <code>hindent</code> can be
-installed through Stack, and <code>vim-hindent</code> is a Vim plugin that shims it.</p>
-
-<p>But I said I&rsquo;m partial to my own style in personal projects. There&rsquo;s another
-Haskell formatter that&rsquo;s much less invasive: <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a>. It basically
-only reformats <code>import</code>s, <code>case</code> branches, and record fields, aligning them
-vertically. And in fact, it&rsquo;s possible to use this alongside <code>hindent</code>.</p>
-
+<p>For small projects, I have an idea of what style I like best. However, for larger projects it’s unfair to ask contributors that they learn the ins and outs of my style. Situations like these call for automated solutions.</p>
+<p><code>go fmt</code> famously solved this problem for Golang by building the formatting tool into the compiler. For Haskell, there’s <a href="https://github.com/commercialhaskell/hindent">hindent</a><span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">Chris Done explains the appeal of solving style issues with tooling for Haskell well. The moral of the story is that hindent version 5 ships with only the most popular style formatter in an effort to arrive at a singular Haskell style: <a href="http://chrisdone.com/posts/hindent-5" class="uri">http://chrisdone.com/posts/hindent-5</a><br />
+<br />
+</span></span>. <code>hindent</code> can be installed through Stack, and <code>vim-hindent</code> is a Vim plugin that shims it.</p>
+<p>But I said I’m partial to my own style in personal projects. There’s another Haskell formatter that’s much less invasive: <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a>. It basically only reformats <code>import</code>s, <code>case</code> branches, and record fields, aligning them vertically. And in fact, it’s possible to use this alongside <code>hindent</code>.</p>
 <p>With these three tools, I can pick the right tool for the job:</p>
-
 <ul>
 <li><strong>Hand saw</strong>: let <code>haskell-vim</code> config control the indentation</li>
 <li><strong>Table saw</strong>: run <code>stylish-haskell</code> only</li>
 <li><strong>Chainsaw</strong>: run <code>hindent</code> only</li>
 <li><strong>Chainsaw, then sand paper</strong>: run <code>hindent</code>, then <code>stylish-haskell</code></li>
 </ul>
-
-
-<p>Getting them to play together requires a bit of config, so I&rsquo;ve included mine at
-the end of the post.</p>
-
-<h2>Quickfix &amp; Sign Columns</h2>
-
+<p>Getting them to play together requires a bit of config, so I’ve included mine at the end of the post.</p>
+<h1 id="quickfix-sign-columns">Quickfix &amp; Sign Columns</h1>
 <ul>
 <li><strong>Plugin</strong>: <a href="https://github.com/w0rp/ale">ale</a></li>
 <li><strong>Tool</strong>: <code>stack install hlint</code></li>
 <li><strong>Tool</strong>: <code>stack build ghc-mod</code>
-
 <ul>
-<li>N.B.: This is <em>build</em> not <em>install</em> here<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</li>
+<li>N.B.: This is <em>build</em> not <em>install</em> here<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">We want to install <code>ghc-mod</code> once in every project. It can be done globally, but it might get out of sync with the current project.<br />
+<br />
+</span></span>.</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-
-
-<p>This step requires <em>either</em> Neovim or Vim 8; ALE stands for &ldquo;Asynchronous Lint
-Engine,&rdquo; so it&rsquo;s using the new asynchronous job control features of these two
-editors. It&rsquo;s like an asynchronous Syntastic<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>.</p>
-
-<p>ALE ships with a number of Haskell integrations by default. For example, it can
-show errors if only Stack is installed. I prefer enabling two of ALE&rsquo;s Haskell
-integrations: <code>hlint</code> and <code>ghc-mod</code>.</p>
-
+<p>This step requires <em>either</em> Neovim or Vim 8; ALE stands for “Asynchronous Lint Engine,” so it’s using the new asynchronous job control features of these two editors. It’s like an asynchronous Syntastic<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="sidenote">Some people are familiar with Neomake for this task. However, Neomake is much more minimal than ALE. Neomake basically only builds, whereas ALE is more configurable and hackable.<br />
+<br />
+</span></span>.</p>
+<p>ALE ships with a number of Haskell integrations by default. For example, it can show errors if only Stack is installed. I prefer enabling two of ALE’s Haskell integrations: <code>hlint</code> and <code>ghc-mod</code>.</p>
 <ul>
-<li><code>hlint</code> is a linter for Haskell. It warns me when I try to do silly things
-like <code>if x then True else False</code>.</li>
+<li><code>hlint</code> is a linter for Haskell. It warns me when I try to do silly things like <code>if x then True else False</code>.</li>
 <li><code>ghc-mod</code> is a tool that can check files for compiler errors.</li>
 </ul>
-
-
-<p>The beauty of ALE is that it works almost entirely out of the box. The only real
-setup is to tell ALE to use only these two integrations explicitly. I&rsquo;ve
-included the one-liner to do this in the config at the bottom.</p>
-
-<h2>Intero: The Pièce de Résistance</h2>
-
+<p>The beauty of ALE is that it works almost entirely out of the box. The only real setup is to tell ALE to use only these two integrations explicitly. I’ve included the one-liner to do this in the config at the bottom.</p>
+<h1 id="intero-the-pièce-de-résistance">Intero: The Pièce de Résistance</h1>
 <ul>
 <li><strong>Plugin</strong>: <a href="https://github.com/parsonsmatt/intero-neovim">intero-neovim</a></li>
 </ul>
-
-
-<p>Intero is a complete development program for Haskell. It started as an Emacs
-package, but has been ported almost entirely to Neovim. Probably the best way to
-introduce it is with this asciicast:</p>
-
+<p>Intero is a complete development program for Haskell. It started as an Emacs package, but has been ported almost entirely to Neovim. Probably the best way to introduce it is with this asciicast:</p>
 <p align="center">
-  <a href="https://asciinema.org/a/128416">
-    <img
+<a href="https://asciinema.org/a/128416"> <img
       width="700px"
       alt="Intero for Neovim asciicast"
-      src="https://asciinema.org/a/128416.png">
-  </a>
+      src="https://asciinema.org/a/128416.png"> </a>
 </p>
+<p>Intero is designed for stack, sets itself up automatically, has point-and-click type information, and lets me jump to identifier definitions. On top of it all, it uses Neovim to communicate back and forth with a terminal buffer so that I get a GHCi buffer <strong>right inside Neovim</strong>. For Emacs users, this is nothing new I’m sure. But having the REPL in my editor continues to blow my mind 😮.</p>
+<p>Developing with the REPL in mind helps me write better code. Only top-level bindings are exposed in the REPL, so I write more small, testable functions. See here for more reasons <a href="http://chrisdone.com/posts/haskell-repl">why the REPL is awesome</a>.</p>
+<p>On top of providing access to the REPL, Intero provides about a dozen convenience commands that shell out to the REPL backend asynchronously. Being able to reload my code in the REPL—from Vim, with a single keystroke!—is a huge boon when developing.</p>
+<p>Intero takes a little getting used to, so be sure to read the docs for some sample workflows. Intero also sets up no mappings by default, so I’ve included my settings below.</p>
+<h1 id="the-eagerly-awaited-config">The Eagerly-Awaited Config</h1>
+<p>And without further ado…</p>
+<pre class="vim"><code>&quot; ----- neovimhaskell/haskell-vim -----
 
+&quot; Align &#39;then&#39; two spaces after &#39;if&#39;
+let g:haskell_indent_if = 2
+&quot; Indent &#39;where&#39; block two spaces under previous body
+let g:haskell_indent_before_where = 2
+&quot; Allow a second case indent style (see haskell-vim README)
+let g:haskell_indent_case_alternative = 1
+&quot; Only next under &#39;let&#39; if there&#39;s an equals sign
+let g:haskell_indent_let_no_in = 0
 
-<p>Intero is designed for stack, sets itself up automatically, has point-and-click
-type information, and lets me jump to identifier definitions. On top of it all,
-it uses Neovim to communicate back and forth with a terminal buffer so that I
-get a GHCi buffer <strong>right inside Neovim</strong>. For Emacs users, this is nothing new
-I&rsquo;m sure. But having the REPL in my editor continues to blow my mind 😮.</p>
+&quot; ----- hindent &amp; stylish-haskell -----
 
-<p>Developing with the REPL in mind helps me write better code. Only top-level
-bindings are exposed in the REPL, so I write more small, testable functions.
-See here for more reasons <a href="http://chrisdone.com/posts/haskell-repl">why the REPL is awesome</a>.</p>
+&quot; Indenting on save is too aggressive for me
+let g:hindent_on_save = 0
 
-<p>On top of providing access to the REPL, Intero provides about a dozen
-convenience commands that shell out to the REPL backend asynchronously. Being
-able to reload my code in the REPL&mdash;from Vim, with a single keystroke!&mdash;is a
-huge boon when developing.</p>
+&quot; Helper function, called below with mappings
+function! HaskellFormat(which) abort
+  if a:which ==# &#39;hindent&#39; || a:which ==# &#39;both&#39;
+    :Hindent
+  endif
+  if a:which ==# &#39;stylish&#39; || a:which ==# &#39;both&#39;
+    silent! exe &#39;undojoin&#39;
+    silent! exe &#39;keepjumps %!stylish-haskell&#39;
+  endif
+endfunction
 
-<p>Intero takes a little getting used to, so be sure to read the docs for some
-sample workflows. Intero also sets up no mappings by default, so I&rsquo;ve included
-my settings below.</p>
+&quot; Key bindings
+augroup haskellStylish
+  au!
+  &quot; Just hindent
+  au FileType haskell nnoremap &lt;leader&gt;hi :Hindent&lt;CR&gt;
+  &quot; Just stylish-haskell
+  au FileType haskell nnoremap &lt;leader&gt;hs :call HaskellFormat(&#39;stylish&#39;)&lt;CR&gt;
+  &quot; First hindent, then stylish-haskell
+  au FileType haskell nnoremap &lt;leader&gt;hf :call HaskellFormat(&#39;both&#39;)&lt;CR&gt;
+augroup END
 
-<h2>The Eagerly-Awaited Config</h2>
+&quot; ----- w0rp/ale -----
 
-<p>And without further ado&hellip;</p>
+let g:ale_linters = {}
+let g:ale_linters.haskell = [&#39;stack-ghc-mod&#39;, &#39;hlint&#39;]
 
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="c">" ----- neovimhaskell/haskell-vim -----</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" Align 'then' two spaces after 'if'</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_if</span> <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'><span class="c">" Indent 'where' block two spaces under previous body</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_before_where</span> <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'><span class="c">" Allow a second case indent style (see haskell-vim README)</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_case_alternative</span> <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'><span class="c">" Only next under 'let' if there's an equals sign</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:haskell_indent_let_no_in</span> <span class="p">=</span> <span class="m">0</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" ----- hindent &amp; stylish-haskell -----</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" Indenting on save is too aggressive for me</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:hindent_on_save</span> <span class="p">=</span> <span class="m">0</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" Helper function, called below with mappings</span>
-</span><span class='line'><span class="k">function</span><span class="p">!</span> HaskellFormat<span class="p">(</span>which<span class="p">)</span> abort
-</span><span class='line'>  <span class="k">if</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'hindent'</span> <span class="p">||</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'both'</span>
-</span><span class='line'>    <span class="p">:</span>Hindent
-</span><span class='line'>  <span class="k">endif</span>
-</span><span class='line'>  <span class="k">if</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'stylish'</span> <span class="p">||</span> <span class="nv">a:which</span> <span class="p">==</span># <span class="s1">'both'</span>
-</span><span class='line'>    <span class="k">silent</span><span class="p">!</span> exe <span class="s1">'undojoin'</span>
-</span><span class='line'>    <span class="k">silent</span><span class="p">!</span> exe <span class="s1">'keepjumps %!stylish-haskell'</span>
-</span><span class='line'>  <span class="k">endif</span>
-</span><span class='line'><span class="k">endfunction</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" Key bindings</span>
-</span><span class='line'>augroup haskellStylish
-</span><span class='line'>  <span class="k">au</span><span class="p">!</span>
-</span><span class='line'>  <span class="c">" Just hindent</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">hi</span> <span class="p">:</span>Hindent<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="c">" Just stylish-haskell</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span>hs <span class="p">:</span><span class="k">call</span> HaskellFormat<span class="p">(</span><span class="s1">'stylish'</span><span class="p">)&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="c">" First hindent, then stylish-haskell</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span>hf <span class="p">:</span><span class="k">call</span> HaskellFormat<span class="p">(</span><span class="s1">'both'</span><span class="p">)&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>augroup END
-</span><span class='line'>
-</span><span class='line'><span class="c">" ----- w0rp/ale -----</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:ale_linters</span> <span class="p">=</span> <span class="p">{}</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:ale_linters</span><span class="p">.</span>haskell <span class="p">=</span> <span class="p">[</span><span class="s1">'stack-ghc-mod'</span><span class="p">,</span> <span class="s1">'hlint'</span><span class="p">]</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" ----- parsonsmatt/intero-neovim -----</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">" Prefer starting Intero manually (faster startup times)</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:intero_start_immediately</span> <span class="p">=</span> <span class="m">0</span>
-</span><span class='line'><span class="c">" Use ALE (works even when not using Intero)</span>
-</span><span class='line'><span class="k">let</span> <span class="nv">g:intero_use_neomake</span> <span class="p">=</span> <span class="m">0</span>
-</span><span class='line'>
-</span><span class='line'>augroup interoMaps
-</span><span class='line'>  <span class="k">au</span><span class="p">!</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>io <span class="p">:</span>InteroOpen<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>iov <span class="p">:</span>InteroOpen<span class="p">&lt;</span>CR<span class="p">&gt;&lt;</span>C<span class="p">-</span>W<span class="p">&gt;</span>H
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>ih <span class="p">:</span>InteroHide<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">is</span> <span class="p">:</span>InteroStart<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>ik <span class="p">:</span>InteroKill<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>wr <span class="p">:</span><span class="k">w</span> \<span class="p">|</span> <span class="p">:</span>InteroReload<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">il</span> <span class="p">:</span>InteroLoadCurrentModule<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">if</span> <span class="p">:</span>InteroLoadCurrentFile<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell map <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">t</span> <span class="p">&lt;</span>Plug<span class="p">&gt;</span>InteroGenericType
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell map <span class="p">&lt;</span>leader<span class="p">&gt;</span>T <span class="p">&lt;</span>Plug<span class="p">&gt;</span>InteroType
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>it <span class="p">:</span>InteroTypeInsert<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>jd <span class="p">:</span>InteroGoToDef<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>iu <span class="p">:</span>InteroUses<span class="p">&lt;</span>CR<span class="p">&gt;</span>
-</span><span class='line'>  <span class="k">au</span> <span class="nb">FileType</span> haskell nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span>ist <span class="p">:</span>InteroSetTargets<span class="p">&lt;</span>SPACE<span class="p">&gt;</span>
-</span><span class='line'>augroup END</span></code></pre></td></tr></table></div></figure>
+&quot; ----- parsonsmatt/intero-neovim -----
 
+&quot; Prefer starting Intero manually (faster startup times)
+let g:intero_start_immediately = 0
+&quot; Use ALE (works even when not using Intero)
+let g:intero_use_neomake = 0
 
-<h2>Wrap Up</h2>
+augroup interoMaps
+  au!
 
-<p>With these tools, I feel empowered (rather than hindered) when I sit down to
-work with Haskell.</p>
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;io :InteroOpen&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;iov :InteroOpen&lt;CR&gt;&lt;C-W&gt;H
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;ih :InteroHide&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;is :InteroStart&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;ik :InteroKill&lt;CR&gt;
 
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;wr :w \| :InteroReload&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;il :InteroLoadCurrentModule&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;if :InteroLoadCurrentFile&lt;CR&gt;
+
+  au FileType haskell map &lt;leader&gt;t &lt;Plug&gt;InteroGenericType
+  au FileType haskell map &lt;leader&gt;T &lt;Plug&gt;InteroType
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;it :InteroTypeInsert&lt;CR&gt;
+
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;jd :InteroGoToDef&lt;CR&gt;
+  au FileType haskell nnoremap &lt;silent&gt; &lt;leader&gt;iu :InteroUses&lt;CR&gt;
+  au FileType haskell nnoremap &lt;leader&gt;ist :InteroSetTargets&lt;SPACE&gt;
+augroup END</code></pre>
+<h1 id="wrap-up">Wrap Up</h1>
+<p>With these tools, I feel empowered (rather than hindered) when I sit down to work with Haskell.</p>
 <ul>
 <li>The entire setup uses Stack, so things Just Work.
-
 <ul>
 <li>As a consequence, everything works with the implicit global Stack project!</li>
-</ul>
-</li>
+</ul></li>
 <li>It scales up in power:
-
 <ul>
-<li>From simple syntax highlighting and manual indentation&hellip;</li>
+<li>From simple syntax highlighting and manual indentation…</li>
 <li>to an indentation chainsaw and a <strong>REPL embeded in the editor</strong>!</li>
+</ul></li>
+<li>I can take full advantage of all my tools working together, leading to cleaner code and fewer frustrations.</li>
 </ul>
-</li>
-<li>I can take full advantage of all my tools working together, leading to cleaner
-code and fewer frustrations.</li>
-</ul>
+<p>Now that I’m finally at a point where I can stop fretting about my Haskell setup, I’ll have more time to explore the language and write about my experience.</p>
+<p>Haskell-the-language isn’t quite on the same level as SML-the-language, but it’s far and above when comparing by tooling support. I’m looking forward to taking advantage of that!</p>
+</main>
 
 
-<p>Now that I&rsquo;m finally at a point where I can stop fretting about my Haskell
-setup, I&rsquo;ll have more time to explore the language and write about my
-experience.</p>
-
-<p>Haskell-the-language isn&rsquo;t quite on the same level as SML-the-language, but it&rsquo;s
-far and above when comparing by tooling support. I&rsquo;m looking forward to taking
-advantage of that!</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>While listed under &ldquo;neovimhaskell&rdquo; on GitHub, this plugin works with normal Vim, too.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>Chris Done explains the appeal of solving style issues with tooling for Haskell well. The moral of the story is that hindent version 5 ships with only the most popular style formatter in an effort to arrive at a singular Haskell style: <a href="http://chrisdone.com/posts/hindent-5">http://chrisdone.com/posts/hindent-5</a><a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>We want to install <code>ghc-mod</code> once in every project. It can be done globally, but it might get out of sync with the current project.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-<li id="fn:4">
-<p>Some people are familiar with Neomake for this task. However, Neomake is much more minimal than ALE. Neomake basically only builds, whereas ALE is more configurable and hackable.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#haskell" title="Pages tagged haskell">haskell</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#vim" title="Pages tagged vim">vim</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2017-07-16T13:45:31-05:00">July 16, 2017</time></span>
-      
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#haskell">haskell</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#vim">vim</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

@@ -1,305 +1,195 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Prefer .then() over .catch() - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2018-05-31 15:58:52 -0700">
+<meta name="description" content="When designing asynchronous APIs that could error in Flow, prefer using `.then` for both successful and failure cases. Flow exposes a relatively unsafe library definition for the `.catch` method, so it's best to avoid it if you can.
+">
+<title>Prefer .then() over .catch() – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
 
 
-<meta name="description" content="When designing asynchronous APIs that could error in Flow, prefer using `.then` for both successful and failure cases. Flow exposes a relatively &hellip;">
-
-<meta name="keywords" content="flow fragment javascript ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Prefer .then() over .catch()">
-  <meta name="twitter:description" content="When designing asynchronous APIs that could error in Flow, prefer using `.then` for both successful and failure cases. Flow exposes a relatively &hellip;">
-  <meta name="twitter:creator" content="@jez_io">
-
-
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/prefer-then-over-catch">
-<meta property="og:title" content="Prefer .then() over .catch()">
-<meta property="og:description" content="When designing asynchronous APIs that could error in Flow, prefer using `.then` for both successful and failure cases. Flow exposes a relatively &hellip;">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
-
-<link rel="canonical" href="https://blog.jez.io/prefer-then-over-catch">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" fancy-blockquotes">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
+
+
+  <header>
+    <h1 class="title">Prefer .then() over .catch()</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2018-05-31 15:58:52 -0700">May 31, 2018</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#problem">Problem</a></li>
+  <li><a href="#solution">Solution</a></li>
+  <li><a href="#caveats">Caveats</a></li>
   </ul>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Prefer .then() over .catch()</h1>
-  <h2 class="EntryHeader-subtitle">May 31, 2018</h2>
-
-  <ul class="Tags">
-    
-      <li class="Tag">
-        <a href="/categories/#fragment" title="This post is shorter and less thought-out than other posts." class="tag">fragment</a>
-      </li>
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p>When designing asynchronous APIs that could error in Flow, prefer using
-<code>.then</code> for both successful and failure cases. Flow exposes a relatively
-unsafe library definition for the <code>.catch</code> method, so it&rsquo;s best to avoid
-it if you can.</p>
-
+<main>
+<p>When designing asynchronous APIs that could error in Flow, prefer using <code>.then</code> for both successful and failure cases. Flow exposes a relatively unsafe library definition for the <code>.catch</code> method, so it’s best to avoid it if you can.</p>
 <!-- more -->
-
-
-<h2>Problem</h2>
-
-<p>What does this look like in practice? Say you&rsquo;re thinking about writing
-code that looks similar to this:</p>
-
-<figure class='code'><figcaption><span>Bad code; don&#8217;t do this</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// "Success" and "failure" types (definitions omitted)</span>
-</span><span class='line'><span class="kr">import</span> <span class="nx">type</span> <span class="p">{</span><span class="nx">OkResult</span><span class="p">,</span> <span class="nx">ErrResult</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'src/types'</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kr">const</span> <span class="nx">doSomething</span> <span class="o">=</span> <span class="p">():</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">OkResult</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="k">new</span> <span class="nx">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// call resolve(...) when it worked, but</span>
-</span><span class='line'>    <span class="c1">// cal reject(...) when it failed.</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">doSomething</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">...)</span>
-</span><span class='line'>  <span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">...)</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>This is okay code, but not great. Why? Because Flow won&rsquo;t prevent us
-from calling <code>reject(...)</code> with something that&rsquo;s <strong>not</strong> of type
-<code>ErrResult</code>, and it won&rsquo;t warn us when we try to use <code>err</code> incorrectly.
-Concretely, if we had this type definition:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">type</span> <span class="nx">ErrResult</span> <span class="o">=</span> <span class="nx">string</span><span class="p">;</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Flow wouldn&rsquo;t prevent us from doing this:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// number, not a string!</span>
-</span><span class='line'><span class="nx">reject</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span></span></code></pre></td></tr></table></div></figure>
-
-
+<h1 id="problem">Problem</h1>
+<p>What does this look like in practice? Say you’re thinking about writing code that looks similar to this:</p>
+<figure>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource js numberLines"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">// &quot;Success&quot; and &quot;failure&quot; types (definitions omitted)</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> type {OkResult<span class="op">,</span> ErrResult} <span class="im">from</span> <span class="st">&#39;src/types&#39;</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">const</span> doSomething <span class="op">=</span> ()<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span>OkResult<span class="op">&gt;</span> <span class="kw">=&gt;</span> {</span>
+<span id="cb1-5"><a href="#cb1-5"></a>  <span class="cf">return</span> <span class="kw">new</span> <span class="bu">Promise</span>((resolve<span class="op">,</span> reject) <span class="kw">=&gt;</span> {</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="co">// call resolve(...) when it worked, but</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>    <span class="co">// cal reject(...) when it failed.</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>  })<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>}<span class="op">;</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a></span>
+<span id="cb1-11"><a href="#cb1-11"></a>doSomething</span>
+<span id="cb1-12"><a href="#cb1-12"></a>  <span class="op">.</span><span class="fu">then</span>((res) <span class="kw">=&gt;</span> <span class="op">...</span>)</span>
+<span id="cb1-13"><a href="#cb1-13"></a>  <span class="op">.</span><span class="fu">catch</span>((err) <span class="kw">=&gt;</span> <span class="op">...</span>)</span></code></pre></div>
+<figcaption>
+Bad code; don’t do this
+</figcaption>
+</figure>
+<p>This is okay code, but not great. Why? Because Flow won’t prevent us from calling <code>reject(...)</code> with something that’s <strong>not</strong> of type <code>ErrResult</code>, and it won’t warn us when we try to use <code>err</code> incorrectly. Concretely, if we had this type definition:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>type ErrResult <span class="op">=</span> string<span class="op">;</span></span></code></pre></div>
+<p>Flow wouldn’t prevent us from doing this:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// number, not a string!</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">reject</span>(<span class="dv">42</span>)<span class="op">;</span></span></code></pre></div>
 <p>nor from doing this:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// boolean, not a string!</span>
-</span><span class='line'><span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">:</span> <span class="kr">boolean</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">...);</span></span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Solution</h2>
-
-<p>As mentioned, we can work around this by only using <code>resolve</code> and
-<code>.then</code>. For example, we can replace our code above with this:</p>
-
-<figure class='code'><figcaption><span>Better code than before</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Helper function for exhaustiveness.</span>
-</span><span class='line'><span class="c1">// See here: https://blog.jez.io/flow-exhaustiveness/</span>
-</span><span class='line'><span class="kr">import</span> <span class="p">{</span><span class="nx">absurd</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'src/absurd'</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kr">import</span> <span class="nx">type</span> <span class="p">{</span><span class="nx">OkResult</span><span class="p">,</span> <span class="nx">ErrResult</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'src/types'</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Use a union type to mean "success OR failure"</span>
-</span><span class='line'><span class="nx">type</span> <span class="nx">Result</span> <span class="o">=</span>
-</span><span class='line'>  <span class="o">|</span> <span class="p">{</span><span class="o">|</span><span class="na">tag</span><span class="p">:</span> <span class="s1">'ok'</span><span class="p">,</span> <span class="na">val</span><span class="p">:</span> <span class="nx">OkResult</span><span class="o">|</span><span class="p">}</span>
-</span><span class='line'>  <span class="o">|</span> <span class="p">{</span><span class="o">|</span><span class="na">tag</span><span class="p">:</span> <span class="s1">'err'</span><span class="p">,</span> <span class="na">val</span><span class="p">:</span> <span class="nx">ErrResult</span><span class="o">|</span><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//     Use our new union type ──┐</span>
-</span><span class='line'><span class="kr">const</span> <span class="nx">doSomething</span> <span class="o">=</span> <span class="p">():</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">Result</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="k">new</span> <span class="nx">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// call resolve({tag: 'ok',  val: ...}) when it worked, and</span>
-</span><span class='line'>    <span class="c1">// call resolve({tag: 'err', val: ...}) when it failed</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">doSomething</span>
-</span><span class='line'>  <span class="c1">// Use a switch statement in the result:</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">switch</span> <span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">tag</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">case</span> <span class="s1">'ok'</span><span class="p">:</span>
-</span><span class='line'>        <span class="c1">// ...</span>
-</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>      <span class="k">case</span> <span class="s1">'err'</span><span class="p">:</span>
-</span><span class='line'>        <span class="c1">// ...</span>
-</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>      <span class="nl">default</span><span class="p">:</span>
-</span><span class='line'>        <span class="c1">// Guarantees we covered all cases.</span>
-</span><span class='line'>        <span class="nx">absurd</span><span class="p">(</span><span class="nx">res</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">})</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>There&rsquo;s a lot of benefits in this newer code:</p>
-
+<div class="sourceCode" id="cb4"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// boolean, not a string!</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span><span class="fu">catch</span>((err<span class="op">:</span> boolean) <span class="kw">=&gt;</span> <span class="op">...</span>)<span class="op">;</span></span></code></pre></div>
+<h1 id="solution">Solution</h1>
+<p>As mentioned, we can work around this by only using <code>resolve</code> and <code>.then</code>. For example, we can replace our code above with this:</p>
+<figure>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource js numberLines"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">// Helper function for exhaustiveness.</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co">// See here: https://blog.jez.io/flow-exhaustiveness/</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="im">import</span> {absurd} <span class="im">from</span> <span class="st">&#39;src/absurd&#39;</span><span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="im">import</span> type {OkResult<span class="op">,</span> ErrResult} <span class="im">from</span> <span class="st">&#39;src/types&#39;</span><span class="op">;</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">// Use a union type to mean &quot;success OR failure&quot;</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>type Result <span class="op">=</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a>  <span class="op">|</span> {<span class="op">|</span><span class="dt">tag</span><span class="op">:</span> <span class="st">&#39;ok&#39;</span><span class="op">,</span> <span class="dt">val</span><span class="op">:</span> OkResult<span class="op">|</span>}</span>
+<span id="cb5-10"><a href="#cb5-10"></a>  <span class="op">|</span> {<span class="op">|</span><span class="dt">tag</span><span class="op">:</span> <span class="st">&#39;err&#39;</span><span class="op">,</span> <span class="dt">val</span><span class="op">:</span> ErrResult<span class="op">|</span>}<span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">//     Use our new union type ──┐</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="kw">const</span> doSomething <span class="op">=</span> ()<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span>Result<span class="op">&gt;</span> <span class="kw">=&gt;</span> {</span>
+<span id="cb5-14"><a href="#cb5-14"></a>  <span class="cf">return</span> <span class="kw">new</span> <span class="bu">Promise</span>((resolve<span class="op">,</span> reject) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-15"><a href="#cb5-15"></a>    <span class="co">// call resolve({tag: &#39;ok&#39;,  val: ...}) when it worked, and</span></span>
+<span id="cb5-16"><a href="#cb5-16"></a>    <span class="co">// call resolve({tag: &#39;err&#39;, val: ...}) when it failed</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a>  })<span class="op">;</span></span>
+<span id="cb5-18"><a href="#cb5-18"></a>}<span class="op">;</span></span>
+<span id="cb5-19"><a href="#cb5-19"></a></span>
+<span id="cb5-20"><a href="#cb5-20"></a>doSomething</span>
+<span id="cb5-21"><a href="#cb5-21"></a>  <span class="co">// Use a switch statement in the result:</span></span>
+<span id="cb5-22"><a href="#cb5-22"></a>  <span class="op">.</span><span class="fu">then</span>((res) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-23"><a href="#cb5-23"></a>    <span class="cf">switch</span> (res<span class="op">.</span><span class="at">tag</span>) {</span>
+<span id="cb5-24"><a href="#cb5-24"></a>      <span class="cf">case</span> <span class="st">&#39;ok&#39;</span><span class="op">:</span></span>
+<span id="cb5-25"><a href="#cb5-25"></a>        <span class="co">// ...</span></span>
+<span id="cb5-26"><a href="#cb5-26"></a>        <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb5-27"><a href="#cb5-27"></a>      <span class="cf">case</span> <span class="st">&#39;err&#39;</span><span class="op">:</span></span>
+<span id="cb5-28"><a href="#cb5-28"></a>        <span class="co">// ...</span></span>
+<span id="cb5-29"><a href="#cb5-29"></a>        <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb5-30"><a href="#cb5-30"></a>      <span class="cf">default</span><span class="op">:</span></span>
+<span id="cb5-31"><a href="#cb5-31"></a>        <span class="co">// Guarantees we covered all cases.</span></span>
+<span id="cb5-32"><a href="#cb5-32"></a>        <span class="fu">absurd</span>(res)<span class="op">;</span></span>
+<span id="cb5-33"><a href="#cb5-33"></a>        <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb5-34"><a href="#cb5-34"></a>    }</span>
+<span id="cb5-35"><a href="#cb5-35"></a>  })</span></code></pre></div>
+<figcaption>
+Better code than before
+</figcaption>
+</figure>
+<p>There’s a lot of benefits in this newer code:</p>
 <ul>
-<li><p>Using <code>resolve</code> is much safer than <code>reject</code>. Flow will always warn us
-if we call <code>resolve</code> with an improperly-typed input.</p></li>
-<li><p>Using <code>.then</code> is the same. Flow will warn for improper usage, <strong>and</strong>
-even correctly infer the type of <code>res</code> in our handler.</p></li>
-<li><p>We got exhaustiveness as a bonus. We now handle all errors, whereas
-before it was easy to forget to include a <code>.catch</code>.</p></li>
+<li><p>Using <code>resolve</code> is much safer than <code>reject</code>. Flow will always warn us if we call <code>resolve</code> with an improperly-typed input.</p></li>
+<li><p>Using <code>.then</code> is the same. Flow will warn for improper usage, <strong>and</strong> even correctly infer the type of <code>res</code> in our handler.</p></li>
+<li><p>We got exhaustiveness as a bonus. We now handle all errors, whereas before it was easy to forget to include a <code>.catch</code>.</p></li>
 </ul>
-
-
-<h2>Caveats</h2>
-
-<p>Of course, there are some times when the you&rsquo;re interfacing with code
-not under your control that exposes critical functionality over
-<code>.catch</code>. In these cases, it&rsquo;s not an option to just &ldquo;not use <code>.catch</code>&rdquo;.
-Instead, you have two options.</p>
-
-<p>If you trust that the library you&rsquo;re using will never &ldquo;misbehave&rdquo;,
-you can ascribe a narrow type to the <code>.catch</code> callback function:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// If I know that throwNumber will always call `reject` with a</span>
-</span><span class='line'><span class="c1">// number, I can stop the loose types from propagating further</span>
-</span><span class='line'><span class="c1">// with an explicit annotation:</span>
-</span><span class='line'><span class="nx">throwNumber</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Didn't throw!"</span><span class="p">))</span>
-</span><span class='line'>  <span class="c1">//         ┌── explicit annotation</span>
-</span><span class='line'>  <span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">n</span><span class="p">:</span> <span class="nx">number</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">handleWhenRejected</span><span class="p">(</span><span class="nx">n</span><span class="p">))</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you aren&rsquo;t comfortable putting this much trust in the API, you
-should instead ascribe <code>mixed</code> to the result of the callback.</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">throwNumber</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Didn't throw!"</span><span class="p">))</span>
-</span><span class='line'>  <span class="c1">//         ┌── defensive annotation</span>
-</span><span class='line'>  <span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">n</span><span class="p">:</span> <span class="nx">mixed</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">n</span> <span class="o">===</span> <span class="s1">'number'</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">handleWhenRejected</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>      <span class="c1">// Reports misbehavior to an imaginary observability service</span>
-</span><span class='line'>      <span class="nx">tracker</span><span class="p">.</span><span class="nx">increment</span><span class="p">(</span><span class="s1">'throwNumber.unexpected_input'</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">});</span></span></code></pre></td></tr></table></div></figure>
-
-
-
-
+<h1 id="caveats">Caveats</h1>
+<p>Of course, there are some times when the you’re interfacing with code not under your control that exposes critical functionality over <code>.catch</code>. In these cases, it’s not an option to just “not use <code>.catch</code>”. Instead, you have two options.</p>
+<p>If you trust that the library you’re using will never “misbehave”, you can ascribe a narrow type to the <code>.catch</code> callback function:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// If I know that throwNumber will always call `reject` with a</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">// number, I can stop the loose types from propagating further</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">// with an explicit annotation:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>throwNumber</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">then</span>(() <span class="kw">=&gt;</span> <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;Didn&#39;t throw!&quot;</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">//         ┌── explicit annotation</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">catch</span>((n<span class="op">:</span> number) <span class="kw">=&gt;</span> <span class="fu">handleWhenRejected</span>(n))</span></code></pre></div>
+<p>If you aren’t comfortable putting this much trust in the API, you should instead ascribe <code>mixed</code> to the result of the callback.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>throwNumber</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">then</span>(() <span class="kw">=&gt;</span> <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;Didn&#39;t throw!&quot;</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">//         ┌── defensive annotation</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">catch</span>((n<span class="op">:</span> mixed) <span class="kw">=&gt;</span> {</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="kw">typeof</span> n <span class="op">===</span> <span class="st">&#39;number&#39;</span>) {</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">handleWhenRejected</span>(n)<span class="op">;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Reports misbehavior to an imaginary observability service</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      tracker<span class="op">.</span><span class="fu">increment</span>(<span class="st">&#39;throwNumber.unexpected_input&#39;</span>)<span class="op">;</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span></code></pre></div>
 <!-- vim:tw=72
 -->
+</main>
 
 
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#flow" title="Pages tagged flow">flow</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#fragment" title="Pages tagged fragment">fragment</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#javascript" title="Pages tagged javascript">javascript</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2018-05-31T15:58:52-07:00">May 31, 2018</time></span>
-      
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#flow">flow</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#fragment">fragment</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#javascript">javascript</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

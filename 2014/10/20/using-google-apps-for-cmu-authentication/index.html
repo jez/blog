@@ -1,241 +1,151 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Using Google OAuth2 for CMU Authentication - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
-
-
-
-
+<meta name="dcterms.date" content="2014-10-20 03:11:37 -0700">
 <meta name="description" content="Using python-social-auth and Django, I've been able to use login.cmu.edu to sign in CMU students by AndrewID.">
+<title>Using Google OAuth2 for CMU Authentication – Jake Zimmerman</title>
 
-<meta name="keywords" content="python webdev ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Using Google OAuth2 for CMU Authentication">
-  <meta name="twitter:description" content="Using python-social-auth and Django, I've been able to use login.cmu.edu to sign in CMU students by AndrewID.">
-  <meta name="twitter:creator" content="@jez_io">
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/2014/10/20/using-google-apps-for-cmu-authentication">
-<meta property="og:title" content="Using Google OAuth2 for CMU Authentication">
-<meta property="og:description" content="Using python-social-auth and Django, I've been able to use login.cmu.edu to sign in CMU students by AndrewID.">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/2014/10/20/using-google-apps-for-cmu-authentication">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" ">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
+
+
+  <header>
+    <h1 class="title">Using Google OAuth2 for CMU Authentication</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2014-10-20 03:11:37 -0700">October 20, 2014</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#background">Background</a></li>
+  <li><a href="#implementing-authentication">Implementing Authentication</a>
+  <ul>
+  <li><a href="#python-social-auth">Python Social Auth</a></li>
+  <li><a href="#the-django-app">The Django App</a></li>
+  <li><a href="#demo">Demo</a></li>
+  <li><a href="#going-forward">Going Forward</a></li>
+  </ul></li>
   </ul>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Using Google OAuth2 for CMU Authentication</h1>
-  <h2 class="EntryHeader-subtitle">October 20, 2014</h2>
-
-  <ul class="Tags">
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p>Using <code>python-social-auth</code> and Django, I&rsquo;ve found a very straightfoward way of adding authentication to apps designed for CMU students. Given that all Andrew accounts are now Google Apps @ CMU accounts, we can take advantage of the widely used Google OAuth2 libraries to authenticate users, but just restrict sign-ins to the <code>andrew.cmu.edu</code> &ldquo;hosted domain.&rdquo;</p>
-
+<main>
+<p>Using <code>python-social-auth</code> and Django, I’ve found a very straightfoward way of adding authentication to apps designed for CMU students. Given that all Andrew accounts are now Google Apps @ CMU accounts, we can take advantage of the widely used Google OAuth2 libraries to authenticate users, but just restrict sign-ins to the <code>andrew.cmu.edu</code> “hosted domain.”</p>
 <!-- more -->
-
-
-<h2>Background</h2>
-
-<p>Finally! I&rsquo;ve alluded many times to blogging about some of the things I&rsquo;m learning from my experiences rewriting <a href="http://print.scottylabs.org/">Print@ScottyLabs</a>. After a summer of putting it off and half a semester more of dawdling, I&rsquo;ve finally managed to lay some solid groundwork.</p>
-
+<h1 id="background">Background</h1>
+<p>Finally! I’ve alluded many times to blogging about some of the things I’m learning from my experiences rewriting <a href="http://print.scottylabs.org/">Print@ScottyLabs</a>. After a summer of putting it off and half a semester more of dawdling, I’ve finally managed to lay some solid groundwork.</p>
 <p>One of the features that we plan on adding to Print 2.0 is a web interface. For people familiar with the way Print works currently, you interact with the service entirely through email. This leads to a clunky user experience and a lot of weird bugs and edge cases. With a web interface, we hope to streamline the process of account management and printing documents.</p>
-
-<p>With this in mind, we needed to decide on a user model. Ideally, we&rsquo;d like this model to give us two things:</p>
-
+<p>With this in mind, we needed to decide on a user model. Ideally, we’d like this model to give us two things:</p>
 <ul>
-<li><strong>It should be secure.</strong> People who don&rsquo;t already have access to CMU printers shoudn&rsquo;t be able to easy gain access by using our system.</li>
+<li><strong>It should be secure.</strong> People who don’t already have access to CMU printers shoudn’t be able to easy gain access by using our system.</li>
 <li><strong>It should be familiar.</strong> We want to design Print 2.0 to be as close to an official-feeling CMU app as we can without stepping on the ever-present administrative toes.</li>
 </ul>
-
-
 <p>Naturally, this leads to an obvious solution: have people sign in using the same <a href="https://login.cmu.edu">https://login.cmu.edu</a> site, which is used for email, Blackboard, AutoLab, and many other on-campus services. The trick, then, is to figure out how to do this.</p>
-
-<p>My first thought was to &ldquo;use Shibboleth.&rdquo; I put this in quotes because I didn&rsquo;t exactly know what that meant at the time. What I was looking for was a simple OAuth2 API (like what Google or Facebook provide) that I could much just drop into my app with no other configuration required on the deployment machine. Shibboleth does not offer this solution.</p>
-
-<p>Luckily, Google&rsquo;s OAuth2 API has a feature that allowed me to do exactly what I wanted. Thanks to a couple of resourceful members of the CMU Computer Science Facebook group (Carlos Diaz-Padron and Arthur Lee), I found out about a barely-documented parameter that you can pass in on the auth URL to restrict Google OAuth2 logins to a <a href="https://developers.google.com/accounts/docs/OAuth2Login#hd-param">specific hosted domain</a>. Since all CMU Andrew accounts are Google Apps accounts (as of Fall 2013), we can ask Google to restrict logins to the <code>'andrew.cmu.edu'</code> hosted domain. From here on, the only trick is to get whatever client library you&rsquo;re using to handle authentication to pass this parameter with a value of <code>'andrew.cmu.edu'</code> along to Google. The rest of this post describes a bare-bones way of doing this using Django.</p>
-
-<h2>Implementing Authentication</h2>
-
-<p>The following is a pretty long-winded explanation of my personal struggles with this. If you&rsquo;d really just like to learn by example and by making your own mistakes, check out the <a href="https://github.com/jez/google-apps-cmu-login/">code on GitHub</a>. I also found the <a href="https://github.com/omab/python-social-auth/tree/master/examples/"><code>python-social-auth</code> examples</a> very helpful. In the spirit of <a href="http://www.gitorial.com/">gitorial</a>, the commits are structured logically to give you a sense of how the app came together as I wrote it. In fact, I&rsquo;ve even <a href="http://www.gitorial.com/#/jez/25536683">made a gitorial</a> for this repo!</p>
-
-<h3>Python Social Auth</h3>
-
-<p>First up: pick a client library. I&rsquo;ve had success using <code>python-social-auth</code> in other projects, and it&rsquo;s generally a mature project, so it&rsquo;s what I picked.</p>
-
+<p>My first thought was to “use Shibboleth.” I put this in quotes because I didn’t exactly know what that meant at the time. What I was looking for was a simple OAuth2 API (like what Google or Facebook provide) that I could much just drop into my app with no other configuration required on the deployment machine. Shibboleth does not offer this solution.</p>
+<p>Luckily, Google’s OAuth2 API has a feature that allowed me to do exactly what I wanted. Thanks to a couple of resourceful members of the CMU Computer Science Facebook group (Carlos Diaz-Padron and Arthur Lee), I found out about a barely-documented parameter that you can pass in on the auth URL to restrict Google OAuth2 logins to a <a href="https://developers.google.com/accounts/docs/OAuth2Login#hd-param">specific hosted domain</a>. Since all CMU Andrew accounts are Google Apps accounts (as of Fall 2013), we can ask Google to restrict logins to the <code>'andrew.cmu.edu'</code> hosted domain. From here on, the only trick is to get whatever client library you’re using to handle authentication to pass this parameter with a value of <code>'andrew.cmu.edu'</code> along to Google. The rest of this post describes a bare-bones way of doing this using Django.</p>
+<h1 id="implementing-authentication">Implementing Authentication</h1>
+<p>The following is a pretty long-winded explanation of my personal struggles with this. If you’d really just like to learn by example and by making your own mistakes, check out the <a href="https://github.com/jez/google-apps-cmu-login/">code on GitHub</a>. I also found the <a href="https://github.com/omab/python-social-auth/tree/master/examples/"><code>python-social-auth</code> examples</a> very helpful. In the spirit of <a href="http://www.gitorial.com/">gitorial</a>, the commits are structured logically to give you a sense of how the app came together as I wrote it. In fact, I’ve even <a href="http://www.gitorial.com/#/jez/25536683">made a gitorial</a> for this repo!</p>
+<h2 id="python-social-auth">Python Social Auth</h2>
+<p>First up: pick a client library. I’ve had success using <code>python-social-auth</code> in other projects, and it’s generally a mature project, so it’s what I picked.</p>
 <p>Next up: skim the docs. Given the enormous size of this project (it has solutions for tons of python frameworks and tons of authentication backends), the docs are pretty comprehensive. Unfortunately, they fell short in the one place where I needed to look.</p>
-
 <p>One of the neat things about the python social auth library is that it can be easily extended to support additional authentications backends using simple object-oriented techniques. To make this happen, very few pieces of information are hardcoded; in particular, the names of the variables that allow for configuration are dynamically generated based on the available backends.</p>
-
 <p><a href="https://python-social-auth.readthedocs.org/en/latest/configuration/settings.html#extra-arguments-on0auth-processes">This page</a> outlines how to pass in extra, optional arguments while constructing the redirect URI for a particular authentication backend. It hints at the names of the variables that need to be defined, but sadly these hints are wrong.</p>
-
 <p><strong>This is a correction to the documentation provided at the above link.</strong> Extra authentication arguments can be passed in using any of the following variables:</p>
-
 <ul>
 <li><code>SOCIAL_AUTH_&lt;backend&gt;_AUTH_EXTRA_ARGUMENTS</code></li>
 <li><code>SOCIAL_AUTH_AUTH_EXTRA_ARGUMENTS</code> (no, this is not a typo)</li>
 <li><code>AUTH_EXTRA_ARGUMENTS</code></li>
 </ul>
-
-
-<p>I&rsquo;m not sure what the difference between using the second and third variables are, but all variables of the first form will allow you to scope the extra arguments to a particular backend (in case you&rsquo;re using more than one in the same app).</p>
-
+<p>I’m not sure what the difference between using the second and third variables are, but all variables of the first form will allow you to scope the extra arguments to a particular backend (in case you’re using more than one in the same app).</p>
 <p>So in my case, I added the following line to my <code>settings.py</code>:</p>
-
-<figure class='code'><figcaption><span>settings.py</span> <a href='https://github.com/jez/google-apps-cmu-login/blob/master/config/settings.py#L66'>(link)</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS</span> <span class="o">=</span> <span class="p">{</span><span class="s">'hd'</span> <span class="p">:</span> <span class="s">'andrew.cmu.edu'</span><span class="p">}</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Phew. That&rsquo;s a long variable name. But Jake, how did you come up with <code>GOOGLE_OAUTH2</code> for the backend name? There&rsquo;s really no good answer to this, because I haven&rsquo;t been able to find a web-readable list of all the names in one place. The way this name is generated is by taking the <code>name</code> property of the particular backend you&rsquo;re using (in my case, <code>social.backends.google.GoogleOAuth2</code> has <code>name = 'google-oauth2'</code>, which I found by looking at the source), replacing all hyphens with underscores and making everything capital.</p>
-
-<h3>The Django App</h3>
-
-<p>Now you should plenty of background knowledge to make sense of the Django app on your own, but I&rsquo;ll reiterate the main points here for completeness. It will be pretty choppy in most places if you&rsquo;re not referring to my example app on GitHub as you read.</p>
-
-<p>First, we&rsquo;ll get all our URLs in place. For Django, all the URLs dealing with logging in are already defined; we just have to include them:</p>
-
-<figure class='code'><figcaption><span>config/urls.py</span> <a href='https://github.com/jez/google-apps-cmu-login/blob/master/config/urls.py#L10'>(link)</a></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="n">url</span><span class="p">(</span><span class="s">r''</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">'social.apps.django_app.urls'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s">'social'</span><span class="p">)),</span>
-</span><span class='line'><span class="o">...</span></span></code></pre></td></tr></table></div></figure>
-
-
+<figure>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python numberLines"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a>SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS <span class="op">=</span> {<span class="st">&#39;hd&#39;</span> : <span class="st">&#39;andrew.cmu.edu&#39;</span>}</span></code></pre></div>
+<figcaption>
+<a href="https://github.com/jez/google-apps-cmu-login/blob/master/config/settings.py#L66">settings.py</a>
+</figcaption>
+</figure>
+<p>Phew. That’s a long variable name. But Jake, how did you come up with <code>GOOGLE_OAUTH2</code> for the backend name? There’s really no good answer to this, because I haven’t been able to find a web-readable list of all the names in one place. The way this name is generated is by taking the <code>name</code> property of the particular backend you’re using (in my case, <code>social.backends.google.GoogleOAuth2</code> has <code>name = 'google-oauth2'</code>, which I found by looking at the source), replacing all hyphens with underscores and making everything capital.</p>
+<h2 id="the-django-app">The Django App</h2>
+<p>Now you should plenty of background knowledge to make sense of the Django app on your own, but I’ll reiterate the main points here for completeness. It will be pretty choppy in most places if you’re not referring to my example app on GitHub as you read.</p>
+<p>First, we’ll get all our URLs in place. For Django, all the URLs dealing with logging in are already defined; we just have to include them:</p>
+<figure>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python numberLines"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>    ...</span>
+<span id="cb2-2"><a href="#cb2-2"></a>    url(<span class="vs">r&#39;&#39;</span>, include(<span class="st">&#39;social.apps.django_app.urls&#39;</span>, namespace<span class="op">=</span><span class="st">&#39;social&#39;</span>)),</span>
+<span id="cb2-3"><a href="#cb2-3"></a>    ...</span></code></pre></div>
+<figcaption>
+<a href="https://github.com/jez/google-apps-cmu-login/blob/master/config/urls.py#L10">config/urls.py</a>
+</figcaption>
+</figure>
 <p>Then we can set up some simple URLs (a home page and a logout view), and accompanying views for these URLs that do exactly what you think they should.</p>
+<p>In our template, if the user is logged in, we’ll show their AndrewID (<code>user.username</code>), or else we’ll hardcode the link to the Google OAuth2 authentication backend.</p>
+<p><strong>Note</strong>: if you plan on using multiple forms of authentication (like Facebook or GitHub) in this app, be sure to check out the python social auth example for how they generate their home page such that no URLs need to be hard coded. For our purposes, though, if there’s only one URL it will be fine to just write it out.</p>
+<h2 id="demo">Demo</h2>
+<iframe width="420" height="315" src="//www.youtube.com/embed/GYRUvTvTSJE" frameborder="0" allowfullscreen>
+</iframe>
+<h2 id="going-forward">Going Forward</h2>
+<p>That’s basically it. The rest is up to you to fill in. Building off this model, you should be able to make basically any Django app that you’d otherwise want to build.</p>
+<p>One thing you’ll want to look into is defining a custom Auth User model. Custom Auth User models allow you to plug into Django’s default auth system to take advantage of all the features it has available for keeping track of your users. The <a href="https://docs.djangoproject.com/en/dev/topics/auth/customizing/">Django docs</a> on this topic are actually pretty good, though you’ll likely want to find an example to help you work through the specifics.</p>
+<p>As always, let me know if you have any questions or if by following these steps something didn’t work for you. Because of how bare bones this app is, it’s likely that I glossed over some points for the sake of minimalism. Comment below with your feedback and feel free to email me or make GitHub issues with your questions.</p>
+</main>
 
-<p>In our template, if the user is logged in, we&rsquo;ll show their AndrewID (<code>user.username</code>), or else we&rsquo;ll hardcode the link to the Google OAuth2 authentication backend.</p>
 
-<p><strong>Note</strong>: if you plan on using multiple forms of authentication (like Facebook or GitHub) in this app, be sure to check out the python social auth example for how they generate their home page such that no URLs need to be hard coded. For our purposes, though, if there&rsquo;s only one URL it will be fine to just write it out.</p>
-
-<h3>Demo</h3>
-
-<iframe width="420" height="315" src="//www.youtube.com/embed/GYRUvTvTSJE" frameborder="0" allowfullscreen></iframe>
-
-
-<h3>Going Forward</h3>
-
-<p>That&rsquo;s basically it. The rest is up to you to fill in. Building off this model, you should be able to make basically any Django app that you&rsquo;d otherwise want to build.</p>
-
-<p>One thing you&rsquo;ll want to look into is defining a custom Auth User model. Custom Auth User models allow you to plug into Django&rsquo;s default auth system to take advantage of all the features it has available for keeping track of your users. The <a href="https://docs.djangoproject.com/en/dev/topics/auth/customizing/">Django docs</a> on this topic are actually pretty good, though you&rsquo;ll likely want to find an example to help you work through the specifics.</p>
-
-<p>As always, let me know if you have any questions or if by following these steps something didn&rsquo;t work for you. Because of how bare bones this app is, it&rsquo;s likely that I glossed over some points for the sake of minimalism. Comment below with your feedback and feel free to email me or make GitHub issues with your questions.</p>
-
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#python" title="Pages tagged python">python</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#webdev" title="Pages tagged webdev">webdev</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2014-10-20T06:11:37-04:00">October 20, 2014</time></span>
-      
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#python">python</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#webdev">webdev</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

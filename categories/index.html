@@ -1,1345 +1,375 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="/categories/">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Categories - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
-
-
-
-
 <meta name="description" content="An archive of posts sorted by category.">
+<title>Categories – Jake Zimmerman</title>
 
-<meta name="keywords" content=" ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Categories">
-  <meta name="twitter:description" content="An archive of posts sorted by category.">
-  <meta name="twitter:creator" content="@jez_io">
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/categories">
-<meta property="og:title" content="Categories">
-<meta property="og:description" content="An archive of posts sorted by category.">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/categories">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post-index">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
+
+
+  <header>
+    <h1 class="title">Categories</h1>
+    <blockquote class="metadata">
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#bash"><span class="smallcaps">bash</span></a></li>
+  <li><a href="#books"><span class="smallcaps">books</span></a></li>
+  <li><a href="#c"><span class="smallcaps">c</span></a></li>
+  <li><a href="#concurrency"><span class="smallcaps">concurrency</span></a></li>
+  <li><a href="#data"><span class="smallcaps">data</span></a></li>
+  <li><a href="#debugging"><span class="smallcaps">debugging</span></a></li>
+  <li><a href="#design"><span class="smallcaps">design</span></a></li>
+  <li><a href="#docker"><span class="smallcaps">docker</span></a></li>
+  <li><a href="#dotfiles"><span class="smallcaps">dotfiles</span></a></li>
+  <li><a href="#flow"><span class="smallcaps">flow</span></a></li>
+  <li><a href="#fragment"><span class="smallcaps">fragment</span></a></li>
+  <li><a href="#git"><span class="smallcaps">git</span></a></li>
+  <li><a href="#haskell"><span class="smallcaps">haskell</span></a></li>
+  <li><a href="#javascript"><span class="smallcaps">javascript</span></a></li>
+  <li><a href="#latex"><span class="smallcaps">latex</span></a></li>
+  <li><a href="#linux"><span class="smallcaps">linux</span></a></li>
+  <li><a href="#make"><span class="smallcaps">make</span></a></li>
+  <li><a href="#markdown"><span class="smallcaps">markdown</span></a></li>
+  <li><a href="#meta"><span class="smallcaps">meta</span></a></li>
+  <li><a href="#notes"><span class="smallcaps">notes</span></a></li>
+  <li><a href="#osx"><span class="smallcaps">osx</span></a></li>
+  <li><a href="#plt"><span class="smallcaps">plt</span></a></li>
+  <li><a href="#printing"><span class="smallcaps">printing</span></a></li>
+  <li><a href="#programming"><span class="smallcaps">programming</span></a></li>
+  <li><a href="#python"><span class="smallcaps">python</span></a></li>
+  <li><a href="#reasonml"><span class="smallcaps">reasonml</span></a></li>
+  <li><a href="#recitation"><span class="smallcaps">recitation</span></a></li>
+  <li><a href="#ruby"><span class="smallcaps">ruby</span></a></li>
+  <li><a href="#sml"><span class="smallcaps">sml</span></a></li>
+  <li><a href="#sorbet"><span class="smallcaps">sorbet</span></a></li>
+  <li><a href="#terminal"><span class="smallcaps">terminal</span></a></li>
+  <li><a href="#tmux"><span class="smallcaps">tmux</span></a></li>
+  <li><a href="#troubleshooting"><span class="smallcaps">troubleshooting</span></a></li>
+  <li><a href="#types"><span class="smallcaps">types</span></a></li>
+  <li><a href="#unix"><span class="smallcaps">unix</span></a></li>
+  <li><a href="#vim"><span class="smallcaps">vim</span></a></li>
+  <li><a href="#webdev"><span class="smallcaps">webdev</span></a></li>
+  <li><a href="#zsh"><span class="smallcaps">zsh</span></a></li>
   </ul>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Bits, Bytes, and Words</h1>
-  <h2 class="EntryHeader-subtitle">Categories</h2>
-
-  <ul class="Tags">
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  
-
-<ul class="Tags">
-  
-    
-      <li class="Tag"><a href="#bash">bash <span class="Tag-size">8</span></a></li>
-    
-      <li class="Tag"><a href="#books">books <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#c">c <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#concurrency">concurrency <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#data">data <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#debugging">debugging <span class="Tag-size">2</span></a></li>
-    
-      <li class="Tag"><a href="#design">design <span class="Tag-size">2</span></a></li>
-    
-      <li class="Tag"><a href="#docker">docker <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#dotfiles">dotfiles <span class="Tag-size">3</span></a></li>
-    
-      <li class="Tag"><a href="#flow">flow <span class="Tag-size">3</span></a></li>
-    
-      <li class="Tag"><a href="#fragment">fragment <span class="Tag-size">6</span></a></li>
-    
-      <li class="Tag"><a href="#git">git <span class="Tag-size">5</span></a></li>
-    
-      <li class="Tag"><a href="#haskell">haskell <span class="Tag-size">6</span></a></li>
-    
-      <li class="Tag"><a href="#javascript">javascript <span class="Tag-size">4</span></a></li>
-    
-      <li class="Tag"><a href="#latex">latex <span class="Tag-size">6</span></a></li>
-    
-      <li class="Tag"><a href="#linux">linux <span class="Tag-size">4</span></a></li>
-    
-      <li class="Tag"><a href="#make">make <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#markdown">markdown <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#meta">meta <span class="Tag-size">4</span></a></li>
-    
-      <li class="Tag"><a href="#notes">notes <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#osx">osx <span class="Tag-size">3</span></a></li>
-    
-      <li class="Tag"><a href="#plt">plt <span class="Tag-size">5</span></a></li>
-    
-      <li class="Tag"><a href="#printing">printing <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#programming">programming <span class="Tag-size">6</span></a></li>
-    
-      <li class="Tag"><a href="#python">python <span class="Tag-size">3</span></a></li>
-    
-      <li class="Tag"><a href="#reasonml">reasonml <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#recitation">recitation <span class="Tag-size">4</span></a></li>
-    
-      <li class="Tag"><a href="#ruby">ruby <span class="Tag-size">8</span></a></li>
-    
-      <li class="Tag"><a href="#sml">sml <span class="Tag-size">4</span></a></li>
-    
-      <li class="Tag"><a href="#sorbet">sorbet <span class="Tag-size">5</span></a></li>
-    
-      <li class="Tag"><a href="#terminal">terminal <span class="Tag-size">4</span></a></li>
-    
-      <li class="Tag"><a href="#tmux">tmux <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#troubleshooting">troubleshooting <span class="Tag-size">1</span></a></li>
-    
-      <li class="Tag"><a href="#types">types <span class="Tag-size">14</span></a></li>
-    
-      <li class="Tag"><a href="#unix">unix <span class="Tag-size">4</span></a></li>
-    
-      <li class="Tag"><a href="#vim">vim <span class="Tag-size">11</span></a></li>
-    
-      <li class="Tag"><a href="#webdev">webdev <span class="Tag-size">2</span></a></li>
-    
-      <li class="Tag"><a href="#zsh">zsh <span class="Tag-size">3</span></a></li>
-    
-  
+<main>
+<p><strong><span class="smallcaps"><a href="#bash">bash</a></span></strong>   <strong><span class="smallcaps"><a href="#books">books</a></span></strong>   <strong><span class="smallcaps"><a href="#c">c</a></span></strong>   <strong><span class="smallcaps"><a href="#concurrency">concurrency</a></span></strong>   <strong><span class="smallcaps"><a href="#data">data</a></span></strong>   <strong><span class="smallcaps"><a href="#debugging">debugging</a></span></strong>   <strong><span class="smallcaps"><a href="#design">design</a></span></strong>   <strong><span class="smallcaps"><a href="#docker">docker</a></span></strong>   <strong><span class="smallcaps"><a href="#dotfiles">dotfiles</a></span></strong>   <strong><span class="smallcaps"><a href="#flow">flow</a></span></strong>   <strong><span class="smallcaps"><a href="#fragment">fragment</a></span></strong>   <strong><span class="smallcaps"><a href="#git">git</a></span></strong>   <strong><span class="smallcaps"><a href="#haskell">haskell</a></span></strong>   <strong><span class="smallcaps"><a href="#javascript">javascript</a></span></strong>   <strong><span class="smallcaps"><a href="#latex">latex</a></span></strong>   <strong><span class="smallcaps"><a href="#linux">linux</a></span></strong>   <strong><span class="smallcaps"><a href="#make">make</a></span></strong>   <strong><span class="smallcaps"><a href="#markdown">markdown</a></span></strong>   <strong><span class="smallcaps"><a href="#meta">meta</a></span></strong>   <strong><span class="smallcaps"><a href="#notes">notes</a></span></strong>   <strong><span class="smallcaps"><a href="#osx">osx</a></span></strong>   <strong><span class="smallcaps"><a href="#plt">plt</a></span></strong>   <strong><span class="smallcaps"><a href="#printing">printing</a></span></strong>   <strong><span class="smallcaps"><a href="#programming">programming</a></span></strong>   <strong><span class="smallcaps"><a href="#python">python</a></span></strong>   <strong><span class="smallcaps"><a href="#reasonml">reasonml</a></span></strong>   <strong><span class="smallcaps"><a href="#recitation">recitation</a></span></strong>   <strong><span class="smallcaps"><a href="#ruby">ruby</a></span></strong>   <strong><span class="smallcaps"><a href="#sml">sml</a></span></strong>   <strong><span class="smallcaps"><a href="#sorbet">sorbet</a></span></strong>   <strong><span class="smallcaps"><a href="#terminal">terminal</a></span></strong>   <strong><span class="smallcaps"><a href="#tmux">tmux</a></span></strong>   <strong><span class="smallcaps"><a href="#troubleshooting">troubleshooting</a></span></strong>   <strong><span class="smallcaps"><a href="#types">types</a></span></strong>   <strong><span class="smallcaps"><a href="#unix">unix</a></span></strong>   <strong><span class="smallcaps"><a href="#vim">vim</a></span></strong>   <strong><span class="smallcaps"><a href="#webdev">webdev</a></span></strong>   <strong><span class="smallcaps"><a href="#zsh">zsh</a></span></strong>  </p>
+<h1 id="bash"><span class="smallcaps">bash</span></h1>
+<ul>
+<li><a href="/surgery-on-code/">Surgery on Code from the Command Line</a>, July 30</li>
+<li><a href="/bash-debugger/">A Debugger for Bash in Six Lines of Bash</a>, June 16</li>
+<li><a href="/cli-tty/">Improving CLIs with isatty</a>, June 11</li>
+<li><a href="/sml-travis-ci/">Standard ML in Travis CI</a>, June 4</li>
+<li><a href="/cli-code-review/">Code Review from the Command Line</a>, January 13</li>
+<li><a href="/2015/06/11/show-where-a-python-package-is-used/">Show where a Python package is used</a>, June 11</li>
+<li><a href="/2014/12/29/google-chrome-a-memory-hog/">Google Chrome: A Memory Hog</a>, December 29</li>
+<li><a href="/2014/12/20/vim-as-a-man-page-viewer/">Vim as a Man Page Viewer</a>, December 20</li>
 </ul>
+<h1 id="books"><span class="smallcaps">books</span></h1>
+<ul>
+<li><a href="/2014/12/13/the-joys-of-the-craft/">The Joys of the Craft</a>, December 13</li>
+</ul>
+<h1 id="c"><span class="smallcaps">c</span></h1>
+<ul>
+<li><a href="/linkers-ruby-c-exts/">Linkers &amp; Ruby C Extensions</a>, June 7</li>
+</ul>
+<h1 id="concurrency"><span class="smallcaps">concurrency</span></h1>
+<ul>
+<li><a href="/cpml-race/">Concurrent Programming in ML: A Race</a>, July 17</li>
+</ul>
+<h1 id="data"><span class="smallcaps">data</span></h1>
+<ul>
+<li><a href="/tufte-course/">Presenting Data &amp; Information: Notes</a>, December 5</li>
+</ul>
+<h1 id="debugging"><span class="smallcaps">debugging</span></h1>
+<ul>
+<li><a href="/clangd-ruby/">Exploring Ruby with clangd</a>, July 21</li>
+<li><a href="/search-down-the-stack/">Search Down the Stack</a>, June 6</li>
+</ul>
+<h1 id="design"><span class="smallcaps">design</span></h1>
+<ul>
+<li><a href="/2014/10/04/solarized-latex-listings/">Solarized LaTeX Listings</a>, October 4</li>
+<li><a href="/2014/06/07/molokai-an-iterm2-color-scheme/">Molokai: An iTerm2 Color Scheme</a>, June 7</li>
+</ul>
+<h1 id="docker"><span class="smallcaps">docker</span></h1>
+<ul>
+<li><a href="/2015/07/12/docker-tips-and-cheatsheet/">Docker Tips and Cheatsheet</a>, July 12</li>
+</ul>
+<h1 id="dotfiles"><span class="smallcaps">dotfiles</span></h1>
+<ul>
+<li><a href="/starter-zsh-setup/">Starter Zsh Setup</a>, January 2</li>
+<li><a href="/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a>, March 9</li>
+<li><a href="/2015/03/09/getting-started-with-rcm/">Getting Started with RCM</a>, March 9</li>
+</ul>
+<h1 id="flow"><span class="smallcaps">flow</span></h1>
+<ul>
+<li><a href="/prefer-then-over-catch/">Prefer .then() over .catch()</a>, May 31</li>
+<li><a href="/union-types-flow-reason/">Union Types in Flow &amp; Reason</a>, April 18</li>
+<li><a href="/flow-exhaustiveness/">Case Exhaustiveness in Flow</a>, April 15</li>
+</ul>
+<h1 id="fragment"><span class="smallcaps">fragment</span></h1>
+<ul>
+<li><a href="/search-down-the-stack/">Search Down the Stack</a>, June 6</li>
+<li><a href="/prefer-then-over-catch/">Prefer .then() over .catch()</a>, May 31</li>
+<li><a href="/lens-composition/">Lenses &amp; Composition</a>, February 5</li>
+<li><a href="/abts-in-haskell/">ABTs in Haskell</a>, November 11</li>
+<li><a href="/tests-types-correctness/">Tests, Types, &amp; Correctness</a>, September 10</li>
+<li><a href="/if-else-purity/">If, Else, &amp; Purity</a>, August 31</li>
+</ul>
+<h1 id="git"><span class="smallcaps">git</span></h1>
+<ul>
+<li><a href="/cli-code-review/">Code Review from the Command Line</a>, January 13</li>
+<li><a href="/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a>, March 9</li>
+<li><a href="/2015/02/03/new-github-username/">New GitHub Username</a>, February 3</li>
+<li><a href="/git-log/">Mastering git log for Collaboration</a>, January 16</li>
+<li><a href="/2014/11/01/using-more-than-one-git-remote/">Using Multiple Git Remotes</a>, November 1</li>
+</ul>
+<h1 id="haskell"><span class="smallcaps">haskell</span></h1>
+<ul>
+<li><a href="/profiling-in-haskell/">Profiling in Haskell for a 10x Speedup</a>, May 19</li>
+<li><a href="/lens-composition/">Lenses &amp; Composition</a>, February 5</li>
+<li><a href="/lens-intuition/">Some Intuition on Lenses</a>, February 5</li>
+<li><a href="/abts-in-haskell/">ABTs in Haskell</a>, November 11</li>
+<li><a href="/haskell-development-with-neovim/">Haskell Development with Neovim</a>, July 16</li>
+<li><a href="/troubleshooting-haskell-stack-setup-on-os-x/">Troubleshooting Haskell Stack Setup on OS X</a>, August 2</li>
+</ul>
+<h1 id="javascript"><span class="smallcaps">javascript</span></h1>
+<ul>
+<li><a href="/prefer-then-over-catch/">Prefer .then() over .catch()</a>, May 31</li>
+<li><a href="/union-types-flow-reason/">Union Types in Flow &amp; Reason</a>, April 18</li>
+<li><a href="/flow-exhaustiveness/">Case Exhaustiveness in Flow</a>, April 15</li>
+<li><a href="/cli-code-review/">Code Review from the Command Line</a>, January 13</li>
+</ul>
+<h1 id="latex"><span class="smallcaps">latex</span></h1>
+<ul>
+<li><a href="/reach-for-markdown/">Reach for Markdown, not LaTeX</a>, February 26</li>
+<li><a href="/2015/01/10/the-latex-homework-document-class/">The LaTeX homework Document Class</a>, January 10</li>
+<li><a href="/2015/01/10/offline-latex-development-part-2/">Offline LaTeX Development - Part 2</a>, January 10</li>
+<li><a href="/2014/10/06/offline-latex-development/">Offline LaTeX Development</a>, October 6</li>
+<li><a href="/2014/10/04/solarized-latex-listings/">Solarized LaTeX Listings</a>, October 4</li>
+<li><a href="/2014/10/03/a-latex-homework-template/">A LaTeX Homework Template</a>, October 3</li>
+</ul>
+<h1 id="linux"><span class="smallcaps">linux</span></h1>
+<ul>
+<li><a href="/linkers-ruby-c-exts/">Linkers &amp; Ruby C Extensions</a>, June 7</li>
+<li><a href="/search-down-the-stack/">Search Down the Stack</a>, June 6</li>
+<li><a href="/2015/08/03/leaking-free-disk-space/">Leaking Free Disk Space</a>, August 3</li>
+<li><a href="/2014/05/05/adding-a-network-printer-to-a-linux-server/">Adding a Network Printer to a Linux Server</a>, May 5</li>
+</ul>
+<h1 id="make"><span class="smallcaps">make</span></h1>
+<ul>
+<li><a href="/2014/10/06/offline-latex-development/">Offline LaTeX Development</a>, October 6</li>
+</ul>
+<h1 id="markdown"><span class="smallcaps">markdown</span></h1>
+<ul>
+<li><a href="/reach-for-markdown/">Reach for Markdown, not LaTeX</a>, February 26</li>
+</ul>
+<h1 id="meta"><span class="smallcaps">meta</span></h1>
+<ul>
+<li><a href="/recitation-notes-tag/">Recitation Notes</a>, September 24</li>
+<li><a href="/2015/02/03/new-github-username/">New GitHub Username</a>, February 3</li>
+<li><a href="/2014/06/04/hpstr-an-octopress-theme/">HPSTR: An Octopress Theme</a>, June 4</li>
+<li><a href="/2014/05/05/shiny-new-octopress-blog/">Shiny New Octopress Blog</a>, May 5</li>
+</ul>
+<h1 id="notes"><span class="smallcaps">notes</span></h1>
+<ul>
+<li><a href="/tufte-course/">Presenting Data &amp; Information: Notes</a>, December 5</li>
+</ul>
+<h1 id="osx"><span class="smallcaps">osx</span></h1>
+<ul>
+<li><a href="/troubleshooting-haskell-stack-setup-on-os-x/">Troubleshooting Haskell Stack Setup on OS X</a>, August 2</li>
+<li><a href="/sml-dev-setup/">SML Dev Setup</a>, March 9</li>
+<li><a href="/2015/01/10/offline-latex-development-part-2/">Offline LaTeX Development - Part 2</a>, January 10</li>
+</ul>
+<h1 id="plt"><span class="smallcaps">plt</span></h1>
+<ul>
+<li><a href="/continuations-notes/">Notes on Continuations</a>, June 18</li>
+<li><a href="/abts-in-haskell/">ABTs in Haskell</a>, November 11</li>
+<li><a href="/variables-and-binding/">Variables and Binding</a>, October 28</li>
+<li><a href="/system-f-param/">System Fω and Parameterization</a>, September 27</li>
+<li><a href="/variables-in-types/">Variables in Types</a>, September 25</li>
+</ul>
+<h1 id="printing"><span class="smallcaps">printing</span></h1>
+<ul>
+<li><a href="/2014/05/05/adding-a-network-printer-to-a-linux-server/">Adding a Network Printer to a Linux Server</a>, May 5</li>
+</ul>
+<h1 id="programming"><span class="smallcaps">programming</span></h1>
+<ul>
+<li><a href="/on-language-choice/">On Programming Language Choice</a>, June 21</li>
+<li><a href="/flow-exhaustiveness/">Case Exhaustiveness in Flow</a>, April 15</li>
+<li><a href="/cli-code-review/">Code Review from the Command Line</a>, January 13</li>
+<li><a href="/tests-types-correctness/">Tests, Types, &amp; Correctness</a>, September 10</li>
+<li><a href="/if-else-purity/">If, Else, &amp; Purity</a>, August 31</li>
+<li><a href="/2014/12/13/the-joys-of-the-craft/">The Joys of the Craft</a>, December 13</li>
+</ul>
+<h1 id="python"><span class="smallcaps">python</span></h1>
+<ul>
+<li><a href="/2015/06/11/show-where-a-python-package-is-used/">Show where a Python package is used</a>, June 11</li>
+<li><a href="/ruby-virtualenvs/">Ruby Virtualenvs</a>, December 22</li>
+<li><a href="/2014/10/20/using-google-apps-for-cmu-authentication/">Using Google OAuth2 for CMU Authentication</a>, October 20</li>
+</ul>
+<h1 id="reasonml"><span class="smallcaps">reasonml</span></h1>
+<ul>
+<li><a href="/union-types-flow-reason/">Union Types in Flow &amp; Reason</a>, April 18</li>
+</ul>
+<h1 id="recitation"><span class="smallcaps">recitation</span></h1>
+<ul>
+<li><a href="/continuations-notes/">Notes on Continuations</a>, June 18</li>
+<li><a href="/system-f-param/">System Fω and Parameterization</a>, September 27</li>
+<li><a href="/variables-in-types/">Variables in Types</a>, September 25</li>
+<li><a href="/recitation-notes-tag/">Recitation Notes</a>, September 24</li>
+</ul>
+<h1 id="ruby"><span class="smallcaps">ruby</span></h1>
+<ul>
+<li><a href="/typed-errors-sorbet/">Typed Errors in Sorbet</a>, June 4</li>
+<li><a href="/union-types-checked-exceptions/">Sorbet Does Not Have Checked Exceptions</a>, May 29</li>
+<li><a href="/clangd-ruby/">Exploring Ruby with clangd</a>, July 21</li>
+<li><a href="/linkers-ruby-c-exts/">Linkers &amp; Ruby C Extensions</a>, June 7</li>
+<li><a href="/sorbet-fixme-comment/">Sorbet Does Not Have FixMe Comments</a>, February 11</li>
+<li><a href="/intersection-types-common/">Intersection Types in Sorbet are Surprisingly Common</a>, January 4</li>
+<li><a href="/ruby-mutation/">What makes type checking Ruby hard?</a>, December 28</li>
+<li><a href="/ruby-virtualenvs/">Ruby Virtualenvs</a>, December 22</li>
+</ul>
+<h1 id="sml"><span class="smallcaps">sml</span></h1>
+<ul>
+<li><a href="/sml-travis-ci/">Standard ML in Travis CI</a>, June 4</li>
+<li><a href="/cpml-race/">Concurrent Programming in ML: A Race</a>, July 17</li>
+<li><a href="/system-f-param/">System Fω and Parameterization</a>, September 27</li>
+<li><a href="/sml-dev-setup/">SML Dev Setup</a>, March 9</li>
+</ul>
+<h1 id="sorbet"><span class="smallcaps">sorbet</span></h1>
+<ul>
+<li><a href="/typed-errors-sorbet/">Typed Errors in Sorbet</a>, June 4</li>
+<li><a href="/union-types-checked-exceptions/">Sorbet Does Not Have Checked Exceptions</a>, May 29</li>
+<li><a href="/sorbet-fixme-comment/">Sorbet Does Not Have FixMe Comments</a>, February 11</li>
+<li><a href="/intersection-types-common/">Intersection Types in Sorbet are Surprisingly Common</a>, January 4</li>
+<li><a href="/ruby-mutation/">What makes type checking Ruby hard?</a>, December 28</li>
+</ul>
+<h1 id="terminal"><span class="smallcaps">terminal</span></h1>
+<ul>
+<li><a href="/cli-tty/">Improving CLIs with isatty</a>, June 11</li>
+<li><a href="/2015/01/10/offline-latex-development-part-2/">Offline LaTeX Development - Part 2</a>, January 10</li>
+<li><a href="/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/">Setting up MobaXterm for SSH on Windows</a>, September 28</li>
+<li><a href="/2014/06/07/molokai-an-iterm2-color-scheme/">Molokai: An iTerm2 Color Scheme</a>, June 7</li>
+</ul>
+<h1 id="tmux"><span class="smallcaps">tmux</span></h1>
+<ul>
+<li><a href="/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a>, March 9</li>
+</ul>
+<h1 id="troubleshooting"><span class="smallcaps">troubleshooting</span></h1>
+<ul>
+<li><a href="/troubleshooting-haskell-stack-setup-on-os-x/">Troubleshooting Haskell Stack Setup on OS X</a>, August 2</li>
+</ul>
+<h1 id="types"><span class="smallcaps">types</span></h1>
+<ul>
+<li><a href="/typed-errors-sorbet/">Typed Errors in Sorbet</a>, June 4</li>
+<li><a href="/union-types-checked-exceptions/">Sorbet Does Not Have Checked Exceptions</a>, May 29</li>
+<li><a href="/sorbet-fixme-comment/">Sorbet Does Not Have FixMe Comments</a>, February 11</li>
+<li><a href="/intersection-types-common/">Intersection Types in Sorbet are Surprisingly Common</a>, January 4</li>
+<li><a href="/ruby-mutation/">What makes type checking Ruby hard?</a>, December 28</li>
+<li><a href="/continuations-notes/">Notes on Continuations</a>, June 18</li>
+<li><a href="/union-types-flow-reason/">Union Types in Flow &amp; Reason</a>, April 18</li>
+<li><a href="/flow-exhaustiveness/">Case Exhaustiveness in Flow</a>, April 15</li>
+<li><a href="/lens-composition/">Lenses &amp; Composition</a>, February 5</li>
+<li><a href="/lens-intuition/">Some Intuition on Lenses</a>, February 5</li>
+<li><a href="/system-f-param/">System Fω and Parameterization</a>, September 27</li>
+<li><a href="/variables-in-types/">Variables in Types</a>, September 25</li>
+<li><a href="/tests-types-correctness/">Tests, Types, &amp; Correctness</a>, September 10</li>
+<li><a href="/if-else-purity/">If, Else, &amp; Purity</a>, August 31</li>
+</ul>
+<h1 id="unix"><span class="smallcaps">unix</span></h1>
+<ul>
+<li><a href="/surgery-on-code/">Surgery on Code from the Command Line</a>, July 30</li>
+<li><a href="/cli-tty/">Improving CLIs with isatty</a>, June 11</li>
+<li><a href="/2014/12/29/google-chrome-a-memory-hog/">Google Chrome: A Memory Hog</a>, December 29</li>
+<li><a href="/2014/10/06/offline-latex-development/">Offline LaTeX Development</a>, October 6</li>
+</ul>
+<h1 id="vim"><span class="smallcaps">vim</span></h1>
+<ul>
+<li><a href="/clangd-ruby/">Exploring Ruby with clangd</a>, July 21</li>
+<li><a href="/cli-code-review/">Code Review from the Command Line</a>, January 13</li>
+<li><a href="/haskell-development-with-neovim/">Haskell Development with Neovim</a>, July 16</li>
+<li><a href="/reach-for-markdown/">Reach for Markdown, not LaTeX</a>, February 26</li>
+<li><a href="/troubleshooting-haskell-stack-setup-on-os-x/">Troubleshooting Haskell Stack Setup on OS X</a>, August 2</li>
+<li><a href="/sml-dev-setup/">SML Dev Setup</a>, March 9</li>
+<li><a href="/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a>, March 9</li>
+<li><a href="/vim-as-an-ide/">Vim as an IDE</a>, March 2</li>
+<li><a href="/2015/01/10/offline-latex-development-part-2/">Offline LaTeX Development - Part 2</a>, January 10</li>
+<li><a href="/2014/12/20/vim-as-a-man-page-viewer/">Vim as a Man Page Viewer</a>, December 20</li>
+<li><a href="/2014/10/06/offline-latex-development/">Offline LaTeX Development</a>, October 6</li>
+</ul>
+<h1 id="webdev"><span class="smallcaps">webdev</span></h1>
+<ul>
+<li><a href="/2014/10/20/using-google-apps-for-cmu-authentication/">Using Google OAuth2 for CMU Authentication</a>, October 20</li>
+<li><a href="/2014/06/04/hpstr-an-octopress-theme/">HPSTR: An Octopress Theme</a>, June 4</li>
+</ul>
+<h1 id="zsh"><span class="smallcaps">zsh</span></h1>
+<ul>
+<li><a href="/starter-zsh-setup/">Starter Zsh Setup</a>, January 2</li>
+<li><a href="/why-zsh/">Why zsh?</a>, March 10</li>
+<li><a href="/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a>, March 9</li>
+</ul>
+</main>
 
 
-  <article id="bash" class="category">
-  <h2>bash</h2>
-    
-    
-      
-      
-        <h3><a href="/surgery-on-code/" title="Surgery on Code from the Command Line">Surgery on Code from the Command Line</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/bash-debugger/" title="A Debugger for Bash in Six Lines of Bash">A Debugger for Bash in Six Lines of Bash</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/cli-tty/" title="Improving CLIs with isatty">Improving CLIs with isatty</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/sml-travis-ci/" title="Standard ML in Travis&nbsp;CI">Standard ML in Travis&nbsp;CI</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/cli-code-review/" title="Code Review from the Command Line">Code Review from the Command Line</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2015/06/11/show-where-a-python-package-is-used/" title="Show where a Python package is used">Show where a Python package is used</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/12/29/google-chrome-a-memory-hog/" title="Google Chrome: A Memory Hog">Google Chrome: A Memory Hog</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/12/20/vim-as-a-man-page-viewer/" title="Vim as a Man Page Viewer">Vim as a Man Page Viewer</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
 
-  <article id="books" class="category">
-  <h2>books</h2>
-    
-    
-      
-      
-        <h3><a href="/2014/12/13/the-joys-of-the-craft/" title="The Joys of the Craft">The Joys of the Craft</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="c" class="category">
-  <h2>c</h2>
-    
-    
-      
-      
-        <h3><a href="/linkers-ruby-c-exts/" title="Linkers & Ruby C Extensions">Linkers & Ruby C Extensions</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="concurrency" class="category">
-  <h2>concurrency</h2>
-    
-    
-      
-      
-        <h3><a href="/cpml-race/" title="Concurrent Programming in ML: A Race">Concurrent Programming in ML: A Race</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="data" class="category">
-  <h2>data</h2>
-    
-    
-      
-      
-        <h3><a href="/tufte-course/" title="Presenting Data & Information: Notes">Presenting Data & Information: Notes</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="debugging" class="category">
-  <h2>debugging</h2>
-    
-    
-      
-      
-        <h3><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/search-down-the-stack/" title="Search Down the Stack">Search Down the Stack</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="design" class="category">
-  <h2>design</h2>
-    
-    
-      
-      
-        <h3><a href="/2014/10/04/solarized-latex-listings/" title="Solarized LaTeX Listings">Solarized LaTeX Listings</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/06/07/molokai-an-iterm2-color-scheme/" title="Molokai: An iTerm2 Color Scheme">Molokai: An iTerm2 Color Scheme</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="docker" class="category">
-  <h2>docker</h2>
-    
-    
-      
-      
-        <h3><a href="/2015/07/12/docker-tips-and-cheatsheet/" title="Docker Tips and Cheatsheet">Docker Tips and Cheatsheet</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="dotfiles" class="category">
-  <h2>dotfiles</h2>
-    
-    
-      
-      
-        <h3><a href="/starter-zsh-setup/" title="Starter Zsh Setup">Starter Zsh Setup</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/noteworthy-dotfile-hacks/" title="Noteworthy Dotfile Hacks">Noteworthy Dotfile Hacks</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2015/03/09/getting-started-with-rcm/" title="Getting Started with RCM">Getting Started with RCM</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="flow" class="category">
-  <h2>flow</h2>
-    
-    
-      
-      
-        <h3><a href="/prefer-then-over-catch/" title="Prefer .then() over .catch()">Prefer .then() over .catch()</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="fragment" class="category">
-  <h2>fragment</h2>
-    
-    
-      
-      
-        <h3><a href="/search-down-the-stack/" title="Search Down the Stack">Search Down the Stack</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/prefer-then-over-catch/" title="Prefer .then() over .catch()">Prefer .then() over .catch()</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/lens-composition/" title="Lenses & Composition">Lenses & Composition</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/abts-in-haskell/" title="ABTs in Haskell">ABTs in Haskell</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/tests-types-correctness/" title="Tests, Types, & Correctness">Tests, Types, & Correctness</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/if-else-purity/" title="If, Else, & Purity">If, Else, & Purity</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="git" class="category">
-  <h2>git</h2>
-    
-    
-      
-      
-        <h3><a href="/cli-code-review/" title="Code Review from the Command Line">Code Review from the Command Line</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/noteworthy-dotfile-hacks/" title="Noteworthy Dotfile Hacks">Noteworthy Dotfile Hacks</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2015/02/03/new-github-username/" title="New GitHub Username">New GitHub Username</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/git-log/" title="Mastering git log for Collaboration">Mastering git log for Collaboration</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/11/01/using-more-than-one-git-remote/" title="Using Multiple Git Remotes">Using Multiple Git Remotes</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="haskell" class="category">
-  <h2>haskell</h2>
-    
-    
-      
-      
-        <h3><a href="/profiling-in-haskell/" title="Profiling in Haskell for a 10x Speedup">Profiling in Haskell for a 10x Speedup</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/lens-composition/" title="Lenses & Composition">Lenses & Composition</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/lens-intuition/" title="Some Intuition on Lenses">Some Intuition on Lenses</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/abts-in-haskell/" title="ABTs in Haskell">ABTs in Haskell</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/haskell-development-with-neovim/" title="Haskell Development with Neovim">Haskell Development with Neovim</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/troubleshooting-haskell-stack-setup-on-os-x/" title="Troubleshooting Haskell Stack Setup on OS X">Troubleshooting Haskell Stack Setup on OS X</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="javascript" class="category">
-  <h2>javascript</h2>
-    
-    
-      
-      
-        <h3><a href="/prefer-then-over-catch/" title="Prefer .then() over .catch()">Prefer .then() over .catch()</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/cli-code-review/" title="Code Review from the Command Line">Code Review from the Command Line</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="latex" class="category">
-  <h2>latex</h2>
-    
-    
-      
-      
-        <h3><a href="/reach-for-markdown/" title="Reach for Markdown, not LaTeX">Reach for Markdown, not LaTeX</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2015/01/10/the-latex-homework-document-class/" title="The LaTeX homework Document Class">The LaTeX homework Document Class</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2015/01/10/offline-latex-development-part-2/" title="Offline LaTeX Development - Part 2">Offline LaTeX Development - Part 2</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/10/06/offline-latex-development/" title="Offline LaTeX Development">Offline LaTeX Development</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/10/04/solarized-latex-listings/" title="Solarized LaTeX Listings">Solarized LaTeX Listings</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/10/04/a-latex-homework-template/" title="A LaTeX Homework Template">A LaTeX Homework Template</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="linux" class="category">
-  <h2>linux</h2>
-    
-    
-      
-      
-        <h3><a href="/linkers-ruby-c-exts/" title="Linkers & Ruby C Extensions">Linkers & Ruby C Extensions</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/search-down-the-stack/" title="Search Down the Stack">Search Down the Stack</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2015/08/03/leaking-free-disk-space/" title="Leaking Free Disk Space">Leaking Free Disk Space</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/05/06/adding-a-network-printer-to-a-linux-server/" title="Adding a Network Printer to a Linux Server">Adding a Network Printer to a Linux Server</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="make" class="category">
-  <h2>make</h2>
-    
-    
-      
-      
-        <h3><a href="/2014/10/06/offline-latex-development/" title="Offline LaTeX Development">Offline LaTeX Development</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="markdown" class="category">
-  <h2>markdown</h2>
-    
-    
-      
-      
-        <h3><a href="/reach-for-markdown/" title="Reach for Markdown, not LaTeX">Reach for Markdown, not LaTeX</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="meta" class="category">
-  <h2>meta</h2>
-    
-    
-      
-      
-        <h3><a href="/recitation-notes-tag/" title="Recitation Notes">Recitation Notes</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2015/02/03/new-github-username/" title="New GitHub Username">New GitHub Username</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/06/04/hpstr-an-octopress-theme/" title="HPSTR: An Octopress Theme">HPSTR: An Octopress Theme</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/05/06/shiny-new-octopress-blog/" title="Shiny New Octopress Blog">Shiny New Octopress Blog</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="notes" class="category">
-  <h2>notes</h2>
-    
-    
-      
-      
-        <h3><a href="/tufte-course/" title="Presenting Data & Information: Notes">Presenting Data & Information: Notes</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="osx" class="category">
-  <h2>osx</h2>
-    
-    
-      
-      
-        <h3><a href="/troubleshooting-haskell-stack-setup-on-os-x/" title="Troubleshooting Haskell Stack Setup on OS X">Troubleshooting Haskell Stack Setup on OS X</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/sml-dev-setup/" title="SML Dev Setup">SML Dev Setup</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2015/01/10/offline-latex-development-part-2/" title="Offline LaTeX Development - Part 2">Offline LaTeX Development - Part 2</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="plt" class="category">
-  <h2>plt</h2>
-    
-    
-      
-      
-        <h3><a href="/continuations-notes/" title="Notes on Continuations">Notes on Continuations</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/abts-in-haskell/" title="ABTs in Haskell">ABTs in Haskell</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/variables-and-binding/" title="Variables and Binding">Variables and Binding</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/system-f-param/" title="System Fω and Parameterization">System Fω and Parameterization</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/variables-in-types/" title="Variables in Types">Variables in Types</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="printing" class="category">
-  <h2>printing</h2>
-    
-    
-      
-      
-        <h3><a href="/2014/05/06/adding-a-network-printer-to-a-linux-server/" title="Adding a Network Printer to a Linux Server">Adding a Network Printer to a Linux Server</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="programming" class="category">
-  <h2>programming</h2>
-    
-    
-      
-      
-        <h3><a href="/on-language-choice/" title="On Programming Language Choice">On Programming Language Choice</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/cli-code-review/" title="Code Review from the Command Line">Code Review from the Command Line</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/tests-types-correctness/" title="Tests, Types, & Correctness">Tests, Types, & Correctness</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/if-else-purity/" title="If, Else, & Purity">If, Else, & Purity</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/12/13/the-joys-of-the-craft/" title="The Joys of the Craft">The Joys of the Craft</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="python" class="category">
-  <h2>python</h2>
-    
-    
-      
-      
-        <h3><a href="/2015/06/11/show-where-a-python-package-is-used/" title="Show where a Python package is used">Show where a Python package is used</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/ruby-virtualenvs/" title="Ruby Virtualenvs">Ruby Virtualenvs</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/10/20/using-google-apps-for-cmu-authentication/" title="Using Google OAuth2 for CMU Authentication">Using Google OAuth2 for CMU Authentication</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="reasonml" class="category">
-  <h2>reasonml</h2>
-    
-    
-      
-      
-        <h3><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="recitation" class="category">
-  <h2>recitation</h2>
-    
-    
-      
-      
-        <h3><a href="/continuations-notes/" title="Notes on Continuations">Notes on Continuations</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/system-f-param/" title="System Fω and Parameterization">System Fω and Parameterization</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/variables-in-types/" title="Variables in Types">Variables in Types</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/recitation-notes-tag/" title="Recitation Notes">Recitation Notes</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="ruby" class="category">
-  <h2>ruby</h2>
-    
-    
-      
-      
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/linkers-ruby-c-exts/" title="Linkers & Ruby C Extensions">Linkers & Ruby C Extensions</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/sorbet-fixme-comment/" title="Sorbet Does Not Have FixMe Comments">Sorbet Does Not Have FixMe Comments</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/intersection-types-common/" title="Intersection Types in Sorbet are Surprisingly Common">Intersection Types in Sorbet are Surprisingly Common</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/ruby-mutation/" title="What makes type checking Ruby hard?">What makes type checking Ruby hard?</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/ruby-virtualenvs/" title="Ruby Virtualenvs">Ruby Virtualenvs</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="sml" class="category">
-  <h2>sml</h2>
-    
-    
-      
-      
-        <h3><a href="/sml-travis-ci/" title="Standard ML in Travis&nbsp;CI">Standard ML in Travis&nbsp;CI</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/cpml-race/" title="Concurrent Programming in ML: A Race">Concurrent Programming in ML: A Race</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/system-f-param/" title="System Fω and Parameterization">System Fω and Parameterization</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/sml-dev-setup/" title="SML Dev Setup">SML Dev Setup</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="sorbet" class="category">
-  <h2>sorbet</h2>
-    
-    
-      
-      
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/sorbet-fixme-comment/" title="Sorbet Does Not Have FixMe Comments">Sorbet Does Not Have FixMe Comments</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/intersection-types-common/" title="Intersection Types in Sorbet are Surprisingly Common">Intersection Types in Sorbet are Surprisingly Common</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/ruby-mutation/" title="What makes type checking Ruby hard?">What makes type checking Ruby hard?</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="terminal" class="category">
-  <h2>terminal</h2>
-    
-    
-      
-      
-        <h3><a href="/cli-tty/" title="Improving CLIs with isatty">Improving CLIs with isatty</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2015/01/10/offline-latex-development-part-2/" title="Offline LaTeX Development - Part 2">Offline LaTeX Development - Part 2</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/09/28/setting-up-mobaxterm-for-ssh-on-windows/" title="Setting up MobaXterm for SSH on Windows">Setting up MobaXterm for SSH on Windows</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/06/07/molokai-an-iterm2-color-scheme/" title="Molokai: An iTerm2 Color Scheme">Molokai: An iTerm2 Color Scheme</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="tmux" class="category">
-  <h2>tmux</h2>
-    
-    
-      
-      
-        <h3><a href="/noteworthy-dotfile-hacks/" title="Noteworthy Dotfile Hacks">Noteworthy Dotfile Hacks</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="troubleshooting" class="category">
-  <h2>troubleshooting</h2>
-    
-    
-      
-      
-        <h3><a href="/troubleshooting-haskell-stack-setup-on-os-x/" title="Troubleshooting Haskell Stack Setup on OS X">Troubleshooting Haskell Stack Setup on OS X</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="types" class="category">
-  <h2>types</h2>
-    
-    
-      
-      
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/sorbet-fixme-comment/" title="Sorbet Does Not Have FixMe Comments">Sorbet Does Not Have FixMe Comments</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/intersection-types-common/" title="Intersection Types in Sorbet are Surprisingly Common">Intersection Types in Sorbet are Surprisingly Common</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/ruby-mutation/" title="What makes type checking Ruby hard?">What makes type checking Ruby hard?</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/continuations-notes/" title="Notes on Continuations">Notes on Continuations</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/union-types-flow-reason/" title="Union Types in Flow & Reason">Union Types in Flow & Reason</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/flow-exhaustiveness/" title="Case Exhaustiveness in Flow">Case Exhaustiveness in Flow</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/lens-composition/" title="Lenses & Composition">Lenses & Composition</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/lens-intuition/" title="Some Intuition on Lenses">Some Intuition on Lenses</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/system-f-param/" title="System Fω and Parameterization">System Fω and Parameterization</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/variables-in-types/" title="Variables in Types">Variables in Types</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/tests-types-correctness/" title="Tests, Types, & Correctness">Tests, Types, & Correctness</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/if-else-purity/" title="If, Else, & Purity">If, Else, & Purity</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="unix" class="category">
-  <h2>unix</h2>
-    
-    
-      
-      
-        <h3><a href="/surgery-on-code/" title="Surgery on Code from the Command Line">Surgery on Code from the Command Line</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/cli-tty/" title="Improving CLIs with isatty">Improving CLIs with isatty</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/12/29/google-chrome-a-memory-hog/" title="Google Chrome: A Memory Hog">Google Chrome: A Memory Hog</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/10/06/offline-latex-development/" title="Offline LaTeX Development">Offline LaTeX Development</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="vim" class="category">
-  <h2>vim</h2>
-    
-    
-      
-      
-        <h3><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/cli-code-review/" title="Code Review from the Command Line">Code Review from the Command Line</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/haskell-development-with-neovim/" title="Haskell Development with Neovim">Haskell Development with Neovim</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/reach-for-markdown/" title="Reach for Markdown, not LaTeX">Reach for Markdown, not LaTeX</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/troubleshooting-haskell-stack-setup-on-os-x/" title="Troubleshooting Haskell Stack Setup on OS X">Troubleshooting Haskell Stack Setup on OS X</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/sml-dev-setup/" title="SML Dev Setup">SML Dev Setup</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/noteworthy-dotfile-hacks/" title="Noteworthy Dotfile Hacks">Noteworthy Dotfile Hacks</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/vim-as-an-ide/" title="Vim as an IDE">Vim as an IDE</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2015/01/10/offline-latex-development-part-2/" title="Offline LaTeX Development - Part 2">Offline LaTeX Development - Part 2</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/12/20/vim-as-a-man-page-viewer/" title="Vim as a Man Page Viewer">Vim as a Man Page Viewer</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/10/06/offline-latex-development/" title="Offline LaTeX Development">Offline LaTeX Development</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="webdev" class="category">
-  <h2>webdev</h2>
-    
-    
-      
-      
-        <h3><a href="/2014/10/20/using-google-apps-for-cmu-authentication/" title="Using Google OAuth2 for CMU Authentication">Using Google OAuth2 for CMU Authentication</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/2014/06/04/hpstr-an-octopress-theme/" title="HPSTR: An Octopress Theme">HPSTR: An Octopress Theme</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
-
-  <article id="zsh" class="category">
-  <h2>zsh</h2>
-    
-    
-      
-      
-        <h3><a href="/starter-zsh-setup/" title="Starter Zsh Setup">Starter Zsh Setup</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/why-zsh/" title="Why zsh?">Why zsh?</a></h3>
-      
-      
-    
-      
-      
-        <h3><a href="/noteworthy-dotfile-hacks/" title="Noteworthy Dotfile Hacks">Noteworthy Dotfile Hacks</a></h3>
-      
-      
-    
-    
-    
-  </article><!-- /.hentry -->
+  
 
 
-
-
-</div><!-- /#main -->
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div><!-- /.footer-wrapper -->
 
 </body>
 </html>
+

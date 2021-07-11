@@ -1,242 +1,165 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Using Multiple Git Remotes - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
-
-
-
-
+<meta name="dcterms.date" content="2014-11-01 15:12:35 -0700">
 <meta name="description" content="An overview of how multiple Git remotes can be used to synchronize code distributed in a read-only Git repo">
+<title>Using Multiple Git Remotes – Jake Zimmerman</title>
 
-<meta name="keywords" content="git ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Using Multiple Git Remotes">
-  <meta name="twitter:description" content="An overview of how multiple Git remotes can be used to synchronize code distributed in a read-only Git repo">
-  <meta name="twitter:creator" content="@jez_io">
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/2014/11/01/using-more-than-one-git-remote">
-<meta property="og:title" content="Using Multiple Git Remotes">
-<meta property="og:description" content="An overview of how multiple Git remotes can be used to synchronize code distributed in a read-only Git repo">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
 
-<link rel="canonical" href="https://blog.jez.io/2014/11/01/using-more-than-one-git-remote">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" ">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
+
+
+  <header>
+    <h1 class="title">Using Multiple Git Remotes</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2014-11-01 15:12:35 -0700">November 1, 2014</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#quick-overview-remotes">Quick Overview: Remotes</a></li>
+  <li><a href="#scenario-working-with-code-in-15-150">Scenario: Working with Code in 15-150</a></li>
+  <li><a href="#more-applications">More Applications</a></li>
   </ul>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Using Multiple Git Remotes</h1>
-  <h2 class="EntryHeader-subtitle">November 1, 2014</h2>
-
-  <ul class="Tags">
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p>Quite often when using git, you only need to use one remote: <code>origin</code>. All your pushes and pulls communicate with this one host. However, there are many occasions when using multiple Git remotes is incredibly handy.</p>
-
+<main>
+<p>Quite often when using git, you only need to use one remote: <code>origin</code>. All your pushes and pulls communicate with this one host. However, there are many occasions when using multiple Git remotes is incredibly handy.</p>
 <!-- more -->
-
-
-<h2>Quick Overview: Remotes</h2>
-
-<p>If you haven&rsquo;t already, I strongly recommend that you check out these two Git resources in your free time:</p>
-
+<h1 id="quick-overview-remotes">Quick Overview: Remotes</h1>
+<p>If you haven’t already, I strongly recommend that you check out these two Git resources in your free time:</p>
 <ul>
 <li><a href="http://pcottle.github.io/learnGitBranching/"><strong>Learn Git Branching</strong></a>, an interactive walkthrough of some powerful Git features</li>
-<li><a href="https://wildlyinaccurate.com/a-hackers-guide-to-git"><strong>A Hacker&rsquo;s Guide to Git</strong></a>, an explanation of Git by &ldquo;taking a peek under the hood&rdquo;</li>
+<li><a href="https://wildlyinaccurate.com/a-hackers-guide-to-git"><strong>A Hacker’s Guide to Git</strong></a>, an explanation of Git by “taking a peek under the hood”</li>
 </ul>
-
-
-<p>In this article, I&rsquo;ll only be talking about remotes. Remotes are basically &ldquo;mirrors&rdquo; of a branch that you have locally, but on a different computer.</p>
-
-<h2>Scenario: Working with Code in 15-150</h2>
-
-<p>At CMU, the class 15-150 distributes its starter code in a beautiful way: using Git! This opens up a number of things we can take advantage of, but there&rsquo;s one thing in particular we can do using multiple git remotes.</p>
-
-<p>In 15-150, the code is distribute in a read-only Git repo. If we want a place where we can push and pull our changes, we&rsquo;ll need to create our own <em>bare repo</em> (a repo that&rsquo;s used just for pushing and pulling). You&rsquo;ll note that I said push <em>and pull</em>. The reason why I want to be able to pull is because I want to have 2 clones of this repo: one on the CMU Andrew Unix servers (where the 15-150 code is hosted), and one on my laptop, where there&rsquo;s no network latency to edit files in Vim.</p>
-
-<p>To achieve this setup, the first thing we&rsquo;ll do is set up the bare repo. The best place to put a bare repo is on a server so that you can always access your code. So from Andrew, I&rsquo;ll run the commands:</p>
-
-<figure class='code'><figcaption><span>Initialize the Bare Repo</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># (unix.andrew.cmu.edu)</span>
-</span><span class='line'><span class="c">#</span>
-</span><span class='line'><span class="c"># `git clone --bare` is basically GitHub's "Fork" feature,</span>
-</span><span class='line'><span class="c"># if you're familiar with that</span>
-</span><span class='line'><span class="gp">$ </span>git clone --bare ~/private/gitrepos/15150
-</span><span class='line'><span class="c"># make sure you clone this into your private folder!</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>This creates a bare repo initialized with all the 15-150 content which I can clone in two different ways: one for if I&rsquo;m on Andrew, one if I&rsquo;m on my laptop.</p>
-
-<figure class='code'><figcaption><span>Clone New Remote</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># (unix.andrew.cmu.edu)</span>
-</span><span class='line'><span class="c">#</span>
-</span><span class='line'><span class="c"># Clone over Unix file path to new folder ~/private/15150</span>
-</span><span class='line'><span class="gp">$ </span>git clone ~/private/gitrepos/15150 ~/private/15150
-</span><span class='line'>
-</span><span class='line'><span class="c"># -- and/or --</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># (my laptop)</span>
-</span><span class='line'><span class="c">#</span>
-</span><span class='line'><span class="c"># Clone over ssh (using ssh alias, i.e., if you use `ssh andrew`)</span>
-</span><span class='line'><span class="gp">$ </span>git clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150
-</span><span class='line'><span class="c"># -- or --</span>
-</span><span class='line'><span class="c"># Clone over ssh (without ssh alias,</span>
-</span><span class='line'><span class="c">#            i.e., if you use `ssh jezimmer@unix.andrew.cmu.edu`)</span>
-</span><span class='line'><span class="gp">$ </span>git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150</span></code></pre></td></tr></table></div></figure>
-
-
+<p>In this article, I’ll only be talking about remotes. Remotes are basically “mirrors” of a branch that you have locally, but on a different computer.</p>
+<h1 id="scenario-working-with-code-in-15-150">Scenario: Working with Code in 15-150</h1>
+<p>At CMU, the class 15-150 distributes its starter code in a beautiful way: using Git! This opens up a number of things we can take advantage of, but there’s one thing in particular we can do using multiple git remotes.</p>
+<p>In 15-150, the code is distribute in a read-only Git repo. If we want a place where we can push and pull our changes, we’ll need to create our own <em>bare repo</em> (a repo that’s used just for pushing and pulling). You’ll note that I said push <em>and pull</em>. The reason why I want to be able to pull is because I want to have 2 clones of this repo: one on the CMU Andrew Unix servers (where the 15-150 code is hosted), and one on my laptop, where there’s no network latency to edit files in Vim.</p>
+<p>To achieve this setup, the first thing we’ll do is set up the bare repo. The best place to put a bare repo is on a server so that you can always access your code. So from Andrew, I’ll run the commands:</p>
+<figure>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (unix.andrew.cmu.edu)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># `git clone --bare` is basically GitHub&#39;s &quot;Fork&quot; feature,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># if you&#39;re familiar with that</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone <span class="at">--bare</span> ~/private/gitrepos/15150</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># make sure you clone this into your private folder!</span></span></code></pre></div>
+<figcaption>
+Initialize the Bare Repo
+</figcaption>
+</figure>
+<p>This creates a bare repo initialized with all the 15-150 content which I can clone in two different ways: one for if I’m on Andrew, one if I’m on my laptop.</p>
+<figure>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (unix.andrew.cmu.edu)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone over Unix file path to new folder ~/private/15150</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone ~/private/gitrepos/15150 ~/private/15150</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># -- and/or --</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># (my laptop)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone over ssh (using ssh alias, i.e., if you use `ssh andrew`)</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># -- or --</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone over ssh (without ssh alias,</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#            i.e., if you use `ssh jezimmer@unix.andrew.cmu.edu`)</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150</span></code></pre></div>
+<figcaption>
+Clone New Remote
+</figcaption>
+</figure>
 <p>To throw in a few graphics, our setup looks like this right now:</p>
-
-<p><a class="image-link" href="/images/multiple-remotes-1.svg"><img src="/images/multiple-remotes-1.svg"></a></p>
-
-<p>I&rsquo;m representing bare repos as clouds and clones of those repos as squares, with arrows representing whether code can flow from one place to the next. As you can see, to send code back and forth between Andrew and my laptop, I can just push in one place and pull in the other.</p>
-
+<p><a href="/assets/img/multiple-remotes-1.svg"><img src="/assets/img/multiple-remotes-1.svg" /></a></p>
+<p>I’m representing bare repos as clouds and clones of those repos as squares, with arrows representing whether code can flow from one place to the next. As you can see, to send code back and forth between Andrew and my laptop, I can just push in one place and pull in the other.</p>
 <p>The one thing missing from our picture is the original handout repo. How will we get updates as the homeworks are released? The last piece involves setting this up.</p>
-
-<figure class='code'><figcaption><span>Add Handout Remote</span></figcaption><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Add the 15-150 handout remote so we can get starter code, etc.</span>
-</span><span class='line'><span class="c"># (unix.andrew.cmu.edu)</span>
-</span><span class='line'><span class="c">#</span>
-</span><span class='line'><span class="c"># A common name for the second remote is "upstream", though you could also</span>
-</span><span class='line'><span class="c"># call this remote "handout" if that would be easier to keep straight</span>
-</span><span class='line'><span class="gp">$ </span><span class="nb">cd</span> ~/private/15150
-</span><span class='line'><span class="gp">$ </span>git remote add upstream /afs/andrew/course/15/150/handout
-</span><span class='line'>
-</span><span class='line'><span class="c"># -- and/or --</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># (my laptop)</span>
-</span><span class='line'><span class="c">#</span>
-</span><span class='line'><span class="c"># Add remote over ssh with alias</span>
-</span><span class='line'><span class="gp">$ </span>git remote add upstream ssh://andrew:/afs/andrew/course/15/150/handout
-</span><span class='line'><span class="c"># -- or --</span>
-</span><span class='line'><span class="c"># Add remote over ssh without alias</span>
-</span><span class='line'><span class="gp">$ </span>git remote add upstream ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/course/15/150/handout</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Once we run those two lines, our setup looks like this, where arrows point in
-the direction data can flow:</p>
-
-<p><a class="image-link" href="/images/multiple-remotes-2.svg"><img src="/images/multiple-remotes-2.svg"></a></p>
-
-<p>After this, we&rsquo;re able to run <code>git pull upstream master</code> to get the 15-150 starter code as it&rsquo;s released. I find this model particularly useful for all my classes, even the ones that don&rsquo;t distribute their code using Git. Having code both on Andrew and on my local machine is a generally handy configuration, and using Git to push the code around to the right places makes my workflow simple.</p>
-
+<figure>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Add the 15-150 handout remote so we can get starter code, etc.</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="co"># (unix.andrew.cmu.edu)</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co"># A common name for the second remote is &quot;upstream&quot;, though you could also</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co"># call this remote &quot;handout&quot; if that would be easier to keep straight</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="ex">$</span> cd ~/private/15150</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="ex">$</span> git remote add upstream /afs/andrew/course/15/150/handout</span>
+<span id="cb3-8"><a href="#cb3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co"># -- and/or --</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co"># (my laptop)</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co"># Add remote over ssh with alias</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="ex">$</span> git remote add upstream ssh://andrew:/afs/andrew/course/15/150/handout</span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co"># -- or --</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co"># Add remote over ssh without alias</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="ex">$</span> git remote add upstream ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/course/15/150/handout</span></code></pre></div>
+<figcaption>
+Add Handout Remote
+</figcaption>
+</figure>
+<p>Once we run those two lines, our setup looks like this, where arrows point in the direction data can flow:</p>
+<p><a href="/assets/img/multiple-remotes-2.svg"><img src="/assets/img/multiple-remotes-2.svg" /></a></p>
+<p>After this, we’re able to run <code>git pull upstream master</code> to get the 15-150 starter code as it’s released. I find this model particularly useful for all my classes, even the ones that don’t distribute their code using Git. Having code both on Andrew and on my local machine is a generally handy configuration, and using Git to push the code around to the right places makes my workflow simple.</p>
 <p>As always, let me know if something was unclear or incorrect in the comments!</p>
-
-<h2>More Applications</h2>
-
+<h1 id="more-applications">More Applications</h1>
 <p>There are plenty other applications of using multiple remotes with Git. Perhaps the most common is to use them with the <a href="https://help.github.com/articles/fork-a-repo/"><strong>GitHub forking model</strong></a>, which is useful when collaborating on a software development project with others. You can use multiple remotes to do things like resolve merge conflicts in pull requests and to keep your fork up to date with the original repo.</p>
+</main>
 
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#git" title="Pages tagged git">git</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2014-11-01T18:12:35-04:00">November 1, 2014</time></span>
-      
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#git">git</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

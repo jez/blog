@@ -1,112 +1,67 @@
-
 <!DOCTYPE html>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
 <head>
-
-
-<meta charset="utf-8">
-<meta http-equiv="cleartype" content="on">
-
-<title>Code Review from the Command Line - Bits, Bytes, and Words</title>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2018-01-13 13:14:24 -0800">
+<meta name="description" content="I do the bulk of my code reviews from the command line, especially when reviewing larger changes. I've built up a number of tools and config settings that help me dig into the nuances of the code I'm reviewing, so that I can understand it better than if I were just browsing online.
+">
+<title>Code Review from the Command Line – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
 
 
 
-<meta name="description" content="I do the bulk of my code reviews from the command line, especially when reviewing larger changes. I've built up a number of tools and config settings &hellip;">
-
-<meta name="keywords" content="bash git programming vim javascript ">
-
-
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Twitter Cards -->
-
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://blog.jez.io/touch-icon.png">
-  <meta name="twitter:title" content="Code Review from the Command Line">
-  <meta name="twitter:description" content="I do the bulk of my code reviews from the command line, especially when reviewing larger changes. I've built up a number of tools and config settings &hellip;">
-  <meta name="twitter:creator" content="@jez_io">
-
-
-<!-- Open Graph -->
-<meta property="og:local" content="en_US">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.jez.io/cli-code-review">
-<meta property="og:title" content="Code Review from the Command Line">
-<meta property="og:description" content="I do the bulk of my code reviews from the command line, especially when reviewing larger changes. I've built up a number of tools and config settings &hellip;">
-<meta property="og:image" content="https://blog.jez.io/touch-icon.png">
-<meta property="og:site_name" content="Bits, Bytes, and Words">
-
-<link rel="canonical" href="https://blog.jez.io/cli-code-review">
-<link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
-<link href="/favicon@2x.png" rel="icon" sizes="32x32">
-<link href="/favicon.png" rel="icon" sizes="16x16">
-<link href="/fonts/concourse.css" rel="stylesheet">
-<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-<link href="/atom.xml" rel="alternate" title="Bits, Bytes, and Words" type="application/atom+xml">
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
 
 
 
 
 </head>
+<body>
+  
 
-<body id="post" class=" fancy-blockquotes">
 
-<nav class="Navigation">
-  <ul class="Tags">
-    
-      <li class="Tag">
-        
-          <a href="/">Home</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="/categories/">Categories</a>
-        
-      </li>
-    
-      <li class="Tag">
-        
-          <a href="https://jez.io">About</a>
-        
-      </li>
-    
+
+
+  <header>
+    <h1 class="title">Code Review from the Command Line</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2018-01-13 13:14:24 -0800">January 13, 2018</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#code-review-philosophy">Code review philosophy</a></li>
+  <li><a href="#checking-out-the-code">Checking out the code</a></li>
+  <li><a href="#at-first-glance">At first glance</a></li>
+  <li><a href="#visualizing-file-change-frequency">Visualizing file change frequency</a></li>
+  <li><a href="#visualizing-relationships-between-files">Visualizing relationships between files</a></li>
+  <li><a href="#reviewing-the-diffs">Reviewing the diffs</a></li>
+  <li><a href="#interactive-code-review">Interactive Code Review</a></li>
+  <li><a href="#recap">Recap</a></li>
   </ul>
 </nav>
 
-
-
-
-
-<div class="EntryHeader">
-  <h1 class="EntryHeader-title">Code Review from the Command Line</h1>
-  <h2 class="EntryHeader-subtitle">January 13, 2018</h2>
-
-  <ul class="Tags">
-    
-  </ul>
-</div>
-
-
-
-<div id="main" role="main">
-  <article class="Post-content">
-    <p>I do the bulk of my code reviews from the command line, especially when
-reviewing larger changes. I&rsquo;ve built up a number of tools and config
-settings that help me dig into the nuances of the code I&rsquo;m reviewing, so
-that I can understand it better than if I were just browsing online.</p>
-
+<main>
+<p>I do the bulk of my code reviews from the command line, especially when reviewing larger changes. I’ve built up a number of tools and config settings that help me dig into the nuances of the code I’m reviewing, so that I can understand it better than if I were just browsing online.</p>
 <!-- more -->
-
-
-<p>In particular, I&rsquo;ll walk through how I&hellip;</p>
-
+<p>In particular, I’ll walk through how I…</p>
 <ul>
 <li>check out the code in the first place,</li>
 <li>get a feel for what changed,</li>
@@ -114,308 +69,140 @@ that I can understand it better than if I were just browsing online.</p>
 <li>bring up the code diffs in Vim,</li>
 <li>leverage the unique power of the editor and the terminal.</li>
 </ul>
-
-
-<p>But first, let&rsquo;s talk briefly about the point of code review in the
-first place.</p>
-
-<h2>Code review philosophy</h2>
-
-<p>When I ask that other people review my code, it&rsquo;s an opportunity for me
-to teach them about the change I&rsquo;ve just made. When I review someone
-else&rsquo;s code, it&rsquo;s to learn something from them. Some other benefits of
-code review include:</p>
-
+<p>But first, let’s talk briefly about the point of code review in the first place.</p>
+<h1 id="code-review-philosophy">Code review philosophy</h1>
+<p>When I ask that other people review my code, it’s an opportunity for me to teach them about the change I’ve just made. When I review someone else’s code, it’s to learn something from them. Some other benefits of code review include:</p>
 <ul>
-<li>Team awareness (to keep a pulse on what else is going on within your
-team).</li>
-<li>Finding alternative solutions (maybe there&rsquo;s a small change that lets
-us kill two birds with one stone).</li>
+<li>Team awareness (to keep a pulse on what else is going on within your team).</li>
+<li>Finding alternative solutions (maybe there’s a small change that lets us kill two birds with one stone).</li>
 </ul>
-
-
-<p>If this is different from how you think about code review, <a href="https://www.youtube.com/watch?v=PJjmw9TRB7s">check out
-this talk</a>. Code review is a powerful tool for
-learning and growing a team.</p>
-
-<p>With that out of the way, let&rsquo;s dive into the tools I use to maximize
-benefit I get from code review.</p>
-
-<h2>Checking out the code</h2>
-
-<p>The first step to reviewing code in the terminal is to check out the
-code in the first place. One option is to simply to <code>git pull</code> and then
-<code>git checkout &lt;branch&gt;</code>. But if you happen to be using GitHub, we can
-get this down to just one command:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class=''><span class='line'>hub pr checkout &lt;pr-number&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It works using <a href="https://github.com/github/hub">hub</a>, which is a tool that exposes various features of
-GitHub from the command line. If the pull request is from someone else&rsquo;s
-fork, <code>hub</code> is even smart enough to add their fork as a remote and fetch
-it.</p>
-
-<h2>At first glance</h2>
-
-<p>With the branch checked out locally, usually my next step is to get a
-feel for what changed. For this, I&rsquo;ve written a git alias that shows:</p>
-
+<p>If this is different from how you think about code review, <a href="https://www.youtube.com/watch?v=PJjmw9TRB7s">check out this talk</a>. Code review is a powerful tool for learning and growing a team.</p>
+<p>With that out of the way, let’s dive into the tools I use to maximize benefit I get from code review.</p>
+<h1 id="checking-out-the-code">Checking out the code</h1>
+<p>The first step to reviewing code in the terminal is to check out the code in the first place. One option is to simply to <code>git pull</code> and then <code>git checkout &lt;branch&gt;</code>. But if you happen to be using GitHub, we can get this down to just one command:</p>
+<pre><code>hub pr checkout &lt;pr-number&gt;</code></pre>
+<p>It works using <a href="https://github.com/github/hub">hub</a>, which is a tool that exposes various features of GitHub from the command line. If the pull request is from someone else’s fork, <code>hub</code> is even smart enough to add their fork as a remote and fetch it.</p>
+<h1 id="at-first-glance">At first glance</h1>
+<p>With the branch checked out locally, usually my next step is to get a feel for what changed. For this, I’ve written a git alias that shows:</p>
 <ul>
 <li>which files changed</li>
 <li>how many lines changed in each file (additions and deletions)</li>
 <li>how many lines changed overall</li>
 </ul>
-
-
-<p><a class="image-link" href="/images/git-stat.png"><img class="fullwidth" src="/images/git-stat.png" title="git stat" ></a></p>
-
-<p>Here&rsquo;s the definition of <code>git stat</code> from my <code>~/.gitconfig</code>:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span><span class="nb">alias</span><span class="o">]</span>
-</span><span class='line'>  <span class="c"># list files which have changed since REVIEW_BASE</span>
-</span><span class='line'>  <span class="c"># (REVIEW_BASE defaults to 'master' in my zshrc)</span>
-</span><span class='line'>  files <span class="o">=</span> !git diff --name-only <span class="k">$(</span>git merge-base HEAD <span class="se">\"</span><span class="nv">$REVIEW_BASE</span><span class="se">\"</span><span class="k">)</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># Same as above, but with a diff stat instead of just names</span>
-</span><span class='line'>  <span class="c"># (better for interactive use)</span>
-</span><span class='line'>  stat <span class="o">=</span> !git diff --stat <span class="k">$(</span>git merge-base HEAD <span class="se">\"</span><span class="nv">$REVIEW_BASE</span><span class="se">\"</span><span class="k">)</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Under the hood, it just works using <code>git diff</code>, <code>git merge-base</code>, and a
-personal environment variable <code>REVIEW_BASE</code>.</p>
-
-<p><code>REVIEW_BASE</code> lets us choose which branch to review relative to. Most of
-the time, <code>REVIEW_BASE</code> is <code>master</code>, but this isn&rsquo;t always the case! Some
-repos branch off of <code>gh-pages</code>. Sometimes I like to review the most
-recent commit as if it were its own branch.</p>
-
-<p>To review the code relative so some other base, set <code>REVIEW_BASE</code> before
-running <code>git stat</code>:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Review between 'gh-pages' and the current branch</span>
-</span><span class='line'><span class="nv">REVIEW_BASE</span><span class="o">=</span>gh-pages git stat
-</span><span class='line'>
-</span><span class='line'><span class="c"># Review changes made by the last commit of this branch:</span>
-</span><span class='line'><span class="nv">REVIEW_BASE</span><span class="o">=</span>HEAD^ git stat</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I have <code>export REVIEW_BASE=master</code> in my <code>~/.bashrc</code>, because most
-projects branch off of <code>master</code>.</p>
-
-<p>Nothing too crazy yet&mdash;GitHub can already do everything we&rsquo;ve seen so
-far. Let&rsquo;s start to up the ante.</p>
-
-<h2>Visualizing file change frequency</h2>
-
-<p>I&rsquo;ve written a short script that shows me a visualization of how
-frequently the files involved in this branch change over time:</p>
-
-<p><a class="image-link" href="/images/git-heatmap.png"><img class="fullwidth" src="/images/git-heatmap.png" title="git heatmap" ></a></p>
-
+<p><a href="/assets/img/git-stat.png"><img src="/assets/img/git-stat.png" alt="git stat" /></a></p>
+<p>Here’s the definition of <code>git stat</code> from my <code>~/.gitconfig</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[alias]</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># list files which have changed since REVIEW_BASE</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (REVIEW_BASE defaults to &#39;master&#39; in my zshrc)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">files</span> = !git diff <span class="at">--name-only</span> <span class="va">$(</span><span class="fu">git</span> merge-base HEAD <span class="dt">\&quot;</span><span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span><span class="va">)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Same as above, but with a diff stat instead of just names</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (better for interactive use)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stat</span> = !git diff <span class="at">--stat</span> <span class="va">$(</span><span class="fu">git</span> merge-base HEAD <span class="dt">\&quot;</span><span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span><span class="va">)</span></span></code></pre></div>
+<p>Under the hood, it just works using <code>git diff</code>, <code>git merge-base</code>, and a personal environment variable <code>REVIEW_BASE</code>.</p>
+<p><code>REVIEW_BASE</code> lets us choose which branch to review relative to. Most of the time, <code>REVIEW_BASE</code> is <code>master</code>, but this isn’t always the case! Some repos branch off of <code>gh-pages</code>. Sometimes I like to review the most recent commit as if it were its own branch.</p>
+<p>To review the code relative so some other base, set <code>REVIEW_BASE</code> before running <code>git stat</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Review between &#39;gh-pages&#39; and the current branch</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">REVIEW_BASE=</span>gh-pages <span class="fu">git</span> stat</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Review changes made by the last commit of this branch:</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="va">REVIEW_BASE=</span>HEAD^ <span class="fu">git</span> stat</span></code></pre></div>
+<p>I have <code>export REVIEW_BASE=master</code> in my <code>~/.bashrc</code>, because most projects branch off of <code>master</code>.</p>
+<p>Nothing too crazy yet—GitHub can already do everything we’ve seen so far. Let’s start to up the ante.</p>
+<h1 id="visualizing-file-change-frequency">Visualizing file change frequency</h1>
+<p>I’ve written a short script that shows me a visualization of how frequently the files involved in this branch change over time:</p>
+<p><a href="/assets/img/git-heatmap.png"><img src="/assets/img/git-heatmap.png" alt="git heatmap" /></a></p>
 <p>This command identifies two main things:</p>
-
 <ul>
 <li><p><strong>Files with lots of changes</strong>.</p>
-
-<p>Files that have changed a lot in the past are likely to change in the
-future. I review these files with an eye towards what the <em>next</em>
-change will bring.</p>
-
-<p><em>&ldquo;Is this change robust enough to still be useful in the future?
-Will we throw this out soon after merging it?&rdquo;</em></p></li>
+<p>Files that have changed a lot in the past are likely to change in the future. I review these files with an eye towards what the <em>next</em> change will bring.</p>
+<p><em>“Is this change robust enough to still be useful in the future? Will we throw this out soon after merging it?”</em></p></li>
 <li><p><strong>Files with few changes</strong>.</p>
-
-<p>Files that aren&rsquo;t changed frequently are more likely to be brittle.
-Alternatively, it&rsquo;s often the case that infrequently changed files
-stay unchanged because the change is better made elsewhere.</p>
-
-<p><em>&ldquo;Does this change challenge an implicit assumption so that some other
-part of the code was relying on? Is there a better place for this
-change?&rdquo;</em></p></li>
+<p>Files that aren’t changed frequently are more likely to be brittle. Alternatively, it’s often the case that infrequently changed files stay unchanged because the change is better made elsewhere.</p>
+<p><em>“Does this change challenge an implicit assumption so that some other part of the code was relying on? Is there a better place for this change?”</em></p></li>
 </ul>
-
-
-<p>Those two commands (<code>git stat</code> and <code>git heatmap</code>) are how I kick off my
-code review: getting a birds-eye view of the change and some historical
-context for what I&rsquo;m dealing with. Next, I drill down into the
-relationships between the files that changed.</p>
-
-<h2>Visualizing relationships between files</h2>
-
-<p>At work I review JavaScript files, so I&rsquo;ve built out this next bit of
-tooling specifically for JavaScript.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> It helps to understand
-which files import others, so I have a command that computes the
-dependency graph of the files changed on this branch:</p>
-
-<p><a class="image-link" href="/images/git-depgraph.png"><img class="fullwidth" src="/images/git-depgraph.png" title="git depgraph" ></a></p>
-
-<p>This is where we start to see some distinct advantages over what GitHub
-provides. As you see above, the <code>git depgraph</code> alias calculates the
-dependency graph for files changed by this branch. Why is this useful?</p>
-
+<p>Those two commands (<code>git stat</code> and <code>git heatmap</code>) are how I kick off my code review: getting a birds-eye view of the change and some historical context for what I’m dealing with. Next, I drill down into the relationships between the files that changed.</p>
+<h1 id="visualizing-relationships-between-files">Visualizing relationships between files</h1>
+<p>At work I review JavaScript files, so I’ve built out this next bit of tooling specifically for JavaScript.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">The techniques here apply to any language that you can statically analyze. In particular, I have a rough prototype of everything JavaScript-specific you see here that works with Standard ML instead. If you can find me the dependency information for your favorite language, I’d be happy to help you turn it into a visualization.<br />
+<br />
+</span></span> It helps to understand which files import others, so I have a command that computes the dependency graph of the files changed on this branch:</p>
+<p><a href="/assets/img/git-depgraph.png"><img src="/assets/img/git-depgraph.png" alt="git depgraph" /></a></p>
+<p>This is where we start to see some distinct advantages over what GitHub provides. As you see above, the <code>git depgraph</code> alias calculates the dependency graph for files changed by this branch. Why is this useful?</p>
 <ul>
-<li><p>Maybe we want to start reviewing from <code>Provider.js</code>, since it doesn&rsquo;t
-depend on any other files that have changed.</p></li>
-<li><p>Maybe we want to work the other way: start with <code>Elements.js</code> so we
-know the motivation for why <code>Provider.js</code> had to changed in the first
-place.</p></li>
+<li><p>Maybe we want to start reviewing from <code>Provider.js</code>, since it doesn’t depend on any other files that have changed.</p></li>
+<li><p>Maybe we want to work the other way: start with <code>Elements.js</code> so we know the motivation for why <code>Provider.js</code> had to changed in the first place.</p></li>
 </ul>
-
-
-<p>In either case, we can see the structure of the change. Three files
-depend on <code>Elements.js</code>, so it&rsquo;s serving the needs of many modules.
-<code>Element.js</code> only has one dependency, etc. Each branch&rsquo;s dependency
-graph shows different information; it can be surprising what turns up.</p>
-
+<p>In either case, we can see the structure of the change. Three files depend on <code>Elements.js</code>, so it’s serving the needs of many modules. <code>Element.js</code> only has one dependency, etc. Each branch’s dependency graph shows different information; it can be surprising what turns up.</p>
 <p>I have the <code>git depgraph</code> alias defined like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span><span class="nb">alias</span><span class="o">]</span>
-</span><span class='line'>  depgraph <span class="o">=</span> !git madge image --webpack-config webpack.config.js --basedir . --style solarized-dark src</span></code></pre></td></tr></table></div></figure>
-
-
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[alias]</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">depgraph</span> = !git madge image <span class="at">--webpack-config</span> webpack.config.js <span class="at">--basedir</span> . <span class="at">--style</span> solarized-dark src</span></code></pre></div>
 <p>Some notes about this definition:</p>
-
 <ul>
-<li><p>It depends on the <code>git-madge</code> command, which you can <a href="https://github.com/jez/git-madge">download
-and install here</a>.</p></li>
-<li><p>It&rsquo;s using <em>this project&rsquo;s</em> <code>webpack.config.js</code> file, so I&rsquo;ve made
-this alias local to the repo, rather than available globally.</p></li>
-<li><p>It dumps the image to stdout. Above, we used iTerm2&rsquo;s <a href="https://iterm2.com/documentation-images.html">imgcat</a>
-program to pipe stdin and dump a raster image to the terminal.</p>
-
-<p>If you don&rsquo;t use iTerm2 or don&rsquo;t want to install <code>imgcat</code>, you can
-pipe it to Preview using open<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> (<code>open -f -a Preview</code>) or just
-redirect the PNG to a file.</p></li>
+<li><p>It depends on the <code>git-madge</code> command, which you can <a href="https://github.com/jez/git-madge">download and install here</a>.</p></li>
+<li><p>It’s using <em>this project’s</em> <code>webpack.config.js</code> file, so I’ve made this alias local to the repo, rather than available globally.</p></li>
+<li><p>It dumps the image to stdout. Above, we used iTerm2’s <a href="https://iterm2.com/documentation-images.html">imgcat</a> program to pipe stdin and dump a raster image to the terminal.</p>
+<p>If you don’t use iTerm2 or don’t want to install <code>imgcat</code>, you can pipe it to Preview using open<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">The <code>open</code> command is macOS-specific. On Linux, you might want to look at the <code>display</code> command from ImageMagick.<br />
+<br />
+</span></span> (<code>open -f -a Preview</code>) or just redirect the PNG to a file.</p></li>
 </ul>
-
-
-<p>The <code>git depgraph</code> alias is a game changer. It makes it easier to get spun
-up in new code bases, helps make sense of large changes, and just looks
-plain cool. But at the end of the day, we came here to review some code,
-so let&rsquo;s take a look at how we can actually view the diffs of the files
-that changed.</p>
-
-<h2>Reviewing the diffs</h2>
-
-<p>To review the diffs, the simplest option is to just run <code>git diff
-master..HEAD</code>. This has a bunch of downsides:</p>
-
+<p>The <code>git depgraph</code> alias is a game changer. It makes it easier to get spun up in new code bases, helps make sense of large changes, and just looks plain cool. But at the end of the day, we came here to review some code, so let’s take a look at how we can actually view the diffs of the files that changed.</p>
+<h1 id="reviewing-the-diffs">Reviewing the diffs</h1>
+<p>To review the diffs, the simplest option is to just run <code>git diff master..HEAD</code>. This has a bunch of downsides:</p>
 <ul>
 <li><p>No syntax highlighting (everything is either green or red).</p></li>
-<li><p>No surrounding context (for example, GitHub lets you click to expand
-lines above or below a diff hunk).</p></li>
-<li><p>The diff is &ldquo;unified,&rdquo; instead of split into two columns.</p></li>
-<li><p>No way to exclude a specific file (the 300 line diff to your
-<code>yarn.lock</code> file is sometimes nice to hide).</p></li>
+<li><p>No surrounding context (for example, GitHub lets you click to expand lines above or below a diff hunk).</p></li>
+<li><p>The diff is “unified,” instead of split into two columns.</p></li>
+<li><p>No way to exclude a specific file (the 300 line diff to your <code>yarn.lock</code> file is sometimes nice to hide).</p></li>
 </ul>
-
-
-<p>My solution to all of these problems is to view the diffs in Vim, with
-the help of two Vim plugins and two git aliases. Before we get to
-that, here&rsquo;s a screenshot:</p>
-
-<p><a class="image-link" href="/images/git-review.png"><img class="fullwidth" src="/images/git-review.png" title="git review" ></a></p>
-
-<p>Looks pretty similar to GitHub&rsquo;s interface, with the added bonus that
-it&rsquo;s using my favorite colorscheme! The Vim plugins featured are:</p>
-
+<p>My solution to all of these problems is to view the diffs in Vim, with the help of two Vim plugins and two git aliases. Before we get to that, here’s a screenshot:</p>
+<p><a href="/assets/img/git-review.png"><img src="/assets/img/git-review.png" alt="git review" /></a></p>
+<p>Looks pretty similar to GitHub’s interface, with the added bonus that it’s using my favorite colorscheme! The Vim plugins featured are:</p>
 <ul>
 <li><a href="https://github.com/tpope/vim-fugitive">tpope/vim-fugitive</a> for showing the side-by-side diff (<code>:Gdiff</code>).</li>
 <li><a href="https://github.com/airblade/vim-gitgutter">airblade/vim-gitgutter</a> for showing the <code>+/-</code> signs.</li>
-<li><a href="https://github.com/jez/vim-colors-solarized">jez/vim-colors-solarized</a> for tweaking the diff highlight
-colors.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></li>
+<li><a href="https://github.com/jez/vim-colors-solarized">jez/vim-colors-solarized</a> for tweaking the diff highlight colors.<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">I’ve patched the default Solarized colors for Vim so that lines retain their syntax highlighting in the diff mode, while the backgrounds are highlighted. You can see how this works in this commit: <a href="https://github.com/jez/vim-colors-solarized/commit/bca72cc" class="uri">https://github.com/jez/vim-colors-solarized/commit/bca72cc</a><br />
+<br />
+</span></span></li>
 </ul>
-
-
-<p>And to orchestrate the whole thing, I&rsquo;ve set up these two aliases:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span><span class="nb">alias</span><span class="o">]</span>
-</span><span class='line'>  <span class="c"># NOTE: These aliases depend on the `git files` alias from</span>
-</span><span class='line'>  <span class="c"># a few sections ago!</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># Open all files changed since REVIEW_BASE in Vim tabs</span>
-</span><span class='line'>  <span class="c"># Then, run fugitive's :Gdiff in each tab, and finally</span>
-</span><span class='line'>  <span class="c"># tell vim-gitgutter to show +/- for changes since REVIEW_BASE</span>
-</span><span class='line'>  review <span class="o">=</span> !vim -p <span class="k">$(</span>git files<span class="k">)</span> +<span class="se">\"</span>tabdo Gdiff <span class="nv">$REVIEW_BASE</span><span class="se">\"</span> +<span class="se">\"</span><span class="nb">let </span>g:gitgutter_diff_base <span class="o">=</span> <span class="s1">'$REVIEW_BASE'</span><span class="se">\"</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># Same as the above, except specify names of files as arguments,</span>
-</span><span class='line'>  <span class="c"># instead of opening all files:</span>
-</span><span class='line'>  <span class="c"># git reviewone foo.js bar.js</span>
-</span><span class='line'>  reviewone <span class="o">=</span> !vim -p +<span class="se">\"</span>tabdo Gdiff <span class="nv">$REVIEW_BASE</span><span class="se">\"</span> +<span class="se">\"</span><span class="nb">let </span>g:gitgutter_diff_base <span class="o">=</span> <span class="s1">'$REVIEW_BASE'</span><span class="se">\"</span></span></code></pre></td></tr></table></div></figure>
-
-
-<p>Here&rsquo;s how they work:</p>
-
+<p>And to orchestrate the whole thing, I’ve set up these two aliases:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[alias]</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># </span><span class="al">NOTE</span><span class="co">: These aliases depend on the `git files` alias from</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># a few sections ago!</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Open all files changed since REVIEW_BASE in Vim tabs</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Then, run fugitive&#39;s :Gdiff in each tab, and finally</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># tell vim-gitgutter to show +/- for changes since REVIEW_BASE</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">review</span> = !vim <span class="at">-p</span> <span class="va">$(</span><span class="fu">git</span> files<span class="va">)</span> +<span class="dt">\&quot;</span>tabdo Gdiff <span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span> +<span class="dt">\&quot;</span>let g:gitgutter_diff_base = <span class="st">&#39;$REVIEW_BASE&#39;</span><span class="dt">\&quot;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Same as the above, except specify names of files as arguments,</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># instead of opening all files:</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># git reviewone foo.js bar.js</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">reviewone</span> = !vim <span class="at">-p</span> +<span class="dt">\&quot;</span>tabdo Gdiff <span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span> +<span class="dt">\&quot;</span>let g:gitgutter_diff_base = <span class="st">&#39;$REVIEW_BASE&#39;</span><span class="dt">\&quot;</span></span></code></pre></div>
+<p>Here’s how they work:</p>
 <ul>
-<li><p><code>git review</code> opens each file changed by this branch as a tab in Vim.
-Then <code>:Gdiff</code> from vim-fugitive shows the diff in each tab.</p></li>
-<li><p><code>git reviewone</code> is like <code>git review</code>, but you specify which
-files to open (in case you only want to diff a few).</p></li>
+<li><p><code>git review</code> opens each file changed by this branch as a tab in Vim. Then <code>:Gdiff</code> from vim-fugitive shows the diff in each tab.</p></li>
+<li><p><code>git reviewone</code> is like <code>git review</code>, but you specify which files to open (in case you only want to diff a few).</p></li>
 </ul>
-
-
-<p>Like with the <code>git stat</code> alias, these aliases respect the <code>REVIEW_BASE</code>
-environment variable I&rsquo;ve set up in my <code>~/.bashrc</code>. (Scroll back up for
-a refresher.) For example, to review all files relative to <code>master</code>:</p>
-
-<figure class='code'><div class="highlight"><table><tr></pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">REVIEW_BASE</span><span class="o">=</span>master git review</span></code></pre></td></tr></table></div></figure>
-
-
-<p>At this point, you might think that all we&rsquo;ve done is re-create the
-GitHub code review experience in Vim. But actually what we&rsquo;ve done is so
-much more powerful.</p>
-
-<h2>Interactive Code Review</h2>
-
-<p>When reviewing on GitHub, the code is completely static&mdash;you can&rsquo;t
-change it. Also, because the code is coming from GitHub&rsquo;s servers,
-it&rsquo;s laggy when you click around to view related files. By switching our
-code review to the terminal, we can now edit files, jump to other files,
-and run arbitrary commands at no cost.</p>
-
-<p>It might not be obvious how huge of a win this is, so let&rsquo;s see some
-examples. Take this screenshot of the <code>requireElement</code> function. It
-moved from <em>above</em> the <code>findElement</code> function to <em>below</em> it (probably
-because the former calls the latter):</p>
-
-<p><a class="image-link" href="/images/requireElement01.png"><img class="fullwidth" src="/images/requireElement01.png" title="diff" ></a></p>
-
-<p>But is the location of the <code>requireElement</code> function the only thing
-that&rsquo;s changed? By editing the file to move the function back to its
-original location, vim-fugitive will automatically recompute the diff.
-And in fact, we can see that the <em>type of the argument</em> has changed too,
-from <code>string</code> to <code>ElementType</code>:</p>
-
-<p><a class="image-link" href="/images/requireElement02.png"><img class="fullwidth" src="/images/requireElement02.png" title="diff" ></a></p>
-
-<p>If we had been viewing this on GitHub, we might have taken for granted
-that the function didn&rsquo;t change. But since we&rsquo;re in our editor, we can
-interactively play around with our code and discover things we might
-have missed otherwise. The advantages of interactive code review go well
-beyond this example:</p>
-
+<p>Like with the <code>git stat</code> alias, these aliases respect the <code>REVIEW_BASE</code> environment variable I’ve set up in my <code>~/.bashrc</code>. (Scroll back up for a refresher.) For example, to review all files relative to <code>master</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="va">REVIEW_BASE=</span>master <span class="fu">git</span> review</span></code></pre></div>
+<p>At this point, you might think that all we’ve done is re-create the GitHub code review experience in Vim. But actually what we’ve done is so much more powerful.</p>
+<h1 id="interactive-code-review">Interactive Code Review</h1>
+<p>When reviewing on GitHub, the code is completely static—you can’t change it. Also, because the code is coming from GitHub’s servers, it’s laggy when you click around to view related files. By switching our code review to the terminal, we can now edit files, jump to other files, and run arbitrary commands at no cost.</p>
+<p>It might not be obvious how huge of a win this is, so let’s see some examples. Take this screenshot of the <code>requireElement</code> function. It moved from <em>above</em> the <code>findElement</code> function to <em>below</em> it (probably because the former calls the latter):</p>
+<p><a href="/assets/img/requireElement01.png"><img src="/assets/img/requireElement01.png" alt="diff" /></a></p>
+<p>But is the location of the <code>requireElement</code> function the only thing that’s changed? By editing the file to move the function back to its original location, vim-fugitive will automatically recompute the diff. And in fact, we can see that the <em>type of the argument</em> has changed too, from <code>string</code> to <code>ElementType</code>:</p>
+<p><a href="/assets/img/requireElement02.png"><img src="/assets/img/requireElement02.png" alt="diff" /></a></p>
+<p>If we had been viewing this on GitHub, we might have taken for granted that the function didn’t change. But since we’re in our editor, we can interactively play around with our code and discover things we might have missed otherwise. The advantages of interactive code review go well beyond this example:</p>
 <ul>
 <li><p>In a Flow project, we can ask for the type of a variable.</p></li>
-<li><p>In a test file, we can change the test and see if it still passes or
-if it now fails.</p></li>
-<li><p>We can <code>grep</code> the project for all uses of a function (including files
-<em>not</em> changed by this branch).</p></li>
+<li><p>In a test file, we can change the test and see if it still passes or if it now fails.</p></li>
+<li><p>We can <code>grep</code> the project for all uses of a function (including files <em>not</em> changed by this branch).</p></li>
 <li><p>We can open up related files for cross-referencing.</p></li>
 <li><p>We can run the code in a debugger and see how it behaves.</p></li>
 </ul>
-
-
-<p>By having the full power of our editor, we can literally retrace the
-steps that the author went through to create the pull request. If our
-goal is to understand and learn from code review, there&rsquo;s no better way
-than walking in the author&rsquo;s shoes.</p>
-
-<h2>Recap</h2>
-
-<p>To recap, here&rsquo;s a list of the tools I use to review code at the command
-line:</p>
-
+<p>By having the full power of our editor, we can literally retrace the steps that the author went through to create the pull request. If our goal is to understand and learn from code review, there’s no better way than walking in the author’s shoes.</p>
+<h1 id="recap">Recap</h1>
+<p>To recap, here’s a list of the tools I use to review code at the command line:</p>
 <ul>
 <li><code>hub pr checkout</code></li>
 <li><code>git stat</code> to list files that have changed</li>
@@ -424,91 +211,47 @@ line:</p>
 <li><code>git review</code> to open diffs of all the files in Vim</li>
 <li><code>git reviewone</code> to open diffs for a specific handful of files</li>
 </ul>
-
-
-<p>If you&rsquo;re having trouble incorporating any of these into your workflow,
-feel free to reach out and let me know! I&rsquo;m happy to help.</p>
-
+<p>If you’re having trouble incorporating any of these into your workflow, feel free to reach out and let me know! I’m happy to help.</p>
 <!-- vim:tw=72
 -->
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>The techniques here apply to any language that you can statically analyze. In particular, I have a rough prototype of everything JavaScript-specific you see here that works with Standard ML instead. If you can find me the dependency information for your favorite language, I&rsquo;d be happy to help you turn it into a visualization.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>The <code>open</code> command is macOS-specific. On Linux, you might want to look at the <code>display</code> command from ImageMagick.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>I&rsquo;ve patched the default Solarized colors for Vim so that lines retain their syntax highlighting in the diff mode, while the backgrounds are highlighted. You can see how this works in this commit: <a href="https://github.com/jez/vim-colors-solarized/commit/bca72cc">https://github.com/jez/vim-colors-solarized/commit/bca72cc</a><a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
+</main>
 
 
-    <footer class="entry-meta">
-      <span class="entry-tags">
-        <ul class="Tags">
-          
-            <li class="Tag">
-              <a href="/categories/#bash" title="Pages tagged bash">bash</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#git" title="Pages tagged git">git</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#programming" title="Pages tagged programming">programming</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#vim" title="Pages tagged vim">vim</a>
-            </li>
-          
-            <li class="Tag">
-              <a href="/categories/#javascript" title="Pages tagged javascript">javascript</a>
-            </li>
-          
-        </ul>
-      </span>
-      <span class="entry-date date published updated"><time datetime="2018-01-13T13:14:24-08:00">January 13, 2018</time></span>
-      
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#bash">bash</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#git">git</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#programming">programming</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#vim">vim</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#javascript">javascript</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
     </footer>
-  </div>
   
-  <div class="read-more">
-    
-      <div class="read-more-header">
-        <a href="/typed-errors-sorbet/" class="Button">Read More</a>
-      </div><!-- /.read-more-header -->
-      <div class="read-more-content">
-        <h3><a href="/typed-errors-sorbet/" title="Typed Errors in Sorbet">Typed Errors in Sorbet</a></h3>
-      <p>Sorbet&#8217;s union types in method returns provide a low-friction, high value way to model how methods can fail.
- <a href="/typed-errors-sorbet/"> Continue reading</a></p>
-        </div><!-- /.read-more-content -->
-      
-      <div class="read-more-list">
-        
-          <div class="list-item">
-            <h4><a href="/union-types-checked-exceptions/" title="Sorbet Does Not Have Checked Exceptions">Sorbet Does Not Have Checked Exceptions</a></h4>
-            <span>Published on May 29, 2021</span>
-          </div><!-- /.list-item -->
-        
-          <div class="list-item">
-            <h4><a href="/clangd-ruby/" title="Exploring Ruby with clangd">Exploring Ruby with clangd</a></h4>
-            <span>Published on July 21, 2020</span>
-          </div><!-- /.list-item -->
-        
-      </div><!-- /.read-more-list -->
-  </div><!-- /.read-more -->
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
 
 
-</div>
-
-<div class="footer-wrapper">
-  Blog source on <a href="https://github.com/jez/blog">GitHub</a>.
-
-</div>
 
 </body>
 </html>
+

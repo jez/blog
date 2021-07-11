@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2014-10-03 23:03:27 -0700">
+<meta name="description" content="All about what template I use for LaTeX on homework assignments.">
+<title>A LaTeX Homework Template – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">A LaTeX Homework Template</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2014-10-03 23:03:27 -0700">October 3, 2014</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#background">Background</a></li>
+  <li><a href="#the-templatetemplate-github"><span>The Template</span></a></li>
+  <li><a href="#screenshot">Screenshot</a></li>
+  <li><a href="#usage">Usage</a>
+  <ul>
+  <li><a href="#personal-info">Personal Info</a></li>
+  <li><a href="#questions">Questions</a></li>
+  <li><a href="#question-parts">Question Parts</a></li>
+  <li><a href="#induction-proofs">Induction Proofs</a></li>
+  </ul></li>
+  <li><a href="#feedback">Feedback</a></li>
+  </ul>
+</nav>
+
+<main>
+<p>Writing a LaTeX document from scratch for every assignment is tedious. Especially for homework assignments, a lot of the structure is repetitive. Read on to learn about the homework template I’ve adapted for use in all my technical classes.</p>
+<!-- more -->
+<h1 id="background">Background</h1>
+<p>I’ve been using LaTeX for assignments in college for over a year now, and from the get-go I loved it; It’s a powerful way to transform plain text (which is editable in Vim!) into beautiful documents. In fact, I use LaTeX + Vim or Google Docs exclusively–no Microsoft Office. People often don’t understand why I prefer this combination, claiming that LaTeX is time consuming and tedious. But with a good template and some Vim-foo, editing LaTeX is a breeze. In a later post, I’ll elaborate how I use Vim + Unix as an IDE for LaTeX. For now, though, let’s take a look at my template!</p>
+<h1 id="the-templatetemplate-github"><a href="https://github.com/jez/latex-hw-template">The Template</a></h1>
+<p>For those who like to learn by doing, I invite you to <a href="https://github.com/jez/latex-hw-template">jump over to GitHub</a> where you can see the source, download the template, and start tinkering. The source isn’t that long, and it comes with tons of examples to get you going.</p>
+<p>The rest of this post goes into some fancy use cases for how to get the best out of this template. If you don’t read it now, check it out later if you want to take advantage of it’s more powerful features. You can also leave comments here asking how something works, and issues on GitHub if something’s broken.</p>
+<h1 id="screenshot">Screenshot</h1>
+<p>Here’s a quick overview of what the theme looks like. You’ll have to use your imagination a bit: this outline is more of a list of examples. I’d show you how nice one of my actual homeworks looks, but then I’d be giving out my homework!</p>
+<p><a href="https://raw.githubusercontent.com/jez/latex-hw-template/master/screenshot.png"><img src="https://raw.githubusercontent.com/jez/latex-hw-template/master/screenshot.png" /></a></p>
+<h1 id="usage">Usage</h1>
+<p>My main use case for LaTeX is (unsurprisingly) to typeset homeworks for math and CS classes. In these classes, the questions are either numbered or have specific names, and they ask for your name, lecture, recitation section, student ID, email address, etc. It turns out that there are some pretty simple ways of modularizing each of these desired features.</p>
+<h2 id="personal-info">Personal Info</h2>
+<p>To solve the issue of entering personal information, the template defines a bunch of commands at the top of the file that enumerate all the fields you’ll likely want to include on your homework.</p>
+<figure>
+<div class="sourceCode" id="cb1"><pre class="sourceCode latex"><code class="sourceCode latex"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">\myname</span>}{Jacob Zimmerman}</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">\myemail</span>}{jezimmer}</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">\myhwtype</span>}{Homework}</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">\myhwnum</span>}{0}</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">\myclass</span>}{12-345}</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">\mylecture</span>}{0}</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">\mysection</span>}{Z}</span></code></pre></div>
+<figcaption>
+Personal Information
+</figcaption>
+</figure>
+<p><strong>This is where forking comes in particularly handy</strong>. You’d like to be able to define your own defaults and push them somewhere, but you also want to be able to update the template as new changes become available. If you fork the repo, you can both have a repository where you can include your own changes as well as pull any updates as they become available. (If you’re new to forks, you should definitely <a href="https://help.github.com/articles/fork-a-repo/">check them out</a>).</p>
+<h2 id="questions">Questions</h2>
+<p>Whenever I have an assignment to do, the questions generally come down to one of two forms: named or numbered questions. As such, there are two environments in the template that let you easily create a space to put your answers for each type of question. These are named <code>namedquestion</code> and <code>numedquestion</code> (<strong>not</strong> <code>numberedquestion</code>).</p>
+<p><strong>The <code>namedquestion</code> environment</strong> takes one required argument: the name! This environment is handy any time the questions don’t have numbers attached to them, or if the ordering of the questions doesn’t conform nicely to a sequential numbering.</p>
+<p><strong>The <code>numedquestion</code> environment</strong> takes no arguments, but that doesn’t mean you can’t configure it. By default, <code>numedquestions</code> begin counting at 1 and go up sequentially from there. To change this, you manually set the contents of the <code>questionCounter</code> counter. Using</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode latex"><code class="sourceCode latex"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">\setcounter</span>{questionCounter}{-1}</span></code></pre></div>
+<p>Before the first question will start the numbering at 0. You can use this pattern (set the <code>questionCounter</code> to one less than the next question) to arbitrarily skip around with your numbering. There’s an example of this in the source.</p>
+<p>There are also times when you’d like numbered questions to be of the form “X.y”, where “X” is the section number that the question comes from, and “y” is the number of the question within that section. The template tracks the value of “X” in <code>\writtensection</code>. By default, the template sets this to 0, which causes the section number to be omitted. If you manually set <code>\writtensection</code> to a non-zero value, this number will be prepended to all questions. When you do this, the value of “y” is determined by <code>questionCounter</code>.</p>
+<p>Similar to what we could do with <code>questionCounter</code>, you can manually turn on the section counter for certain questions by including something like</p>
+<pre><code>\renewcommand{\writtensection}{X}</code></pre>
+<p>in front of that particular question. Use <code>\renewcommand{\writtensection}{0}</code> after that question if you’d like to turn it back off.</p>
+<h2 id="question-parts">Question Parts</h2>
+<p>All in all, these two environments will take care of 90% of what you need to do in your homework. Sometimes, though, questions have multiple parts. To handle this, there are two environments, <code>alphaparts</code> and <code>arabicparts</code>, that take care of alphabetic and numeric question parts, respectively.</p>
+<p>The uses of these environments are pretty straightforward and have no real special cases. Each environment wraps around the <code>enumerate</code> environment. This means you can just use a normal <code>\item</code> to indicate a specific part of the question.</p>
+<h2 id="induction-proofs">Induction Proofs</h2>
+<p>There’s one more thing that I’d like to mention here. Different people have different ways of typesetting induction proofs, with varying degrees of success. Personally, I like the <code>description</code> environment for outlining the base case, induction hypothesis, and inductive step of the proof. It works well for basically every induction proof, and looks nice and clean.</p>
+<h1 id="feedback">Feedback</h1>
+<p>Be sure to let me know how you like this template! It works for me, but obviously I’m only using it for a small number of things on exactly one system. If something doesn’t seem to work, or if you’d like to see a particular feature implemented, comment or create a GitHub issue to let me know!</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#latex">latex</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
+
+
+
+</body>
+</html>
+
