@@ -13,7 +13,6 @@ description: >
   write better code.
 redirect_from:
 - /testing-types/
-# TODO(jez) Would prefer footnotes
 ---
 
 Understanding correctness of code really comes down to *proving* that
@@ -33,7 +32,10 @@ proving the correctness of our code?
 1. **Program authors** can prove the correctness of their code (i.e.,
    with a traditional pen-and-paper proof).
 
-[^contradiction]: Recall that raising an exception is logically the same as throwing a value to a continuation and carrying out a [proof by contradiction](/continuations-notes/)!
+[^contradiction]:
+  {.} Recall that raising an exception is logically the same as throwing
+  a value to a continuation and carrying out a [proof by
+  contradiction](/continuations-notes/)!
 
 The first three are exciting because they involve a computer doing most
 of the work for us! The fourth might seem not helpful, but is often
