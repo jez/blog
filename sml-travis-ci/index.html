@@ -23,6 +23,8 @@
   
     <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
   
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
 
 
 
@@ -89,18 +91,18 @@
 </ul>
 <p>The usage looks something like this:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># initialize a new project:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> symbol-new hello</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> cd hello</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">symbol-new</span> hello</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>❯ <span class="bu">cd</span> hello</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># build with SML/NJ:</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> ./symbol make</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> .symbol-work/bin/hello</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Hello,</span> world!</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">./symbol</span> make</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">.symbol-work/bin/hello</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Hello</span>, world!</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># or, build with MLton:</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> ./symbol make with=mlton</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> .symbol-work/bin/hello</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Hello,</span> world!</span></code></pre></div>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">./symbol</span> make with=mlton</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">.symbol-work/bin/hello</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Hello</span>, world!</span></code></pre></div>
 <p>Again, there’s way more information <a href="https://github.com/jez/symbol">in the README</a>, so definitely check it out if you’re thinking about setting up a new Standard ML project.</p>
 <h1 id="why-standard-ml-in-the-first-place">Why Standard ML in the first place?</h1>
 <p>I’ll probably get around to <a href="/surgery-on-code/">writing about <code>multi-grep</code></a> (and related tools like <code>diff-locs</code> and <code>multi-sub</code>) but at the end of the day: SML is a really pleasant language to use in a lot of ways:</p>

@@ -23,6 +23,8 @@
   
     <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
   
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
 
 
 
@@ -55,7 +57,7 @@
 <p>One thing I like to do to improve the command-line programs I maintain is to make them aware of whether they’re being run interactively. In this post I’ll show off an easy trick to make programs running interactively more usable.</p>
 <!-- more -->
 <p>This always used to trip me up when I was first learning to use the terminal:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> grep <span class="st">&#39;def foo&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>❯ <span class="fu">grep</span> <span class="st">&#39;def foo&#39;</span></span></code></pre></div>
 <p>I’d drop this into the command-line and what happens? It hangs… Is it because it’s taking a long time to search? Nope—I’ve forgetten to tell <code>grep</code> what files to search in!</p>
 <p>When <code>grep</code> is given only a pattern to search for and no files to search in, it assumes we want to search for that pattern on stdin. This is great for shell scripts and one-liners at the command-line, but it’s <strong>super</strong> annoying when we’re just grepping interactively.</p>
 <p>The thing is, it’s super easy to detect when the user might have made this mistake: if we’re defaulting to reading from stdin <strong>and</strong> the file corresponding to stdin represents a terminal (more specifically, a <a href="https://unix.stackexchange.com/questions/4126/">tty</a>). And once we’ve detected it, we can print a helpful message.</p>
@@ -76,7 +78,7 @@ Check if stdin is a tty in Haskell
 <br />
 </span></span> The complete file containing the snippet above is [on GitHub][haskell-isatty].</p>
 <p>I’ve implemented <code>diff-locs</code> as a standard Unix filter—it takes input on stdin and emits output on stdout. Normal usage looks something like this, where we pipe <code>git diff</code> into <code>diff-locs</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> git diff <span class="kw">|</span> <span class="ex">diff-locs</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>❯ <span class="fu">git</span> diff <span class="kw">|</span> <span class="ex">diff-locs</span></span></code></pre></div>
 <p>But if someone is just playing around at the terminal (maybe, trying to get the help output to show up), they might run <code>diff-locs</code> without args, and then be greeted with this message:</p>
 <pre><code>❯ diff-locs
 Warning: reading from stdin, which is a tty.
@@ -93,8 +95,8 @@ Ruby
 </figcaption>
 </figure>
 <figure>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">-t</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>  <span class="bu">echo</span> <span class="st">&#39;Warning: reading from stdin, which is a tty.&#39;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">if</span><span class="bu"> [</span> <span class="ot">-t</span> 0<span class="bu"> ]</span>; <span class="kw">then</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="bu">echo</span> <span class="st">&#39;Warning: reading from stdin, which is a tty.&#39;</span> <span class="op">&gt;&amp;2</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="ex">end</span></span></code></pre></div>
 <figcaption>
 Bash

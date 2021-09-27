@@ -23,6 +23,8 @@
   
     <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
   
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
 
 
 
@@ -85,13 +87,13 @@ Set STACK_ROOT to avoid clutter
 <p>If you’re like me, you’ll want to take a second to purge anything Haskell-related from previous botched setup attempts:</p>
 <figure>
 <div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># If you had GHC installed</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="ex">$</span> brew uninstall ghc</span>
+<span id="cb2-2"><a href="#cb2-2"></a>$ <span class="ex">brew</span> uninstall ghc</span>
 <span id="cb2-3"><a href="#cb2-3"></a></span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="co"># If you tried and failed at installing Stack already</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="ex">$</span> brew uninstall haskell-stack</span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="ex">$</span> rm <span class="at">-r</span> ~/.stack</span>
+<span id="cb2-5"><a href="#cb2-5"></a>$ <span class="ex">brew</span> uninstall haskell-stack</span>
+<span id="cb2-6"><a href="#cb2-6"></a>$ <span class="fu">rm</span> -r ~/.stack</span>
 <span id="cb2-7"><a href="#cb2-7"></a><span class="co"># If you happened to also set STACK_ROOT</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="ex">$</span> rm <span class="at">-r</span> <span class="va">$STACK_ROOT</span></span></code></pre></div>
+<span id="cb2-8"><a href="#cb2-8"></a>$ <span class="fu">rm</span> -r <span class="va">$STACK_ROOT</span></span></code></pre></div>
 <figcaption>
 Wipe the slate clean
 </figcaption>
@@ -109,7 +111,7 @@ Install Stack
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Change the resolver to the most up-to-date one. This is a hack to ensure that</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="co"># get GHC version &gt; 7.8, because there&#39;s an issue with El Capitan&#39;s rootless</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co"># mode.</span></span>
-<span id="cb4-4"><a href="#cb4-4"></a><span class="ex">stack</span> <span class="at">--resolver</span><span class="op">=</span>lts-6.10 setup</span></code></pre></div>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="ex">stack</span> --resolver=lts-6.10 setup</span></code></pre></div>
 <figcaption>
 Side-step rootless issue in setup
 </figcaption>

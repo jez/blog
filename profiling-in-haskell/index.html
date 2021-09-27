@@ -23,6 +23,8 @@
   
     <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
   
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
 
 
 
@@ -119,10 +121,10 @@ Hit rate: 0.03529
 <h1 id="how-to-profile-haskell-code">How to profile Haskell code</h1>
 <p>Determined to make it faster, at this point I resigned myself from guessing and looked up how to profile Haskell code. Turns out, with Stack it’s <strong>super</strong> simple:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rebuild with profiling information</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> stack build <span class="at">--profile</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">stack</span> build --profile</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the code with runtime profiling enabled</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> stack exec <span class="at">--</span> bingo-sim 100000 +RTS <span class="at">-p</span> <span class="at">-RTS</span></span></code></pre></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">stack</span> exec -- bingo-sim 100000 +RTS -p -RTS</span></code></pre></div>
 <p>That’s all it took, and it generated a <code>bingo-sim.prof</code> file that had a bunch of lines that <a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof#L112-L115">looked like this</a>:</p>
 <pre><code>COST CENTRE              MODULE  SRC  no.  entries  %time %alloc   %time %alloc
 ...

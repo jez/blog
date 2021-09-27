@@ -23,6 +23,8 @@
   
     <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
   
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
 
 
 
@@ -72,7 +74,7 @@
 <p>There’s probably no technical limitation for why this couldn’t be done in bash, but as of yet no one has done it.</p>
 <h1 id="better-tab-completion">Better Tab Completion</h1>
 <p>In zsh when you tab complete, the matches are listed below the current line, whereas in bash they’re listed above it. For an example, check out the screenshot. I perform the same keystrokes in bash and zsh:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd D<span class="op">&lt;</span>TAB<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>$ <span class="bu">cd</span> D<span class="op">&lt;</span>TAB<span class="op">&gt;</span></span></code></pre></div>
 <p><a href="/assets/img/zsh-tab-completion.png"><img src="/assets/img/zsh-tab-completion.png" /></a></p>
 <p>In bash, pressing TAB prints out the completions followed by a new line. In zsh, they’re simply listed conveniently below the current line. If I continued to complete many things in that line or ran the command, zsh would overwrite the old completions, but bash would keep on printing additional lines, taking up precious screen space.</p>
 <h1 id="better-completion-support">Better Completion Support</h1>

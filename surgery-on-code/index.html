@@ -23,6 +23,8 @@
   
     <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
   
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
 
 
 
@@ -82,14 +84,14 @@ locs.txt
 </figure>
 <p>(I call such <code>filename:line</code> pairs “locations” or “locs.”)</p>
 <p>Also consider that our project is huge, and has many more files than just <code>file_a.txt</code> and <code>file_b.txt</code>. To filter the <code>locs.txt</code> list to only the lines that contain the pattern “hello”, we can use <code>multi-grep</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> multi-grep <span class="st">&#39;hello&#39;</span> locs.txt</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">file_a.txt:13</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">file_b.txt:10</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">multi-grep</span> <span class="st">&#39;hello&#39;</span> locs.txt</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">file_a.txt</span>:13</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">file_b.txt</span>:10</span></code></pre></div>
 <p>The output means that only line 13 in <code>file_a.txt</code> and line 10 in <code>file_b.txt</code> contain <code>hello</code>, given our initial set of 5 locs. The search completely ignored all other files in the project because they weren’t mentioned in <code>locs.txt</code>. Searching with <code>multi-grep</code> scales with the size of the input list, not with the size of the codebase being searched.</p>
 <p>This was a contrived example, but let’s keep plowing forward with the basics so we can apply them to a real example.</p>
 <h1 id="multi-sub"><code>multi-sub</code></h1>
 <p>If <code>multi-grep</code> is like <code>grep</code>, <code>multi-sub</code> is like <code>sed</code> but with only the substitute command (<code>s/find/replace/</code>). Taking our previous example, <code>multi-sub</code> finds and replaces a pattern on specific input lines:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> multi-sub <span class="st">&#39;hello&#39;</span> <span class="st">&#39;goodbye&#39;</span> locs.txt</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">multi-sub</span> <span class="st">&#39;hello&#39;</span> <span class="st">&#39;goodbye&#39;</span> locs.txt</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ... file_a.txt:13 edited: s/hello/goodbye/ ...</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ... file_b.txt:10 edited: s/hello/goodbye/ ...</span></span></code></pre></div>
 <p>In our previous example, only locations <code>file_a.txt:13</code> and <code>file_b.txt:10</code> matched the pattern <code>hello</code>. So after running this <code>multi-sub</code> command, those two files will be updated in place. On both lines, <code>hello</code> will be replaced with <code>goodbye</code>.</p>
@@ -120,11 +122,11 @@ Errors: 253</code></pre>
 <p>This instructs to Sorbet to <a href="https://sorbet.org/docs/troubleshooting#escape-hatches">forget all static type information</a> about the variable, thus silencing the error. The key is to only perform this edit on lines with errors— we’d hate to needlessly throw away type information by changing unrelated lines! For things like this, <code>grep</code> and <code>sed</code> are often too coarse-grained, because accessing a hash like this in Ruby is abundantly common.</p>
 <p>With <code>multi-sub</code>, we can write a really simple regex targetting these hash lookups, but scope the regex to only lines in the error output:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (1) Type check the project</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> srb tc <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="dt">\</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">srb</span> tc <span class="op">2&gt;&amp;1</span> <span class="kw">|</span> <span class="kw">\</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># (2) Filter the error output to only have the top-level error lines</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sed</span> <span class="at">-e</span> <span class="st">&#39;/^ /d; /^$/d; /^Errors:/d&#39;</span> <span class="kw">|</span> <span class="dt">\</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sed</span> -e <span class="st">&#39;/^ /d; /^$/d; /^Errors:/d&#39;</span> <span class="kw">|</span> <span class="kw">\</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># (3) Chop off the error message, keeping only the filename:line</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cut</span> <span class="at">-d</span> : <span class="at">-f</span> 1-2 <span class="kw">|</span> <span class="dt">\</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cut</span> -d : -f 1-2 <span class="kw">|</span> <span class="kw">\</span></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># (4) Use multi-sub to replace things like foo[ with T.unsafe(foo)[</span></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">multi-sub</span> <span class="st">&#39;\([a-zA-Z0-9_]+\)\[&#39;</span> <span class="st">&#39;T.unsafe(\1)[&#39;</span></span></code></pre></div>
 <p>Take a look through the four steps in the bash oneliner above:</p>
@@ -135,7 +137,7 @@ Errors: 253</code></pre>
 <li>use <code>multi-sub</code> to perform the substitution.</li>
 </ol>
 <p>The net result is to update the files in place, performing the substitution only on the lines with errors. Altogether once more, but on one line, making use of a shell alias that I have to abbreviate the inner two steps:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> srb tc <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="ex">onlylocs</span> <span class="kw">|</span> <span class="ex">multi-sub</span> <span class="st">&#39;\([a-zA-Z0-9_]+\)\[&#39;</span> <span class="st">&#39;T.unsafe(\1)[&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">srb</span> tc <span class="op">2&gt;&amp;1</span> <span class="kw">|</span> <span class="ex">onlylocs</span> <span class="kw">|</span> <span class="ex">multi-sub</span> <span class="st">&#39;\([a-zA-Z0-9_]+\)\[&#39;</span> <span class="st">&#39;T.unsafe(\1)[&#39;</span></span></code></pre></div>
 <p>So with a super short bash oneliner, we’ve done a mass codemod that fixes hundreds of errors at once, without having to silence more than necessary.</p>
 <p>If <code>grep</code> and <code>sed</code> are like chainsaws, I like to think of <code>multi-grep</code> and <code>multi-sub</code> like scalpels—ideal for performing surgery on a codebase. Regular expressions are often super imprecise tools for codemods. But by scoping down the regex to run only on specific lines, it doesn’t matter. The added precision from explicit locations makes up for how blunt regular expressions are.</p>
 <h1 id="diff-locs"><code>diff-locs</code></h1>
@@ -148,9 +150,9 @@ test/payment_methods/update.rb:649
 test/payment_methods/webhooks.rb:610</code></pre>
 <p>I frequently use <code>diff-locs</code> to tweak codemods that I’ve already committed. For example, we could go back and add a TODO comment above each new <code>T.unsafe</code> call:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (1) Generate a diff from git</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> git show HEAD <span class="kw">|</span> <span class="dt">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>❯ <span class="fu">git</span> show HEAD <span class="kw">|</span> <span class="kw">\</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># (2) Convert the diff to a list of locations</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">diff-locs</span> <span class="kw">|</span> <span class="dt">\</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">diff-locs</span> <span class="kw">|</span> <span class="kw">\</span></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># (3) Use multi-sub to insert a comment before each line</span></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">multi-sub</span> <span class="st">&#39;^\( *\)&#39;</span> <span class="st">$&#39;</span><span class="dt">\\</span><span class="st">1# TODO: Unsilence this error</span><span class="dt">\n\\</span><span class="st">1&#39;</span></span></code></pre></div>
 <p>Recapping the pipeline above:</p>

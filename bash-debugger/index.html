@@ -22,6 +22,8 @@
   
     <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
   
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
 
 
 
@@ -57,9 +59,9 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">debugger()</span> <span class="kw">{</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Stopped in REPL. Press ^D to resume, or ^C to abort.&quot;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">local</span> <span class="va">line</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="bu">read</span> <span class="at">-r</span> <span class="at">-p</span> <span class="st">&quot;&gt; &quot;</span> <span class="va">line</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">while</span> <span class="bu">read</span> -r -p <span class="st">&quot;&gt; &quot;</span> <span class="va">line</span>; <span class="kw">do</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">eval</span> <span class="st">&quot;</span><span class="va">$line</span><span class="st">&quot;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">done</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">done</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
 <p>And there it is. Add this to a script, insert a call to <code>debugger</code> somewhere, and run the script. It’ll pause right execution right there. Once paused, we can do things like:</p>
