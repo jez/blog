@@ -1,7 +1,11 @@
 ---
+# vim:ft=liquid
+# liquid_subtype=pandoc
 layout: 'index'
 title: 'Jake Zimmerman'
 subtitle: 'A collection of my writings about programming'
+# Always regenerate, even with --incremental
+regenerate: true
 ---
 
 Here I write technical posts across a broad category of topics, mostly related

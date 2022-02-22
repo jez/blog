@@ -1,7 +1,11 @@
 ---
+# vim:ft=liquid
+# liquid_subtype=pandoc
 layout: page
 title: Categories
 description: "An archive of posts sorted by category."
+# Always regenerate, even with --incremental
+regenerate: true
 ---
 
 {%- assign categories_list = site.categories | sort -%}
