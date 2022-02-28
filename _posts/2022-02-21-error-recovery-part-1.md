@@ -29,7 +29,7 @@ so that you can learn too.
 The original post kept growing and growing as I wrote it, so I broke it up into a handful
 of parts:
 
-- [Part 1: Why Recover from Syntax Errors][part1]
+- [**Part 1: Why Recover from Syntax Errors**][part1]
 - [Part 2: What I Didn't Do][part2]
 - (*coming soon*) Part 3: Tools and Techniques for Debugging a (Bison) Parser
 - (*coming soon*) Part 4: Bison's `error` Token

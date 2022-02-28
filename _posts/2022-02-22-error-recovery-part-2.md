@@ -20,7 +20,7 @@ to Sorbet's parser." Specifically, it's about approaches I considered but decide
 <!-- more -->
 
 - [Part 1: Why Recover from Syntax Errors][part1]
-- [Part 2: What I Didn't Do][part2]
+- **[Part 2: What I Didn't Do][part2]**
 - (*coming soon*) Part 3: Tools and Techniques for Debugging a (Bison) Parser
 - (*coming soon*) Part 4: Bison's `error` Token
 - (*coming soon*) Part 5: Backtracking, aka Lexer Hacks
