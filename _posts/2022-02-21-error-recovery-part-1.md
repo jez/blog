@@ -31,7 +31,7 @@ of parts:
 
 - [**Part 1: Why Recover from Syntax Errors**][part1]
 - [Part 2: What I Didn't Do][part2]
-- (*coming soon*) Part 3: Tools and Techniques for Debugging a (Bison) Parser
+- [Part 3: Tools and Techniques for Debugging a (Bison) Parser][part3]
 - (*coming soon*) Part 4: Bison's `error` Token
 - (*coming soon*) Part 5: Backtracking, aka Lexer Hacks
 - (*coming soon*) Part 6: Falling Back on Indentation, aka More Lexer Hacks
