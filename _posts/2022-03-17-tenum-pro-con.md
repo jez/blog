@@ -80,12 +80,12 @@ one day), there are still *a lot of points* in favor of `T::Enum` as it exists t
 
 `T::Enum`s are just normal constants. Sorbet supports finding all constant references,
 renaming constants, autocompleting constant names, jumping to a constant's definition,
-hovering over a constant to its documentation comment. Also all of those features work on
-both the enum class itself and each individual enum value.
+hovering over a constant to see its documentation comment. Also all of those features work
+on both the enum class itself and each individual enum value.
 
 We could _maybe_ support completion for symbol literals in limited circumstances, but it
 would be the first of its kind in Sorbet. Same goes for rename, and maybe find all
-references. Jump to Definition I guess would want to jump not actually to the definition,
+references. Jump to Definition I guess would want to jump not to the actual definition,
 but rather to the signature that specified the literal type? It's weird.
 
 ## 🙊 `T::Enum` guards against basically all typos.
