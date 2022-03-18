@@ -17,6 +17,7 @@ You might have to `dropbox stop` on Linux for inotify problems.
 
 ```
 bundle exec jekyll serve --drafts
+bundle exec jekyll serve --drafts --incremental --livereload
 
 bundle exec octopress new draft my-slug
 
