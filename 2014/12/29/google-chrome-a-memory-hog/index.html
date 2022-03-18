@@ -63,7 +63,7 @@
 <h1 id="the-oneliner">The Oneliner</h1>
 <p>For the impatient, here’s the code. It uses standard Unix tools:</p>
 <figure>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a>$ <span class="fu">ps</span> -ev <span class="kw">|</span> <span class="fu">grep</span> -i chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="ex">$</span> ps <span class="at">-ev</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span></span></code></pre></div>
 <figcaption>
 Chrome Memory Usage
 </figcaption>
@@ -77,7 +77,7 @@ Add as an alias
 </figure>
 <p>It outputs a percentage. Here’s the alias in action:</p>
 <figure>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a>$ <span class="ex">chromemem</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">$</span> chromemem</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="ex">60</span></span></code></pre></div>
 <figcaption>
 Usage
@@ -87,13 +87,13 @@ Usage
 <p>There’s a lot of good stuff going on here, so let’s take it step-by-step.</p>
 <p>First, we’ll need a program that tells us memory usage. I’m sure there are many, but I’m familiar with <code>ps</code>. After checking out the man page for a few options, I came up with <code>ps -ev</code>, to show all information about all processes. Maybe wasteful, but it works.</p>
 <figure class="wide extra-wide">
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a>$ <span class="fu">ps</span> -ev</span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">$</span> ps <span class="at">-ev</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>  <span class="ex">PID</span> STAT      TIME  SL  RE PAGEIN      VSZ    RSS   LIM     TSIZ  %CPU %MEM COMMAND</span>
-<span id="cb4-3"><a href="#cb4-3"></a> <span class="ex">3473</span> S      0:54.92   0   0      0  3579092 301244     -        0   6.7  7.2 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
-<span id="cb4-4"><a href="#cb4-4"></a>  <span class="ex">365</span> S      3:03.17   0   0      0  3920732 206808     -        0   0.3  4.9 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
-<span id="cb4-5"><a href="#cb4-5"></a>  <span class="ex">983</span> S      1:29.23   0   0      0  3560272 193860     -        0   0.1  4.6 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
-<span id="cb4-6"><a href="#cb4-6"></a>  <span class="ex">395</span> S      0:13.11   0   0      0  2824936 141644     -        0   0.0  3.4 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
-<span id="cb4-7"><a href="#cb4-7"></a>  <span class="ex">422</span> S      0:27.22   0   0      0  3345796 130796     -        0   0.0  3.1 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
+<span id="cb4-3"><a href="#cb4-3"></a> <span class="ex">3473</span> S      0:54.92   0   0      0  3579092 301244     <span class="at">-</span>        0   6.7  7.2 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="ex">365</span> S      3:03.17   0   0      0  3920732 206808     <span class="at">-</span>        0   0.3  4.9 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="ex">983</span> S      1:29.23   0   0      0  3560272 193860     <span class="at">-</span>        0   0.1  4.6 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="ex">395</span> S      0:13.11   0   0      0  2824936 141644     <span class="at">-</span>        0   0.0  3.4 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="ex">422</span> S      0:27.22   0   0      0  3345796 130796     <span class="at">-</span>        0   0.0  3.1 /Applications/Google Chrome.app/Contents/Frameworks/...</span>
 <span id="cb4-8"><a href="#cb4-8"></a>  <span class="ex">...</span></span></code></pre></div>
 <figcaption>
 ps -ev
@@ -102,7 +102,7 @@ ps -ev
 <p>Notice that there’s a convenient column describing memory usage as a percentage of total available memory, as well as what command is being run in that process. Let’s make sure that we’re looking at only the processes running some sort of Chrome service before totaling up the memory. We can find these lines with <code>ps -ev | grep -i chrome</code> (the -i means case-insensitive). Due to the way I clipped the previous sample output, nothing changes in the first five lines, but rest assured: we’re only looking at Chrome processes now.</p>
 <p>Now it’s time to get rid of all the other nonsense that we included with <code>ps -ev</code>. Luckily, there’s a handy tool called <code>awk</code> that makes parsing text by column easy. If we want to print the 12th column (which just so happens to contain the memory consumption!) we can do <code>awk '{print $12}'</code>:</p>
 <figure>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a>$ <span class="fu">ps</span> -ev <span class="kw">|</span> <span class="fu">grep</span> -i chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span></span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="ex">$</span> ps <span class="at">-ev</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="ex">7.2</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="ex">5.1</span></span>
 <span id="cb5-4"><a href="#cb5-4"></a><span class="ex">4.6</span></span>
@@ -115,7 +115,7 @@ ps -ev | grep -i chrome | awk ‘{print $12}’
 </figure>
 <p>Finally, I found myself needing a way to add up a column of numbers. A quick Google search led me to <a href="http://stackoverflow.com/questions/2572495/read-from-file-and-add-numbers">this StackOverflow question</a>, and I picked the <code>awk</code> solution because I knew I could just pipe the input to awk (as opposed to having to do weird hacks to get it to work with a bash for loop):</p>
 <figure>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a>$ <span class="fu">ps</span> -emv <span class="kw">|</span> <span class="fu">grep</span> -i chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span></span>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="ex">$</span> ps <span class="at">-emv</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print s}&#39;</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="ex">60.4</span></span></code></pre></div>
 <figcaption>
 Final Solution
@@ -123,7 +123,7 @@ Final Solution
 </figure>
 <p>Of course, you could change the last <code>awk</code> command to print out something fancier like</p>
 <figure>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a>$ <span class="fu">ps</span> -emv <span class="kw">|</span> <span class="fu">grep</span> -i chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print &quot;Chrome is using &quot;s&quot;% of total memory.&quot;}&#39;</span></span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="ex">$</span> ps <span class="at">-emv</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> chrome <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $12}&#39;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{for(i=1;i&lt;=NF;i++)s+=$i}END{print &quot;Chrome is using &quot;s&quot;% of total memory.&quot;}&#39;</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="ex">Chrome</span> is using 60.4% of total memory.</span></code></pre></div>
 <figcaption>
 Final Solution

@@ -93,14 +93,14 @@
 </ul>
 <p><a href="/assets/img/git-stat.png"><img src="/assets/img/git-stat.png" alt="git stat" /></a></p>
 <p>Here’s the definition of <code>git stat</code> from my <code>~/.gitconfig</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>[<span class="ex">alias</span>]</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[alias]</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># list files which have changed since REVIEW_BASE</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (REVIEW_BASE defaults to &#39;master&#39; in my zshrc)</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">files</span> = !git diff --name-only <span class="va">$(</span><span class="fu">git</span> merge-base HEAD <span class="dt">\&quot;</span><span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span><span class="va">)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">files</span> = !git diff <span class="at">--name-only</span> <span class="va">$(</span><span class="fu">git</span> merge-base HEAD <span class="dt">\&quot;</span><span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span><span class="va">)</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Same as above, but with a diff stat instead of just names</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (better for interactive use)</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stat</span> = !git diff --stat <span class="va">$(</span><span class="fu">git</span> merge-base HEAD <span class="dt">\&quot;</span><span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span><span class="va">)</span></span></code></pre></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stat</span> = !git diff <span class="at">--stat</span> <span class="va">$(</span><span class="fu">git</span> merge-base HEAD <span class="dt">\&quot;</span><span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span><span class="va">)</span></span></code></pre></div>
 <p>Under the hood, it just works using <code>git diff</code>, <code>git merge-base</code>, and a personal environment variable <code>REVIEW_BASE</code>.</p>
 <p><code>REVIEW_BASE</code> lets us choose which branch to review relative to. Most of the time, <code>REVIEW_BASE</code> is <code>master</code>, but this isn’t always the case! Some repos branch off of <code>gh-pages</code>. Sometimes I like to review the most recent commit as if it were its own branch.</p>
 <p>To review the code relative so some other base, set <code>REVIEW_BASE</code> before running <code>git stat</code>:</p>
@@ -136,8 +136,8 @@
 </ul>
 <p>In either case, we can see the structure of the change. Three files depend on <code>Elements.js</code>, so it’s serving the needs of many modules. <code>Element.js</code> only has one dependency, etc. Each branch’s dependency graph shows different information; it can be surprising what turns up.</p>
 <p>I have the <code>git depgraph</code> alias defined like this:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>[<span class="ex">alias</span>]</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">depgraph</span> = !git madge image --webpack-config webpack.config.js --basedir . --style solarized-dark src</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[alias]</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">depgraph</span> = !git madge image <span class="at">--webpack-config</span> webpack.config.js <span class="at">--basedir</span> . <span class="at">--style</span> solarized-dark src</span></code></pre></div>
 <p>Some notes about this definition:</p>
 <ul>
 <li><p>It depends on the <code>git-madge</code> command, which you can <a href="https://github.com/jez/git-madge">download and install here</a>.</p></li>
@@ -167,19 +167,19 @@
 </span></span></li>
 </ul>
 <p>And to orchestrate the whole thing, I’ve set up these two aliases:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>[<span class="ex">alias</span>]</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[alias]</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># </span><span class="al">NOTE</span><span class="co">: These aliases depend on the `git files` alias from</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># a few sections ago!</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Open all files changed since REVIEW_BASE in Vim tabs</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Then, run fugitive&#39;s :Gdiff in each tab, and finally</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># tell vim-gitgutter to show +/- for changes since REVIEW_BASE</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">review</span> = !vim -p <span class="va">$(</span><span class="fu">git</span> files<span class="va">)</span> +<span class="dt">\&quot;</span>tabdo Gdiff <span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span> +<span class="dt">\&quot;</span>let g:gitgutter_diff_base = <span class="st">&#39;$REVIEW_BASE&#39;</span><span class="dt">\&quot;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">review</span> = !vim <span class="at">-p</span> <span class="va">$(</span><span class="fu">git</span> files<span class="va">)</span> +<span class="dt">\&quot;</span>tabdo Gdiff <span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span> +<span class="dt">\&quot;</span>let g:gitgutter_diff_base = <span class="st">&#39;$REVIEW_BASE&#39;</span><span class="dt">\&quot;</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Same as the above, except specify names of files as arguments,</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># instead of opening all files:</span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># git reviewone foo.js bar.js</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">reviewone</span> = !vim -p +<span class="dt">\&quot;</span>tabdo Gdiff <span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span> +<span class="dt">\&quot;</span>let g:gitgutter_diff_base = <span class="st">&#39;$REVIEW_BASE&#39;</span><span class="dt">\&quot;</span></span></code></pre></div>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">reviewone</span> = !vim <span class="at">-p</span> +<span class="dt">\&quot;</span>tabdo Gdiff <span class="va">$REVIEW_BASE</span><span class="dt">\&quot;</span> +<span class="dt">\&quot;</span>let g:gitgutter_diff_base = <span class="st">&#39;$REVIEW_BASE&#39;</span><span class="dt">\&quot;</span></span></code></pre></div>
 <p>Here’s how they work:</p>
 <ul>
 <li><p><code>git review</code> opens each file changed by this branch as a tab in Vim. Then <code>:Gdiff</code> from vim-fugitive shows the diff in each tab.</p></li>

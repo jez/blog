@@ -73,7 +73,7 @@
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># `git clone --bare` is basically GitHub&#39;s &quot;Fork&quot; feature,</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># if you&#39;re familiar with that</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>$ <span class="fu">git</span> clone --bare ~/private/gitrepos/15150</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone <span class="at">--bare</span> ~/private/gitrepos/15150</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># make sure you clone this into your private folder!</span></span></code></pre></div>
 <figcaption>
 Initialize the Bare Repo
@@ -84,18 +84,18 @@ Initialize the Bare Repo
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (unix.andrew.cmu.edu)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone over Unix file path to new folder ~/private/15150</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>$ <span class="fu">git</span> clone ~/private/gitrepos/15150 ~/private/15150</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone ~/private/gitrepos/15150 ~/private/15150</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># -- and/or --</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># (my laptop)</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone over ssh (using ssh alias, i.e., if you use `ssh andrew`)</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>$ <span class="fu">git</span> clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone ssh://andrew:/afs/andrew/usr/jezimmer/private/15150</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># -- or --</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone over ssh (without ssh alias,</span></span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#            i.e., if you use `ssh jezimmer@unix.andrew.cmu.edu`)</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>$ <span class="fu">git</span> clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150</span></code></pre></div>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/usr/jezimmer/private/15150</span></code></pre></div>
 <figcaption>
 Clone New Remote
 </figcaption>
@@ -110,18 +110,18 @@ Clone New Remote
 <span id="cb3-3"><a href="#cb3-3"></a><span class="co">#</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="co"># A common name for the second remote is &quot;upstream&quot;, though you could also</span></span>
 <span id="cb3-5"><a href="#cb3-5"></a><span class="co"># call this remote &quot;handout&quot; if that would be easier to keep straight</span></span>
-<span id="cb3-6"><a href="#cb3-6"></a>$ <span class="bu">cd</span> ~/private/15150</span>
-<span id="cb3-7"><a href="#cb3-7"></a>$ <span class="fu">git</span> remote add upstream /afs/andrew/course/15/150/handout</span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="ex">$</span> cd ~/private/15150</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="ex">$</span> git remote add upstream /afs/andrew/course/15/150/handout</span>
 <span id="cb3-8"><a href="#cb3-8"></a></span>
 <span id="cb3-9"><a href="#cb3-9"></a><span class="co"># -- and/or --</span></span>
 <span id="cb3-10"><a href="#cb3-10"></a></span>
 <span id="cb3-11"><a href="#cb3-11"></a><span class="co"># (my laptop)</span></span>
 <span id="cb3-12"><a href="#cb3-12"></a><span class="co">#</span></span>
 <span id="cb3-13"><a href="#cb3-13"></a><span class="co"># Add remote over ssh with alias</span></span>
-<span id="cb3-14"><a href="#cb3-14"></a>$ <span class="fu">git</span> remote add upstream ssh://andrew:/afs/andrew/course/15/150/handout</span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="ex">$</span> git remote add upstream ssh://andrew:/afs/andrew/course/15/150/handout</span>
 <span id="cb3-15"><a href="#cb3-15"></a><span class="co"># -- or --</span></span>
 <span id="cb3-16"><a href="#cb3-16"></a><span class="co"># Add remote over ssh without alias</span></span>
-<span id="cb3-17"><a href="#cb3-17"></a>$ <span class="fu">git</span> remote add upstream ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/course/15/150/handout</span></code></pre></div>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="ex">$</span> git remote add upstream ssh://jezimmer@unix.andrew.cmu.edu:/afs/andrew/course/15/150/handout</span></code></pre></div>
 <figcaption>
 Add Handout Remote
 </figcaption>

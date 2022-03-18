@@ -58,7 +58,7 @@
 <p>One of the first Git commands people learn is <code>git status</code>. It’s a great command to understand the state of your personal repository, but it tells you nothing about the structure of your teammates’ branches or remotes. Luckily, <code>git log</code> visualises the state of a Git repository at any time, so we can collaborate seamlessly.</p>
 <!-- more -->
 <p>This post is going to focus on this one, amazing command. Behold:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log --graph --oneline --abbrev-commit --decorate --all</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--graph</span> <span class="at">--oneline</span> <span class="at">--abbrev-commit</span> <span class="at">--decorate</span> <span class="at">--all</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># That&#39;s borderlying fearsome! Let&#39;s make an alias:</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> gll=<span class="st">&quot;git log --graph --oneline --abbrev-commit --decorate --all&quot;</span></span></code></pre></div>
