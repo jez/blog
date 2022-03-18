@@ -26,7 +26,7 @@ is typed enums:
   ... but actually Sorbet already has these types internally 😅 It's just that it doesn't
   have syntax for people to write them in type annotations. And lo, it's [because they're
   buggy], but for the things where Sorbet needs to use them internally we can
-  intentionally work around the known bugs, so it hasn't been work the pain to fix.
+  intentionally work around the known bugs, so it hasn't been worth the pain to fix.
 
 
 ```ruby
@@ -46,16 +46,11 @@ prove that I hear you.
 
 ## 👎 `T::Enum` cannot be combined in ad hoc unions.
 
-That's a fancy way of saying you can just write `T.any(:left, :right)` in any type
-annotation, without first having to pre-declare the new union type to the world. I spoke
-at length about how the existence of ad hoc union types make handling exceptional
+That's a fancy way of saying we'd like to be able to write `T.any(:left, :right)` in any
+type annotation, without first having to pre-declare the new union type to the world. I
+spoke at length about how the existence of ad hoc union types make handling exceptional
 conditions [more pleasant than checked exceptions][ad-hoc-exceptions], so I'm right there
 with you in appreciating that feature.
-
-We could _maybe_ support completion for symbol literals in limited circumstances, but it
-would be the first of its kind in Sorbet. Same goes for rename, and maybe find all
-references. Jump to Definition I guess would want to jump not actually to the definition,
-but rather to the signature that specified the literal type? It's weird.
 
 ## 👎 `T::Enum` is verbose.
 
@@ -87,6 +82,11 @@ one day), there are still *a lot of points* in favor of `T::Enum` as it exists t
 renaming constants, autocompleting constant names, jumping to a constant's definition,
 hovering over a constant to its documentation comment. Also all of those features work on
 both the enum class itself and each individual enum value.
+
+We could _maybe_ support completion for symbol literals in limited circumstances, but it
+would be the first of its kind in Sorbet. Same goes for rename, and maybe find all
+references. Jump to Definition I guess would want to jump not actually to the definition,
+but rather to the signature that specified the literal type? It's weird.
 
 ## 🙊 `T::Enum` guards against basically all typos.
 
