@@ -82,7 +82,7 @@ We recommend using a MacTeX distribution: http://www.tug.org/mactex/</code></pre
 <p>The biggest productivity improvement you gain from developing LaTeX locally is that you get to use Vim. Make sure you have a nice colorscheme for both your terminal and for Vim. <strong>I can’t stress enough how important it is to make your terminal look nice</strong>: you want to enjoy your terminal experience, and this is one of the easiest ways to do so.</p>
 <h1 id="use-make">Use Make</h1>
 <p>Compiling LaTeX is pretty straightforward. To generate a PDF, all you have to do is run the command</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> pdflatex <span class="op">&lt;</span>myfile<span class="op">&gt;</span>.tex</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>$ <span class="ex">pdflatex</span> <span class="op">&lt;</span>myfile<span class="op">&gt;</span>.tex</span></code></pre></div>
 <p>and you’ll get a file called <code>&lt;myfile&gt;.pdf</code> in the current directory, plus some intermediate files. We can go one step further and put a bunch of useful build targets into a Makefile and use it to build our PDF:</p>
 <figure>
 <div class="sourceCode" id="cb3"><pre class="sourceCode numberSource make numberLines"><code class="sourceCode"><span id="cb3-1"><a href="#cb3-1"></a># NOTE: Change &quot;written&quot; to the name of your TeX file with no extension</span>

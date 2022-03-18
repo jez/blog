@@ -88,15 +88,15 @@
 <p>That Sorbet allows defining union types on demand is similar to Java’s <code>throws</code> clause, but more powerful: <code>throws A, B, C</code> is not a type, while <code>T.any(A, B, C)</code> is. We’ll see why that matters below.</p>
 <h1 id="example-from-checked-exceptions-to-union-types">Example: From checked exceptions to union types</h1>
 <p>Using Sorbet’s ad hoc union types, it’s mechanical to convert Java-style checked exceptions to Sorbet-annotated Ruby. To demonstrate:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Currency</span> <span class="fu">parseCurrency</span><span class="op">(</span><span class="bu">String</span> currencyStr<span class="op">)</span> <span class="kw">throws</span> <span class="bu">ParseException</span> <span class="op">{</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Currency</span> currency <span class="op">=</span> KNOWN_CURRENCIES<span class="op">.</span><span class="fu">get</span><span class="op">(</span>currencyStr<span class="op">);</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>currency <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">ParseException</span><span class="op">(</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;&#39;&quot;</span> currencyStr <span class="op">+</span> <span class="st">&quot;&#39; is not a valid currency&quot;</span><span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Currency</span> <span class="fu">parseCurrency</span>(<span class="bu">String</span> currencyStr) <span class="kw">throws</span> <span class="bu">ParseException</span> {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Currency</span> currency = KNOWN_CURRENCIES.<span class="fu">get</span>(currencyStr);</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> (currency == <span class="kw">null</span>) {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">throw</span> <span class="kw">new</span> <span class="bu">ParseException</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;&#39;&quot;</span> currencyStr + <span class="st">&quot;&#39; is not a valid currency&quot;</span>, <span class="dv">0</span>);</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    }</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> currency<span class="op">;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> currency;</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>This is a somewhat contrived Java method, but it’ll be good enough to demonstrate the concepts.</p>
 <p>If <code>parseCurrency</code> is given a string it can’t handle, it raises a <code>ParseException</code>. It declares this with <code>throws</code> because <code>ParseException</code> is a checked exception. If the currency string is recognized, it returns some <code>Currency</code> object.</p>
 <p>Here’s how we’d write that in Sorbet:</p>
@@ -132,10 +132,10 @@
 <li>Where the Java example uses <code>throw</code>, the Ruby example uses <code>return</code>.</li>
 </ol>
 <p>Our translation isn’t complete until we see how the <code>parseCurrency</code> caller side changes. In Java, we call <code>parseCurrency</code> like this:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Charge <span class="fu">createCharge</span><span class="op">(</span><span class="dt">int</span> amount<span class="op">,</span> <span class="bu">String</span> currencyStr<span class="op">)</span> <span class="kw">throws</span> <span class="bu">ParseException</span> <span class="op">{</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Currency</span> currency <span class="op">=</span> <span class="fu">parseCurrency</span><span class="op">(</span>currencyStr<span class="op">);</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">new</span> <span class="fu">Charge</span><span class="op">(</span>amount<span class="op">,</span> currency<span class="op">);</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Charge <span class="fu">createCharge</span>(<span class="dt">int</span> amount, <span class="bu">String</span> currencyStr) <span class="kw">throws</span> <span class="bu">ParseException</span> {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Currency</span> currency = <span class="fu">parseCurrency</span>(currencyStr);</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="kw">new</span> <span class="fu">Charge</span>(amount, currency);</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>With Sorbet, this snippet becomes:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  params(<span class="wa">amount: </span><span class="dt">Integer</span>, <span class="wa">currency_str: </span><span class="dt">String</span>)</span>
@@ -183,15 +183,15 @@
 <hr />
 <h1 id="appendix">Appendix: Checked Exceptions</h1>
 <p>As a quick refresher, <a href="https://en.wikibooks.org/wiki/Java_Programming/Checked_Exceptions">checked exceptions</a> are a feature popularized by Java. The syntax looks like this:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">doThing</span><span class="op">()</span> <span class="kw">throws</span> MyException <span class="op">{</span></span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">doThing</span>() <span class="kw">throws</span> MyException {</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>The <code>throws</code> keyword is a part of the method’s signature, just like argument and return types. It declares that this method might throw <code>MyException</code>.</p>
 <p>Since it’s a part of this method’s signature the <code>throws</code> annotation will be checked at all call sites (just like argument and return types). A method containing calls to <code>doThing</code> must either <code>catch</code> all mentioned exceptions or repeat any maybe-thrown-but-uncaught exceptions in its own <code>throws</code> clause.</p>
 <p>If a method throws multiple classes of exceptions, they can all be listed:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">doThing</span><span class="op">()</span> <span class="kw">throws</span> MyException<span class="op">,</span> YourException<span class="op">,</span> AnotherException <span class="op">{</span></span>
+<div class="sourceCode" id="cb8"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">doThing</span>() <span class="kw">throws</span> MyException, YourException, AnotherException {</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>The argument in favor of checked exceptions is that they’re explicit and machine-checked. Users don’t have to guess at what a method might throw, or hope that there’s accurate documentation—all benefits shared by static typing in general, which is a sympathetic goal.</p>
 <p>Checked exceptions seem like a good feature on paper. In practice, they’re generally regretted. I’m nowhere near the first person to come to this conclusion, so instead I’ll link you to some previous discussions:</p>
 <ul>

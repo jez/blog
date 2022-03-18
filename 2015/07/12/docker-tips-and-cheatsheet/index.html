@@ -73,26 +73,26 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build your whole Docker Compose project...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> build</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ...or just build one piece of it</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> build [app<span class="kw">|</span><span class="ex">db</span><span class="kw">|</span><span class="ex">etc...]</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> build [app<span class="kw">|</span><span class="ex">db</span><span class="kw">|</span><span class="ex">etc...</span>]</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Start your Docker Compose project</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up -d</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># View the logs for this docker-compose proejct</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> logs</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop running containers</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> stop</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># remove stopped containers</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rm <span class="va">$(</span><span class="ex">docker</span> ps <span class="at">-a</span> <span class="kw">|</span> <span class="fu">grep</span> Exited <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $1;}&#39;</span><span class="va">)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rm <span class="va">$(</span><span class="ex">docker</span> ps -a <span class="kw">|</span> <span class="fu">grep</span> Exited <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $1;}&#39;</span><span class="va">)</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># or, to remove the stopped containers that were started by Docker Compose</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> rm</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># remove untagged images</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rmi <span class="va">$(</span><span class="ex">docker</span> images <span class="at">-q</span> <span class="at">--filter</span> <span class="st">&quot;dangling=true&quot;</span><span class="va">)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rmi <span class="va">$(</span><span class="ex">docker</span> images -q --filter <span class="st">&quot;dangling=true&quot;</span><span class="va">)</span></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean up dangling volumes</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># (see the post below for how to install the python script)</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> python docker_clean_vfs.py</span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Better yet, remove dangling volumes before they&#39;re created by using -v</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-composer</span> rm <span class="at">-v</span></span></code></pre></div>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-composer</span> rm -v</span></code></pre></div>
 <p>Keep in mind that Docker Compose needs to always read your <code>docker-compose.yml</code> file, so make sure to always run <code>docker-compose</code> commands from the root of your project.</p>
 <h1 id="building-your-app">Building your app</h1>
 <p>Docker Compose’s biggest advantage is that it simplifies building your Dockerized app to just</p>
@@ -129,7 +129,7 @@ docker-compose.yml
 <p>If you’re not using Docker Compose, you’ll have to find them and manually prune them:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find all exited containers (docker ps ...),</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># and remove these containers (docker rm)</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rm <span class="va">$(</span><span class="ex">docker</span> ps <span class="at">-a</span> <span class="kw">|</span> <span class="fu">grep</span> Exited <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $1;}&#39;</span><span class="va">)</span></span></code></pre></div>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rm <span class="va">$(</span><span class="ex">docker</span> ps -a <span class="kw">|</span> <span class="fu">grep</span> Exited <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $1;}&#39;</span><span class="va">)</span></span></code></pre></div>
 <h2 id="un-tagged-docker-images">Un-tagged Docker images</h2>
 <p>When you’re using Docker for developing an app, every time you change and rebuild your Docker images, you’ll leave behind an old, un-tagged image. This is actually a “feature” of Docker: all images that you build are cached so that subsequently builds are instantaneous. However, when we’re developing and generating new images frequently, previous image builds only take up space.</p>
 <pre><code># find all un-tagged images (docker images ...),

@@ -88,8 +88,8 @@
 <p><br />
 </p>
 <h2 id="every-ide-feature-sorbet-supports-works-for-tenum.">🚀 Every IDE feature Sorbet supports works for <code>T::Enum</code>.</h2>
-<p><code>T::Enum</code>s are just normal constants. Sorbet supports finding all constant references, renaming constants, autocompleting constant names, jumping to a constant’s definition, hovering over a constant to its documentation comment. Also all of those features work on both the enum class itself and each individual enum value.</p>
-<p>We could <em>maybe</em> support completion for symbol literals in limited circumstances, but it would be the first of its kind in Sorbet. Same goes for rename, and maybe find all references. Jump to Definition I guess would want to jump not actually to the definition, but rather to the signature that specified the literal type? It’s weird.</p>
+<p><code>T::Enum</code>s are just normal constants. Sorbet supports finding all constant references, renaming constants, autocompleting constant names, jumping to a constant’s definition, hovering over a constant to see its documentation comment. Also all of those features work on both the enum class itself and each individual enum value.</p>
+<p>We could <em>maybe</em> support completion for symbol literals in limited circumstances, but it would be the first of its kind in Sorbet. Same goes for rename, and maybe find all references. Jump to Definition I guess would want to jump not to the actual definition, but rather to the signature that specified the literal type? It’s weird.</p>
 <h2 id="tenum-guards-against-basically-all-typos.">🙊 <code>T::Enum</code> guards against basically all typos.</h2>
 <p>Even in <code># typed: false</code> files! Even when calling methods that take don’t have signatures, or that have loose signatures like <code>Object</code>! Incidentally, this is basically the same reason why find all references can work so well.</p>
 <h2 id="it-requires-being-intentional.">🤝 It requires being intentional.</h2>
