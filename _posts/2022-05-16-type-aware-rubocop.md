@@ -16,14 +16,18 @@ categories: ['sorbet', 'ruby', 'rubocop']
 _This post represents my opinions at a point in time. It's not necessarily the views of my
 team or my employer._
 
-From time to time, someone asks, "Would Sorbet ever allow defining some sort of type-aware
+From time to time, someone asks, "Would [Sorbet] ever allow defining some sort of type-aware
 lint rules?" The answer has usually been "no," for a couple of reasons.
+
+[Sorbet]: https://sorbet.org
 
 <!-- more -->
 
 The biggest open question is that it's not 100% clear what use cases people have in mind.
-Most commonly people imagine "the full Rubocop API, but with types," but this is
+Most commonly people imagine "the full [Rubocop] API, but with types," but this is
 underspecified, in my opinion.
+
+[Rubocop]: https://rubocop.org/
 
 ### Should every AST node (i.e., every expression) have a type associated with it?
 
