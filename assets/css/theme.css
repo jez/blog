@@ -860,6 +860,12 @@ nav#TOC > input:checked + ul {
     margin-left: 0;
   }
 
+  nav#TOC li {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   nav#TOC code {
     font-size: var(--nav-toc-code-font-size);
   }
@@ -903,7 +909,6 @@ nav#TOC > input:checked + ul {
  */
 @media screen and (min-width: calc(745px + 2 * (52px + 206px + 52px))) {
   header,
-  nav#TOC,
   main,
   footer {
     max-width: var(--main-width);
@@ -1113,6 +1118,8 @@ nav#TOC > input:checked + ul {
 @page {
   size: letter;
   margin: 0.5in;
+  /* To make room for line numbers in left margin. */
+  margin-left: 0.25in;
 }
 
 @media print {
@@ -1120,13 +1127,13 @@ nav#TOC > input:checked + ul {
     --line-height: 18px;
     --font-size: 12px;
 
-    --inline-code-font-size: 12.5px;
-    --code-block-font-size: 11.5px;
+    --inline-code-font-size: 11px;
+    --code-block-font-size: 10px;
     --code-block-side-padding: 6px;
     --line-numbers-font-size: 8.5px;
 
-    --tight-code-line-height: 15px;
-    --tight-code-padding-top: 1px;
+    --tight-code-line-height: 12.5px;
+    --tight-code-padding-top: 2px;
 
     --side-note-line-height: 14px;
     --side-note-font-size: 9px;
@@ -1176,6 +1183,8 @@ nav#TOC > input:checked + ul {
 
   body {
     padding-top: 0;
+    /* To make room for line numbers in left margin. */
+    padding-left: 0.25in;
   }
 
   header,
