@@ -61,9 +61,9 @@
 
 <main>
 <p><em>This post represents my opinions at a point in time. It’s not necessarily the views of my team or my employer.</em></p>
-<p>From time to time, someone asks, “Would Sorbet ever allow defining some sort of type-aware lint rules?” The answer has usually been “no,” for a couple of reasons.</p>
+<p>From time to time, someone asks, “Would <a href="https://sorbet.org">Sorbet</a> ever allow defining some sort of type-aware lint rules?” The answer has usually been “no,” for a couple of reasons.</p>
 <!-- more -->
-<p>The biggest open question is that it’s not 100% clear what use cases people have in mind. Most commonly people imagine “the full Rubocop API, but with types,” but this is underspecified, in my opinion.</p>
+<p>The biggest open question is that it’s not 100% clear what use cases people have in mind. Most commonly people imagine “the full <a href="https://rubocop.org/">Rubocop</a> API, but with types,” but this is underspecified, in my opinion.</p>
 <h3 id="should-every-ast-node-i.e.-every-expression-have-a-type-associated-with-it">Should every AST node (i.e., every expression) have a type associated with it?</h3>
 <p>This would be particularly hard to support, because Sorbet aggressively simplifies the AST from the start to the end of its pipeline. The Rubocop AST has something like 100 node types. Sorbet immediately converts this into an AST that only has 30 or so node types, then subsequently keeps refining the AST. The thing Sorbet type checks looks nothing like the AST that you’d want if you were trying to write a linter, because so much of it has been desugared, rewritten, or simplified.</p>
 <p>Also, at the end of the day, the data structure Sorbet type checks is a <strong>control flow graph</strong> (CFG), not a tree structure! This breaks a lot of the assumptions people make about what’s possible to do in a linter rule.</p>
