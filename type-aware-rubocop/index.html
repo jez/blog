@@ -54,7 +54,7 @@
   <li><a href="#rubocop-types-or-sorbet-linter">Rubocop + types, or Sorbet + linter?</a></li>
   <li><a href="#what-do-people-actually-want-this-for">… what do people actually want this for?</a></li>
   <li><a href="#is-there-anything-like-this-in-another-language">… is there anything like this in another language?</a></li>
-  <li><a href="#competing-priorities">Competing priorities</a></li>
+  <li><a href="#competing-priorities-tend-to-win-out">Competing priorities tend to win out</a></li>
   <li><a href="#maybe-in-the-future">“Maybe in the future…”</a></li>
   </ul>
 </nav>
@@ -65,21 +65,25 @@
 <!-- more -->
 <p>The biggest open question is that it’s not 100% clear what use cases people have in mind. Most commonly people imagine “the full <a href="https://rubocop.org/">Rubocop</a> API, but with types,” but this is underspecified, in my opinion.</p>
 <h3 id="should-every-ast-node-i.e.-every-expression-have-a-type-associated-with-it">Should every AST node (i.e., every expression) have a type associated with it?</h3>
-<p>This would be particularly hard to support, because Sorbet aggressively simplifies the AST from the start to the end of its pipeline. The Rubocop AST has something like 100 node types. Sorbet immediately converts this into an AST that only has 30 or so node types, then subsequently keeps refining the AST. The thing Sorbet type checks looks nothing like the AST that you’d want if you were trying to write a linter, because so much of it has been desugared, rewritten, or simplified.</p>
-<p>Also, at the end of the day, the data structure Sorbet type checks is a <strong>control flow graph</strong> (CFG), not a tree structure! This breaks a lot of the assumptions people make about what’s possible to do in a linter rule.</p>
-<p><em>Maybe</em> it’s possible to take the type-annotated CFG and use it to reconstruct some sort of typed AST, but that sounds brittle and error prone.</p>
-<p>And finally, Sorbet doesn’t associate types with expressions, only types with variables! This works because the act of building a CFG assigns all intermediate expressions’ result to a variable, but the expression it originally belonged to is discarded.</p>
+<p>This would be particularly hard to support, because Sorbet aggressively simplifies the AST from the start to the end of its pipeline. The Rubocop AST has something like 100 node types. Sorbet immediately simplifies this into an AST that only has 30 or so node types, then subsequently keeps refining the AST until it only has about 15. The thing Sorbet type checks looks nothing like the AST that you’d want if you were trying to write a linter, because so much of it has been desugared, rewritten, or simplified.</p>
+<p>Then finally right before type checking, Sorbet actually abandons the (tree-based) AST, preferring to use a <strong>control flow graph</strong> (CFG) for type checking! A CFG is no longer tree-based<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">It’s a graph, where nodes are basic blocks and edges are control flow jumps between those blocks.<br />
+<br />
+</span></span>, which breaks a lot of the assumptions people make about what’s easy and hard to build in a linter rule.</p>
+<p>Because Sorbet type checks a CFG only, there’s no tree-based structure inside Sorbet that has types. <em>Maybe</em> it’s possible to take the type-annotated CFG and use it to reconstruct some sort of typed AST, but that sounds brittle and error prone.</p>
+<p>And finally, in the CFG Sorbet doesn’t associate types with expressions, only types with variables! This works because the act of building a CFG assigns all intermediate expressions’ results to a variable and then only dealing with variables from then on.</p>
 <h3 id="maybe-types-for-just-variables-is-enough">Maybe types for just variables is enough?</h3>
 <p>This would likely be somewhat easier to implement, because Sorbet already does maintain environments mapping variables to their types.</p>
-<p>However, these data structures are expensive to maintain and therefore not long-lived. Unlike Sorbet’s symbol table, which exists indefinitely after creation, the environments that track variable types only last as long as is required to type check a single method.</p>
+<p>However, these data structures are expensive to maintain and therefore not long-lived.<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">Sorbet’s LSP editor integration gets around this by re-typechecking an entire method every time the user hovers over a variable. When these hover requests come as (infrequent) requests from the user, this is fine because Sorbet is already initialized. Powering a linter this way would either require that the Sorbet server be initialized for variable type every request (crazy slow), or somehow kept around persistently (brittle).<br />
+<br />
+</span></span> Unlike Sorbet’s symbol table, which exists indefinitely after creation, the environments that track variable types only last as long as is required to type check a single method.</p>
 <p>Maybe there could be an API like “please give me the type of the variable with this name,” but again this would be tricky, because chances are the lint rule author wants to build the lint rule on some tree-based data structure, and Sorbet only has the CFG. So there would additionally need to be some mapping between environments (basic blocks) and AST variable nodes, which again sounds pretty tricky and likely to break some assumptions.</p>
 <h3 id="even-if-this-give-me-the-type-of-a-variable-api-works-is-it-enough">Even if this “give me the type of a variable” API works, is it enough?</h3>
-<p>Knowing the type of a variable on its own isn’t very useful. The most common questions you want to use a type’s data structure to be able to answer are:</p>
+<p>Knowing the type of a variable on its own isn’t very useful. The most common questions you want ask of a type are:</p>
 <ol type="1">
 <li>Is is this type a subtype of this other type?</li>
 <li>If a method with a given name is called on a receiver of this type, what are the <em>list</em> of methods that would be dispatched to? (It’s a list because the receiver could be a union type.)</li>
 </ol>
-<p>The answer to (1) requires having the entire symbol table on hand (lots of memory). The answer to (2) is subtle and complicated—Sorbet spends <a href="https://github.com/sorbet/sorbet/blob/master/core/types/calls.cc">about 4,000 lines of code</a> answering it—and <em>also</em> require having the symbol table on hand.</p>
+<p>The answer to (1) requires having the entire symbol table on hand (lots of memory). The answer to (2) is subtle and complicated—Sorbet spends <a href="https://github.com/sorbet/sorbet/blob/master/core/types/calls.cc">about 4,000 lines of code</a> answering it—and <em>also</em> requires having the symbol table on hand.</p>
 <p>So it’s probably not enough to just, e.g., return some JSON representation of one of Sorbet’s types. It’d also require having some structured representation of Sorbet’s symbol table, which brings us to our next question:</p>
 <h3 id="rubocop-types-or-sorbet-linter">Rubocop + types, or Sorbet + linter?</h3>
 <p>So far I’ve kind of assumed that we want to start with an existing linter (Rubocop) and just add types. But what we’ve seen so far is that the things we’d need to get types into Rubocop basically amount to exporting almost all of Sorbet’s internal data structures.</p>
@@ -111,13 +115,13 @@
 </ol>
 <p>— <a href="https://github.com/sorbet/sorbet/#sorbet-user-facing-design-principles">Sorbet user-facing design principles</a></p>
 </blockquote>
-<p>Another way to read this is, “we let other people blaze trails, and then copy their good ideas.” The only other remotely similar tool I’ve seen has been C#’s support for building custom static analyzers. Unfortunately, C#’s Roslyn architecture was a rewrite of the C# language designed with extensibility in mind from day 1, so a lot of the things that are trivial in C# are quite hard in Sorbet’s current architecture.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">Sorbet’s current architecture was designed for batch type checking performance on large monorepos, which it’s actually quite well designed for.<br />
+<p>Another way to read this is, “we let other people blaze trails, and then copy their good ideas.” The only other remotely similar tool I’ve seen has been C#’s support for building custom static analyzers. Unfortunately, C#’s Roslyn architecture was a rewrite of the C# language designed with extensibility in mind from day 1, so a lot of the things that are trivial in C# are quite hard in Sorbet’s current architecture.<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">Sorbet’s current architecture was designed for batch type checking performance on large monorepos, which it’s actually quite well designed for.<br />
 <br />
 </span></span></p>
-<p>This question comes up often enough that it makes me want to imagine that some sort of similar tool exists for other dynamically typed languages? But as far as I’m aware, no sort of type-aware linter exists for TypeScript, Flow, or Mypy.<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">If you know of a comparable tool, please do share!<br />
+<p>This question comes up often enough that it makes me want to imagine that some sort of similar tool exists for other dynamically typed languages? But as far as I’m aware, no sort of type-aware linter exists for TypeScript, Flow, or Mypy.<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="sidenote">If you know of a comparable tool, please do share!<br />
 <br />
 </span></span> Not having any sort of frame of reference makes it hard to gauge expectations people have when asking for a tool like this.</p>
-<h3 id="competing-priorities">Competing priorities</h3>
+<h3 id="competing-priorities-tend-to-win-out">Competing priorities tend to win out</h3>
 <p>When attempting to build this feature, we’d of course have to judge the cost of what we’d have to give up.</p>
 <p>Overwhelmingly, the requests people have about Sorbet are:</p>
 <ul>
@@ -129,7 +133,7 @@
 <p>So far, these requests have taken priority over greenfield projects, including things like a type-aware linter.</p>
 <h3 id="maybe-in-the-future">“Maybe in the future…”</h3>
 <p>Those are my current thoughts on the topic. Obviously, a lot of these reasons are just “it’s hard,” and maybe for someone else those things would be easy. Others are just selfish, “it’s convenient for us to not have to think about compatibility,” and so they’re easy to disagree with. Some of them are, “there’s no clear answer to this question,” and sometimes you can wave those away by just picking <em>any</em> answer and living with it, rather than searching for the best.</p>
-<p>But so far, all of these reasons in combination have presented a pretty high barrier to building something like this. Hopefully this post sheds some light on why a type-aware linter for Sorbet does not currently exist.</p>
+<p>So while I don’t think that Sorbet would <em>never</em> get some sort of type-aware linter, so far there are many factors that present a pretty high barrier to building something like this. Hopefully this post sheds some light on why a type-aware linter for Sorbet does not currently exist.</p>
 </main>
 
 
