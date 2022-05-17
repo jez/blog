@@ -33,30 +33,45 @@ underspecified, in my opinion.
 
 This would be particularly hard to support, because Sorbet aggressively simplifies the
 AST from the start to the end of its pipeline. The Rubocop AST has something like 100
-node types. Sorbet immediately converts this into an AST that only has 30 or so node
-types, then subsequently keeps refining the AST. The thing Sorbet type checks looks
-nothing like the AST that you'd want if you were trying to write a linter, because so
-much of it has been desugared, rewritten, or simplified.
+node types. Sorbet immediately simplifies this into an AST that only has 30 or so node
+types, then subsequently keeps refining the AST until it only has about 15. The thing
+Sorbet type checks looks nothing like the AST that you'd want if you were trying to write
+a linter, because so much of it has been desugared, rewritten, or simplified.
 
-Also, at the end of the day, the data structure Sorbet type checks is a **control flow
-graph** (CFG), not a tree structure! This breaks a lot of the assumptions people make
-about what's possible to do in a linter rule.
+Then finally right before type checking, Sorbet actually abandons the (tree-based) AST,
+preferring to use a **control flow graph** (CFG) for type checking! A CFG is no longer
+tree-based[^graph], which breaks a lot of the assumptions people make about what's
+easy and hard to build in a linter rule.
 
-_Maybe_ it's possible to take the type-annotated CFG and use it to reconstruct some sort
-of typed AST, but that sounds brittle and error prone.
+[^graph]:
+  It's a graph, where nodes are basic blocks and edges are control flow jumps between
+  those blocks.
 
-And finally, Sorbet doesn't associate types with expressions, only types with variables!
-This works because the act of building a CFG assigns all intermediate expressions' result
-to a variable, but the expression it originally belonged to is discarded.
+Because Sorbet type checks a CFG only, there's no tree-based structure inside Sorbet that
+has types. _Maybe_ it's possible to take the type-annotated CFG and use it to reconstruct
+some sort of typed AST, but that sounds brittle and error prone.
+
+And finally, in the CFG Sorbet doesn't associate types with expressions, only types with
+variables! This works because the act of building a CFG assigns all intermediate
+expressions' results to a variable and then only dealing with variables from then on.
 
 ### Maybe types for just variables is enough?
 
 This would likely be somewhat easier to implement, because Sorbet already does maintain
 environments mapping variables to their types.
 
-However, these data structures are expensive to maintain and therefore not long-lived.
+However, these data structures are expensive to maintain and therefore not long-lived.[^lsp]
 Unlike Sorbet's symbol table, which exists indefinitely after creation, the environments
-that track variable types only last as long as is required to type check a single method.
+that track variable types only last as long as is required to type check a single
+method.
+
+[^lsp]:
+  Sorbet's LSP editor integration gets around this by re-typechecking an entire method
+  every time the user hovers over a variable. When these hover requests come as
+  (infrequent) requests from the user, this is fine because Sorbet is already initialized.
+  Powering a linter this way would either require that the Sorbet server be
+  initialized for variable type every request (crazy slow), or somehow kept around
+  persistently (brittle).
 
 Maybe there could be an API like "please give me the type of the variable with this name,"
 but again this would be tricky, because chances are the lint rule author wants to build
@@ -67,7 +82,7 @@ variable nodes, which again sounds pretty tricky and likely to break some assump
 ### Even if this "give me the type of a variable" API works, is it enough?
 
 Knowing the type of a variable on its own isn't very useful. The most common questions you
-want to use a type's data structure to be able to answer are:
+want ask of a type are:
 
 1.  Is is this type a subtype of this other type?
 1.  If a method with a given name is called on a receiver of this type, what are the
@@ -76,7 +91,7 @@ want to use a type's data structure to be able to answer are:
 
 The answer to (1) requires having the entire symbol table on hand (lots of memory). The
 answer to (2) is subtle and complicated—Sorbet spends [about 4,000 lines of
-code][calls.cc] answering it—and _also_ require having the symbol table on hand.
+code][calls.cc] answering it—and _also_ requires having the symbol table on hand.
 
 [calls.cc]: https://github.com/sorbet/sorbet/blob/master/core/types/calls.cc
 
@@ -186,7 +201,7 @@ a tool like this.
 
 [^comp]: If you know of a comparable tool, please do share!
 
-### Competing priorities
+### Competing priorities tend to win out
 
 When attempting to build this feature, we'd of course have to judge the cost of what we'd
 have to give up.
@@ -210,9 +225,10 @@ disagree with. Some of them are, "there's no clear answer to this question," and
 you can wave those away by just picking _any_ answer and living with it, rather than
 searching for the best.
 
-But so far, all of these reasons in combination have presented a pretty high barrier to
-building something like this. Hopefully this post sheds some light on why a type-aware
-linter for Sorbet does not currently exist.
+So while I don't think that Sorbet would _never_ get some sort of type-aware linter, so
+far there are many factors that present a pretty high barrier to building something like
+this. Hopefully this post sheds some light on why a type-aware linter for Sorbet does not
+currently exist.
 
 
 
