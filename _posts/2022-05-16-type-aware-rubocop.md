@@ -184,22 +184,65 @@ Here's one of Sorbet's explicit design principles:
 > — [Sorbet user-facing design principles](https://github.com/sorbet/sorbet/#sorbet-user-facing-design-principles)
 
 Another way to read this is, "we let other people blaze trails, and then copy their good
-ideas." The only other remotely similar tool I've seen has been C#'s support for building
-custom static analyzers. Unfortunately, C#'s Roslyn architecture was a rewrite of the C#
-language designed with extensibility in mind from day 1, so a lot of the things that are
-trivial in C# are quite hard in Sorbet's current architecture.[^perf]
+ideas."
 
-[^perf]:
-  Sorbet's current architecture was designed for batch type checking performance on large
-  monorepos, which it's actually quite well designed for.
-
-This question comes up often enough that it makes me want to imagine that some sort of
+~~This question comes up often enough that it makes me want to imagine that some sort of
 similar tool exists for other dynamically typed languages? But as far as I'm aware,
 no sort of type-aware linter exists for TypeScript, Flow, or Mypy.[^comp] Not having any
 sort of frame of reference makes it hard to gauge expectations people have when asking for
-a tool like this.
+a tool like this.~~
 
-[^comp]: If you know of a comparable tool, please do share!
+[^comp]: ~~If you know of a comparable tool, please do share!~~
+
+**Update, 2022-05-18**[^steved] There _are_ type-aware static analysis tools for C# and
+TypeScript. Both languages were designed by the
+[same person](https://en.wikipedia.org/wiki/Anders_Hejlsberg), so maybe this isn't
+surprising. Unfortunately for Sorbet, they were architected to support static analysis
+tooling
+[from the
+beginning](https://en.wikipedia.org/wiki/Roslyn_%28compiler%29#:~:text=Roslyn%20was%20designed%20with%20that%20intent%20from%20the%20beginning.).
+Sorbet's current architecture was instead designed for batch type checking performance on
+large monorepos,[^perf] and IDE support was grafted on later. Exposing hackable APIs has
+so far not been considered.
+
+[^steved]:
+  Thanks to Steve Dignam for pointing out that not only does C# have static
+  analysis APIs, but that TypeScript does as well, along with an ecosystem of type-aware
+  lint rules.
+
+[^perf]:
+  All things considered, it's actually quite good at this.
+
+For example, TypeScript offers a [compiler API][tsc-api], which is then used by the
+TypeScript ESLint project, which allows defining [custom type-aware lint rules]. What can
+we learn from this project?
+
+[tsc-api]: https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
+[custom type-aware lint rules]: https://typescript-eslint.io/docs/development/custom-rules#type-checking
+
+- The TypeScript compiler API does not have any sort of backwards compatibility guarantee,
+  so breaking changes are published from time to time.
+- It appears that all TypeScript functionality can be accessed behind the API, including
+  instantiating a stateful object representing the type checker, running the type checker
+  end-to-end on a project, spawning an LSP server, etc.
+- The way custom lint rules are written is by converting between ESLint's AST node type
+  and TypeScript's AST node type. The TypeScript compiler APIs then allow asking for the
+  type of an AST (i.e., expression). I haven't confirmed, but this leads me to believe
+  that TypeScript itself is doing typechecking on the AST (maybe with some auxiliary
+  structures to track control flow), not on a CFG like Sorbet, which makes it easier to
+  present the kind of API that makes sense in a lint rule.
+
+It's interesting to [browse the rules that require type information][requires-type-info]
+to get a sense for what's possible. Things like `strict-boolean-expressions` and
+`no-floating-promises` are examples of non-trivial lints using type information.
+
+[requires-type-info]: https://cs.github.com/typescript-eslint/typescript-eslint?q=%22requiresTypeChecking%3A+true%22
+
+I have spent very limited time looking into how things work exactly, so it's possible I'm
+misrepresenting the ideas. In any case, I personally still draw the same conclusion:
+clearly people in the TypeScript community derive value from building type-aware lint
+rules, and TypeScript is well-architected to enable this. As mentioned in previous
+sections, Sorbet's current architecture does not present the same conveniences.
 
 ### Competing priorities tend to win out
 
