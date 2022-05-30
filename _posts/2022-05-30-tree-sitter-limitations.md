@@ -3,7 +3,9 @@
 layout: post
 title: "Is tree-sitter good enough?"
 date: 2022-05-30T04:43:46-04:00
-description: TODO
+description: >
+  While tree-sitter is a neat project with lots of valid use case, it isn't a silver
+  bullet for all parsing-related projects.
 math: false
 categories: ['parsing', 'tree-sitter']
 # subtitle:
@@ -11,18 +13,18 @@ categories: ['parsing', 'tree-sitter']
 # author_url:
 ---
 
-My answer: mostly no, or at the very least not for all cases, though I really wish it
-were good enough for the use cases I have, because then I would have less work to do.
+**tl;dr**: no, or at the very least, "not for every use case." (Though I really wish it
+were for the use cases I have, because it would save me a lot of work.)
 
 <!-- more -->
 
-I'm guessing you already know what tree-sitter is because you clicked on the title. If
-you clicked because you were hoping to find out: [tree-sitter] is a relatively[^new] new
-project which aims to make writing fast, error-tolerant parsers take less work. To do
-that, it provides both pre-built parsers for common programming languages and a toolkit
-for building new parsers. It's known for use in various GitHub features by way of their
-[semantic] tool, which powers the code navigation tooltips that you sometimes see on
-GitHub.[^semantic]
+> I'm guessing you already know what tree-sitter is because you clicked on the title. If
+> you clicked because you were hoping to find out: [tree-sitter] is a relatively[^new] new
+> project which aims to make writing fast, error-tolerant parsers take less work. To do
+> that, it provides both pre-built parsers for common programming languages and a toolkit
+> for building new parsers. It's known for use in various GitHub features by way of their
+> [semantic] tool, which powers the code navigation tooltips that you sometimes see on
+> GitHub.[^semantic]
 
 [^new]:
   Is it still new? The GitHub repo has commits dating back to 2013, though I only
@@ -32,57 +34,52 @@ GitHub.[^semantic]
   The semantic repo actually has a [short overview][why-tree-sitter] of why they chose
   tree-sitter, along with some drawbacks.
 
-I see a lot of talk about tree-sitter these days. And for a lot of projects, it's really
-nice! This is especially true for projects that want to be able to parse a super wide
-variety of languages with an otherwise uniform API with the least amount of manual work.
-Things like writing a syntax highlighter in an editor, or building something like
-[ParEdit] for arbitrary languages, or providing best-effort jump-to-definition
-results.[^approval]
+For a lot of projects, tree-sitter is really nice! _Especially_ for projects where the
+quality of the parser is less important than the quantity of languages supported. For
+example: an editor syntax highlighter. It's more important that the editor highlight lots
+of languages' syntax than it is that every language is highlighted perfectly. Another
+example: building something like [ParEdit] for arbitrary languages. Or providing
+jump-to-def that's mostly better than plain-text code search.[^approval] For a lot of
+these applications it's actually _completely fine_ if there's a flagrant bug in one of the
+grammars, because the project is still so useful in all the other languages.
 
 [^approval]:
   Another neat use case, from work: every time a commit is pushed to an approved PR, the
   approval is dismissed, unless (using tree-sitter) the CI system detects that the parse
   tree hasn't changed. This spares comment and formatting changes the toil of a re-review.
 
-When those goals are flipped—it has to work for exactly one language, and "best-effort"
-isn't enough—tree-sitter becomes less attractive. As someone who works on language tooling
-[professionally](https://jez.io/#work) and is lazy, it's kind of disappointing. As much as
-tree-sitter enthusiasts sell it as a magical solution that can free me from having to
-think about parsers, it's just not been that silver bullet in my experience.
+But when the goals are flipped—it has to work for exactly one language, and the quality of
+the parser is paramount—tree-sitter becomes less attractive. There are two questions I
+would pose to anyone curious about using tree-sitter for their parser:
 
-There are two questions I would pose to anyone curious about using tree-sitter for their
-parser:
+1.  Is serving autocompletion requests a key use cases?
 
-1.  Is serving autocompletion requests going to be one of your use cases?
-2.  How much do you care about custom messages for syntax errors?
+    Serving autocompletion requests requires an unnaturally high parse fidelity, even when
+    the buffer is ridiculed with syntax errors.
 
-If either or both of these are important, I'd probably recommend rolling your own parser,
-either using a parser generator or using recursive descent by hand. The longer lived your
-project is, the more these constraints are going to be hard to accomplish in tree-sitter.
+2.  How much do you care about crafting custom messages for syntax errors?
 
-At this point, I should caveat this by saying that I've come to these conclusions having
-spent far less time with tree-sitter than I have with other parsing techniques, so maybe I
-only think they're harder than they actually are because I lack a depth of tree-sitter
-experience.
+    Customizing syntax error messages becomes context-dependent very quickly. It's easy to
+    maintain that context when your parser allows running arbitrary code, and hard when
+    the parser is constrained to a declarative DSL.
 
-When investigating tree-sitter as a replacement for an existing parser, it's been too easy
-to find parses from tree-sitter that don't look like what I'd expect out of a parser that
-is meant to handle the kinds of errors programmers write in the real world.
+If either of these goals are important, I'd recommend rolling your own parser (using the
+technique of your choice). It comes down to flexibility: a tree-sitter grammar, with it's
+declarative specification, provides a lot of neat features for free (like error recovery),
+but places a ceiling on possibilities for future improvement.
 
-It's entirely possible that I've just been _really_ unlucky, and that the problems I've
-found are all fixable with a few bug reports and a little elbow grease. But it just seems
-to me that if I'm going to have to spend time fixing bugs anyways, it may as well be in a
-parser I've written myself.
+Let me show some examples.[^bugs] The snippets of code below are exactly the kinds of
+programs that people type in their editors, but which tree-sitter doesn't parse well
+enough. You can follow along on the [tree-sitter online playground].
 
-Let me show what I mean. Here are some snippets of code that I hope you'll agree
-represents code someone might write mid-edit, for which you want to both (1) provide
-autocompletion results for and (2) provide a human-friendly error message for. Following
-the code snippet is the parse result produced by the corresponding tree-sitter grammar for
-that language. You can follow along on the [tree-sitter online playground].
+[^bugs]:
+  It's entirely possible that I've just been _really_ unlucky, and that the problems I've
+  found are all fixable with a few bug reports and a little ingenuity. But if it's
+  going to take ingenuity anyways, isn't that the same as writing a parser myself?
 
 \
 
-Let's start with a Ruby program:
+Let's start with a Ruby program, alongside its parse result:
 
 ```ruby
 f = ->(x) {
@@ -102,7 +99,7 @@ program [0, 0] - [3, 0]
         ERROR [1, 3] - [1, 4]
 ```
 
-By way of comparison, here's what a valid parse looks like:
+Here's what a comparable, syntactically-valid parse looks like:
 
 ```ruby
 f = ->(x) {
@@ -133,11 +130,11 @@ call
   method: ERROR
 ```
 
-Which tells us (1) that there was a method call, (2) what the receiver of the method call
-was so we know where to start looking for methods to autocomplete, (3) that the syntax
-error was localized to the method call.
+Which tells us that there was a method call, what the receiver of the method call was so
+we know where to start looking for methods to autocomplete, and that the syntax error was
+localized to the method call.
 
-There's a similar problem with constants accesses:
+There's a similar problem with constant accesses:
 
 ```ruby
 f = ->(x) {
@@ -161,13 +158,15 @@ program [0, 0] - [6, 0]
           name: constant [4, 5] - [4, 6]
 ```
 
+... and a similar problem with `@` (the start of an instance variable access), and with `x =` (the start of an assignment).
+
 \
 
-Maybe this example was a little contrived, because a comparable program written in
-JavaScript actually parses the way I'd hoped the Ruby one did. Okay, maybe it's just a bug
-in the Ruby grammar?
+Maybe this example was a little contrived? Comparable programs written in JavaScript
+actually parse the good way, so maybe that's just an indictment of tree-sitter-ruby, not
+tree-sitter itself.
 
-This next snippet reproduces in both Ruby and JavaScript:
+But this next snippet reproduces in both Ruby and JavaScript:
 
 ```js
 class A {
@@ -194,8 +193,8 @@ program [0, 0] - [6, 0]
             ERROR [3, 8] - [3, 9]
 ```
 
-It's hard to see what's going on here without matching up the line numbers in the parse
-tree. Here's essentially what the snippet above looks like to tree-sitter:
+To make it more obvious why this parse tree is not great, it's basically the same parse
+tree as produced by this program:
 
 ```js
 class A {
@@ -207,22 +206,22 @@ class A {
 
 Some points:
 
-- Even though `bar() { ... }` is valid method syntax, that's gone. The parser thinks that
-  there was a call to a method named `bar` on an implicit receiver (i.e., `this`).
-- The syntax error shows up after the imagined call to `bar`, not associated with the
+- Even though `bar() { ... }` is valid method syntax, there's no mention of any method
+  called `bar` in the parse. Instead, the parser thinks that there was a **method call**
+  to a method named `bar` on an implicit receiver (i.e., `this`).
+- The syntax error shows up after the imagined call to `bar` (associated with the `{`
+  immediately after the `bar()` token), not associated with the
   `foo` method.
 
-It gets even worse if the snippet changes so that `bar` actually has parameters and code in
-the method body.[^worse] With a parse that drops the `bar` method definition entirely, the
-user no longer receives autocompletion results inside `bar` until they fix the error in
-`foo`.
+If the user's cursor was inside the `bar` method and asking for completion results, we'd
+be forced to serve them completion results as though their cursor was inside the
+half-formed `foo` method, which produces completely wrong results.
 
-[^worse]:
-  The parameters become call-site arguments, and the code acts as though it was written
-  inside `foo` not `bar`.
+This behavior is not unique to JavaScript. I've reproduced it almost verbatim in Ruby and
+Java, and partially in most other tree-sitter parsers (C#, C++, Rust, etc.).
 
-The best error message here would be to point out to the author that their curly braces
-are mismatched,[^rust] and then ideally use that information to recover when parsing.
+The best behavior here would be to point out that the curly braces are mismatched,[^rust]
+and then recover assuming that the user fixed that mismatch, preserving the `bar` method.
 
 [^rust]:
   Indeed, that's [exactly the error](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=872bd946a8789aba9d49e07aef614819)
@@ -231,87 +230,24 @@ are mismatched,[^rust] and then ideally use that information to recover when par
 \
 
 I could turn this into a post full of weird code snippets and poor parse results, but
-that's not useful. What I'm trying to show is that when the demands are "the one specific
-language I care about has lots of idiosyncratic parse errors that are super common when in
-an editor," then you're still going to be limited by the quality of the particular
-tree-sitter grammar you're working with. Fixing bugs in that grammar requires working
-within the constraints tree-sitter imposes to be able to power all the grammar-agnostic
-features (best-effort error recovery, uniform API, etc.) that it provides.
+that's not useful. What I'm trying to show is that when the demands are, "The one specific
+language I care about has lots of idiosyncratic but common parse errors that I want to
+handle well," then prepare to devote a substantial amount of time to tweaking anyways. I
+prefer doing that in a setting that gives me maximum flexibility, so that I can be as
+clever as I need to eke out good parse results.
 
-On the other hand, if you control the whole parser, you can bend it however you want. You
-arguably do more work, but you at least have the option of doing more work (with the
-reward of better results).
-
-Don't get me wrong, I still think tree-sitter is a great project with a neat new idea, and
-it's done more to make parsing more accessible than any recent effort. But too many people
-tout it as something with no tradeoffs, and I just don't think that's fair.
-
-If you think I'm overlooking something, please let me know and I'll happily update this
-post, and maybe even start using tree-sitter in my projects.
+Don't get me wrong, I still think tree-sitter is a great project with a neat new idea. I
+also haven't shown how surprisingly good tree-sitter was on a lot of the examples I tried!
+All I'm saying is that tree-sitter comes with tradeoffs, and that it's not useful to
+respond to every complaint about an existing parser with, "If you just used tree-sitter,
+your problems would go away," because that's not true. For a certain class of parsing
+problems, tree-sitter is not quite good enough.
 
 \
 
-# Appendix: Sorbet
+*If I've overlooked something, please let me know and I'll happily update this post (and
+maybe even start using tree-sitter in my projects).*
 
-This is the part where I get to gleefully show off Sorbet's parser, which I'm quite proud
-of.
-
-```ruby
-# typed: true
-class A
-  def foo
-    puts('inside foo')
-
-  puts('after (outside) foo')
-
-  def bar(x)
-    x.
-  end
-end
-```
-
-The parse tree:
-
-```ruby
-s(:class,
-  s(:const, nil, :A), nil,
-  s(:begin,
-    s(:def, :foo, nil,
-      s(:begin,
-        s(:send, nil, :puts,
-          s(:str, "inside foo")))),
-    s(:send, nil, :puts,
-      s(:str, "after (outside) foo")),
-    s(:def, :bar,
-      s(:args,
-        s(:arg, :x)),
-      s(:send,
-        s(:lvar, :x), :<method-name-missing>))))
-```
-
-The errors:
-
-```
-editor.rb:10: unexpected token "end" https://srb.help/2001
-    10 |  end
-          ^^^
-
-editor.rb:11: unexpected token "end of file" https://srb.help/2001
-    11 |end
-    12 |
-
-editor.rb:3: Hint: this "def" token might not be properly closed https://srb.help/2003
-     3 |  def foo
-          ^^^
-    editor.rb:11: Matching `end` found here but is not indented as far
-    11 |end
-        ^^^
-Errors: 3
-```
-
-If you use Sorbet and ever come across a file where you either didn't get the
-autocompletion results that you wanted or you thought a syntax error was particularly
-confusing, feel free to [craft a bug report here] and I'd be happy to take a look.
 
 [tree-sitter]: https://tree-sitter.github.io/tree-sitter/
 [semantic]: https://github.com/github/semantic
