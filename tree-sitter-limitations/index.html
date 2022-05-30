@@ -150,13 +150,14 @@
 <p>To make it more obvious why this parse tree is not great, it’s basically the same parse tree as produced by this program:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> A {</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">foo</span>() {</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">bar</span>() {</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bar</span>()<span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Some points:</p>
 <ul>
-<li>Even though <code>bar() { ... }</code> is valid method syntax, there’s no mention of any method called <code>bar</code> in the parse. Instead, the parser thinks that there was a <strong>method call</strong> to a method named <code>bar</code> on an implicit receiver (i.e., <code>this</code>).</li>
-<li>The syntax error shows up after the imagined call to <code>bar</code> (associated with the <code>{</code> immediately after the <code>bar()</code> token), not associated with the <code>foo</code> method.</li>
+<li>Even though <code>bar() { ... }</code> is valid method syntax, there’s no definition of a method called <code>bar</code> in the parse. Instead, the parser thinks that there was a <strong>function call</strong> to a function named <code>bar</code> that doesn’t exist.</li>
+<li>The syntax error shows up after the imagined call to <code>bar</code> (associated with the <code>{</code> immediately after the call to <code>bar</code>), not associated with the <code>foo</code> method.</li>
 </ul>
 <p>If the user’s cursor was inside the <code>bar</code> method and asking for completion results, we’d be forced to serve them completion results as though their cursor was inside the half-formed <code>foo</code> method, which produces completely wrong results.</p>
 <p>This behavior is not unique to JavaScript. I’ve reproduced it almost verbatim in Ruby and Java, and partially in most other tree-sitter parsers (C#, C++, Rust, etc.).</p>
