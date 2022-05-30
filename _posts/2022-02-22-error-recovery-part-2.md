@@ -8,7 +8,7 @@ description: >
   to Sorbet's parser." Specifically, it's about approaches I considered but decided
   against.
 math: false
-categories: ['sorbet', 'parsing']
+categories: ['sorbet', 'parsing', 'tree-sitter']
 subtitle: "What I Didn't Do"
 # author:
 # author_url:
@@ -91,9 +91,9 @@ Importantly...
   error when there isn't one, or not reporting an error when there is one, both of which
   are particularly bad.
 
-  Given that it was both (1) going to take extra hacks to get working instead of being a
-  drop-in solution and (2) potentially trade Sorbet's mature parser for a less-mature
-  parser, it didn't seem worth pursuing.
+  Given that it was both (1) going to take extra hacks[^hacks] to get working instead of
+  being a drop-in solution and (2) potentially trade Sorbet's mature parser for a
+  less-mature parser, it didn't seem worth pursuing.
 
 - Sorbet's parser is not hand-written with [recursive descent].
 
@@ -111,6 +111,9 @@ Importantly...
   parser. Some of them intentionally break Ruby compatibility (in minor ways), and
   even the changes that don't would likely require effort to get them merged properly. If
   you find my changes and want to submit them upstream, please go ahead!
+
+[^hacks]:
+  After publishing this post, I wrote more about my [thoughts on tree-sitter].
 
 All of these claims about Sorbet's parser were true when I started, and they haven't
 changed. You'll notice that in most cases the justification is "I don't have time to do
@@ -208,6 +211,7 @@ The next few posts will discuss those tricks!
 
 [tree-sitter]: https://tree-sitter.github.io/tree-sitter/
 [tree-sitter playground]: https://tree-sitter.github.io/tree-sitter/playground
+[thoughts on tree-sitter]: /tree-sitter-limitations/
 
 [recursive descent]: https://en.wikipedia.org/wiki/Recursive_descent_parser
 
