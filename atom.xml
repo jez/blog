@@ -1,4 +1,179 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-05-18T15:09:40-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">What would a type-aware Rubocop look like?</title><link href="https://blog.jez.io/type-aware-rubocop/" rel="alternate" type="text/html" title="What would a type-aware Rubocop look like?" /><published>2022-05-16T16:17:20-04:00</published><updated>2022-05-16T16:17:20-04:00</updated><id>https://blog.jez.io/type-aware-rubocop</id><content type="html" xml:base="https://blog.jez.io/type-aware-rubocop/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-05-30T04:47:37-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Is tree-sitter good enough?</title><link href="https://blog.jez.io/tree-sitter-limitations/" rel="alternate" type="text/html" title="Is tree-sitter good enough?" /><published>2022-05-30T04:43:46-04:00</published><updated>2022-05-30T04:43:46-04:00</updated><id>https://blog.jez.io/tree-sitter-limitations</id><content type="html" xml:base="https://blog.jez.io/tree-sitter-limitations/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+  &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
+  &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
+  &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
+  &lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#appendix-sorbet&quot;&gt;Appendix: Sorbet&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+
+&lt;main&gt;
+&lt;p&gt;My answer: mostly no, or at the very least not for all cases, though I really wish it were good enough for the use cases I have, because then I would have less work to do.&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;p&gt;I’m guessing you already know what tree-sitter is because you clicked on the title. If you clicked because you were hoping to find out: &lt;a href=&quot;https://tree-sitter.github.io/tree-sitter/&quot;&gt;tree-sitter&lt;/a&gt; is a relatively&lt;span class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;Is it still new? The GitHub repo has commits dating back to 2013, though I only first heard about it in 2017. It still has a feeling of newness about it, but I digress.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; new project which aims to make writing fast, error-tolerant parsers take less work. To do that, it provides both pre-built parsers for common programming languages and a toolkit for building new parsers. It’s known for use in various GitHub features by way of their &lt;a href=&quot;https://github.com/github/semantic&quot;&gt;semantic&lt;/a&gt; tool, which powers the code navigation tooltips that you sometimes see on GitHub.&lt;span class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-1&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-1&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;The semantic repo actually has a &lt;a href=&quot;https://github.com/github/semantic/blob/master/docs/why-tree-sitter.md&quot;&gt;short overview&lt;/a&gt; of why they chose tree-sitter, along with some drawbacks.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;I see a lot of talk about tree-sitter these days. And for a lot of projects, it’s really nice! This is especially true for projects that want to be able to parse a super wide variety of languages with an otherwise uniform API with the least amount of manual work. Things like writing a syntax highlighter in an editor, or building something like &lt;a href=&quot;https://www.emacswiki.org/emacs/ParEdit&quot;&gt;ParEdit&lt;/a&gt; for arbitrary languages, or providing best-effort jump-to-definition results.&lt;span class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-2&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-2&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;Another neat use case, from work: every time a commit is pushed to an approved PR, the approval is dismissed, unless (using tree-sitter) the CI system detects that the parse tree hasn’t changed. This spares comment and formatting changes the toil of a re-review.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;When those goals are flipped—it has to work for exactly one language, and “best-effort” isn’t enough—tree-sitter becomes less attractive. As someone who works on language tooling &lt;a href=&quot;https://jez.io/#work&quot;&gt;professionally&lt;/a&gt; and is lazy, it’s kind of disappointing. As much as tree-sitter enthusiasts sell it as a magical solution that can free me from having to think about parsers, it’s just not been that silver bullet in my experience.&lt;/p&gt;
+&lt;p&gt;There are two questions I would pose to anyone curious about using tree-sitter for their parser:&lt;/p&gt;
+&lt;ol type=&quot;1&quot;&gt;
+&lt;li&gt;Is serving autocompletion requests going to be one of your use cases?&lt;/li&gt;
+&lt;li&gt;How much do you care about custom messages for syntax errors?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If either or both of these are important, I’d probably recommend rolling your own parser, either using a parser generator or using recursive descent by hand. The longer lived your project is, the more these constraints are going to be hard to accomplish in tree-sitter.&lt;/p&gt;
+&lt;p&gt;At this point, I should caveat this by saying that I’ve come to these conclusions having spent far less time with tree-sitter than I have with other parsing techniques, so maybe I only think they’re harder than they actually are because I lack a depth of tree-sitter experience.&lt;/p&gt;
+&lt;p&gt;When investigating tree-sitter as a replacement for an existing parser, it’s been too easy to find parses from tree-sitter that don’t look like what I’d expect out of a parser that is meant to handle the kinds of errors programmers write in the real world.&lt;/p&gt;
+&lt;p&gt;It’s entirely possible that I’ve just been &lt;em&gt;really&lt;/em&gt; unlucky, and that the problems I’ve found are all fixable with a few bug reports and a little elbow grease. But it just seems to me that if I’m going to have to spend time fixing bugs anyways, it may as well be in a parser I’ve written myself.&lt;/p&gt;
+&lt;p&gt;Let me show what I mean. Here are some snippets of code that I hope you’ll agree represents code someone might write mid-edit, for which you want to both (1) provide autocompletion results for and (2) provide a human-friendly error message for. Following the code snippet is the parse result produced by the corresponding tree-sitter grammar for that language. You can follow along on the &lt;a href=&quot;https://tree-sitter.github.io/tree-sitter/playground&quot;&gt;tree-sitter online playground&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;/p&gt;
+&lt;p&gt;Let’s start with a Ruby program:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot;&gt;&lt;pre class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;f &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;-&amp;gt;&lt;/span&gt;(x) &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-2&quot;&gt;&lt;a href=&quot;#cb1-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  x&lt;span class=&quot;kw&quot;&gt;.&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-3&quot;&gt;&lt;a href=&quot;#cb1-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot;&gt;&lt;pre class=&quot;sourceCode numberSource numberLines hl-8 hl-9&quot;&gt;&lt;code class=&quot;sourceCode&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot;&gt;&lt;/a&gt;program [0, 0] - [3, 0]&lt;/span&gt;
+&lt;span id=&quot;cb2-2&quot;&gt;&lt;a href=&quot;#cb2-2&quot;&gt;&lt;/a&gt;  assignment [0, 0] - [2, 1]&lt;/span&gt;
+&lt;span id=&quot;cb2-3&quot;&gt;&lt;a href=&quot;#cb2-3&quot;&gt;&lt;/a&gt;    left: identifier [0, 0] - [0, 1]&lt;/span&gt;
+&lt;span id=&quot;cb2-4&quot;&gt;&lt;a href=&quot;#cb2-4&quot;&gt;&lt;/a&gt;    right: lambda [0, 4] - [2, 1]&lt;/span&gt;
+&lt;span id=&quot;cb2-5&quot;&gt;&lt;a href=&quot;#cb2-5&quot;&gt;&lt;/a&gt;      parameters: lambda_parameters [0, 6] - [0, 9]&lt;/span&gt;
+&lt;span id=&quot;cb2-6&quot;&gt;&lt;a href=&quot;#cb2-6&quot;&gt;&lt;/a&gt;        identifier [0, 7] - [0, 8]&lt;/span&gt;
+&lt;span id=&quot;cb2-7&quot;&gt;&lt;a href=&quot;#cb2-7&quot;&gt;&lt;/a&gt;      body: block [0, 10] - [2, 1]&lt;/span&gt;
+&lt;span id=&quot;cb2-8&quot;&gt;&lt;a href=&quot;#cb2-8&quot;&gt;&lt;/a&gt;        identifier [1, 2] - [1, 3]&lt;/span&gt;
+&lt;span id=&quot;cb2-9&quot;&gt;&lt;a href=&quot;#cb2-9&quot;&gt;&lt;/a&gt;        ERROR [1, 3] - [1, 4]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;By way of comparison, here’s what a valid parse looks like:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb3&quot;&gt;&lt;pre class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb3-1&quot;&gt;&lt;a href=&quot;#cb3-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;f &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;-&amp;gt;&lt;/span&gt;(x) &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-2&quot;&gt;&lt;a href=&quot;#cb3-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  x&lt;span class=&quot;at&quot;&gt;.foo&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-3&quot;&gt;&lt;a href=&quot;#cb3-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb4&quot;&gt;&lt;pre class=&quot;sourceCode numberSource numberLines hl-8 hl-9 hl-10&quot;&gt;&lt;code class=&quot;sourceCode&quot;&gt;&lt;span id=&quot;cb4-1&quot;&gt;&lt;a href=&quot;#cb4-1&quot;&gt;&lt;/a&gt;program [0, 0] - [3, 0]&lt;/span&gt;
+&lt;span id=&quot;cb4-2&quot;&gt;&lt;a href=&quot;#cb4-2&quot;&gt;&lt;/a&gt;  assignment [0, 0] - [2, 1]&lt;/span&gt;
+&lt;span id=&quot;cb4-3&quot;&gt;&lt;a href=&quot;#cb4-3&quot;&gt;&lt;/a&gt;    left: identifier [0, 0] - [0, 1]&lt;/span&gt;
+&lt;span id=&quot;cb4-4&quot;&gt;&lt;a href=&quot;#cb4-4&quot;&gt;&lt;/a&gt;    right: lambda [0, 4] - [2, 1]&lt;/span&gt;
+&lt;span id=&quot;cb4-5&quot;&gt;&lt;a href=&quot;#cb4-5&quot;&gt;&lt;/a&gt;      parameters: lambda_parameters [0, 6] - [0, 9]&lt;/span&gt;
+&lt;span id=&quot;cb4-6&quot;&gt;&lt;a href=&quot;#cb4-6&quot;&gt;&lt;/a&gt;        identifier [0, 7] - [0, 8]&lt;/span&gt;
+&lt;span id=&quot;cb4-7&quot;&gt;&lt;a href=&quot;#cb4-7&quot;&gt;&lt;/a&gt;      body: block [0, 10] - [2, 1]&lt;/span&gt;
+&lt;span id=&quot;cb4-8&quot;&gt;&lt;a href=&quot;#cb4-8&quot;&gt;&lt;/a&gt;        call [1, 2] - [1, 7]&lt;/span&gt;
+&lt;span id=&quot;cb4-9&quot;&gt;&lt;a href=&quot;#cb4-9&quot;&gt;&lt;/a&gt;          receiver: identifier [1, 2] - [1, 3]&lt;/span&gt;
+&lt;span id=&quot;cb4-10&quot;&gt;&lt;a href=&quot;#cb4-10&quot;&gt;&lt;/a&gt;          method: identifier [1, 4] - [1, 7]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;In the good parse, tree-sitter produces a &lt;code&gt;call&lt;/code&gt; node. In the bad parse, it just produces a &lt;code&gt;block&lt;/code&gt; that has a list containing two elements. Ideally, what we’d see here is something like this:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;call
+  receiver: identifier
+  method: ERROR&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Which tells us (1) that there was a method call, (2) what the receiver of the method call was so we know where to start looking for methods to autocomplete, (3) that the syntax error was localized to the method call.&lt;/p&gt;
+&lt;p&gt;There’s a similar problem with constants accesses:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb6&quot;&gt;&lt;pre class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb6-1&quot;&gt;&lt;a href=&quot;#cb6-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;f &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;-&amp;gt;&lt;/span&gt;(x) &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb6-2&quot;&gt;&lt;a href=&quot;#cb6-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  A&lt;span class=&quot;kw&quot;&gt;::&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb6-3&quot;&gt;&lt;a href=&quot;#cb6-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb6-4&quot;&gt;&lt;a href=&quot;#cb6-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;g &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;-&amp;gt;&lt;/span&gt;(x) &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb6-5&quot;&gt;&lt;a href=&quot;#cb6-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  A&lt;span class=&quot;kw&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;cn&quot;&gt;B&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb6-6&quot;&gt;&lt;a href=&quot;#cb6-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb7&quot;&gt;&lt;pre class=&quot;sourceCode numberSource numberLines&quot;&gt;&lt;code class=&quot;sourceCode&quot;&gt;&lt;span id=&quot;cb7-1&quot;&gt;&lt;a href=&quot;#cb7-1&quot;&gt;&lt;/a&gt;program [0, 0] - [6, 0]&lt;/span&gt;
+&lt;span id=&quot;cb7-2&quot;&gt;&lt;a href=&quot;#cb7-2&quot;&gt;&lt;/a&gt;  # ...&lt;/span&gt;
+&lt;span id=&quot;cb7-3&quot;&gt;&lt;a href=&quot;#cb7-3&quot;&gt;&lt;/a&gt;      body: block [0, 10] - [2, 1]&lt;/span&gt;
+&lt;span id=&quot;cb7-4&quot;&gt;&lt;a href=&quot;#cb7-4&quot;&gt;&lt;/a&gt;        constant [1, 2] - [1, 3]&lt;/span&gt;
+&lt;span id=&quot;cb7-5&quot;&gt;&lt;a href=&quot;#cb7-5&quot;&gt;&lt;/a&gt;        ERROR [1, 3] - [1, 5]&lt;/span&gt;
+&lt;span id=&quot;cb7-6&quot;&gt;&lt;a href=&quot;#cb7-6&quot;&gt;&lt;/a&gt;  # ...&lt;/span&gt;
+&lt;span id=&quot;cb7-7&quot;&gt;&lt;a href=&quot;#cb7-7&quot;&gt;&lt;/a&gt;      body: block [3, 10] - [5, 1]&lt;/span&gt;
+&lt;span id=&quot;cb7-8&quot;&gt;&lt;a href=&quot;#cb7-8&quot;&gt;&lt;/a&gt;        scope_resolution [4, 2] - [4, 6]&lt;/span&gt;
+&lt;span id=&quot;cb7-9&quot;&gt;&lt;a href=&quot;#cb7-9&quot;&gt;&lt;/a&gt;          scope: constant [4, 2] - [4, 3]&lt;/span&gt;
+&lt;span id=&quot;cb7-10&quot;&gt;&lt;a href=&quot;#cb7-10&quot;&gt;&lt;/a&gt;          name: constant [4, 5] - [4, 6]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;/p&gt;
+&lt;p&gt;Maybe this example was a little contrived, because a comparable program written in JavaScript actually parses the way I’d hoped the Ruby one did. Okay, maybe it’s just a bug in the Ruby grammar?&lt;/p&gt;
+&lt;p&gt;This next snippet reproduces in both Ruby and JavaScript:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb8&quot;&gt;&lt;pre class=&quot;sourceCode js&quot;&gt;&lt;code class=&quot;sourceCode javascript&quot;&gt;&lt;span id=&quot;cb8-1&quot;&gt;&lt;a href=&quot;#cb8-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;class&lt;/span&gt; A {&lt;/span&gt;
+&lt;span id=&quot;cb8-2&quot;&gt;&lt;a href=&quot;#cb8-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;fu&quot;&gt;foo&lt;/span&gt;() {&lt;/span&gt;
+&lt;span id=&quot;cb8-3&quot;&gt;&lt;a href=&quot;#cb8-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb8-4&quot;&gt;&lt;a href=&quot;#cb8-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;fu&quot;&gt;bar&lt;/span&gt;() {&lt;/span&gt;
+&lt;span id=&quot;cb8-5&quot;&gt;&lt;a href=&quot;#cb8-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  }&lt;/span&gt;
+&lt;span id=&quot;cb8-6&quot;&gt;&lt;a href=&quot;#cb8-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;program [0, 0] - [6, 0]
+  class_declaration [0, 0] - [5, 1]
+    name: identifier [0, 6] - [0, 7]
+    body: class_body [0, 8] - [5, 1]
+      member: method_definition [1, 2] - [4, 3]
+        name: property_identifier [1, 2] - [1, 5]
+        parameters: formal_parameters [1, 5] - [1, 7]
+        body: statement_block [1, 8] - [4, 3]
+          expression_statement [3, 2] - [3, 9]
+            call_expression [3, 2] - [3, 7]
+              function: identifier [3, 2] - [3, 5]
+              arguments: arguments [3, 5] - [3, 7]
+            ERROR [3, 8] - [3, 9]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It’s hard to see what’s going on here without matching up the line numbers in the parse tree. Here’s essentially what the snippet above looks like to tree-sitter:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb10&quot;&gt;&lt;pre class=&quot;sourceCode js&quot;&gt;&lt;code class=&quot;sourceCode javascript&quot;&gt;&lt;span id=&quot;cb10-1&quot;&gt;&lt;a href=&quot;#cb10-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;class&lt;/span&gt; A {&lt;/span&gt;
+&lt;span id=&quot;cb10-2&quot;&gt;&lt;a href=&quot;#cb10-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;fu&quot;&gt;foo&lt;/span&gt;() {&lt;/span&gt;
+&lt;span id=&quot;cb10-3&quot;&gt;&lt;a href=&quot;#cb10-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;kw&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;fu&quot;&gt;bar&lt;/span&gt;() {&lt;/span&gt;
+&lt;span id=&quot;cb10-4&quot;&gt;&lt;a href=&quot;#cb10-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  }&lt;/span&gt;
+&lt;span id=&quot;cb10-5&quot;&gt;&lt;a href=&quot;#cb10-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Some points:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Even though &lt;code&gt;bar() { ... }&lt;/code&gt; is valid method syntax, that’s gone. The parser thinks that there was a call to a method named &lt;code&gt;bar&lt;/code&gt; on an implicit receiver (i.e., &lt;code&gt;this&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;The syntax error shows up after the imagined call to &lt;code&gt;bar&lt;/code&gt;, not associated with the &lt;code&gt;foo&lt;/code&gt; method.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It gets even worse if the snippet changes so that &lt;code&gt;bar&lt;/code&gt; actually has parameters and code in the method body.&lt;span class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-3&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-3&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;The parameters become call-site arguments, and the code acts as though it was written inside &lt;code&gt;foo&lt;/code&gt; not &lt;code&gt;bar&lt;/code&gt;.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; With a parse that drops the &lt;code&gt;bar&lt;/code&gt; method definition entirely, the user no longer receives autocompletion results inside &lt;code&gt;bar&lt;/code&gt; until they fix the error in &lt;code&gt;foo&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The best error message here would be to point out to the author that their curly braces are mismatched,&lt;span class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-4&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-4&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;Indeed, that’s &lt;a href=&quot;https://play.rust-lang.org/?version=stable&amp;amp;mode=debug&amp;amp;edition=2021&amp;amp;gist=872bd946a8789aba9d49e07aef614819&quot;&gt;exactly the error&lt;/a&gt; on a comparable Rust example. (Rust’s parser is hand-written.)&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; and then ideally use that information to recover when parsing.&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;/p&gt;
+&lt;p&gt;I could turn this into a post full of weird code snippets and poor parse results, but that’s not useful. What I’m trying to show is that when the demands are “the one specific language I care about has lots of idiosyncratic parse errors that are super common when in an editor,” then you’re still going to be limited by the quality of the particular tree-sitter grammar you’re working with. Fixing bugs in that grammar requires working within the constraints tree-sitter imposes to be able to power all the grammar-agnostic features (best-effort error recovery, uniform API, etc.) that it provides.&lt;/p&gt;
+&lt;p&gt;On the other hand, if you control the whole parser, you can bend it however you want. You arguably do more work, but you at least have the option of doing more work (with the reward of better results).&lt;/p&gt;
+&lt;p&gt;Don’t get me wrong, I still think tree-sitter is a great project with a neat new idea, and it’s done more to make parsing more accessible than any recent effort. But too many people tout it as something with no tradeoffs, and I just don’t think that’s fair.&lt;/p&gt;
+&lt;p&gt;If you think I’m overlooking something, please let me know and I’ll happily update this post, and maybe even start using tree-sitter in my projects.&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;/p&gt;
+&lt;h1 id=&quot;appendix-sorbet&quot;&gt;Appendix: Sorbet&lt;/h1&gt;
+&lt;p&gt;This is the part where I get to gleefully show off Sorbet’s parser, which I’m quite proud of.&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb11&quot;&gt;&lt;pre class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb11-1&quot;&gt;&lt;a href=&quot;#cb11-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# typed: true&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb11-2&quot;&gt;&lt;a href=&quot;#cb11-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;class&lt;/span&gt; A&lt;/span&gt;
+&lt;span id=&quot;cb11-3&quot;&gt;&lt;a href=&quot;#cb11-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; foo&lt;/span&gt;
+&lt;span id=&quot;cb11-4&quot;&gt;&lt;a href=&quot;#cb11-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;fu&quot;&gt;puts&lt;/span&gt;(&lt;span class=&quot;vs&quot;&gt;&amp;#39;inside foo&amp;#39;&lt;/span&gt;)&lt;/span&gt;
+&lt;span id=&quot;cb11-5&quot;&gt;&lt;a href=&quot;#cb11-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb11-6&quot;&gt;&lt;a href=&quot;#cb11-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;fu&quot;&gt;puts&lt;/span&gt;(&lt;span class=&quot;vs&quot;&gt;&amp;#39;after (outside) foo&amp;#39;&lt;/span&gt;)&lt;/span&gt;
+&lt;span id=&quot;cb11-7&quot;&gt;&lt;a href=&quot;#cb11-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb11-8&quot;&gt;&lt;a href=&quot;#cb11-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; bar(x)&lt;/span&gt;
+&lt;span id=&quot;cb11-9&quot;&gt;&lt;a href=&quot;#cb11-9&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    x&lt;span class=&quot;kw&quot;&gt;.&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb11-10&quot;&gt;&lt;a href=&quot;#cb11-10&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb11-11&quot;&gt;&lt;a href=&quot;#cb11-11&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The parse tree:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb12&quot;&gt;&lt;pre class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb12-1&quot;&gt;&lt;a href=&quot;#cb12-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;s(&lt;span class=&quot;wa&quot;&gt;:class&lt;/span&gt;,&lt;/span&gt;
+&lt;span id=&quot;cb12-2&quot;&gt;&lt;a href=&quot;#cb12-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  s(&lt;span class=&quot;wa&quot;&gt;:const&lt;/span&gt;, &lt;span class=&quot;dv&quot;&gt;nil&lt;/span&gt;, &lt;span class=&quot;wa&quot;&gt;:A&lt;/span&gt;), &lt;span class=&quot;dv&quot;&gt;nil&lt;/span&gt;,&lt;/span&gt;
+&lt;span id=&quot;cb12-3&quot;&gt;&lt;a href=&quot;#cb12-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  s(&lt;span class=&quot;wa&quot;&gt;:begin&lt;/span&gt;,&lt;/span&gt;
+&lt;span id=&quot;cb12-4&quot;&gt;&lt;a href=&quot;#cb12-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    s(&lt;span class=&quot;wa&quot;&gt;:def&lt;/span&gt;, &lt;span class=&quot;wa&quot;&gt;:foo&lt;/span&gt;, &lt;span class=&quot;dv&quot;&gt;nil&lt;/span&gt;,&lt;/span&gt;
+&lt;span id=&quot;cb12-5&quot;&gt;&lt;a href=&quot;#cb12-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;      s(&lt;span class=&quot;wa&quot;&gt;:begin&lt;/span&gt;,&lt;/span&gt;
+&lt;span id=&quot;cb12-6&quot;&gt;&lt;a href=&quot;#cb12-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;        s(&lt;span class=&quot;wa&quot;&gt;:send&lt;/span&gt;, &lt;span class=&quot;dv&quot;&gt;nil&lt;/span&gt;, &lt;span class=&quot;wa&quot;&gt;:puts&lt;/span&gt;,&lt;/span&gt;
+&lt;span id=&quot;cb12-7&quot;&gt;&lt;a href=&quot;#cb12-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;          s(&lt;span class=&quot;wa&quot;&gt;:str&lt;/span&gt;, &lt;span class=&quot;st&quot;&gt;&amp;quot;inside foo&amp;quot;&lt;/span&gt;)))),&lt;/span&gt;
+&lt;span id=&quot;cb12-8&quot;&gt;&lt;a href=&quot;#cb12-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    s(&lt;span class=&quot;wa&quot;&gt;:send&lt;/span&gt;, &lt;span class=&quot;dv&quot;&gt;nil&lt;/span&gt;, &lt;span class=&quot;wa&quot;&gt;:puts&lt;/span&gt;,&lt;/span&gt;
+&lt;span id=&quot;cb12-9&quot;&gt;&lt;a href=&quot;#cb12-9&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;      s(&lt;span class=&quot;wa&quot;&gt;:str&lt;/span&gt;, &lt;span class=&quot;st&quot;&gt;&amp;quot;after (outside) foo&amp;quot;&lt;/span&gt;)),&lt;/span&gt;
+&lt;span id=&quot;cb12-10&quot;&gt;&lt;a href=&quot;#cb12-10&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    s(&lt;span class=&quot;wa&quot;&gt;:def&lt;/span&gt;, &lt;span class=&quot;wa&quot;&gt;:bar&lt;/span&gt;,&lt;/span&gt;
+&lt;span id=&quot;cb12-11&quot;&gt;&lt;a href=&quot;#cb12-11&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;      s(&lt;span class=&quot;wa&quot;&gt;:args&lt;/span&gt;,&lt;/span&gt;
+&lt;span id=&quot;cb12-12&quot;&gt;&lt;a href=&quot;#cb12-12&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;        s(&lt;span class=&quot;wa&quot;&gt;:arg&lt;/span&gt;, &lt;span class=&quot;wa&quot;&gt;:x&lt;/span&gt;)),&lt;/span&gt;
+&lt;span id=&quot;cb12-13&quot;&gt;&lt;a href=&quot;#cb12-13&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;      s(&lt;span class=&quot;wa&quot;&gt;:send&lt;/span&gt;,&lt;/span&gt;
+&lt;span id=&quot;cb12-14&quot;&gt;&lt;a href=&quot;#cb12-14&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;        s(&lt;span class=&quot;wa&quot;&gt;:lvar&lt;/span&gt;, &lt;span class=&quot;wa&quot;&gt;:x&lt;/span&gt;), :&lt;span class=&quot;kw&quot;&gt;&amp;lt;&lt;/span&gt;method&lt;span class=&quot;kw&quot;&gt;-&lt;/span&gt;name&lt;span class=&quot;kw&quot;&gt;-&lt;/span&gt;missing&lt;span class=&quot;kw&quot;&gt;&amp;gt;&lt;/span&gt;))))&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The errors:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;editor.rb:10: unexpected token &amp;quot;end&amp;quot; https://srb.help/2001
+    10 |  end
+          ^^^
+
+editor.rb:11: unexpected token &amp;quot;end of file&amp;quot; https://srb.help/2001
+    11 |end
+    12 |
+
+editor.rb:3: Hint: this &amp;quot;def&amp;quot; token might not be properly closed https://srb.help/2003
+     3 |  def foo
+          ^^^
+    editor.rb:11: Matching `end` found here but is not indented as far
+    11 |end
+        ^^^
+Errors: 3&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you use Sorbet and ever come across a file where you either didn’t get the autocompletion results that you wanted or you thought a syntax error was particularly confusing, feel free to &lt;a href=&quot;https://sorbet.run/?arg=--print=parse-tree-whitequark#%23%20typed%3A%20true%0A%23%20Share%20your%20example%20with%20%22Examples%20%3E%20Create%20issue%20with%20example%22%0A&quot;&gt;craft a bug report here&lt;/a&gt; and I’d be happy to take a look.&lt;/p&gt;
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="parsing" /><category term="tree-sitter" /><summary type="html">← Return home My answer: mostly no, or at the very least not for all cases, though I really wish it were good enough for the use cases I have, because then I would have less work to do.</summary></entry><entry><title type="html">What would a type-aware Rubocop look like?</title><link href="https://blog.jez.io/type-aware-rubocop/" rel="alternate" type="text/html" title="What would a type-aware Rubocop look like?" /><published>2022-05-16T16:17:20-04:00</published><updated>2022-05-16T16:17:20-04:00</updated><id>https://blog.jez.io/type-aware-rubocop</id><content type="html" xml:base="https://blog.jez.io/type-aware-rubocop/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
   &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
   &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
@@ -356,13 +531,15 @@ Errors: 1&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Tree-sitter is tool whose main goals are basically 100% aligned with Sorbet’s needs in a parser: fast enough to run on every keystoke, robust enough to handle syntax errors, and native-code friendly. It would seem like a no-brainer for Sorbet to use.&lt;/p&gt;
 &lt;p&gt;Unfortunately when I looked closely, it didn’t actually pan out. I used the &lt;a href=&quot;https://tree-sitter.github.io/tree-sitter/playground&quot;&gt;tree-sitter playground&lt;/a&gt; to test a bunch of syntax errors where I wanted to be able to respond to completion requests for to see what the parse result looked like. In some cases it worked okay, but for the cases I cared about the most (mostly those involving &lt;code&gt;x.&lt;/code&gt;), the results weren’t good enough. If I was going to have to manually hack on a parser to get it to do what I wanted, I figured I’d rather just stick with what Sorbet already had.&lt;/p&gt;
 &lt;p&gt;On top of that tree-sitter is still pretty young, and almost everyone who is using tree-sitter right now is using it for two use cases: syntax highlighting, and code navigation. If the parse result generates the wrong thing (imagine there’s a bug in the grammar file that no one else has reported yet), oh well, maybe the colors are wrong or the jump-to-def goes to the wrong place. In Sorbet, it would mean either reporting an error when there isn’t one, or not reporting an error when there is one, both of which are particularly bad.&lt;/p&gt;
-&lt;p&gt;Given that it was both (1) going to take extra hacks to get working instead of being a drop-in solution and (2) potentially trade Sorbet’s mature parser for a less-mature parser, it didn’t seem worth pursuing.&lt;/p&gt;&lt;/li&gt;
+&lt;p&gt;Given that it was both (1) going to take extra hacks&lt;span class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-2&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-2&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;After publishing this post, I wrote more about my &lt;a href=&quot;/tree-sitter-limitations/&quot;&gt;thoughts on tree-sitter&lt;/a&gt;.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; to get working instead of being a drop-in solution and (2) potentially trade Sorbet’s mature parser for a less-mature parser, it didn’t seem worth pursuing.&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;Sorbet’s parser is not hand-written with &lt;a href=&quot;https://en.wikipedia.org/wiki/Recursive_descent_parser&quot;&gt;recursive descent&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Many people whose opinions I respect have told me that there’s a reason why so many people hand-write their parsers: error recovery is easier when given the flexibility to bend the whole parser to your will.&lt;/p&gt;
 &lt;p&gt;But there isn’t an existing hand-written Ruby parser I could start from, and I didn’t want to completely stall progress with a bug-for-bug rewrite when I already had some ideas for how to make the existing parser better. Basically this approach has the same tradeoffs as adopting tree-sitter (lots of work with too many unknowns).&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;All of these claims about Sorbet’s parser were true when I started, and they haven’t changed. You’ll notice that in most cases the justification is “I don’t have time to do X” and not “doing X is wrong.” My biggest constraint in improving the parser has been making small, fast, iterative improvements. I wanted to be left with something to show even if I had to stop working on the parser sooner than expected. It’s possible that someone with more time or more patience will want to revisit one of these approaches in the future, and if you do I’d love to hear about it!&lt;/p&gt;
-&lt;p&gt;Anyways, that rules out the most common refrains from onlookers. But there was another, more unconventional approach I considered and decided against: using &lt;a href=&quot;https://github.com/zombocom/dead_end&quot;&gt;dead_end&lt;/a&gt;. &lt;code&gt;dead_end&lt;/code&gt; isn’t a Ruby parser but rather a tool that hijacks Ruby’s syntax error reporting mechanism&lt;span class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-2&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-2&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;It turns out, all (“all”) you have to do is is monkey patch &lt;code&gt;require&lt;/code&gt; to &lt;code&gt;rescue   SyntaxError&lt;/code&gt;. Thanks Ruby &lt;span class=&quot;emoji&quot; data-emoji=&quot;slightly_smiling_face&quot;&gt;🙂&lt;/span&gt;&lt;br /&gt;
+&lt;p&gt;Anyways, that rules out the most common refrains from onlookers. But there was another, more unconventional approach I considered and decided against: using &lt;a href=&quot;https://github.com/zombocom/dead_end&quot;&gt;dead_end&lt;/a&gt;. &lt;code&gt;dead_end&lt;/code&gt; isn’t a Ruby parser but rather a tool that hijacks Ruby’s syntax error reporting mechanism&lt;span class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-3&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-3&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;It turns out, all (“all”) you have to do is is monkey patch &lt;code&gt;require&lt;/code&gt; to &lt;code&gt;rescue   SyntaxError&lt;/code&gt;. Thanks Ruby &lt;span class=&quot;emoji&quot; data-emoji=&quot;slightly_smiling_face&quot;&gt;🙂&lt;/span&gt;&lt;br /&gt;
 &lt;br /&gt;
 &lt;/span&gt;&lt;/span&gt; to improve the message for certain syntax errors. Specifically, it’ll try to show error messages in cases like this:&lt;/p&gt;
 &lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot;&gt;&lt;pre class=&quot;sourceCode numberSource ruby numberLines hl-4 hl-8&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;class&lt;/span&gt; A&lt;/span&gt;
@@ -373,7 +550,7 @@ Errors: 1&lt;/code&gt;&lt;/pre&gt;
 &lt;span id=&quot;cb1-6&quot;&gt;&lt;a href=&quot;#cb1-6&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; bar&lt;/span&gt;
 &lt;span id=&quot;cb1-7&quot;&gt;&lt;a href=&quot;#cb1-7&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
 &lt;span id=&quot;cb1-8&quot;&gt;&lt;a href=&quot;#cb1-8&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;co&quot;&gt;# ← ruby default error: unexpected token &amp;quot;end of file&amp;quot;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Missing an &lt;code&gt;end&lt;/code&gt; keyword is a super common class of Ruby syntax errors,&lt;span class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-3&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-3&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;One of my biggest Ruby syntax gripes is that it isn’t a curly brace language like C or JavaScript. Any sensibly editor will &lt;strong&gt;immediately&lt;/strong&gt; insert the matching &lt;code&gt;}&lt;/code&gt; after first typing &lt;code&gt;{&lt;/code&gt;. But most Ruby editors will only insert the &lt;code&gt;end&lt;/code&gt; matching some statement after a full line has been typed and &lt;code&gt;&amp;lt;Enter&amp;gt;&lt;/code&gt; has been pressed, if anything. This means that unclosed &lt;code&gt;if&lt;/code&gt;/&lt;code&gt;while&lt;/code&gt;/&lt;code&gt;do&lt;/code&gt;/&lt;code&gt;def&lt;/code&gt;/&lt;code&gt;class&lt;/code&gt; statements are &lt;strong&gt;abundantly&lt;/strong&gt; common in Ruby, and this class of error (mismatched pairs) is trickier than the average error.&lt;br /&gt;
+&lt;p&gt;Missing an &lt;code&gt;end&lt;/code&gt; keyword is a super common class of Ruby syntax errors,&lt;span class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-4&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-4&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;One of my biggest Ruby syntax gripes is that it isn’t a curly brace language like C or JavaScript. Any sensibly editor will &lt;strong&gt;immediately&lt;/strong&gt; insert the matching &lt;code&gt;}&lt;/code&gt; after first typing &lt;code&gt;{&lt;/code&gt;. But most Ruby editors will only insert the &lt;code&gt;end&lt;/code&gt; matching some statement after a full line has been typed and &lt;code&gt;&amp;lt;Enter&amp;gt;&lt;/code&gt; has been pressed, if anything. This means that unclosed &lt;code&gt;if&lt;/code&gt;/&lt;code&gt;while&lt;/code&gt;/&lt;code&gt;do&lt;/code&gt;/&lt;code&gt;def&lt;/code&gt;/&lt;code&gt;class&lt;/code&gt; statements are &lt;strong&gt;abundantly&lt;/strong&gt; common in Ruby, and this class of error (mismatched pairs) is trickier than the average error.&lt;br /&gt;
 &lt;br /&gt;
 &lt;/span&gt;&lt;/span&gt; and &lt;code&gt;dead_end&lt;/code&gt; already works particularly well at reporting them, so it was tempting to &lt;del&gt;steal&lt;/del&gt; reuse either the code or the ideas.&lt;/p&gt;
 &lt;p&gt;Early on I had decided not to use the code directly (it’s written in Ruby, and I didn’t want to add a runtime dependency on Ruby to Sorbet). But in the end, I decided not to use its recovery algorithm either.&lt;/p&gt;
@@ -393,7 +570,7 @@ Errors: 1&lt;/code&gt;&lt;/pre&gt;
 &lt;a href=&quot;/error-recovery-part-3/&quot;&gt;Part 3: Tools and Techniques for Debugging a (Bison) Parser →&lt;/a&gt;
 &lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="sorbet" /><category term="parsing" /><summary type="html">← Return home This is the second post in a series about “things I’ve learned while making improvements to Sorbet’s parser.” Specifically, it’s about approaches I considered but decided against.</summary></entry><entry><title type="html">Parse Error Recovery in Sorbet: Part 1</title><link href="https://blog.jez.io/error-recovery-part-1/" rel="alternate" type="text/html" title="Parse Error Recovery in Sorbet: Part 1" /><published>2022-02-21T03:56:34-05:00</published><updated>2022-02-21T03:56:34-05:00</updated><id>https://blog.jez.io/error-recovery-part-1</id><content type="html" xml:base="https://blog.jez.io/error-recovery-part-1/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="sorbet" /><category term="parsing" /><category term="tree-sitter" /><summary type="html">← Return home This is the second post in a series about “things I’ve learned while making improvements to Sorbet’s parser.” Specifically, it’s about approaches I considered but decided against.</summary></entry><entry><title type="html">Parse Error Recovery in Sorbet: Part 1</title><link href="https://blog.jez.io/error-recovery-part-1/" rel="alternate" type="text/html" title="Parse Error Recovery in Sorbet: Part 1" /><published>2022-02-21T03:56:34-05:00</published><updated>2022-02-21T03:56:34-05:00</updated><id>https://blog.jez.io/error-recovery-part-1</id><content type="html" xml:base="https://blog.jez.io/error-recovery-part-1/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;← Return home&lt;/a&gt;&lt;br&gt;
 &lt;/nav&gt;
 
@@ -806,95 +983,4 @@ Errors: 1&lt;/code&gt;&lt;/pre&gt;
 &lt;h1 id=&quot;appendix-lsp-in-neovim-with-languageclient-neovim&quot;&gt;Appendix: LSP in Neovim with LanguageClient-neovim&lt;/h1&gt;
 &lt;p&gt;I use Neovim. My preferred LSP client is &lt;a href=&quot;https://github.com/autozimu/LanguageClient-neovim&quot;&gt;LanguageClient-neovim&lt;/a&gt;. Here’s the parts of my Neovim config files that setup &lt;code&gt;clangd&lt;/code&gt;:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;https://github.com/jez/dotfiles/blob/865a74d93d8ab1c28713ae0dcd53797b6c26dc6a/vim/plug-settings.vim#L576-L587&quot;&gt;→ &lt;code&gt;vim/plug-settings.vim&lt;/code&gt; in jez/dotfiles&lt;/a&gt;&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="vim" /><category term="debugging" /><summary type="html">← Return home I’ve managed to get LSP-based IDE features powered by clangd working for the Ruby VM’s source code (in my case, in Vim). Here’s how I did it!</summary></entry><entry><title type="html">Linkers &amp;amp; Ruby C Extensions</title><link href="https://blog.jez.io/linkers-ruby-c-exts/" rel="alternate" type="text/html" title="Linkers &amp;amp; Ruby C Extensions" /><published>2020-06-07T13:05:07-04:00</published><updated>2020-06-07T13:05:07-04:00</updated><id>https://blog.jez.io/linkers-ruby-c-exts</id><content type="html" xml:base="https://blog.jez.io/linkers-ruby-c-exts/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
-  &lt;a href=&quot;/&quot;&gt;← Return home&lt;/a&gt;&lt;br&gt;
-&lt;/nav&gt;
-
-&lt;main&gt;
-&lt;p&gt;I recently learned that linkers are really cool. It all started when I saw an error message that looked something like this:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;❯ rake test
-symbol lookup error: /home/jez/.../foo.so: undefined symbol bar&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;I &lt;a href=&quot;/search-down-the-stack/&quot;&gt;already wrote&lt;/a&gt; about finding where this error was coming from. The tl;dr is that it was coming from GNU’s libc implementation:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;❯ rg -t c &amp;#39;symbol lookup error&amp;#39;
-dl-lookup.c
-876:      _dl_signal_cexception (0, &amp;amp;exception, N_(&amp;quot;symbol lookup error&amp;quot;));&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;That led me to a fun exploration of how linux linkers work, and how Ruby C extensions rely on them.&lt;/p&gt;
-&lt;p&gt;I always knew that Ruby C extensions existed (that they &lt;a href=&quot;https://twitter.com/asolove/status/1261339091485917184&quot;&gt;break all the time&lt;/a&gt; is a constant reminder…) but I never really connected the dots between “here’s some C code” and how Ruby actually runs that code.&lt;/p&gt;
-&lt;p&gt;Ruby C extensions are just shared libraries following certain conventions. Specifically, a Ruby C extension might look like this:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb3&quot;&gt;&lt;pre class=&quot;sourceCode c&quot;&gt;&lt;code class=&quot;sourceCode c&quot;&gt;&lt;span id=&quot;cb3-1&quot;&gt;&lt;a href=&quot;#cb3-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;pp&quot;&gt;#include &lt;/span&gt;&lt;span class=&quot;im&quot;&gt;&amp;quot;ruby.h&amp;quot;&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-2&quot;&gt;&lt;a href=&quot;#cb3-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-3&quot;&gt;&lt;a href=&quot;#cb3-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;VALUE my_foo(VALUE self, VALUE val) {&lt;/span&gt;
-&lt;span id=&quot;cb3-4&quot;&gt;&lt;a href=&quot;#cb3-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;return&lt;/span&gt; rb_funcall(self, rb_intern(&lt;span class=&quot;st&quot;&gt;&amp;quot;puts&amp;quot;&lt;/span&gt;), &lt;span class=&quot;dv&quot;&gt;1&lt;/span&gt;, val)&lt;/span&gt;
-&lt;span id=&quot;cb3-5&quot;&gt;&lt;a href=&quot;#cb3-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;}&lt;/span&gt;
-&lt;span id=&quot;cb3-6&quot;&gt;&lt;a href=&quot;#cb3-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-7&quot;&gt;&lt;a href=&quot;#cb3-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// This function&amp;#39;s name matters:&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-8&quot;&gt;&lt;a href=&quot;#cb3-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;dt&quot;&gt;void&lt;/span&gt; Init_my_lib() {&lt;/span&gt;
-&lt;span id=&quot;cb3-9&quot;&gt;&lt;a href=&quot;#cb3-9&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  rb_define_method(rb_cObject, &lt;span class=&quot;st&quot;&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;, my_foo);&lt;/span&gt;
-&lt;span id=&quot;cb3-10&quot;&gt;&lt;a href=&quot;#cb3-10&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;The important part is that the name of that &lt;code&gt;Init_my_lib&lt;/code&gt; function matters. When Ruby sees a line like&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb4&quot;&gt;&lt;pre class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb4-1&quot;&gt;&lt;a href=&quot;#cb4-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;fu&quot;&gt;require_relative&lt;/span&gt; &lt;span class=&quot;vs&quot;&gt;&amp;#39;./my_lib&amp;#39;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;it looks for a file called &lt;code&gt;my_lib.so&lt;/code&gt; (or &lt;code&gt;my_lib.bundle&lt;/code&gt; on macOS), asks the operating system to load that file as a shared library, and then looks for a function with the name &lt;code&gt;Init_my_lib&lt;/code&gt; inside the library it just loaded.&lt;/p&gt;
-&lt;p&gt;When that function runs, it’s a chance for the C extension to do the same sorts of things that a normal Ruby file might have done if it had been &lt;code&gt;require&lt;/code&gt;’d. In this example, it defines a method &lt;code&gt;foo&lt;/code&gt; at the top level, almost like the user had written normal Ruby code like this:&lt;/p&gt;
-&lt;figure&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb5&quot;&gt;&lt;pre class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb5-1&quot;&gt;&lt;a href=&quot;#cb5-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; foo(val)&lt;/span&gt;
-&lt;span id=&quot;cb5-2&quot;&gt;&lt;a href=&quot;#cb5-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;fu&quot;&gt;puts&lt;/span&gt; val&lt;/span&gt;
-&lt;span id=&quot;cb5-3&quot;&gt;&lt;a href=&quot;#cb5-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;figcaption&gt;
-my_lib.rb
-&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;That’s kind of wild! That means:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;C programs can load libraries dynamically at runtime, using arbitrary user input.&lt;/li&gt;
-&lt;li&gt;C programs can then ask if there’s a function defined in that library with an arbitrary name, and get a function pointer to call it if there is!&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;I was pretty shocked to learn this, because my mental model of how linking worked was that it split evenly into two parts:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;“My application is statically linked, where all the code and libraries my application depends on are compiled into my binary.”&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;“My application is dynamically linked, which means my binary pre-declares some libraries that must be loaded before my program can start running.”&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;There’s actually a third option!&lt;/p&gt;
-&lt;p&gt;Then I looked into what code Ruby actually calls to do this. I found the code in &lt;code&gt;dln.c&lt;/code&gt;:&lt;/p&gt;
-&lt;figure&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb6&quot;&gt;&lt;pre class=&quot;sourceCode c&quot;&gt;&lt;code class=&quot;sourceCode c&quot;&gt;&lt;span id=&quot;cb6-1&quot;&gt;&lt;a href=&quot;#cb6-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;/* Load file */&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-2&quot;&gt;&lt;a href=&quot;#cb6-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;if&lt;/span&gt; ((handle = (&lt;span class=&quot;dt&quot;&gt;void&lt;/span&gt;*)dlopen(file, RTLD_LAZY|RTLD_GLOBAL)) == NULL) {&lt;/span&gt;
-&lt;span id=&quot;cb6-3&quot;&gt;&lt;a href=&quot;#cb6-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    error = dln_strerror();&lt;/span&gt;
-&lt;span id=&quot;cb6-4&quot;&gt;&lt;a href=&quot;#cb6-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;cf&quot;&gt;goto&lt;/span&gt; failed;&lt;/span&gt;
-&lt;span id=&quot;cb6-5&quot;&gt;&lt;a href=&quot;#cb6-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;figcaption&gt;
-dln.c
-&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;a href=&quot;https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1341&quot;&gt;→ View on github.com&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Ruby uses the &lt;code&gt;dlopen(3)&lt;/code&gt; function in libc to request that an arbitrary user library be loaded. From the man page:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;The function dlopen() loads the dynamic shared object (shared library) file named by the null-terminated string filename and returns an opaque “handle” for the loaded object.&lt;/p&gt;
-&lt;p&gt;— man dlopen&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;The next thing Ruby does with this opaque &lt;code&gt;handle&lt;/code&gt; is to find if the thing it just loaded has an &lt;code&gt;Init_&amp;lt;...&amp;gt;&lt;/code&gt; function inside it:&lt;/p&gt;
-&lt;figure&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb7&quot;&gt;&lt;pre class=&quot;sourceCode c&quot;&gt;&lt;code class=&quot;sourceCode c&quot;&gt;&lt;span id=&quot;cb7-1&quot;&gt;&lt;a href=&quot;#cb7-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;init_fct = (&lt;span class=&quot;dt&quot;&gt;void&lt;/span&gt;(*)())(VALUE)dlsym(handle, buf);&lt;/span&gt;
-&lt;span id=&quot;cb7-2&quot;&gt;&lt;a href=&quot;#cb7-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;if&lt;/span&gt; (init_fct == NULL) {&lt;/span&gt;
-&lt;span id=&quot;cb7-3&quot;&gt;&lt;a href=&quot;#cb7-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;dt&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;size_t&lt;/span&gt; errlen = strlen(error = dln_strerror()) + &lt;span class=&quot;dv&quot;&gt;1&lt;/span&gt;;&lt;/span&gt;
-&lt;span id=&quot;cb7-4&quot;&gt;&lt;a href=&quot;#cb7-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    error = memcpy(ALLOCA_N(&lt;span class=&quot;dt&quot;&gt;char&lt;/span&gt;, errlen), error, errlen);&lt;/span&gt;
-&lt;span id=&quot;cb7-5&quot;&gt;&lt;a href=&quot;#cb7-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    dlclose(handle);&lt;/span&gt;
-&lt;span id=&quot;cb7-6&quot;&gt;&lt;a href=&quot;#cb7-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;cf&quot;&gt;goto&lt;/span&gt; failed;&lt;/span&gt;
-&lt;span id=&quot;cb7-7&quot;&gt;&lt;a href=&quot;#cb7-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;figcaption&gt;
-dln.c
-&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;a href=&quot;https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1363-L1369&quot;&gt;→ View on github.com&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;It uses &lt;code&gt;dlsym(3)&lt;/code&gt; (again in libc) to look up a method with an arbitrary name (&lt;code&gt;buf&lt;/code&gt;) inside the library it just opened (&lt;code&gt;handle&lt;/code&gt;). That function must exist—if it doesn’t, it’s not a valid Ruby C extension and Ruby reports an error.&lt;/p&gt;
-&lt;p&gt;If &lt;code&gt;dlsym&lt;/code&gt; found a function with the right name, it stores a function pointer into &lt;code&gt;init_fct&lt;/code&gt;, which Ruby immediately dereferences and calls:&lt;/p&gt;
-&lt;figure&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb8&quot;&gt;&lt;pre class=&quot;sourceCode c&quot;&gt;&lt;code class=&quot;sourceCode c&quot;&gt;&lt;span id=&quot;cb8-1&quot;&gt;&lt;a href=&quot;#cb8-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;/* Call the init code */&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb8-2&quot;&gt;&lt;a href=&quot;#cb8-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;(*init_fct)();&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;figcaption&gt;
-dln.c
-&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;a href=&quot;https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1370-L1371&quot;&gt;→ View on github.com&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;It’s still kind of mind bending to think that C provides this level of “dynamism.” I had always thought that being a compiled language meant that the set of functions a C program could call was fixed at compile time, but that’s not true at all!&lt;/p&gt;
-&lt;p&gt;This search led me down a rabbit hole of learning more about linkers, and now I think they’re super cool—and far less cryptic! I &lt;strong&gt;highly&lt;/strong&gt; recommend &lt;em&gt;Chapter 7: Linking&lt;/em&gt; from &lt;a href=&quot;http://www.csapp.cs.cmu.edu/&quot;&gt;Computer Systems: A Programmer’s Perspective&lt;/a&gt; if this was interesting to you.&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="linux" /><category term="ruby" /><category term="c" /><summary type="html">← Return home I recently learned that linkers are really cool. It all started when I saw an error message that looked something like this:</summary></entry></feed>
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="vim" /><category term="debugging" /><summary type="html">← Return home I’ve managed to get LSP-based IDE features powered by clangd working for the Ruby VM’s source code (in my case, in Vim). Here’s how I did it!</summary></entry></feed>
