@@ -199,19 +199,19 @@ tree as produced by this program:
 ```js
 class A {
   foo() {
-    this.bar() {
+    bar();
+    {
   }
 }
 ```
 
 Some points:
 
-- Even though `bar() { ... }` is valid method syntax, there's no mention of any method
-  called `bar` in the parse. Instead, the parser thinks that there was a **method call**
-  to a method named `bar` on an implicit receiver (i.e., `this`).
+- Even though `bar() { ... }` is valid method syntax, there's no definition of a method
+  called `bar` in the parse. Instead, the parser thinks that there was a **function call**
+  to a function named `bar` that doesn't exist.
 - The syntax error shows up after the imagined call to `bar` (associated with the `{`
-  immediately after the `bar()` token), not associated with the
-  `foo` method.
+  immediately after the call to `bar`), not associated with the `foo` method.
 
 If the user's cursor was inside the `bar` method and asking for completion results, we'd
 be forced to serve them completion results as though their cursor was inside the
