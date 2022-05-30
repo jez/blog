@@ -232,12 +232,11 @@ are mismatched,[^rust] and then ideally use that information to recover when par
 
 I could turn this into a post full of weird code snippets and poor parse results, but
 that's not useful. What I'm trying to show is that when the demands are "the one specific
-language I care about has lots of idiosyncratic parse errors that are super common when
-authoring code in an editor," then you're still going to be limited by the quality of the
-particular tree-sitter grammar you're working with. Fixing bugs in that grammar requires
-working within the constraints tree-sitter imposes to be able to power all the
-grammar-agnostic features (best-effort error recovery, uniform API, etc.) that it
-provides.
+language I care about has lots of idiosyncratic parse errors that are super common when in
+an editor," then you're still going to be limited by the quality of the particular
+tree-sitter grammar you're working with. Fixing bugs in that grammar requires working
+within the constraints tree-sitter imposes to be able to power all the grammar-agnostic
+features (best-effort error recovery, uniform API, etc.) that it provides.
 
 On the other hand, if you control the whole parser, you can bend it however you want. You
 arguably do more work, but you at least have the option of doing more work (with the
