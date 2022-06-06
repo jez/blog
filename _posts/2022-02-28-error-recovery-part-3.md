@@ -26,7 +26,7 @@ gears to focus on specific tips and techniques I found useful while making parse
 - [Part 1: Why Recover from Syntax Errors][part1]
 - [Part 2: What I Didn't Do][part2]
 - **[Part 3: Tools and Techniques for Debugging a (Bison) Parser][part3]**
-- (*coming soon*) Part 4: Bison's `error` Token
+- [Part 4: Bison's `error` Token][part4]
 - (*coming soon*) Part 5: Backtracking, aka Lexer Hacks
 - (*coming soon*) Part 6: Falling Back on Indentation, aka More Lexer Hacks
 
@@ -136,7 +136,11 @@ lot of tokens. You'll note that Bison even lets you register `%printer`s for non
 reduced AST for that non-terminal, or some other summary.
 
 The next step is to actually understand what these traces mean, because it looks like
-there's a lot of magic names and numbers, but there's a short cut for that.
+there's a lot of magic names and numbers. The long answer is that you'll have to look in
+the textual report that Bison generates about all the intermediate states in your parser.
+This is documented in the [Understanding Your Parser] section of the Bison docs.
+
+But if you're impatient, there's a bit of a short cut that can work in many cases.
 
 # Diff traces for good and bad parses
 
@@ -263,7 +267,7 @@ more about what this `error` token means in the next post.
   [← Part 2: Why Recover from Syntax Errors][part2]
 </p>
 <p style="width: 50%; float: right; text-align: right;">
-  (*coming soon*) Part 4: Bison's `error` Token →
+  [Part 4: Bison's `error` Token →][part4]
 </p>
 
 <br>
@@ -273,3 +277,4 @@ more about what this `error` token means in the next post.
 [`parse.trace`]: https://www.gnu.org/software/bison/manual/bison.html#Tracing
 [`set_debug_level`]: https://www.gnu.org/software/bison/manual/bison.html#index-set_005fdebug_005flevel-on-parser
 [4985]: https://github.com/sorbet/sorbet/pull/4985/files?w=1#diff-63fada7036ffcba42e6615c3b85615cb81d47aafbf88122a552a34fb799c06b5R17
+[Understanding Your Parser]: https://www.gnu.org/software/bison/manual/bison.html#Understanding

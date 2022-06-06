@@ -22,7 +22,7 @@ to Sorbet's parser." Specifically, it's about approaches I considered but decide
 - [Part 1: Why Recover from Syntax Errors][part1]
 - **[Part 2: What I Didn't Do][part2]**
 - [Part 3: Tools and Techniques for Debugging a (Bison) Parser][part3]
-- (*coming soon*) Part 4: Bison's `error` Token
+- [Part 4: Bison's `error` Token][part4]
 - (*coming soon*) Part 5: Backtracking, aka Lexer Hacks
 - (*coming soon*) Part 6: Falling Back on Indentation, aka More Lexer Hacks
 
