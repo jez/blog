@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2022-06-06 01:56:49 -0400">
+<meta name="description" content="This is the fourth post in a series about things I've learned while making improvements to Sorbet's parser. With the last post, I talked about some tools and techniques that I've found useful while hacking on Sorbet's Bison-based parser. This post is going to continue that theme by explaining in a little more detail the primary tool Bison has for adding error recovery to a parser—the special `error` token.
+">
+<title>Parse Error Recovery in Sorbet: Part 4 – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">Parse Error Recovery in Sorbet: Part 4</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2022-06-06 01:56:49 -0400">June 6, 2022</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#bisons-error-recovery-algorithm">Bison’s error recovery algorithm</a></li>
+  <li><a href="#figure-out-the-most-common-edit-paths">Figure out the most common edit paths</a></li>
+  <li><a href="#the-error-token-is-usually-last">The <code>error</code> token is usually last</a></li>
+  <li><a href="#consider-using-yyclearin">Consider using <code>yyclearin</code></a></li>
+  <li><a href="#invent-a-special-ast-node-for-errors">Invent a special AST node for errors</a></li>
+  <li><a href="#read-the-generated-parsers-source">Read the generated parser’s source</a></li>
+  </ul>
+</nav>
+
+<main>
+<p>This is the fourth post in a series about “things I’ve learned while making improvements to Sorbet’s parser.” With the last post, I talked about some tools and techniques that I’ve found useful while hacking on Sorbet’s <a href="https://www.gnu.org/software/bison/">Bison</a>-based parser. This post is going to continue that theme by explaining in a little more detail the primary tool Bison has for adding error recovery to a parser: the special <code>error</code> token.</p>
+<!-- more -->
+<p>You don’t <em>really</em> need to read the previous posts for this post to be useful, but if in case you want to queue them up to read later, here’s the list:</p>
+<ul>
+<li><a href="/error-recovery-part-1/">Part 1: Why Recover from Syntax Errors</a></li>
+<li><a href="/error-recovery-part-2/">Part 2: What I Didn’t Do</a></li>
+<li><a href="/error-recovery-part-3/">Part 3: Tools and Techniques for Debugging a (Bison) Parser</a></li>
+<li><strong><a href="/error-recovery-part-4/">Part 4: Bison’s <code>error</code> Token</a></strong></li>
+<li>(<em>coming soon</em>) Part 5: Backtracking, aka Lexer Hacks</li>
+<li>(<em>coming soon</em>) Part 6: Falling Back on Indentation, aka More Lexer Hacks</li>
+</ul>
+<p>That being said, if you’re also trying to hack on a Bison parser to make it recover from errors, I hate to say it but this post is not going to be a substitute for the <a href="https://www.gnu.org/software/bison/manual/bison.html#Error-Recovery">official docs on Error Recovery</a>. You’re going to want to spend some time skimming that section of the docs if you haven’t already.</p>
+<p><br />
+</p>
+<p>Bison needs explicit annotations within a grammar to provide syntax error recovery. This is in contrast with parser tools like <a href="https://tree-sitter.github.io/tree-sitter/">tree-sitter</a>,<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">If you’re curious, I’ve written some other with assorted <a href="/categories/#tree-sitter">thoughts on tree-sitter</a>.<br />
+<br />
+</span></span> which automatically generate the error recovery for for you. Concretely, Bison requires inserting special <code>error</code> tokens in production rules that should participate in error recovery.</p>
+<p>To get the most out of Bison’s error recovery mode, it’s crucial to understand what it’s actually doing with those <code>error</code> tokens.</p>
+<h1 id="bisons-error-recovery-algorithm">Bison’s error recovery algorithm</h1>
+<p>There’s a vague description of the algorithm <a href="https://www.gnu.org/software/bison/manual/bison.html#Error-Recovery">in the docs</a>, but I found that I had to make the algorithm more explicit before I could understand what was and wasn’t possible.</p>
+<p>At a high level, this is what Bison does:</p>
+<ol type="1">
+<li><p>It encounters an error. By which we mean: neither shifting the lookahead token nor reducing the current stack is a valid action given the current lookahead token).</p></li>
+<li><p>It reports the error by calling the (user-defined) <code>yyerror</code><span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">In C++ parsers, this is called <code>parser::error</code>.<br />
+<br />
+</span></span> function.</p>
+<p>Importantly, this function is <strong>always</strong> called.<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">Other parser generators, for example <a href="https://www.haskell.org/happy/">Happy</a> for Haskell but do <em>not</em> necessarily report an error when an <code>error</code> token is produced.<br />
+<br />
+</span></span> Even if a production rule eventually consumes the error token and successfully recovers from the parse error, an error will have been reported.</p>
+<p>Also note that it’s impossible<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="sidenote">Sorbet gets around this limitation by appending parse errors to a temporary queue, only flushing them to the user once parsing has completed. Sorbet sometimes <a href="https://github.com/sorbet/sorbet/blob/e961ac4ee7c4e425e5b5f14a03b7ce20c3bdbbc2/parser/parser/cc/grammars/typedruby.ypp#L1976-L1981">mutates</a> the last element of the queue inside semantic actions to improve the error message with specific information about the parse failure.<br />
+<br />
+</span></span> to delay calling <code>yyerror</code> until it’s clear that no production rule matched the <code>error</code> token, since the <code>yyerror</code> function is called even before attempting to <strong>shift</strong> the <code>error</code> token, less reduce a rule that uses it. For similar reasons, this makes it more complicated to allow the eventual error rule to provide extra context on the error message</p></li>
+<li><p>Next, Bison looks to see it can shift the <code>error</code> token, given what the current stack contents and parser state are. It leaves the current lookahead token untouched for the time being.</p>
+<p>If it can shift the <code>error</code> token, it does so. Bison has finished recovering from the syntax error. The parse continues, using the untouched lookahead token. If it shifted the lookahead token, another one is lexed as normal.</p></li>
+<li><p>If it <strong>can’t</strong> shift the <code>error</code> token, Bison <strong>completely discards</strong> the object on the top of the stack.</p>
+<p>To make that clear, if the parser stack looked something like this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># def foo</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   x.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># end</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>stack <span class="kw">=</span> <span class="kw">[</span><span class="vs">&#39;def&#39;</span>, identifier, <span class="ch">&#39;\n&#39;</span>, expression, <span class="ch">&#39;.&#39;</span><span class="kw">]</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>lookahead <span class="kw">=</span> <span class="vs">&#39;end&#39;</span></span></code></pre></div>
+<p>and Bison found no matching error production rule, it would throw away the <code>'.'</code> token that it had already shifted onto the parser stack:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>stack <span class="kw">=</span> <span class="kw">[</span><span class="vs">&#39;def&#39;</span>, identifier, <span class="ch">&#39;\n&#39;</span>, expression<span class="kw">]</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>lookahead <span class="kw">=</span> <span class="vs">&#39;end&#39;</span></span></code></pre></div>
+<p>and then loop back to the previous step, checking to see whether it’s now possible to shift the <code>error</code> token. This process repeats until Bison has gobbled up the whole stack or some production rule consumes the error token.</p></li>
+<li><p>If Bison’s <a href="https://www.gnu.org/software/bison/manual/bison.html#Tracking-Locations">Location Tracking</a> feature is on (which allows using <code>@1</code>, <code>@2</code>, etc. in semantic actions to get the locations associated with components of the rule), it’s worth knowing how the <code>error</code> token’s location is set. Bison sets the error location to span from the last thing it discarded from the stack all the way to the lookahead token that induced the error. If it discarded nothing, then the range would just be the location of the lookahead token.</p>
+<p>Using the example above, if the <code>'.'</code> token was the only token Bison had to discard, the error token’s location would be set to span from that <code>'.'</code> token all the way to the <code>'end'</code> lookahead token.</p></li>
+</ol>
+<p>Most Bison grammars have a catch all <code>| error</code> production somewhere, like this one in Sorbet’s parser:</p>
+<figure class="left-align-caption">
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource yacc numberLines hl-4"><code class="sourceCode yacc"><span id="cb3-1"><a href="#cb3-1"></a>stmts: <span class="kw">%empty</span> { <span class="co">/* ... */</span> }</span>
+<span id="cb3-2"><a href="#cb3-2"></a>     | stmt { <span class="co">/* ... */</span> }</span>
+<span id="cb3-3"><a href="#cb3-3"></a>     | stmts newline stmt { <span class="co">/* ... */</span> }</span>
+<span id="cb3-4"><a href="#cb3-4"></a>     | error { <span class="co">/* ... */</span> }</span></code></pre></div>
+<figcaption>
+Snippet of Sorbet’s parser. <a href="https://github.com/sorbet/sorbet/blob/e961ac4ee7c4e425e5b5f14a03b7ce20c3bdbbc2/parser/parser/cc/grammars/typedruby.ypp#L653-L657">View on GitHub →</a>
+</figcaption>
+</figure>
+<p>The nice thing about a rule like this is that it provides coarse grained error recovery at a high level without requiring special cases for every production in the grammar. It works because no matter what happens to be on the stack, it’ll always eventually match (as long as we’re in the parser state corresponding to <code>stmts</code>) because eventually Bison will have discarded the entire stack.</p>
+<p>It’ll definitely throw away a lot of stuff, but at least it’ll let the parse continue instead of failing to produce any parse result. For example, if there was no parse error further down in the file, and the error occurred near the top, this rule gets us lots of error recovery for little work. But yeah, it’s not great to throw that much stuff away.</p>
+<p>We’re going to want to put more <code>error</code> tokens in more targeted places. For that, I’ve come up with a handful of strategies to make the most of Bison’s error recovery.</p>
+<h1 id="figure-out-the-most-common-edit-paths">Figure out the most common edit paths</h1>
+<p>Even though Bison requires a lot of <code>error</code> annotations to get good parse results, you can get good bang for your buck by figuring out the most common edit paths. For example, here’s every intermediate edit when the user adds a keyword argument to a Ruby method:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x: </span>x) <span class="co"># contents before edit</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x: </span>x,)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x: </span>x, y)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x: </span>x, y:)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x: </span>x, <span class="wa">y: </span>y) <span class="co"># edit finished</span></span></code></pre></div>
+<p>Ideally there’s an <code>error</code> production for every intermediate state, because adding a keyword argument to a method call is common. On the other hand, you can likely get away not adding rules for uncommon syntax errors.</p>
+<p>If you want, you can take the guesswork out of what’s common and what’s not by measuring, assuming you have a corpus of syntax errors you can sample from.<span class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span class="sidenote">For example, we gather usage metrics from every Sorbet user at Stripe.<br />
+<br />
+</span></span> The semi-automated approach to measurement, which is what I’ve personally used: when there’s a syntax error and the parse result is “bad” according to some heuristic (like: the parse is completely empty, or there was a partial parse result but it was too bad to find any completion suggestions at the user’s cursor), log the bad source buffer to a file, and then go triage the logged files, fixing the most common errors first.</p>
+<p>The annoying part about that approach is the manual triage work of opening up the logged buffers, identifying which part of the file had the parse error, and blaming it to some section of the parser. An idea I’ve had (but not implemented) for a more automatic approach: when there’s a syntax error that’s never recovered (or that’s handled by some “catch all” production rule), log the lookahead token and parser state where the error happened. Cross reference parser states with what’s in the <a href="https://www.gnu.org/software/bison/manual/bison.html#Understanding">textual report</a> on the parser to get approximate line numbers in the grammar that need to be updated. States that show up the most commonly are the ones in need of dedicated <code>error</code> rules.</p>
+<h1 id="the-error-token-is-usually-last">The <code>error</code> token is usually last</h1>
+<p>With the most common edit paths in hand, I’ve usually had the most success by following two tips for crafting the error rules.</p>
+<ol type="1">
+<li><p>Put the <code>error</code> token as the very last token in the production rule. It can be tempting to try writing rules like this, where the <code>error</code> token is followed by some other stuff:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode yacc"><code class="sourceCode yacc"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  | args &#39;,&#39; arg { <span class="co">/* ... */</span> }</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  | args &#39;,&#39; error arg  { <span class="co">/* ... */</span> }</span></code></pre></div>
+<p>Sometimes this works, but in my experience, it’s much easier to reason about conflicts when the <code>error</code> token is the last token in a rule.</p></li>
+<li><p>Put the <code>error</code> token <strong>only</strong> after terminals. There’s almost never conflicts in the grammar when putting the <code>error</code> token after a <code>','</code> or <code>'='</code> token, but there usually are when putting it after something like an <code>args</code> non-terminal.</p>
+<p>Intuitively this makes sense, because the <code>args</code> production itself probably has a bunch of rules that have consume an <code>error</code> token at the end, causing the conflicts. The non-terminal might even have a catch-all <code>| error</code> rule.</p></li>
+</ol>
+<p>In situations where I haven’t been able to trivially follow these rules, I’ve usually been able to go into the preceding non-terminal rule (like <code>args</code>) and sprinkle <code>error</code> tokens judiciously inside <em>that</em> rule to allow following these rules.</p>
+<p>Unfortunately, there have definitely been times where that hasn’t worked, which will be the topic of a future post. <!-- TODO(jez) Link to the indentation post here, when written --></p>
+<h1 id="consider-using-yyclearin">Consider using <code>yyclearin</code></h1>
+<p>After recovering from a parse error using the <code>error</code> token, the lookahead token will still be set to whatever it was that caused the error to happen in the first place.</p>
+<p>If for whatever reason you think that attempting to continue the parse with that token would just screw things up again, you can use the <code>yyclearin</code> macro<span class="sidenote-wrapper"><label for="sn-5" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-5" class="margin-toggle"/><span class="sidenote">In the C++ skeleton, this is available using <code>yyla.clear()</code> instead.<br />
+<br />
+</span></span> to clear out the lookahead token, which will cause Bison to request another token from the lexer.</p>
+<p>We’re not currently using this in Sorbet because I’ve replaced most places where it might have been useful with some even more powerful techniques (discussed in a future part), but I figured I may as well mention it. <!-- TODO(jez) Link to part 5 lexer hacks here --></p>
+<h1 id="invent-a-special-ast-node-for-errors">Invent a special AST node for errors</h1>
+<p>Consider this parse error:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>The rule for parsing an assignment with no error is looks like this, and produces an <code>assign</code> node in the AST:</p>
+<figure class="left-align-caption">
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource yacc numberLines"><code class="sourceCode yacc"><span id="cb7-1"><a href="#cb7-1"></a>arg: lhs &#39;=&#39; arg_rhs</span>
+<span id="cb7-2"><a href="#cb7-2"></a>       {</span>
+<span id="cb7-3"><a href="#cb7-3"></a>         $$ = driver.build.assign(self, $1, $2, $3);</span>
+<span id="cb7-4"><a href="#cb7-4"></a>       }</span>
+<span id="cb7-5"><a href="#cb7-5"></a>   | ...</span></code></pre></div>
+<figcaption>
+Snippet of Sorbet’s parser. <a href="https://github.com/sorbet/sorbet/blob/e961ac4ee7c4e425e5b5f14a03b7ce20c3bdbbc2/parser/parser/cc/grammars/typedruby.ypp#L1285-L1288">View on GitHub →</a>
+</figcaption>
+</figure>
+<p>To handle the error case, we still have the <code>lhs</code> and the <code>'='</code>, but we don’t have the <code>arg_rhs</code>. The parser will detect that <code>'end'</code> is not a valid <code>arg_rhs</code>, and shift the <code>error</code> token for us to recognize:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource yacc numberLines hl-5 hl-7"><code class="sourceCode yacc"><span id="cb8-1"><a href="#cb8-1"></a>arg: lhs &#39;=&#39; arg_rhs</span>
+<span id="cb8-2"><a href="#cb8-2"></a>       {</span>
+<span id="cb8-3"><a href="#cb8-3"></a>         $$ = driver.build.assign(self, $1, $2, $3);</span>
+<span id="cb8-4"><a href="#cb8-4"></a>       }</span>
+<span id="cb8-5"><a href="#cb8-5"></a>   | lhs &#39;=&#39; error</span>
+<span id="cb8-6"><a href="#cb8-6"></a>       {</span>
+<span id="cb8-7"><a href="#cb8-7"></a>         $$ = driver.build.assign(self, $1, $2, <span class="co">/* ... ? ... */</span>);</span>
+<span id="cb8-8"><a href="#cb8-8"></a>       }</span>
+<span id="cb8-9"><a href="#cb8-9"></a>   | ...</span></code></pre></div>
+<p>It’s unclear what to use in place of <code>$3</code>, because <code>error</code> doesn’t have an associated semantic value. To fill the void, we can invent a special AST <code>error_node</code> type.<span class="sidenote-wrapper"><label for="sn-6" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-6" class="margin-toggle"/><span class="sidenote">Slight fib; Sorbet actually creates a <a href="https://github.com/sorbet/sorbet/blob/e961ac4ee7c4e425e5b5f14a03b7ce20c3bdbbc2/parser/Builder.cc#L911-L913">constant literal node</a> with a magic name for backwards compatibility reasons.<br />
+<br />
+“What’s up with that <code>endPos</code> stuff?”<br />
+There’s some discussion in the full source on GitHub.<br />
+<br />
+</span></span></p>
+<figure class="left-align-caption">
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource yacc numberLines hl-7 hl-8"><code class="sourceCode yacc"><span id="cb9-1"><a href="#cb9-1"></a>arg: lhs &#39;=&#39; arg_rhs</span>
+<span id="cb9-2"><a href="#cb9-2"></a>       {</span>
+<span id="cb9-3"><a href="#cb9-3"></a>         $$ = driver.build.assign(self, $1, $2, $3);</span>
+<span id="cb9-4"><a href="#cb9-4"></a>       }</span>
+<span id="cb9-5"><a href="#cb9-5"></a>   | lhs &#39;=&#39; error</span>
+<span id="cb9-6"><a href="#cb9-6"></a>       {</span>
+<span id="cb9-7"><a href="#cb9-7"></a>         auto enode = driver.build.error_node(self, @2.endPos(), @3.endPos());</span>
+<span id="cb9-8"><a href="#cb9-8"></a>         $$ = driver.build.assign(self, $1, $2, enode);</span>
+<span id="cb9-9"><a href="#cb9-9"></a>       }</span>
+<span id="cb9-10"><a href="#cb9-10"></a>   | ...</span></code></pre></div>
+<figcaption>
+Snippet of Sorbet’s parser. <a href="https://github.com/sorbet/sorbet/blob/e961ac4ee7c4e425e5b5f14a03b7ce20c3bdbbc2/parser/parser/cc/grammars/typedruby.ypp#L1289-L1303">View on GitHub →</a>
+</figcaption>
+</figure>
+<p>This special AST node allows phases downstream of the parser to pretend the parse succeeded. In particular, it’s easy to detect where the syntax error occurred when responding to completion requests (which is important, because in the above example, the syntax error is also where the user’s cursor is).</p>
+<h1 id="read-the-generated-parsers-source">Read the generated parser’s source</h1>
+<p>To close, I’d like to point out that everything in this post that I didn’t find in the official docs, I taught myself by browsing the source code generated by Bison. Despite being generated, it’s actually pretty well commented, and with a bit of elbow grease you might even be able to get your IDE to let you use jump to def in it.</p>
+<p>Some nice things about browsing the source:</p>
+<ul>
+<li><p>It’s never out of sync with the version of Bison you’re using (unlike the official docs, which only track the latest version).</p></li>
+<li><p>You can see exactly what happens and in what order. For example, reading the source is how I convinced a colleague that no, using <code>error</code> productions did not mean we would be preventing errors from being reported. It was faster to read the source than attempt to find whether the docs mentioned this.</p></li>
+<li><p>You can see what fun, undocumented APIs are actually available to you. For example, the docs talk about <code>yylval</code> and <code>yylloc</code>, which are supposed to store the semantic value and location of the lookahead token. But in the C++ skeleton, these things have been renamed (without documentation) to <code>yyla.value</code> and <code>yyla.location</code>, respectively.</p></li>
+</ul>
+<p>Reading the generated parser’s source code reinforced my understanding of Bison’s parsing algorithm and made it easier to debug when things went wrong.</p>
+<p>All this being said, I’ve run into plenty of limitations when attempting to improve Sorbet’s parser. In the next post, I’ll explain one such example, why using <code>error</code> tokens alone wasn’t enough, and how I tweaked Sorbet’s lexer to aid the parser in error recovery.</p>
+<p style="width: 50%; float: left; text-align: left;">
+<a href="/error-recovery-part-3/">← Part 3: Tools and Techniques for Debugging a (Bison) Parser</a>
+</p>
+<p style="width: 50%; float: right; text-align: right;">
+(<em>coming soon</em>) Part 5: Backtracking, aka Lexer Hacks →
+</p>
+<p><br></p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#sorbet">sorbet</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#parsing">parsing</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
+
+
+
+</body>
+</html>
+

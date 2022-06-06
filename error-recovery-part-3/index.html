@@ -122,7 +122,8 @@ Reducing stack by rule 125 (line 1140):
 -&gt; $$ = nterm fname ()
 ...</code></pre>
 <p>So far I’ve been adding these <code>%printer</code>s only as I encounter the tokens that show up, mostly because I’m too lazy to exhaustively define printers for all the tokens—Ruby has a lot of tokens. You’ll note that Bison even lets you register <code>%printer</code>s for non-terminals (not pictured, but the same mechanism). You could use this to, like, print the currently reduced AST for that non-terminal, or some other summary.</p>
-<p>The next step is to actually understand what these traces mean, because it looks like there’s a lot of magic names and numbers, but there’s a short cut for that.</p>
+<p>The next step is to actually understand what these traces mean, because it looks like there’s a lot of magic names and numbers. The long answer is that you’ll have to look in the textual report that Bison generates about all the intermediate states in your parser. This is documented in the <a href="https://www.gnu.org/software/bison/manual/bison.html#Understanding">Understanding Your Parser</a> section of the Bison docs.</p>
+<p>But if you’re impatient, there’s a bit of a short cut that can work in many cases.</p>
 <h1 id="diff-traces-for-good-and-bad-parses">Diff traces for good and bad parses</h1>
 <p>This code is a syntax error in Ruby:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo(x,); <span class="cf">end</span></span></code></pre></div>
