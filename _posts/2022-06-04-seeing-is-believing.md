@@ -53,8 +53,8 @@ this:
    not tell the user that their change was broken.
 
 1. This process repeats until the pings are only **high-signal** pings. When there's an
-   error, it represents actual bugs (or maybe doesn't ping: remember, most files are still
-   `# typed: false`).
+   error, it represents actual bugs (or maybe it doesn't error at all: remember, most files
+   are still `# typed: false`).
 
 1. Double check at this point that it's easy to configure whatever editors your team uses
    to put the errors directly in the editor. You likely already did this for yourself
@@ -95,21 +95,22 @@ this:
 [^gradual]:
   This is the whole point of "gradual" in [gradual type checking].
 
-In my experience trying to bring static types to Ruby users, seeing is really believing.
+In my experience trying to bring static types to Ruby users, seeing really is believing.
 I've seen this exact same story or slight variations of it play out in just about
 every successful adoption case.
 
 While it's true that the type checker is going to prevent people from writing valid code
 they used to be able to write, every gradual type system has [escape hatches] to opt out
-of those checks in some way. But it's the feeling of instant feedback and powerful editor
-features that's impossible to convince someone of until they've had the chance to see it
-in their own editor, on the files they work with.
+of those checks in some way. The argument that people fond of type checkers want to make
+is that the instant feedback and powerful editor features a type checker provides
+outshine the times when the type checker gets in the way, but it's impossible to make that
+argument with words alone.
 
 One final, important note: **be supportive**. Advertise a single place for anyone to ask
 questions and get quick responses.[^quick] Admit that this will likely lead to being
-overworked for a bit until it takes off. In the long run as adoption and experience using
-the type checker spreads, other teammates will start to help out with the evangelism as
-the benefits spread outward.
+overworked for a bit until it takes off. In the long run as adoption and familiarity
+spread, other teammates will start to help out with the evangelism as the benefits spread
+outward.
 
 [^quick]:
   Like, actually quick. "Notify for new Slack every message" quick. If you queue questions
