@@ -52,11 +52,11 @@ that section of the docs if you haven't already.
 
 Bison needs explicit annotations within a grammar to provide syntax error recovery. This
 is in contrast with parser tools like [tree-sitter],[^tree-sitter] which automatically
-generate the error recovery for for you. Concretely, Bison requires inserting special
-`error` tokens in production rules that should participate in error recovery.
+include error recovery. Concretely, Bison requires inserting special `error` tokens in
+production rules that should participate in error recovery.
 
 [^tree-sitter]:
-  If you're curious, I've written some other with assorted [thoughts on tree-sitter].
+  If you're curious, I've written some assorted [thoughts on tree-sitter].
 
 To get the most out of Bison's error recovery mode, it's crucial to understand what it's
 actually doing with those `error` tokens.
@@ -82,15 +82,14 @@ At a high level, this is what Bison does:
     that no production rule matched the `error` token, since the `yyerror` function is
     called even before attempting to **shift** the `error` token, less reduce a rule that
     uses it. For similar reasons, this makes it more complicated to allow the eventual
-    error rule to provide extra context on the error message
+    error rule to provide extra context on the error message.
 
 1.  Next, Bison looks to see it can shift the `error` token, given what the current stack
     contents and parser state are. It leaves the current lookahead token untouched for the
     time being.
 
     If it can shift the `error` token, it does so. Bison has finished recovering from the
-    syntax error. The parse continues, using the untouched lookahead token. If it shifted
-    the lookahead token, another one is lexed as normal.
+    syntax error. The parse continues, using the untouched lookahead token.
 
 1.  If it **can't** shift the `error` token, Bison **completely discards** the object on
     the top of the stack.
@@ -125,15 +124,15 @@ At a high level, this is what Bison does:
     lookahead token that induced the error. If it discarded nothing, then the range would
     just be the location of the lookahead token.
 
-    Using the example above, if the `'.'` token was the only token Bison had to discard,
-    the error token's location would be set to span from that `'.'` token all the way to
-    the `'end'` lookahead token.
+    Using the example above, if the `'.'` token was the only token Bison needed to
+    discard, the error token's location would be set to span from that `'.'` token all the
+    way to the `'end'` lookahead token.
 
 [^yyerror]:
   In C++ parsers, this is called `parser::error`.
 
 [^happy]:
-  Other parser generators, for example [Happy] for Haskell but do _not_ necessarily report
+  Other parser generators, for example [Happy] for Haskell do not necessarily report
   an error when an `error` token is produced.
 
 [^delay]:
@@ -269,8 +268,8 @@ def foo
 end
 ```
 
-The rule for parsing an assignment with no error is looks like this, and produces an
-`assign` node in the AST:
+The rule for parsing an assignment with no error looks like this, and produces an `assign`
+node in the AST:
 
 <figure class="left-align-caption">
 ```{.yacc .numberLines}
