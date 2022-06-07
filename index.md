@@ -15,6 +15,8 @@ to programming languages and productivity tips.
 → 📺 [Talks I've given](https://jez.io/talks/)\
 → 💭 [Thoughts and opinion pieces](https://jez.io/thoughts/)
 
+Jump to [All Posts](#all-posts) or to [All Categories](categories/)
+
 {% capture numposts %}{{ site.posts | size }}{% endcapture %}
 {% if numposts != '0' %}
 
