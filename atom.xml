@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-08-24T18:55:32-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Control Flow in Sorbet is Syntactic</title><link href="https://blog.jez.io/syntactic-control-flow/" rel="alternate" type="text/html" title="Control Flow in Sorbet is Syntactic" /><published>2022-08-24T17:30:43-04:00</published><updated>2022-08-24T17:30:43-04:00</updated><id>https://blog.jez.io/syntactic-control-flow</id><content type="html" xml:base="https://blog.jez.io/syntactic-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-08-24T19:08:56-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Control Flow in Sorbet is Syntactic</title><link href="https://blog.jez.io/syntactic-control-flow/" rel="alternate" type="text/html" title="Control Flow in Sorbet is Syntactic" /><published>2022-08-24T17:30:43-04:00</published><updated>2022-08-24T17:30:43-04:00</updated><id>https://blog.jez.io/syntactic-control-flow</id><content type="html" xml:base="https://blog.jez.io/syntactic-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
   &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
   &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
@@ -148,11 +148,14 @@ too. Feel free to send me more examples.&lt;br /&gt;
 treating properties and attributes different from methods.&lt;/p&gt;
 &lt;p&gt;&lt;a
 href=&quot;https://www.typescriptlang.org/play?#code/MYGwhgzhAECC0G8BQ1oQPYFsCmAFATugA7b4AuAngFzQB2ArpgEanQA+09tAJtgGYBLWtm4BuFGizYAstjIALdNwAUAShoNmrDl16Dh3RNHxz6+WqOgBfJDaR8uwMgPS1owLEXplssNTXhkVBMyMzdhAHc4NXEbB1onFzcyMABrbAgAOUYWfGUADw0c0lVECQ9aDBBsADoQdABzAtVYpHtHZ1dobHywTCJqgEZlMADSoOgBPmgRmowcAmJSSnGJVBT0rOK8sDmpRZJyChaJG3W0jOytHb2FwkOV1vaEzrcevoHsACY1MtQpmYefreXxqW54e7LY5-VDQDaXbbKIFeHx+VTgg5Qk6oM5wi5ba5IzwgtEYyFHE52eKJLrvfrVADMIzGMIBs3mMjkihUqlWsLxmyuuXZUlkCiUamx1gk8IJwt2HLF3MlsSAA&quot;&gt;→
-View example in TypeScript Playground&lt;/a&gt; &lt;a
+View example in TypeScript Playground&lt;/a&gt;&lt;br /&gt;
+&lt;a
 href=&quot;https://flow.org/try/#0PQKgBAAgZgNg9gdzCYAoVBjGBDAzrsAQTAG9Uwxc4BbAUwAUAnOAB1sYBcBPALjAH4AdgFdqAI3YBucpRq0AsrQ4ALOABMAFAEo+Q0RMakAvqhOoowwRg4BLOILAYaLYR1qFtfYmQqMlwxgdBWiQPLWkTCytbezAObABrWlwAOX12DQAPPhFxdi1SGSdBKhhaADp4AHMs8NN0KOs7B1pM7GoWMoBGDWwvAp8wGygwXvKqOiZWdm4BmQp4pNT0xjGJhmY2Ti46ihMFxOS0vNXscbkprdmIhssm2Nb2ztoAJm1CimHRpw7Xd21zpNNjMdh8KHFDssThofi43GFARtpttdmB9hClscDDDnH8EetLiC6mZGjEWm0OmUAMy9fpgr5rOSKFTqbRzcEYo4rRl0ZmqTRaVHoxZc6FndZ81mCiJAA&quot;&gt;→
-View example in Try Flow&lt;/a&gt; &lt;a
+View example in Try Flow&lt;/a&gt;&lt;br /&gt;
+&lt;a
 href=&quot;https://mypy-play.net/?mypy=latest&amp;amp;python=3.10&amp;amp;flags=strict&amp;amp;gist=3e149c861a4f10dc474fd473021b0345&quot;&gt;→
-View example in mypy Playground&lt;/a&gt;&lt;/p&gt;
+View example in mypy Playground&lt;/a&gt;&lt;br /&gt;
+&lt;/p&gt;
 &lt;p&gt;In all the above examples, we see that the type of
 &lt;code&gt;variable.property&lt;/code&gt; is aware of control flow, the types of
 &lt;code&gt;expression().property&lt;/code&gt; and &lt;code&gt;variable.method()&lt;/code&gt;
