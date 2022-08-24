@@ -112,34 +112,34 @@ before inference, it must conservatively assume that subsequent calls to
 a method might return a different value for each call. Here’s a
 pathological example:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">FooIsAttr</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span>returns(T<span class="at">.nilable</span>(<span class="dt">Integer</span>))<span class="kw">}</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="ot">attr_accessor</span> <span class="wa">:foo</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">FooIsMethod</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span>returns(T<span class="at">.nilable</span>(<span class="dt">Integer</span>))<span class="kw">}</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> foo</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Returns something different every call</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">[</span><span class="dv">0</span>, <span class="dv">nil</span><span class="kw">]</span><span class="at">.sample</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span>params(<span class="wa">x: </span><span class="dt">Integer</span>)<span class="at">.void</span><span class="kw">}</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> takes_integer(x); <span class="cf">end</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Have to run inference to get type of `x`</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># (running inference requires control flow)</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[</span><span class="dv">true</span>, <span class="dv">false</span><span class="kw">]</span><span class="at">.sample</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span> <span class="dt">FooIsAttr</span><span class="at">.new</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span> <span class="dt">FooIsMethod</span><span class="at">.new</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># x.foo returns the same thing only if x is `FooIsAttr`</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> x<span class="at">.foo</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  takes_integer(x<span class="at">.foo</span>) <span class="co"># error</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+class="sourceCode numberSource ruby numberLines hl-25 hl-26 hl-27"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">class</span> <span class="dt">FooIsAttr</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>  sig <span class="kw">{</span>returns(T<span class="at">.nilable</span>(<span class="dt">Integer</span>))<span class="kw">}</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>  <span class="ot">attr_accessor</span> <span class="wa">:foo</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="cf">end</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="cf">class</span> <span class="dt">FooIsMethod</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>  sig <span class="kw">{</span>returns(T<span class="at">.nilable</span>(<span class="dt">Integer</span>))<span class="kw">}</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>  <span class="cf">def</span> foo</span>
+<span id="cb2-9"><a href="#cb2-9"></a>    <span class="co"># Returns something different every call</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>    <span class="kw">[</span><span class="dv">0</span>, <span class="dv">nil</span><span class="kw">]</span><span class="at">.sample</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a>  <span class="cf">end</span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="cf">end</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a></span>
+<span id="cb2-14"><a href="#cb2-14"></a>sig <span class="kw">{</span>params(<span class="wa">x: </span><span class="dt">Integer</span>)<span class="at">.void</span><span class="kw">}</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="cf">def</span> takes_integer(x); <span class="cf">end</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a></span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="co"># Have to run inference to get type of `x`</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a><span class="co"># (running inference requires control flow)</span></span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="cf">if</span> <span class="kw">[</span><span class="dv">true</span>, <span class="dv">false</span><span class="kw">]</span><span class="at">.sample</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a>  x <span class="kw">=</span> <span class="dt">FooIsAttr</span><span class="at">.new</span></span>
+<span id="cb2-21"><a href="#cb2-21"></a><span class="cf">else</span></span>
+<span id="cb2-22"><a href="#cb2-22"></a>  x <span class="kw">=</span> <span class="dt">FooIsMethod</span><span class="at">.new</span></span>
+<span id="cb2-23"><a href="#cb2-23"></a><span class="cf">end</span></span>
+<span id="cb2-24"><a href="#cb2-24"></a></span>
+<span id="cb2-25"><a href="#cb2-25"></a><span class="co"># x.foo returns the same thing only if x is `FooIsAttr`</span></span>
+<span id="cb2-26"><a href="#cb2-26"></a><span class="cf">if</span> x<span class="at">.foo</span></span>
+<span id="cb2-27"><a href="#cb2-27"></a>  takes_integer(x<span class="at">.foo</span>) <span class="co"># error</span></span>
+<span id="cb2-28"><a href="#cb2-28"></a><span class="cf">end</span></span></code></pre></div>
 <p><a
 href="https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0Aextend%20T%3A%3ASig%0A%0Aclass%20FooIsAttr%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20attr_accessor%20%3Afoo%0Aend%0A%0Aclass%20FooIsMethod%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20def%20foo%0A%20%20%20%20%23%20Returns%20something%20different%20every%20call%0A%20%20%20%20%5B0%2C%20nil%5D.sample%0A%20%20end%0Aend%0A%0Asig%20%7Bparams%28x%3A%20Integer%29.void%7D%0Adef%20takes_integer%28x%29%3B%20end%0A%0A%23%20Have%20to%20run%20inference%20to%20get%20type%20of%20%60x%60%0A%23%20%28running%20inference%20requires%20control%20flow%29%0Aif%20%5Btrue%2C%20false%5D.sample%0A%20%20x%20%3D%20FooIsAttr.new%0Aelse%0A%20%20x%20%3D%20FooIsMethod.new%0Aend%0A%0A%23%20x.foo%20returns%20the%20same%20thing%20only%20if%20x%20is%20%60FooIsAttr%60%0Aif%20x.foo%0A%20%20takes_integer%28x.foo%29%20%23%20error%0Aend">→
 View on sorbet.run</a></p>
