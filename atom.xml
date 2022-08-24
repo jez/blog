@@ -1,4 +1,235 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-08-24T18:55:03-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Parse Error Recovery in Sorbet: Part 4</title><link href="https://blog.jez.io/error-recovery-part-4/" rel="alternate" type="text/html" title="Parse Error Recovery in Sorbet: Part 4" /><published>2022-06-06T01:56:49-04:00</published><updated>2022-06-06T01:56:49-04:00</updated><id>https://blog.jez.io/error-recovery-part-4</id><content type="html" xml:base="https://blog.jez.io/error-recovery-part-4/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-08-24T18:55:32-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Control Flow in Sorbet is Syntactic</title><link href="https://blog.jez.io/syntactic-control-flow/" rel="alternate" type="text/html" title="Control Flow in Sorbet is Syntactic" /><published>2022-08-24T17:30:43-04:00</published><updated>2022-08-24T17:30:43-04:00</updated><id>https://blog.jez.io/syntactic-control-flow</id><content type="html" xml:base="https://blog.jez.io/syntactic-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+  &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
+  &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
+  &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
+  &lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#properties-and-attributes-in-other-languages&quot;
+  id=&quot;toc-properties-and-attributes-in-other-languages&quot;&gt;Properties and
+  attributes in other languages&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#extra-thoughts&quot; id=&quot;toc-extra-thoughts&quot;&gt;Extra
+  thoughts&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+
+&lt;main&gt;
+&lt;p&gt;The most commonly asked Sorbet question is, “Why does Sorbet think
+this is nil? I just checked that it’s not!” and as such, it’s listed as
+the &lt;a href=&quot;https://sorbet.org/docs/faq&quot;&gt;very first FAQ entry&lt;/a&gt; in
+the Sorbet docs.&lt;/p&gt;
+&lt;p&gt;But the most common follow up question goes something like this:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Having to use local variables as mentioned in Sorbet’s &lt;a
+href=&quot;https://sorbet.org/docs/flow-sensitive#limitations-of-flow-sensitivity&quot;&gt;limitations
+of flow-sensitivity&lt;/a&gt; docs is annoying. Idiomatic Ruby doesn’t use
+local variables nearly as much as Sorbet requires. What gives?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;TL;DR&lt;/strong&gt;: Type inference in Sorbet requires that it be
+given control flow as an input, which means that inference can’t change
+Sorbet’s view of control flow in a program. (This is in line with the
+other popular type systems for dynamically typed languages.) As a result
+control flow must be a function of local syntax alone (variables), not
+global nor semantic information (methods).&lt;/p&gt;
+&lt;p&gt;But that’s packing a lot in at once, so let’s take a step back.&lt;/p&gt;
+&lt;p&gt;Type inference, by which we mean assigning types to local variables,
+requires two inputs:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A symbol table, which maps names to global program definitions (like
+classes and methods, and their types).&lt;/li&gt;
+&lt;li&gt;A control flow graph, which is a data structure that models the flow
+of control through a single method.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So computing the control flow graph can’t depend on type inference,
+and must therefore be a function of syntax alone. Some examples of
+syntax-only observations are “these two variables are the same” and “the
+method branches on the value of this variable.” We can draw these
+observations exclusively from the syntactic structure of the current
+method, with no need to consult the symbol table, let alone run
+inference.&lt;/p&gt;
+&lt;p&gt;This brings us to our central conflict: knowing what method a call
+site refers to is not a syntactic property. Consider this snippet:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot;&gt;&lt;pre
+class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;dv&quot;&gt;true&lt;/span&gt;, &lt;span class=&quot;dv&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;kw&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.sample&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-2&quot;&gt;&lt;a href=&quot;#cb1-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  x &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;0&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-3&quot;&gt;&lt;a href=&quot;#cb1-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;else&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-4&quot;&gt;&lt;a href=&quot;#cb1-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  x &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;nil&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-5&quot;&gt;&lt;a href=&quot;#cb1-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-6&quot;&gt;&lt;a href=&quot;#cb1-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-7&quot;&gt;&lt;a href=&quot;#cb1-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;x&lt;span class=&quot;at&quot;&gt;.even?&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The meaning of &lt;code&gt;x.even?&lt;/code&gt; depends on the type of
+&lt;code&gt;x&lt;/code&gt;, which depends on the earlier control flow in the method.
+That means that if a program branches on a &lt;strong&gt;method return
+value&lt;/strong&gt;, Sorbet cannot draw any interesting observations about
+control flow.&lt;/p&gt;
+&lt;p&gt;This causes confusion when people &lt;strong&gt;know&lt;/strong&gt; that their
+method returns the same thing every time it’s called, but they can’t
+convince Sorbet of that. Since it has to build the control flow graph
+before inference, it must conservatively assume that subsequent calls to
+a method might return a different value for each call. Here’s a
+pathological example:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot;&gt;&lt;pre
+class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;FooIsAttr&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-2&quot;&gt;&lt;a href=&quot;#cb2-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  sig &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;returns(T&lt;span class=&quot;at&quot;&gt;.nilable&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;Integer&lt;/span&gt;))&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-3&quot;&gt;&lt;a href=&quot;#cb2-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;ot&quot;&gt;attr_accessor&lt;/span&gt; &lt;span class=&quot;wa&quot;&gt;:foo&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-4&quot;&gt;&lt;a href=&quot;#cb2-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-5&quot;&gt;&lt;a href=&quot;#cb2-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-6&quot;&gt;&lt;a href=&quot;#cb2-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;FooIsMethod&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-7&quot;&gt;&lt;a href=&quot;#cb2-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  sig &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;returns(T&lt;span class=&quot;at&quot;&gt;.nilable&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;Integer&lt;/span&gt;))&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-8&quot;&gt;&lt;a href=&quot;#cb2-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; foo&lt;/span&gt;
+&lt;span id=&quot;cb2-9&quot;&gt;&lt;a href=&quot;#cb2-9&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;co&quot;&gt;# Returns something different every call&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-10&quot;&gt;&lt;a href=&quot;#cb2-10&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;kw&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;dv&quot;&gt;0&lt;/span&gt;, &lt;span class=&quot;dv&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;kw&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.sample&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-11&quot;&gt;&lt;a href=&quot;#cb2-11&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-12&quot;&gt;&lt;a href=&quot;#cb2-12&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-13&quot;&gt;&lt;a href=&quot;#cb2-13&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-14&quot;&gt;&lt;a href=&quot;#cb2-14&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;sig &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;params(&lt;span class=&quot;wa&quot;&gt;x: &lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;Integer&lt;/span&gt;)&lt;span class=&quot;at&quot;&gt;.void&lt;/span&gt;&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-15&quot;&gt;&lt;a href=&quot;#cb2-15&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; takes_integer(x); &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-16&quot;&gt;&lt;a href=&quot;#cb2-16&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-17&quot;&gt;&lt;a href=&quot;#cb2-17&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# Have to run inference to get type of `x`&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-18&quot;&gt;&lt;a href=&quot;#cb2-18&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# (running inference requires control flow)&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-19&quot;&gt;&lt;a href=&quot;#cb2-19&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;dv&quot;&gt;true&lt;/span&gt;, &lt;span class=&quot;dv&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;kw&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.sample&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-20&quot;&gt;&lt;a href=&quot;#cb2-20&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  x &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;FooIsAttr&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.new&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-21&quot;&gt;&lt;a href=&quot;#cb2-21&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;else&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-22&quot;&gt;&lt;a href=&quot;#cb2-22&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  x &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;FooIsMethod&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.new&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-23&quot;&gt;&lt;a href=&quot;#cb2-23&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-24&quot;&gt;&lt;a href=&quot;#cb2-24&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-25&quot;&gt;&lt;a href=&quot;#cb2-25&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# x.foo returns the same thing only if x is `FooIsAttr`&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-26&quot;&gt;&lt;a href=&quot;#cb2-26&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;if&lt;/span&gt; x&lt;span class=&quot;at&quot;&gt;.foo&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-27&quot;&gt;&lt;a href=&quot;#cb2-27&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  takes_integer(x&lt;span class=&quot;at&quot;&gt;.foo&lt;/span&gt;) &lt;span class=&quot;co&quot;&gt;# error&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-28&quot;&gt;&lt;a href=&quot;#cb2-28&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;a
+href=&quot;https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0Aextend%20T%3A%3ASig%0A%0Aclass%20FooIsAttr%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20attr_accessor%20%3Afoo%0Aend%0A%0Aclass%20FooIsMethod%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20def%20foo%0A%20%20%20%20%23%20Returns%20something%20different%20every%20call%0A%20%20%20%20%5B0%2C%20nil%5D.sample%0A%20%20end%0Aend%0A%0Asig%20%7Bparams%28x%3A%20Integer%29.void%7D%0Adef%20takes_integer%28x%29%3B%20end%0A%0A%23%20Have%20to%20run%20inference%20to%20get%20type%20of%20%60x%60%0A%23%20%28running%20inference%20requires%20control%20flow%29%0Aif%20%5Btrue%2C%20false%5D.sample%0A%20%20x%20%3D%20FooIsAttr.new%0Aelse%0A%20%20x%20%3D%20FooIsMethod.new%0Aend%0A%0A%23%20x.foo%20returns%20the%20same%20thing%20only%20if%20x%20is%20%60FooIsAttr%60%0Aif%20x.foo%0A%20%20takes_integer%28x.foo%29%20%23%20error%0Aend&quot;&gt;→
+View on sorbet.run&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Note the two calls to &lt;code&gt;x.foo&lt;/code&gt; at the very end of the
+snippet:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Knowing whether the second call to &lt;code&gt;x.foo&lt;/code&gt; is non-nil
+requires knowing whether &lt;code&gt;x.foo&lt;/code&gt; returns the same thing
+across subsequent calls.&lt;/li&gt;
+&lt;li&gt;Knowing &lt;em&gt;that&lt;/em&gt; requires knowing whether &lt;code&gt;foo&lt;/code&gt;
+refers to an &lt;code&gt;attr_accessor&lt;/code&gt; method or some other
+method.&lt;/li&gt;
+&lt;li&gt;Knowing &lt;em&gt;that&lt;/em&gt; requires knowing the type of
+&lt;code&gt;x&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Knowing &lt;em&gt;that&lt;/em&gt; requires understanding the control flow in the
+method.&lt;/li&gt;
+&lt;li&gt;So we can’t make understanding the control flow in the method
+require knowing whether the second call to &lt;code&gt;x.foo&lt;/code&gt; returns
+the same thing.
+&lt;ul&gt;
+&lt;li&gt;But we &lt;em&gt;can&lt;/em&gt; make it require knowing whether a variable has
+been assigned to between two variable accesses.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&quot;properties-and-attributes-in-other-languages&quot;&gt;Properties and
+attributes in other languages&lt;/h1&gt;
+&lt;p&gt;So unfortunately, this all means that Sorbet can only track control
+flow-sensitive types on variables, not methods. This is the exact same
+limitation that other popular gradual type checkers
+&lt;strong&gt;except&lt;/strong&gt; for one difference: both JavaScript and Python
+make a &lt;strong&gt;syntactic&lt;/strong&gt; distinction between method calls
+(which have parentheses) versus property/attribute access (which
+don’t):&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb3&quot;&gt;&lt;pre
+class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb3-1&quot;&gt;&lt;a href=&quot;#cb3-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;x&lt;span class=&quot;at&quot;&gt;.foo&lt;/span&gt;   &lt;span class=&quot;co&quot;&gt;# &amp;lt;- syntactically a property (JS) or attribute (Python)&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-2&quot;&gt;&lt;a href=&quot;#cb3-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;x&lt;span class=&quot;at&quot;&gt;.foo&lt;/span&gt;() &lt;span class=&quot;co&quot;&gt;# &amp;lt;- syntactically a method call&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;In Ruby, &lt;strong&gt;both&lt;/strong&gt; &lt;code&gt;x.foo&lt;/code&gt; and
+&lt;code&gt;x.foo()&lt;/code&gt; correspond to method calls,&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;This is true even if &lt;code&gt;foo&lt;/code&gt; was defined with
+&lt;code&gt;attr_reader :foo&lt;/code&gt;, a subtlety which comes as a shock to most
+new Rubyists.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; so Sorbet models them as such. But in TypeScript, Flow,
+and Mypy,&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-1&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-1&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;And maybe other control-flow sensitive type systems,
+too. Feel free to send me more examples.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; that small, syntactic difference is enough to allow
+treating properties and attributes different from methods.&lt;/p&gt;
+&lt;p&gt;&lt;a
+href=&quot;https://www.typescriptlang.org/play?#code/MYGwhgzhAECC0G8BQ1oQPYFsCmAFATugA7b4AuAngFzQB2ArpgEanQA+09tAJtgGYBLWtm4BuFGizYAstjIALdNwAUAShoNmrDl16Dh3RNHxz6+WqOgBfJDaR8uwMgPS1owLEXplssNTXhkVBMyMzdhAHc4NXEbB1onFzcyMABrbAgAOUYWfGUADw0c0lVECQ9aDBBsADoQdABzAtVYpHtHZ1dobHywTCJqgEZlMADSoOgBPmgRmowcAmJSSnGJVBT0rOK8sDmpRZJyChaJG3W0jOytHb2FwkOV1vaEzrcevoHsACY1MtQpmYefreXxqW54e7LY5-VDQDaXbbKIFeHx+VTgg5Qk6oM5wi5ba5IzwgtEYyFHE52eKJLrvfrVADMIzGMIBs3mMjkihUqlWsLxmyuuXZUlkCiUamx1gk8IJwt2HLF3MlsSAA&quot;&gt;→
+View example in TypeScript Playground&lt;/a&gt; &lt;a
+href=&quot;https://flow.org/try/#0PQKgBAAgZgNg9gdzCYAoVBjGBDAzrsAQTAG9Uwxc4BbAUwAUAnOAB1sYBcBPALjAH4AdgFdqAI3YBucpRq0AsrQ4ALOABMAFAEo+Q0RMakAvqhOoowwRg4BLOILAYaLYR1qFtfYmQqMlwxgdBWiQPLWkTCytbezAObABrWlwAOX12DQAPPhFxdi1SGSdBKhhaADp4AHMs8NN0KOs7B1pM7GoWMoBGDWwvAp8wGygwXvKqOiZWdm4BmQp4pNT0xjGJhmY2Ti46ihMFxOS0vNXscbkprdmIhssm2Nb2ztoAJm1CimHRpw7Xd21zpNNjMdh8KHFDssThofi43GFARtpttdmB9hClscDDDnH8EetLiC6mZGjEWm0OmUAMy9fpgr5rOSKFTqbRzcEYo4rRl0ZmqTRaVHoxZc6FndZ81mCiJAA&quot;&gt;→
+View example in Try Flow&lt;/a&gt; &lt;a
+href=&quot;https://mypy-play.net/?mypy=latest&amp;amp;python=3.10&amp;amp;flags=strict&amp;amp;gist=3e149c861a4f10dc474fd473021b0345&quot;&gt;→
+View example in mypy Playground&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;In all the above examples, we see that the type of
+&lt;code&gt;variable.property&lt;/code&gt; is aware of control flow, the types of
+&lt;code&gt;expression().property&lt;/code&gt; and &lt;code&gt;variable.method()&lt;/code&gt;
+are not.&lt;/p&gt;
+&lt;p&gt;Unfortunately, the direct analogue to properties in Ruby are instance
+variables like &lt;code&gt;@property&lt;/code&gt;, which have the limitation that
+they can can only be accessed inside their owning class. It’s like if
+JavaScript only allowed &lt;code&gt;this.property&lt;/code&gt; instead of allowing
+the call site to be any arbitrary expression like
+&lt;code&gt;x.property&lt;/code&gt;. In Ruby, you can’t write
+&lt;code&gt;x.@property&lt;/code&gt;.&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-2&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-2&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;You can do something similar:
+&lt;code&gt;x.instance_variable_get(:@property)&lt;/code&gt;, but again this is a
+method, not a property access—someone could have overridden the
+&lt;code&gt;.instance_variable_get&lt;/code&gt; method!&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;If you &lt;strong&gt;do&lt;/strong&gt; use instance variables in Ruby with
+Sorbet, they behave comparably&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-3&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-3&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;There’s a &lt;a
+href=&quot;https://github.com/sorbet/sorbet/issues/1374&quot;&gt;known bug&lt;/a&gt; in the
+implementation at the time of writing, but it occurs somewhat rarely in
+practice so we haven’t prioritized fixing it.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; to their counterparts in other languages:&lt;/p&gt;
+&lt;p&gt;&lt;a
+href=&quot;https://sorbet.run/#%23%20typed%3A%20strict%0A%0Aclass%20A%0A%20%20extend%20T%3A%3ASig%0A%0A%20%20sig%20%7Bvoid%7D%0A%20%20def%20initialize%0A%20%20%20%20%40some_property%20%3D%20T.let%28nil%2C%20T.nilable%28Integer%29%29%0A%20%20end%0A%0A%20%20sig%20%7Bparams%28x%3A%20Integer%29.void%7D%0A%20%20def%20takes_number%28x%29%0A%20%20%20%20puts%20x%0A%20%20end%0A%0A%20%20sig%20%7Bvoid%7D%0A%20%20def%20example1%0A%20%20%20%20if%20%40some_property%0A%20%20%20%20%20%20takes_number%28%40some_property%29%0A%20%20%20%20end%0A%20%20%20%20takes_number%28%40some_property%29%0A%20%20end%0Aend&quot;&gt;→
+View example on sorbet.run&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Seen from this lens, I think it’s fair to say that Sorbet is doing
+the best it can with what it has. If you disagree and have a suggestion
+for how Sorbet could do better, feel free to reach out.&lt;/p&gt;
+&lt;h1 id=&quot;extra-thoughts&quot;&gt;Extra thoughts&lt;/h1&gt;
+&lt;p&gt;It’s maybe worth noting that even the Ruby VM itself cheats a little
+here: yes &lt;code&gt;x.foo&lt;/code&gt; is technically a method call, but if that
+method was defined via &lt;code&gt;attr_reader&lt;/code&gt;, the Ruby VM has special
+handling to make it run much, much faster than had the method been
+defined manually. So while you can think of these two things as doing
+the same thing, the first one will run much faster:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb4&quot;&gt;&lt;pre
+class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb4-1&quot;&gt;&lt;a href=&quot;#cb4-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;ot&quot;&gt;attr_reader&lt;/span&gt; &lt;span class=&quot;wa&quot;&gt;:foo&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb4-2&quot;&gt;&lt;a href=&quot;#cb4-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; foo; &lt;span class=&quot;ot&quot;&gt;@foo&lt;/span&gt;; &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;I take this to mean that even the Ruby VM itself realizes that there
+is value in having something property like. It just unfortunately didn’t
+make it into the language itself.&lt;/p&gt;
+&lt;p&gt;It’s interesting to imagine a future where Sorbet treats
+&lt;code&gt;x.foo&lt;/code&gt; and &lt;code&gt;x.foo()&lt;/code&gt; separately. For example, it
+could &lt;strong&gt;require&lt;/strong&gt; that non-constant, nullary methods be
+written with trailing &lt;code&gt;()&lt;/code&gt; even though Ruby doesn’t require
+it. Then a follow up change might be able to build on that invariant, to
+treat &lt;code&gt;x.foo&lt;/code&gt; like a property access instead of a method
+call.&lt;/p&gt;
+&lt;p&gt;But not only are there some high-level design and low-level technical
+problems standing in the way of implementing this right now, there’s
+also a social problem: almost every Ruby style guide and linter requires
+the opposite, namely that nullary methods &lt;strong&gt;never&lt;/strong&gt; be
+called with &lt;code&gt;()&lt;/code&gt; explicitly. Solving social problems tends to
+involve waging holy wars, which is never all that fun.&lt;/p&gt;
+&lt;p&gt;And to throw another wrench into the picture: recent versions of
+JavaScript added getters, which allow executing an arbitrary method on
+property access. Python has had computed &lt;code&gt;@property&lt;/code&gt;
+declarations since version 2.2. Notably, TypeScript, Flow, and mypy
+simply do not implement getters the same way as methods, even though
+they arguably should for soundness:&lt;/p&gt;
+&lt;p&gt;&lt;a
+href=&quot;https://www.typescriptlang.org/play?#code/MYGwhgzhAECC0G8BQ1oQPYFsCmAFATugA7b4AuAngFzQB2ArpgEanQA+09tAJtgGYBLWtm4BuFGizYAstjIALdNwAUAShoNmrDl16Dh3RNHxz6+WqOgBfCQHM5knAHE5ZUmo2MW+dpx78hEUQJVAE+aGVpMAUAOnwwHiw1aAAeaAAGGIBWVWDUfPyTMjNaaABGcQKraGwQCGw8gsLTc0r8m1QbGyQ+LmAyAXRS4CwiejdYDzhGopK6bAB3ODVxG17afsHSsjAAa2wIADkvdwAPTy18XORUEdoMEGwYkHRbZVPVVaQevoGhmtOYEwREeZWUYBosGuEjCETAMQwOAIxFIlGhBR2+yOJ3w4IRUmRJHIFE+Eg60ExB2OlzxiLwhCJaK+Pw2f1K2EBwMeACZkjdoLDlCNgeNsJNVPikQzUSTGqhKdiacKxhM1JL6SjiaTOhIFdTvELRqLxerCTLSd11pt-hygSDsABmcGQ9EC8K0qSyBRKNSu+V7Kk4j04L2KFSqbXWXUBxUG+F00M+iPMq1sgF2x4AFmdcFdgvjUhcZDcVzlFJj+vcBecrlIkfJeqD1ewRZLFqAA&quot;&gt;→
+View example on TypeScript Playground&lt;/a&gt; &lt;a
+href=&quot;https://flow.org/try/#0PQKgBAAgZgNg9gdzCYAoVBjGBDAzrsAQTAG9Uwxc4BbAUwAUAnOAB1sYBcBPALjAH4AdgFdqAI3YBucpRq0AsrQ4ALOABMAFAEo+Q0RMakAvjIDmS2XQDiSju226R49qRkUAllDAb52FQDpGbEE1Gm0wAB4wAAZ-AFYtVwpk5MYlYUZBMABGaRSjMFoYXFoklNT0zLzkkwoTE1QoYUEMDnc4LIwaFmE7QgciMrSODKzBWiR+rWkTJpa2jrAObABrWlwAOX17AA8+JwNEsgouwSoYWn94Uw0d6dQGudb2rNod7GoWC+yNbD5CI4yTzebD+Kh0JisdjcQEpZZrTbbRi-MFySFsThce51GTw9ZbZzI0HghjMDEwmboJ4LV7vT4XABM4WOYGBGi6n16tCmqIhZOhWLKFDxiMJ7O6XJ5JPRAuxYFqS1W+KR4s5fW0vNJUMx90ezWeizeHy+tAAzL9-rDWV4USTFCp1NorcKlaKDLa5PbVJotHKFSKCe7iZ6lN6nZTGvqaYU6SaACwWohWtnB6y2djOxUIwP2VO0GwcOyMP24105omagtF3VAA&quot;&gt;→
+View example on Try Flow&lt;/a&gt; &lt;a
+href=&quot;https://mypy-play.net/?mypy=latest&amp;amp;python=3.10&amp;amp;flags=strict&amp;amp;gist=753c6fdd9c640d3c5cfba896894e95bd&quot;&gt;→
+View example on mypy Playground&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;If it were not so common in Ruby for &lt;strong&gt;all&lt;/strong&gt; nullary
+methods to be called without &lt;code&gt;()&lt;/code&gt;, instead of just those
+defined with &lt;code&gt;attr_reader&lt;/code&gt; or something similar, maybe Sorbet
+could have chosen the same trade-off.&lt;/p&gt;
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="sorbet" /><category term="types" /><summary type="html">← Return home The most commonly asked Sorbet question is, “Why does Sorbet think this is nil? I just checked that it’s not!” and as such, it’s listed as the very first FAQ entry in the Sorbet docs.</summary></entry><entry><title type="html">Parse Error Recovery in Sorbet: Part 4</title><link href="https://blog.jez.io/error-recovery-part-4/" rel="alternate" type="text/html" title="Parse Error Recovery in Sorbet: Part 4" /><published>2022-06-06T01:56:49-04:00</published><updated>2022-06-06T01:56:49-04:00</updated><id>https://blog.jez.io/error-recovery-part-4</id><content type="html" xml:base="https://blog.jez.io/error-recovery-part-4/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
   &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
   &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
@@ -1918,148 +2149,4 @@ the implementation of generic functions are constrained to basically
 only do one thing, modulo side-effects. It goes further than just
 intuition though, and people have done interesting work to formalize the
 intuitions into proofs.&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="sorbet" /><category term="plt" /><summary type="html">← Return home Consider this snippet of Ruby code using Sorbet:</summary></entry><entry><title type="html">Typed Errors in Sorbet</title><link href="https://blog.jez.io/typed-errors-sorbet/" rel="alternate" type="text/html" title="Typed Errors in Sorbet" /><published>2021-06-05T01:12:37-04:00</published><updated>2021-06-05T01:12:37-04:00</updated><id>https://blog.jez.io/typed-errors-sorbet</id><content type="html" xml:base="https://blog.jez.io/typed-errors-sorbet/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
-  &lt;a href=&quot;/&quot;&gt;← Return home&lt;/a&gt;&lt;br&gt;
-&lt;/nav&gt;
-
-&lt;main&gt;
-&lt;p&gt;I really like this post from Matt Parsons, &lt;a
-href=&quot;https://www.parsonsmatt.org/2018/11/03/trouble_with_typed_errors.html&quot;&gt;The
-Trouble with Typed Errors&lt;/a&gt;. It’s written for an audience writing
-Haskell, but if you can grok Haskell syntax, it’s worth the read because
-the lessons apply broadly to most statically typed programming
-languages.&lt;/p&gt;
-&lt;p&gt;If you haven’t read it (or it’s been a while) the setup is basically:
-typing errors is hard, and nearly every solution is either brittle,
-clunky, verbose, or uses powerful type system features that we didn’t
-want to have to reach for.&lt;/p&gt;
-&lt;p&gt;Hidden towards the bottom of the post, we find:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;In PureScript or OCaml, you can use open variant types to do this
-flawlessly. Haskell doesn’t have open variants, and the attempts to &amp;gt;
-mock them end up quite clumsy to use in practice.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;What Matt calls “open variant types” I call &lt;strong&gt;ad hoc union
-types&lt;/strong&gt; (see my previous post about &lt;a
-href=&quot;https://blog.jez.io/union-types-checked-exceptions/&quot;&gt;checked
-exceptions and Sorbet&lt;/a&gt;). Naming aside, Sorbet has them! We don’t have
-to suffer from clunky error handling!&lt;/p&gt;
-&lt;p&gt;I thought it’d be interesting to show what Matt meant in this quote
-by translating his example to Sorbet.&lt;/p&gt;
-&lt;p&gt;I wrote a complete, working example, but rather than repeat the whole
-thing here, I’m just going to excerpt the good stuff. If you’re
-wondering how something is defined in full, check the full example:&lt;/p&gt;
-&lt;p&gt;&lt;a
-href=&quot;https://sorbet.run/#%23%20typed%3A%20strict%0A%0A%23%20This%20is%20a%20re-implementation%20of%20Matt%20Parsons&amp;#39;s%20%22The%20Trouble%20with%20Typed%0A%23%20Errors%22%20in%20Sorbet%20(Ruby)%20because%20I%20think%20Sorbet%20happens%20to%20handle%20it%0A%23%20pretty%20well%20all%20things%20considered.%0A%23%0A%23%20%20%20%20%20%3Chttps%3A%2F%2Fwww.parsonsmatt.org%2F2018%2F11%2F03%2Ftrouble_with_typed_errors.html%3E%0A%23%0A%23%20Specifically%2C%20he%20mentions%0A%23%0A%23%20%20%20%20%20In%20PureScript%20or%20OCaml%2C%20you%20can%20use%20open%20variant%20types%20to%20do%20this%0A%23%20%20%20%20%20flawlessly.%0A%23%0A%23%20and%20Sorbet%20more%20or%20less%20has%20those%20(untagged%20unions).%20It&amp;#39;s%20interesting%0A%23%20to%20see%20what%20that%20means%20for%20being%20able%20to%20track%20errors%2C%20because%20we%0A%23%20actually%20use%20Sorbet%20in%20a%20huge%20codebase%20at%20work.%20Tracking%20all%20the%20kinds%0A%23%20of%20errors%20that%20could%20happen--and%20no%20more--can%20make%20code%20far%20easier%20to%0A%23%20understand.%0A%0A%23%20To%20run%20this%20file%3A%0A%23%0A%23%20%20%20gem%20install%20sorbet-runtime%0A%23%20%20%20ruby%20typed-errors.rb%0A%0Arequire%20&amp;#39;sorbet-runtime&amp;#39;%0A%0A%23%20There&amp;#39;s%20a%20bug%20in%20Sorbet%20that%20forces%20us%20to%20wrap%20all%20this%20code%20in%20a%0A%23%20class%2C%20but%20I%20have%20a%20PR%20open%20to%20fix%20it.%20For%20now%2C%20we%20tolerate%20it.%0Aclass%20Main%0A%20%20extend%20T%3A%3ASig%0A%0A%20%20%23%20-----%20Custom%20error%20types%20-----%0A%0A%20%20%23%20Defining%20custom%20data%20types%20is%20a%20little%20clunky%20in%20Ruby%20%2F%20Sorbet.%20You%0A%20%20%23%20have%20to%20chose%20whether%20you%20want%20a%20plain%20class%2C%20an%20enum%2C%20a%20sealed%0A%20%20%23%20class%20hierarchy%2C%20etc.%20In%20a%20real%20codebase%2C%20I%20think%20if%20you%20were%20going%0A%20%20%23%20to%20this%20length%20to%20care%20for%20errors%20the%20kinds%20of%20errors%20that%20you%20have%0A%20%20%23%20are%20usually%20pretty%20rich%20(e.g.%2C%20there&amp;#39;s%20a%20message%20and%20context%20with%0A%20%20%23%20the%20failures)%2C%20so%20you&amp;#39;d%20probably%20go%20with%20the%20sealed%20class%20hierarchy.%0A%20%20%23%0A%20%20%23%20For%20this%20example%2C%20I%20chose%20three%20different%20ways%20to%20just%20show%20them%20all.%0A%0A%20%20class%20HeadError%0A%20%20end%0A%0A%20%20class%20LookupError%20%3C%20T%3A%3AEnum%0A%20%20%20%20enums%20do%0A%20%20%20%20%20%20KeyWasNotPresent%20%3D%20new%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20module%20ParseError%0A%20%20%20%20extend%20T%3A%3AHelpers%0A%20%20%20%20sealed!%0A%0A%20%20%20%20class%20UnexpectedChar%20%3C%20T%3A%3AStruct%0A%20%20%20%20%20%20include%20ParseError%0A%20%20%20%20%20%20prop%20%3Amessage%2C%20String%0A%20%20%20%20end%0A%0A%20%20%20%20class%20RanOutOfInput%0A%20%20%20%20%20%20include%20ParseError%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20%23%20-----%20Helper%20methods%20-----%0A%0A%20%20%23%20Again%2C%20concise%20syntax%20is%20not%20Sorbet&amp;#39;s%20strong%20suit.%20The%20signature%0A%20%20%23%20annotations%20are%20pretty%20verbose%20here%20(especially%20generics)%20but%20they%0A%20%20%23%20pretty%20much%20exactly%20map%20to%20the%20Haskell%20functions%20in%20the%20post.%0A%0A%20%20sig%20do%0A%20%20%20%20%20%20params(xs%3A%20String)%0A%20%20%20%20%20%20.returns(T.any(String%2C%20HeadError))%0A%20%20end%0A%20%20def%20self.head(xs)%0A%20%20%20%20case%20xs.size%0A%20%20%20%20when%200%20then%20HeadError.new%0A%20%20%20%20else%20T.must(xs%5B0%5D)%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20sig%20do%0A%20%20%20%20type_parameters(%3AK%2C%20%3AV)%0A%20%20%20%20%20%20.params(%0A%20%20%20%20%20%20%20%20hash%3A%20T%3A%3AHash%5BT.type_parameter(%3AK)%2C%20T.type_parameter(%3AV)%5D%2C%0A%20%20%20%20%20%20%20%20key%3A%20T.type_parameter(%3AK)%0A%20%20%20%20%20%20)%0A%20%20%20%20%20%20.returns(T.any(T.type_parameter(%3AV)%2C%20LookupError))%0A%20%20end%0A%20%20def%20self.lookup(hash%2C%20key)%0A%20%20%20%20if%20hash.key%3F(key)%0A%20%20%20%20%20%20hash.fetch(key)%0A%20%20%20%20else%0A%20%20%20%20%20%20LookupError%3A%3AKeyWasNotPresent%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20sig%20do%0A%20%20%20%20params(source%3A%20String).returns(T.any(Integer%2C%20ParseError))%0A%20%20end%0A%20%20def%20self.parse(source)%0A%20%20%20%20case%20source%0A%20%20%20%20when%20%22%22%20then%20ParseError%3A%3ARanOutOfInput.new%0A%20%20%20%20else%0A%20%20%20%20%20%20begin%0A%20%20%20%20%20%20%20%20Integer(source%2C%2010)%0A%20%20%20%20%20%20rescue%20ArgumentError%20%3D%3E%20exn%0A%20%20%20%20%20%20%20%20ParseError%3A%3AUnexpectedChar.new(message%3A%20exn.message)%0A%20%20%20%20%20%20end%0A%20%20%20%20end%0A%20%20end%0A%0A%20%20%23%20-----%20Composing%20errors%20-----%0A%0A%20%20STR_MAP%20%3D%20T.let(%7B%0A%20%20%20%20%224__%22%20%3D%3E%20%222%22%0A%20%20%7D%2C%20T%3A%3AHash%5BString%2C%20String%5D)%0A%0A%20%20sig%20do%0A%20%20%20%20params(str%3A%20String)%0A%20%20%20%20%20%20.returns(T.any(Integer%2C%20HeadError%2C%20LookupError%2C%20ParseError))%0A%20%20end%0A%20%20def%20self.foo(str)%0A%20%20%20%20%23%20These%20%60return%60%20lines%20are%20definitely%20not%20as%20convenient%20as%20do%0A%20%20%20%20%23%20notation%20in%20Haskell%2C%20but%20the%20interesting%20thing%20is%20that%20they&amp;#39;re%0A%20%20%20%20%23%20still%20pretty%20nice%3A%20because%20of%20flow-sensitive%20typing%2C%20the%20type%20of%0A%20%20%20%20%23%20%60c%60%20changes%2C%20as%20commented%3A%0A%20%20%20%20c%20%3D%20head(str)%20%23%20%3D%3E%20c%20%3A%20T.any(String%2C%20HeadError)%0A%20%20%20%20return%20c%20unless%20c.is_a%3F(String)%0A%20%20%20%20%23%20%3D%3E%20c%20%3A%20String%0A%20%20%20%20r%20%3D%20lookup(STR_MAP%2C%20str)%0A%20%20%20%20return%20r%20unless%20r.is_a%3F(String)%0A%20%20%20%20parse(%22%23%7Bc%7D%23%7Br%7D%22)%0A%20%20end%0A%0A%20%20%23%20This%20method%20doesn&amp;#39;t%20call%20%60head%60%20like%20before%2C%20so%20it%20doesn&amp;#39;t%20need%20to%0A%20%20%23%20have%20%60HeadError%60%20in%20the%20return%20type.%0A%20%20sig%20do%0A%20%20%20%20params(str%3A%20String)%0A%20%20%20%20%20%20.returns(T.any(Integer%2C%20LookupError%2C%20ParseError))%0A%20%20end%0A%20%20def%20self.bar(str)%0A%20%20%20%20r%20%3D%20lookup(STR_MAP%2C%20str)%0A%20%20%20%20return%20r%20unless%20r.is_a%3F(String)%0A%20%20%20%20parse(r)%0A%20%20end%0A%0A%20%20p%20foo(%224__%22)%0A%20%20p%20bar(%224__%22)%0Aend%0A%0A%23%20Because%20%60T.any%60%20can%20create%20ad%20hoc%2C%20untagged%20union%20types%20anywhere%2C%0A%23%20there&amp;#39;s%20no%20need%20to%20define%20an%20%60AllErrorsEver%60%20data%20type%20like%20the%20reader%0A%23%20was%20tempted%20to%20in%20the%20Typed%20Errors%20blog%20post.%0A%23%0A%23%20If%20you%20find%20that%20a%20particular%20set%20of%20errors%20are%20showing%20up%20super%0A%23%20frequently%2C%20you%20can%20lurk%20them%20into%20a%20type%20alias%3A%0A%23%0A%23%20%20%20%20%20MostCommonErrors%20%3D%20T.type_alias%20%7BT.any(LookupError%2C%20ParseError)%7D%0A%23%0A%23%20and%20then%20use%20this%20alias%20in%20various%20places.%0A%23%0A%23%20One%20other%20note%3A%20to%20make%20this%20pattern%20nicer%2C%20code%20might%20want%20to%0A%23%20explicitly%20box%20up%20successful%20results%2C%20with%20a%20type%20like%0A%23%0A%23%20%20%20%20%20class%20Ok%20%3C%20T%3A%3AStruct%0A%23%20%20%20%20%20%20%20extend%20T%3A%3AGeneric%0A%23%20%20%20%20%20%20%20Type%20%3D%20type_member%0A%23%20%20%20%20%20%20%20prop%20%3Aval%2C%20Type%0A%23%20%20%20%20%20end%0A%23%0A%23%20So%20then%20you&amp;#39;d%20have%0A%23%20%20%20%20%20T.any(Ok%5BString%5D%2C%20MostCommonErrors)%0A%23%20and%20you%20could%20do%20make%20all%20the%20%60return%60%20lines%20always%20look%20the%20same%3A%0A%23%20%20%20%20%20return%20x%20unless%20x.is_a%3F(Ok)%0A%23%20but%20the%20flipside%20would%20mean%20that%20you&amp;#39;d%20have%20to%20use%20%60.val%60%20at%20all%20the%0A%23%20places%20that%20you%20would%20have%20normally%20used%20%60x%60%3A%0A%23%20%20%20%20%20parse(x.val)%0A%23%20so%20it&amp;#39;s%20maybe%20not%20worth%20it.%0A%0A&quot;&gt;→
-View on sorbet.run&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;First, here’s how we’d type the three running helper methods from
-Matt’s post:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# Returns the first letter of the input,&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-2&quot;&gt;&lt;a href=&quot;#cb1-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# or returns `HeadError` if empty&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-3&quot;&gt;&lt;a href=&quot;#cb1-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;sig &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;params(&lt;span class=&quot;wa&quot;&gt;xs: &lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;String&lt;/span&gt;)&lt;span class=&quot;at&quot;&gt;.returns&lt;/span&gt;(T&lt;span class=&quot;at&quot;&gt;.any&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;String&lt;/span&gt;, &lt;span class=&quot;dt&quot;&gt;HeadError&lt;/span&gt;))&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-4&quot;&gt;&lt;a href=&quot;#cb1-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.head&lt;/span&gt;(xs); &lt;span class=&quot;kw&quot;&gt;...&lt;/span&gt;; &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-5&quot;&gt;&lt;a href=&quot;#cb1-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-6&quot;&gt;&lt;a href=&quot;#cb1-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-7&quot;&gt;&lt;a href=&quot;#cb1-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# Gets the value for `key` in `hash`, or returns LookupError.&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-8&quot;&gt;&lt;a href=&quot;#cb1-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;#&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-9&quot;&gt;&lt;a href=&quot;#cb1-9&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# This is normally defined in the stdlib, and in trying to&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-10&quot;&gt;&lt;a href=&quot;#cb1-10&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# match Matt&amp;#39;s post, it ends up not being super idiomatic,&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-11&quot;&gt;&lt;a href=&quot;#cb1-11&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# but the types still work out.&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-12&quot;&gt;&lt;a href=&quot;#cb1-12&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;sig &lt;span class=&quot;cf&quot;&gt;do&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-13&quot;&gt;&lt;a href=&quot;#cb1-13&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  type_parameters(&lt;span class=&quot;wa&quot;&gt;:K&lt;/span&gt;, &lt;span class=&quot;wa&quot;&gt;:V&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb1-14&quot;&gt;&lt;a href=&quot;#cb1-14&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;at&quot;&gt;.params&lt;/span&gt;(&lt;/span&gt;
-&lt;span id=&quot;cb1-15&quot;&gt;&lt;a href=&quot;#cb1-15&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;      &lt;span class=&quot;wa&quot;&gt;hash: &lt;/span&gt;T&lt;span class=&quot;kw&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;Hash&lt;/span&gt;&lt;span class=&quot;kw&quot;&gt;[&lt;/span&gt;T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:K&lt;/span&gt;), T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:V&lt;/span&gt;)&lt;span class=&quot;kw&quot;&gt;]&lt;/span&gt;,&lt;/span&gt;
-&lt;span id=&quot;cb1-16&quot;&gt;&lt;a href=&quot;#cb1-16&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;      &lt;span class=&quot;wa&quot;&gt;key: &lt;/span&gt;T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:K&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb1-17&quot;&gt;&lt;a href=&quot;#cb1-17&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    )&lt;/span&gt;
-&lt;span id=&quot;cb1-18&quot;&gt;&lt;a href=&quot;#cb1-18&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;at&quot;&gt;.returns&lt;/span&gt;(T&lt;span class=&quot;at&quot;&gt;.any&lt;/span&gt;(T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:V&lt;/span&gt;), &lt;span class=&quot;dt&quot;&gt;LookupError&lt;/span&gt;))&lt;/span&gt;
-&lt;span id=&quot;cb1-19&quot;&gt;&lt;a href=&quot;#cb1-19&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-20&quot;&gt;&lt;a href=&quot;#cb1-20&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.lookup&lt;/span&gt;(hash, key); &lt;span class=&quot;kw&quot;&gt;...&lt;/span&gt;; en&lt;/span&gt;
-&lt;span id=&quot;cb1-21&quot;&gt;&lt;a href=&quot;#cb1-21&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-22&quot;&gt;&lt;a href=&quot;#cb1-22&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-23&quot;&gt;&lt;a href=&quot;#cb1-23&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# Convert a String to an integer, or return ParseError.&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-24&quot;&gt;&lt;a href=&quot;#cb1-24&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;sig &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;params(&lt;span class=&quot;wa&quot;&gt;source: &lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;String&lt;/span&gt;)&lt;span class=&quot;at&quot;&gt;.returns&lt;/span&gt;(T&lt;span class=&quot;at&quot;&gt;.any&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;Integer&lt;/span&gt;, &lt;span class=&quot;dt&quot;&gt;ParseError&lt;/span&gt;))&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-25&quot;&gt;&lt;a href=&quot;#cb1-25&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.parse&lt;/span&gt;(source); &lt;span class=&quot;kw&quot;&gt;...&lt;/span&gt;; &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Notice how in all three cases, we use a normal &lt;a
-href=&quot;https://sorbet.org/docs/union-types&quot;&gt;Sorbet union type&lt;/a&gt; in the
-return, like &lt;code&gt;T.any(String, HeadError)&lt;/code&gt;. All of the error
-types are just user-defined classes. For example, &lt;code&gt;HeadError&lt;/code&gt;
-is just defined like this:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;HeadError&lt;/span&gt;; &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;And &lt;code&gt;ParseError&lt;/code&gt; is defined using &lt;a
-href=&quot;https://sorbet.org/docs/sealed&quot;&gt;sealed classes&lt;/a&gt; and &lt;a
-href=&quot;https://sorbet.org/docs/tstruct&quot;&gt;typed structs&lt;/a&gt; to approximate
-algebraic data types in other typed languages:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb3&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb3-1&quot;&gt;&lt;a href=&quot;#cb3-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;ParseError&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-2&quot;&gt;&lt;a href=&quot;#cb3-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;fu&quot;&gt;extend&lt;/span&gt; T&lt;span class=&quot;kw&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;Helpers&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-3&quot;&gt;&lt;a href=&quot;#cb3-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  sealed!&lt;/span&gt;
-&lt;span id=&quot;cb3-4&quot;&gt;&lt;a href=&quot;#cb3-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-5&quot;&gt;&lt;a href=&quot;#cb3-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;UnexpectedChar&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;&amp;lt;&lt;/span&gt; T&lt;span class=&quot;kw&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;Struct&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-6&quot;&gt;&lt;a href=&quot;#cb3-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;fu&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;ParseError&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-7&quot;&gt;&lt;a href=&quot;#cb3-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    prop &lt;span class=&quot;wa&quot;&gt;:message&lt;/span&gt;, &lt;span class=&quot;dt&quot;&gt;String&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-8&quot;&gt;&lt;a href=&quot;#cb3-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-9&quot;&gt;&lt;a href=&quot;#cb3-9&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-10&quot;&gt;&lt;a href=&quot;#cb3-10&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;RanOutOfInput&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-11&quot;&gt;&lt;a href=&quot;#cb3-11&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;fu&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;ParseError&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-12&quot;&gt;&lt;a href=&quot;#cb3-12&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-13&quot;&gt;&lt;a href=&quot;#cb3-13&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Then at the caller side, it’s simple to handle the errors:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb4&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb4-1&quot;&gt;&lt;a href=&quot;#cb4-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;sig &lt;span class=&quot;cf&quot;&gt;do&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb4-2&quot;&gt;&lt;a href=&quot;#cb4-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  params(&lt;span class=&quot;wa&quot;&gt;str: &lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;String&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb4-3&quot;&gt;&lt;a href=&quot;#cb4-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;at&quot;&gt;.returns&lt;/span&gt;(T&lt;span class=&quot;at&quot;&gt;.any&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;Integer&lt;/span&gt;, &lt;span class=&quot;dt&quot;&gt;HeadError&lt;/span&gt;, &lt;span class=&quot;dt&quot;&gt;LookupError&lt;/span&gt;, &lt;span class=&quot;dt&quot;&gt;ParseError&lt;/span&gt;))&lt;/span&gt;
-&lt;span id=&quot;cb4-4&quot;&gt;&lt;a href=&quot;#cb4-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb4-5&quot;&gt;&lt;a href=&quot;#cb4-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.foo&lt;/span&gt;(str)&lt;/span&gt;
-&lt;span id=&quot;cb4-6&quot;&gt;&lt;a href=&quot;#cb4-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  c &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; head(str) &lt;span class=&quot;co&quot;&gt;# =&amp;gt; c : T.any(String, HeadError)&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb4-7&quot;&gt;&lt;a href=&quot;#cb4-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;return&lt;/span&gt; c &lt;span class=&quot;cf&quot;&gt;unless&lt;/span&gt; c&lt;span class=&quot;at&quot;&gt;.is_a?&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;String&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb4-8&quot;&gt;&lt;a href=&quot;#cb4-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;co&quot;&gt;# =&amp;gt; c : String&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb4-9&quot;&gt;&lt;a href=&quot;#cb4-9&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  r &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; lookup(&lt;span class=&quot;cn&quot;&gt;STR_MAP&lt;/span&gt;, str)&lt;/span&gt;
-&lt;span id=&quot;cb4-10&quot;&gt;&lt;a href=&quot;#cb4-10&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;return&lt;/span&gt; r &lt;span class=&quot;cf&quot;&gt;unless&lt;/span&gt; r&lt;span class=&quot;at&quot;&gt;.is_a?&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;String&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb4-11&quot;&gt;&lt;a href=&quot;#cb4-11&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  parse(&lt;span class=&quot;st&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;#{&lt;/span&gt;c&lt;span class=&quot;sc&quot;&gt;}#{&lt;/span&gt;r&lt;span class=&quot;sc&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;st&quot;&gt;&amp;quot;&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb4-12&quot;&gt;&lt;a href=&quot;#cb4-12&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;The idea is that the return type includes the possible errors, so we
-have to handle them. This example handles the errors by checking for
-success and returning early with the error otherwise. This manifests in
-the return type of &lt;code&gt;foo&lt;/code&gt;, which mentions four outcomes:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;a successful result (&lt;code&gt;Integer&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;three kinds of failures (&lt;code&gt;HeadError&lt;/code&gt;,
-&lt;code&gt;LookupError&lt;/code&gt;, and &lt;code&gt;ParseError&lt;/code&gt;)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;It would have worked equally well to handle and recover from any or
-all of the errors: Sorbet knows exactly which error is returned by which
-method, so there’s never a burden of handling more errors than are
-possible.&lt;/p&gt;
-&lt;p&gt;It’s fun that what makes this work is Sorbet’s natural &lt;a
-href=&quot;https://sorbet.org/docs/flow-sensitive&quot;&gt;flow-sensitive typing&lt;/a&gt;,
-not some special language feature. Notice how before and after the first
-early return, Sorbet updates its knowledge of the type of &lt;code&gt;c&lt;/code&gt;
-(shown in the comments) because it knows how &lt;code&gt;is_a?&lt;/code&gt;
-works.&lt;/p&gt;
-&lt;p&gt;Another example: if some other method only calls &lt;code&gt;lookup&lt;/code&gt;
-and &lt;code&gt;parse&lt;/code&gt; (but not &lt;code&gt;head&lt;/code&gt;), it doesn’t have to
-mention &lt;code&gt;HeadError&lt;/code&gt; in its return:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb5&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb5-1&quot;&gt;&lt;a href=&quot;#cb5-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;sig &lt;span class=&quot;cf&quot;&gt;do&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb5-2&quot;&gt;&lt;a href=&quot;#cb5-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  params(&lt;span class=&quot;wa&quot;&gt;str: &lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;String&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb5-3&quot;&gt;&lt;a href=&quot;#cb5-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;co&quot;&gt;# does need to mention HeadError&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb5-4&quot;&gt;&lt;a href=&quot;#cb5-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;at&quot;&gt;.returns&lt;/span&gt;(T&lt;span class=&quot;at&quot;&gt;.any&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;Integer&lt;/span&gt;, &lt;span class=&quot;dt&quot;&gt;LookupError&lt;/span&gt;, &lt;span class=&quot;dt&quot;&gt;ParseError&lt;/span&gt;))&lt;/span&gt;
-&lt;span id=&quot;cb5-5&quot;&gt;&lt;a href=&quot;#cb5-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb5-6&quot;&gt;&lt;a href=&quot;#cb5-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.bar&lt;/span&gt;(str)&lt;/span&gt;
-&lt;span id=&quot;cb5-7&quot;&gt;&lt;a href=&quot;#cb5-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  r &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; lookup(&lt;span class=&quot;cn&quot;&gt;STR_MAP&lt;/span&gt;, str)&lt;/span&gt;
-&lt;span id=&quot;cb5-8&quot;&gt;&lt;a href=&quot;#cb5-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;return&lt;/span&gt; r &lt;span class=&quot;cf&quot;&gt;unless&lt;/span&gt; r&lt;span class=&quot;at&quot;&gt;.is_a?&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;String&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb5-9&quot;&gt;&lt;a href=&quot;#cb5-9&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  parse(r)&lt;/span&gt;
-&lt;span id=&quot;cb5-10&quot;&gt;&lt;a href=&quot;#cb5-10&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;And while there’s never a &lt;strong&gt;need&lt;/strong&gt; to predeclare one
-monolithic error type (like &lt;code&gt;AllErrorsEver&lt;/code&gt; in Matt’s post),
-if it happens to be convenient, Sorbet still lets you, using type
-aliases. For example, maybe there are a bunch of methods that all return
-&lt;code&gt;LookupError&lt;/code&gt; and &lt;code&gt;ParseError&lt;/code&gt;. We can factor that
-out into a type alias:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb6&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb6-1&quot;&gt;&lt;a href=&quot;#cb6-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;dt&quot;&gt;MostCommonErrors&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; T&lt;span class=&quot;at&quot;&gt;.type_alias&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;T&lt;span class=&quot;at&quot;&gt;.any&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;LookupError&lt;/span&gt;, &lt;span class=&quot;dt&quot;&gt;ParseError&lt;/span&gt;)&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;That’s it! Sorbet’s union types in method returns provide a
-low-friction, high value way to model how methods can fail.&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="sorbet" /><category term="types" /><summary type="html">← Return home I really like this post from Matt Parsons, The Trouble with Typed Errors. It’s written for an audience writing Haskell, but if you can grok Haskell syntax, it’s worth the read because the lessons apply broadly to most statically typed programming languages.</summary></entry></feed>
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="sorbet" /><category term="plt" /><summary type="html">← Return home Consider this snippet of Ruby code using Sorbet:</summary></entry></feed>
