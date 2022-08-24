@@ -49,72 +49,131 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#setup-union-types-in-a-react-component">Setup: Union Types in a React Component</a></li>
-  <li><a href="#switch-optimizing-for-exhaustiveness"><code>switch</code>: Optimizing for Exhaustiveness</a></li>
-  <li><a href="#correctness-but-at-what-cost">Correctness, but at what cost?</a></li>
-  <li><a href="#types-and-optimizing-compilers">Types and Optimizing Compilers</a></li>
-  <li><a href="#appendix-other-compile-to-js-runtimes">Appendix: Other Compile-to-JS Runtimes</a>
+  <li><a href="#setup-union-types-in-a-react-component"
+  id="toc-setup-union-types-in-a-react-component">Setup: Union Types in
+  a React Component</a></li>
+  <li><a href="#switch-optimizing-for-exhaustiveness"
+  id="toc-switch-optimizing-for-exhaustiveness"><code>switch</code>:
+  Optimizing for Exhaustiveness</a></li>
+  <li><a href="#correctness-but-at-what-cost"
+  id="toc-correctness-but-at-what-cost">Correctness, but at what
+  cost?</a></li>
+  <li><a href="#types-and-optimizing-compilers"
+  id="toc-types-and-optimizing-compilers">Types and Optimizing
+  Compilers</a></li>
+  <li><a href="#appendix-other-compile-to-js-runtimes"
+  id="toc-appendix-other-compile-to-js-runtimes">Appendix: Other
+  Compile-to-JS Runtimes</a>
   <ul>
-  <li><a href="#typescript">TypeScript</a></li>
-  <li><a href="#purescript">PureScript</a></li>
-  <li><a href="#elm">Elm</a></li>
+  <li><a href="#typescript" id="toc-typescript">TypeScript</a></li>
+  <li><a href="#purescript" id="toc-purescript">PureScript</a></li>
+  <li><a href="#elm" id="toc-elm">Elm</a></li>
   </ul></li>
   </ul>
 </nav>
 
 <main>
-<p>Union types are powerful yet often overlooked. At work, I’ve been using Flow which <a href="https://flow.org/en/docs/types/unions/">thankfully supports union types</a>. But as I’ve refactored more of our code to use union types, I’ve noticed that our bundle size has been steadily increasing!</p>
+<p>Union types are powerful yet often overlooked. At work, I’ve been
+using Flow which <a
+href="https://flow.org/en/docs/types/unions/">thankfully supports union
+types</a>. But as I’ve refactored more of our code to use union types,
+I’ve noticed that our bundle size has been steadily increasing!</p>
 <!-- more -->
-<p>In this post, we’re going to explore why that’s the case. We’ll start with a problem which union types can solve, flesh out the problem to motivate why union types are definitely the solution, then examine the resulting cost of introducing them. In the end, we’ll compare Flow to other compile-to-JS languages on the basis of how they represent union types in the compiled output. I’m especially excited about <a href="https://reasonml.github.io/">Reason</a>, so we’ll talk about it the most.</p>
-<h1 id="setup-union-types-in-a-react-component">Setup: Union Types in a React Component</h1>
-<p>Let’s consider we’re writing a simple React 2FA<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">2FA: two-factor authentication<br />
+<p>In this post, we’re going to explore why that’s the case. We’ll start
+with a problem which union types can solve, flesh out the problem to
+motivate why union types are definitely the solution, then examine the
+resulting cost of introducing them. In the end, we’ll compare Flow to
+other compile-to-JS languages on the basis of how they represent union
+types in the compiled output. I’m especially excited about <a
+href="https://reasonml.github.io/">Reason</a>, so we’ll talk about it
+the most.</p>
+<h1 id="setup-union-types-in-a-react-component">Setup: Union Types in a
+React Component</h1>
+<p>Let’s consider we’re writing a simple React 2FA<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">2FA: two-factor authentication<br />
 <br />
-</span></span> modal. We’ll be using Flow, but you can pretend it’s TypeScript if you want. The mockup we were given looks like this:</p>
-<p><a href="/assets/img/2fa-mockup.jpeg"><img src="/assets/img/2fa-mockup.jpeg" alt="A sample mockup for a two-factor authenticaion modal" /></a></p>
+</span></span> modal. We’ll be using Flow, but you can pretend it’s
+TypeScript if you want. The mockup we were given looks like this:</p>
+<p><a href="/assets/img/2fa-mockup.jpeg"><img
+src="/assets/img/2fa-mockup.jpeg"
+alt="A sample mockup for a two-factor authenticaion modal" /></a></p>
 <p>In this mockup:</p>
 <ul>
 <li>There’s a loading state while we send the text message.</li>
 <li>We’ll show an input for the code after the message is sent.</li>
 <li>There’s no failure screen (it hasn’t been drawn up yet).</li>
 </ul>
-<p>We’ll need some way for our component to know which of the three screens is visible. Let’s use a <a href="https://flow.org/en/docs/types/unions/">union type</a> in Flow:</p>
+<p>We’ll need some way for our component to know which of the three
+screens is visible. Let’s use a <a
+href="https://flow.org/en/docs/types/unions/">union type</a> in
+Flow:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>type Screen <span class="op">=</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;LoadingScreen&#39;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;CodeEntryScreen&#39;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;SuccessScreen&#39;</span><span class="op">;</span></span></code></pre></div>
-<p>Union types are a perfect fit! 🎉 Union types document intent and can help guard against mistakes. Fellow developers and our compiler can know “these are all the cases.” In particular, Flow can warn us when we’ve <a href="/flow-exhaustiveness/">forgotten a case</a>.</p>
-<p>Our initial implementation is working great. After sharing it with the team, someone suggests adding a “cancel” button in the top corner. It doesn’t make sense to cancel when the flow has already succeeded, so we’ll exclude it from the last screen:</p>
-<p><a href="/assets/img/2fa-close-btn.jpeg"><img src="/assets/img/2fa-close-btn.jpeg" alt="Adding a close button to our modal" /></a></p>
-<p>No problem: let’s write a function called <code>needsCancelButton</code> to determine if we need to put a cancel button in the header of a particular screen:</p>
+<p>Union types are a perfect fit! 🎉 Union types document intent and can
+help guard against mistakes. Fellow developers and our compiler can know
+“these are all the cases.” In particular, Flow can warn us when we’ve <a
+href="/flow-exhaustiveness/">forgotten a case</a>.</p>
+<p>Our initial implementation is working great. After sharing it with
+the team, someone suggests adding a “cancel” button in the top corner.
+It doesn’t make sense to cancel when the flow has already succeeded, so
+we’ll exclude it from the last screen:</p>
+<p><a href="/assets/img/2fa-close-btn.jpeg"><img
+src="/assets/img/2fa-close-btn.jpeg"
+alt="Adding a close button to our modal" /></a></p>
+<p>No problem: let’s write a function called
+<code>needsCancelButton</code> to determine if we need to put a cancel
+button in the header of a particular screen:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> needsCancelButton <span class="op">=</span> (<span class="bu">screen</span><span class="op">:</span> Screen)<span class="op">:</span> boolean <span class="kw">=&gt;</span> {</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Recall: &#39;SuccessScreen&#39; is the last screen,</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// so it shouldn&#39;t have a cancel button.</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">screen</span> <span class="op">!==</span> <span class="st">&#39;SuccessScreen&#39;</span><span class="op">;</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
 <p>Short and sweet. 👌 Everything seems to be working great, until…</p>
-<h1 id="switch-optimizing-for-exhaustiveness"><code>switch</code>: Optimizing for Exhaustiveness</h1>
-<p>The next day, we get some updated mocks from the design team. This time, they’ve also drawn up a “failure” screen for when the customer has entered the wrong code too many times:</p>
-<p><a href="/assets/img/2fa-failure-screen.jpeg"><img src="/assets/img/2fa-failure-screen.jpeg" alt="The failure screen for our modal" /></a></p>
-<p>We can handle this—we’ll just add a case to our <code>Screen</code> type:</p>
+<h1 id="switch-optimizing-for-exhaustiveness"><code>switch</code>:
+Optimizing for Exhaustiveness</h1>
+<p>The next day, we get some updated mocks from the design team. This
+time, they’ve also drawn up a “failure” screen for when the customer has
+entered the wrong code too many times:</p>
+<p><a href="/assets/img/2fa-failure-screen.jpeg"><img
+src="/assets/img/2fa-failure-screen.jpeg"
+alt="The failure screen for our modal" /></a></p>
+<p>We can handle this—we’ll just add a case to our <code>Screen</code>
+type:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>type Screen <span class="op">=</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;LoadingScreen&#39;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;CodeEntryScreen&#39;</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;SuccessScreen&#39;</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// New case to handle too many wrong attempts:</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;FailureScreen&#39;</span><span class="op">;</span></span></code></pre></div>
-<p>But now <strong>there’s a bug</strong> in our <code>needsCancelButton</code> function. 😧 We should only show a close button on screens where it makes sense, and <code>'FailureScreen'</code> is not one of those screens. Our first reaction after discovering the bug would be to just blacklist <code>'FailureScreen'</code> too:</p>
+<p>But now <strong>there’s a bug</strong> in our
+<code>needsCancelButton</code> function. 😧 We should only show a close
+button on screens where it makes sense, and <code>'FailureScreen'</code>
+is not one of those screens. Our first reaction after discovering the
+bug would be to just blacklist <code>'FailureScreen'</code> too:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> needsCancelButton <span class="op">=</span> (<span class="bu">screen</span><span class="op">:</span> Screen)<span class="op">:</span> boolean <span class="kw">=&gt;</span> {</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">screen</span> <span class="op">!==</span> <span class="st">&#39;SuccessScreen&#39;</span> <span class="op">||</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">screen</span> <span class="op">!==</span> <span class="st">&#39;FailureScreen&#39;</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
-<p>But we can do better than just fixing the <strong>current</strong> bug. We should write code so that when we add a new case to a union type, our type checker alerts us before a <strong>future</strong> bug even happens. What if instead of a silent bug, we got this cheery message from our type checker?</p>
+<p>But we can do better than just fixing the <strong>current</strong>
+bug. We should write code so that when we add a new case to a union
+type, our type checker alerts us before a <strong>future</strong> bug
+even happens. What if instead of a silent bug, we got this cheery
+message from our type checker?</p>
 <blockquote>
-<p>Hey, you forgot to add a case to <code>needsCancelButton</code> for the new screen you added. <em>🙂</em></p>
+<p>Hey, you forgot to add a case to <code>needsCancelButton</code> for
+the new screen you added. <em>🙂</em></p>
 <p>— your friendly, neighborhood type checker</p>
 </blockquote>
-<p>Let’s go back and rewrite <code>needsCancelButton</code> so that it <strong>will</strong> tell us this when adding new cases. We’ll use a <code>switch</code> statement with <a href="/flow-exhaustiveness/">something special in the <code>default</code> case</a>:</p>
+<p>Let’s go back and rewrite <code>needsCancelButton</code> so that it
+<strong>will</strong> tell us this when adding new cases. We’ll use a
+<code>switch</code> statement with <a
+href="/flow-exhaustiveness/">something special in the
+<code>default</code> case</a>:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> impossible <span class="op">=</span> <span class="op">&lt;</span>T<span class="op">&gt;</span>(x<span class="op">:</span> empty)<span class="op">:</span> T <span class="kw">=&gt;</span> {</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;This case is impossible.&#39;</span>)<span class="op">;</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>}</span>
@@ -136,12 +195,27 @@
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="fu">impossible</span>(<span class="bu">screen</span>)<span class="op">;</span></span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p><a href="https://flow.org/try/#0PTAEAEDMBsHsHcBQiAuBPADgU1AZQMYBOWWAdqALyKigA+oA5ADKwCGAJgJakDmBxZBtTqMAwrHZYAoqRSE0-EqSE16DXAFd8+LAGddiwcLUAxVp2gbih5QG5k+WKV0pQnALYZY+zgCNoOBSgADwAKgB8ABQAHgBcoFie6ACU8aGU4aAA3sIoABaECKCkWPCgUoSFhJEMoXmcuqD4rLo4DW6e3rp+AQB0DMn2AL4OTi7FJOy6oqykOtAAQhooKE6UoJG6RErxNqmgvrCwAbMZ2cK68Jwo+HkbWwKkyec0NM2tjCwc3HzbgrHCV6gYgoKzkOQaLD2IHvHAMcSSGRyBR-ZQAoE0EFg0AQqGApotOGabR6AyohjojFYwjkSCsaCtaGvECgACqc1g7ncZFcq1AkE40RxeRwJjgZSwlVghHxLNhjDMFisWBsFNlYGBWFBNP59MZ+MkdI00BQlKB1PIHi8Pn8WE2qMGwhGQyAA"><strong>(Play with it on Try Flow →)</strong></a></p>
-<p>Now Flow is smart enough to give us an error! Making our code safer, one <code>switch</code> statement at a time. 😅 Union types in Flow are a powerful way to use types to guarantee correctness. But to get the most out of union types, <strong>always</strong><span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">“Always” is a very strong statement. Please use your best judgement. But know that if you’re not using a <code>switch</code>, you’re trading off the burden of exhaustiveness &amp; correctness from the type checker to the programmer!<br />
+<p><a
+href="https://flow.org/try/#0PTAEAEDMBsHsHcBQiAuBPADgU1AZQMYBOWWAdqALyKigA+oA5ADKwCGAJgJakDmBxZBtTqMAwrHZYAoqRSE0-EqSE16DXAFd8+LAGddiwcLUAxVp2gbih5QG5k+WKV0pQnALYZY+zgCNoOBSgADwAKgB8ABQAHgBcoFie6ACU8aGU4aAA3sIoABaECKCkWPCgUoSFhJEMoXmcuqD4rLo4DW6e3rp+AQB0DMn2AL4OTi7FJOy6oqykOtAAQhooKE6UoJG6RErxNqmgvrCwAbMZ2cK68Jwo+HkbWwKkyec0NM2tjCwc3HzbgrHCV6gYgoKzkOQaLD2IHvHAMcSSGRyBR-ZQAoE0EFg0AQqGApotOGabR6AyohjojFYwjkSCsaCtaGvECgACqc1g7ncZFcq1AkE40RxeRwJjgZSwlVghHxLNhjDMFisWBsFNlYGBWFBNP59MZ+MkdI00BQlKB1PIHi8Pn8WE2qMGwhGQyAA"><strong>(Play
+with it on Try Flow →)</strong></a></p>
+<p>Now Flow is smart enough to give us an error! Making our code safer,
+one <code>switch</code> statement at a time. 😅 Union types in Flow are
+a powerful way to use types to guarantee correctness. But to get the
+most out of union types, <strong>always</strong><span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">“Always” is a very strong statement. Please use your
+best judgement. But know that if you’re not using a <code>switch</code>,
+you’re trading off the burden of exhaustiveness &amp; correctness from
+the type checker to the programmer!<br />
 <br />
-</span></span> access them through a <code>switch</code> statement. Every time we use a union type without an exhaustive switch statement, we make it harder for Flow to tell us where we’ve missed something.</p>
-<h1 id="correctness-but-at-what-cost">Correctness, but at what cost?</h1>
-<p>You might not have noticed, but we paid a subtle cost in rewriting our <code>needsCancelButton</code> function. Let’s compare our two functions:</p>
+</span></span> access them through a <code>switch</code> statement.
+Every time we use a union type without an exhaustive switch statement,
+we make it harder for Flow to tell us where we’ve missed something.</p>
+<h1 id="correctness-but-at-what-cost">Correctness, but at what
+cost?</h1>
+<p>You might not have noticed, but we paid a subtle cost in rewriting
+our <code>needsCancelButton</code> function. Let’s compare our two
+functions:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ----- before: 62 bytes (minified) -----</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> needsCancelButton <span class="op">=</span> (<span class="bu">screen</span>) <span class="kw">=&gt;</span> {</span>
@@ -166,14 +240,40 @@
 <span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="fu">impossible</span>(<span class="bu">screen</span>)<span class="op">;</span></span>
 <span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
-<p>With just an equality check, our function was small: 62 bytes minified. But when we refactored to use a <code>switch</code> statement, its size shot up to 240 bytes! That’s a 4x increase, just to get exhaustiveness. Admittedly, <code>needsCancelButton</code> is a bit of a pathological case. But in general: as we make our code bases <strong>more safe</strong> using Flow’s union types of string literals, our <strong>bundle size bloats</strong>!</p>
-<h1 id="types-and-optimizing-compilers">Types and Optimizing Compilers</h1>
-<p>One of the many overlooked promises of types is the claim that by writing our code with <strong>higher-level abstractions</strong>, we give more information to the compiler. The compiler can then generate code that captures our original intent, but as efficiently as possible.</p>
-<p>Flow is decidedly <strong>not</strong> a compiler: it’s only a type checker. To run JavaScript annotated with Flow types, we first strip the types (with something like Babel). All information about the types vanishes when we run the code.<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">Even though TypeScript defines both a language <strong>and</strong> a compiler for that language, in practice it’s not much different from Flow here. A goal of the TypeScript compiler is to generate JavaScript that closely resembles the original TypeScript, so it doesn’t do compile-time optimizations based on the types.<br />
+<p>With just an equality check, our function was small: 62 bytes
+minified. But when we refactored to use a <code>switch</code> statement,
+its size shot up to 240 bytes! That’s a 4x increase, just to get
+exhaustiveness. Admittedly, <code>needsCancelButton</code> is a bit of a
+pathological case. But in general: as we make our code bases
+<strong>more safe</strong> using Flow’s union types of string literals,
+our <strong>bundle size bloats</strong>!</p>
+<h1 id="types-and-optimizing-compilers">Types and Optimizing
+Compilers</h1>
+<p>One of the many overlooked promises of types is the claim that by
+writing our code with <strong>higher-level abstractions</strong>, we
+give more information to the compiler. The compiler can then generate
+code that captures our original intent, but as efficiently as
+possible.</p>
+<p>Flow is decidedly <strong>not</strong> a compiler: it’s only a type
+checker. To run JavaScript annotated with Flow types, we first strip the
+types (with something like Babel). All information about the types
+vanishes when we run the code.<span
+class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
+class="sidenote">Even though TypeScript defines both a language
+<strong>and</strong> a compiler for that language, in practice it’s not
+much different from Flow here. A goal of the TypeScript compiler is to
+generate JavaScript that closely resembles the original TypeScript, so
+it doesn’t do compile-time optimizations based on the types.<br />
 <br />
-</span></span> What can we achieve if we were to <strong>keep the types around</strong> all the way through compilation?</p>
-<p><a href="https://reasonml.github.io/">Reason</a> (i.e., ReasonML) is an exciting effort to bring all the benefits of the OCaml tool chain to the web. In particular, Reason works using OCaml’s mature optimizing compiler alongside BuckleScript (which turns OCaml to JavaScript) to emit great code.</p>
-<p>To see what I mean, let’s re-implement our <code>Screen</code> type and <code>needsCancelButton</code> function, this time in Reason:</p>
+</span></span> What can we achieve if we were to <strong>keep the types
+around</strong> all the way through compilation?</p>
+<p><a href="https://reasonml.github.io/">Reason</a> (i.e., ReasonML) is
+an exciting effort to bring all the benefits of the OCaml tool chain to
+the web. In particular, Reason works using OCaml’s mature optimizing
+compiler alongside BuckleScript (which turns OCaml to JavaScript) to
+emit great code.</p>
+<p>To see what I mean, let’s re-implement our <code>Screen</code> type
+and <code>needsCancelButton</code> function, this time in Reason:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>type <span class="bu">screen</span> <span class="op">=</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> LoadingScreen</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> CodeEntryScreen</span>
@@ -186,9 +286,18 @@
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> SuccessScreen <span class="kw">=&gt;</span> <span class="kw">false</span><span class="op">;</span></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
-<p>Looks pretty close to JavaScript with Flow types, doesn’t it? The biggest difference is that the <code>case</code> keyword was replaced with the <code>|</code> character. Making the way we define and use union types look the same is a subtle reminder to always pair union types with <code>switch</code> statements! <span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="sidenote">More than being a nice reminder, it makes it easy to copy / paste our type definition as boilerplate to start writing a new function!<br />
+<p>Looks pretty close to JavaScript with Flow types, doesn’t it? The
+biggest difference is that the <code>case</code> keyword was replaced
+with the <code>|</code> character. Making the way we define and use
+union types look the same is a subtle reminder to always pair union
+types with <code>switch</code> statements! <span
+class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
+class="sidenote">More than being a nice reminder, it makes it easy to
+copy / paste our type definition as boilerplate to start writing a new
+function!<br />
 <br />
-</span></span> Another difference: Reason handles exhaustiveness checking out of the box. 🙂</p>
+</span></span> Another difference: Reason handles exhaustiveness
+checking out of the box. 🙂</p>
 <p>What does the Reason output look like?</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Generated by BUCKLESCRIPT VERSION 3.0.1, PLEASE EDIT WITH CARE</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="st">&#39;use strict&#39;</span><span class="op">;</span></span>
@@ -200,34 +309,68 @@
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p><a href="https://reasonml.github.io/en/try.html?rrjsx=true&amp;reason=C4TwDgpgBAzgxgJwhAdlAvAKClAPlAGQHsBDAEwEsUBzAZUWRWzygGEiyIBRFYBEeklTN8tAK5w4EGDEGMA3JkwAbCMCgpkZGKxIopygEJjgwImnRQAFPCEoAXLAaoAlI4BGRIsowA+KADezDAA7hTAcAAW1raMLoEihKSUNHKoflB8YhCKOPjsnDx8As4W-lk5ieKS0rKlGQBmJMowlTgAvpjtikA"><strong>(Play with it on Try Reason →)</strong></a></p>
-<p>Not bad! Telling Reason that our function was exhaustive let it optimize the entire <code>switch</code> statement back down to a single <code>if</code> statement. In fact, it gets even better: when we run this through <code>uglifyjs</code>, it removes the redundant <code>true</code> / <code>false</code>:</p>
+<p><a
+href="https://reasonml.github.io/en/try.html?rrjsx=true&amp;reason=C4TwDgpgBAzgxgJwhAdlAvAKClAPlAGQHsBDAEwEsUBzAZUWRWzygGEiyIBRFYBEeklTN8tAK5w4EGDEGMA3JkwAbCMCgpkZGKxIopygEJjgwImnRQAFPCEoAXLAaoAlI4BGRIsowA+KADezDAA7hTAcAAW1raMLoEihKSUNHKoflB8YhCKOPjsnDx8As4W-lk5ieKS0rKlGQBmJMowlTgAvpjtikA"><strong>(Play
+with it on Try Reason →)</strong></a></p>
+<p>Not bad! Telling Reason that our function was exhaustive let it
+optimize the entire <code>switch</code> statement back down to a single
+<code>if</code> statement. In fact, it gets even better: when we run
+this through <code>uglifyjs</code>, it removes the redundant
+<code>true</code> / <code>false</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;use strict&quot;</span><span class="op">;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">needsCancelButton</span>(n){</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="op">!</span>(n<span class="op">&gt;=</span><span class="dv">2</span>)</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>Wow! This is actually <strong>better</strong> than our initial, hand-written <code>if</code> statement. Reason compiled what used to be a string literal <code>'SuccessScreen'</code> to just the number <code>2</code>. Reason can do this safely because custom-defined types in Reason <strong>aren’t</strong> strings, so it doesn’t matter if the names get mangled.</p>
-<p>Taking a step back, Reason’s type system delivered on the promise of types in a way Flow couldn’t:</p>
+<p>Wow! This is actually <strong>better</strong> than our initial,
+hand-written <code>if</code> statement. Reason compiled what used to be
+a string literal <code>'SuccessScreen'</code> to just the number
+<code>2</code>. Reason can do this safely because custom-defined types
+in Reason <strong>aren’t</strong> strings, so it doesn’t matter if the
+names get mangled.</p>
+<p>Taking a step back, Reason’s type system delivered on the promise of
+types in a way Flow couldn’t:</p>
 <ul>
 <li>We wrote high-level, expressive code.</li>
-<li>The type checker gave us strong guarantees about our code’s correctness via exhaustiveness.</li>
+<li>The type checker gave us strong guarantees about our code’s
+correctness via exhaustiveness.</li>
 <li>The compiler translated that all to tiny, performant output.</li>
 </ul>
-<p>I’m really excited about Reason. 😄 It has a delightful type system and is backed by a decades-old optimizing compiler tool chain. I’d love to see more people take advantage of improvements in type systems to write better code!</p>
+<p>I’m really excited about Reason. 😄 It has a delightful type system
+and is backed by a decades-old optimizing compiler tool chain. I’d love
+to see more people take advantage of improvements in type systems to
+write better code!</p>
 <hr />
-<h1 id="appendix-other-compile-to-js-runtimes">Appendix: Other Compile-to-JS Runtimes</h1>
-<p>The above analysis only considered Flow + Babel and Reason. But then I got curious about how other typed languages that compile to JavaScript compare on the optimizations front:</p>
+<h1 id="appendix-other-compile-to-js-runtimes">Appendix: Other
+Compile-to-JS Runtimes</h1>
+<p>The above analysis only considered Flow + Babel and Reason. But then
+I got curious about how other typed languages that compile to JavaScript
+compare on the optimizations front:</p>
 <h2 id="typescript">TypeScript</h2>
-<p>Despite being a language <strong>and</strong> compiler, TypeScript maintains a goal of compiling to JavaScript that closely resembles the source TypesScript code. TypeScript has three language constructs for working with exhaustiveness:</p>
+<p>Despite being a language <strong>and</strong> compiler, TypeScript
+maintains a goal of compiling to JavaScript that closely resembles the
+source TypesScript code. TypeScript has three language constructs for
+working with exhaustiveness:</p>
 <ol type="1">
-<li>union types (identical to the Flow unions that we’ve been talking about),</li>
-<li><code>enum</code>s, which are sort of like definition a group of variable constants all at once, and</li>
-<li><code>const enum</code>s which are like <code>enum</code>s except that they’re represented more succinctly in the compiled output.</li>
+<li>union types (identical to the Flow unions that we’ve been talking
+about),</li>
+<li><code>enum</code>s, which are sort of like definition a group of
+variable constants all at once, and</li>
+<li><code>const enum</code>s which are like <code>enum</code>s except
+that they’re represented more succinctly in the compiled output.</li>
 </ol>
-<p>TypeScript’s union type over string literals are represented the same way as Flow, so I’m going to skip (1) and focus instead on (2) and (3).</p>
-<p>TypeScript’s <code>enum</code> and <code>const enum</code> are subtly different. Not having used the language much, I’ll refer you to <a href="https://www.typescriptlang.org/docs/handbook/enums.html">the TypeScript documentation</a> to learn more about the differences. But for sure, <code>const enum</code>s compile much better than normal <code>enum</code>s.</p>
-<p>Here’s what normal <code>enum</code>s look like in TypeScript—they’re <strong>even worse</strong> than unions of string literals:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> Screen_<span class="op">;</span></span>
+<p>TypeScript’s union type over string literals are represented the same
+way as Flow, so I’m going to skip (1) and focus instead on (2) and
+(3).</p>
+<p>TypeScript’s <code>enum</code> and <code>const enum</code> are subtly
+different. Not having used the language much, I’ll refer you to <a
+href="https://www.typescriptlang.org/docs/handbook/enums.html">the
+TypeScript documentation</a> to learn more about the differences. But
+for sure, <code>const enum</code>s compile much better than normal
+<code>enum</code>s.</p>
+<p>Here’s what normal <code>enum</code>s look like in TypeScript—they’re
+<strong>even worse</strong> than unions of string literals:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> Screen_<span class="op">;</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>(<span class="kw">function</span> (Screen_) {</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    Screen_[Screen_[<span class="st">&quot;LoadingScreen&quot;</span>] <span class="op">=</span> <span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;LoadingScreen&quot;</span><span class="op">;</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    Screen_[Screen_[<span class="st">&quot;CodeEntryScreen&quot;</span>] <span class="op">=</span> <span class="dv">1</span>] <span class="op">=</span> <span class="st">&quot;CodeEntryScreen&quot;</span><span class="op">;</span></span>
@@ -248,14 +391,21 @@
 <span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="fu">impossible</span>(<span class="bu">screen</span>)<span class="op">;</span></span>
 <span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    }</span>
 <span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
-<p><a href="https://www.typescriptlang.org/play/#src=enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error(&#39;This%20case%20is%20impossible.&#39;)%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D"><strong>TypeScript Playground →</strong></a></p>
+<p><a
+href="https://www.typescriptlang.org/play/#src=enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error(&#39;This%20case%20is%20impossible.&#39;)%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D"><strong>TypeScript
+Playground →</strong></a></p>
 <p>So for normal <code>enum</code>s:</p>
 <ul>
-<li>It’s not smart enough to optimize away the <code>impossible</code> call.</li>
-<li>It keeps around a JavaScript object representing the collection of enum values at run time, in a format that doesn’t minify well.</li>
+<li>It’s not smart enough to optimize away the <code>impossible</code>
+call.</li>
+<li>It keeps around a JavaScript object representing the collection of
+enum values at run time, in a format that doesn’t minify well.</li>
 </ul>
-<p>And then here’s what <code>const enum</code>s look like—you can see that TypeScript represents them under the hood without any sort of <code>Screen_</code> object:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> impossible <span class="op">=</span> <span class="kw">function</span> (x) {</span>
+<p>And then here’s what <code>const enum</code>s look like—you can see
+that TypeScript represents them under the hood without any sort of
+<code>Screen_</code> object:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> impossible <span class="op">=</span> <span class="kw">function</span> (x) {</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;This case is impossible.&#39;</span>)<span class="op">;</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> needsCancelButton <span class="op">=</span> <span class="kw">function</span> (<span class="bu">screen</span>) {</span>
@@ -270,14 +420,21 @@
 <span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="fu">impossible</span>(<span class="bu">screen</span>)<span class="op">;</span></span>
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    }</span>
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
-<p><a href="https://www.typescriptlang.org/play/#src=const%20enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error(&#39;This%20case%20is%20impossible.&#39;)%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D"><strong>TypeScript Playground →</strong></a></p>
+<p><a
+href="https://www.typescriptlang.org/play/#src=const%20enum%20Screen_%20%7B%0D%0A%20%20%20%20LoadingScreen%2C%0D%0A%20%20%20%20CodeEntryScreen%2C%0D%0A%20%20%20%20SuccessScreen%2C%0D%0A%7D%0D%0A%0D%0Aconst%20impossible%20%3D%20%3CT%3E(x%3A%20never)%3A%20T%20%3D%3E%20%7B%0D%0A%20%20throw%20new%20Error(&#39;This%20case%20is%20impossible.&#39;)%3B%0D%0A%7D%0D%0A%0D%0Aconst%20needsCancelButton%20%3D%20(screen%3A%20Screen_)%3A%20boolean%20%3D%3E%20%7B%0D%0A%20%20switch%20(screen)%20%7B%0D%0A%20%20%20%20case%20Screen_.LoadingScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.CodeEntryScreen%3A%0D%0A%20%20%20%20%20%20return%20true%3B%0D%0A%20%20%20%20case%20Screen_.SuccessScreen%3A%0D%0A%20%20%20%20%20%20return%20false%3B%0D%0A%20%20%20%20default%3A%0D%0A%20%20%20%20%20%20return%20impossible(screen)%3B%0D%0A%20%20%7D%0D%0A%7D"><strong>TypeScript
+Playground →</strong></a></p>
 <ul>
 <li>It uses numbers instead of strings.</li>
-<li>It still uses a switch statement, instead of reducing to just an <code>if</code> statement.</li>
+<li>It still uses a switch statement, instead of reducing to just an
+<code>if</code> statement.</li>
 </ul>
 <h2 id="purescript">PureScript</h2>
-<p>PureScript is another high-level language like Reason. Both Reason and PureScript have data types where we can define unions with custom constructor names. Despite that, PureScript’s generated code is significantly worse than Reason’s.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;use strict&quot;</span><span class="op">;</span></span>
+<p>PureScript is another high-level language like Reason. Both Reason
+and PureScript have data types where we can define unions with custom
+constructor names. Despite that, PureScript’s generated code is
+significantly worse than Reason’s.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;use strict&quot;</span><span class="op">;</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> LoadingScreen <span class="op">=</span> (<span class="kw">function</span> () {</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">function</span> <span class="fu">LoadingScreen</span>() {}<span class="op">;</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    LoadingScreen<span class="op">.</span><span class="at">value</span> <span class="op">=</span> <span class="kw">new</span> <span class="fu">LoadingScreen</span>()<span class="op">;</span></span>
@@ -307,13 +464,23 @@
 <span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
 <ul>
 <li>It’s generating ES5 classes for each data constructor.</li>
-<li>It compiles pattern matching to a series of <code>instanceof</code> checks.</li>
-<li>Even though it <strong>knows</strong> the match is exhaustive, it still emits a <code>throw</code> statement in case the pattern match fails!</li>
+<li>It compiles pattern matching to a series of <code>instanceof</code>
+checks.</li>
+<li>Even though it <strong>knows</strong> the match is exhaustive, it
+still emits a <code>throw</code> statement in case the pattern match
+fails!</li>
 </ul>
-<p>Admittedly, I didn’t try that hard to turn on optimizations in the compiler. Maybe there’s a flag I can pass to get this <code>Error</code> to go away. But that’s pretty disappointing, compared to how small Reason’s generated code was!</p>
+<p>Admittedly, I didn’t try that hard to turn on optimizations in the
+compiler. Maybe there’s a flag I can pass to get this <code>Error</code>
+to go away. But that’s pretty disappointing, compared to how small
+Reason’s generated code was!</p>
 <h2 id="elm">Elm</h2>
-<p>I list Elm in the same class as Reason and PureScript. Like the other two, it lets us define custom data types, and will automatically warn when us pattern matches aren’t exhaustive. Here’s the code Elm generates:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> _user$project$Main$needsCancelButton <span class="op">=</span> <span class="kw">function</span> (page) {</span>
+<p>I list Elm in the same class as Reason and PureScript. Like the other
+two, it lets us define custom data types, and will automatically warn
+when us pattern matches aren’t exhaustive. Here’s the code Elm
+generates:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> _user$project$Main$needsCancelButton <span class="op">=</span> <span class="kw">function</span> (page) {</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">var</span> _p0 <span class="op">=</span> page<span class="op">;</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">switch</span> (_p0<span class="op">.</span><span class="at">ctor</span>) {</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> <span class="st">&#39;LoadingScreen&#39;</span><span class="op">:</span></span>
@@ -329,10 +496,14 @@
 <span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> _user$project$Main$LoadingScreen <span class="op">=</span> {<span class="dt">ctor</span><span class="op">:</span> <span class="st">&#39;LoadingScreen&#39;</span>}<span class="op">;</span></span></code></pre></div>
 <ul>
 <li>It’s using string literals, much like Flow and TypeScript.</li>
-<li>It’s smart enough to collapse the last case to just use <code>default</code> (at least it doesn’t <code>throw</code> in the <code>default</code> case!)</li>
+<li>It’s smart enough to collapse the last case to just use
+<code>default</code> (at least it doesn’t <code>throw</code> in the
+<code>default</code> case!)</li>
 <li>The variable names are long, but these would still minify well.</li>
 </ul>
-<p>It’s interesting to see that even though Reason, PureScript, and Elm all have ML-style datatypes, Reason is the only one that uses an integer representation for the constructor tags.</p>
+<p>It’s interesting to see that even though Reason, PureScript, and Elm
+all have ML-style datatypes, Reason is the only one that uses an integer
+representation for the constructor tags.</p>
 <!-- vim:tw=72
 -->
 </main>

@@ -49,35 +49,65 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#installing-sml-locally">Installing SML Locally</a></li>
-  <li><a href="#getting-comfortable-with-smlnj">Getting Comfortable with SML/NJ</a></li>
-  <li><a href="#enhancing-the-repl">Enhancing the REPL</a></li>
-  <li><a href="#setting-up-vim">Setting Up Vim</a>
+  <li><a href="#installing-sml-locally"
+  id="toc-installing-sml-locally">Installing SML Locally</a></li>
+  <li><a href="#getting-comfortable-with-smlnj"
+  id="toc-getting-comfortable-with-smlnj">Getting Comfortable with
+  SML/NJ</a></li>
+  <li><a href="#enhancing-the-repl"
+  id="toc-enhancing-the-repl">Enhancing the REPL</a></li>
+  <li><a href="#setting-up-vim" id="toc-setting-up-vim">Setting Up
+  Vim</a>
   <ul>
-  <li><a href="#ale">ALE</a></li>
-  <li><a href="#extra-ale-setup">Extra ALE Setup</a></li>
-  <li><a href="#using-ale-with-cm-files">Using ALE with CM files</a></li>
-  <li><a href="#vim-better-sml"><code>vim-better-sml</code></a></li>
+  <li><a href="#ale" id="toc-ale">ALE</a></li>
+  <li><a href="#extra-ale-setup" id="toc-extra-ale-setup">Extra ALE
+  Setup</a></li>
+  <li><a href="#using-ale-with-cm-files"
+  id="toc-using-ale-with-cm-files">Using ALE with CM files</a></li>
+  <li><a href="#vim-better-sml"
+  id="toc-vim-better-sml"><code>vim-better-sml</code></a></li>
   </ul></li>
-  <li><a href="#general-vim-settings">General Vim Settings</a></li>
-  <li><a href="#tldr">TL;DR</a></li>
+  <li><a href="#general-vim-settings"
+  id="toc-general-vim-settings">General Vim Settings</a></li>
+  <li><a href="#tldr" id="toc-tldr">TL;DR</a></li>
   </ul>
 </nav>
 
 <main>
-<p>When it comes right down to it, SML is a pretty great language. It’s clear that extensive thought has gone into its design and implementation. I quite enjoy programming in SML, due in no small part to my collection of workflow hacks that make editing and developing with SML responsive and interactive.</p>
+<p>When it comes right down to it, SML is a pretty great language. It’s
+clear that extensive thought has gone into its design and
+implementation. I quite enjoy programming in SML, due in no small part
+to my collection of workflow hacks that make editing and developing with
+SML responsive and interactive.</p>
 <!-- more -->
-<p>We’re going to be walking through a couple easy steps to make developing SML feel more fluid. I have a slight preference for Vim (Neovim) on macOS, but many of these steps are platform agnostic.</p>
-<p><strong>Note</strong>: I updated this post to more accurately reflect my SML dev setup in December 2019.</p>
+<p>We’re going to be walking through a couple easy steps to make
+developing SML feel more fluid. I have a slight preference for Vim
+(Neovim) on macOS, but many of these steps are platform agnostic.</p>
+<p><strong>Note</strong>: I updated this post to more accurately reflect
+my SML dev setup in December 2019.</p>
 <h1 id="installing-sml-locally">Installing SML Locally</h1>
-<p>While developing SML in a remote environment like the shared Andrew Unix machines makes it easy to dive right in, I prefer doing development on my laptop—it doesn’t get slow when there are many people logged in, there’s no nightly reboots, and it doesn’t matter whether I have a strong WiFi connection.</p>
-<p>On macOS and Ubuntu, the two most popular implementations of SML are already packaged. Take the time to install a version of SML right now:</p>
+<p>While developing SML in a remote environment like the shared Andrew
+Unix machines makes it easy to dive right in, I prefer doing development
+on my laptop—it doesn’t get slow when there are many people logged in,
+there’s no nightly reboots, and it doesn’t matter whether I have a
+strong WiFi connection.</p>
+<p>On macOS and Ubuntu, the two most popular implementations of SML are
+already packaged. Take the time to install a version of SML right
+now:</p>
 <ul>
-<li><p>At CMU we use <a href="http://smlnj.org/">SML/NJ</a>, which is convenient because it has a REPL that for playing around with SML interactively.</p></li>
-<li><p>To play around with releasing programs written in SML to other people, install <a href="http://www.mlton.org/">MLton</a>. It has better support for compiling SML programs to standalone executables which can be shared from one machine to another. (I have a separate post on <a href="/sml-travis-ci/">using SML to release software publically</a> with more details).</p></li>
+<li><p>At CMU we use <a href="http://smlnj.org/">SML/NJ</a>, which is
+convenient because it has a REPL that for playing around with SML
+interactively.</p></li>
+<li><p>To play around with releasing programs written in SML to other
+people, install <a href="http://www.mlton.org/">MLton</a>. It has better
+support for compiling SML programs to standalone executables which can
+be shared from one machine to another. (I have a separate post on <a
+href="/sml-travis-ci/">using SML to release software publically</a> with
+more details).</p></li>
 </ul>
 <figure>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># macOS -- one or both of:</span></span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># macOS -- one or both of:</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="ex">brew</span> install smlnj</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="ex">brew</span> install mlton</span>
 <span id="cb1-4"><a href="#cb1-4"></a></span>
@@ -88,34 +118,57 @@
 Install SML from your package manager
 </figcaption>
 </figure>
-<p>Feel free to install both; they’ll play nicely with each other, and each offers advantages over the other.</p>
-<p>Note for macOS users: if you’ve never used <a href="http://brew.sh">Homebrew</a> before, you’ll need to <a href="http://brew.sh">install it first</a>.</p>
-<p>Note for Ubuntu users: the versions of these two that ship in the default package distribution are frequently out of date. If that matters to you, consider following the the <a href="http://smlnj.org/">SML/NJ</a> and <a href="http://www.mlton.org/">MLton</a> installation instructions directly.</p>
-<h1 id="getting-comfortable-with-smlnj">Getting Comfortable with SML/NJ</h1>
-<p>The rest of these steps should apply regardless of whether you’re working on SML locally or remotely.</p>
-<p>One thing that I’ve seen far too many times from course documentation is that they tell students to run their code like this:</p>
+<p>Feel free to install both; they’ll play nicely with each other, and
+each offers advantages over the other.</p>
+<p>Note for macOS users: if you’ve never used <a
+href="http://brew.sh">Homebrew</a> before, you’ll need to <a
+href="http://brew.sh">install it first</a>.</p>
+<p>Note for Ubuntu users: the versions of these two that ship in the
+default package distribution are frequently out of date. If that matters
+to you, consider following the the <a
+href="http://smlnj.org/">SML/NJ</a> and <a
+href="http://www.mlton.org/">MLton</a> installation instructions
+directly.</p>
+<h1 id="getting-comfortable-with-smlnj">Getting Comfortable with
+SML/NJ</h1>
+<p>The rest of these steps should apply regardless of whether you’re
+working on SML locally or remotely.</p>
+<p>One thing that I’ve seen far too many times from course documentation
+is that they tell students to run their code like this:</p>
 <ol type="1">
 <li>Run <code>sml</code></li>
-<li>Type <code>use "foo.sml";</code> or <code>CM.make "sources.cm";</code> at the REPL</li>
+<li>Type <code>use "foo.sml";</code> or
+<code>CM.make "sources.cm";</code> at the REPL</li>
 </ol>
-<p>Don’t get me wrong; this works, but there’s a better way. Being responsible CLI-citizens, we should always be looking for ways to tab-complete. We can easily get tab-completion on the filename by changing our workflow:</p>
+<p>Don’t get me wrong; this works, but there’s a better way. Being
+responsible CLI-citizens, we should always be looking for ways to
+tab-complete. We can easily get tab-completion on the filename by
+changing our workflow:</p>
 <ol type="1">
 <li>Run <code>sml foo.sml</code> or <code>sml -m sources.cm</code></li>
 </ol>
 <p>Look at that! We’ve,</p>
 <ul>
 <li>dropped a step (having to launch the REPL first), and</li>
-<li>introduced tab completion (because the shell has filename completion)</li>
+<li>introduced tab completion (because the shell has filename
+completion)</li>
 </ul>
 <p>It’s the little things, but they add up.</p>
 <h1 id="enhancing-the-repl">Enhancing the REPL</h1>
-<p>Speaking of the little things, when using the SML REPL, you don’t have access to all the usual command line niceties like command history and access to arrow keys for editing, let alone Vi-like keybindings. To get started, you’ll have to change how you launch the SML/NJ REPL. In particular, we’re going to preface our commands with <code>rlwrap</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># instead of this...</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>$ <span class="ex">sml</span></span>
+<p>Speaking of the little things, when using the SML REPL, you don’t
+have access to all the usual command line niceties like command history
+and access to arrow keys for editing, let alone Vi-like keybindings. To
+get started, you’ll have to change how you launch the SML/NJ REPL. In
+particular, we’re going to preface our commands with
+<code>rlwrap</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># instead of this...</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sml</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># use this:</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>$ <span class="ex">rlwrap</span> sml</span></code></pre></div>
-<p><code>rlwrap</code> stands for “readline wrap.” Readline is a library that adds all the features mentioned above to any REPL program:</p>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> rlwrap sml</span></code></pre></div>
+<p><code>rlwrap</code> stands for “readline wrap.” Readline is a library
+that adds all the features mentioned above to any REPL program:</p>
 <ul>
 <li>Command history tracking (up arrow keys)</li>
 <li>Line editing with arrow keys</li>
@@ -124,62 +177,130 @@ Install SML from your package manager
 <li>We can use this to get fancy features like Vi keybindings</li>
 </ul></li>
 </ul>
-<p>For more information, see <a href="https://github.com/jez/dotfiles/blob/ed8e531eebe43a8aef05fc4cb768157d03408cea/inputrc#L12-L14">these lines</a> of my inputrc, a small part of my <a href="https://github.com/jez/dotfiles">dotfiles repo</a> on GitHub.</p>
+<p>For more information, see <a
+href="https://github.com/jez/dotfiles/blob/ed8e531eebe43a8aef05fc4cb768157d03408cea/inputrc#L12-L14">these
+lines</a> of my inputrc, a small part of my <a
+href="https://github.com/jez/dotfiles">dotfiles repo</a> on GitHub.</p>
 <h1 id="setting-up-vim">Setting Up Vim</h1>
-<p>Programming is so much more enjoyable when you’re not fighting your editor. For me, this means striving to get the most out of Vim. In this section, I’ll outline all the cool tips and tricks I have for developing SML in Vim.</p>
-<p>But first, if you’ve never taken a look into how to configure Vim, I suggest you start out by walking through this quick workshop called <a href="https://github.com/jez/vim-as-an-ide">Vim as an IDE</a>. It’ll teach you where to start when configuring Vim and get you set up with a bunch of standard plugins that improve on the standard Vim experience tenfold.</p>
-<p>No actually, take a second and <a href="https://github.com/jez/vim-as-an-ide">walk through it</a>. We’ll still be here when you’re done, and you’ll appreciate Vim more when you’re done.</p>
+<p>Programming is so much more enjoyable when you’re not fighting your
+editor. For me, this means striving to get the most out of Vim. In this
+section, I’ll outline all the cool tips and tricks I have for developing
+SML in Vim.</p>
+<p>But first, if you’ve never taken a look into how to configure Vim, I
+suggest you start out by walking through this quick workshop called <a
+href="https://github.com/jez/vim-as-an-ide">Vim as an IDE</a>. It’ll
+teach you where to start when configuring Vim and get you set up with a
+bunch of standard plugins that improve on the standard Vim experience
+tenfold.</p>
+<p>No actually, take a second and <a
+href="https://github.com/jez/vim-as-an-ide">walk through it</a>. We’ll
+still be here when you’re done, and you’ll appreciate Vim more when
+you’re done.</p>
 <h2 id="ale">ALE</h2>
-<p><a href="https://github.com/dense-analysis/ale">ALE</a> is a Vim plugin that provides what it calls “asynchronous linting.” That’s a fancy way of saying that it can show little red x’s on all the lines that have errors. It works for many languages out of the box, including Standard ML.</p>
-<p>It’s super simple to set up. The <a href="https://github.com/dense-analysis/ale">ALE homepage</a> should have all the instructions.</p>
-<p>With ALE set up, try writing this into a file called <code>test.sml</code>:</p>
+<p><a href="https://github.com/dense-analysis/ale">ALE</a> is a Vim
+plugin that provides what it calls “asynchronous linting.” That’s a
+fancy way of saying that it can show little red x’s on all the lines
+that have errors. It works for many languages out of the box, including
+Standard ML.</p>
+<p>It’s super simple to set up. The <a
+href="https://github.com/dense-analysis/ale">ALE homepage</a> should
+have all the instructions.</p>
+<p>With ALE set up, try writing this into a file called
+<code>test.sml</code>:</p>
 <figure>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource sml numberLines"><code class="sourceCode sml"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">val</span> foo : <span class="dt">string</span> = <span class="dv">42</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode numberSource sml numberLines"><code class="sourceCode sml"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">val</span> foo : <span class="dt">string</span> = <span class="dv">42</span></span></code></pre></div>
 <figcaption>
 test.sml
 </figcaption>
 </figure>
-<p>While typing, any errors should appear as markers to the left of the line numbers. Super handy!</p>
-<p>If nothing shows up, check <code>:ALEInfo</code> which dumps a bunch of information about whether ALE was set up correctly. In particular, SML support requires having <a href="http://smlnj.org/">SML/NJ</a> installed (i.e., installing it on your laptop or working on a server where it’s already installed).</p>
+<p>While typing, any errors should appear as markers to the left of the
+line numbers. Super handy!</p>
+<p>If nothing shows up, check <code>:ALEInfo</code> which dumps a bunch
+of information about whether ALE was set up correctly. In particular,
+SML support requires having <a href="http://smlnj.org/">SML/NJ</a>
+installed (i.e., installing it on your laptop or working on a server
+where it’s already installed).</p>
 <h2 id="extra-ale-setup">Extra ALE Setup</h2>
-<p>While the default settings for ALE work well enough, there’s plenty of reasons to tweak them. For example, here are <a href="https://github.com/jez/dotfiles/blob/b942b6336ee968c9d94a9ea363c1cbcdb44b9846/vim/plug-settings.vim#L227-L239">all my ALE settings</a>.</p>
+<p>While the default settings for ALE work well enough, there’s plenty
+of reasons to tweak them. For example, here are <a
+href="https://github.com/jez/dotfiles/blob/b942b6336ee968c9d94a9ea363c1cbcdb44b9846/vim/plug-settings.vim#L227-L239">all
+my ALE settings</a>.</p>
 <p>The key changes I make:</p>
 <ul>
 <li>I ask ALE to show a list of all errors if there were any.</li>
-<li>I ask ALE to only run when the file was saved (not when it was opened or edited).</li>
+<li>I ask ALE to only run when the file was saved (not when it was
+opened or edited).</li>
 </ul>
-<p>(You’ll also see a bunch of settings for other languages, but you won’t find any SML-specific config… it’s not needed!)</p>
-<p>Also, a tip for those who’ve never used Vim’s location list: you can close the list of errors with <code>:lclose</code>.</p>
+<p>(You’ll also see a bunch of settings for other languages, but you
+won’t find any SML-specific config… it’s not needed!)</p>
+<p>Also, a tip for those who’ve never used Vim’s location list: you can
+close the list of errors with <code>:lclose</code>.</p>
 <h2 id="using-ale-with-cm-files">Using ALE with CM files</h2>
-<p>Sometimes a single SML file is self-contained enough to type check on it’s own. But most of the time, we’re working with multi-file SML projects. With SML/NJ, multi-file SML projects are managed using CM files (<code>*.cm</code> files) which declare groups of SML files that must be compiled together to make sense.</p>
-<p>ALE’s support for SML handles both of these scenarios. When opening an SML file, ALE will search up the folder hierarchy for any <code>*.cm</code> file, stopping when it finds the first one. When there are multiple in a single folder, it takes the alphabetically first option.</p>
-<p>Usually this works fine but sometimes ALE picks the wrong one. There are instructions for how to manually fix this by setting some variables in the ALE help:</p>
+<p>Sometimes a single SML file is self-contained enough to type check on
+it’s own. But most of the time, we’re working with multi-file SML
+projects. With SML/NJ, multi-file SML projects are managed using CM
+files (<code>*.cm</code> files) which declare groups of SML files that
+must be compiled together to make sense.</p>
+<p>ALE’s support for SML handles both of these scenarios. When opening
+an SML file, ALE will search up the folder hierarchy for any
+<code>*.cm</code> file, stopping when it finds the first one. When there
+are multiple in a single folder, it takes the alphabetically first
+option.</p>
+<p>Usually this works fine but sometimes ALE picks the wrong one. There
+are instructions for how to manually fix this by setting some variables
+in the ALE help:</p>
 <pre><code>:help ale-sml-options</code></pre>
 <h2 id="vim-better-sml"><code>vim-better-sml</code></h2>
-<p>After all that, I still wasn’t satisfied with developing SML in Vim, so I wrote a plugin to make it even better: <a href="https://github.com/jez/vim-better-sml">vim-better-sml</a>. Here’s a quick rundown of its features:</p>
+<p>After all that, I still wasn’t satisfied with developing SML in Vim,
+so I wrote a plugin to make it even better: <a
+href="https://github.com/jez/vim-better-sml">vim-better-sml</a>. Here’s
+a quick rundown of its features:</p>
 <ul>
 <li>It supports for embedding a REPL directly inside Vim.</li>
 <li>It supports asking for the type of a variable under the cursor.</li>
-<li>It supports jump to definition, even into the Standard Basis Library.</li>
-<li><code>*.sig</code> files are properly detected as SML signature files.</li>
-<li>Many small annoyances with syntax highlighting and indentation are fixed.</li>
+<li>It supports jump to definition, even into the Standard Basis
+Library.</li>
+<li><code>*.sig</code> files are properly detected as SML signature
+files.</li>
+<li>Many small annoyances with syntax highlighting and indentation are
+fixed.</li>
 </ul>
-<p>For more information, including how to install it, check out the homepage: <a href="https://github.com/jez/vim-better-sml">vim-better-sml</a>. For the most part, the plugin itself will guide you through the installation, declaring any dependencies that might be missing.</p>
-<p>I recorded a screencast of all those features above in action, which you might want to check out:</p>
-<p><a href="https://youtu.be/Z5FsPZ5cm8Y"><img src="/assets/img/vim-better-sml-demo-thumbnail.png" alt="thumbnail" /></a></p>
+<p>For more information, including how to install it, check out the
+homepage: <a
+href="https://github.com/jez/vim-better-sml">vim-better-sml</a>. For the
+most part, the plugin itself will guide you through the installation,
+declaring any dependencies that might be missing.</p>
+<p>I recorded a screencast of all those features above in action, which
+you might want to check out:</p>
+<p><a href="https://youtu.be/Z5FsPZ5cm8Y"><img
+src="/assets/img/vim-better-sml-demo-thumbnail.png"
+alt="thumbnail" /></a></p>
 <h1 id="general-vim-settings">General Vim Settings</h1>
-<p>As a quick addendum, one common complaint people have when editing SML is that it forces the line to wrap if it extends past 80 characters. Some people don’t like that, and others don’t like that it doesn’t do it frequently enough (namely, it only wraps the line if your <strong>cursor</strong> extends past 80 characters, not the end of the line).</p>
+<p>As a quick addendum, one common complaint people have when editing
+SML is that it forces the line to wrap if it extends past 80 characters.
+Some people don’t like that, and others don’t like that it doesn’t do it
+frequently enough (namely, it only wraps the line if your
+<strong>cursor</strong> extends past 80 characters, not the end of the
+line).</p>
 <p>If you don’t want Vim to do any of this wrapping, run this:</p>
 <figure>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource vim numberLines"><code class="sourceCode"><span id="cb5-1"><a href="#cb5-1"></a>setlocal textwidth=0</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode numberSource vim numberLines"><code class="sourceCode"><span id="cb5-1"><a href="#cb5-1"></a>setlocal textwidth=0</span></code></pre></div>
 <figcaption>
 Disable hard line wrapping
 </figcaption>
 </figure>
-<p>If you’d like this change to persist between Vim sessions, add it to <code>~/.vim/after/ftplugin/sml.vim</code>. These folders and file likely don’t exist yet; you’ll have to create them. The <code>after</code> folder in Vim is used to override settings loaded from plugins.</p>
-<p>Alternatively, if you’d like a little better idea when Vim’s going to hard wrap your line, you can add one of these lines to your vimrc:</p>
+<p>If you’d like this change to persist between Vim sessions, add it to
+<code>~/.vim/after/ftplugin/sml.vim</code>. These folders and file
+likely don’t exist yet; you’ll have to create them. The
+<code>after</code> folder in Vim is used to override settings loaded
+from plugins.</p>
+<p>Alternatively, if you’d like a little better idea when Vim’s going to
+hard wrap your line, you can add one of these lines to your vimrc:</p>
 <figure>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource vim numberLines"><code class="sourceCode"><span id="cb6-1"><a href="#cb6-1"></a>&quot; Always draw the line at 80 characters</span>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode numberSource vim numberLines"><code class="sourceCode"><span id="cb6-1"><a href="#cb6-1"></a>&quot; Always draw the line at 80 characters</span>
 <span id="cb6-2"><a href="#cb6-2"></a>set colorcolumn=80</span>
 <span id="cb6-3"><a href="#cb6-3"></a></span>
 <span id="cb6-4"><a href="#cb6-4"></a>&quot; Draw the line at whatever the current value of textwidth is</span>
@@ -192,12 +313,19 @@ Show a color column
 <h1 id="tldr">TL;DR</h1>
 <p>We covered a lot, so here’s a quick recap:</p>
 <ul>
-<li>Install SML locally. It’s super easy to do on macOS and Linux (use your package manager), and means you don’t have to have a Wi-Fi connection to develop SML.</li>
-<li>Invest time into learning Vim. Here’s a reference: <a href="https://github.com/jez/vim-as-an-ide">Vim as an IDE</a>.</li>
-<li>Install <a href="https://github.com/dense-analysis/ale">ALE</a>. It tells you what lines your errors are on.</li>
-<li>Install <a href="https://github.com/jez/vim-better-sml">vim-better-sml</a>. It includes a whole host of added power features.</li>
+<li>Install SML locally. It’s super easy to do on macOS and Linux (use
+your package manager), and means you don’t have to have a Wi-Fi
+connection to develop SML.</li>
+<li>Invest time into learning Vim. Here’s a reference: <a
+href="https://github.com/jez/vim-as-an-ide">Vim as an IDE</a>.</li>
+<li>Install <a href="https://github.com/dense-analysis/ale">ALE</a>. It
+tells you what lines your errors are on.</li>
+<li>Install <a
+href="https://github.com/jez/vim-better-sml">vim-better-sml</a>. It
+includes a whole host of added power features.</li>
 </ul>
-<p>And as always, you can see even more Vim settings in my <a href="https://github.com/jez/dotfiles">dotfiles repo</a> on GitHub.</p>
+<p>And as always, you can see even more Vim settings in my <a
+href="https://github.com/jez/dotfiles">dotfiles repo</a> on GitHub.</p>
 </main>
 
 

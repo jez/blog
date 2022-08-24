@@ -48,60 +48,97 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#sourcehomework"><span>Source</span></a></li>
-  <li><a href="#what">What</a></li>
-  <li><a href="#installation">Installation</a>
+  <li><a href="#sourcehomework"
+  id="toc-sourcehomework"><span>Source</span></a></li>
+  <li><a href="#what" id="toc-what">What</a></li>
+  <li><a href="#installation" id="toc-installation">Installation</a>
   <ul>
-  <li><a href="#preferred-installation">Preferred Installation</a></li>
+  <li><a href="#preferred-installation"
+  id="toc-preferred-installation">Preferred Installation</a></li>
   </ul></li>
-  <li><a href="#usage">Usage</a>
+  <li><a href="#usage" id="toc-usage">Usage</a>
   <ul>
-  <li><a href="#question"><code>\question</code></a></li>
-  <li><a href="#question-1"><code>\question*</code></a></li>
-  <li><a href="#question-parts">Question Parts</a></li>
-  <li><a href="#induction-proofs">Induction Proofs</a></li>
+  <li><a href="#question"
+  id="toc-question"><code>\question</code></a></li>
+  <li><a href="#question-1"
+  id="toc-question-1"><code>\question*</code></a></li>
+  <li><a href="#question-parts" id="toc-question-parts">Question
+  Parts</a></li>
+  <li><a href="#induction-proofs" id="toc-induction-proofs">Induction
+  Proofs</a></li>
   </ul></li>
-  <li><a href="#markdown">Markdown</a></li>
-  <li><a href="#more">More</a></li>
+  <li><a href="#markdown" id="toc-markdown">Markdown</a></li>
+  <li><a href="#more" id="toc-more">More</a></li>
   </ul>
 </nav>
 
 <main>
-<p>There are LaTeX document classes for typesetting books, articles, exams, presentations, and more. Now, there’s one for homework assignments, too.</p>
+<p>There are LaTeX document classes for typesetting books, articles,
+exams, presentations, and more. Now, there’s one for homework
+assignments, too.</p>
 <!-- more -->
-<h1 id="sourcehomework"><a href="https://github.com/jez/latex-homework-class">Source</a></h1>
-<p>Check out and download the source <a href="https://github.com/jez/latex-homework-class">on GitHub</a>.</p>
+<h1 id="sourcehomework"><a
+href="https://github.com/jez/latex-homework-class">Source</a></h1>
+<p>Check out and download the source <a
+href="https://github.com/jez/latex-homework-class">on GitHub</a>.</p>
 <h1 id="what">What</h1>
-<p>This is a LaTeX document class. That means you use it with <code>\documentclass{homework}</code> at the top of the document. It provides a document layout and some helper commands that make working with questions easy.</p>
+<p>This is a LaTeX document class. That means you use it with
+<code>\documentclass{homework}</code> at the top of the document. It
+provides a document layout and some helper commands that make working
+with questions easy.</p>
 <h1 id="installation">Installation</h1>
-<p>Certainly the easiest way to start using this template is to copy the .cls file to your computer in the same directory as your LaTeX project directory.</p>
-<p>A better way to install this template is to fork <a href="https://github.com/jez/latex-homework-class">the above repository</a> and then clone that fork to a particular folder on your computer:</p>
+<p>Certainly the easiest way to start using this template is to copy the
+.cls file to your computer in the same directory as your LaTeX project
+directory.</p>
+<p>A better way to install this template is to fork <a
+href="https://github.com/jez/latex-homework-class">the above
+repository</a> and then clone that fork to a particular folder on your
+computer:</p>
 <figure>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">git</span> clone https://github.com/<span class="op">&lt;</span>your-username<span class="op">&gt;</span>/latex-hw-template</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">git</span> clone https://github.com/<span class="op">&lt;</span>your-username<span class="op">&gt;</span>/latex-hw-template</span></code></pre></div>
 <figcaption>
 Install
 </figcaption>
 </figure>
-<p>Then, whenever you need to use the template, you can copy the template wherever. Also, if there are ever any updates, you can simply run</p>
+<p>Then, whenever you need to use the template, you can copy the
+template wherever. Also, if there are ever any updates, you can simply
+run</p>
 <figure>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">git</span> pull</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">git</span> pull</span></code></pre></div>
 <figcaption>
 Update
 </figcaption>
 </figure>
 <p>to update the template.</p>
 <h2 id="preferred-installation">Preferred Installation</h2>
-<p>The <em>best</em> way to install this file is to <a href="https://github.com/jez/latex-solarized#installation">follow the instructions here</a>, keeping in mind that you’re trying to install a <code>.cls</code> file instead of three <code>.sty</code> files.</p>
+<p>The <em>best</em> way to install this file is to <a
+href="https://github.com/jez/latex-solarized#installation">follow the
+instructions here</a>, keeping in mind that you’re trying to install a
+<code>.cls</code> file instead of three <code>.sty</code> files.</p>
 <h1 id="usage">Usage</h1>
-<p>See the <a href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a> file for an exhaustive list of usage examples. There are also comments explaining features for which there are no examples given.</p>
+<p>See the <a
+href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a>
+file for an exhaustive list of usage examples. There are also comments
+explaining features for which there are no examples given.</p>
 <p>The result is the following:</p>
-<p><a href="/assets/img/homework-class.png"><img src="/assets/img/homework-class.png" /></a></p>
-<p>The class file also has a bunch of helper <code>\usepackage</code>s that you might want to take a look at in <a href="https://github.com/jez/latex-homework-class/blob/master/homework.cls">homework.cls</a>.</p>
-<p>For your convenience, the file <a href="https://github.com/jez/latex-homework-class/blob/master/template.tex">template.tex</a> is a nearly-empty LaTeX file that contains the bare essentials to get started using the homework class.</p>
+<p><a href="/assets/img/homework-class.png"><img
+src="/assets/img/homework-class.png" /></a></p>
+<p>The class file also has a bunch of helper <code>\usepackage</code>s
+that you might want to take a look at in <a
+href="https://github.com/jez/latex-homework-class/blob/master/homework.cls">homework.cls</a>.</p>
+<p>For your convenience, the file <a
+href="https://github.com/jez/latex-homework-class/blob/master/template.tex">template.tex</a>
+is a nearly-empty LaTeX file that contains the bare essentials to get
+started using the homework class.</p>
 <h2 id="question"><code>\question</code></h2>
-<p>To start a question, just type <code>\question</code>. It will add the text “Question #” with a line underneath to the document. If you’d like to change “Question” to something else, use</p>
+<p>To start a question, just type <code>\question</code>. It will add
+the text “Question #” with a line underneath to the document. If you’d
+like to change “Question” to something else, use</p>
 <figure>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource tex numberLines"><code class="sourceCode latex"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">\renewcommand</span>{<span class="ex">\questiontype</span>}{Whatever You Want}</span>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode numberSource tex numberLines"><code class="sourceCode latex"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">\renewcommand</span>{<span class="ex">\questiontype</span>}{Whatever You Want}</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="co">% Now questions will be titled &quot;Whatever You Want #&quot;</span></span></code></pre></div>
 <figcaption>
 Change the Question Type
@@ -109,20 +146,31 @@ Change the Question Type
 </figure>
 <p>Similarly, if you ever need to skip numbers, you can do</p>
 <figure>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource tex numberLines"><code class="sourceCode latex"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">\setcounter</span>{<span class="fu">\questionCounter</span>}{&lt;target number - 1&gt;}</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode numberSource tex numberLines"><code class="sourceCode latex"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">\setcounter</span>{<span class="fu">\questionCounter</span>}{&lt;target number - 1&gt;}</span></code></pre></div>
 <figcaption>
 Non-contiguous Question Numbers
 </figcaption>
 </figure>
-<p>So, to skip to the 10th question, <code>&lt;target number - 1&gt;</code> = 9.</p>
-<p>See <a href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
+<p>So, to skip to the 10th question,
+<code>&lt;target number - 1&gt;</code> = 9.</p>
+<p>See <a
+href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a>
+for more.</p>
 <h2 id="question-1"><code>\question*</code></h2>
-<p>Some classes like to give their homework questions fancy names. If this is the case, you can use <code>\question*{The Question's Name}</code> to make a named question.</p>
-<p>See <a href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
+<p>Some classes like to give their homework questions fancy names. If
+this is the case, you can use
+<code>\question*{The Question's Name}</code> to make a named
+question.</p>
+<p>See <a
+href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a>
+for more.</p>
 <h2 id="question-parts">Question Parts</h2>
-<p>Another common thing on homework assignments is to have multi-part questions. To deal with these, use the form</p>
+<p>Another common thing on homework assignments is to have multi-part
+questions. To deal with these, use the form</p>
 <figure>
-<div class="sourceCode" id="cb5"><pre class="sourceCode tex"><code class="sourceCode latex"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">\begin</span>{<span class="ex">alphaparts</span>}</span>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode tex"><code class="sourceCode latex"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">\begin</span>{<span class="ex">alphaparts</span>}</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">\questionpart</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    This will be part (a).</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">\questionpart</span></span>
@@ -134,7 +182,8 @@ Lettered Question Parts
 </figure>
 <p>or</p>
 <figure>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource tex numberLines"><code class="sourceCode latex"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">\begin</span>{<span class="ex">arabicparts</span>}</span>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode numberSource tex numberLines"><code class="sourceCode latex"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">\begin</span>{<span class="ex">arabicparts</span>}</span>
 <span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">\questionpart</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a>    This will be part x.1.</span>
 <span id="cb6-4"><a href="#cb6-4"></a>  <span class="fu">\questionpart</span></span>
@@ -144,11 +193,16 @@ Lettered Question Parts
 Numbered Question Parts
 </figcaption>
 </figure>
-<p>See <a href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a> for more.</p>
+<p>See <a
+href="https://github.com/jez/latex-homework-class/blob/master/homework.tex">homework.tex</a>
+for more.</p>
 <h2 id="induction-proofs">Induction Proofs</h2>
-<p>In math classes, induction proofs come up a lot, and they almost always have the same form: base case, induction hypothesis, and induction step.</p>
+<p>In math classes, induction proofs come up a lot, and they almost
+always have the same form: base case, induction hypothesis, and
+induction step.</p>
 <figure>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource tex numberLines"><code class="sourceCode latex"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">\begin</span>{<span class="ex">induction</span>}</span>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode numberSource tex numberLines"><code class="sourceCode latex"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">\begin</span>{<span class="ex">induction</span>}</span>
 <span id="cb7-2"><a href="#cb7-2"></a>  <span class="fu">\basecase</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a>    This is my fancy base case.</span>
 <span id="cb7-4"><a href="#cb7-4"></a>  <span class="fu">\indhyp</span></span>
@@ -161,9 +215,15 @@ Induction Environment
 </figcaption>
 </figure>
 <h1 id="markdown">Markdown</h1>
-<p>One of my favorite features of this document class is that it redefines the <code>\section</code> macros. This means you can use tools like Markdown, which have a concise syntax, together with a tool like <a href="http://johnmacfarlane.net/pandoc/"><code>pandoc</code></a> to convert Markdown into LaTeX. As an example, consider that we have the Markdown:</p>
+<p>One of my favorite features of this document class is that it
+redefines the <code>\section</code> macros. This means you can use tools
+like Markdown, which have a concise syntax, together with a tool like <a
+href="http://johnmacfarlane.net/pandoc/"><code>pandoc</code></a> to
+convert Markdown into LaTeX. As an example, consider that we have the
+Markdown:</p>
 <figure>
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource plain numberLines"><code class="sourceCode"><span id="cb8-1"><a href="#cb8-1"></a>#</span>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode numberSource plain numberLines"><code class="sourceCode"><span id="cb8-1"><a href="#cb8-1"></a>#</span>
 <span id="cb8-2"><a href="#cb8-2"></a></span>
 <span id="cb8-3"><a href="#cb8-3"></a>This is my first answer.</span>
 <span id="cb8-4"><a href="#cb8-4"></a></span>
@@ -176,9 +236,11 @@ Induction Environment
 my-homework.md
 </figcaption>
 </figure>
-<p>Running <code>pandoc -f markdown -t latex my-homework.md</code> will output</p>
+<p>Running <code>pandoc -f markdown -t latex my-homework.md</code> will
+output</p>
 <figure>
-<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource tex numberLines"><code class="sourceCode latex"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">% $ pandoc -f markdown -t latex my-homework.md</span></span>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode numberSource tex numberLines"><code class="sourceCode latex"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">% $ pandoc -f markdown -t latex my-homework.md</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a><span class="kw">\section</span>{}<span class="kw">\label</span>{<span class="ex">section</span>}</span>
 <span id="cb9-3"><a href="#cb9-3"></a></span>
 <span id="cb9-4"><a href="#cb9-4"></a>This is my first answer.</span>
@@ -192,9 +254,15 @@ my-homework.md
 Convert markdown to LaTeX
 </figcaption>
 </figure>
-<p>And since <code>\section</code> is the same thing as , we’re golden, and this compiles as we’d want it to. Throw it into the blank <a href="https://github.com/jez/latex-homework-class/blob/master/template.tex">template.tex</a> file included in the repo, and you’ve got yourself a typeset homework.</p>
+<p>And since <code>\section</code> is the same thing as , we’re golden,
+and this compiles as we’d want it to. Throw it into the blank <a
+href="https://github.com/jez/latex-homework-class/blob/master/template.tex">template.tex</a>
+file included in the repo, and you’ve got yourself a typeset
+homework.</p>
 <h1 id="more">More</h1>
-<p>I’ve make a lot of other LaTeX-related posts. Be sure to <a href="/categories#latex">check them out</a> as well! My hope is that you find something that makes developing LaTeX just that much easier.</p>
+<p>I’ve make a lot of other LaTeX-related posts. Be sure to <a
+href="/categories#latex">check them out</a> as well! My hope is that you
+find something that makes developing LaTeX just that much easier.</p>
 </main>
 
 

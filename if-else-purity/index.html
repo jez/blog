@@ -49,14 +49,50 @@
 </nav>
 
 <main>
-<p>I prefer to let the language I’m using think on my behalf as much as possible. Ideally, the language is rich enough that the proof of correctness is inherent in the code I’ve written. Even when I use looser languages, these principled languages inform the structure of my code. To make this a bit more let’s turn our focus to <code>if</code>, <code>else</code>, and purity.</p>
+<p>I prefer to let the language I’m using think on my behalf as much as
+possible. Ideally, the language is rich enough that the proof of
+correctness is inherent in the code I’ve written. Even when I use looser
+languages, these principled languages inform the structure of my code.
+To make this a bit more let’s turn our focus to <code>if</code>,
+<code>else</code>, and purity.</p>
 <!-- more -->
-<p>A cool way to understand purity is using what’s known as a “modal separation.” This is a really fancy way to say that we have <span class="smallcaps"><strong>expressions</strong></span> which are pure and always evaluate to a value, alongside <span class="smallcaps"><strong>commands</strong></span> which are impure and are executed for their side effects. If you’ve ever used Haskell, you’re already familiar with this notion—we only need <code>do</code> notation when we need to write impure (or “monadic”) code.</p>
-<p>In an expression language, every <code>if</code> <strong>must</strong> have an <code>else</code>; for the entire <code>if</code> expression to be used as a value, both branches must in turn evaluate to values. It’s only when we move to a language with commands where it makes sense to allow omitting the <code>else</code> branch. <code>if</code> expressions are not some abstract concept; chances are you’ve encountered them under the name “the ternary operator.”</p>
-<p>An <code>if</code> <strong>statement</strong> (as opposed to an <code>if</code> expression) is a command; it’s useful for running side-effectful code. Sometimes, we don’t want one of the branches to have any side effects (for example, because the state of the world doesn’t need to be changed). Languages with commands allow omitting the <code>else</code>.</p>
-<p>What does this mean for us? Since expression languages form the basis for purity, every pure function can be written where the <code>if</code> is matched with an <code>else</code>. Put another way, an unmatched <code>if</code> is a likely indicator that the code I’ve written is impure.</p>
-<p>This makes me more aware of when I’m dealing with impure code. For example, I might want to factor out as much of the pure code into a separate helper function. There’s a time and a place for impure code. But since pure code is more composable and easier to test, it’s best to factor the impure code out whenever possible.</p>
-<p>In a principled language, there’s a distinction between <code>if</code> expressions and <code>if</code> statements. On the other hand, some language only have one, or they blur the line between the two. We can draw upon our experiences with languages that are rigorous about minutia like this to better inform how we write clean code.</p>
+<p>A cool way to understand purity is using what’s known as a “modal
+separation.” This is a really fancy way to say that we have <span
+class="smallcaps"><strong>expressions</strong></span> which are pure and
+always evaluate to a value, alongside <span
+class="smallcaps"><strong>commands</strong></span> which are impure and
+are executed for their side effects. If you’ve ever used Haskell, you’re
+already familiar with this notion—we only need <code>do</code> notation
+when we need to write impure (or “monadic”) code.</p>
+<p>In an expression language, every <code>if</code>
+<strong>must</strong> have an <code>else</code>; for the entire
+<code>if</code> expression to be used as a value, both branches must in
+turn evaluate to values. It’s only when we move to a language with
+commands where it makes sense to allow omitting the <code>else</code>
+branch. <code>if</code> expressions are not some abstract concept;
+chances are you’ve encountered them under the name “the ternary
+operator.”</p>
+<p>An <code>if</code> <strong>statement</strong> (as opposed to an
+<code>if</code> expression) is a command; it’s useful for running
+side-effectful code. Sometimes, we don’t want one of the branches to
+have any side effects (for example, because the state of the world
+doesn’t need to be changed). Languages with commands allow omitting the
+<code>else</code>.</p>
+<p>What does this mean for us? Since expression languages form the basis
+for purity, every pure function can be written where the <code>if</code>
+is matched with an <code>else</code>. Put another way, an unmatched
+<code>if</code> is a likely indicator that the code I’ve written is
+impure.</p>
+<p>This makes me more aware of when I’m dealing with impure code. For
+example, I might want to factor out as much of the pure code into a
+separate helper function. There’s a time and a place for impure code.
+But since pure code is more composable and easier to test, it’s best to
+factor the impure code out whenever possible.</p>
+<p>In a principled language, there’s a distinction between
+<code>if</code> expressions and <code>if</code> statements. On the other
+hand, some language only have one, or they blur the line between the
+two. We can draw upon our experiences with languages that are rigorous
+about minutia like this to better inform how we write clean code.</p>
 <!-- vim:tw=72
 -->
 </main>

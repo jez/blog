@@ -49,20 +49,52 @@
 </nav>
 
 <main>
-<p>I’ve found it useful to search though the source code of things lower in the stack lately. For example I saw an error something like this at work recently:</p>
+<p>I’ve found it useful to search though the source code of things lower
+in the stack lately. For example I saw an error something like this at
+work recently:</p>
 <pre><code>❯ rake test
 symbol lookup error: /home/jez/.../foo.so: undefined symbol bar</code></pre>
-<p>I was pretty confused. Modulo the names of commands and files, this was pretty much all the output.</p>
-<p>So I started searching. First I searched through my codebase for <code>"symbol lookup error"</code>, but found nothing. Surely that string exists somewhere. That must mean it’s coming from lower in the stack?</p>
-<p>The next level lower would mean third party Ruby gems. At work we use Bundler <a href="https://bundler.io/v2.0/guides/deploying.html#manual-deployment">in a mode</a> where it installs all gems into a single convenient folder in the current directory: <code>./vendor/bundle/</code>. But a search in that folder turned up nothing again. So… further down?</p>
-<p>If it’s not from the app, and not from the gems, then maybe it’s in Ruby itself? I cloned the <a href="https://github.com/ruby/ruby">Ruby source</a>, checked out the <a href="https://github.com/ruby/ruby/tree/v2_6_5">version tag</a> for the Ruby version we’re running, and searched for <code>"symbol lookup error"</code> once again. And again nothing!</p>
-<p>There’s still plenty of layers below us, so let’s keep peeling them back. Ruby is written in C, which means we should check libc next (the C standard library). There are multiple libc implementations, but I was running this on Linux, so let’s check GNU libc (glibc). glibc is <a href="https://www.gnu.org/software/libc/sources.html">isn’t on GitHub</a>, but that’s not a huge deterrant. Here’s the search:</p>
+<p>I was pretty confused. Modulo the names of commands and files, this
+was pretty much all the output.</p>
+<p>So I started searching. First I searched through my codebase for
+<code>"symbol lookup error"</code>, but found nothing. Surely that
+string exists somewhere. That must mean it’s coming from lower in the
+stack?</p>
+<p>The next level lower would mean third party Ruby gems. At work we use
+Bundler <a
+href="https://bundler.io/v2.0/guides/deploying.html#manual-deployment">in
+a mode</a> where it installs all gems into a single convenient folder in
+the current directory: <code>./vendor/bundle/</code>. But a search in
+that folder turned up nothing again. So… further down?</p>
+<p>If it’s not from the app, and not from the gems, then maybe it’s in
+Ruby itself? I cloned the <a href="https://github.com/ruby/ruby">Ruby
+source</a>, checked out the <a
+href="https://github.com/ruby/ruby/tree/v2_6_5">version tag</a> for the
+Ruby version we’re running, and searched for
+<code>"symbol lookup error"</code> once again. And again nothing!</p>
+<p>There’s still plenty of layers below us, so let’s keep peeling them
+back. Ruby is written in C, which means we should check libc next (the C
+standard library). There are multiple libc implementations, but I was
+running this on Linux, so let’s check GNU libc (glibc). glibc is <a
+href="https://www.gnu.org/software/libc/sources.html">isn’t on
+GitHub</a>, but that’s not a huge deterrant. Here’s the search:</p>
 <pre><code>❯ rg -t c &#39;symbol lookup error&#39;
 dl-lookup.c
 876:      _dl_signal_cexception (0, &amp;exception, N_(&quot;symbol lookup error&quot;));</code></pre>
-<p>That’s a bit of a smoking gun! After all those layers, we found our error message in libc itself. (This gave me a lot of leads on the problem at hand, e.g., I had definitely ruled out a problem in my app or its dependencies, and I was thinking, “probably something is wrong about how <code>foo.so</code> was compiled.” There’s a fun story here about how Ruby C extensions work, but that’s a <a href="/linkers-ruby-c-exts/">tangent for another time</a>.)</p>
-<p>My point is that <a href="https://livegrep.com/search/linux">searching all the code</a> is a super power, and it applies to more than just searching the code we’ve written. What a blessing that the tools we’re building on, like Ruby and GNU libc, are all open source!</p>
-<p>The next time it looks like a problem is outside the scope of your app’s code, maybe try searching the code:</p>
+<p>That’s a bit of a smoking gun! After all those layers, we found our
+error message in libc itself. (This gave me a lot of leads on the
+problem at hand, e.g., I had definitely ruled out a problem in my app or
+its dependencies, and I was thinking, “probably something is wrong about
+how <code>foo.so</code> was compiled.” There’s a fun story here about
+how Ruby C extensions work, but that’s a <a
+href="/linkers-ruby-c-exts/">tangent for another time</a>.)</p>
+<p>My point is that <a
+href="https://livegrep.com/search/linux">searching all the code</a> is a
+super power, and it applies to more than just searching the code we’ve
+written. What a blessing that the tools we’re building on, like Ruby and
+GNU libc, are all open source!</p>
+<p>The next time it looks like a problem is outside the scope of your
+app’s code, maybe try searching the code:</p>
 <ul>
 <li>inside your gems or packages!</li>
 <li>inside your language’s standard library!
@@ -71,13 +103,23 @@ dl-lookup.c
 </ul></li>
 <li>inside your language’s runtime
 <ul>
-<li>(if you’re using a language with a runtime like Ruby or Python or even <a href="https://github.com/v8/v8">JavaScript</a>)</li>
+<li>(if you’re using a language with a runtime like Ruby or Python or
+even <a href="https://github.com/v8/v8">JavaScript</a>)</li>
 </ul></li>
-<li>powering your operating system kernel! <span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">This might sound daunting, but sometimes it can be useful. A good thing to keep in mind: every <strong>system call</strong> like <code>open(2)</code> or <code>write(2)</code> or <code>select(2)</code> (and every other function from section 2 of the man pages) is really just a way for your program to request that the operating system do something; knowing that can be a decent place to start traipsing through code in the operating system.<br />
+<li>powering your operating system kernel! <span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">This might sound daunting, but sometimes it can be
+useful. A good thing to keep in mind: every <strong>system call</strong>
+like <code>open(2)</code> or <code>write(2)</code> or
+<code>select(2)</code> (and every other function from section 2 of the
+man pages) is really just a way for your program to request that the
+operating system do something; knowing that can be a decent place to
+start traipsing through code in the operating system.<br />
 <br />
 </span></span></li>
 </ul>
-<p>For me, I’ve already noticed it help save me time and give me more context when I’m debugging.</p>
+<p>For me, I’ve already noticed it help save me time and give me more
+context when I’m debugging.</p>
 <!-- vim:tw=72
 -->
 </main>

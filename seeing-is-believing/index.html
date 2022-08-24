@@ -52,36 +52,118 @@
 <main>
 <p>From time to time I get asked something like this:</p>
 <blockquote>
-<p>I write a lot of Ruby at work. In past projects I’ve really enjoyed and benefited from a statically typed language. But on my current team, people aren’t as excited.</p>
-<p>What can I say to them to get them to change their mind, so we can start using types in Ruby?</p>
+<p>I write a lot of Ruby at work. In past projects I’ve really enjoyed
+and benefited from a statically typed language. But on my current team,
+people aren’t as excited.</p>
+<p>What can I say to them to get them to change their mind, so we can
+start using types in Ruby?</p>
 </blockquote>
-<p>In my experience, this framing is backwards. You don’t first convince everyone that types are good, and then start adopting types. Instead, you put them to sleep, enter their dream, and plant the idea that types are good—ah, wait, wrong storyline. Instead, you adopt types first and then let people see for themselves what types do for them. The people opposed to types won’t be convinced to start liking them by anything you can tell them or ask them to read.</p>
+<p>In my experience, this framing is backwards. You don’t first convince
+everyone that types are good, and then start adopting types. Instead,
+you put them to sleep, enter their dream, and plant the idea that types
+are good—ah, wait, wrong storyline. Instead, you adopt types first and
+then let people see for themselves what types do for them. The people
+opposed to types won’t be convinced to start liking them by anything you
+can tell them or ask them to read.</p>
 <!-- more -->
-<p>In all of the cases where I’ve seen Sorbet be adopted, the process looked like this:</p>
+<p>In all of the cases where I’ve seen Sorbet be adopted, the process
+looked like this:</p>
 <ol type="1">
-<li><p>An ambitious team (or even individual) who really, really wants types in Ruby does the work to get an initial pass at adoption passing in CI.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">This can be somewhat of a grind, and is all too often done during nights and weekends, though high-trust teams do a good job of carving out time for experiments like this.<br />
+<li><p>An ambitious team (or even individual) who really, really wants
+types in Ruby does the work to get an initial pass at adoption passing
+in CI.<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">This can be somewhat of a grind, and is all too often
+done during nights and weekends, though high-trust teams do a good job
+of carving out time for experiments like this.<br />
 <br />
-</span></span> Importantly, the initial pass does a minimal amount of work, so that it doesn’t take long to get here.</p>
-<p>For <a href="https://sorbet.org">Sorbet</a>, that means only checking at <a href="https://sorbet.org/docs/static#file-level-granularity-strictness-levels"><code># typed: false</code></a>, which enables Sorbet in every file but only does the most basic checks, like checking for syntax errors and typos in constant literals.</p></li>
-<li><p>That initial version sits silently in the codebase over a period of days or weeks. When new changes introduce new type errors, it pings the enthusiastic types adoption team; they figure out whether it caught a real bug or whether the tooling could be improved (for example, for syncing type definitions for third-party code). It does <strong>not</strong> ping the unsuspecting user yet.</p>
-<p>When we did this to roll out Sorbet at Stripe, this manifested as a job that ran on the <code>master</code> branch<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">Limiting to <code>master</code>, instead of all branches, is a convenient way to get a sense for whether enforcing types would have actually blocked someone. It’s far more likely that in-progress branches with type failures also have failing tests, and that the type failure would have done a <em>better</em> job at alerting the user to the problem.<br />
+</span></span> Importantly, the initial pass does a minimal amount of
+work, so that it doesn’t take long to get here.</p>
+<p>For <a href="https://sorbet.org">Sorbet</a>, that means only checking
+at <a
+href="https://sorbet.org/docs/static#file-level-granularity-strictness-levels"><code># typed: false</code></a>,
+which enables Sorbet in every file but only does the most basic checks,
+like checking for syntax errors and typos in constant literals.</p></li>
+<li><p>That initial version sits silently in the codebase over a period
+of days or weeks. When new changes introduce new type errors, it pings
+the enthusiastic types adoption team; they figure out whether it caught
+a real bug or whether the tooling could be improved (for example, for
+syncing type definitions for third-party code). It does
+<strong>not</strong> ping the unsuspecting user yet.</p>
+<p>When we did this to roll out Sorbet at Stripe, this manifested as a
+job that ran on the <code>master</code> branch<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">Limiting to <code>master</code>, instead of all
+branches, is a convenient way to get a sense for whether enforcing types
+would have actually blocked someone. It’s far more likely that
+in-progress branches with type failures also have failing tests, and
+that the type failure would have done a <em>better</em> job at alerting
+the user to the problem.<br />
 <br />
-</span></span> in CI, but if it failed it would send a Slack message to us, not tell the user that their change was broken.</p></li>
-<li><p>This process repeats until the pings are only <strong>high-signal</strong> pings. When there’s an error, it represents actual bugs (or maybe it doesn’t error at all: remember, most files are still <code># typed: false</code>).</p></li>
-<li><p>Double check at this point that it’s easy to configure whatever editors your team uses to put the errors directly in the editor. You likely already did this for yourself while working on the initial migration.</p>
-<p>Sorbet exposes an <a href="https://microsoft.github.io/language-server-protocol/">LSP server</a> via the <code>--lsp</code> command line flag to allow integrating with arbitrary editors, and also publishes a <a href="https://sorbet.org/docs/vscode">VS Code extension</a> for people who want a one-click, low-config solution.</p></li>
-<li><p>The time has come to enforce that the codebase type checks in CI. You and your team effectively beta-tested it on behalf of the organization and decided it wasn’t going to bring development to a halt. Flip the switch, and if need be, remind people that this is still an experiment. “We can try it out for a while and re-evaluate later—it’s still the same language.”</p>
-<p>Most code still has no explicit type annotations and limited type checking (due to the <code># typed: false</code>), but now more teams can experiment with enabling stricter type checking in the sections of the codebase they own.<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">This is the whole point of “gradual” in <a href="https://sorbet.org/docs/gradual">gradual type checking</a>.<br />
+</span></span> in CI, but if it failed it would send a Slack message to
+us, not tell the user that their change was broken.</p></li>
+<li><p>This process repeats until the pings are only
+<strong>high-signal</strong> pings. When there’s an error, it represents
+actual bugs (or maybe it doesn’t error at all: remember, most files are
+still <code># typed: false</code>).</p></li>
+<li><p>Double check at this point that it’s easy to configure whatever
+editors your team uses to put the errors directly in the editor. You
+likely already did this for yourself while working on the initial
+migration.</p>
+<p>Sorbet exposes an <a
+href="https://microsoft.github.io/language-server-protocol/">LSP
+server</a> via the <code>--lsp</code> command line flag to allow
+integrating with arbitrary editors, and also publishes a <a
+href="https://sorbet.org/docs/vscode">VS Code extension</a> for people
+who want a one-click, low-config solution.</p></li>
+<li><p>The time has come to enforce that the codebase type checks in CI.
+You and your team effectively beta-tested it on behalf of the
+organization and decided it wasn’t going to bring development to a halt.
+Flip the switch, and if need be, remind people that this is still an
+experiment. “We can try it out for a while and re-evaluate later—it’s
+still the same language.”</p>
+<p>Most code still has no explicit type annotations and limited type
+checking (due to the <code># typed: false</code>), but now more teams
+can experiment with enabling stricter type checking in the sections of
+the codebase they own.<span
+class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
+class="sidenote">This is the whole point of “gradual” in <a
+href="https://sorbet.org/docs/gradual">gradual type checking</a>.<br />
 <br />
 </span></span></p></li>
-<li><p>Finally, the important part: <strong>show</strong> people how good Sorbet is, don’t tell them. Fire up Sorbet on your codebase, delete something, and watch as the error list populates instantly. Jump to definition on a constant. Try autocompleting something.</p>
-<p>Notice how we’re <strong>not</strong> showing off the type system and how expressive it might be. We’re showing off what the type system actually lets them do! Be more productive at their job.</p></li>
+<li><p>Finally, the important part: <strong>show</strong> people how
+good Sorbet is, don’t tell them. Fire up Sorbet on your codebase, delete
+something, and watch as the error list populates instantly. Jump to
+definition on a constant. Try autocompleting something.</p>
+<p>Notice how we’re <strong>not</strong> showing off the type system and
+how expressive it might be. We’re showing off what the type system
+actually lets them do! Be more productive at their job.</p></li>
 </ol>
-<p>In my experience trying to bring static types to Ruby users, seeing really is believing. I’ve seen this exact same story or slight variations of it play out in just about every successful adoption case.</p>
-<p>While it’s true that the type checker is going to prevent people from writing valid code they used to be able to write, every gradual type system has <a href="https://sorbet.org/docs/troubleshooting#escape-hatches">escape hatches</a> to opt out of those checks in some way. The argument that people fond of type checkers want to make is that the instant feedback and powerful editor features a type checker provides outshine the times when the type checker gets in the way, but it’s impossible to make that argument with words alone.</p>
-<p>One final, important note: <strong>be supportive</strong>. Advertise a single place for anyone to ask questions and get quick responses.<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="sidenote">Like, actually quick. “Notify for new Slack every message” quick. If you queue questions into some ticketing system and respond tomorrow, people will lose patience with <em>types overall</em> not just with you.<br />
+<p>In my experience trying to bring static types to Ruby users, seeing
+really is believing. I’ve seen this exact same story or slight
+variations of it play out in just about every successful adoption
+case.</p>
+<p>While it’s true that the type checker is going to prevent people from
+writing valid code they used to be able to write, every gradual type
+system has <a
+href="https://sorbet.org/docs/troubleshooting#escape-hatches">escape
+hatches</a> to opt out of those checks in some way. The argument that
+people fond of type checkers want to make is that the instant feedback
+and powerful editor features a type checker provides outshine the times
+when the type checker gets in the way, but it’s impossible to make that
+argument with words alone.</p>
+<p>One final, important note: <strong>be supportive</strong>. Advertise
+a single place for anyone to ask questions and get quick responses.<span
+class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
+class="sidenote">Like, actually quick. “Notify for new Slack every
+message” quick. If you queue questions into some ticketing system and
+respond tomorrow, people will lose patience with <em>types overall</em>
+not just with you.<br />
 <br />
-</span></span> Admit that this will likely lead to being overworked for a bit until it takes off. In the long run as adoption and familiarity spread, other teammates will start to help out with the evangelism as the benefits spread outward.</p>
+</span></span> Admit that this will likely lead to being overworked for
+a bit until it takes off. In the long run as adoption and familiarity
+spread, other teammates will start to help out with the evangelism as
+the benefits spread outward.</p>
 </main>
 
 
