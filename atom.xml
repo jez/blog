@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-08-24T19:11:49-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Control Flow in Sorbet is Syntactic</title><link href="https://blog.jez.io/syntactic-control-flow/" rel="alternate" type="text/html" title="Control Flow in Sorbet is Syntactic" /><published>2022-08-24T17:30:43-04:00</published><updated>2022-08-24T17:30:43-04:00</updated><id>https://blog.jez.io/syntactic-control-flow</id><content type="html" xml:base="https://blog.jez.io/syntactic-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-08-25T14:52:22-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Control Flow in Sorbet is Syntactic</title><link href="https://blog.jez.io/syntactic-control-flow/" rel="alternate" type="text/html" title="Control Flow in Sorbet is Syntactic" /><published>2022-08-24T17:30:43-04:00</published><updated>2022-08-24T17:30:43-04:00</updated><id>https://blog.jez.io/syntactic-control-flow</id><content type="html" xml:base="https://blog.jez.io/syntactic-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
   &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
   &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
@@ -12,41 +12,51 @@
 &lt;/nav&gt;
 
 &lt;main&gt;
-&lt;p&gt;The most commonly asked Sorbet question is, “Why does Sorbet think
-this is nil? I just checked that it’s not!” and as such, it’s listed as
-the &lt;a href=&quot;https://sorbet.org/docs/faq&quot;&gt;very first FAQ entry&lt;/a&gt; in
-the Sorbet docs.&lt;/p&gt;
-&lt;p&gt;But the most common follow up question goes something like this:&lt;/p&gt;
+&lt;p&gt;People always ask me, “Why does Sorbet think this is nil? I just
+checked that it’s not!” So much so, that it’s at the very top of the &lt;a
+href=&quot;https://sorbet.org/docs/faq&quot;&gt;Sorbet FAQ&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;That doc answers what is happening and what to do to fix it, but
+doesn’t really answer why its like that. A common follow up question
+looks something like this:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Having to use local variables as mentioned in Sorbet’s &lt;a
 href=&quot;https://sorbet.org/docs/flow-sensitive#limitations-of-flow-sensitivity&quot;&gt;limitations
 of flow-sensitivity&lt;/a&gt; docs is annoying. Idiomatic Ruby doesn’t use
 local variables nearly as much as Sorbet requires. What gives?&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;strong&gt;TL;DR&lt;/strong&gt;: Type inference in Sorbet requires that it be
-given control flow as an input, which means that inference can’t change
-Sorbet’s view of control flow in a program. (This is in line with the
-other popular type systems for dynamically typed languages.) As a result
-control flow must be a function of local syntax alone (variables), not
-global nor semantic information (methods).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;TL;DR&lt;/strong&gt;: Sorbet’s type inference algorithm requires
+being given a fixed data structure modeling control flow inside a
+method. Type inference doesn’t get to change that structure, so the
+things Sorbet learns while from inference don’t retroactively change
+Sorbet’s view of control flow. (This is in line with the other popular
+type systems for dynamically typed languages.) As a result control flow
+must be a function of local syntax alone (variables), not global nor
+semantic information (methods).&lt;/p&gt;
 &lt;p&gt;But that’s packing a lot in at once, so let’s take a step back.&lt;/p&gt;
-&lt;p&gt;Type inference, by which we mean assigning types to local variables,
-requires two inputs:&lt;/p&gt;
+&lt;p&gt;In this post whenever I say type inference I basically mean assigning
+types to variables, and using the types of variables to resolve calls to
+methods. Type inference in Sorbet needs two things:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;A symbol table, which maps names to global program definitions (like
-classes and methods, and their types).&lt;/li&gt;
-&lt;li&gt;A control flow graph, which is a data structure that models the flow
-of control through a single method.&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;A symbol table, which maps names to global program definitions
+(like classes and methods, and their types). Sorbet spends a ton of time
+building a symbol table representing an entire codebase before it ever
+starts running type inference.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;A control flow graph, which is a data structure that models the
+flow of control through a single method. Sorbet builds these graphs on
+the fly right before running type inference.&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;So computing the control flow graph can’t depend on type inference,
-and must therefore be a function of syntax alone. Some examples of
-syntax-only observations are “these two variables are the same” and “the
-method branches on the value of this variable.” We can draw these
-observations exclusively from the syntactic structure of the current
-method, with no need to consult the symbol table, let alone run
-inference.&lt;/p&gt;
-&lt;p&gt;This brings us to our central conflict: knowing what method a call
-site refers to is not a syntactic property. Consider this snippet:&lt;/p&gt;
+&lt;p&gt;Since type inference requires the control flow graph, clearly
+building the control flow graph can’t require type inference. Instead,
+it has to build a control flow graph using only the method’s abstract
+syntax tree (or AST). Since all Sorbet has is an AST, the control flow
+only reflects syntax-only observations, like “these two variables are
+the same” and “an if condition branches on the value of this variable.”
+Sorbet can draw these observations exclusively from the syntactic
+structure of the current method, with no need to consult the symbol
+table, let alone run inference.&lt;/p&gt;
+&lt;p&gt;This brings us to our central conflict: knowing which method (or
+methods!) a given call site resolves to is &lt;strong&gt;not&lt;/strong&gt; a
+syntactic property. Consider this snippet:&lt;/p&gt;
 &lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot;&gt;&lt;pre
 class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;dv&quot;&gt;true&lt;/span&gt;, &lt;span class=&quot;dv&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;kw&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;at&quot;&gt;.sample&lt;/span&gt;&lt;/span&gt;
 &lt;span id=&quot;cb1-2&quot;&gt;&lt;a href=&quot;#cb1-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  x &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;0&lt;/span&gt;&lt;/span&gt;
@@ -60,12 +70,13 @@ class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&
 That means that if a program branches on a &lt;strong&gt;method return
 value&lt;/strong&gt;, Sorbet cannot draw any interesting observations about
 control flow.&lt;/p&gt;
-&lt;p&gt;This causes confusion when people &lt;strong&gt;know&lt;/strong&gt; that their
-method returns the same thing every time it’s called, but they can’t
-convince Sorbet of that. Since it has to build the control flow graph
-before inference, it must conservatively assume that subsequent calls to
-a method might return a different value for each call. Here’s a
-pathological example:&lt;/p&gt;
+&lt;p&gt;This gets to be a problem for methods whose meaning involves some
+claim like, “I always return the same thing every time I’m called.”
+Sorbet can’t know whether &lt;code&gt;x.foo&lt;/code&gt; refers to one of those
+constant methods or a method that returns a random number every time, so
+it has to assume the worst.&lt;/p&gt;
+&lt;p&gt;Here’s a pathological example:&lt;/p&gt;
+&lt;figure class=&quot;left-align-caption&quot;&gt;
 &lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot;&gt;&lt;pre
 class=&quot;sourceCode numberSource ruby numberLines hl-25 hl-26 hl-27&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;FooIsAttr&lt;/span&gt;&lt;/span&gt;
 &lt;span id=&quot;cb2-2&quot;&gt;&lt;a href=&quot;#cb2-2&quot;&gt;&lt;/a&gt;  sig &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;returns(T&lt;span class=&quot;at&quot;&gt;.nilable&lt;/span&gt;(&lt;span class=&quot;dt&quot;&gt;Integer&lt;/span&gt;))&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
@@ -95,9 +106,12 @@ class=&quot;sourceCode numberSource ruby numberLines hl-25 hl-26 hl-27&quot;&gt;
 &lt;span id=&quot;cb2-26&quot;&gt;&lt;a href=&quot;#cb2-26&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;if&lt;/span&gt; x&lt;span class=&quot;at&quot;&gt;.foo&lt;/span&gt;&lt;/span&gt;
 &lt;span id=&quot;cb2-27&quot;&gt;&lt;a href=&quot;#cb2-27&quot;&gt;&lt;/a&gt;  takes_integer(x&lt;span class=&quot;at&quot;&gt;.foo&lt;/span&gt;) &lt;span class=&quot;co&quot;&gt;# error&lt;/span&gt;&lt;/span&gt;
 &lt;span id=&quot;cb2-28&quot;&gt;&lt;a href=&quot;#cb2-28&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;a
+&lt;figcaption&gt;
+&lt;a
 href=&quot;https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0Aextend%20T%3A%3ASig%0A%0Aclass%20FooIsAttr%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20attr_accessor%20%3Afoo%0Aend%0A%0Aclass%20FooIsMethod%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20def%20foo%0A%20%20%20%20%23%20Returns%20something%20different%20every%20call%0A%20%20%20%20%5B0%2C%20nil%5D.sample%0A%20%20end%0Aend%0A%0Asig%20%7Bparams%28x%3A%20Integer%29.void%7D%0Adef%20takes_integer%28x%29%3B%20end%0A%0A%23%20Have%20to%20run%20inference%20to%20get%20type%20of%20%60x%60%0A%23%20%28running%20inference%20requires%20control%20flow%29%0Aif%20%5Btrue%2C%20false%5D.sample%0A%20%20x%20%3D%20FooIsAttr.new%0Aelse%0A%20%20x%20%3D%20FooIsMethod.new%0Aend%0A%0A%23%20x.foo%20returns%20the%20same%20thing%20only%20if%20x%20is%20%60FooIsAttr%60%0Aif%20x.foo%0A%20%20takes_integer%28x.foo%29%20%23%20error%0Aend&quot;&gt;→
-View on sorbet.run&lt;/a&gt;&lt;/p&gt;
+View on sorbet.run&lt;/a&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
 &lt;p&gt;Note the two calls to &lt;code&gt;x.foo&lt;/code&gt; at the very end of the
 snippet:&lt;/p&gt;
 &lt;ul&gt;
@@ -121,7 +135,7 @@ been assigned to between two variable accesses.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h1 id=&quot;properties-and-attributes-in-other-languages&quot;&gt;Properties and
 attributes in other languages&lt;/h1&gt;
-&lt;p&gt;So unfortunately, this all means that Sorbet can only track control
+&lt;p&gt;Unfortunately, this all means that Sorbet can only track control
 flow-sensitive types on variables, not methods. This is the exact same
 limitation that other popular gradual type checkers
 &lt;strong&gt;except&lt;/strong&gt; for one difference: both JavaScript and Python
@@ -135,8 +149,7 @@ class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&
 &lt;code&gt;x.foo()&lt;/code&gt; correspond to method calls,&lt;span
 class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
 class=&quot;sidenote&quot;&gt;This is true even if &lt;code&gt;foo&lt;/code&gt; was defined with
-&lt;code&gt;attr_reader :foo&lt;/code&gt;, a subtlety which comes as a shock to most
-new Rubyists.&lt;br /&gt;
+&lt;code&gt;attr_reader :foo&lt;/code&gt;!&lt;br /&gt;
 &lt;br /&gt;
 &lt;/span&gt;&lt;/span&gt; so Sorbet models them as such. But in TypeScript, Flow,
 and Mypy,&lt;span
@@ -235,7 +248,7 @@ View example on mypy Playground&lt;/a&gt;&lt;br /&gt;
 methods to be called without &lt;code&gt;()&lt;/code&gt;, instead of just those
 defined with &lt;code&gt;attr_reader&lt;/code&gt; or something similar, maybe Sorbet
 could have chosen the same trade-off.&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="sorbet" /><category term="types" /><summary type="html">← Return home The most commonly asked Sorbet question is, “Why does Sorbet think this is nil? I just checked that it’s not!” and as such, it’s listed as the very first FAQ entry in the Sorbet docs.</summary></entry><entry><title type="html">Parse Error Recovery in Sorbet: Part 4</title><link href="https://blog.jez.io/error-recovery-part-4/" rel="alternate" type="text/html" title="Parse Error Recovery in Sorbet: Part 4" /><published>2022-06-06T01:56:49-04:00</published><updated>2022-06-06T01:56:49-04:00</updated><id>https://blog.jez.io/error-recovery-part-4</id><content type="html" xml:base="https://blog.jez.io/error-recovery-part-4/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="sorbet" /><category term="types" /><summary type="html">← Return home People always ask me, “Why does Sorbet think this is nil? I just checked that it’s not!” So much so, that it’s at the very top of the Sorbet FAQ</summary></entry><entry><title type="html">Parse Error Recovery in Sorbet: Part 4</title><link href="https://blog.jez.io/error-recovery-part-4/" rel="alternate" type="text/html" title="Parse Error Recovery in Sorbet: Part 4" /><published>2022-06-06T01:56:49-04:00</published><updated>2022-06-06T01:56:49-04:00</updated><id>https://blog.jez.io/error-recovery-part-4</id><content type="html" xml:base="https://blog.jez.io/error-recovery-part-4/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
   &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
   &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;

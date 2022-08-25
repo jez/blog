@@ -57,41 +57,51 @@
 </nav>
 
 <main>
-<p>The most commonly asked Sorbet question is, “Why does Sorbet think
-this is nil? I just checked that it’s not!” and as such, it’s listed as
-the <a href="https://sorbet.org/docs/faq">very first FAQ entry</a> in
-the Sorbet docs.</p>
-<p>But the most common follow up question goes something like this:</p>
+<p>People always ask me, “Why does Sorbet think this is nil? I just
+checked that it’s not!” So much so, that it’s at the very top of the <a
+href="https://sorbet.org/docs/faq">Sorbet FAQ</a></p>
+<p>That doc answers what is happening and what to do to fix it, but
+doesn’t really answer why its like that. A common follow up question
+looks something like this:</p>
 <blockquote>
 <p>Having to use local variables as mentioned in Sorbet’s <a
 href="https://sorbet.org/docs/flow-sensitive#limitations-of-flow-sensitivity">limitations
 of flow-sensitivity</a> docs is annoying. Idiomatic Ruby doesn’t use
 local variables nearly as much as Sorbet requires. What gives?</p>
 </blockquote>
-<p><strong>TL;DR</strong>: Type inference in Sorbet requires that it be
-given control flow as an input, which means that inference can’t change
-Sorbet’s view of control flow in a program. (This is in line with the
-other popular type systems for dynamically typed languages.) As a result
-control flow must be a function of local syntax alone (variables), not
-global nor semantic information (methods).</p>
+<p><strong>TL;DR</strong>: Sorbet’s type inference algorithm requires
+being given a fixed data structure modeling control flow inside a
+method. Type inference doesn’t get to change that structure, so the
+things Sorbet learns while from inference don’t retroactively change
+Sorbet’s view of control flow. (This is in line with the other popular
+type systems for dynamically typed languages.) As a result control flow
+must be a function of local syntax alone (variables), not global nor
+semantic information (methods).</p>
 <p>But that’s packing a lot in at once, so let’s take a step back.</p>
-<p>Type inference, by which we mean assigning types to local variables,
-requires two inputs:</p>
+<p>In this post whenever I say type inference I basically mean assigning
+types to variables, and using the types of variables to resolve calls to
+methods. Type inference in Sorbet needs two things:</p>
 <ul>
-<li>A symbol table, which maps names to global program definitions (like
-classes and methods, and their types).</li>
-<li>A control flow graph, which is a data structure that models the flow
-of control through a single method.</li>
+<li><p>A symbol table, which maps names to global program definitions
+(like classes and methods, and their types). Sorbet spends a ton of time
+building a symbol table representing an entire codebase before it ever
+starts running type inference.</p></li>
+<li><p>A control flow graph, which is a data structure that models the
+flow of control through a single method. Sorbet builds these graphs on
+the fly right before running type inference.</p></li>
 </ul>
-<p>So computing the control flow graph can’t depend on type inference,
-and must therefore be a function of syntax alone. Some examples of
-syntax-only observations are “these two variables are the same” and “the
-method branches on the value of this variable.” We can draw these
-observations exclusively from the syntactic structure of the current
-method, with no need to consult the symbol table, let alone run
-inference.</p>
-<p>This brings us to our central conflict: knowing what method a call
-site refers to is not a syntactic property. Consider this snippet:</p>
+<p>Since type inference requires the control flow graph, clearly
+building the control flow graph can’t require type inference. Instead,
+it has to build a control flow graph using only the method’s abstract
+syntax tree (or AST). Since all Sorbet has is an AST, the control flow
+only reflects syntax-only observations, like “these two variables are
+the same” and “an if condition branches on the value of this variable.”
+Sorbet can draw these observations exclusively from the syntactic
+structure of the current method, with no need to consult the symbol
+table, let alone run inference.</p>
+<p>This brings us to our central conflict: knowing which method (or
+methods!) a given call site resolves to is <strong>not</strong> a
+syntactic property. Consider this snippet:</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[</span><span class="dv">true</span>, <span class="dv">false</span><span class="kw">]</span><span class="at">.sample</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span> <span class="dv">0</span></span>
@@ -105,12 +115,13 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="
 That means that if a program branches on a <strong>method return
 value</strong>, Sorbet cannot draw any interesting observations about
 control flow.</p>
-<p>This causes confusion when people <strong>know</strong> that their
-method returns the same thing every time it’s called, but they can’t
-convince Sorbet of that. Since it has to build the control flow graph
-before inference, it must conservatively assume that subsequent calls to
-a method might return a different value for each call. Here’s a
-pathological example:</p>
+<p>This gets to be a problem for methods whose meaning involves some
+claim like, “I always return the same thing every time I’m called.”
+Sorbet can’t know whether <code>x.foo</code> refers to one of those
+constant methods or a method that returns a random number every time, so
+it has to assume the worst.</p>
+<p>Here’s a pathological example:</p>
+<figure class="left-align-caption">
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode numberSource ruby numberLines hl-25 hl-26 hl-27"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">class</span> <span class="dt">FooIsAttr</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  sig <span class="kw">{</span>returns(T<span class="at">.nilable</span>(<span class="dt">Integer</span>))<span class="kw">}</span></span>
@@ -140,9 +151,12 @@ class="sourceCode numberSource ruby numberLines hl-25 hl-26 hl-27"><code class="
 <span id="cb2-26"><a href="#cb2-26"></a><span class="cf">if</span> x<span class="at">.foo</span></span>
 <span id="cb2-27"><a href="#cb2-27"></a>  takes_integer(x<span class="at">.foo</span>) <span class="co"># error</span></span>
 <span id="cb2-28"><a href="#cb2-28"></a><span class="cf">end</span></span></code></pre></div>
-<p><a
+<figcaption>
+<a
 href="https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0Aextend%20T%3A%3ASig%0A%0Aclass%20FooIsAttr%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20attr_accessor%20%3Afoo%0Aend%0A%0Aclass%20FooIsMethod%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20def%20foo%0A%20%20%20%20%23%20Returns%20something%20different%20every%20call%0A%20%20%20%20%5B0%2C%20nil%5D.sample%0A%20%20end%0Aend%0A%0Asig%20%7Bparams%28x%3A%20Integer%29.void%7D%0Adef%20takes_integer%28x%29%3B%20end%0A%0A%23%20Have%20to%20run%20inference%20to%20get%20type%20of%20%60x%60%0A%23%20%28running%20inference%20requires%20control%20flow%29%0Aif%20%5Btrue%2C%20false%5D.sample%0A%20%20x%20%3D%20FooIsAttr.new%0Aelse%0A%20%20x%20%3D%20FooIsMethod.new%0Aend%0A%0A%23%20x.foo%20returns%20the%20same%20thing%20only%20if%20x%20is%20%60FooIsAttr%60%0Aif%20x.foo%0A%20%20takes_integer%28x.foo%29%20%23%20error%0Aend">→
-View on sorbet.run</a></p>
+View on sorbet.run</a>
+</figcaption>
+</figure>
 <p>Note the two calls to <code>x.foo</code> at the very end of the
 snippet:</p>
 <ul>
@@ -166,7 +180,7 @@ been assigned to between two variable accesses.</li>
 </ul>
 <h1 id="properties-and-attributes-in-other-languages">Properties and
 attributes in other languages</h1>
-<p>So unfortunately, this all means that Sorbet can only track control
+<p>Unfortunately, this all means that Sorbet can only track control
 flow-sensitive types on variables, not methods. This is the exact same
 limitation that other popular gradual type checkers
 <strong>except</strong> for one difference: both JavaScript and Python
@@ -180,8 +194,7 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="
 <code>x.foo()</code> correspond to method calls,<span
 class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
 class="sidenote">This is true even if <code>foo</code> was defined with
-<code>attr_reader :foo</code>, a subtlety which comes as a shock to most
-new Rubyists.<br />
+<code>attr_reader :foo</code>!<br />
 <br />
 </span></span> so Sorbet models them as such. But in TypeScript, Flow,
 and Mypy,<span
