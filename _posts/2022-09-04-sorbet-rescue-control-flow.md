@@ -1,7 +1,7 @@
 ---
 # vim:tw=95
 layout: post
-title: "Sorbet's weird approach to exception handling"
+title: "Sorbet’s weird approach to exception handling"
 date: 2022-09-04T23:12:12-04:00
 description:
   A quick post explaining why exception handling in Sorbet is weird, by way of a buggy program
