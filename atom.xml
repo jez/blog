@@ -1,4 +1,303 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-08-25T14:52:22-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Control Flow in Sorbet is Syntactic</title><link href="https://blog.jez.io/syntactic-control-flow/" rel="alternate" type="text/html" title="Control Flow in Sorbet is Syntactic" /><published>2022-08-24T17:30:43-04:00</published><updated>2022-08-24T17:30:43-04:00</updated><id>https://blog.jez.io/syntactic-control-flow</id><content type="html" xml:base="https://blog.jez.io/syntactic-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-09-05T00:27:19-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Sorbet’s weird approach to exception handling</title><link href="https://blog.jez.io/sorbet-rescue-control-flow/" rel="alternate" type="text/html" title="Sorbet’s weird approach to exception handling" /><published>2022-09-04T23:12:12-04:00</published><updated>2022-09-04T23:12:12-04:00</updated><id>https://blog.jez.io/sorbet-rescue-control-flow</id><content type="html" xml:base="https://blog.jez.io/sorbet-rescue-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+  &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
+  &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
+  &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
+  &lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#control-flow-and-rescue-in-sorbet&quot;
+  id=&quot;toc-control-flow-and-rescue-in-sorbet&quot;&gt;Control flow and
+  &lt;code&gt;rescue&lt;/code&gt; in Sorbet&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#a-brief-history-of-rescue-in-sorbet&quot;
+  id=&quot;toc-a-brief-history-of-rescue-in-sorbet&quot;&gt;A brief history of
+  &lt;code&gt;rescue&lt;/code&gt; in Sorbet&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-bigger-picture&quot; id=&quot;toc-the-bigger-picture&quot;&gt;The
+  bigger picture&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+
+&lt;main&gt;
+&lt;p&gt;Here’s a fun bug in Sorbet:&lt;/p&gt;
+&lt;figure class=&quot;left-align-caption&quot;&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot;&gt;&lt;pre
+class=&quot;sourceCode numberSource ruby numberLines hl-11 hl-12&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; example&lt;/span&gt;
+&lt;span id=&quot;cb1-2&quot;&gt;&lt;a href=&quot;#cb1-2&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;begin&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-3&quot;&gt;&lt;a href=&quot;#cb1-3&quot;&gt;&lt;/a&gt;    loop_count &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;0&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-4&quot;&gt;&lt;a href=&quot;#cb1-4&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-5&quot;&gt;&lt;a href=&quot;#cb1-5&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;cf&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;true&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-6&quot;&gt;&lt;a href=&quot;#cb1-6&quot;&gt;&lt;/a&gt;      &lt;span class=&quot;fu&quot;&gt;sleep&lt;/span&gt;(&lt;span class=&quot;dv&quot;&gt;1&lt;/span&gt;)&lt;/span&gt;
+&lt;span id=&quot;cb1-7&quot;&gt;&lt;a href=&quot;#cb1-7&quot;&gt;&lt;/a&gt;      loop_count &lt;span class=&quot;kw&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;1&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-8&quot;&gt;&lt;a href=&quot;#cb1-8&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-9&quot;&gt;&lt;a href=&quot;#cb1-9&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;rescue&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;Interrupt&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-10&quot;&gt;&lt;a href=&quot;#cb1-10&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;cf&quot;&gt;if&lt;/span&gt; loop_count&lt;/span&gt;
+&lt;span id=&quot;cb1-11&quot;&gt;&lt;a href=&quot;#cb1-11&quot;&gt;&lt;/a&gt;      &lt;span class=&quot;fu&quot;&gt;puts&lt;/span&gt;(&lt;span class=&quot;st&quot;&gt;&amp;quot;Looped &lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;#{&lt;/span&gt;loop_count&lt;span class=&quot;sc&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;st&quot;&gt; times&amp;quot;&lt;/span&gt;)&lt;/span&gt;
+&lt;span id=&quot;cb1-12&quot;&gt;&lt;a href=&quot;#cb1-12&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;co&quot;&gt;# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ error: This code is unreachable&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-13&quot;&gt;&lt;a href=&quot;#cb1-13&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-14&quot;&gt;&lt;a href=&quot;#cb1-14&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-15&quot;&gt;&lt;a href=&quot;#cb1-15&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;figcaption&gt;
+&lt;a
+href=&quot;https://sorbet.run/#%23%20typed%3A%20true%0A%0Adef%20example%0A%20%20begin%0A%20%20%20%20loop_count%20%3D%200%0A%0A%20%20%20%20while%20true%0A%20%20%20%20%20%20sleep%281%29%0A%20%20%20%20%20%20loop_count%20%2B%3D%201%0A%20%20%20%20end%0A%20%20rescue%20Interrupt%0A%20%20%20%20if%20loop_count%0A%20%20%20%20%20%20puts%28%22Looped%20%23%7Bloop_count%7D%20times%22%29%0A%20%20%20%20end%0A%20%20end%0Aend&quot;&gt;→View
+on sorbet.run&lt;/a&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;Sorbet thinks that &lt;code&gt;loop_count&lt;/code&gt; has type
+&lt;code&gt;NilClass&lt;/code&gt; at the start of the &lt;code&gt;rescue&lt;/code&gt; block,
+which causes it to declare that the &lt;code&gt;puts&lt;/code&gt; line is dead
+(because &lt;code&gt;NilClass&lt;/code&gt; is never truthy).&lt;/p&gt;
+&lt;p&gt;But why? Clearly, we can see that &lt;code&gt;loop_count&lt;/code&gt; is an
+&lt;code&gt;Integer&lt;/code&gt;. We’d expect Sorbet to &lt;em&gt;at least&lt;/em&gt; think
+&lt;code&gt;loop_count&lt;/code&gt; has type &lt;code&gt;T.nilable(Integer)&lt;/code&gt;, if not
+simply &lt;code&gt;Integer&lt;/code&gt; outright.&lt;/p&gt;
+&lt;p&gt;When developing Sorbet, sometimes we choose an implementation because
+it’s good enough, most of the time, but is simple to implement and/or
+fast. Sorbet’s approach to &lt;code&gt;rescue&lt;/code&gt; and exception handling is
+one such choice.&lt;/p&gt;
+&lt;h1 id=&quot;control-flow-and-rescue-in-sorbet&quot;&gt;Control flow and
+&lt;code&gt;rescue&lt;/code&gt; in Sorbet&lt;/h1&gt;
+&lt;p&gt;I mentioned in &lt;a href=&quot;/syntactic-control-flow/&quot;&gt;my last post&lt;/a&gt;
+that Sorbet builds a &lt;span class=&quot;smallcaps&quot;&gt;&lt;strong&gt;control flow
+graph&lt;/strong&gt;&lt;/span&gt; (CFG) in order to model control-flow sensitive
+types throughout the body of a method. But for &lt;code&gt;rescue&lt;/code&gt;
+nodes, it takes one of those “good enough, most of the time” shortcuts.
+It pretends that there are only two jumps into the &lt;code&gt;rescue&lt;/code&gt;
+block: once before any &lt;strong&gt;any&lt;/strong&gt; code in the
+&lt;code&gt;begin&lt;/code&gt; block has run, and once after &lt;strong&gt;all&lt;/strong&gt;
+the code in &lt;code&gt;begin&lt;/code&gt; block has run:&lt;/p&gt;
+&lt;div class=&quot;only-light-mode&quot;&gt;
+&lt;figure&gt;
+&lt;img src=&quot;/assets/img/rescue-cfg-light-mode.png&quot;
+alt=&quot;A hand-drawn diagram of a CFG showing how rescue works&quot; /&gt;
+&lt;figcaption aria-hidden=&quot;true&quot;&gt;A hand-drawn diagram of a CFG showing how
+&lt;code&gt;rescue&lt;/code&gt; works&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/div&gt;
+&lt;div class=&quot;only-dark-mode&quot;&gt;
+&lt;figure&gt;
+&lt;img src=&quot;/assets/img/rescue-cfg-dark-mode.png&quot;
+alt=&quot;A hand-drawn diagram of a CFG showing how rescue works&quot; /&gt;
+&lt;figcaption aria-hidden=&quot;true&quot;&gt;A hand-drawn diagram of a CFG showing how
+&lt;code&gt;rescue&lt;/code&gt; works&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/div&gt;
+&lt;p&gt;This is a diagram of what a CFG in Sorbet mostly&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;If you have &lt;a
+href=&quot;https://graphviz.org/&quot;&gt;Graphviz&lt;/a&gt; installed, you can get Sorbet
+to dump its internal CFG for a given file with the
+&lt;code&gt;cfg-view.sh&lt;/code&gt; script in the Sorbet repo. The CFG for the
+example above looks like &lt;a
+href=&quot;/assets/img/rescue-example-01.svg&quot;&gt;like this&lt;/a&gt;.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; looks like. The conditions for these jumps read from a
+magical &lt;code&gt;&amp;lt;exn-value&amp;gt;&lt;/code&gt; variable, which Sorbet treats as
+&lt;span class=&quot;smallcaps&quot;&gt;&lt;strong&gt;unanalyzable&lt;/strong&gt;&lt;/span&gt;: Sorbet
+doesn’t attempt to track how the value is initialized nor how control
+flow affects it. At any point it might be truthy or falsy, so Sorbet
+will always assume both outcomes could happen.&lt;/p&gt;
+&lt;p&gt;Knowing this, we can explain the behavior in the example above:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Since the first jump into the &lt;code&gt;rescue&lt;/code&gt; block happens, the
+&lt;code&gt;loop_count&lt;/code&gt; variable is still uninitialized at that point,
+and thus has type &lt;code&gt;NilClass&lt;/code&gt; at that point.&lt;/li&gt;
+&lt;li&gt;The second jump into the &lt;code&gt;rescue&lt;/code&gt; block happens after the
+&lt;code&gt;begin&lt;/code&gt; block finishes. But from Sorbet’s point of view, the
+&lt;code&gt;begin&lt;/code&gt; block never finishes: Sorbet sees the infinite
+&lt;code&gt;while   true&lt;/code&gt; loop and thinks that it’s impossible for
+control to ever leave the &lt;code&gt;begin&lt;/code&gt; block.&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-1&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-1&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;If you’re fearless, you can prove that this is what’s
+happening in the &lt;a href=&quot;/assets/img/rescue-example-01.svg&quot;&gt;rendered
+CFG&lt;/a&gt; for the above example.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;That second point is &lt;a
+href=&quot;https://github.com/sorbet/sorbet/issues/4108&quot;&gt;simply a bug&lt;/a&gt;.
+Sorbet should be smart enough to suspend the normal rules it applies
+when processing code that infinitely loops (or unconditionally raises)
+while checking code in a &lt;code&gt;begin&lt;/code&gt; block that has a
+&lt;code&gt;rescue&lt;/code&gt;.&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-2&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-2&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;easier said than done, lol&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; But still, fixing that bug would only make Sorbet think
+that &lt;code&gt;loop_count&lt;/code&gt; has type &lt;code&gt;T.nilable(Integer)&lt;/code&gt; in
+the &lt;code&gt;rescue&lt;/code&gt; body—remember we said that ideally Sorbet would
+know that &lt;code&gt;loop_count&lt;/code&gt; is &lt;strong&gt;always&lt;/strong&gt;
+initialized, having type &lt;code&gt;Integer&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;So then, what is that weird jump to the &lt;code&gt;rescue&lt;/code&gt; body
+doing there? Intuitively, taking that branch means that the
+&lt;code&gt;begin&lt;/code&gt; block raised an exception &lt;em&gt;before ever running a
+single line of code in the begin block&lt;/em&gt;. To answer this, some
+history.&lt;/p&gt;
+&lt;h1 id=&quot;a-brief-history-of-rescue-in-sorbet&quot;&gt;A brief history of
+&lt;code&gt;rescue&lt;/code&gt; in Sorbet&lt;/h1&gt;
+&lt;p&gt;Sorbet’s &lt;a
+href=&quot;https://github.com/sorbet/sorbet/commit/9189734a6c061071c3d3cd4398a5d7874a8c0c49&quot;&gt;first
+commit&lt;/a&gt; dates to October 3, 2017. Six weeks later, the &lt;a
+href=&quot;https://github.com/sorbet/sorbet/commit/afb234741f4ccd98ca2903d1621746c64a2da5ab&quot;&gt;initial
+support for &lt;code&gt;rescue&lt;/code&gt;&lt;/a&gt; landed. The pull request description
+is from a time when all pull requests were Stripe-internal, so I’ll
+quote it here:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;This does most of the work in the CFG, preserving the semantics in
+the desugarer. This is nice since we can treat these differently if we
+want since we have the information this late.&lt;/p&gt;
+&lt;p&gt;It introduces a series of uncomputable &lt;code&gt;if&lt;/code&gt;s since 0 or
+more instructions from the first block will execute then one of the
+&lt;code&gt;rescue&lt;/code&gt;s could match and then if none do the
+&lt;code&gt;else&lt;/code&gt; will match. Check out the &lt;code&gt;.svg&lt;/code&gt;s to see
+the chaining.&lt;/p&gt;
+&lt;p&gt;If an invalid name is put in the exception expression, it will be
+caught by the namer since the tree walk goes through them.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Maybe that description only makes sense if you’re a Sorbet developer.
+The approach it’s describing is what most people might do intuitively:
+any instruction in a &lt;code&gt;begin&lt;/code&gt; might raise, so record a jump
+from each instruction in the &lt;code&gt;begin&lt;/code&gt; block to the
+&lt;code&gt;rescue&lt;/code&gt; block. In picture form:&lt;/p&gt;
+&lt;div class=&quot;only-light-mode&quot;&gt;
+&lt;figure&gt;
+&lt;img src=&quot;/assets/img/rescue-cfg-multi-block-light-mode.png&quot;
+alt=&quot;A diagram depicting the implementation described in the above commit&quot; /&gt;
+&lt;figcaption aria-hidden=&quot;true&quot;&gt;A diagram depicting the implementation
+described in the above commit&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/div&gt;
+&lt;div class=&quot;only-dark-mode&quot;&gt;
+&lt;figure&gt;
+&lt;img src=&quot;/assets/img/rescue-cfg-multi-block-dark-mode.png&quot;
+alt=&quot;A diagram depicting the implementation described in the above commit&quot; /&gt;
+&lt;figcaption aria-hidden=&quot;true&quot;&gt;A diagram depicting the implementation
+described in the above commit&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/div&gt;
+&lt;p&gt;After the code at the start of the method, control flows immediately
+to the first line of the &lt;code&gt;begin&lt;/code&gt; body. But every line of the
+&lt;code&gt;begin&lt;/code&gt; body gets its own, tiny basic block with an
+unanalyzable jump to the &lt;code&gt;rescue&lt;/code&gt; block, or to the next line
+of the body. On its own, this was probably enough to fix the bug in our
+initial example—there would be a jump after the
+&lt;code&gt;loop_count = 0&lt;/code&gt; assignment into the &lt;code&gt;rescue&lt;/code&gt;
+block, so when merging all the previous environments, Sorbet would now
+be able to see that &lt;code&gt;loop_count&lt;/code&gt; is an
+&lt;code&gt;Integer&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;But importantly, this original approach was thrown out. Which brings
+us to our second point of history, when &lt;a
+href=&quot;https://github.com/sorbet/sorbet/commit/a6ed41e0b8deee28ff592063934b28676ac77927#diff-c9b037996e9c16464e031136abe5d9df567c72f283d572b070d108228b733127R335-R342&quot;&gt;almost
+exactly 9 months later&lt;/a&gt;&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-3&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-3&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;And only two days after I joined the team 😅&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; the “only before and after” approach arrived. In fact, a
+comment from that commit persists unchanged in the codebase today:&lt;/p&gt;
+&lt;figure class=&quot;left-align-caption&quot;&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot;&gt;&lt;pre
+class=&quot;sourceCode cpp&quot;&gt;&lt;code class=&quot;sourceCode cpp&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// We have a simplified view of the control flow here but in&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-2&quot;&gt;&lt;a href=&quot;#cb2-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// practise it has been reasonable on our codebase.&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-3&quot;&gt;&lt;a href=&quot;#cb2-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// We don&amp;#39;t model that each expression in the `body` or `else` could&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-4&quot;&gt;&lt;a href=&quot;#cb2-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// throw, instead we model only never running anything in the&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-5&quot;&gt;&lt;a href=&quot;#cb2-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// body, or running the whole thing. To do this we  have a magic&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-6&quot;&gt;&lt;a href=&quot;#cb2-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// Unanalyzable variable at the top of the body using&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-7&quot;&gt;&lt;a href=&quot;#cb2-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// `rescueStartTemp` and one at the end of the else using&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-8&quot;&gt;&lt;a href=&quot;#cb2-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// `rescueEndTemp` which can jump into the rescue handlers.&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;figcaption&gt;
+&lt;a
+href=&quot;https://github.com/sorbet/sorbet/blob/e63d2893edecc30e3eda5cd3378e02b8996e866f/cfg/builder/builder_walk.cc#L761-L768&quot;&gt;→
+View in &lt;code&gt;cfg/builder/builder_walk.cc&lt;/code&gt;&lt;/a&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;If we just said that the original approach didn’t yield the bug in
+our original example, why adopt this new approach?&lt;/p&gt;
+&lt;p&gt;For starters, the first approach had an even more insidious bug:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb3&quot;&gt;&lt;pre
+class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb3-1&quot;&gt;&lt;a href=&quot;#cb3-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;begin&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-2&quot;&gt;&lt;a href=&quot;#cb3-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  x &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; might_raise()&lt;/span&gt;
+&lt;span id=&quot;cb3-3&quot;&gt;&lt;a href=&quot;#cb3-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;co&quot;&gt;# ...&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-4&quot;&gt;&lt;a href=&quot;#cb3-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;rescue&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-5&quot;&gt;&lt;a href=&quot;#cb3-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;co&quot;&gt;# Sorbet would assume `x` was always set&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-6&quot;&gt;&lt;a href=&quot;#cb3-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;fu&quot;&gt;puts&lt;/span&gt;(x)&lt;/span&gt;
+&lt;span id=&quot;cb3-7&quot;&gt;&lt;a href=&quot;#cb3-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The original &lt;code&gt;rescue&lt;/code&gt; implementation had a bit of an of
+off-by-one error, where it would think that &lt;code&gt;x&lt;/code&gt; (being an
+assignment as the very first instruction) would be set unconditionally.
+But if the initializer for &lt;code&gt;x&lt;/code&gt; raises, it in fact
+&lt;strong&gt;won’t&lt;/strong&gt; be set in the &lt;code&gt;rescue&lt;/code&gt; block. Checking
+to see whether a variable you were hoping was set by a rescue block but
+which might not actually be set is much more common in correct code than
+asserting in the rescue block that something was for sure set.&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-4&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-4&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;And intuitively there’s an easy workaround: if you
+expect some variable to be unconditionally set, don’t set it in the
+&lt;code&gt;begin&lt;/code&gt; block, set it outside!&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; Even still: that problem on its own would have been easy
+enough to fix, but there was a second problem: typechecking
+performance.&lt;/p&gt;
+&lt;p&gt;There are a lot of reasons why having lots of tiny basic blocks is
+bad for performance:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;It’s not just the number of basic blocks. Sorbet also had to
+duplicate a bunch of setup code to make sure that those unanalyzable
+&lt;code&gt;&amp;lt;exn-value&amp;gt;&lt;/code&gt; variables actually existed in the CFG. So
+the absolute number of instructions in the CFG was larger, too (versus
+the same number of instructions, but just distributed to more basic
+blocks).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;When finalizing a CFG, Sorbet has to compute the variables that
+each basic block reads and writes. The algorithms inside Sorbet to
+compute which variables are &lt;a
+href=&quot;https://en.wikipedia.org/wiki/Live-variable_analysis&quot;&gt;live&lt;/a&gt; by
+a given point scale poorly when there are lots of blocks.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;When typechecking a method, every basic block in the CFG requires
+its own &lt;a
+href=&quot;https://github.com/sorbet/sorbet/blob/master/infer/environment.h#L127&quot;&gt;&lt;code&gt;Environment&lt;/code&gt;&lt;/a&gt;
+data structure, which maps variables to their types within that block.
+Sorbet either has to allocate a separate &lt;code&gt;Environment&lt;/code&gt; per
+block (what it currently does) or incur complexity from making them &lt;a
+href=&quot;https://en.wikipedia.org/wiki/Copy-on-write&quot;&gt;copy-on-write&lt;/a&gt;. &lt;a
+href=&quot;https://blog.nelhage.com/post/why-sorbet-is-fast/&quot;&gt;Allocating is
+slow&lt;/a&gt; and we really like to avoid complexity.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Before typechecking a basic block, Sorbet has to merge the
+environments of all blocks that can jump into it. Merging environments
+involves doing slow type checking operations (checking whether two
+possibly-arbitrary types are subtypes of each other).&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The new “only before and after” approach is pretty clever. In
+practice, it more or less models the “raise in first assignment” case
+while generating far fewer basic blocks, thus running much faster.&lt;/p&gt;
+&lt;h1 id=&quot;the-bigger-picture&quot;&gt;The bigger picture&lt;/h1&gt;
+&lt;p&gt;There’s a lot of these clever “good enough” tricks in Sorbet. In a
+sense, a lot of them are only possible because of the stakes: Sorbet
+&lt;em&gt;already&lt;/em&gt; allows &lt;a
+href=&quot;https://sorbet.org/docs/gradual&quot;&gt;&lt;code&gt;T.untyped&lt;/code&gt;&lt;/a&gt;, so
+depending on your viewpoint, either:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;There is already the holy grail of all hacks in the type system, so
+why not cut corners elsewhere when it makes sense.&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Because&lt;/em&gt; &lt;code&gt;T.untyped&lt;/code&gt; is in the type system, at
+least if there’s a bug in Sorbet the user can always work around it by
+way of &lt;code&gt;T.untyped&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Either way, in some sense the stakes are low. In a compiler where the
+stakes for being wrong are higher (the code compute the wrong answer),
+maybe shortcuts aren’t the best idea. And in fact, &lt;a
+href=&quot;https://github.com/sorbet/sorbet/pull/2962&quot;&gt;multiple&lt;/a&gt; &lt;a
+href=&quot;https://github.com/sorbet/sorbet/pull/3044&quot;&gt;distinct&lt;/a&gt; &lt;a
+href=&quot;https://github.com/sorbet/sorbet/pull/4488&quot;&gt;exception&lt;/a&gt; &lt;a
+href=&quot;https://github.com/sorbet/sorbet/pull/4531&quot;&gt;changes&lt;/a&gt; landed in
+Sorbet’s CFG code to support the Sorbet Compiler.&lt;/p&gt;
+&lt;p&gt;It’s now been over four years since we shipped the change to model
+&lt;code&gt;rescue&lt;/code&gt; this way. I’m not aware of a single incident caused
+by this bug, and I can only directly remember being asked why Sorbet has
+behavior like this twice (and I read &lt;em&gt;a lot&lt;/em&gt; of Sorbet
+questions). I can’t find any performance numbers from when the original
+change landed, but we can still put it into perspective: it’s the
+difference between a handful of people being confused over the course of
+4 years, or thousands of people getting faster typechecking results
+thousands of times per day. Seems like a reasonable trade-off.&lt;/p&gt;
+&lt;p&gt;Though eventually it would be nice to at least fix &lt;a
+href=&quot;https://github.com/sorbet/sorbet/issues/4108&quot;&gt;that earlier
+bug&lt;/a&gt;. 😅&lt;/p&gt;
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="sorbet" /><category term="types" /><summary type="html">← Return home Here’s a fun bug in Sorbet:</summary></entry><entry><title type="html">Control Flow in Sorbet is Syntactic</title><link href="https://blog.jez.io/syntactic-control-flow/" rel="alternate" type="text/html" title="Control Flow in Sorbet is Syntactic" /><published>2022-08-24T17:30:43-04:00</published><updated>2022-08-24T17:30:43-04:00</updated><id>https://blog.jez.io/syntactic-control-flow</id><content type="html" xml:base="https://blog.jez.io/syntactic-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
   &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
   &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
@@ -2048,124 +2347,4 @@ results for syntax errors.&lt;/p&gt;
 &lt;p style=&quot;text-align: right;&quot;&gt;
 &lt;a href=&quot;/error-recovery-part-2/&quot;&gt;Part 2: What I Didn’t Do →&lt;/a&gt;
 &lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="sorbet" /><category term="parsing" /><summary type="html">← Return home I’ve spent a lot of time recently making Sorbet’s parser recover from syntax errors when parsing. I didn’t have any experience with this before getting started, no one told me what the good tools or techniques for improving a parser were, and none of the things I read quite described the ideas I ended up implementing. I figured I’d share the experience so that you can learn too.</summary></entry><entry><title type="html">Sorbet, Generics, and Parametricity</title><link href="https://blog.jez.io/sorbet-parametricity/" rel="alternate" type="text/html" title="Sorbet, Generics, and Parametricity" /><published>2022-02-18T02:59:55-05:00</published><updated>2022-02-18T02:59:55-05:00</updated><id>https://blog.jez.io/sorbet-parametricity</id><content type="html" xml:base="https://blog.jez.io/sorbet-parametricity/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
-  &lt;a href=&quot;/&quot;&gt;← Return home&lt;/a&gt;&lt;br&gt;
-&lt;/nav&gt;
-
-&lt;main&gt;
-&lt;p&gt;Consider this snippet of Ruby code using Sorbet:&lt;/p&gt;
-&lt;!-- more --&gt;
-&lt;figure class=&quot;left-align-caption&quot;&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot;&gt;&lt;pre
-class=&quot;sourceCode numberSource ruby numberLines hl-11&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# typed: true&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-2&quot;&gt;&lt;a href=&quot;#cb1-2&quot;&gt;&lt;/a&gt;&lt;span class=&quot;fu&quot;&gt;extend&lt;/span&gt; T&lt;span class=&quot;kw&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;Sig&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-3&quot;&gt;&lt;a href=&quot;#cb1-3&quot;&gt;&lt;/a&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-4&quot;&gt;&lt;a href=&quot;#cb1-4&quot;&gt;&lt;/a&gt;sig &lt;span class=&quot;cf&quot;&gt;do&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-5&quot;&gt;&lt;a href=&quot;#cb1-5&quot;&gt;&lt;/a&gt;  type_parameters(&lt;span class=&quot;wa&quot;&gt;:U&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb1-6&quot;&gt;&lt;a href=&quot;#cb1-6&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;at&quot;&gt;.params&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;x: &lt;/span&gt;T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:U&lt;/span&gt;))&lt;/span&gt;
-&lt;span id=&quot;cb1-7&quot;&gt;&lt;a href=&quot;#cb1-7&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;at&quot;&gt;.returns&lt;/span&gt;(T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:U&lt;/span&gt;))&lt;/span&gt;
-&lt;span id=&quot;cb1-8&quot;&gt;&lt;a href=&quot;#cb1-8&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-9&quot;&gt;&lt;a href=&quot;#cb1-9&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; fake_identity_function(x)&lt;/span&gt;
-&lt;span id=&quot;cb1-10&quot;&gt;&lt;a href=&quot;#cb1-10&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;case&lt;/span&gt; x&lt;/span&gt;
-&lt;span id=&quot;cb1-11&quot;&gt;&lt;a href=&quot;#cb1-11&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;when&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;Integer&lt;/span&gt; &lt;span class=&quot;cf&quot;&gt;then&lt;/span&gt; &lt;span class=&quot;cf&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;0&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-12&quot;&gt;&lt;a href=&quot;#cb1-12&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;co&quot;&gt;#                 ^^^^^^^^ error&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-13&quot;&gt;&lt;a href=&quot;#cb1-13&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;cf&quot;&gt;return&lt;/span&gt; x&lt;/span&gt;
-&lt;span id=&quot;cb1-14&quot;&gt;&lt;a href=&quot;#cb1-14&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-15&quot;&gt;&lt;a href=&quot;#cb1-15&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;figcaption&gt;
-&lt;a
-href=&quot;https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20do%0A%20%20type_parameters%28%3AU%29%0A%20%20%20%20.params%28x%3A%20T.type_parameter%28%3AU%29%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AU%29%29%0Aend%0Adef%20fake_identity_function%28x%29%0A%20%20case%20x%0A%20%20when%20Integer%20then%20return%200%0A%20%20else%20return%20x%0A%20%20end%0Aend&quot;&gt;→
-View on sorbet.run&lt;/a&gt;
-&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;It has the same signature as the identity function (which returns its
-argument unchanged), but doesn’t actually do that in all cases. In
-particular, on the highlighted line it checks the type of &lt;code&gt;x&lt;/code&gt;
-at runtime, and if it’s an &lt;code&gt;Integer&lt;/code&gt;, it always returns
-&lt;code&gt;0&lt;/code&gt;, regardless of the input.&lt;/p&gt;
-&lt;p&gt;Sorbet flags this as an error (see the full error message in the
-sorbet.run link). Sometimes I get asked: “why?” The reasoning for why
-people think this &lt;em&gt;shouldn’t&lt;/em&gt; be an error usually looks like
-this: the signature just says that the output has to be the same as the
-input, and &lt;code&gt;Integer&lt;/code&gt; is the same as &lt;code&gt;Integer&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;But the fun thing is that this signature makes a stronger constraint
-on the implementation of the method—in this case the signature
-&lt;strong&gt;mandates&lt;/strong&gt; that the result is the input. The hand-wavy
-intuition for how to think about what’s going on is to mentally read the
-&lt;code&gt;type_parameters(:U)&lt;/code&gt; in the signature as “for all,”
-specifically, “the behavior of this function is the same &lt;em&gt;for
-all&lt;/em&gt; choices of the type parameters.”&lt;/p&gt;
-&lt;p&gt;In that light, generics put a pretty hefty constraint on the
-implementation of a generic method—which is actually a good thing! It
-means that the caller of the method can make stronger guarantees about
-what the method can or cannot do, even seeing only the types. For
-example:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;sig &lt;span class=&quot;cf&quot;&gt;do&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb2-2&quot;&gt;&lt;a href=&quot;#cb2-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  type_parameters(&lt;span class=&quot;wa&quot;&gt;:U&lt;/span&gt;, &lt;span class=&quot;wa&quot;&gt;:V&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb2-3&quot;&gt;&lt;a href=&quot;#cb2-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;at&quot;&gt;.params&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;x: &lt;/span&gt;T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:U&lt;/span&gt;), &lt;span class=&quot;wa&quot;&gt;y: &lt;/span&gt;T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:V&lt;/span&gt;))&lt;/span&gt;
-&lt;span id=&quot;cb2-4&quot;&gt;&lt;a href=&quot;#cb2-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;at&quot;&gt;.returns&lt;/span&gt;(T&lt;span class=&quot;at&quot;&gt;.any&lt;/span&gt;(T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:U&lt;/span&gt;), T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:V&lt;/span&gt;)))&lt;/span&gt;
-&lt;span id=&quot;cb2-5&quot;&gt;&lt;a href=&quot;#cb2-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;From this signature we’re guaranteed that the method has to return
-exactly one of the arguments we provided (&lt;code&gt;x&lt;/code&gt; or
-&lt;code&gt;y&lt;/code&gt;) and nothing else. It can’t invent some third value and
-return that.&lt;/p&gt;
-&lt;p&gt;But the constraints come within reason: the types don’t say anything
-about what side effects the function might have. This isn’t particularly
-unique to generics (Sorbet doesn’t track side effects no matter the
-types), but it is worth noting as a sneaky way that methods can do
-different things with different arguments. Going back to our
-&lt;code&gt;fake_identity_function&lt;/code&gt; example from earlier:&lt;/p&gt;
-&lt;figure class=&quot;left-align-caption&quot;&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb3&quot;&gt;&lt;pre
-class=&quot;sourceCode numberSource ruby numberLines hl-12 hl-15&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb3-1&quot;&gt;&lt;a href=&quot;#cb3-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# typed: true&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-2&quot;&gt;&lt;a href=&quot;#cb3-2&quot;&gt;&lt;/a&gt;&lt;span class=&quot;fu&quot;&gt;extend&lt;/span&gt; T&lt;span class=&quot;kw&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;Sig&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-3&quot;&gt;&lt;a href=&quot;#cb3-3&quot;&gt;&lt;/a&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-4&quot;&gt;&lt;a href=&quot;#cb3-4&quot;&gt;&lt;/a&gt;sig &lt;span class=&quot;cf&quot;&gt;do&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-5&quot;&gt;&lt;a href=&quot;#cb3-5&quot;&gt;&lt;/a&gt;  type_parameters(&lt;span class=&quot;wa&quot;&gt;:U&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb3-6&quot;&gt;&lt;a href=&quot;#cb3-6&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;at&quot;&gt;.params&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;x: &lt;/span&gt;T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:U&lt;/span&gt;))&lt;/span&gt;
-&lt;span id=&quot;cb3-7&quot;&gt;&lt;a href=&quot;#cb3-7&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;at&quot;&gt;.returns&lt;/span&gt;(T&lt;span class=&quot;at&quot;&gt;.type_parameter&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:U&lt;/span&gt;))&lt;/span&gt;
-&lt;span id=&quot;cb3-8&quot;&gt;&lt;a href=&quot;#cb3-8&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-9&quot;&gt;&lt;a href=&quot;#cb3-9&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; fake_identity_function(x)&lt;/span&gt;
-&lt;span id=&quot;cb3-10&quot;&gt;&lt;a href=&quot;#cb3-10&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;case&lt;/span&gt; x&lt;/span&gt;
-&lt;span id=&quot;cb3-11&quot;&gt;&lt;a href=&quot;#cb3-11&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;when&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;Integer&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-12&quot;&gt;&lt;a href=&quot;#cb3-12&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;fu&quot;&gt;puts&lt;/span&gt;(x&lt;span class=&quot;at&quot;&gt;.even?&lt;/span&gt;)&lt;/span&gt;
-&lt;span id=&quot;cb3-13&quot;&gt;&lt;a href=&quot;#cb3-13&quot;&gt;&lt;/a&gt;    x&lt;/span&gt;
-&lt;span id=&quot;cb3-14&quot;&gt;&lt;a href=&quot;#cb3-14&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;else&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-15&quot;&gt;&lt;a href=&quot;#cb3-15&quot;&gt;&lt;/a&gt;    x&lt;span class=&quot;at&quot;&gt;.even?&lt;/span&gt; &lt;span class=&quot;co&quot;&gt;# error: Method `even?` does not exist&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-16&quot;&gt;&lt;a href=&quot;#cb3-16&quot;&gt;&lt;/a&gt;    x&lt;/span&gt;
-&lt;span id=&quot;cb3-17&quot;&gt;&lt;a href=&quot;#cb3-17&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-18&quot;&gt;&lt;a href=&quot;#cb3-18&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;figcaption&gt;
-&lt;a
-href=&quot;https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20do%0A%20%20type_parameters%28%3AU%29%0A%20%20%20%20.params%28x%3A%20T.type_parameter%28%3AU%29%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AU%29%29%0Aend%0Adef%20fake_identity_function%28x%29%0A%20%20case%20x%0A%20%20when%20Integer%0A%20%20%20%20x.even%3F%0A%20%20%20%20x%0A%20%20else%0A%20%20%20%20x.even%3F%0A%20%20%20%20x%0A%20%20end%0Aend&quot;&gt;→
-View on sorbet.run&lt;/a&gt;
-&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;In this example, the side effect of calling
-&lt;code&gt;puts(x.even?)&lt;/code&gt; only happens if the type is
-&lt;code&gt;Integer&lt;/code&gt;, breaking the intuition that the behavior of this
-function is uniform for all input types.&lt;/p&gt;
-&lt;p&gt;If Sorbet wanted,&lt;span
-class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
-class=&quot;sidenote&quot;&gt;Unlike everything we’ve discussed so far, I’m not
-actually sure whether that was a conscious decision or an accident. But
-it is a pretty useful feature in practice.&lt;br /&gt;
-&lt;br /&gt;
-&lt;/span&gt;&lt;/span&gt; it could prevent this particular form of anti-uniformity
-by not allowing any &lt;a
-href=&quot;https://sorbet.org/docs/flow-sensitive&quot;&gt;control-flow-sensitive&lt;/a&gt;
-type updates. But it wouldn’t change the fact that, for example, one
-implementation of &lt;code&gt;fake_identity_function&lt;/code&gt; could always print
-one log line, while another implementation could always print two log
-lines. The only uniformity guarantees we get are about specifically
-what’s captured in the input and output types.&lt;/p&gt;
-&lt;p&gt;It turns out that there’s a name for this property of generic
-functions: &lt;a
-href=&quot;https://en.wikipedia.org/wiki/Parametricity&quot;&gt;parametricity&lt;/a&gt;.
-It’s a fancy word but it basically means what we’ve talked about here:
-the implementation of generic functions are constrained to basically
-only do one thing, modulo side-effects. It goes further than just
-intuition though, and people have done interesting work to formalize the
-intuitions into proofs.&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="sorbet" /><category term="plt" /><summary type="html">← Return home Consider this snippet of Ruby code using Sorbet:</summary></entry></feed>
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="sorbet" /><category term="parsing" /><summary type="html">← Return home I’ve spent a lot of time recently making Sorbet’s parser recover from syntax errors when parsing. I didn’t have any experience with this before getting started, no one told me what the good tools or techniques for improving a parser were, and none of the things I read quite described the ideas I ended up implementing. I figured I’d share the experience so that you can learn too.</summary></entry></feed>

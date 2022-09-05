@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2022-09-04 23:12:12 -0400">
+<meta name="description" content="A quick post explaining why exception handling in Sorbet is weird, by way of a buggy program and some pretty pictures.">
+<title>Sorbet's weird approach to exception handling – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">Sorbet's weird approach to exception handling</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2022-09-04 23:12:12 -0400">September 4, 2022</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#control-flow-and-rescue-in-sorbet"
+  id="toc-control-flow-and-rescue-in-sorbet">Control flow and
+  <code>rescue</code> in Sorbet</a></li>
+  <li><a href="#a-brief-history-of-rescue-in-sorbet"
+  id="toc-a-brief-history-of-rescue-in-sorbet">A brief history of
+  <code>rescue</code> in Sorbet</a></li>
+  <li><a href="#the-bigger-picture" id="toc-the-bigger-picture">The
+  bigger picture</a></li>
+  </ul>
+</nav>
+
+<main>
+<p>Here’s a fun bug in Sorbet:</p>
+<figure class="left-align-caption">
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode numberSource ruby numberLines hl-11 hl-12"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">def</span> example</span>
+<span id="cb1-2"><a href="#cb1-2"></a>  <span class="cf">begin</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>    loop_count <span class="kw">=</span> <span class="dv">0</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a>    <span class="cf">while</span> <span class="dv">true</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>      <span class="fu">sleep</span>(<span class="dv">1</span>)</span>
+<span id="cb1-7"><a href="#cb1-7"></a>      loop_count <span class="kw">+=</span> <span class="dv">1</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>    <span class="cf">end</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>  <span class="cf">rescue</span> <span class="dt">Interrupt</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>    <span class="cf">if</span> loop_count</span>
+<span id="cb1-11"><a href="#cb1-11"></a>      <span class="fu">puts</span>(<span class="st">&quot;Looped </span><span class="sc">#{</span>loop_count<span class="sc">}</span><span class="st"> times&quot;</span>)</span>
+<span id="cb1-12"><a href="#cb1-12"></a>    <span class="co"># ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ error: This code is unreachable</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a>    <span class="cf">end</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a>  <span class="cf">end</span></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="cf">end</span></span></code></pre></div>
+<figcaption>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20true%0A%0Adef%20example%0A%20%20begin%0A%20%20%20%20loop_count%20%3D%200%0A%0A%20%20%20%20while%20true%0A%20%20%20%20%20%20sleep%281%29%0A%20%20%20%20%20%20loop_count%20%2B%3D%201%0A%20%20%20%20end%0A%20%20rescue%20Interrupt%0A%20%20%20%20if%20loop_count%0A%20%20%20%20%20%20puts%28%22Looped%20%23%7Bloop_count%7D%20times%22%29%0A%20%20%20%20end%0A%20%20end%0Aend">→View
+on sorbet.run</a>
+</figcaption>
+</figure>
+<p>Sorbet thinks that <code>loop_count</code> has type
+<code>NilClass</code> at the start of the <code>rescue</code> block,
+which causes it to declare that the <code>puts</code> line is dead
+(because <code>NilClass</code> is never truthy).</p>
+<p>But why? Clearly, we can see that <code>loop_count</code> is an
+<code>Integer</code>. We’d expect Sorbet to <em>at least</em> think
+<code>loop_count</code> has type <code>T.nilable(Integer)</code>, if not
+simply <code>Integer</code> outright.</p>
+<p>When developing Sorbet, sometimes we choose an implementation because
+it’s good enough, most of the time, but is simple to implement and/or
+fast. Sorbet’s approach to <code>rescue</code> and exception handling is
+one such choice.</p>
+<h1 id="control-flow-and-rescue-in-sorbet">Control flow and
+<code>rescue</code> in Sorbet</h1>
+<p>I mentioned in <a href="/syntactic-control-flow/">my last post</a>
+that Sorbet builds a <span class="smallcaps"><strong>control flow
+graph</strong></span> (CFG) in order to model control-flow sensitive
+types throughout the body of a method. But for <code>rescue</code>
+nodes, it takes one of those “good enough, most of the time” shortcuts.
+It pretends that there are only two jumps into the <code>rescue</code>
+block: once before any <strong>any</strong> code in the
+<code>begin</code> block has run, and once after <strong>all</strong>
+the code in <code>begin</code> block has run:</p>
+<div class="only-light-mode">
+<figure>
+<img src="/assets/img/rescue-cfg-light-mode.png"
+alt="A hand-drawn diagram of a CFG showing how rescue works" />
+<figcaption aria-hidden="true">A hand-drawn diagram of a CFG showing how
+<code>rescue</code> works</figcaption>
+</figure>
+</div>
+<div class="only-dark-mode">
+<figure>
+<img src="/assets/img/rescue-cfg-dark-mode.png"
+alt="A hand-drawn diagram of a CFG showing how rescue works" />
+<figcaption aria-hidden="true">A hand-drawn diagram of a CFG showing how
+<code>rescue</code> works</figcaption>
+</figure>
+</div>
+<p>This is a diagram of what a CFG in Sorbet mostly<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">If you have <a
+href="https://graphviz.org/">Graphviz</a> installed, you can get Sorbet
+to dump its internal CFG for a given file with the
+<code>cfg-view.sh</code> script in the Sorbet repo. The CFG for the
+example above looks like <a
+href="/assets/img/rescue-example-01.svg">like this</a>.<br />
+<br />
+</span></span> looks like. The conditions for these jumps read from a
+magical <code>&lt;exn-value&gt;</code> variable, which Sorbet treats as
+<span class="smallcaps"><strong>unanalyzable</strong></span>: Sorbet
+doesn’t attempt to track how the value is initialized nor how control
+flow affects it. At any point it might be truthy or falsy, so Sorbet
+will always assume both outcomes could happen.</p>
+<p>Knowing this, we can explain the behavior in the example above:</p>
+<ul>
+<li>Since the first jump into the <code>rescue</code> block happens, the
+<code>loop_count</code> variable is still uninitialized at that point,
+and thus has type <code>NilClass</code> at that point.</li>
+<li>The second jump into the <code>rescue</code> block happens after the
+<code>begin</code> block finishes. But from Sorbet’s point of view, the
+<code>begin</code> block never finishes: Sorbet sees the infinite
+<code>while   true</code> loop and thinks that it’s impossible for
+control to ever leave the <code>begin</code> block.<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">If you’re fearless, you can prove that this is what’s
+happening in the <a href="/assets/img/rescue-example-01.svg">rendered
+CFG</a> for the above example.<br />
+<br />
+</span></span></li>
+</ul>
+<p>That second point is <a
+href="https://github.com/sorbet/sorbet/issues/4108">simply a bug</a>.
+Sorbet should be smart enough to suspend the normal rules it applies
+when processing code that infinitely loops (or unconditionally raises)
+while checking code in a <code>begin</code> block that has a
+<code>rescue</code>.<span
+class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
+class="sidenote">easier said than done, lol<br />
+<br />
+</span></span> But still, fixing that bug would only make Sorbet think
+that <code>loop_count</code> has type <code>T.nilable(Integer)</code> in
+the <code>rescue</code> body—remember we said that ideally Sorbet would
+know that <code>loop_count</code> is <strong>always</strong>
+initialized, having type <code>Integer</code>.</p>
+<p>So then, what is that weird jump to the <code>rescue</code> body
+doing there? Intuitively, taking that branch means that the
+<code>begin</code> block raised an exception <em>before ever running a
+single line of code in the begin block</em>. To answer this, some
+history.</p>
+<h1 id="a-brief-history-of-rescue-in-sorbet">A brief history of
+<code>rescue</code> in Sorbet</h1>
+<p>Sorbet’s <a
+href="https://github.com/sorbet/sorbet/commit/9189734a6c061071c3d3cd4398a5d7874a8c0c49">first
+commit</a> dates to October 3, 2017. Six weeks later, the <a
+href="https://github.com/sorbet/sorbet/commit/afb234741f4ccd98ca2903d1621746c64a2da5ab">initial
+support for <code>rescue</code></a> landed. The pull request description
+is from a time when all pull requests were Stripe-internal, so I’ll
+quote it here:</p>
+<blockquote>
+<p>This does most of the work in the CFG, preserving the semantics in
+the desugarer. This is nice since we can treat these differently if we
+want since we have the information this late.</p>
+<p>It introduces a series of uncomputable <code>if</code>s since 0 or
+more instructions from the first block will execute then one of the
+<code>rescue</code>s could match and then if none do the
+<code>else</code> will match. Check out the <code>.svg</code>s to see
+the chaining.</p>
+<p>If an invalid name is put in the exception expression, it will be
+caught by the namer since the tree walk goes through them.</p>
+</blockquote>
+<p>Maybe that description only makes sense if you’re a Sorbet developer.
+The approach it’s describing is what most people might do intuitively:
+any instruction in a <code>begin</code> might raise, so record a jump
+from each instruction in the <code>begin</code> block to the
+<code>rescue</code> block. In picture form:</p>
+<div class="only-light-mode">
+<figure>
+<img src="/assets/img/rescue-cfg-multi-block-light-mode.png"
+alt="A diagram depicting the implementation described in the above commit" />
+<figcaption aria-hidden="true">A diagram depicting the implementation
+described in the above commit</figcaption>
+</figure>
+</div>
+<div class="only-dark-mode">
+<figure>
+<img src="/assets/img/rescue-cfg-multi-block-dark-mode.png"
+alt="A diagram depicting the implementation described in the above commit" />
+<figcaption aria-hidden="true">A diagram depicting the implementation
+described in the above commit</figcaption>
+</figure>
+</div>
+<p>After the code at the start of the method, control flows immediately
+to the first line of the <code>begin</code> body. But every line of the
+<code>begin</code> body gets its own, tiny basic block with an
+unanalyzable jump to the <code>rescue</code> block, or to the next line
+of the body. On its own, this was probably enough to fix the bug in our
+initial example—there would be a jump after the
+<code>loop_count = 0</code> assignment into the <code>rescue</code>
+block, so when merging all the previous environments, Sorbet would now
+be able to see that <code>loop_count</code> is an
+<code>Integer</code>.</p>
+<p>But importantly, this original approach was thrown out. Which brings
+us to our second point of history, when <a
+href="https://github.com/sorbet/sorbet/commit/a6ed41e0b8deee28ff592063934b28676ac77927#diff-c9b037996e9c16464e031136abe5d9df567c72f283d572b070d108228b733127R335-R342">almost
+exactly 9 months later</a><span
+class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
+class="sidenote">And only two days after I joined the team 😅<br />
+<br />
+</span></span> the “only before and after” approach arrived. In fact, a
+comment from that commit persists unchanged in the codebase today:</p>
+<figure class="left-align-caption">
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// We have a simplified view of the control flow here but in</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">// practise it has been reasonable on our codebase.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">// We don&#39;t model that each expression in the `body` or `else` could</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">// throw, instead we model only never running anything in the</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">// body, or running the whole thing. To do this we  have a magic</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Unanalyzable variable at the top of the body using</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">// `rescueStartTemp` and one at the end of the else using</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">// `rescueEndTemp` which can jump into the rescue handlers.</span></span></code></pre></div>
+<figcaption>
+<a
+href="https://github.com/sorbet/sorbet/blob/e63d2893edecc30e3eda5cd3378e02b8996e866f/cfg/builder/builder_walk.cc#L761-L768">→
+View in <code>cfg/builder/builder_walk.cc</code></a>
+</figcaption>
+</figure>
+<p>If we just said that the original approach didn’t yield the bug in
+our original example, why adopt this new approach?</p>
+<p>For starters, the first approach had an even more insidious bug:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">begin</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span> might_raise()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">rescue</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Sorbet would assume `x` was always set</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span>(x)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>The original <code>rescue</code> implementation had a bit of an of
+off-by-one error, where it would think that <code>x</code> (being an
+assignment as the very first instruction) would be set unconditionally.
+But if the initializer for <code>x</code> raises, it in fact
+<strong>won’t</strong> be set in the <code>rescue</code> block. Checking
+to see whether a variable you were hoping was set by a rescue block but
+which might not actually be set is much more common in correct code than
+asserting in the rescue block that something was for sure set.<span
+class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
+class="sidenote">And intuitively there’s an easy workaround: if you
+expect some variable to be unconditionally set, don’t set it in the
+<code>begin</code> block, set it outside!<br />
+<br />
+</span></span> Even still: that problem on its own would have been easy
+enough to fix, but there was a second problem: typechecking
+performance.</p>
+<p>There are a lot of reasons why having lots of tiny basic blocks is
+bad for performance:</p>
+<ul>
+<li><p>It’s not just the number of basic blocks. Sorbet also had to
+duplicate a bunch of setup code to make sure that those unanalyzable
+<code>&lt;exn-value&gt;</code> variables actually existed in the CFG. So
+the absolute number of instructions in the CFG was larger, too (versus
+the same number of instructions, but just distributed to more basic
+blocks).</p></li>
+<li><p>When finalizing a CFG, Sorbet has to compute the variables that
+each basic block reads and writes. The algorithms inside Sorbet to
+compute which variables are <a
+href="https://en.wikipedia.org/wiki/Live-variable_analysis">live</a> by
+a given point scale poorly when there are lots of blocks.</p></li>
+<li><p>When typechecking a method, every basic block in the CFG requires
+its own <a
+href="https://github.com/sorbet/sorbet/blob/master/infer/environment.h#L127"><code>Environment</code></a>
+data structure, which maps variables to their types within that block.
+Sorbet either has to allocate a separate <code>Environment</code> per
+block (what it currently does) or incur complexity from making them <a
+href="https://en.wikipedia.org/wiki/Copy-on-write">copy-on-write</a>. <a
+href="https://blog.nelhage.com/post/why-sorbet-is-fast/">Allocating is
+slow</a> and we really like to avoid complexity.</p></li>
+<li><p>Before typechecking a basic block, Sorbet has to merge the
+environments of all blocks that can jump into it. Merging environments
+involves doing slow type checking operations (checking whether two
+possibly-arbitrary types are subtypes of each other).</p></li>
+</ul>
+<p>The new “only before and after” approach is pretty clever. In
+practice, it more or less models the “raise in first assignment” case
+while generating far fewer basic blocks, thus running much faster.</p>
+<h1 id="the-bigger-picture">The bigger picture</h1>
+<p>There’s a lot of these clever “good enough” tricks in Sorbet. In a
+sense, a lot of them are only possible because of the stakes: Sorbet
+<em>already</em> allows <a
+href="https://sorbet.org/docs/gradual"><code>T.untyped</code></a>, so
+depending on your viewpoint, either:</p>
+<ul>
+<li>There is already the holy grail of all hacks in the type system, so
+why not cut corners elsewhere when it makes sense.</li>
+<li><em>Because</em> <code>T.untyped</code> is in the type system, at
+least if there’s a bug in Sorbet the user can always work around it by
+way of <code>T.untyped</code>.</li>
+</ul>
+<p>Either way, in some sense the stakes are low. In a compiler where the
+stakes for being wrong are higher (the code compute the wrong answer),
+maybe shortcuts aren’t the best idea. And in fact, <a
+href="https://github.com/sorbet/sorbet/pull/2962">multiple</a> <a
+href="https://github.com/sorbet/sorbet/pull/3044">distinct</a> <a
+href="https://github.com/sorbet/sorbet/pull/4488">exception</a> <a
+href="https://github.com/sorbet/sorbet/pull/4531">changes</a> landed in
+Sorbet’s CFG code to support the Sorbet Compiler.</p>
+<p>It’s now been over four years since we shipped the change to model
+<code>rescue</code> this way. I’m not aware of a single incident caused
+by this bug, and I can only directly remember being asked why Sorbet has
+behavior like this twice (and I read <em>a lot</em> of Sorbet
+questions). I can’t find any performance numbers from when the original
+change landed, but we can still put it into perspective: it’s the
+difference between a handful of people being confused over the course of
+4 years, or thousands of people getting faster typechecking results
+thousands of times per day. Seems like a reasonable trade-off.</p>
+<p>Though eventually it would be nice to at least fix <a
+href="https://github.com/sorbet/sorbet/issues/4108">that earlier
+bug</a>. 😅</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#ruby">ruby</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#sorbet">sorbet</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#types">types</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
+
+
+
+</body>
+</html>
+
