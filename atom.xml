@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-09-05T00:37:57-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Sorbet’s weird approach to exception handling</title><link href="https://blog.jez.io/sorbet-rescue-control-flow/" rel="alternate" type="text/html" title="Sorbet’s weird approach to exception handling" /><published>2022-09-04T23:12:12-04:00</published><updated>2022-09-04T23:12:12-04:00</updated><id>https://blog.jez.io/sorbet-rescue-control-flow</id><content type="html" xml:base="https://blog.jez.io/sorbet-rescue-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-09-06T03:01:59-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Sorbet’s weird approach to exception handling</title><link href="https://blog.jez.io/sorbet-rescue-control-flow/" rel="alternate" type="text/html" title="Sorbet’s weird approach to exception handling" /><published>2022-09-04T23:12:12-04:00</published><updated>2022-09-04T23:12:12-04:00</updated><id>https://blog.jez.io/sorbet-rescue-control-flow</id><content type="html" xml:base="https://blog.jez.io/sorbet-rescue-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
   &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
   &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
@@ -39,46 +39,46 @@ href=&quot;https://sorbet.run/#%23%20typed%3A%20true%0A%0Adef%20example%0A%20%20
 on sorbet.run&lt;/a&gt;
 &lt;/figcaption&gt;
 &lt;/figure&gt;
-&lt;p&gt;Sorbet thinks that &lt;code&gt;loop_count&lt;/code&gt; has type
-&lt;code&gt;NilClass&lt;/code&gt; at the start of the &lt;code&gt;rescue&lt;/code&gt; block,
-which causes it to declare that the &lt;code&gt;puts&lt;/code&gt; line is dead
-(because &lt;code&gt;NilClass&lt;/code&gt; is never truthy).&lt;/p&gt;
-&lt;p&gt;But why? Clearly, we can see that &lt;code&gt;loop_count&lt;/code&gt; is an
+&lt;p&gt;Sorbet thinks that &lt;code&gt;loop_count&lt;/code&gt; is &lt;code&gt;nil&lt;/code&gt; at the
+start of the &lt;code&gt;rescue&lt;/code&gt; block, which causes it to declare the
+&lt;code&gt;puts&lt;/code&gt; line unreachable (because &lt;code&gt;nil&lt;/code&gt; is never
+truthy).&lt;/p&gt;
+&lt;p&gt;But why? Clearly we can see that &lt;code&gt;loop_count&lt;/code&gt; is an
 &lt;code&gt;Integer&lt;/code&gt;. We’d expect Sorbet to &lt;em&gt;at least&lt;/em&gt; think
 &lt;code&gt;loop_count&lt;/code&gt; has type &lt;code&gt;T.nilable(Integer)&lt;/code&gt;, if not
 simply &lt;code&gt;Integer&lt;/code&gt; outright.&lt;/p&gt;
-&lt;p&gt;When developing Sorbet, sometimes we choose an implementation because
-it’s good enough, most of the time, but is simple to implement and/or
-fast. Sorbet’s approach to &lt;code&gt;rescue&lt;/code&gt; and exception handling is
-one such choice.&lt;/p&gt;
+&lt;p&gt;Sometimes Sorbet takes shortcuts—especially when the short cut is
+good enough 99% of the time while being simple and fast. Sorbet’s
+approach to &lt;code&gt;rescue&lt;/code&gt; and exception handling is one of these
+shortcuts.&lt;/p&gt;
 &lt;h1 id=&quot;control-flow-and-rescue-in-sorbet&quot;&gt;Control flow and
 &lt;code&gt;rescue&lt;/code&gt; in Sorbet&lt;/h1&gt;
 &lt;p&gt;I mentioned in &lt;a href=&quot;/syntactic-control-flow/&quot;&gt;my last post&lt;/a&gt;
 that Sorbet builds a &lt;span class=&quot;smallcaps&quot;&gt;&lt;strong&gt;control flow
 graph&lt;/strong&gt;&lt;/span&gt; (CFG) in order to model control-flow sensitive
-types throughout the body of a method. But for &lt;code&gt;rescue&lt;/code&gt;
-nodes, it takes one of those “good enough, most of the time” shortcuts.
-It pretends that there are only two jumps into the &lt;code&gt;rescue&lt;/code&gt;
-block: once before any &lt;strong&gt;any&lt;/strong&gt; code in the
-&lt;code&gt;begin&lt;/code&gt; block has run, and once after &lt;strong&gt;all&lt;/strong&gt;
-the code in &lt;code&gt;begin&lt;/code&gt; block has run:&lt;/p&gt;
+types throughout the body of a method. For &lt;code&gt;rescue&lt;/code&gt; nodes, it
+pretends that there are only two jumps into the &lt;code&gt;rescue&lt;/code&gt;
+block: once &lt;strong&gt;before any&lt;/strong&gt; any code in the
+&lt;code&gt;begin&lt;/code&gt; block has run, and once after all the code in
+&lt;code&gt;begin&lt;/code&gt; block has run. It looks a little something like
+this:&lt;/p&gt;
 &lt;div class=&quot;only-light-mode&quot;&gt;
 &lt;figure&gt;
 &lt;img src=&quot;/assets/img/rescue-cfg-light-mode.png&quot;
-alt=&quot;A hand-drawn diagram of a CFG showing how rescue works&quot; /&gt;
-&lt;figcaption aria-hidden=&quot;true&quot;&gt;A hand-drawn diagram of a CFG showing how
-&lt;code&gt;rescue&lt;/code&gt; works&lt;/figcaption&gt;
+alt=&quot;An example CFG with a rescue block&quot; /&gt;
+&lt;figcaption aria-hidden=&quot;true&quot;&gt;An example CFG with a &lt;code&gt;rescue&lt;/code&gt;
+block&lt;/figcaption&gt;
 &lt;/figure&gt;
 &lt;/div&gt;
 &lt;div class=&quot;only-dark-mode&quot;&gt;
 &lt;figure&gt;
 &lt;img src=&quot;/assets/img/rescue-cfg-dark-mode.png&quot;
-alt=&quot;A hand-drawn diagram of a CFG showing how rescue works&quot; /&gt;
-&lt;figcaption aria-hidden=&quot;true&quot;&gt;A hand-drawn diagram of a CFG showing how
-&lt;code&gt;rescue&lt;/code&gt; works&lt;/figcaption&gt;
+alt=&quot;An example CFG with a rescue block&quot; /&gt;
+&lt;figcaption aria-hidden=&quot;true&quot;&gt;An example CFG with a &lt;code&gt;rescue&lt;/code&gt;
+block&lt;/figcaption&gt;
 &lt;/figure&gt;
 &lt;/div&gt;
-&lt;p&gt;This is a diagram of what a CFG in Sorbet mostly&lt;span
+&lt;p&gt;This is a simplified view of a CFG in Sorbet.&lt;span
 class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
 class=&quot;sidenote&quot;&gt;If you have &lt;a
 href=&quot;https://graphviz.org/&quot;&gt;Graphviz&lt;/a&gt; installed, you can get Sorbet
@@ -87,48 +87,54 @@ to dump its internal CFG for a given file with the
 example above looks like &lt;a
 href=&quot;/assets/img/rescue-example-01.svg&quot;&gt;like this&lt;/a&gt;.&lt;br /&gt;
 &lt;br /&gt;
-&lt;/span&gt;&lt;/span&gt; looks like. The conditions for these jumps read from a
-magical &lt;code&gt;&amp;lt;exn-value&amp;gt;&lt;/code&gt; variable, which Sorbet treats as
-&lt;span class=&quot;smallcaps&quot;&gt;&lt;strong&gt;unanalyzable&lt;/strong&gt;&lt;/span&gt;: Sorbet
-doesn’t attempt to track how the value is initialized nor how control
-flow affects it. At any point it might be truthy or falsy, so Sorbet
-will always assume both outcomes could happen.&lt;/p&gt;
-&lt;p&gt;Knowing this, we can explain the behavior in the example above:&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt; The boxes contain hunks of straight-line code (code
+without control flow), and all control flow is made explicit by
+branching on a specified variable at the end of each block. For the case
+of &lt;code&gt;rescue&lt;/code&gt;, the branches read from a magical
+&lt;code&gt;&amp;lt;exn-value&amp;gt;&lt;/code&gt; variable, which Sorbet treats as &lt;span
+class=&quot;smallcaps&quot;&gt;&lt;strong&gt;unanalyzable&lt;/strong&gt;&lt;/span&gt;: Sorbet doesn’t
+attempt to track how the value is initialized nor how control flow
+affects it.&lt;/p&gt;
+&lt;p&gt;Knowing this, we can explain the weird dead code error from the
+snippet above:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Since the first jump into the &lt;code&gt;rescue&lt;/code&gt; block happens, the
-&lt;code&gt;loop_count&lt;/code&gt; variable is still uninitialized at that point,
-and thus has type &lt;code&gt;NilClass&lt;/code&gt; at that point.&lt;/li&gt;
+&lt;li&gt;The first jump into the &lt;code&gt;rescue&lt;/code&gt; block happens before any
+code in the &lt;code&gt;begin&lt;/code&gt; block runs. At that point, the
+&lt;code&gt;loop_count&lt;/code&gt; variable is still uninitialized, and thus has
+type &lt;code&gt;NilClass&lt;/code&gt; when taking that branch.&lt;/li&gt;
 &lt;li&gt;The second jump into the &lt;code&gt;rescue&lt;/code&gt; block happens after the
 &lt;code&gt;begin&lt;/code&gt; block finishes. But from Sorbet’s point of view, the
-&lt;code&gt;begin&lt;/code&gt; block never finishes: Sorbet sees the infinite
-&lt;code&gt;while   true&lt;/code&gt; loop and thinks that it’s impossible for
-control to ever leave the &lt;code&gt;begin&lt;/code&gt; block.&lt;span
+&lt;code&gt;begin&lt;/code&gt; block in the &lt;code&gt;loop_count&lt;/code&gt; snippet never
+finishes! Sorbet sees the infinite &lt;code&gt;while true&lt;/code&gt; loop and
+says, “it doesn’t matter where to branch at the end of the
+&lt;code&gt;begin&lt;/code&gt; block—the infinite loop won’t allow control to flow
+there.”&lt;span
 class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-1&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-1&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
 class=&quot;sidenote&quot;&gt;If you’re fearless, you can prove that this is what’s
 happening in the &lt;a href=&quot;/assets/img/rescue-example-01.svg&quot;&gt;rendered
 CFG&lt;/a&gt; for the above example.&lt;br /&gt;
 &lt;br /&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+&lt;/span&gt;&lt;/span&gt; Despite it being able to tell that
+&lt;code&gt;loop_count&lt;/code&gt; has type &lt;code&gt;Integer&lt;/code&gt; inside the
+&lt;code&gt;begin&lt;/code&gt;, only the &lt;code&gt;NilClass&lt;/code&gt; branch is live in the
+&lt;code&gt;rescue&lt;/code&gt; block.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;That second point is &lt;a
+&lt;p&gt;That second point about &lt;code&gt;while true&lt;/code&gt; is &lt;a
 href=&quot;https://github.com/sorbet/sorbet/issues/4108&quot;&gt;simply a bug&lt;/a&gt;.
-Sorbet should be smart enough to suspend the normal rules it applies
-when processing code that infinitely loops (or unconditionally raises)
-while checking code in a &lt;code&gt;begin&lt;/code&gt; block that has a
-&lt;code&gt;rescue&lt;/code&gt;.&lt;span
+Sorbet should be smart enough to suspend the normal flow-sensitivity
+rules for infinite loops while checking code in a &lt;code&gt;begin&lt;/code&gt;
+block that has a &lt;code&gt;rescue&lt;/code&gt;.&lt;span
 class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-2&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-2&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
-class=&quot;sidenote&quot;&gt;easier said than done, lol&lt;br /&gt;
+class=&quot;sidenote&quot;&gt;Of course, easier said than done.&lt;br /&gt;
 &lt;br /&gt;
-&lt;/span&gt;&lt;/span&gt; But still, fixing that bug would only make Sorbet think
-that &lt;code&gt;loop_count&lt;/code&gt; has type &lt;code&gt;T.nilable(Integer)&lt;/code&gt; in
-the &lt;code&gt;rescue&lt;/code&gt; body—remember we said that ideally Sorbet would
-know that &lt;code&gt;loop_count&lt;/code&gt; is &lt;strong&gt;always&lt;/strong&gt;
-initialized, having type &lt;code&gt;Integer&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;So then, what is that weird jump to the &lt;code&gt;rescue&lt;/code&gt; body
-doing there? Intuitively, taking that branch means that the
-&lt;code&gt;begin&lt;/code&gt; block raised an exception &lt;em&gt;before ever running a
-single line of code in the begin block&lt;/em&gt;. To answer this, some
-history.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt; But still, fixing that bug would only fix half the
+problem: Sorbet would think that &lt;code&gt;loop_count&lt;/code&gt; has type
+&lt;code&gt;T.nilable(Integer)&lt;/code&gt; in the &lt;code&gt;rescue&lt;/code&gt; body, but we
+said the best outcome would be for Sorbet to know that
+&lt;code&gt;loop_count&lt;/code&gt; is &lt;strong&gt;always&lt;/strong&gt; initialized, having
+type &lt;code&gt;Integer&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Before we can see what it would take for Sorbet to infer
+&lt;code&gt;Integer&lt;/code&gt;, some history.&lt;/p&gt;
 &lt;h1 id=&quot;a-brief-history-of-rescue-in-sorbet&quot;&gt;A brief history of
 &lt;code&gt;rescue&lt;/code&gt; in Sorbet&lt;/h1&gt;
 &lt;p&gt;Sorbet’s &lt;a
@@ -136,25 +142,26 @@ href=&quot;https://github.com/sorbet/sorbet/commit/9189734a6c061071c3d3cd4398a5d
 commit&lt;/a&gt; dates to October 3, 2017. Six weeks later, the &lt;a
 href=&quot;https://github.com/sorbet/sorbet/commit/afb234741f4ccd98ca2903d1621746c64a2da5ab&quot;&gt;initial
 support for &lt;code&gt;rescue&lt;/code&gt;&lt;/a&gt; landed. The pull request description
-is from a time when all pull requests were Stripe-internal, so I’ll
-quote it here:&lt;/p&gt;
+is from a time when all pull requests were not public, so I’ll quote it
+here:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;This does most of the work in the CFG, preserving the semantics in
-the desugarer. This is nice since we can treat these differently if we
-want since we have the information this late.&lt;/p&gt;
+the desugarer. […]&lt;/p&gt;
 &lt;p&gt;It introduces a series of uncomputable &lt;code&gt;if&lt;/code&gt;s since 0 or
 more instructions from the first block will execute then one of the
 &lt;code&gt;rescue&lt;/code&gt;s could match and then if none do the
-&lt;code&gt;else&lt;/code&gt; will match. Check out the &lt;code&gt;.svg&lt;/code&gt;s to see
-the chaining.&lt;/p&gt;
-&lt;p&gt;If an invalid name is put in the exception expression, it will be
-caught by the namer since the tree walk goes through them.&lt;/p&gt;
+&lt;code&gt;else&lt;/code&gt; will match.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;Maybe that description only makes sense if you’re a Sorbet developer.
-The approach it’s describing is what most people might do intuitively:
-any instruction in a &lt;code&gt;begin&lt;/code&gt; might raise, so record a jump
-from each instruction in the &lt;code&gt;begin&lt;/code&gt; block to the
-&lt;code&gt;rescue&lt;/code&gt; block. In picture form:&lt;/p&gt;
+&lt;p&gt;The approach it’s describing is what most people might do
+intuitively: any instruction in a &lt;code&gt;begin&lt;/code&gt; might raise,&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-3&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-3&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;This is not quite true: &lt;code&gt;x = 0&lt;/code&gt; doesn’t
+raise, and Sorbet can &lt;a href=&quot;/syntactic-control-flow/&quot;&gt;see that
+syntactically&lt;/a&gt;. This might be something to take advantage of in the
+future.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; so let’s record an unanalyzable jump after each
+instruction, into the &lt;code&gt;rescue&lt;/code&gt; block. In picture form:&lt;/p&gt;
 &lt;div class=&quot;only-light-mode&quot;&gt;
 &lt;figure&gt;
 &lt;img src=&quot;/assets/img/rescue-cfg-multi-block-light-mode.png&quot;
@@ -171,82 +178,77 @@ alt=&quot;A diagram depicting the implementation described in the above commit&q
 described in the above commit&lt;/figcaption&gt;
 &lt;/figure&gt;
 &lt;/div&gt;
-&lt;p&gt;After the code at the start of the method, control flows immediately
-to the first line of the &lt;code&gt;begin&lt;/code&gt; body. But every line of the
-&lt;code&gt;begin&lt;/code&gt; body gets its own, tiny basic block with an
-unanalyzable jump to the &lt;code&gt;rescue&lt;/code&gt; block, or to the next line
-of the body. On its own, this was probably enough to fix the bug in our
-initial example—there would be a jump after the
-&lt;code&gt;loop_count = 0&lt;/code&gt; assignment into the &lt;code&gt;rescue&lt;/code&gt;
-block, so when merging all the previous environments, Sorbet would now
-be able to see that &lt;code&gt;loop_count&lt;/code&gt; is an
-&lt;code&gt;Integer&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;But importantly, this original approach was thrown out. Which brings
-us to our second point of history, when &lt;a
+&lt;p&gt;Note how every line of the &lt;code&gt;begin&lt;/code&gt; body gets its own, tiny
+basic block with an unanalyzable jump to the &lt;code&gt;rescue&lt;/code&gt; block,
+or to the next line of the body. This implementation wouldn’t have
+exhibited the bug in our &lt;code&gt;loop_count&lt;/code&gt; example—there would be
+a jump after the &lt;code&gt;loop_count = 0&lt;/code&gt; assignment into the
+&lt;code&gt;rescue&lt;/code&gt; block, which would have been enough for Sorbet to
+infer a type of &lt;code&gt;Integer&lt;/code&gt; (regardless of whether that
+&lt;code&gt;while true&lt;/code&gt; bug were fixed method).&lt;/p&gt;
+&lt;p&gt;But importantly, this original approach was thrown out, &lt;a
 href=&quot;https://github.com/sorbet/sorbet/commit/a6ed41e0b8deee28ff592063934b28676ac77927#diff-c9b037996e9c16464e031136abe5d9df567c72f283d572b070d108228b733127R335-R342&quot;&gt;almost
 exactly 9 months later&lt;/a&gt;&lt;span
-class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-3&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-3&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-4&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-4&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
 class=&quot;sidenote&quot;&gt;And only two days after I joined the team 😅&lt;br /&gt;
 &lt;br /&gt;
-&lt;/span&gt;&lt;/span&gt; the “only before and after” approach arrived. In fact, a
-comment from that commit persists unchanged in the codebase today:&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt; later, when the shortcut we’ve been discussing arrived.
+In fact, a comment from that commit persists unchanged in the codebase
+today:&lt;/p&gt;
+&lt;blockquote&gt;
 &lt;figure class=&quot;left-align-caption&quot;&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot;&gt;&lt;pre
-class=&quot;sourceCode cpp&quot;&gt;&lt;code class=&quot;sourceCode cpp&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// We have a simplified view of the control flow here but in&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb2-2&quot;&gt;&lt;a href=&quot;#cb2-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// practise it has been reasonable on our codebase.&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb2-3&quot;&gt;&lt;a href=&quot;#cb2-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// We don&amp;#39;t model that each expression in the `body` or `else` could&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb2-4&quot;&gt;&lt;a href=&quot;#cb2-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// throw, instead we model only never running anything in the&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb2-5&quot;&gt;&lt;a href=&quot;#cb2-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// body, or running the whole thing. To do this we  have a magic&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb2-6&quot;&gt;&lt;a href=&quot;#cb2-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// Unanalyzable variable at the top of the body using&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb2-7&quot;&gt;&lt;a href=&quot;#cb2-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// `rescueStartTemp` and one at the end of the else using&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb2-8&quot;&gt;&lt;a href=&quot;#cb2-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// `rescueEndTemp` which can jump into the rescue handlers.&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We have a simplified view of the control flow here but in practise it
+has been reasonable on our codebase. We don’t model that each expression
+in the &lt;code&gt;body&lt;/code&gt; or &lt;code&gt;else&lt;/code&gt; could throw, instead we
+model only never running anything in the body, or running the whole
+thing. To do this we have a magic Unanalyzable variable at the top of
+the body using &lt;code&gt;rescueStartTemp&lt;/code&gt; and one at the end of the
+else using &lt;code&gt;rescueEndTemp&lt;/code&gt; which can jump into the rescue
+handlers.&lt;/p&gt;
 &lt;figcaption&gt;
 &lt;a
 href=&quot;https://github.com/sorbet/sorbet/blob/e63d2893edecc30e3eda5cd3378e02b8996e866f/cfg/builder/builder_walk.cc#L761-L768&quot;&gt;→
 View in &lt;code&gt;cfg/builder/builder_walk.cc&lt;/code&gt;&lt;/a&gt;
 &lt;/figcaption&gt;
 &lt;/figure&gt;
-&lt;p&gt;If we just said that the original approach didn’t yield the bug in
-our original example, why adopt this new approach?&lt;/p&gt;
-&lt;p&gt;For starters, the first approach had an even more insidious bug:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb3&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb3-1&quot;&gt;&lt;a href=&quot;#cb3-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;begin&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-2&quot;&gt;&lt;a href=&quot;#cb3-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  x &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; might_raise()&lt;/span&gt;
-&lt;span id=&quot;cb3-3&quot;&gt;&lt;a href=&quot;#cb3-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;co&quot;&gt;# ...&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-4&quot;&gt;&lt;a href=&quot;#cb3-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;rescue&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-5&quot;&gt;&lt;a href=&quot;#cb3-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;co&quot;&gt;# Sorbet would assume `x` was always set&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb3-6&quot;&gt;&lt;a href=&quot;#cb3-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;fu&quot;&gt;puts&lt;/span&gt;(x)&lt;/span&gt;
-&lt;span id=&quot;cb3-7&quot;&gt;&lt;a href=&quot;#cb3-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;The original &lt;code&gt;rescue&lt;/code&gt; implementation had a bit of an of
-off-by-one error, where it would think that &lt;code&gt;x&lt;/code&gt; (being an
-assignment as the very first instruction) would be set unconditionally.
-But if the initializer for &lt;code&gt;x&lt;/code&gt; raises, it in fact
-&lt;strong&gt;won’t&lt;/strong&gt; be set in the &lt;code&gt;rescue&lt;/code&gt; block. Checking
-to see whether a variable you were hoping was set by a rescue block but
-which might not actually be set is much more common in correct code than
-asserting in the rescue block that something was for sure set.&lt;span
-class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-4&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-4&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
-class=&quot;sidenote&quot;&gt;And intuitively there’s an easy workaround: if you
-expect some variable to be unconditionally set, don’t set it in the
-&lt;code&gt;begin&lt;/code&gt; block, set it outside!&lt;br /&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Why adopt this shortcut approach if it &lt;em&gt;causes&lt;/em&gt; bugs like this
+to happen? Well for starters, the original approach had an even more
+insidious bug. Consider this example:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot;&gt;&lt;pre
+class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;begin&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-2&quot;&gt;&lt;a href=&quot;#cb2-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  x &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; might_raise()&lt;/span&gt;
+&lt;span id=&quot;cb2-3&quot;&gt;&lt;a href=&quot;#cb2-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;co&quot;&gt;# ...&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-4&quot;&gt;&lt;a href=&quot;#cb2-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;rescue&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-5&quot;&gt;&lt;a href=&quot;#cb2-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;co&quot;&gt;# Sorbet would assume `x` was always set&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-6&quot;&gt;&lt;a href=&quot;#cb2-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;fu&quot;&gt;puts&lt;/span&gt;(x)&lt;/span&gt;
+&lt;span id=&quot;cb2-7&quot;&gt;&lt;a href=&quot;#cb2-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;In this example, the first instruction in the block is an assignment
+(&lt;code&gt;x = ...&lt;/code&gt;). But Sorbet would only record the jump after the
+assignment entirely, not between the method call and the assignment.
+This meant Sorbet would think that &lt;code&gt;x&lt;/code&gt; was unconditionally
+set, but in fact it’s &lt;strong&gt;not&lt;/strong&gt; set when
+&lt;code&gt;might_raise()&lt;/code&gt; does actually raise. At the time, Sorbet
+tripped this bug all the time on real-world code—there were beta users
+of Sorbet chiming in on the PR eagerly waiting for the bug to be fixed.
+Meanwhile, code that looked like our &lt;code&gt;loop_count&lt;/code&gt; example
+either did not exist or was simply rewritten&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-5&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-5&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;There’s an easy workaround: use &lt;code&gt;T.let&lt;/code&gt; to
+pin the type of the variable outside the &lt;code&gt;begin&lt;/code&gt; block.&lt;br /&gt;
 &lt;br /&gt;
-&lt;/span&gt;&lt;/span&gt; Even still: that problem on its own would have been easy
-enough to fix, but there was a second problem: typechecking
-performance.&lt;/p&gt;
-&lt;p&gt;There are a lot of reasons why having lots of tiny basic blocks is
-bad for performance:&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt; to avoid the bug.&lt;/p&gt;
+&lt;p&gt;But this still doesn’t quite paint the full picture. I’ve told you,
+“There was a bug, and Sorbet fixed it by introducing another bug.” Which
+leads us to out second point: having a lot of tiny, jumpy basic blocks
+is slow to typecheck. There are lots of reasons:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;It’s not just the number of basic blocks. Sorbet also had to
-duplicate a bunch of setup code to make sure that those unanalyzable
-&lt;code&gt;&amp;lt;exn-value&amp;gt;&lt;/code&gt; variables actually existed in the CFG. So
-the absolute number of instructions in the CFG was larger, too (versus
-the same number of instructions, but just distributed to more basic
-blocks).&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;When finalizing a CFG, Sorbet has to compute the variables that
-each basic block reads and writes. The algorithms inside Sorbet to
-compute which variables are &lt;a
-href=&quot;https://en.wikipedia.org/wiki/Live-variable_analysis&quot;&gt;live&lt;/a&gt; by
-a given point scale poorly when there are lots of blocks.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;After building a CFG, Sorbet does a bunch of post-processing on
+it. For example, it computes which variables each basic block reads and
+writes, tries to dealias variable writes, and merges adjacent blocks if
+possible. When there are fewer basic blocks, these post-processing steps
+run faster to begin with, and are more likely to drastically shrink the
+CFG size (making type inference run faster).&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;When typechecking a method, every basic block in the CFG requires
 its own &lt;a
 href=&quot;https://github.com/sorbet/sorbet/blob/master/infer/environment.h#L127&quot;&gt;&lt;code&gt;Environment&lt;/code&gt;&lt;/a&gt;
@@ -257,28 +259,37 @@ href=&quot;https://en.wikipedia.org/wiki/Copy-on-write&quot;&gt;copy-on-write&lt
 href=&quot;https://blog.nelhage.com/post/why-sorbet-is-fast/&quot;&gt;Allocating is
 slow&lt;/a&gt; and we really like to avoid complexity.&lt;/p&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;Before typechecking a basic block, Sorbet has to merge the
-environments of all blocks that can jump into it. Merging environments
-involves doing slow type checking operations (checking whether two
-possibly-arbitrary types are subtypes of each other).&lt;/p&gt;&lt;/li&gt;
+environments of all incoming blocks. Merging environments involves doing
+slow type checking operations, like checking whether two
+possibly-arbitrary types are subtypes of each other and allocating union
+types.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Not only are there more basic blocks, there are more
+instructions! Each &lt;code&gt;&amp;lt;exn-value&amp;gt;&lt;/code&gt; variable has to be
+populated before Sorbet can branch on it, and that each tiny basic block
+has not only the single instruction inside it, but also an extra
+instruction to initialize the &lt;code&gt;&amp;lt;exn-valu&amp;gt;&lt;/code&gt; variable.
+That basically doubles the number of instructions Sorbet emits for a
+&lt;code&gt;begin&lt;/code&gt; block, making more work for type inference.&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;The new “only before and after” approach is pretty clever. In
-practice, it more or less models the “raise in first assignment” case
-while generating far fewer basic blocks, thus running much faster.&lt;/p&gt;
+&lt;p&gt;The new “only before and after” shortcut is pretty clever. In
+practice, it models the case when even the very first assignment might
+raise, while generating far fewer basic blocks, thus running much
+faster.&lt;/p&gt;
 &lt;h1 id=&quot;the-bigger-picture&quot;&gt;The bigger picture&lt;/h1&gt;
-&lt;p&gt;There’s a lot of these clever “good enough” tricks in Sorbet. In a
-sense, a lot of them are only possible because of the stakes: Sorbet
-&lt;em&gt;already&lt;/em&gt; allows &lt;a
+&lt;p&gt;There are a lot of these clever “good enough” tricks in Sorbet. Many
+of them are only possible because of the stakes: Sorbet &lt;em&gt;already&lt;/em&gt;
+allows &lt;a
 href=&quot;https://sorbet.org/docs/gradual&quot;&gt;&lt;code&gt;T.untyped&lt;/code&gt;&lt;/a&gt;, so
 depending on your viewpoint, either:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;There is already the holy grail of all hacks in the type system, so
-why not cut corners elsewhere when it makes sense.&lt;/li&gt;
+why not cut more corners when it makes sense.&lt;/li&gt;
 &lt;li&gt;&lt;em&gt;Because&lt;/em&gt; &lt;code&gt;T.untyped&lt;/code&gt; is in the type system, at
-least if there’s a bug in Sorbet the user can always work around it by
-way of &lt;code&gt;T.untyped&lt;/code&gt;.&lt;/li&gt;
+least the user can use &lt;code&gt;T.untyped&lt;/code&gt; to not be completely
+blocked from writing the code they need to write.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Either way, in some sense the stakes are low. In a compiler where the
-stakes for being wrong are higher (the code compute the wrong answer),
+stakes for being wrong are higher (the code computes the wrong answer),
 maybe shortcuts aren’t the best idea. And in fact, &lt;a
 href=&quot;https://github.com/sorbet/sorbet/pull/2962&quot;&gt;multiple&lt;/a&gt; &lt;a
 href=&quot;https://github.com/sorbet/sorbet/pull/3044&quot;&gt;distinct&lt;/a&gt; &lt;a
@@ -287,16 +298,16 @@ href=&quot;https://github.com/sorbet/sorbet/pull/4531&quot;&gt;changes&lt;/a&gt;
 Sorbet’s CFG code to support the Sorbet Compiler.&lt;/p&gt;
 &lt;p&gt;It’s now been over four years since we shipped the change to model
 &lt;code&gt;rescue&lt;/code&gt; this way. I’m not aware of a single incident caused
-by this bug, and I can only directly remember being asked why Sorbet has
-behavior like this twice (and I read &lt;em&gt;a lot&lt;/em&gt; of Sorbet
-questions). I can’t find any performance numbers from when the original
-change landed, but we can still put it into perspective: it’s the
-difference between a handful of people being confused over the course of
-4 years, or thousands of people getting faster typechecking results
-thousands of times per day. Seems like a reasonable trade-off.&lt;/p&gt;
+by this shortcut, and I can only even remember explaining this behavior
+to a confused Sorbet user twice. I can’t find any performance numbers
+from when the original change landed, but we can still put it into
+perspective: it’s the difference between a handful of people being
+confused over the course of 4 years, or thousands of people getting
+faster typechecking results thousands of times per day. Seems like a
+reasonable trade-off.&lt;/p&gt;
 &lt;p&gt;Though eventually it would be nice to at least fix &lt;a
-href=&quot;https://github.com/sorbet/sorbet/issues/4108&quot;&gt;that earlier
-bug&lt;/a&gt;. 😅&lt;/p&gt;
+href=&quot;https://github.com/sorbet/sorbet/issues/4108&quot;&gt;that
+&lt;code&gt;while true&lt;/code&gt; bug&lt;/a&gt;. 😅&lt;/p&gt;
 &lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="ruby" /><category term="sorbet" /><category term="types" /><summary type="html">← Return home Here’s a fun bug in Sorbet:</summary></entry><entry><title type="html">Control Flow in Sorbet is Syntactic</title><link href="https://blog.jez.io/syntactic-control-flow/" rel="alternate" type="text/html" title="Control Flow in Sorbet is Syntactic" /><published>2022-08-24T17:30:43-04:00</published><updated>2022-08-24T17:30:43-04:00</updated><id>https://blog.jez.io/syntactic-control-flow</id><content type="html" xml:base="https://blog.jez.io/syntactic-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
   &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
