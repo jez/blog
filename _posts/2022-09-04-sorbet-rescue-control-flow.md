@@ -41,89 +41,90 @@ end
 
 </figure>
 
-Sorbet thinks that `loop_count` has type `NilClass` at the start of the `rescue` block, which
-causes it to declare that the `puts` line is dead (because `NilClass` is never truthy).
+Sorbet thinks that `loop_count` is `nil` at the start of the `rescue` block, which causes it to
+declare the `puts` line unreachable (because `nil` is never truthy).
 
-But why? Clearly, we can see that `loop_count` is an `Integer`. We'd expect Sorbet to _at
+But why? Clearly we can see that `loop_count` is an `Integer`. We'd expect Sorbet to _at
 least_ think `loop_count` has type `T.nilable(Integer)`, if not simply `Integer` outright.
 
-When developing Sorbet, sometimes we choose an implementation because it's good enough, most of
-the time, but is simple to implement and/or fast. Sorbet's approach to `rescue` and exception
-handling is one such choice.
+Sometimes Sorbet takes shortcuts—especially when the short cut is good enough 99% of the time
+while being simple and fast. Sorbet's approach to `rescue` and exception handling is one
+of these shortcuts.
 
 # Control flow and `rescue` in Sorbet
 
 I mentioned in [my last post] that Sorbet builds a [**control flow graph**]{.smallcaps} (CFG)
-in order to model control-flow sensitive types throughout the body of a method. But for
-`rescue` nodes, it takes one of those "good enough, most of the time" shortcuts. It pretends
-that there are only two jumps into the `rescue` block: once before any **any** code in the
-`begin` block has run, and once after **all** the code in `begin` block has run:
+in order to model control-flow sensitive types throughout the body of a method. For `rescue`
+nodes, it pretends that there are only two jumps into the `rescue` block: once **before any**
+any code in the `begin` block has run, and once after all the code in `begin` block has
+run. It looks a little something like this:
 
 :::{.only-light-mode}
-![A hand-drawn diagram of a CFG showing how `rescue` works](/assets/img/rescue-cfg-light-mode.png)
+![An example CFG with a `rescue` block](/assets/img/rescue-cfg-light-mode.png)
 :::
 
 :::{.only-dark-mode}
-![A hand-drawn diagram of a CFG showing how `rescue` works](/assets/img/rescue-cfg-dark-mode.png)
+![An example CFG with a `rescue` block](/assets/img/rescue-cfg-dark-mode.png)
 :::
 
-This is a diagram of what a CFG in Sorbet mostly[^mostly] looks like. The conditions for these
-jumps read from a magical `<exn-value>` variable, which Sorbet treats as
-[**unanalyzable**]{.smallcaps}: Sorbet doesn't attempt to track how the value is initialized
-nor how control flow affects it. At any point it might be truthy or falsy, so Sorbet will
-always assume both outcomes could happen.
+This is a simplified view of a CFG in Sorbet.[^mostly] The boxes contain hunks of straight-line
+code (code without control flow), and all control flow is made explicit by branching on a
+specified variable at the end of each block. For the case of `rescue`, the branches read from a
+magical `<exn-value>` variable, which Sorbet treats as [**unanalyzable**]{.smallcaps}: Sorbet
+doesn't attempt to track how the value is initialized nor how control flow affects it.
 
 [^mostly]:
   If you have [Graphviz] installed, you can get Sorbet to dump its internal CFG for a given
   file with the `cfg-view.sh` script in the Sorbet repo. The CFG for the example above looks
   like [like this](/assets/img/rescue-example-01.svg).
 
-Knowing this, we can explain the behavior in the example above:
+Knowing this, we can explain the weird dead code error from the snippet above:
 
-- Since the first jump into the `rescue` block happens, the `loop_count` variable is still
-  uninitialized at that point, and thus has type `NilClass` at that point.
+- The first jump into the `rescue` block happens before any code in the `begin` block runs.
+  At that point, the `loop_count` variable is still uninitialized, and thus has type `NilClass`
+  when taking that branch.
 - The second jump into the `rescue` block happens after the `begin` block finishes. But from
-  Sorbet's point of view, the `begin` block never finishes: Sorbet sees the infinite `while
-  true` loop and thinks that it's impossible for control to ever leave the `begin` block.[^loop]
+  Sorbet's point of view, the `begin` block in the `loop_count` snippet never finishes! Sorbet
+  sees the infinite `while true` loop and says, "it doesn't matter where to branch at the end
+  of the `begin` block—the infinite loop won't allow control to flow there."[^loop] Despite
+  it being able to tell that `loop_count` has type `Integer` inside the `begin`, only the
+  `NilClass` branch is live in the `rescue` block.
 
 [^loop]:
   If you're fearless, you can prove that this is what's happening in the [rendered
   CFG](/assets/img/rescue-example-01.svg) for the above example.
 
-That second point is [simply a bug][4108]. Sorbet should be smart enough to suspend the normal
-rules it applies when processing code that infinitely loops (or unconditionally raises) while
-checking code in a `begin` block that has a `rescue`.[^said] But still, fixing that bug would
-only make Sorbet think that `loop_count` has type `T.nilable(Integer)` in the `rescue`
-body—remember we said that ideally Sorbet would know that `loop_count` is **always**
+That second point about `while true` is [simply a bug][4108]. Sorbet should be smart enough to
+suspend the normal flow-sensitivity rules for infinite loops while checking code in a `begin`
+block that has a `rescue`.[^said] But still, fixing that bug would only fix half the problem:
+Sorbet would think that `loop_count` has type `T.nilable(Integer)` in the `rescue`
+body, but we said the best outcome would be for Sorbet to know that `loop_count` is **always**
 initialized, having type `Integer`.
 
 [^said]:
-  easier said than done, lol
+  Of course, easier said than done.
 
-So then, what is that weird jump to the `rescue` body doing there? Intuitively, taking that
-branch means that the `begin` block raised an exception _before ever running a single line
-of code in the begin block_. To answer this, some history.
+Before we can see what it would take for Sorbet to infer `Integer`, some history.
 
 # A brief history of `rescue` in Sorbet
 
 Sorbet's [first commit] dates to October 3, 2017. Six weeks later, the [initial support for
 `rescue`][afb23474] landed. The pull request description is from a time when all pull requests
-were Stripe-internal, so I'll quote it here:
+were not public, so I'll quote it here:
 
-> This does most of the work in the CFG, preserving the semantics in the desugarer. This is
-> nice since we can treat these differently if we want since we have the information this late.
+> This does most of the work in the CFG, preserving the semantics in the desugarer. [...]
 >
 > It introduces a series of uncomputable `if`s since 0 or more instructions from the first
 > block will execute then one of the `rescue`s could match and then if none do the `else` will
-> match. Check out the `.svg`s to see the chaining.
->
-> If an invalid name is put in the exception expression, it will be caught by the namer since
-> the tree walk goes through them.
+> match.
 
-Maybe that description only makes sense if you're a Sorbet developer. The approach it's
-describing is what most people might do intuitively: any instruction in a `begin` might raise,
-so record a jump from each instruction in the `begin` block to the `rescue` block. In picture
-form:
+The approach it's describing is what most people might do intuitively: any instruction in a
+`begin` might raise,[^not-quite] so let's record an unanalyzable jump after each instruction,
+into the `rescue` block. In picture form:
+
+[^not-quite]:
+  This is not quite true: `x = 0` doesn't raise, and Sorbet can [see that syntactically][my
+  last post]. This might be something to take advantage of in the future.
 
 :::{.only-light-mode}
 ![A diagram depicting the implementation described in the above commit](/assets/img/rescue-cfg-multi-block-light-mode.png)
@@ -133,42 +134,34 @@ form:
 ![A diagram depicting the implementation described in the above commit](/assets/img/rescue-cfg-multi-block-dark-mode.png)
 :::
 
-After the code at the start of the method, control flows immediately to the first line of the
-`begin` body. But every line of the `begin` body gets its own, tiny basic block with an
-unanalyzable jump to the `rescue` block, or to the next line of the body. On its own, this
-was probably enough to fix the bug in our initial example—there would be a jump after the
-`loop_count = 0` assignment into the `rescue` block, so when merging all the previous
-environments, Sorbet would now be able to see that `loop_count` is an `Integer`.
+Note how every line of the `begin` body gets its own, tiny basic block with an unanalyzable
+jump to the `rescue` block, or to the next line of the body. This implementation wouldn't have
+exhibited the bug in our `loop_count` example—there would be a jump after the `loop_count = 0`
+assignment into the `rescue` block, which would have been enough for Sorbet to infer a type of
+`Integer` (regardless of whether that `while true` bug were fixed method).
 
-But importantly, this original approach was thrown out. Which brings us to our second point of
-history, when [almost exactly 9 months later][a6ed41e0][^2018] the "only before and after"
-approach arrived. In fact, a comment from that commit persists unchanged in the codebase today:
+But importantly, this original approach was thrown out, [almost exactly 9 months
+later][a6ed41e0][^2018] later, when the shortcut we've been discussing arrived. In fact, a
+comment from that commit persists unchanged in the codebase today:
 
 [^2018]:
   And only two days after I joined the team 😅
 
-<figure class="left-align-caption">
+> <figure class="left-align-caption">
+>
+> We have a simplified view of the control flow here but in practise it has been reasonable on
+> our codebase. We don't model that each expression in the `body` or `else` could throw,
+> instead we model only never running anything in the body, or running the whole thing. To do
+> this we  have a magic Unanalyzable variable at the top of the body using `rescueStartTemp`
+> and one at the end of the else using `rescueEndTemp` which can jump into the rescue handlers.
+>
+> <figcaption>
+> [→ View in `cfg/builder/builder_walk.cc`](https://github.com/sorbet/sorbet/blob/e63d2893edecc30e3eda5cd3378e02b8996e866f/cfg/builder/builder_walk.cc#L761-L768)
+> </figcaption>
+> </figure>
 
-```cpp
-// We have a simplified view of the control flow here but in
-// practise it has been reasonable on our codebase.
-// We don't model that each expression in the `body` or `else` could
-// throw, instead we model only never running anything in the
-// body, or running the whole thing. To do this we  have a magic
-// Unanalyzable variable at the top of the body using
-// `rescueStartTemp` and one at the end of the else using
-// `rescueEndTemp` which can jump into the rescue handlers.
-```
-
-<figcaption>
-[→ View in `cfg/builder/builder_walk.cc`](https://github.com/sorbet/sorbet/blob/e63d2893edecc30e3eda5cd3378e02b8996e866f/cfg/builder/builder_walk.cc#L761-L768)
-</figcaption>
-</figure>
-
-If we just said that the original approach didn't yield the bug in our original example, why
-adopt this new approach?
-
-For starters, the first approach had an even more insidious bug:
+Why adopt this shortcut approach if it _causes_ bugs like this to happen? Well for starters,
+the original approach had an even more insidious bug. Consider this example:
 
 ```ruby
 begin
@@ -180,28 +173,27 @@ rescue
 end
 ```
 
-The original `rescue` implementation had a bit of an of off-by-one error, where it would think
-that `x` (being an assignment as the very first instruction) would be set unconditionally. But
-if the initializer for `x` raises, it in fact **won't** be set in the `rescue` block. Checking
-to see whether a variable you were hoping was set by a rescue block but which might not
-actually be set is much more common in correct code than asserting in the rescue block that
-something was for sure set.[^unconditional] Even still: that problem on its own would have been
-easy enough to fix, but there was a second problem: typechecking performance.
+In this example, the first instruction in the block is an assignment (`x = ...`). But Sorbet
+would only record the jump after the assignment entirely, not between the method call and the
+assignment. This meant Sorbet would think that `x` was unconditionally set, but in fact it's
+**not** set when `might_raise()` does actually raise. At the time, Sorbet tripped this bug all
+the time on real-world code—there were beta users of Sorbet chiming in on the PR eagerly
+waiting for the bug to be fixed. Meanwhile, code that looked like our `loop_count` example
+either did not exist or was simply rewritten[^unconditional] to avoid the bug.
 
 [^unconditional]:
-  And intuitively there's an easy workaround: if you expect some variable to be unconditionally
-  set, don't set it in the `begin` block, set it outside!
+  There's an easy workaround: use `T.let` to pin the type of the variable outside the `begin`
+  block.
 
-There are a lot of reasons why having lots of tiny basic blocks is bad for performance:
+But this still doesn't quite paint the full picture. I've told you, "There was a bug, and Sorbet
+fixed it by introducing another bug." Which leads us to out second point: having a lot of tiny,
+jumpy basic blocks is slow to typecheck. There are lots of reasons:
 
-- It's not just the number of basic blocks. Sorbet also had to duplicate a bunch of setup code
-  to make sure that those unanalyzable `<exn-value>` variables actually existed in the CFG. So
-  the absolute number of instructions in the CFG was larger, too (versus the same number of
-  instructions, but just distributed to more basic blocks).
-
-- When finalizing a CFG, Sorbet has to compute the variables that each basic block reads and
-  writes. The algorithms inside Sorbet to compute which variables are [live] by a given point
-  scale poorly when there are lots of blocks.
+- After building a CFG, Sorbet does a bunch of post-processing on it. For example, it computes
+  which variables each basic block reads and writes, tries to dealias variable writes, and
+  merges adjacent blocks if possible. When there are fewer basic blocks, these post-processing
+  steps run faster to begin with, and are more likely to drastically shrink the CFG size
+  (making type inference run faster).
 
 - When typechecking a method, every basic block in the CFG requires its own [`Environment`]
   data structure, which maps variables to their types within that block. Sorbet either has to
@@ -209,39 +201,45 @@ There are a lot of reasons why having lots of tiny basic blocks is bad for perfo
   from making them [copy-on-write]. [Allocating is slow][nelhage-sorbet-fast] and we really
   like to avoid complexity.
 
-- Before typechecking a basic block, Sorbet has to merge the environments of all blocks that
-  can jump into it. Merging environments involves doing slow type checking operations
-  (checking whether two possibly-arbitrary types are subtypes of each other).
+- Before typechecking a basic block, Sorbet has to merge the environments of all incoming
+  blocks. Merging environments involves doing slow type checking operations, like checking
+  whether two possibly-arbitrary types are subtypes of each other and allocating union types.
 
-The new "only before and after" approach is pretty clever. In practice, it more or less models
-the "raise in first assignment" case while generating far fewer basic blocks, thus running much
-faster.
+- Not only are there more basic blocks, there are more instructions! Each `<exn-value>`
+  variable has to be populated before Sorbet can branch on it, and that each tiny basic block
+  has not only the single instruction inside it, but also an extra instruction to initialize
+  the `<exn-valu>` variable. That basically doubles the number of instructions Sorbet emits for
+  a `begin` block, making more work for type inference.
+
+The new "only before and after" shortcut is pretty clever. In practice, it models the case when
+even the very first assignment might raise, while generating far fewer basic blocks, thus
+running much faster.
 
 # The bigger picture
 
-There's a lot of these clever "good enough" tricks in Sorbet. In a sense, a lot of them are
-only possible because of the stakes: Sorbet _already_ allows [`T.untyped`], so depending on
-your viewpoint, either:
+There are a lot of these clever "good enough" tricks in Sorbet. Many of them are only possible
+because of the stakes: Sorbet _already_ allows [`T.untyped`], so depending on your viewpoint,
+either:
 
-- There is already the holy grail of all hacks in the type system, so why not cut corners
-  elsewhere when it makes sense.
-- _Because_ `T.untyped` is in the type system, at least if there's a bug in Sorbet the user can
-  always work around it by way of `T.untyped`.
+- There is already the holy grail of all hacks in the type system, so why not cut more corners
+  when it makes sense.
+- _Because_ `T.untyped` is in the type system, at least the user can use `T.untyped` to not be
+  completely blocked from writing the code they need to write.
 
 Either way, in some sense the stakes are low. In a compiler where the stakes for being wrong
-are higher (the code compute the wrong answer), maybe shortcuts aren't the best idea. And in
+are higher (the code computes the wrong answer), maybe shortcuts aren't the best idea. And in
 fact, [multiple][2962] [distinct][3044] [exception][4488] [changes][4531] landed in Sorbet's
 CFG code to support the Sorbet Compiler.
 
 It's now been over four years since we shipped the change to model `rescue` this way. I'm not
-aware of a single incident caused by this bug, and I can only directly remember being asked why
-Sorbet has behavior like this twice (and I read *a lot* of Sorbet questions). I can't find any
-performance numbers from when the original change landed, but we can still put it into
-perspective: it's the difference between a handful of people being confused over the course of
-4 years, or thousands of people getting faster typechecking results thousands of times per day.
-Seems like a reasonable trade-off.
+aware of a single incident caused by this shortcut, and I can only even remember explaining
+this behavior to a confused Sorbet user twice. I can't find any performance numbers from when
+the original change landed, but we can still put it into perspective: it's the difference
+between a handful of people being confused over the course of 4 years, or thousands of people
+getting faster typechecking results thousands of times per day. Seems like a reasonable
+trade-off.
 
-Though eventually it would be nice to at least fix [that earlier bug][4108]. 😅
+Though eventually it would be nice to at least fix [that `while true` bug][4108]. 😅
 
 
 
