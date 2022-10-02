@@ -32,8 +32,6 @@ and I'll be writing more about why in a future post.
 By the way, new to Vim plugins? I happen to have [just the post for
 you][vim-as-an-ide]!
 
-<!-- TODO(jez): Update with link to Neovim post -->
-
 # Overview
 
 We're going to move in order of increasing complexity. That said, even the most
@@ -49,8 +47,6 @@ have a complete development experience! Coming up:
 
 To keep things concise, I've moved all the relevant configuration to the end of
 the post. For now, let's start at the top.
-
-<!-- TODO(jez) Demonstrate everything with an asciicast -->
 
 # Syntax Highlighting & Indentation
 
