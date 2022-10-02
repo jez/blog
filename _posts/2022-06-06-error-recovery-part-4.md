@@ -239,7 +239,7 @@ judiciously inside _that_ rule to allow following these rules.
 
 Unfortunately, there have definitely been times where that hasn't worked, which will be
 the topic of a future post.
-<!-- TODO(jez) Link to the indentation post here, when written -->
+<!-- TODO(jez) Link to the part 6 indentation post here, when written -->
 
 # Consider using `yyclearin`
 
