@@ -4,7 +4,7 @@ title: "Surgery on Code from the Command Line"
 date: 2019-07-30 09:32:48 -0700
 comments: false
 share: false
-categories: ['bash', 'unix']
+categories: ['codemods', 'bash', 'unix']
 description: >
   One problem that comes up all the time for me is needing to manipulate
   files only on specific lines. Like, “find and replace this pattern,

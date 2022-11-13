@@ -3,9 +3,10 @@
 layout: post
 title: "Tips for large-scale codemods"
 date: 2022-11-12T21:34:51-05:00
-description: TODO
+description: >
+  Some tips I've accumulated while working on a team that does a lot of codemods.
 math: false
-categories: ['TODO']
+categories: ['codemods', 'devprod']
 # subtitle:
 # author:
 # author_url:
