@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2022-11-12 21:34:51 -0500">
+<meta name="description" content="Some tips I've accumulated while working on a team that does a lot of codemods.
+">
+<title>Tips for large-scale codemods – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">Tips for large-scale codemods</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2022-11-12 21:34:51 -0500">November 12, 2022</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#the-unreasonable-effectiveness-of-regular-expressions"
+  id="toc-the-unreasonable-effectiveness-of-regular-expressions">The
+  unreasonable effectiveness of regular expressions</a></li>
+  <li><a href="#when-regex-arent-good-enough"
+  id="toc-when-regex-arent-good-enough">When regex aren’t good
+  enough</a></li>
+  <li><a href="#managing-the-complexity"
+  id="toc-managing-the-complexity">Managing the complexity</a></li>
+  <li><a href="#how-will-i-know-if-the-change-is-okay"
+  id="toc-how-will-i-know-if-the-change-is-okay">How will I know if the
+  change is okay?</a></li>
+  </ul>
+</nav>
+
+<main>
+<p>I get the sense that people looking for advice on how to run a
+codemod are simply asking to be told, “don’t worry, they’re actually
+easy.” They <em>can</em> be sometimes, but usually the people desperate
+for codemod tips are also the people faced with running the gnarliest
+codemods.</p>
+<!-- more -->
+<p>The biggest tip I can offer you is “shift your mindset.” After a
+certain scale, codemods always get at least a little painful. You’re
+going to find some tips below that make codemods less painful, but after
+a certain scale, you’re never going to find a holy grail tool that makes
+codemods painless. In fact <strong>that’s okay</strong>, because:</p>
+<ul>
+<li>It means the work is <strong>high-leverage</strong>—you’re one
+person sucking up the pain for the benefit of dozens, hundreds, or even
+thousands of others, and you get to claim all the impact.</li>
+<li>You’re way more likely to finish the get the migration finished than
+you are by trying to shovel the work onto other teams’ plates.</li>
+</ul>
+<p>That’s tip 1: don’t let the fact that you know a codemod will be
+painful keep you from doing it. Like anything else, balance the pain
+with the payoff, and make a judgement call.</p>
+<p>Alright cool now let’s dive into some more tactical tips.</p>
+<p><br />
+</p>
+<h1 id="the-unreasonable-effectiveness-of-regular-expressions">The
+unreasonable effectiveness of regular expressions</h1>
+<ol type="1">
+<li><p>A regex-based, find-and-replace tool with multiline matches lines
+is often the only tool you need.<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">If you don’t have a preferred tool that meets these
+criteria, just use <a
+href="https://github.com/facebookincubator/fastmod">fastmod</a>.<br />
+<br />
+</span></span></p>
+<p>You probably already know how to use regular expressions. Getting
+started with regular expressions will either show you that they’re
+powerful enough to solve the problem outright, or be fast enough to
+prototype to the point where you realize, “yeah no, I’m definitely gonna
+need something more powerful for this.”</p></li>
+<li><p>Don’t give up so quickly on regex.</p>
+<p>Four hacky, specific regex can often take the place of an impossibly
+perfect regex. If you’re struggling to find one regex that magically
+works in all cases, try making the regex so specific that you know it
+won’t handle all the cases. The aim is to knock out the easiest 80% of
+cases, and then be left with a much smaller set of tricker things to
+codemod.</p></li>
+<li><p>Use age-old tricks like using <code>def foo\b</code>,
+<code>\.foo\(\b</code>, <code>= foo\(\b</code>, etc.</p>
+<p>The first one matches method definitions with the name
+<code>foo</code>. The latter two match calls to <code>foo</code> methods
+but not definitions.<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">Mostly. But again, that’s the whole point.<br />
+<br />
+</span></span> (This is basically the same tip as the last
+one.)</p></li>
+<li><p>Let the type checker be an input to your regex.</p>
+<p>Here’s a trick: introduce a type error in such a way that the type
+checker will report an error at every place you want to codemod.
+(Sometimes this is as easy as changing a method definition’s name.
+Sometimes the type checker errors are the reason why you have to do the
+codemod in the first place.)</p>
+<p>Then, run the type checker to get a list of locations, and then
+<strong>only</strong> run the regex on those locations.</p>
+<p>Sometimes you can get away with the locations being “any file with an
+error” but other times you’re going to need something more specific.
+I’ve written some tools to support running <a
+href="/surgery-on-code/">regex on specific lines of a file</a> in
+bulk.</p></li>
+<li><p>Let your test suite be an input to your regex.</p>
+<p>Like the previous tip, you can do things like raise test-only
+exceptions or insert test-only print statements to get a list of file
+locations to feed into the regex input.</p>
+<p>For example, maybe we want to replace calls to
+<code>old_method</code> with <code>new_method</code>. In Ruby, we can do
+something like log <a
+href="https://ruby-doc.org/core-2.7.2/Kernel.html#method-i-caller">caller(1..1)</a>
+to get the first entry in the backtrace at the top of
+<code>old_method</code>’s definition and feed those logs into our
+regex.</p></li>
+<li><p>Let production be an input to your regex.</p>
+<p>Do the same thing as above, but using production log lines (for
+obvious reasons, this only works with log lines, not exceptions like you
+might have been able to use in tests).</p>
+<p>When using this approach in production you might want to avoid doing
+things like looking at the stack trace specifically, as that can
+sometimes have unwanted performance impacts. (Of course, if performance
+isn’t a problem, or it can tolerate a short-term degradation during a
+codemod, go ahead.)</p></li>
+</ol>
+<h1 id="when-regex-arent-good-enough">When regex aren’t good enough</h1>
+<ol type="1">
+<li><p>Your linter might have an API for writing auto-correctable lint
+rules.</p>
+<p>Here are the docs for how to write fixers attached to custom <a
+href="https://eslint.org/docs/latest/developer-guide/working-with-rules#applying-fixes">ESLint</a>
+and <a
+href="https://docs.rubocop.org/rubocop/development.html#autocorrect">Rubocop</a>
+lint rules. The downside is that sometimes these APIs can be a little
+confusing to understand (slower spin up time). But compared to regex
+they’re far less likely to be brittle.<span
+class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
+class="sidenote">A nice side effect of writing a custom linter rule is
+that it can remain behind in the codebase, making it easier for people
+to resolve version control conflicts after the original codemod lands.
+Usually hacky regex scripts aren’t robust enough to outlive their
+original run.<br />
+<br />
+</span></span></p>
+<p>Note that just like with regex scripts, you can use information from
+the type checker or the test suite to limit which files you use the lint
+rule on.</p></li>
+<li><p>A few manual fixes are actually okay.</p>
+<p>The goal is to finish the codemod, not to 100% automate the codemod.
+If you’ve tried all the above options and there are still 100 or fewer
+locations that need to change, you can probably knock them out in an
+afternoon (depending on how involved the change is).</p>
+<p>There’s no shame in codemods that are 90% automated and 10%
+manual.</p></li>
+<li><p>Maybe use Vim?</p>
+<p>If you’re already comfortable with Vim, some tools you might want to
+look at:</p>
+<pre><code>:help gf
+  Edit the file whose name is under the cursor
+
+:help gF
+  Same as gf, but also position the cursor on the line number
+  following the filename
+
+:help CTRL-W_gf
+:help CTRL-W_gF
+  Prefixing gf or gF with &lt;C-W&gt; opens in a new tab (instead
+  of the current buffer)
+
+:help %
+  Jump to the matching paren or bracket under the cursor.
+
+:help q
+:help @
+  Record and replay arbitrary keys.</code></pre>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rg</span> <span class="at">-n</span> ... <span class="kw">|</span> <span class="ex">vim</span> <span class="at">-</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#               ^ reads content from stdin</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  ^^ prefixes each result with filename:line</span></span></code></pre></div>
+<p>Some codemods can be entirely automated with Vim. In others, using
+Vim with these tricks helps partially automate the manual
+parts.</p></li>
+<li><p>This is an oddly specific suggestion, but since I do it a
+lot:</p>
+<p><a href="https://sorbet.org">Sorbet</a> has an <a
+href="https://sorbet.org/docs/cli#accepting-autocorrect-suggestions">autocorrect
+mechanism</a>, where autocorrects are tied to error messages. In the
+past I’ve patched Sorbet on a branch I never intend to commit. The
+branch reports a fake error and includes an autocorrect. I run the
+patched version of Sorbet, apply the autocorrects, then throw away the
+branch.</p>
+<p>(Had the <em>goal</em> been to introduce some new error in the first
+place then I would, of course, land both the error and the
+autocorrect.)</p>
+<p>If you’re codemoding Ruby code, you might be able to do this.
+Depending on the language you’re using, a similar approach might be
+available.<span
+class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
+class="sidenote">Frequently, these things end up being called <a
+href="https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/tutorials/how-to-write-csharp-analyzer-code-fix">static
+analyzers</a>. Different languages and compilers have varying degrees of
+support for building these.<br />
+<br />
+</span></span> The benefit of this approach is that the autocorrect can
+rely on all the information Sorbet knows about the codebase in the
+codemod.</p></li>
+</ol>
+<h1 id="managing-the-complexity">Managing the complexity</h1>
+<ol type="1">
+<li><p>Split the change into entirely automated commits and entirely
+manual changes.</p>
+<p>Be very rigorous and do not edit an automated commit. This makes
+fixing conflicts easier (because conflicts in automated commits are
+fixed by throwing the commit away and re-running the script).</p></li>
+<li><p>Clearly label which commits are automated and which are
+manual.</p>
+<p>This makes it easier for your reviewer, and for you to figure out the
+best way to resolve conflicts.</p>
+<p>I like making the commit message title for automated commits be the
+command used to generate those changes. That when a rebase fails midway,
+you’ll see the command used to generate that commit directly in the
+status message. It’s also nice for your reviewer, because they can
+review both the command that generated the change and the
+changes.</p></li>
+<li><p>When rebasing, don’t <code>pick</code> the automated commits,
+re-run the command that generated them.</p>
+<p>If you’re using the previous convention for Git commit messages, this
+is as easy as using <code>git rebase -i</code> and changing
+<code>pick abc123 ...</code> lines to simply <code>exec ...</code>.</p>
+<p>This is also another reason why regex-based tooling is great, as
+regex tend to run fast and not require something like waiting for a sync
+script or a test run as input.</p></li>
+<li><p>Run the codemod in three phases: prep, codemod, cleanup.</p>
+<p>Say you want to delete a deprecated method, and replace it with a new
+one. Prep by adding the new method in its own change, and land that
+change. Run and land the codemod, but don’t delete the old method.
+Finally the cleanup is removing the method. Try to land as many prep
+changes as possible.</p>
+<p>When structured like this, it’s usually possible to fix conflicts by
+simply dropping codemod changes in files with conflicts. You can land
+the 99% of files that didn’t have conflicts, and then make a second
+codemod change that re-runs the codemod on the files with
+conflicts.</p></li>
+<li><p>If you <strong>really</strong> expect a codemod to be long-lived,
+you probably want to structure the whole thing as one big script.</p>
+<p>It might look something like this:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Always run the migration fresh against origin/master</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> reset <span class="at">--hard</span> origin/master</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># These prep branches are are still being reviewed and landed</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge instead of rebase because it&#39;s simpler in the script.</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># (They might not all be stacked on each other, so they can be reviewed</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># and landed on their own.)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># As these branches land upstream, delete them from the script.</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> merge prep-branch-1 prep-branch-2</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># An example automated commit.</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Commit messages don&#39;t have to be full commands anymore,</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># because we have the complete script anyways.</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="ex">fastmod</span> <span class="st">&#39;some thing&#39;</span> <span class="st">&#39;other thing&#39;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-a</span> <span class="at">-m</span> <span class="st">&quot;replace with other thing&quot;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># These commits are manual fixes to the automated commits.</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Each manual patch get a branch name so the ref can be</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># updated by the script each time.</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="ot">! </span><span class="fu">git</span> cherry-pick manual-patch-1<span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="bu">read</span> <span class="at">-p</span> <span class="st">&quot;Fix conflicts and commit in another session, then press Enter...&quot;</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-B</span> manual-patch-1</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: now you can intermix automated and manual commits as needed,</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># growing the script as needed.</span></span></code></pre></div></li>
+</ol>
+<h1 id="how-will-i-know-if-the-change-is-okay">How will I know if the
+change is okay?</h1>
+<ol type="1">
+<li><p>Rely on your existing safety rails.</p>
+<p>Ideally, your codebase has a type checker, a great test suite, some
+sort of gradual deploy procedures, and automated alerting.</p>
+<p>If not, maybe take the “move fast and break things” approach, where
+you land the codemod, and if landing it causes problems, the breakage
+has shown you the specific places in your infra that could be improved
+(like which tests to write, or which alerts to add).</p></li>
+<li><p>For some codemods, it’s possible to write some sort of sanity
+check.</p>
+<p>For example, when rolling out a code formatter, you might be able to
+write a tool that says that the parsing the unformatted and formatted
+files produces equivalent ASTs.</p>
+<p>Another trick is to add some sort of debug assertion that an old
+method is never called (or that a method is always called in some
+post-codemod way), but still pass through to the old behavior in
+production.</p>
+<p>It’s common for these debug assertions to cause tests to fail, but
+only log errors in production, which can then be collected and fixed in
+a following change.</p></li>
+</ol>
+<p><br />
+</p>
+<p>Like I said up front, codemods are painful. Some of the tips
+mentioned here can help ease the pain, but the codemod is only really
+going to succeed if you embrace the pain and power through. It’ll be
+fun<span
+class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
+class="sidenote">For further reading, <a
+href="https://www.rei.com/blog/climb/fun-scale">The Fun Scale</a>. With
+any luck, you’ll manage to avoid type 3 fun, and come back to run
+another codemod in the future.<br />
+<br />
+</span></span> when you get to announce that it’s done.</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#codemods">codemods</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#devprod">devprod</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
+
+
+
+</body>
+</html>
+

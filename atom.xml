@@ -1,4 +1,303 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-09-06T03:01:59-04:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Sorbet’s weird approach to exception handling</title><link href="https://blog.jez.io/sorbet-rescue-control-flow/" rel="alternate" type="text/html" title="Sorbet’s weird approach to exception handling" /><published>2022-09-04T23:12:12-04:00</published><updated>2022-09-04T23:12:12-04:00</updated><id>https://blog.jez.io/sorbet-rescue-control-flow</id><content type="html" xml:base="https://blog.jez.io/sorbet-rescue-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-11-13T01:34:40-05:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Tips for large-scale codemods</title><link href="https://blog.jez.io/codemods-tips/" rel="alternate" type="text/html" title="Tips for large-scale codemods" /><published>2022-11-12T21:34:51-05:00</published><updated>2022-11-12T21:34:51-05:00</updated><id>https://blog.jez.io/codemods-tips</id><content type="html" xml:base="https://blog.jez.io/codemods-tips/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+  &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
+  &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
+  &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
+  &lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-unreasonable-effectiveness-of-regular-expressions&quot;
+  id=&quot;toc-the-unreasonable-effectiveness-of-regular-expressions&quot;&gt;The
+  unreasonable effectiveness of regular expressions&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#when-regex-arent-good-enough&quot;
+  id=&quot;toc-when-regex-arent-good-enough&quot;&gt;When regex aren’t good
+  enough&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#managing-the-complexity&quot;
+  id=&quot;toc-managing-the-complexity&quot;&gt;Managing the complexity&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#how-will-i-know-if-the-change-is-okay&quot;
+  id=&quot;toc-how-will-i-know-if-the-change-is-okay&quot;&gt;How will I know if the
+  change is okay?&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+
+&lt;main&gt;
+&lt;p&gt;I get the sense that people looking for advice on how to run a
+codemod are simply asking to be told, “don’t worry, they’re actually
+easy.” They &lt;em&gt;can&lt;/em&gt; be sometimes, but usually the people desperate
+for codemod tips are also the people faced with running the gnarliest
+codemods.&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;p&gt;The biggest tip I can offer you is “shift your mindset.” After a
+certain scale, codemods always get at least a little painful. You’re
+going to find some tips below that make codemods less painful, but after
+a certain scale, you’re never going to find a holy grail tool that makes
+codemods painless. In fact &lt;strong&gt;that’s okay&lt;/strong&gt;, because:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It means the work is &lt;strong&gt;high-leverage&lt;/strong&gt;—you’re one
+person sucking up the pain for the benefit of dozens, hundreds, or even
+thousands of others, and you get to claim all the impact.&lt;/li&gt;
+&lt;li&gt;You’re way more likely to finish the get the migration finished than
+you are by trying to shovel the work onto other teams’ plates.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;That’s tip 1: don’t let the fact that you know a codemod will be
+painful keep you from doing it. Like anything else, balance the pain
+with the payoff, and make a judgement call.&lt;/p&gt;
+&lt;p&gt;Alright cool now let’s dive into some more tactical tips.&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;/p&gt;
+&lt;h1 id=&quot;the-unreasonable-effectiveness-of-regular-expressions&quot;&gt;The
+unreasonable effectiveness of regular expressions&lt;/h1&gt;
+&lt;ol type=&quot;1&quot;&gt;
+&lt;li&gt;&lt;p&gt;A regex-based, find-and-replace tool with multiline matches lines
+is often the only tool you need.&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;If you don’t have a preferred tool that meets these
+criteria, just use &lt;a
+href=&quot;https://github.com/facebookincubator/fastmod&quot;&gt;fastmod&lt;/a&gt;.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;You probably already know how to use regular expressions. Getting
+started with regular expressions will either show you that they’re
+powerful enough to solve the problem outright, or be fast enough to
+prototype to the point where you realize, “yeah no, I’m definitely gonna
+need something more powerful for this.”&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Don’t give up so quickly on regex.&lt;/p&gt;
+&lt;p&gt;Four hacky, specific regex can often take the place of an impossibly
+perfect regex. If you’re struggling to find one regex that magically
+works in all cases, try making the regex so specific that you know it
+won’t handle all the cases. The aim is to knock out the easiest 80% of
+cases, and then be left with a much smaller set of tricker things to
+codemod.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Use age-old tricks like using &lt;code&gt;def foo\b&lt;/code&gt;,
+&lt;code&gt;\.foo\(\b&lt;/code&gt;, &lt;code&gt;= foo\(\b&lt;/code&gt;, etc.&lt;/p&gt;
+&lt;p&gt;The first one matches method definitions with the name
+&lt;code&gt;foo&lt;/code&gt;. The latter two match calls to &lt;code&gt;foo&lt;/code&gt; methods
+but not definitions.&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-1&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-1&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;Mostly. But again, that’s the whole point.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; (This is basically the same tip as the last
+one.)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Let the type checker be an input to your regex.&lt;/p&gt;
+&lt;p&gt;Here’s a trick: introduce a type error in such a way that the type
+checker will report an error at every place you want to codemod.
+(Sometimes this is as easy as changing a method definition’s name.
+Sometimes the type checker errors are the reason why you have to do the
+codemod in the first place.)&lt;/p&gt;
+&lt;p&gt;Then, run the type checker to get a list of locations, and then
+&lt;strong&gt;only&lt;/strong&gt; run the regex on those locations.&lt;/p&gt;
+&lt;p&gt;Sometimes you can get away with the locations being “any file with an
+error” but other times you’re going to need something more specific.
+I’ve written some tools to support running &lt;a
+href=&quot;/surgery-on-code/&quot;&gt;regex on specific lines of a file&lt;/a&gt; in
+bulk.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Let your test suite be an input to your regex.&lt;/p&gt;
+&lt;p&gt;Like the previous tip, you can do things like raise test-only
+exceptions or insert test-only print statements to get a list of file
+locations to feed into the regex input.&lt;/p&gt;
+&lt;p&gt;For example, maybe we want to replace calls to
+&lt;code&gt;old_method&lt;/code&gt; with &lt;code&gt;new_method&lt;/code&gt;. In Ruby, we can do
+something like log &lt;a
+href=&quot;https://ruby-doc.org/core-2.7.2/Kernel.html#method-i-caller&quot;&gt;caller(1..1)&lt;/a&gt;
+to get the first entry in the backtrace at the top of
+&lt;code&gt;old_method&lt;/code&gt;’s definition and feed those logs into our
+regex.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Let production be an input to your regex.&lt;/p&gt;
+&lt;p&gt;Do the same thing as above, but using production log lines (for
+obvious reasons, this only works with log lines, not exceptions like you
+might have been able to use in tests).&lt;/p&gt;
+&lt;p&gt;When using this approach in production you might want to avoid doing
+things like looking at the stack trace specifically, as that can
+sometimes have unwanted performance impacts. (Of course, if performance
+isn’t a problem, or it can tolerate a short-term degradation during a
+codemod, go ahead.)&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&quot;when-regex-arent-good-enough&quot;&gt;When regex aren’t good enough&lt;/h1&gt;
+&lt;ol type=&quot;1&quot;&gt;
+&lt;li&gt;&lt;p&gt;Your linter might have an API for writing auto-correctable lint
+rules.&lt;/p&gt;
+&lt;p&gt;Here are the docs for how to write fixers attached to custom &lt;a
+href=&quot;https://eslint.org/docs/latest/developer-guide/working-with-rules#applying-fixes&quot;&gt;ESLint&lt;/a&gt;
+and &lt;a
+href=&quot;https://docs.rubocop.org/rubocop/development.html#autocorrect&quot;&gt;Rubocop&lt;/a&gt;
+lint rules. The downside is that sometimes these APIs can be a little
+confusing to understand (slower spin up time). But compared to regex
+they’re far less likely to be brittle.&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-2&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-2&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;A nice side effect of writing a custom linter rule is
+that it can remain behind in the codebase, making it easier for people
+to resolve version control conflicts after the original codemod lands.
+Usually hacky regex scripts aren’t robust enough to outlive their
+original run.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Note that just like with regex scripts, you can use information from
+the type checker or the test suite to limit which files you use the lint
+rule on.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;A few manual fixes are actually okay.&lt;/p&gt;
+&lt;p&gt;The goal is to finish the codemod, not to 100% automate the codemod.
+If you’ve tried all the above options and there are still 100 or fewer
+locations that need to change, you can probably knock them out in an
+afternoon (depending on how involved the change is).&lt;/p&gt;
+&lt;p&gt;There’s no shame in codemods that are 90% automated and 10%
+manual.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Maybe use Vim?&lt;/p&gt;
+&lt;p&gt;If you’re already comfortable with Vim, some tools you might want to
+look at:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;:help gf
+  Edit the file whose name is under the cursor
+
+:help gF
+  Same as gf, but also position the cursor on the line number
+  following the filename
+
+:help CTRL-W_gf
+:help CTRL-W_gF
+  Prefixing gf or gF with &amp;lt;C-W&amp;gt; opens in a new tab (instead
+  of the current buffer)
+
+:help %
+  Jump to the matching paren or bracket under the cursor.
+
+:help q
+:help @
+  Record and replay arbitrary keys.&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot;&gt;&lt;pre
+class=&quot;sourceCode bash&quot;&gt;&lt;code class=&quot;sourceCode bash&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;ex&quot;&gt;rg&lt;/span&gt; &lt;span class=&quot;at&quot;&gt;-n&lt;/span&gt; ... &lt;span class=&quot;kw&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;ex&quot;&gt;vim&lt;/span&gt; &lt;span class=&quot;at&quot;&gt;-&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-2&quot;&gt;&lt;a href=&quot;#cb2-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;#               ^ reads content from stdin&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-3&quot;&gt;&lt;a href=&quot;#cb2-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;#  ^^ prefixes each result with filename:line&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Some codemods can be entirely automated with Vim. In others, using
+Vim with these tricks helps partially automate the manual
+parts.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;This is an oddly specific suggestion, but since I do it a
+lot:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://sorbet.org&quot;&gt;Sorbet&lt;/a&gt; has an &lt;a
+href=&quot;https://sorbet.org/docs/cli#accepting-autocorrect-suggestions&quot;&gt;autocorrect
+mechanism&lt;/a&gt;, where autocorrects are tied to error messages. In the
+past I’ve patched Sorbet on a branch I never intend to commit. The
+branch reports a fake error and includes an autocorrect. I run the
+patched version of Sorbet, apply the autocorrects, then throw away the
+branch.&lt;/p&gt;
+&lt;p&gt;(Had the &lt;em&gt;goal&lt;/em&gt; been to introduce some new error in the first
+place then I would, of course, land both the error and the
+autocorrect.)&lt;/p&gt;
+&lt;p&gt;If you’re codemoding Ruby code, you might be able to do this.
+Depending on the language you’re using, a similar approach might be
+available.&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-3&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-3&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;Frequently, these things end up being called &lt;a
+href=&quot;https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/tutorials/how-to-write-csharp-analyzer-code-fix&quot;&gt;static
+analyzers&lt;/a&gt;. Different languages and compilers have varying degrees of
+support for building these.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; The benefit of this approach is that the autocorrect can
+rely on all the information Sorbet knows about the codebase in the
+codemod.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&quot;managing-the-complexity&quot;&gt;Managing the complexity&lt;/h1&gt;
+&lt;ol type=&quot;1&quot;&gt;
+&lt;li&gt;&lt;p&gt;Split the change into entirely automated commits and entirely
+manual changes.&lt;/p&gt;
+&lt;p&gt;Be very rigorous and do not edit an automated commit. This makes
+fixing conflicts easier (because conflicts in automated commits are
+fixed by throwing the commit away and re-running the script).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Clearly label which commits are automated and which are
+manual.&lt;/p&gt;
+&lt;p&gt;This makes it easier for your reviewer, and for you to figure out the
+best way to resolve conflicts.&lt;/p&gt;
+&lt;p&gt;I like making the commit message title for automated commits be the
+command used to generate those changes. That when a rebase fails midway,
+you’ll see the command used to generate that commit directly in the
+status message. It’s also nice for your reviewer, because they can
+review both the command that generated the change and the
+changes.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;When rebasing, don’t &lt;code&gt;pick&lt;/code&gt; the automated commits,
+re-run the command that generated them.&lt;/p&gt;
+&lt;p&gt;If you’re using the previous convention for Git commit messages, this
+is as easy as using &lt;code&gt;git rebase -i&lt;/code&gt; and changing
+&lt;code&gt;pick abc123 ...&lt;/code&gt; lines to simply &lt;code&gt;exec ...&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This is also another reason why regex-based tooling is great, as
+regex tend to run fast and not require something like waiting for a sync
+script or a test run as input.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Run the codemod in three phases: prep, codemod, cleanup.&lt;/p&gt;
+&lt;p&gt;Say you want to delete a deprecated method, and replace it with a new
+one. Prep by adding the new method in its own change, and land that
+change. Run and land the codemod, but don’t delete the old method.
+Finally the cleanup is removing the method. Try to land as many prep
+changes as possible.&lt;/p&gt;
+&lt;p&gt;When structured like this, it’s usually possible to fix conflicts by
+simply dropping codemod changes in files with conflicts. You can land
+the 99% of files that didn’t have conflicts, and then make a second
+codemod change that re-runs the codemod on the files with
+conflicts.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;If you &lt;strong&gt;really&lt;/strong&gt; expect a codemod to be long-lived,
+you probably want to structure the whole thing as one big script.&lt;/p&gt;
+&lt;p&gt;It might look something like this:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb3&quot;&gt;&lt;pre
+class=&quot;sourceCode bash&quot;&gt;&lt;code class=&quot;sourceCode bash&quot;&gt;&lt;span id=&quot;cb3-1&quot;&gt;&lt;a href=&quot;#cb3-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# Always run the migration fresh against origin/master&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-2&quot;&gt;&lt;a href=&quot;#cb3-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;fu&quot;&gt;git&lt;/span&gt; reset &lt;span class=&quot;at&quot;&gt;--hard&lt;/span&gt; origin/master&lt;/span&gt;
+&lt;span id=&quot;cb3-3&quot;&gt;&lt;a href=&quot;#cb3-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-4&quot;&gt;&lt;a href=&quot;#cb3-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# These prep branches are are still being reviewed and landed&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-5&quot;&gt;&lt;a href=&quot;#cb3-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# Merge instead of rebase because it&amp;#39;s simpler in the script.&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-6&quot;&gt;&lt;a href=&quot;#cb3-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# (They might not all be stacked on each other, so they can be reviewed&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-7&quot;&gt;&lt;a href=&quot;#cb3-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# and landed on their own.)&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-8&quot;&gt;&lt;a href=&quot;#cb3-8&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;#&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-9&quot;&gt;&lt;a href=&quot;#cb3-9&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# As these branches land upstream, delete them from the script.&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-10&quot;&gt;&lt;a href=&quot;#cb3-10&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;fu&quot;&gt;git&lt;/span&gt; merge prep-branch-1 prep-branch-2&lt;/span&gt;
+&lt;span id=&quot;cb3-11&quot;&gt;&lt;a href=&quot;#cb3-11&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-12&quot;&gt;&lt;a href=&quot;#cb3-12&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# An example automated commit.&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-13&quot;&gt;&lt;a href=&quot;#cb3-13&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;#&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-14&quot;&gt;&lt;a href=&quot;#cb3-14&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# Commit messages don&amp;#39;t have to be full commands anymore,&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-15&quot;&gt;&lt;a href=&quot;#cb3-15&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# because we have the complete script anyways.&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-16&quot;&gt;&lt;a href=&quot;#cb3-16&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;ex&quot;&gt;fastmod&lt;/span&gt; &lt;span class=&quot;st&quot;&gt;&amp;#39;some thing&amp;#39;&lt;/span&gt; &lt;span class=&quot;st&quot;&gt;&amp;#39;other thing&amp;#39;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-17&quot;&gt;&lt;a href=&quot;#cb3-17&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;fu&quot;&gt;git&lt;/span&gt; commit &lt;span class=&quot;at&quot;&gt;-a&lt;/span&gt; &lt;span class=&quot;at&quot;&gt;-m&lt;/span&gt; &lt;span class=&quot;st&quot;&gt;&amp;quot;replace with other thing&amp;quot;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-18&quot;&gt;&lt;a href=&quot;#cb3-18&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-19&quot;&gt;&lt;a href=&quot;#cb3-19&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# These commits are manual fixes to the automated commits.&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-20&quot;&gt;&lt;a href=&quot;#cb3-20&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;#&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-21&quot;&gt;&lt;a href=&quot;#cb3-21&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# Each manual patch get a branch name so the ref can be&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-22&quot;&gt;&lt;a href=&quot;#cb3-22&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# updated by the script each time.&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-23&quot;&gt;&lt;a href=&quot;#cb3-23&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;ot&quot;&gt;! &lt;/span&gt;&lt;span class=&quot;fu&quot;&gt;git&lt;/span&gt; cherry-pick manual-patch-1&lt;span class=&quot;kw&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;cf&quot;&gt;then&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-24&quot;&gt;&lt;a href=&quot;#cb3-24&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;bu&quot;&gt;read&lt;/span&gt; &lt;span class=&quot;at&quot;&gt;-p&lt;/span&gt; &lt;span class=&quot;st&quot;&gt;&amp;quot;Fix conflicts and commit in another session, then press Enter...&amp;quot;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-25&quot;&gt;&lt;a href=&quot;#cb3-25&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;fi&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-26&quot;&gt;&lt;a href=&quot;#cb3-26&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;fu&quot;&gt;git&lt;/span&gt; checkout &lt;span class=&quot;at&quot;&gt;-B&lt;/span&gt; manual-patch-1&lt;/span&gt;
+&lt;span id=&quot;cb3-27&quot;&gt;&lt;a href=&quot;#cb3-27&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-28&quot;&gt;&lt;a href=&quot;#cb3-28&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# Note: now you can intermix automated and manual commits as needed,&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb3-29&quot;&gt;&lt;a href=&quot;#cb3-29&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;# growing the script as needed.&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&quot;how-will-i-know-if-the-change-is-okay&quot;&gt;How will I know if the
+change is okay?&lt;/h1&gt;
+&lt;ol type=&quot;1&quot;&gt;
+&lt;li&gt;&lt;p&gt;Rely on your existing safety rails.&lt;/p&gt;
+&lt;p&gt;Ideally, your codebase has a type checker, a great test suite, some
+sort of gradual deploy procedures, and automated alerting.&lt;/p&gt;
+&lt;p&gt;If not, maybe take the “move fast and break things” approach, where
+you land the codemod, and if landing it causes problems, the breakage
+has shown you the specific places in your infra that could be improved
+(like which tests to write, or which alerts to add).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;For some codemods, it’s possible to write some sort of sanity
+check.&lt;/p&gt;
+&lt;p&gt;For example, when rolling out a code formatter, you might be able to
+write a tool that says that the parsing the unformatted and formatted
+files produces equivalent ASTs.&lt;/p&gt;
+&lt;p&gt;Another trick is to add some sort of debug assertion that an old
+method is never called (or that a method is always called in some
+post-codemod way), but still pass through to the old behavior in
+production.&lt;/p&gt;
+&lt;p&gt;It’s common for these debug assertions to cause tests to fail, but
+only log errors in production, which can then be collected and fixed in
+a following change.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;/p&gt;
+&lt;p&gt;Like I said up front, codemods are painful. Some of the tips
+mentioned here can help ease the pain, but the codemod is only really
+going to succeed if you embrace the pain and power through. It’ll be
+fun&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-4&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-4&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;For further reading, &lt;a
+href=&quot;https://www.rei.com/blog/climb/fun-scale&quot;&gt;The Fun Scale&lt;/a&gt;. With
+any luck, you’ll manage to avoid type 3 fun, and come back to run
+another codemod in the future.&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; when you get to announce that it’s done.&lt;/p&gt;
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="codemods" /><category term="devprod" /><summary type="html">← Return home I get the sense that people looking for advice on how to run a codemod are simply asking to be told, “don’t worry, they’re actually easy.” They can be sometimes, but usually the people desperate for codemod tips are also the people faced with running the gnarliest codemods.</summary></entry><entry><title type="html">Sorbet’s weird approach to exception handling</title><link href="https://blog.jez.io/sorbet-rescue-control-flow/" rel="alternate" type="text/html" title="Sorbet’s weird approach to exception handling" /><published>2022-09-04T23:12:12-04:00</published><updated>2022-09-04T23:12:12-04:00</updated><id>https://blog.jez.io/sorbet-rescue-control-flow</id><content type="html" xml:base="https://blog.jez.io/sorbet-rescue-control-flow/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
   &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
   &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
@@ -819,7 +1118,7 @@ judiciously inside &lt;em&gt;that&lt;/em&gt; rule to allow following these
 rules.&lt;/p&gt;
 &lt;p&gt;Unfortunately, there have definitely been times where that hasn’t
 worked, which will be the topic of a future post.
-&lt;!-- TODO(jez) Link to the indentation post here, when written --&gt;&lt;/p&gt;
+&lt;!-- TODO(jez) Link to the part 6 indentation post here, when written --&gt;&lt;/p&gt;
 &lt;h1 id=&quot;consider-using-yyclearin&quot;&gt;Consider using
 &lt;code&gt;yyclearin&lt;/code&gt;&lt;/h1&gt;
 &lt;p&gt;After recovering from a parse error using the &lt;code&gt;error&lt;/code&gt;
@@ -2236,126 +2535,4 @@ Errors&lt;/a&gt;
 Debugging a (Bison) Parser →&lt;/a&gt;
 &lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="sorbet" /><category term="parsing" /><category term="tree-sitter" /><summary type="html">← Return home This is the second post in a series about “things I’ve learned while making improvements to Sorbet’s parser.” Specifically, it’s about approaches I considered but decided against.</summary></entry><entry><title type="html">Parse Error Recovery in Sorbet: Part 1</title><link href="https://blog.jez.io/error-recovery-part-1/" rel="alternate" type="text/html" title="Parse Error Recovery in Sorbet: Part 1" /><published>2022-02-21T03:56:34-05:00</published><updated>2022-02-21T03:56:34-05:00</updated><id>https://blog.jez.io/error-recovery-part-1</id><content type="html" xml:base="https://blog.jez.io/error-recovery-part-1/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
-  &lt;a href=&quot;/&quot;&gt;← Return home&lt;/a&gt;&lt;br&gt;
-&lt;/nav&gt;
-
-&lt;main&gt;
-&lt;p&gt;I’ve spent a lot of time recently making &lt;a
-href=&quot;https://sorbet.org&quot;&gt;Sorbet&lt;/a&gt;’s parser recover from syntax errors
-when parsing. I didn’t have any experience with this before getting
-started, no one told me what the good tools or techniques for improving
-a parser were, and none of the things I read quite described the ideas I
-ended up implementing. I figured I’d share the experience so that you
-can learn too.&lt;/p&gt;
-&lt;!-- more --&gt;
-&lt;p&gt;The original post kept growing and growing as I wrote it, so I broke
-it up into a handful of parts:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;/error-recovery-part-1/&quot;&gt;&lt;strong&gt;Part 1: Why Recover from
-Syntax Errors&lt;/strong&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/error-recovery-part-2/&quot;&gt;Part 2: What I Didn’t Do&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/error-recovery-part-3/&quot;&gt;Part 3: Tools and Techniques for
-Debugging a (Bison) Parser&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/error-recovery-part-4/&quot;&gt;Part 4: Bison’s &lt;code&gt;error&lt;/code&gt;
-Token&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;(&lt;em&gt;coming soon&lt;/em&gt;) Part 5: Backtracking, aka Lexer Hacks&lt;/li&gt;
-&lt;li&gt;(&lt;em&gt;coming soon&lt;/em&gt;) Part 6: Falling Back on Indentation, aka More
-Lexer Hacks&lt;/li&gt;
-&lt;/ul&gt;
-&lt;!-- more --&gt;
-&lt;p&gt;This part is going to set the stage a bit and briefly mention why
-Sorbet cares so much about syntax errors. The short answer? Editor
-support is everything.&lt;/p&gt;
-&lt;p&gt;There are people out there who clamor for a type checker in any
-codebase they work for. They’re zealous, early-adopters who evangelize
-types to everyone around them. They love even just being able to run the
-type checker in the command line or in CI hand have it reject code where
-the types don’t check. Sorbet has snuck its way into many codebases this
-way! But this approach always introduces friction: there’s always a
-group of people who see the type checker as an antagonist, sitting there
-and rejecting code that passes the test suite and gets the job done.&lt;/p&gt;
-&lt;p&gt;Having a powerful editor integration drives organic adoption. A
-command line interface to a type checker is only really good at
-reporting errors, but an editor interface exposes so much more: inline
-hover lets programmers explore a code’s types and documentation by
-pointing. Language-aware jump-to-definition and find-all-references mean
-spending less time fumbling around a code base and more time looking at
-the code that’s relevant in the moment. And of course autocompletion is
-huge. Maybe you’re a curmudgeon like me who doesn’t use completion
-except the occasional keyword completion in Vim, but I’ve learned that
-many, many people feel like moving back to the dark ages when they have
-to work in a codebase that doesn’t have fast, accurate autocompletion.
-Every additional editor feature is another spoonful of sugar—once there
-are enough, it overwhelms any feeling that the type checker tastes like
-medicine.&lt;/p&gt;
-&lt;p&gt;But if a syntax error means that the parser returns an empty parse
-result, all those spoonfuls fall to the floor with a loud clang. Hover
-and go-to-def are serve stale (read: imperfect) results at best, if
-anything. Autocomplete yields no results no matter how long you wait for
-the menu to appear.&lt;/p&gt;
-&lt;p&gt;And in Sorbet’s situation, it’s even more severe because of how it
-has chosen to implement the persistent editor mode. I’m sure I’ll
-discuss this in more depth at some point (because despite the criticism
-I’m going to leverage against it, I still think it works
-&lt;strong&gt;really&lt;/strong&gt; well), but here’s a quick overview of Sorbet’s
-language server architecture:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Nearly every part of Sorbet’s offline pipeline is embarrassingly
-parallel.&lt;/p&gt;
-&lt;p&gt;All of the syntactic transformations on the tree happen without
-access to any sort of codebase-wide information. Type inference is only
-local—inferring types in one method body never affects the type check
-result of another method, let alone another file. Program-wide state is
-made immutable and shared across threads using shared memory (no
-copying).&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Sorbet does not track dependencies.&lt;/p&gt;
-&lt;p&gt;That means it doesn’t track which files &lt;code&gt;require&lt;/code&gt; what
-other files. It doesn’t have a way to incrementally update its class
-hierarchy (symbol table) when something changes. It only caches parse
-results and which what errors came from which files. There are no module
-or package boundaries—Sorbet views a codebase as one codebase.&lt;span
-class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
-class=&quot;sidenote&quot;&gt;This is starting to change, but only because the
-approach mentioned here doesn’t scale to 10 million-line Ruby codebases.
-It’s probably possible to count all such codebases on your
-fingers.&lt;br /&gt;
-&lt;br /&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Given all of this, there are two paths in server mode: the fast
-path and the slow path.&lt;/p&gt;
-&lt;p&gt;When an edit comes in, Sorbet quickly decides whether the edit
-changes any global information. If it can, Sorbet throws everything away
-(except for cached parse results) and type checks the entire codebase
-from scratch. Otherwise, it leaves the symbol table unchanged and just
-retypechecks the edited file.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;On one hand, this is a very elegant architecture. Sorbet can be
-almost entirely understood by how it behaves in batch mode. Put another
-way, if a user reports a bug in the editor mode, it almost always
-reproduces outside of the editor mode. It’s rare in Sorbet to find a bug
-that only reproduces when the user makes one edit followed by another
-edit.&lt;/p&gt;
-&lt;p&gt;But on the other hand, if the parser can’t recover from a syntax
-error, not only can Sorbet not provide those fancy editor features, it
-also makes it look like all the definitions in a file were deleted,
-which makes it look like the contents of the symbol table will have
-changed, which kicks off a retypecheck of the whole codebase. Most
-syntax errors are introduced in completely benign places (like
-&lt;code&gt;x.&lt;/code&gt; or &lt;code&gt;if x&lt;/code&gt;), not as part of changing what’s
-defined in a file (like &lt;code&gt;def foo&lt;/code&gt; or &lt;code&gt;X =&lt;/code&gt;)
-because people spend more time editing method bodies than anything else.
-So most syntax errors can take the fast path as long as the parser can
-manage to return a decent result.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;All of this is to say&lt;/strong&gt;: it’s important for Sorbet to
-recover from syntax errors for two reasons: it can’t provide editor
-features like completion consistently without it, and in large codebases
-it makes Sorbet deliver in-editor type checking errors far faster. In
-future posts we’ll ramp up to more technical and esoteric parsing
-topics. In particular, the next post gives some historical context about
-Sorbet’s parser and some ideas I rejected for how to get better parse
-results for syntax errors.&lt;/p&gt;
-&lt;p style=&quot;text-align: right;&quot;&gt;
-&lt;a href=&quot;/error-recovery-part-2/&quot;&gt;Part 2: What I Didn’t Do →&lt;/a&gt;
-&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="sorbet" /><category term="parsing" /><summary type="html">← Return home I’ve spent a lot of time recently making Sorbet’s parser recover from syntax errors when parsing. I didn’t have any experience with this before getting started, no one told me what the good tools or techniques for improving a parser were, and none of the things I read quite described the ideas I ended up implementing. I figured I’d share the experience so that you can learn too.</summary></entry></feed>
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="sorbet" /><category term="parsing" /><category term="tree-sitter" /><summary type="html">← Return home This is the second post in a series about “things I’ve learned while making improvements to Sorbet’s parser.” Specifically, it’s about approaches I considered but decided against.</summary></entry></feed>
