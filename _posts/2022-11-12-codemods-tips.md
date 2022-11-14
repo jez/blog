@@ -25,7 +25,7 @@ pain-free. In fact **that's okay**, because it means the work is high-leverageâ€
 one person sucking up the pain for the benefit of dozens, hundreds, or even thousands of
 others. They get to ignore all the pain, and you get to claim all the impact.
 
-That's tip 1: don't let the fact that you know a codemod will be painful keep you from
+That's tip 0: don't let the fact that you know a codemod will be painful keep you from
 doing it. Like anything else, balance the pain with the payoff, and make a judgement call.
 
 Alright cool now let's dive into some more tactical tips.
