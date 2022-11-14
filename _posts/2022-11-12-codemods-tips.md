@@ -12,22 +12,18 @@ categories: ['codemods', 'devprod']
 # author_url:
 ---
 
-I get the sense that people looking for advice on how to run a codemod are simply asking
-to be told, "don't worry, they're actually easy." Sometimes they are, but usually the people
-desperate for codemod tips are also the people faced with running the gnarliest codemods.
+I get the sense that a lot of people looking for advice on how to run a codemod are simply
+asking to be told, "don't worry, they're actually easy." Sometimes they are, but usually
+the people desperate for codemod tips are also the people faced with running the gnarliest
+codemods.
 
 <!-- more -->
 
-The biggest tip I can offer is to shift your mindset. After a certain scale, codemods
-always get at least a little painful. Some of the tips below help make codemods less
-painful, but after a certain scale, codemods are never going to be pain-free. In fact
-**that's okay**, because:
-
-- It means the work is **high-leverage**—you're one person sucking up the pain for the
-  benefit of dozens, hundreds, or even thousands of others. They get to ignore all the
-  pain, and you get to claim all the impact.
-- You are way more likely to get the migration finished personally than you are by trying
-  to shovel the work onto other teams' plates and hope they follow up.
+The biggest tip I can offer is to shift your mindset. Some of the tips below help make
+codemods less painful, but after a certain scale, codemods are never going to be
+pain-free. In fact **that's okay**, because it means the work is high-leverage—you're
+one person sucking up the pain for the benefit of dozens, hundreds, or even thousands of
+others. They get to ignore all the pain, and you get to claim all the impact.
 
 That's tip 1: don't let the fact that you know a codemod will be painful keep you from
 doing it. Like anything else, balance the pain with the payoff, and make a judgement call.
@@ -36,24 +32,22 @@ Alright cool now let's dive into some more tactical tips.
 
 \
 
-# The unreasonable effectiveness of regular expressions
+# 1. The unreasonable effectiveness of regular expressions
 
-1.  A regex-based, find-and-replace tool supporting multiline matches[^fastmod] lines is
-    often the only tool you need.
+1.  A regex-based, find-and-replace tool supporting multiline matches[^fastmod] is often
+    the only tool you need.
 
-    You probably already know how to use regular expressions, so don't start by sinking a
-    bunch of time into learning some complicated AST-based codemod tool. Getting started
-    with regular expressions will either show you that they're powerful enough to solve
-    the problem outright, or be fast enough to prototype to the point where you realize,
-    "yeah no, I'm definitely gonna need something more powerful for this."
+    You probably already know how to use regular expressions, so you can get started
+    quickly and usually finish just as fast—either regex will be powerful enough to solve
+    the problem outright, or let you prototype fast enough to realize, "yeah no, I'm
+    definitely gonna need something more powerful for this."
 
 1.  Don't give up so quickly on regex.
 
-    Four hacky, specific regex can often take the place of an impossibly perfect regex. If
-    you're struggling to find one regex that magically works in all cases, try making the
-    regex so specific that you know it won't handle all the cases. The aim is to knock out
-    the easiest 80% of cases, and then be left with a much smaller set of tricker things
-    to codemod.
+    Three or four oddly-specific regex can often take the place of an impossibly perfect
+    regex. If you're struggling to find one regex that magically works in all cases, try
+    making the regex so specific that you know it won't handle all the cases. The aim is
+    to knock out the easiest 80% of cases, and then either repeat or fix the rest manually.
 
 1.  Use age-old tricks like using `def foo\b`, `\.foo\(\b`, `= foo\(\b`, etc.
 
@@ -61,8 +55,9 @@ Alright cool now let's dive into some more tactical tips.
     calls to `foo` methods but not definitions.[^mostly] (This is basically the same tip
     as the last one.)
 
-    This won't be as robust as using some sort of AST-based codemod tool, but I'm
-    certain it's easier to remember than whatever the API of such a tool is.
+    This won't be as robust as using some sort of AST-based codemod tool, but it's way
+    easier to remember than whatever the API of such a tool is, so you can start making
+    progress quickly.
 
 1.  Let the parser sanity-check your find-and-replace result.
 
@@ -71,46 +66,45 @@ Alright cool now let's dive into some more tactical tips.
     all the files, and list the files that now have syntax errors.[^sed] Revert all the
     changes the regex made to those files.
 
-    Chances are that 90% of the original find and replace change is still committed. The
-    other 10% can be dealt with on its own.
+    Chances are that a huge portion of the original find and replace change was valid. The
+    files whose changes had to be reverted can be handled separately (either with another
+    oddly-specific regex, or by hand).
 
 1.  Let the type checker be an input to your regex.
 
     Here's another trick.[^another] introduce a type error in such a way that the type
     checker will report an error at every place you want to codemod. (Sometimes this is as
-    easy as changing a method definition's name. Sometimes the type checker errors are the
-    reason why you have to do the codemod in the first place.)
+    easy as changing a method definition's name, and sometimes it's the fact that there
+    are the type errors that you're doing the codemod in the first place.)
 
     Then, run the type checker to get a list of locations, and then **only** run the regex
     on those locations.
 
-    Sometimes you can get away with the locations being "any file with an error" but other
-    times you're going to need something more specific. I've written some tools to support
-    running [regex on specific lines of a file](/surgery-on-code/) in bulk.
+    This might mean simply "run on any matching files" but sometimes you need something
+    even more specific: "run on only the exact lines with type errors." I've written some
+    tools to do [exactly that](/surgery-on-code/).
 
 1.  Let your test suite be an input to your regex.
 
-    Like the previous tip, you can do things like raise test-only exceptions or insert
-    test-only print statements to get a list of file locations to feed into the regex
-    input.
+    Like the previous tip, except using test-only print statements to get the list of
+    locations.
 
     For example, maybe we want to replace calls to `old_method` with `new_method`. In
-    Ruby, we can do something like edit the implementation of `old_method` to log
-    [caller(1..1)] every time its called. After running our tests, the log will list every
+    Ruby, we could do something like edit the implementation of `old_method` to log
+    [caller(1..1)] every time it's called. After running our tests, the log will list every
     call site to `old_method` covered by our test suite, which we can then use to
     selectively apply our regex (using those [custom codemod tools](/surgery-on-code/)
     mentioned before).
 
 1.  Let production logs be an input to your regex.
 
-    Do the same thing as above, but using production log lines (for obvious reasons, this
-    only works with log lines, not exceptions like you might have been able to use in
-    tests).
+    This involves doing the same thing as the previous two tips above, but using
+    production log lines.
 
-    When using this approach in production you might want to avoid doing things like
-    looking at the stack trace specifically, as that can sometimes have unwanted
-    performance impacts. (Of course, if performance isn't a problem, or it can tolerate a
-    short-term degradation during a codemod, go ahead.)
+    When dealing with production you might want to specifically avoid materializing a
+    stack trace (because it can be slow), which is why you probably want to try with
+    test-only logging first. Of course, if performance isn't a problem, or it can tolerate
+    a short-term degradation during a codemod, go ahead.
 
 [^fastmod]:
   If you don't have a preferred tool that meets these criteria, just use [fastmod].
@@ -131,26 +125,28 @@ Alright cool now let's dive into some more tactical tips.
 
 [fastmod]: https://github.com/facebookincubator/fastmod
 
-# When regex aren't good enough
+# 2. When regex aren't good enough
 
 1.  A few manual fixes are actually okay.
 
-    The goal is to finish the codemod, not to 100% automate the codemod. If you've tried
-    all the above options and there are still 100 or fewer locations that need to change,
-    you can probably knock them out in an afternoon (depending on how involved the change
-    is).
+    The goal is to finish the codemod, not to 100% automate the codemod.[^automate] If
+    you've tried and failed to entirely automate the codemod, there's no shame in doing a
+    little bit of manual work to fix the rest of the cases.
 
-    There's no shame in codemods that are 90% automated and 10% manual.
+    In my experience, anything smaller than ~75 files worth of things to codemod can
+    usually be done by hand in an afternoon in a pinch (depending on how involved the
+    change is). If the point is to finish the migration as quickly as possible, you might
+    get further by just rolling up your sleeves for that last 10% than sinking another 3
+    days into figuring out how to automate it.
 
 1.  Your linter might have an API for writing auto-correctable lint rules.
 
     Here are the docs for how to write fixers attached to custom [ESLint] and [Rubocop]
-    lint rules. The downside is that sometimes these APIs can be a little confusing to
-    understand (slower spin up time). But compared to regex they're far less likely to be
-    brittle.[^publish]
+    lint rules. The downside is that sometimes these APIs can be a little foreign or
+    confusing. But compared to regex they're far less likely to be brittle.[^publish]
 
     Note that just like with regex scripts, you can use information from the type checker
-    or the test suite to limit which files you use the lint rule on.
+    or the test suite to limit which files you use the lint rule on if you have to.
 
 1.  It might finally be time for a language-specific, AST-based codemod tool.
 
@@ -192,73 +188,87 @@ Alright cool now let's dive into some more tactical tips.
     #  ^^ prefixes each result with filename:line
     ```
 
+1.  Check if your language supports pluggable static analyzers.
+
+    This is basically the same approach as above, but as a first-class feature of your
+    language's compiler. For example, Clang supports writing [compiler plugins] and C# has
+    a [rich static analyzer] API. These APIs tend to be maximally powerful, as they can
+    leverage nearly everything the compiler knows about a codebase, and sometimes more.
+    You pay for it by these APIs tending to be the hardest to learn to use.
+
 1.  This is an oddly specific suggestion, but since I do it a lot:
 
-    [Sorbet] has an [autocorrect mechanism], where autocorrects are tied to error
-    messages. In the past I've patched Sorbet on a branch I never intend to commit. The
-    branch reports a fake error and includes an autocorrect. I run the patched version of
-    Sorbet, apply the autocorrects, then throw away the branch.
+    [Sorbet] does not support pluggable static analyzers, but it does have an [autocorrect
+    mechanism], where autocorrects are tied to error messages.
 
-    (Had the *goal* been to introduce some new error in the first place then I would, of
-    course, land both the error and the autocorrect.)
+    In the past I've temporarily patched Sorbet (on a branch) to introduce a new, fake
+    error[^fake] that includes an autocorrect which can take advantage of everything Sorbet
+    knows. I run the patched version of Sorbet, apply the autocorrects, then throw away
+    the patch.
 
-    If you're doing a Ruby codemod, you might also want to look into this. A similar
-    approach might be available for other languages too, if it's easy to patch.[^analyzer]
-    The benefit of this approach is that the autocorrect can rely on all the information
-    the type checker knows about the codebase.
+[^automate]:
+  This is true for most individuals doing codemods on large, proprietary codebases. This
+  might not apply to you if you maintain some open-source tool and want to release an
+  automated codemod alongside a breaking API change.
 
+[ESLint]: https://eslint.org/docs/latest/developer-guide/working-with-rules#applying-fixes
+[Rubocop]: https://docs.rubocop.org/rubocop/development.html#autocorrect
+
+[^publish]:
+  A nice side effect of writing a custom linter rule is that it can remain behind in the
+  codebase, teaching people (via an error message) what the replacement for an old API is
+  after the original codemod lands.
+
+[compiler plugins]: https://clang.llvm.org/docs/ClangPlugins.html
+[rich static analyzer]: https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/tutorials/how-to-write-csharp-analyzer-code-fix
 
 [Sorbet]: https://sorbet.org
 [autocorrect mechanism]: https://sorbet.org/docs/cli#accepting-autocorrect-suggestions
 
-[^analyzer]:
-  In other languages these tools are frequently called [static analyzers], if you're
-  looking for something to search for. Different languages and compilers have varying
-  degrees of support for building these.
-
-[static analyzers]: https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/tutorials/how-to-write-csharp-analyzer-code-fix
+[^fake]:
+  Had the *goal* been to introduce an error in the first place, then I would of course
+  land both the error and the autocorrect.
 
 
-# Managing the complexity
+# 3. Managing the life cycle of a codemod
 
-1.  Split the change into entirely automated commits and entirely manual changes.
+1.  Split the change into commits which are either entirely automated or entirely manual.
 
-    Be very rigorous and do not edit an automated commit. This makes fixing conflicts
-    easier (because conflicts in automated commits are fixed by throwing the commit away
-    and re-running the automation that produced it).
+    Be very rigorous and do not edit an automated change in the same commit. This makes
+    fixing conflicts easier (automated commits with conflicts are simply thrown away and
+    regenerated).
 
 1.  Clearly label which commits are automated and which are manual.
 
     This makes it easier for your reviewer, and for you to figure out the best way to
     resolve conflicts.
 
-1.  Use the full command itself as the commit message title for automated commits.
+1.  Put the full command itself in the commit title for automated commits.
 
     That when a rebase fails midway, you'll see the command used to generate that commit
     directly in the status message. It's also nice for your reviewer, because they can
-    review both the command that generated the change and the changes.
+    review both the command that generated the change and the change itself.
 
-1.  When rebasing, don't `pick` the automated commits, re-run the command that generated
-    them.
+1.  When rebasing, don't `pick` the automated commits, re-generate them.[^regen]
+
+    This is not simply to avoid conflicts, but also to catch any new locations that have
+    been added between when you started the codemod and now.
 
     If you're using the previous convention for Git commit messages, this is as easy as
     using `git rebase -i` and changing `pick abc123 ...` lines to simply `exec ...`.
 
-    This is also another reason why regex-based tooling is great, as regex tend to run
-    fast and not require something like waiting for a sync script or a test run as input.
-
 1.  Run the codemod in three phases: prep, codemod, cleanup.
 
-    Say you want to delete a deprecated method, and replace it with a new one. Prep by
+    Say you want to delete a deprecated method and replace it with a new one. Prep by
     adding the new method in its own change, and land that change. Run and land the
-    codemod, but don't delete the old method. Finally the cleanup is removing the method.
+    codemod, but don't delete the old method. Finally cleanup by removing the method.
 
 1.  Land enough prep changes that it's possible to run old and new code simultaneously.
 
     This won't always be possible, but it's worth striving for in every change. If the old
     and new code can live side by side, it'll be easier to land the change and
-    importantly, to revert *parts* of a change if there are problems without having to
-    revert the entire change.
+    importantly, to revert *parts* of a change (if there are problems) without having to
+    rollback the entire change.
 
 1.  Consider ignoring conflicts and fixing them later.
 
@@ -270,7 +280,7 @@ Alright cool now let's dive into some more tactical tips.
     After the first lands, you can land a second codemod change which modifies only the
     files that got dropped from the previous change.
 
-    This obviously only works if you've landed enough prep changes.
+    (This obviously only works if you've landed enough prep changes.)
 
 1.  If you expect a codemod to be **really** long-lived, structure the whole thing as one
     big script.
@@ -312,16 +322,12 @@ Alright cool now let's dive into some more tactical tips.
     Now you should never need to rebase, and can always re-run the script when the code
     changes.
 
-[ESLint]: https://eslint.org/docs/latest/developer-guide/working-with-rules#applying-fixes
-[Rubocop]: https://docs.rubocop.org/rubocop/development.html#autocorrect
+[^regen]:
+  This is also another reason why regex-based tooling is great, as regex commands are
+  usually fast enough to run during a rebase without having to pause and wait for the
+  codebase to rebuild mid rebase.
 
-[^publish]:
-  A nice side effect of writing a custom linter rule is that it can remain behind in the
-  codebase, making it easier for people to resolve version control conflicts after the
-  original codemod lands. Usually hacky regex scripts aren't robust enough to outlive
-  their original run.
-
-# How will I know if the change is okay?
+# 4. How will I know if the change is okay?
 
 1.  Rely on your existing safety rails.
 
@@ -331,7 +337,8 @@ Alright cool now let's dive into some more tactical tips.
     If not, maybe take the "move fast and break things" approach, where you land the
     codemod, and if landing it causes problems, the breakage has shown you the specific
     places in your infra that could be improved (like which tests to write, or which
-    alerts to add).
+    alerts to add). Also if you landed enough prep work, hopefully it's possible to only
+    revert the problems, not the entire change.
 
 1.  For some codemods, it's possible to write some sort of sanity check.
 
@@ -342,14 +349,16 @@ Alright cool now let's dive into some more tactical tips.
     called (or that a method is always called in some post-codemod way), but still pass
     through to the old behavior in production.
 
-    It's common for these debug assertions to cause tests to fail, but only log errors
-    in production, which can then be collected and fixed in a following change.
+    It's common to write these debug assertions such that they cause hard failures in
+    tests, but in production only log an error. These logs can then be collected and fixed
+    in a follow-up change.
 
 \
 
-Like I said up front, codemods are painful. Some of the tips mentioned here can help ease
+Like I said up front, codemods involve pain. Some of the tips mentioned here can help ease
 the pain, but the codemod is only really going to succeed if you embrace the pain and
-power through. It'll be fun[^fun] when you get to announce that it's done.
+power through. With any luck, you'll find that you had fun[^fun] when you get to announce
+that it's finished.
 
 [^fun]:
   For further reading, [The Fun Scale]. With any luck, you'll manage to avoid type 3 fun,
