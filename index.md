@@ -34,9 +34,11 @@ _[Read more →]({{ post.url }})_
 
 {% endfor %}
 
-# All posts
+# Categories
 
 → [Posts by category](categories/)
+
+# All posts
 
 {% for post in site.posts %}{% assign currentyear = post.date | date: "%Y" %}{% if currentyear != prevyear %}
 
