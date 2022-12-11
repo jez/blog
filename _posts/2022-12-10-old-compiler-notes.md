@@ -48,13 +48,13 @@ privy to confidential information—it was just that the compiler was not a publ
 at the time, so it didn't make sense to post them publicly.
 
 I've gone back and taken those internal notes and published them here to my blog. (Mostly,
-I just wanted to fill in the gaps on my blog.[^gaps] In 2020 and 2021, I Note
-that they are all quite old now, and may not be as accurate as they were at the time of
-writing. I've dated them with the date they were published internally to reflect that,
-which means you'll have to find them in the archives.
+I just wanted to fill in the gaps on my blog.[^gaps]) Note that they are all quite old
+now, and may not be as accurate as they were at the time of writing. I've dated them with
+the date they were published internally to reflect that, which means you'll have to find
+them in the archives.
 
 [^gaps]:
-  Before reposting these Sorbet Compiler posts, I only posted publicly six times in 2020
+  Before reposting these Sorbet Compiler posts, I only posted publicly five times in 2020
   and twice in 2021 😞
 
 Note that the compiler is **still** not a project that we would encourage anyone to use.

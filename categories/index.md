@@ -20,7 +20,7 @@ regenerate: true
 
 {% assign pages_list = category[1] -%}
 {% for post in pages_list -%}
-- [{{ post.title }}]({{ site.baseurl }}{{ post.url }}), {{ post.date | date: '%B %-d' }}
+- [{{ post.title }}]({{ site.baseurl }}{{ post.url }}), {{ post.date | date: '%B %-d, %Y' }}
 {% endfor %}
 
 {% endfor -%}
