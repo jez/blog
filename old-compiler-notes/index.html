@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2022-12-10 17:38:00 -0500">
+<meta name="description" content="Today I'm publshing a few of my old, internal-facing notes about the Sorbet Compiler here to my blog.">
+<title>Some Old Sorbet Compiler Notes – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">Some Old Sorbet Compiler Notes</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2022-12-10 17:38:00 -0500">December 10, 2022</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">← Return home</a><br>
+</nav>
+
+<main>
+<p>From January 2020 to December 2021 I was primarily working on the <a
+href="https://sorbet.org/blog/2021/07/30/open-sourcing-sorbet-compiler">Sorbet
+Compiler</a>, an experimental, ahead-of-time compiler for Ruby,
+targeting native code. For most of that time, it was a mostly-secret,
+internal-only project. Today I’m publishing a few of my old,
+internal-facing notes about the compiler here to my blog.</p>
+<!-- more -->
+<p>In July 2021 we open sourced the Sorbet Compiler,<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">… not so much because it was ready for widespread
+adoption but largely because it made some internal logistics
+easier!<br />
+<br />
+</span></span> but there’s not much written about it outside of Stripe.
+It’s basically just the above blog post and this talk that Trevor
+Elliott and I presented at RubyConf 2021:</p>
+<!-- https://stackoverflow.com/a/38149485 -->
+<div
+style="position:relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+<p><iframe
+    style="position: absolute; top: 0; left: 0; width: 100%; height:100%;"
+    src="https://www.youtube-nocookie.com/embed/BH8S1htcHXY"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen> </iframe></p>
+</div>
+<p>While I was working on the compiler internally, I wrote up some
+informal notes about how the compiler worked and the potential it could
+have. None of those notes were particularly privy to confidential
+information—it was just that the compiler was not a public project at
+the time, so it didn’t make sense to post them publicly.</p>
+<p>I’ve gone back and taken those internal notes and published them here
+to my blog. (Mostly, I just wanted to fill in the gaps on my blog.<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">Before reposting these Sorbet Compiler posts, I only
+posted publicly six times in 2020 and twice in 2021 😞<br />
+<br />
+</span></span> In 2020 and 2021, I Note that they are all quite old now,
+and may not be as accurate as they were at the time of writing. I’ve
+dated them with the date they were published internally to reflect that,
+which means you’ll have to find them in the archives.</p>
+<p>Note that the compiler is <strong>still</strong> not a project that
+we would encourage anyone to use. At this point, it <a
+href="https://github.com/sorbet/sorbet/commits/master/compiler">hasn’t
+seen active development</a> for the better part of the last year as
+we’ve focused on improvements to Sorbet itself (though we have kept the
+test suite running, so things are unlikely to have slipped into complete
+disrepair).</p>
+<p>The official word is still what’s written in the <a
+href="https://sorbet.org/blog/2021/07/30/open-sourcing-sorbet-compiler">sorbet.org
+blog post</a>:</p>
+<blockquote>
+<p>We want to be clear up front: the code is nowhere near ready for
+external use right now, but we welcome you to read the code and give us
+feedback on our approach!</p>
+</blockquote>
+<p>Anyways, maybe you’ll enjoy the assorted notes digging into some of
+the compiler’s guts. If you have questions, feel free to reach out.</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#meta">meta</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#sorbet">sorbet</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#sorbet-compiler">sorbet-compiler</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
+
+
+
+</body>
+</html>
+

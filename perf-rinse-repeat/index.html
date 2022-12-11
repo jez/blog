@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2021-05-23 20:43:22 -0400">
+<meta name="description" content="TODO">
+<title>perf, Rinse, Repeat: Making the Sorbet Compiler faster – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">perf, Rinse, Repeat: Making the Sorbet Compiler faster</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2021-05-23 20:43:22 -0400">May 23, 2021</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">← Return home</a><br>
+</nav>
+
+<main>
+<blockquote>
+<p><strong>Disclaimer</strong>: this post was first drafted as a
+Stripe-internal email. On December 10, 2022 I republished it here,
+largely unchanged from the original. See <a
+href="/old-compiler-notes/">Some Old Sorbet Compiler Notes</a> for more.
+The Sorbet Compiler is still largely an experimental project: this post
+is available purely for curiosity’s sake.</p>
+<p>Any benchmark numbers included in this post are intended to be
+educational about how the Sorbet Compiler approaches speeding up code.
+They should not be taken as representative or predictive of any
+real-world workload, and are likely out-of-date with respect to
+improvements that have been made since this post originally
+appeared.</p>
+</blockquote>
+<p>The prompt for today’s post began as I asked myself, “Why is the
+Sorbet compiler slower than the interpreter for this benchmark?” But in
+asking this question (originally just out of curiosity), I accidentally
+nerd-sniped half my team into making some speedups.</p>
+<p>Thus, this post continues an ongoing series looking into the
+performance of compiled Ruby. Previous posts in the series:</p>
+<ul>
+<li><a href="/types-make-array-access-faster/">Types Make Array Access
+Faster</a></li>
+<li><a href="/another-look-at-typed-array-access/">Another Look at Typed
+Array Access</a></li>
+<li><a href="/fast-while-loops-in-ruby/">Fast While Loops in
+Ruby</a></li>
+<li><a href="/instant-runtime-type-checks-in-ruby/">Instant Runtime Type
+Checks in Ruby</a></li>
+</ul>
+<p>Unlike those posts (which mostly say, “look how much faster Ruby is
+when compiled!”), this post is about something the compiler is not great
+at (yet!).</p>
+<p>Our agenda:</p>
+<p>⏱ Introduce the benchmark, and measure it.<br />
+🔬 Profile the benchmark, and find (one part of) what’s slow.<br />
+🚀 Make it faster.<br />
+🤔 Close with some vague next steps.</p>
+<p>Here’s our benchmark:</p>
+<figure class="left-align-caption">
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> returns_nilclass; <span class="dv">nil</span>; <span class="cf">end</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="kw">&lt;</span> <span class="dv">10_000_000</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">self</span><span class="at">.returns_nilclass</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  i <span class="kw">+=</span> <span class="dv">1</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<figcaption>
+<a
+href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/returns_nilclass/no_sig.rb">→
+Full benchmark in the Sorbet repo</a>
+</figcaption>
+</figure>
+<p>It’s got a method that does nothing, and we call it 10 million times.
+The compiler is particularly fast with <code>while</code> loops (as I <a
+href="/types-make-array-access-faster/">mentioned before</a>), so we
+subtract out time spent running the <code>while</code> loop when looking
+at benchmarks:</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 65%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">benchmark</th>
+<th style="text-align: right;">interpreted</th>
+<th style="text-align: right;">compiled</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><a
+href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
+<td style="text-align: right;">0.186s</td>
+<td style="text-align: right;">0.067s</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a
+href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/returns_nilclass/no_sig.rb">returns_nilclass/no_sig.rb</a></td>
+<td style="text-align: right;">0.264s</td>
+<td style="text-align: right;">0.206s</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">returns_nilclass/no_sig.rb −
+while_10_000_000.rb</td>
+<td style="text-align: right;">0.078s</td>
+<td style="text-align: right;">0.139s</td>
+</tr>
+</tbody>
+</table>
+<p>The compiler is ~61 ms, or 78%, slower—that’s obviously not great.
+This 78% means that the compiler starts “in the hole” every time it does
+a method call. We’ve <a
+href="/another-look-at-typed-array-access/">already</a> seen <a
+href="/fast-while-loops-in-ruby/">previous posts</a> showing <a
+href="/instant-runtime-type-checks-in-ruby/">specific things</a> that
+the compiler can do faster than the interpreter, so getting a speed up
+in the real world means a method has to contain enough of those fast
+operations to pay off the “debt” of doing another method call.</p>
+<p>I want to be clear now and say: our hypothesis is that there is
+<strong>no fundamental reason</strong> why this debt has to exist;
+merely: it does right now. Our claim is that we can speed up Ruby code
+as it occurs in real-world scenarios by compiling it.</p>
+<p>At first, I was going to cut the post here, and say “yep, we haven’t
+won yet!” But I mentioned this slowness to my teammates, and we
+effectively sniped ourselves into making it better. This is what we did
+to make it faster.</p>
+<!-- TODO(jez) If you ever port Diagnosing Compiler Performance to your blog, link it here -->
+<!--
+> Tangentially, the last N months of my life has been measuring and diagnosing
+> performance. If you're interested, you might want to read my notes on performance:
+>
+> → [+🕵️‍♂️ Diagnosing Compiler Performance](...)
+>
+> I wrote it for "people working on the Sorbet compiler," but you'll find tips that apply
+> in general if you look hard enough.
+-->
+<p>Our first step once the program is already this small—a mere 7 lines
+of code 😎<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote"><strong>Editor’s note</strong>: “7 lines of code” is a
+<a href="https://stripe.com/blog/payment-api-design">Stripe
+meme</a>.<br />
+<br />
+</span></span>—is to profile it with <a
+href="http://www.brendangregg.com/perf.html"><code>perf</code></a>:</p>
+<figure>
+<img src="/assets/img/perf-rinse-repeat-01.png"
+alt="Largest self time: func_Object#returns_nilclass" />
+<figcaption aria-hidden="true">Largest self time:
+<code>func_Object#returns_nilclass</code></figcaption>
+</figure>
+<p>The heaviest entry by <code>Self</code> time is
+<code>func_Object#returns_nilclass</code>. That’s the C function the
+compiler emitted containing the code for our Ruby-level
+<code>returns_nilclass</code> method above.</p>
+<!-- TODO(jez) "by Self time" used to link to the relevant section in Diagnosing Compiler Performance -->
+<p>Perf lets us dig into an individual method’s assembly to see where
+the time is spent. Here’s the hot instructions:<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">You’ll notice: we even emit debug info, mapping which
+Ruby-level line these instructions came from!<br />
+<br />
+It means that if you run Ruby under <code>gdb</code> and print a
+backtrace, sometimes you’ll see C files in the backtrace (from inside
+the Ruby VM), and sometimes you’ll see Ruby files (for C functions
+emitted by the Sorbet compiler).<br />
+<br />
+</span></span></p>
+<figure>
+<img src="/assets/img/perf-rinse-repeat-02.png"
+alt="body of returns_nilclass when compiled" />
+<figcaption aria-hidden="true">body of <code>returns_nilclass</code>
+when compiled</figcaption>
+</figure>
+<p>What immediately stands out is a long chain of <code>mov</code>
+instructions at the top of the method, followed by an <code>add</code>.
+In particular, you’ll notice these <code>mov</code> instructions all
+look like:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode gnuassembler"><code class="sourceCode gnuassembler"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mov smallNumber<span class="op">(%</span>register1<span class="op">),%</span>register2</span></code></pre></div>
+<p>It’s super esoteric (thanks, <a
+href="https://elronnd.net/writ/2021-02-13_att-asm.html">AT&amp;T
+assembly syntax</a>),<span
+class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
+class="sidenote">Comment from Nathan:
+“<code>perf report -M intel ...</code> ought to use a more reasonable
+disassembly syntax.”<br />
+<br />
+</span></span> but this means: take <code>%register1</code>, add
+<code>smallNumber</code> to it, assume the result is an address, get the
+value stored there and put it in <code>%register2</code>.</p>
+<p>Sound familiar? That’s basically the <strong>assembly equivalent of
+<code>foo-&gt;bar</code> in C</strong>. Start with <code>foo</code>
+which is an address, add some number to get the address of the
+<code>bar</code> field, and dereference to get the result. Since there’s
+a bunch of these <code>mov</code> instructions in a row, we probably
+have something like <code>foo-&gt;bar-&gt;qux-&gt;zap</code>.</p>
+<p>Why is this slow? Bad cache locality. Chances are good that following
+any of those pointers means jumping to a completely different data
+structure stored in memory that’s not cached.</p>
+<p>Skipping to the answer, these <code>mov</code> instructions came from
+code in the Sorbet compiler designed to reach into one of the VM’s data
+structures and pull out a field called <code>iseq_encoded</code> which,
+among other things, is important for setting up line number information
+for Ruby backtraces:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> VALUE <span class="op">*</span>sorbet_getIseqEncoded<span class="op">(</span>rb_control_frame_t <span class="op">*</span>cfp<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> cfp<span class="op">-&gt;</span>iseq<span class="op">-&gt;</span>body<span class="op">-&gt;</span>iseq_encoded<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><a
+href="https://github.com/sorbet/sorbet/commit/0ff3751ea#diff-9c37838fc00fae9eb63691612abaa1c8a683401145d7f5a614d0c854c900da86L1130-L1132">→
+Code here in codegen-payload.c</a></p>
+<p>This code looks pretty much exactly like what we expected to
+find!</p>
+<p>At this point, Trevor had an insight: we already know the contents of
+that <code>iseq_encoded</code> field statically (because the compiler
+allocated it earlier and stored the result in a known location). That
+means we don’t even need this code at all. He <a
+href="https://github.com/sorbet/sorbet/commit/0ff3751ea">put together a
+PR</a> implementing the change.</p>
+<p>Then Nathan followed on with a <a
+href="https://github.com/sorbet/sorbet/commit/56812a019">similar
+change</a>, noticing that the compiled code was doing
+<code>ruby_current_execution_context_ptr-&gt;cfp</code> in a bunch of
+places where we could have instead passed <code>cfp</code> from the
+caller.</p>
+<p>After another <code>perf</code> run, there’s far less self time spent
+in <code>func_Object#returns_nilclass</code>!</p>
+<figure>
+<img src="/assets/img/perf-rinse-repeat-03.png"
+alt="perf output after those changes" />
+<figcaption aria-hidden="true"><code>perf</code> output after those
+changes</figcaption>
+</figure>
+<p>What took ~23.82% of self time before only takes ~8.23% now (making
+everything else take proportionally more time). If we dig into the
+assembly again, we notice <strong>two big differences</strong>:</p>
+<figure class="left-align-caption">
+<img src="/assets/img/perf-rinse-repeat-04.png"
+style="display: inline;;width:43.9%" alt="Disassembly, from before" />
+<img src="/assets/img/perf-rinse-repeat-05.png"
+style="display: inline;;width:54.1%"
+alt="Disassembly, after these two changes" />
+<figcaption>
+<strong>Left</strong>: disassembly from before. <strong>Right</strong>:
+disassembly after these two changes.
+</figcaption>
+</figure>
+<ul>
+<li>The <code>mov</code> chain is gone, and has been replaced with a
+reference to <code>iseqEncodedArray</code> (a global variable holding
+the <code>iseq_encoded</code> thing that the compiler allocated).</li>
+<li>The <code>ruby_current_execution_context_ptr</code> is gone, because
+<code>cfp</code> is now passed from the caller as the fourth argument
+(unused, or we would see a mention of the <code>%r9</code>
+register).</li>
+</ul>
+<p>But the real question: did it actually get faster? Or did we just
+shuffle the samples around? We can answer by running the benchmark
+again:</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 65%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">benchmark</th>
+<th style="text-align: right;">interpreted</th>
+<th style="text-align: right;">compiled</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">returns_nilclass/no_sig.rb - baseline,
+before</td>
+<td style="text-align: right;">0.078s</td>
+<td style="text-align: right;">0.139s</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">returns_nilclass/no_sig.rb - baseline,
+after</td>
+<td style="text-align: right;">0.079s</td>
+<td style="text-align: right;">0.127s</td>
+</tr>
+</tbody>
+</table>
+<p>The compiled version <strong>speeds up by about 12 ms</strong>, or
+8.6%, dropping the difference between compiled and interpreted from 78%
+slower to 60% slower. This is definitely good news, but maybe not quite
+as good as we would have hoped (the compiler is still slower than the
+interpreter). So what’s next?</p>
+<p>At this point, nearly all the slowness comes from the call site, not
+the definition. Taking another look at the new perf output, we see that
+the heaviest methods by self time are now:</p>
+<ul>
+<li>32.92% – <code>sorbet_callFuncWithCache</code>
+<ul>
+<li>A Sorbet compiler method that gets ready to call back from compiled
+code into the VM.</li>
+</ul></li>
+<li>22.57% – <code>vm_call_sorbet_with_frame_normal</code>
+<ul>
+<li>A method that we’ve patched into the Ruby VM that makes calling Ruby
+C extension functions faster.</li>
+</ul></li>
+<li>18.45% – <code>vm_search_method</code>
+<ul>
+<li>A method in the Ruby VM that answers, “For a method with name
+<code>foo</code> on value <code>x</code>, what method entry do I
+call?”</li>
+</ul></li>
+</ul>
+<p>These functions all happen before the
+<code>func_Object#returns_nilclass</code> method is called. I’m sure
+that we’ll dig into them as a team eventually, but for now, I don’t know
+why they’re slow! But the process of finding out what’s wrong would look
+the exact same:</p>
+<ul>
+<li>Profile and stare at the assembly to find the hot code.</li>
+<li>Have a stroke of insight to realize, “wait, we can just… not do
+this”
+<ul>
+<li>(or, more rare: “we need to do this, but it’s faster if we do it
+another way”).</li>
+</ul></li>
+<li>Repeat until it’s fast.</li>
+</ul>
+<p>There are a handful of other places where we know the compiler isn’t
+quite up to snuff yet, and priority number one right now is to eliminate
+them so that we can deliver real performance wins with the Sorbet
+compiler in production.</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#ruby">ruby</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#debugging">debugging</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#sorbet-compiler">sorbet-compiler</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
+
+
+
+</body>
+</html>
+
