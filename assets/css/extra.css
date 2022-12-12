@@ -1,0 +1,17 @@
+img[src^="/assets/img/dark"],
+img[src^="/assets/img/dark"] + figcaption {
+  display: none;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  img[src^="/assets/img/dark"],
+  img[src^="/assets/img/dark"] + figcaption {
+    display: inherit;
+  }
+
+  img[src^="/assets/img/light"],
+  img[src^="/assets/img/light"] + figcaption {
+    display: inherit;
+  }
+}
