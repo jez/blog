@@ -141,7 +141,7 @@ assignment into the `rescue` block, which would have been enough for Sorbet to i
 `Integer` (regardless of whether that `while true` bug were fixed method).
 
 But importantly, this original approach was thrown out, [almost exactly 9 months
-later][a6ed41e0][^2018] later, when the shortcut we've been discussing arrived. In fact, a
+later][a6ed41e0][^2018], when the shortcut we've been discussing arrived. In fact, a
 comment from that commit persists unchanged in the codebase today:
 
 [^2018]:
