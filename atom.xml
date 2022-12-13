@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-12-12T21:20:28-05:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Some Old Sorbet Compiler Notes</title><link href="https://blog.jez.io/old-compiler-notes/" rel="alternate" type="text/html" title="Some Old Sorbet Compiler Notes" /><published>2022-12-10T17:38:00-05:00</published><updated>2022-12-10T17:38:00-05:00</updated><id>https://blog.jez.io/old-compiler-notes</id><content type="html" xml:base="https://blog.jez.io/old-compiler-notes/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-12-12T21:30:47-05:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Some Old Sorbet Compiler Notes</title><link href="https://blog.jez.io/old-compiler-notes/" rel="alternate" type="text/html" title="Some Old Sorbet Compiler Notes" /><published>2022-12-10T17:38:00-05:00</published><updated>2022-12-10T17:38:00-05:00</updated><id>https://blog.jez.io/old-compiler-notes</id><content type="html" xml:base="https://blog.jez.io/old-compiler-notes/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;← Return home&lt;/a&gt;&lt;br&gt;
 &lt;/nav&gt;
 
@@ -62,7 +62,87 @@ feedback on our approach!&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;Anyways, maybe you’ll enjoy the assorted notes digging into some of
 the compiler’s guts. If you have questions, feel free to reach out.&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="meta" /><category term="sorbet" /><category term="sorbet-compiler" /><summary type="html">← Return home From January 2020 to December 2021 I was primarily working on the Sorbet Compiler, an experimental, ahead-of-time compiler for Ruby, targeting native code. For most of that time, it was a mostly-secret, internal-only project. Today I’m publishing a few of my old, internal-facing notes about the compiler here to my blog.</summary></entry><entry><title type="html">Tips for large-scale codemods</title><link href="https://blog.jez.io/codemods-tips/" rel="alternate" type="text/html" title="Tips for large-scale codemods" /><published>2022-11-12T21:34:51-05:00</published><updated>2022-11-12T21:34:51-05:00</updated><id>https://blog.jez.io/codemods-tips</id><content type="html" xml:base="https://blog.jez.io/codemods-tips/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="meta" /><category term="sorbet" /><category term="sorbet-compiler" /><summary type="html">← Return home From January 2020 to December 2021 I was primarily working on the Sorbet Compiler, an experimental, ahead-of-time compiler for Ruby, targeting native code. For most of that time, it was a mostly-secret, internal-only project. Today I’m publishing a few of my old, internal-facing notes about the compiler here to my blog.</summary></entry><entry><title type="html">Don’t bury the lede in technical docs</title><link href="https://blog.jez.io/dont-bury-the-lede/" rel="alternate" type="text/html" title="Don’t bury the lede in technical docs" /><published>2022-11-29T21:21:10-05:00</published><updated>2022-11-29T21:21:10-05:00</updated><id>https://blog.jez.io/dont-bury-the-lede</id><content type="html" xml:base="https://blog.jez.io/dont-bury-the-lede/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+  &lt;a href=&quot;/&quot;&gt;← Return home&lt;/a&gt;&lt;br&gt;
+&lt;/nav&gt;
+
+&lt;main&gt;
+&lt;p&gt;I’ve noticed that programmers really like to bury the lede. An easy
+way to make technical writing stronger is to &lt;strong&gt;figure out the main
+point, and then just say it&lt;/strong&gt; (before anything else). All the
+supporting information can come after. Why does this strengthen the
+piece?&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Readers will find it easier to read.&lt;/strong&gt; Readers won’t
+have to store all your supporting evidence in a mental queue while
+waiting for a point to be made. Instead, they’ll read the main point,
+then check supporting evidence against that claim piece by piece (only
+holding one piece of evidence in mind at a time).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The piece will sound more authoritative.&lt;/strong&gt; This falls
+somewhat naturally out of the new structure—it’s a lot harder to use
+weasel words to water down your main claims when they come first.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Skimming the piece will be more effective.&lt;/strong&gt; Skimming
+becomes ineffective if the topic sentence is buried somewhere in a
+paragraph, because skimmers will skip it.&lt;/p&gt;
+&lt;p&gt;A suggestion: go so far as to write the claims into section headers.
+Sometimes, this is just a technique I use while drafting, and I’ll
+change the section headers before publishing. But sometimes I’ll
+actually keep those headings in the finished product. It’s nice because
+headings have to be short: short headings imply short, focused claims,
+which are strong claims. This doc isn’t long enough for section headers,
+but I still did this for the title itself.&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;I learned this technique from one of my college
+professor’s “&lt;a
+href=&quot;https://graphics.stanford.edu/~kayvonf/misc/cleartalktips.pdf&quot;&gt;Tips
+for Giving Clear Talks&lt;/a&gt;” presentation. It’s worth a read, as a lot of
+the tips work for long-form writing as well as presentations. (I have a
+local recording of the talk I can share if you’d like more than just the
+slides.)&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Another suggestion: before publishing, try bolding the topic sentence
+in each paragraph. First, it’ll expose whether a paragraph’s main point
+is buried at the bottom. But also, it’ll expose whether your topic
+sentence is a succinct: if a paragraph’s main point isn’t succinct,
+there will be bold all over the place and maybe even bold in multiple
+places. Like with the previous tip, sometimes I’ll keep and sometimes
+I’ll drop these bolded claims before publishing (as you can see
+above).&lt;/p&gt;
+&lt;p&gt;Burying the lede manifests most frequently by programmers putting the
+“Why” before the “What.” I have various theories why this is, but I
+think it’s mostly because programmers feel like logical proofs need to
+flow from assumptions to conclusions—that by introducing the claim first
+and supporting it second, they’re not being rigorous. Another theory:
+people think that they need to make their writing more entertaining by
+making it “suspenseful.” Suspense rarely improves technical writing,
+where the focus is on conveying facts quickly.&lt;/p&gt;
+&lt;p&gt;Here’s two common examples of putting why before what, and how
+inverting things makes the writing stronger:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;A “look at what I did” email that puts the “background” section
+ahead of the “impact” section.&lt;/p&gt;
+&lt;p&gt;Unless you’re really good at narration (funny, clever, etc.), the
+background is going to be more boring than the impact you’re announcing.
+Leading with impact is the easiest tool you have in an email to wow the
+reader and capture their attention. Once captivated, they’ll continue
+with your background for more details, or decide that they don’t need
+to.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;A help doc structured like “Here’s something incorrect that you
+could do you do. Here’s why it’s a problem. You need to do this
+instead.”&lt;/p&gt;
+&lt;p&gt;Writing the claim first anchors all further examples on what to pay
+attention to. Here’s an &lt;a
+href=&quot;https://sorbet.org/docs/attached-class#tattached_class-as-an-argument&quot;&gt;example
+in the Sorbet docs&lt;/a&gt; about using &lt;code&gt;T.attached_class&lt;/code&gt; in an
+argument. Note how the first sentence is “you can’t do this, because of
+soundness problems.” The alternative would be to dive into the bad
+example immediately, leaving readers wondering what the final point will
+eventually be.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Don’t bury the lede. Instead, start by saying what you want to say,
+and then follow up by supporting it. Your piece will sound stronger and
+be more effective, and your readers will thank you.&lt;/p&gt;
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="writing" /><summary type="html">← Return home I’ve noticed that programmers really like to bury the lede. An easy way to make technical writing stronger is to figure out the main point, and then just say it (before anything else). All the supporting information can come after. Why does this strengthen the piece?</summary></entry><entry><title type="html">Tips for large-scale codemods</title><link href="https://blog.jez.io/codemods-tips/" rel="alternate" type="text/html" title="Tips for large-scale codemods" /><published>2022-11-12T21:34:51-05:00</published><updated>2022-11-12T21:34:51-05:00</updated><id>https://blog.jez.io/codemods-tips</id><content type="html" xml:base="https://blog.jez.io/codemods-tips/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
   &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
   &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
@@ -2180,270 +2260,4 @@ page. It’s similarly easy to find examples of it being used in a given
 codebase, to learn from real code. There’s no unique piece of syntax in
 &lt;code&gt;T.any(:left, :right)&lt;/code&gt; that is a surefire thing to search
 for.&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="fragment" /><category term="sorbet" /><summary type="html">← Return home One feature that Sorbet doesn’t have[^yet][^but-actually] but gets requested frequently is support for literal string and symbol types. Something like T.any(:left, :right), which is a type that allows either the symbol literal :left or :right, but no other Symbols much less other types of values. The closest that Sorbet has to this right now is typed enums:</summary></entry><entry><title type="html">Parse Error Recovery in Sorbet: Part 3</title><link href="https://blog.jez.io/error-recovery-part-3/" rel="alternate" type="text/html" title="Parse Error Recovery in Sorbet: Part 3" /><published>2022-02-28T00:25:56-05:00</published><updated>2022-02-28T00:25:56-05:00</updated><id>https://blog.jez.io/error-recovery-part-3</id><content type="html" xml:base="https://blog.jez.io/error-recovery-part-3/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
-  &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
-  &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
-  &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
-  &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#read-the-docs&quot; id=&quot;toc-read-the-docs&quot;&gt;Read the
-  docs&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#enable-traces-and-make-them-good&quot;
-  id=&quot;toc-enable-traces-and-make-them-good&quot;&gt;Enable traces, and make them
-  good&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#diff-traces-for-good-and-bad-parses&quot;
-  id=&quot;toc-diff-traces-for-good-and-bad-parses&quot;&gt;Diff traces for good and
-  bad parses&lt;/a&gt;&lt;/li&gt;
-  &lt;/ul&gt;
-&lt;/nav&gt;
-
-&lt;main&gt;
-&lt;p&gt;This is the third post in a series about “things I’ve learned while
-making improvements to Sorbet’s parser.” Previously I discussed high
-level questions like why it’s an important problem for Sorbet to solve
-and some approaches I decided not to take. This post switches gears to
-focus on specific tips and techniques I found useful while making parser
-changes.&lt;/p&gt;
-&lt;!-- more --&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;/error-recovery-part-1/&quot;&gt;Part 1: Why Recover from Syntax
-Errors&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/error-recovery-part-2/&quot;&gt;Part 2: What I Didn’t Do&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;a href=&quot;/error-recovery-part-3/&quot;&gt;Part 3: Tools and
-Techniques for Debugging a (Bison) Parser&lt;/a&gt;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/error-recovery-part-4/&quot;&gt;Part 4: Bison’s &lt;code&gt;error&lt;/code&gt;
-Token&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;(&lt;em&gt;coming soon&lt;/em&gt;) Part 5: Backtracking, aka Lexer Hacks&lt;/li&gt;
-&lt;li&gt;(&lt;em&gt;coming soon&lt;/em&gt;) Part 6: Falling Back on Indentation, aka More
-Lexer Hacks&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;With that all out of the way, let’s dive into the tips.&lt;/p&gt;
-&lt;h1 id=&quot;read-the-docs&quot;&gt;Read the docs&lt;/h1&gt;
-&lt;p&gt;Haha! You probably thought that by Googling for things you’d be able
-to find something that lets you avoid reading the official docs. But
-it’s boring for me to repeat everything that’s in the docs, and honestly
-the Bison and Ragel docs are rather comprehensive as far as software
-documentation goes these days:&lt;/p&gt;
-&lt;p&gt;→ &lt;a
-href=&quot;https://www.colm.net/files/ragel/ragel-guide-6.9.pdf&quot;&gt;Ragel User
-Guide&lt;/a&gt;&lt;br /&gt;
-→ &lt;a href=&quot;https://www.gnu.org/software/bison/manual/bison.html&quot;&gt;Bison
-User Guide&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;But I will give you some tips for &lt;strong&gt;how&lt;/strong&gt; to read the
-docs:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;You ~always want the “HTML entirely on one web page” version of
-the Bison docs—it’s way easier to ⌘F around one page.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Bison actually gets new, interesting features from version to
-version. Double check that the version of the docs you’re reading
-actually match the version of Bison you’re using. I haven’t found an
-easy way to read old Bison docs online, so I usually just
-&lt;code&gt;grep&lt;/code&gt; for things in the docs’ sources:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;❯ git clone https://github.com/akimd/bison
-❯ git checkout v3.3.2
-❯ grep -r &amp;#39;error.*token&amp;#39; doc/
-doc/bison.texi:error.  If there is a @samp{..} token before the next
-doc/bison.texi:value of the error token is 256, unless you explicitly assigned 256
-... many more results ...&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;I’ve found it valuable to actually take my time while reading the
-Bison docs. I’ve found a lot of things that turned out to be relevant
-later on because I took the time to read parts of the docs that didn’t
-look immediately relevant.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;But that’s enough soapbox standing, now we return to regularly
-scheduled tips.&lt;/p&gt;
-&lt;h1 id=&quot;enable-traces-and-make-them-good&quot;&gt;Enable traces, and make them
-good&lt;/h1&gt;
-&lt;p&gt;Before I started working on this project, I treated Sorbet’s parser
-like a black box. In the spirit of “&lt;a
-href=&quot;https://blog.nelhage.com/post/computers-can-be-understood/&quot;&gt;Computers
-can be understood&lt;/a&gt;,” the first thing I did was enable traces for our
-parser. Easy enough:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Define the &lt;a
-href=&quot;https://www.gnu.org/software/bison/manual/bison.html#Tracing&quot;&gt;&lt;code&gt;parse.trace&lt;/code&gt;&lt;/a&gt;
-variable in the grammar&lt;/li&gt;
-&lt;li&gt;Call &lt;a
-href=&quot;https://www.gnu.org/software/bison/manual/bison.html#index-set_005fdebug_005flevel-on-parser&quot;&gt;&lt;code&gt;set_debug_level&lt;/code&gt;&lt;/a&gt;
-on the generated parser&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Here’s &lt;a
-href=&quot;https://github.com/sorbet/sorbet/pull/4985/files?w=1#diff-63fada7036ffcba42e6615c3b85615cb81d47aafbf88122a552a34fb799c06b5R17&quot;&gt;the
-PR in Sorbet&lt;/a&gt;, which might help to make these two steps more
-concrete.&lt;/p&gt;
-&lt;p&gt;The trace output looks something like this:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;❯ sorbet --trace-parser -e &amp;#39;def foo; end&amp;#39;
-Starting parse
-Entering state 0
-Reading a token: Next token is token &amp;quot;def&amp;quot; ()
-Shifting token &amp;quot;def&amp;quot; ()
-Entering state 4
-Reading a token: Next token is token tIDENTIFIER ()
-Shifting token tIDENTIFIER ()
-Entering state 184
-
-...&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The output is somewhat useful as is, but it can be better. First, all
-the trailing &lt;code&gt;()&lt;/code&gt; on the “Next token is …” lines are present
-because there aren’t any &lt;code&gt;%printer&lt;/code&gt;’s for those tokens–we can
-easily get the trace to not only show that it read a
-&lt;code&gt;tIDENTIFIER&lt;/code&gt; token, but also what the name of that variable
-was. After adding one for &lt;code&gt;tIDENTIFIER&lt;/code&gt; like this:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;%printer { yyo &amp;lt;&amp;lt; $$-&amp;gt;view(); } tIDENTIFIER&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The &lt;code&gt;$$-&amp;gt;view();&lt;/code&gt; bit calls the &lt;code&gt;view&lt;/code&gt;
-method on Sorbet’s token type, converting it to a string. Now our traces
-look better:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;❯ sorbet --trace-parser -e &amp;#39;def foo; end&amp;#39;
-Starting parse
-Entering state 0
-Reading a token: Next token is token &amp;quot;def&amp;quot; ()
-Shifting token &amp;quot;def&amp;quot; ()
-Entering state 4
-Reading a token: Next token is token tIDENTIFIER (foo)
-Shifting token tIDENTIFIER (foo)
-Entering state 184
-Reading a token: Next token is token &amp;quot;;&amp;quot; ()
-Reducing stack by rule 125 (line 1140):
-   $1 = token tIDENTIFIER (foo)
--&amp;gt; $$ = nterm fname ()
-...&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;So far I’ve been adding these &lt;code&gt;%printer&lt;/code&gt;s only as I
-encounter the tokens that show up, mostly because I’m too lazy to
-exhaustively define printers for all the tokens—Ruby has a lot of
-tokens. You’ll note that Bison even lets you register
-&lt;code&gt;%printer&lt;/code&gt;s for non-terminals (not pictured, but the same
-mechanism). You could use this to, like, print the currently reduced AST
-for that non-terminal, or some other summary.&lt;/p&gt;
-&lt;p&gt;The next step is to actually understand what these traces mean,
-because it looks like there’s a lot of magic names and numbers. The long
-answer is that you’ll have to look in the textual report that Bison
-generates about all the intermediate states in your parser. This is
-documented in the &lt;a
-href=&quot;https://www.gnu.org/software/bison/manual/bison.html#Understanding&quot;&gt;Understanding
-Your Parser&lt;/a&gt; section of the Bison docs.&lt;/p&gt;
-&lt;p&gt;But if you’re impatient, there’s a bit of a short cut that can work
-in many cases.&lt;/p&gt;
-&lt;h1 id=&quot;diff-traces-for-good-and-bad-parses&quot;&gt;Diff traces for good and
-bad parses&lt;/h1&gt;
-&lt;p&gt;This code is a syntax error in Ruby:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb5&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb5-1&quot;&gt;&lt;a href=&quot;#cb5-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;def&lt;/span&gt; foo(x,); &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Bison has a fancy &lt;code&gt;error&lt;/code&gt; token that we can use to recover
-from cases like this, but it’s hard to know where to add that
-&lt;code&gt;error&lt;/code&gt; token into the grammar. Printing the trace file would
-likely help us figure out where, but even when we’re staring at the
-trace file it’s not entirely clear.&lt;/p&gt;
-&lt;p&gt;Luckily there’s a short cut:&lt;/p&gt;
-&lt;ol type=&quot;1&quot;&gt;
-&lt;li&gt;Record a parser trace for the invalid parse.&lt;/li&gt;
-&lt;li&gt;“Fix” the file so that it parses by only adding tokens, and record a
-trace for that parse.
-&lt;ul&gt;
-&lt;li&gt;This ensures that all the tokens present in the bad parse are also
-present in the good parse.&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;diff&lt;/code&gt; (or &lt;code&gt;vimdiff&lt;/code&gt;) the two traces, and add
-an error recovery rule to the place where the trace differs.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;In our case, I want &lt;code&gt;def foo(x,); end&lt;/code&gt; to parse as if the
-user had properly written two arguments, so that I can record the fact
-that the user started to introduce a second argument. I’ll record a
-trace for the program &lt;code&gt;def foo(x, y); end&lt;/code&gt;, and diff it. The
-diff looks like this:&lt;/p&gt;
-&lt;figure class=&quot;left-align-caption&quot;&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb6&quot;&gt;&lt;pre
-class=&quot;sourceCode numberSource diff numberLines hl-30 hl-31 hl-32 hl-33 hl-34&quot;&gt;&lt;code class=&quot;sourceCode diff&quot;&gt;&lt;span id=&quot;cb6-1&quot;&gt;&lt;a href=&quot;#cb6-1&quot;&gt;&lt;/a&gt;❯ sorbet --trace-parser -e &amp;#39;def foo(x,); end&amp;#39; 2&amp;gt; trace-bad.txt;&lt;/span&gt;
-&lt;span id=&quot;cb6-2&quot;&gt;&lt;a href=&quot;#cb6-2&quot;&gt;&lt;/a&gt;  sorbet --trace-parser -e &amp;#39;def foo(x, y); end&amp;#39; 2&amp;gt; trace-good.txt;&lt;/span&gt;
-&lt;span id=&quot;cb6-3&quot;&gt;&lt;a href=&quot;#cb6-3&quot;&gt;&lt;/a&gt;  diff -u trace-bad.txt trace-good.txt&lt;/span&gt;
-&lt;span id=&quot;cb6-4&quot;&gt;&lt;a href=&quot;#cb6-4&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;--- trace-bad.txt       2022-01-16 14:40:51.168977798 -0800&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-5&quot;&gt;&lt;a href=&quot;#cb6-5&quot;&gt;&lt;/a&gt;&lt;span class=&quot;dt&quot;&gt;+++ trace-good.txt      2022-01-16 14:40:51.728976581 -0800&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-6&quot;&gt;&lt;a href=&quot;#cb6-6&quot;&gt;&lt;/a&gt;&lt;span class=&quot;dt&quot;&gt;@@ -53,45 +53,201 @@&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-7&quot;&gt;&lt;a href=&quot;#cb6-7&quot;&gt;&lt;/a&gt; Next token is token &amp;quot;,&amp;quot; ()&lt;/span&gt;
-&lt;span id=&quot;cb6-8&quot;&gt;&lt;a href=&quot;#cb6-8&quot;&gt;&lt;/a&gt; Shifting token &amp;quot;,&amp;quot; ()&lt;/span&gt;
-&lt;span id=&quot;cb6-9&quot;&gt;&lt;a href=&quot;#cb6-9&quot;&gt;&lt;/a&gt; Entering state 752&lt;/span&gt;
-&lt;span id=&quot;cb6-10&quot;&gt;&lt;a href=&quot;#cb6-10&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Reading a token: Next token is token tIDENTIFIER ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-11&quot;&gt;&lt;a href=&quot;#cb6-11&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Shifting token tIDENTIFIER ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-12&quot;&gt;&lt;a href=&quot;#cb6-12&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Entering state 541&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-13&quot;&gt;&lt;a href=&quot;#cb6-13&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Reducing stack by rule 660 (line 3400):&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-14&quot;&gt;&lt;a href=&quot;#cb6-14&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+   $1 = token tIDENTIFIER ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-15&quot;&gt;&lt;a href=&quot;#cb6-15&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+-&amp;gt; $$ = nterm f_norm_arg ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-16&quot;&gt;&lt;a href=&quot;#cb6-16&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Stack now 752 562 349 78 0&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-17&quot;&gt;&lt;a href=&quot;#cb6-17&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Entering state 559&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-18&quot;&gt;&lt;a href=&quot;#cb6-18&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Reducing stack by rule 661 (line 3408):&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-19&quot;&gt;&lt;a href=&quot;#cb6-19&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+   $1 = nterm f_norm_arg ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-20&quot;&gt;&lt;a href=&quot;#cb6-20&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+-&amp;gt; $$ = nterm f_arg_asgn ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-21&quot;&gt;&lt;a href=&quot;#cb6-21&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Stack now 752 562 349 78 0&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-22&quot;&gt;&lt;a href=&quot;#cb6-22&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Entering state 560&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-23&quot;&gt;&lt;a href=&quot;#cb6-23&quot;&gt;&lt;/a&gt; Reading a token: Next token is token &amp;quot;)&amp;quot; ()&lt;/span&gt;
-&lt;span id=&quot;cb6-24&quot;&gt;&lt;a href=&quot;#cb6-24&quot;&gt;&lt;/a&gt;&lt;span class=&quot;st&quot;&gt;-Error: popping token &amp;quot;,&amp;quot; ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-25&quot;&gt;&lt;a href=&quot;#cb6-25&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Reducing stack by rule 662 (line 3414):&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-26&quot;&gt;&lt;a href=&quot;#cb6-26&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+   $1 = nterm f_arg_asgn ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-27&quot;&gt;&lt;a href=&quot;#cb6-27&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+-&amp;gt; $$ = nterm f_arg_item ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-28&quot;&gt;&lt;a href=&quot;#cb6-28&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Stack now 752 562 349 78 0&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-29&quot;&gt;&lt;a href=&quot;#cb6-29&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Entering state 901&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-30&quot;&gt;&lt;a href=&quot;#cb6-30&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+Reducing stack by rule 665 (line 3428):&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-31&quot;&gt;&lt;a href=&quot;#cb6-31&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+   $1 = nterm f_arg ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-32&quot;&gt;&lt;a href=&quot;#cb6-32&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+   $2 = token &amp;quot;,&amp;quot; ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-33&quot;&gt;&lt;a href=&quot;#cb6-33&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+   $3 = nterm f_arg_item ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-34&quot;&gt;&lt;a href=&quot;#cb6-34&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+-&amp;gt; $$ = nterm f_arg ()&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb6-35&quot;&gt;&lt;a href=&quot;#cb6-35&quot;&gt;&lt;/a&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;figcaption&gt;
-This example shows &lt;code&gt;diff -u&lt;/code&gt; in the command line, but when
-I’m looking at these traces I almost exclusively use
-&lt;code&gt;vimdiff&lt;/code&gt;, because it lets me expand surrounding context,
-search for keywords, etc. And it looks nicer.
-&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;Looking at the highlighted lines near the bottom, we see that
-eventually the good parse was able to reduce &lt;code&gt;nterm f_arg&lt;/code&gt; by
-combining &lt;code&gt;f_arg&lt;/code&gt;, &lt;code&gt;&quot;,&quot;&lt;/code&gt;, and
-&lt;code&gt;f_arg_item&lt;/code&gt;. The trace tells us that this happened in
-&lt;code&gt;rule 665 (line 2428)&lt;/code&gt;. That line number is the actual source
-line number in our &lt;code&gt;*.ypp&lt;/code&gt; grammar file.&lt;/p&gt;
-&lt;p&gt;All we have to do is go to that line and add an error case, which is
-pretty easy:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb7&quot;&gt;&lt;pre
-class=&quot;sourceCode numberSource diff numberLines hl-11 hl-12 hl-13 hl-14&quot;&gt;&lt;code class=&quot;sourceCode diff&quot;&gt;&lt;span id=&quot;cb7-1&quot;&gt;&lt;a href=&quot;#cb7-1&quot;&gt;&lt;/a&gt;           f_arg: f_arg_item&lt;/span&gt;
-&lt;span id=&quot;cb7-2&quot;&gt;&lt;a href=&quot;#cb7-2&quot;&gt;&lt;/a&gt;                    {&lt;/span&gt;
-&lt;span id=&quot;cb7-3&quot;&gt;&lt;a href=&quot;#cb7-3&quot;&gt;&lt;/a&gt;                      $$ = driver.alloc.node_list($1);&lt;/span&gt;
-&lt;span id=&quot;cb7-4&quot;&gt;&lt;a href=&quot;#cb7-4&quot;&gt;&lt;/a&gt;                    }&lt;/span&gt;
-&lt;span id=&quot;cb7-5&quot;&gt;&lt;a href=&quot;#cb7-5&quot;&gt;&lt;/a&gt;                | f_arg tCOMMA f_arg_item&lt;/span&gt;
-&lt;span id=&quot;cb7-6&quot;&gt;&lt;a href=&quot;#cb7-6&quot;&gt;&lt;/a&gt;                    {&lt;/span&gt;
-&lt;span id=&quot;cb7-7&quot;&gt;&lt;a href=&quot;#cb7-7&quot;&gt;&lt;/a&gt;                      auto &amp;amp;list = $1;&lt;/span&gt;
-&lt;span id=&quot;cb7-8&quot;&gt;&lt;a href=&quot;#cb7-8&quot;&gt;&lt;/a&gt;                      list-&amp;gt;emplace_back($3);&lt;/span&gt;
-&lt;span id=&quot;cb7-9&quot;&gt;&lt;a href=&quot;#cb7-9&quot;&gt;&lt;/a&gt;                      $$ = list;&lt;/span&gt;
-&lt;span id=&quot;cb7-10&quot;&gt;&lt;a href=&quot;#cb7-10&quot;&gt;&lt;/a&gt;                    }&lt;/span&gt;
-&lt;span id=&quot;cb7-11&quot;&gt;&lt;a href=&quot;#cb7-11&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+               | f_arg tCOMMA error&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb7-12&quot;&gt;&lt;a href=&quot;#cb7-12&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+                   {&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb7-13&quot;&gt;&lt;a href=&quot;#cb7-13&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+                     $$ = $1;&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb7-14&quot;&gt;&lt;a href=&quot;#cb7-14&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;+                   }&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;And now the parser reports the error but continues to recover from
-the error:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;❯ sorbet -p parse-tree-whitequark -e &amp;#39;def foo(x,); end&amp;#39;
-s(:def, :foo,
-  s(:args,
-    s(:arg, :x)), nil)
--e:1: unexpected token &amp;quot;)&amp;quot; https://srb.help/2001
-     1 |def foo(x,); end
-                  ^
-Errors: 1&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This technique of comparing the trace for “what it currently does”
-against “what I wish it did” has been super useful, because it often
-shows exactly the point where the trace diverged, along with the reason.
-In this example, the &lt;code&gt;f_arg_item&lt;/code&gt; was never reduced, but
-sometimes the difference will be something like “the lexer didn’t read a
-token” or “the lexer read a token, but because of the state the lexer
-was in, it was the wrong token.” Whatever the cause, comparing traces
-usually shows the problem.&lt;/p&gt;
-&lt;p&gt;This particular example also showed an example of using Bison’s
-&lt;code&gt;error&lt;/code&gt; token. I’ll talk more about what this
-&lt;code&gt;error&lt;/code&gt; token means in the next post.&lt;/p&gt;
-&lt;p style=&quot;width: 50%; float: left; text-align: left;&quot;&gt;
-&lt;a href=&quot;/error-recovery-part-2/&quot;&gt;← Part 2: Why Recover from Syntax
-Errors&lt;/a&gt;
-&lt;/p&gt;
-&lt;p style=&quot;width: 50%; float: right; text-align: right;&quot;&gt;
-&lt;a href=&quot;/error-recovery-part-4/&quot;&gt;Part 4: Bison’s &lt;code&gt;error&lt;/code&gt;
-Token →&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="sorbet" /><category term="parsing" /><summary type="html">← Return home This is the third post in a series about “things I’ve learned while making improvements to Sorbet’s parser.” Previously I discussed high level questions like why it’s an important problem for Sorbet to solve and some approaches I decided not to take. This post switches gears to focus on specific tips and techniques I found useful while making parser changes.</summary></entry></feed>
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="fragment" /><category term="sorbet" /><summary type="html">← Return home One feature that Sorbet doesn’t have[^yet][^but-actually] but gets requested frequently is support for literal string and symbol types. Something like T.any(:left, :right), which is a type that allows either the symbol literal :left or :right, but no other Symbols much less other types of values. The closest that Sorbet has to this right now is typed enums:</summary></entry></feed>
