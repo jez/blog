@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2020-09-25 22:00:58 -0400">
+<meta name="description" content="A look at how two type system features overlap in a surprising way.">
+<title>Singletons and Flow-Sensitive Typing – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+   var mathElements = document.getElementsByClassName("math");
+   var macros = [];
+   for (var i = 0; i < mathElements.length; i++) {
+    var texText = mathElements[i].firstChild;
+    if (mathElements[i].tagName == "SPAN") {
+     katex.render(texText.data, mathElements[i], {
+      displayMode: mathElements[i].classList.contains('display'),
+      throwOnError: false,
+      macros: macros,
+      fleqn: false
+     });
+  }}});
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" />
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+    <link rel="stylesheet" href="/assets/css/extra.css">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">Singletons and Flow-Sensitive Typing</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2020-09-25 22:00:58 -0400">September 25, 2020</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">← Return home</a><br>
+</nav>
+
+<main>
+<blockquote>
+<p><strong>Editing note</strong>: This post first appeared in a
+work-internal email. It was first cross-posted to this blog December 12,
+2022.</p>
+</blockquote>
+<p>Someone asked a question at work on Slack this week, and I thought it
+would be a neat chance to look at a small part of Sorbet’s
+flow-sensitive type checking algorithm. Paraphrasing, the question
+was:</p>
+<blockquote>
+<p>I want to create some config classes that can inherit from each
+other. For example:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">BaseConfig</span>; <span class="kw">...</span>; <span class="cf">end</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">SpecialConfig</span> <span class="kw">&lt;</span> <span class="dt">BaseConfig</span>; <span class="kw">...</span>; <span class="cf">end</span></span></code></pre></div>
+<code>SpecialConfig</code> could override some behaviors, etc. Since
+there’s no point creating multiple instances of the same config class,
+I’m thinking about using Ruby’s <code>singleton</code> module to enforce
+that there’s only one instance of each config class. Is this good or
+bad?
+</blockquote>
+<p>The Ruby standard library includes the <a
+href="https://ruby-doc.org/stdlib-2.6.5/libdoc/singleton/rdoc/Singleton.html"><code>singleton</code></a>
+gem as a drop-in implementation of the <a
+href="https://en.wikipedia.org/wiki/Singleton_pattern">Singleton
+pattern</a>. It allows people to write code like this:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;singleton&#39;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">MySingleton</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="dt">Singleton</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># all calls to `.instance` return a reference-equal object</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span> <span class="dt">MySingleton</span><span class="at">.instance</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># it&#39;s impossible to construct two instances of this class</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="dt">MySingleton</span><span class="at">.new</span> <span class="co"># =&gt; raises `TypeError`</span></span></code></pre></div>
+<p>Maybe you already have your own opinions about the Singleton pattern:
+I’m not here to debate you. If you don’t have your own opinion,
+Wikipedia has you covered:</p>
+<blockquote>
+<p>Critics consider the singleton to be an anti-pattern in that it is
+frequently used in scenarios where it is not beneficial […] and
+introduces global state into an application.</p>
+</blockquote>
+<p>Instead, I’d like to convince you why that this specific
+<strong>combination</strong> (the Singleton pattern and inheritance) is
+a bad idea. I’m going to do it by reasoning from the perspective of the
+type system, and I’ll starts with the observation that if we let
+singletons be subclassed, we don’t really have a singleton anymore:</p>
+<figure class="left-align-caption">
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;singleton&#39;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Sig</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ParentSingleton</span>; <span class="fu">include</span> <span class="dt">Singleton</span>; <span class="cf">end</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ChildSingleton</span> <span class="kw">&lt;</span> <span class="dt">ParentSingleton</span>; <span class="cf">end</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span>params(<span class="wa">x: </span><span class="dt">ParentSingleton</span>)<span class="at">.returns</span>(<span class="dt">TrueClass</span>)<span class="kw">}</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> takes_parent_singleton(x)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> x <span class="kw">==</span> <span class="dt">ParentSingleton</span><span class="at">.instance</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">true</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    T<span class="at">.absurd</span>(x)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<figcaption>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20true%0Arequire%20&#39;singleton&#39;%0Aextend%20T%3A%3ASig%0Aclass%20ParentSingleton%3B%20include%20Singleton%3B%20end%0Aclass%20ChildSingleton%20%3C%20ParentSingleton%3B%20end%0A%0Asig%20%7Bparams(x%3A%20ParentSingleton).returns(TrueClass)%7D%0Adef%20takes_parent_singleton(x)%0A%20%20if%20x%20%3D%3D%20ParentSingleton.instance%0A%20%20%20%20true%0A%20%20else%0A%20%20%20%20T.absurd(x)%0A%20%20end%0Aend">→
+View on sorbet.run</a>
+</figcaption>
+</figure>
+<p>In this snippet, we’ve set up a parent / child relationship between
+two singleton classes, and defined a method that takes in an (the?)
+instance of the <code>ParentSingleton</code> class. Ideally, this
+function would be trivial. Our <code>sig</code> enforces that we’re
+given an instance of <code>ParentSingleton</code>, so the only valid
+value for <code>x</code> would be <code>ParentSingleton.instance</code>,
+and then the equality comparison on line 8 would never fail.</p>
+<p>But that’s not what happens, because <code>x</code> could also be
+<code>ChildSingleton.instance</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>takes_parent_singleton(<span class="dt">ChildSingleton</span><span class="at">.instance</span>)</span></code></pre></div>
+<p><code>ChildSingleton</code> is a subtype of
+<code>ParentSingleton</code>, so this call site is perfectly fine
+types-wise. Sorbet has to reject the definition of
+<code>takes_parent_singleton</code> statically so the <a
+href="https://sorbet.org/docs/exhaustiveness"><code>T.absurd</code></a>
+never fails at runtime:</p>
+<pre class="plain"><code>editor.rb:12: Control flow could reach `T.absurd` because the type `ParentSingleton` wasn&#39;t handled https://srb.help/7026
+    12 |    T.absurd(x)
+            ^^^^^^^^^^^</code></pre>
+<p>At a high-level, Sorbet’s <a
+href="https://sorbet.org/docs/flow-sensitive">flow-sensitive</a>
+analysis takes steps like these to arrive at that error message:</p>
+<ol type="1">
+<li><p>Start by looking at <code>x == ParentSingleton.instance</code>.
+It’s used in an <code>if</code> condition, so we might need to update
+our knowledge about the type of <code>x</code> under some
+hypotheticals.</p></li>
+<li><p>Hypothetical 1: the condition is <code>true</code>. If these
+values are equal, then certainly their types must be equal, so we record
+this implication in our set of knowledge:</p>
+<p><code>x == ParentSingleton.instance</code> <span
+class="math inline">\Longrightarrow</span>
+<code>x.is_a?(ParentSingleton)</code></p>
+<p>We read this as “whenever the left side is true, then also the right
+side must be true.”</p></li>
+<li><p>Hypothetical 2: the condition is <code>false</code>. If these
+values are not equal, we know nothing types-wise. We don’t record any
+new knowledge about the type of <code>x</code>.</p></li>
+<li><p>Finish type checking the rest of the method. When we’re type
+checking a different part of our method where we know whether
+<code>x == ParentSingleton.instance</code> is <code>true</code> or
+<code>false</code>, we can look up the relevant knowledge we recorded
+earlier and apply that implication to the types of any variables still
+in scope.</p></li>
+</ol>
+<p>Step 3 could look different, if only Sorbet had the extra knowledge
+that <code>ParentSingleton</code> was <a
+href="https://sorbet.org/docs/final#final-classes-and-modules">a final
+class</a>, i.e., one that can’t be subclassed. In this case, everything
+from earlier we wished were true actually is true:
+<code>ParentSingleton</code> is now a real singleton, a type inhabited
+by only one value:</p>
+<figure class="left-align-caption">
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ParentSingleton</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="dt">Singleton</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Helpers</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  final! <span class="co"># &lt;- declare that this class can&#39;t be subclassed</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ChildSingleton</span> <span class="kw">&lt;</span> <span class="dt">ParentSingleton</span>; <span class="cf">end</span> <span class="co"># static error!</span></span></code></pre></div>
+<figcaption>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20true%0A%0Aclass%20ParentSingleton%0A%20%20include%20Singleton%0A%20%20extend%20T%3A%3AHelpers%0A%20%20final!%20%23%20%3C-%20declare%20that%20this%20class%20can&#39;t%20be%20subclassed%0Aend%0A%0Aclass%20ChildSingleton%20%3C%20ParentSingleton%3B%20end%20%23%20static%20error!">→
+View on sorbet.run</a>
+</figcaption>
+</figure>
+<p>Here’s how Step 3 would look instead if <code>ParentSingleton</code>
+was final:</p>
+<ol start="3" type="1">
+<li><p>Hypothetical 2: <code>x == ParentSingleton.instance</code> is
+<code>false</code>. Since <code>ParentSingleton</code> is a final class,
+we have exhaustively checked all values of this type and determined that
+<code>x</code> isn’t any of them. That means we can record this
+implication in our set of knowledge:</p>
+<p><code>x != ParentSingleton.instance</code> <span
+class="math inline">\Longrightarrow</span>
+<code>!x.is_a?(ParentSingleton)</code></p></li>
+</ol>
+<p>Later on when the <code>else</code> branch of our method is type
+checked, we’d look up this implication and apply it to the types of the
+variables in scope. If <code>x</code> can’t be
+<code>ParentSingleton</code>, then it can’t be anything, and Sorbet
+updates it’s knowledge of the type of <code>x</code> to <a
+href="https://sorbet.org/docs/noreturn"><code>T.noreturn</code></a>, and
+it no longer reports an error on the <code>T.absurd</code>.</p>
+<p>In fact, this feature (in combination with a few other features) is
+actually how <a
+href="https://sorbet.org/docs/tenum"><code>T::Enum</code></a> worked for
+almost a year! If you’re curious you can check out <a
+href="https://github.com/sorbet/sorbet/pull/1473/files#diff-f035687fd87cb5891ce1011ef2b79c7cR1">the
+original PR</a> where I implemented it. (We <a
+href="https://github.com/sorbet/sorbet/pull/3213">ended up changing
+it</a> to work differently for unrelated reasons.)</p>
+<p>Hopefully this explanation answers the original question (don’t use
+inheritance with singletons!) but also gives a little insight into
+what’s happening when Sorbet type checks a program.</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#ruby">ruby</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#sorbet">sorbet</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#types">types</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
+
+
+
+</body>
+</html>
+
