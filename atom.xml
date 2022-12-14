@@ -1,4 +1,98 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-12-12T21:42:27-05:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">Some Old Sorbet Compiler Notes</title><link href="https://blog.jez.io/old-compiler-notes/" rel="alternate" type="text/html" title="Some Old Sorbet Compiler Notes" /><published>2022-12-10T17:38:00-05:00</published><updated>2022-12-10T17:38:00-05:00</updated><id>https://blog.jez.io/old-compiler-notes</id><content type="html" xml:base="https://blog.jez.io/old-compiler-notes/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="https://blog.jez.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.jez.io/" rel="alternate" type="text/html" /><updated>2022-12-13T19:10:03-05:00</updated><id>https://blog.jez.io/atom.xml</id><title type="html">Jake Zimmerman</title><subtitle>A collection of blog posts about programming, software, types, programming languages, Sorbet, Vim, Markdown, and more.</subtitle><author><name>Jake Zimmerman</name></author><entry><title type="html">My workflow for hand-drawn diagrams</title><link href="https://blog.jez.io/hand-drawn-diagrams/" rel="alternate" type="text/html" title="My workflow for hand-drawn diagrams" /><published>2022-12-13T17:10:22-05:00</published><updated>2022-12-13T17:10:22-05:00</updated><id>https://blog.jez.io/hand-drawn-diagrams</id><content type="html" xml:base="https://blog.jez.io/hand-drawn-diagrams/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
+  &lt;a href=&quot;/&quot;&gt;← Return home&lt;/a&gt;&lt;br&gt;
+&lt;/nav&gt;
+
+&lt;main&gt;
+&lt;p&gt;One thing I’ve had a lot of fun with is little hand-drawn diagrams to
+help me explain things. Some examples:&lt;/p&gt;
+&lt;p&gt;→ &lt;a href=&quot;https://blog.jez.io/sorbet-rescue-control-flow/&quot;&gt;Sorbet’s
+weird approach to exception handling&lt;/a&gt;&lt;br /&gt;
+→ &lt;a href=&quot;https://blog.jez.io/gc-compact-in-pictures/&quot;&gt;GC.compact in
+Pictures&lt;/a&gt;&lt;br /&gt;
+→ &lt;a
+href=&quot;https://sorbet.run/talks/RubyConf2021/#/visualizing-api-latency-1&quot;&gt;Compiling
+Ruby to Native Code with Sorbet and LLVM&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Here’s my workflow for drawing them:&lt;/p&gt;
+&lt;ol type=&quot;1&quot;&gt;
+&lt;li&gt;&lt;p&gt;I draw the diagrams with an Apple Pencil on a 12.9-inch iPad Pro
+(2nd generation) that I bought new in 2017—it still runs as well as the
+day I brought it home. It took a little time to get used to the feeling
+of drawing with plastic-on-glass instead of ink-on-paper, but I find
+that the super-low-latency of the screen helps a lot.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;I simply use the default Notes app. I tried some other apps but
+found that I kept coming back to Notes at the end of the day (I also use
+Notes for random notes I need to jot down).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The text and lines are all free-form. I like the charm that it
+adds to posts—I don’t want something super polished looking like you’d
+get from another diagramming tool.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;To export a finished diagram for use in a post, I lasso-select
+the piece I want to export, copy and paste it into an iMessage with
+myself,&lt;span
+class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
+class=&quot;sidenote&quot;&gt;If you have tips for how to cut out this step and go
+straight from a selection to a file, I’d love to hear!&lt;br /&gt;
+&lt;br /&gt;
+&lt;/span&gt;&lt;/span&gt; and then hop over to a laptop to save the image to a
+file.&lt;/p&gt;
+&lt;figure&gt;
+&lt;img src=&quot;/assets/img/light/hand-drawn-lasso.png&quot;
+alt=&quot;A screenshot of the Notes app&quot; /&gt;
+&lt;figcaption aria-hidden=&quot;true&quot;&gt;A screenshot of the Notes
+app&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+&lt;img src=&quot;/assets/img/dark/hand-drawn-lasso.png&quot;
+alt=&quot;A screenshot of the Notes app&quot; /&gt;
+&lt;figcaption aria-hidden=&quot;true&quot;&gt;A screenshot of the Notes
+app&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;The images are transparent by default (which is nice) and the
+lasso-select crops the export to the same size every time a selection is
+made (important for the next step).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;I really like that my blog has a high quality light &lt;em&gt;and&lt;/em&gt;
+dark theme—try toggling on your device!—but all that work goes away if
+there’s a big white diagram on an otherwise dark-mode page.&lt;/p&gt;
+&lt;p&gt;The fun thing about drawing in Notes is that I get light and dark
+versions of the diagrams for free. When I switch from light to dark mode
+on my iPad, the Notes app re-renders all my drawings to use
+dark-mode-friendly colors (for example, black lines become white
+lines).&lt;/p&gt;
+&lt;p&gt;Here’s what it looks like in practice:&lt;/p&gt;
+&lt;div
+style=&quot;position:relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&quot;&gt;
+&lt;p&gt;&lt;iframe
+    style=&quot;position: absolute; top: 0; left: 0; width: 100%; height:100%;&quot;
+    src=&quot;https://www.youtube-nocookie.com/embed/CJ1tHoDdlWE&quot;
+    title=&quot;YouTube video player&quot;
+    frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture&quot;
+    allowfullscreen&gt; &lt;/iframe&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;As long as the light and dark mode images have the same cropping
+(which they do, because of the the Notes lasso select) then the rendered
+page will look the same in light or dark.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Once I have light and dark versions of both images, I have some
+CSS on my blog that lets me just put the two directly adjacent in the
+source, and one of them will get &lt;code&gt;display: none&lt;/code&gt;. So this
+Markdown:&lt;/p&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot;&gt;&lt;pre
+class=&quot;sourceCode markdown&quot;&gt;&lt;code class=&quot;sourceCode markdown&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;Here&amp;#39;s an example image:&lt;/span&gt;
+&lt;span id=&quot;cb1-2&quot;&gt;&lt;a href=&quot;#cb1-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-3&quot;&gt;&lt;a href=&quot;#cb1-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;al&quot;&gt;![](/assets/img/light/example.png)&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-4&quot;&gt;&lt;a href=&quot;#cb1-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-5&quot;&gt;&lt;a href=&quot;#cb1-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;al&quot;&gt;![](/assets/img/dark/example.png)&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-6&quot;&gt;&lt;a href=&quot;#cb1-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-7&quot;&gt;&lt;a href=&quot;#cb1-7&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;As you can see, ...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and &lt;a
+href=&quot;https://github.com/jez/blog/blob/a5ccacacc0b38cfad79d6f08067dd09ba5ee8c7a/assets/css/extra.css#L1-L17&quot;&gt;this
+CSS&lt;/a&gt; combine to show the relevant image and hide the other.&lt;/p&gt;
+&lt;p&gt;I like that it’s very light on additional markup in the
+page.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;That’s pretty much it 👌 It’s a bit clunky (it would be neat if I
+could streamline or even automate the export flow), but it’s not that
+bad. In any given post I’ll usually only have a two or three diagrams so
+it’s not super toilsome, and adds a nice bit of charm.&lt;/p&gt;
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="meta" /><summary type="html">← Return home One thing I’ve had a lot of fun with is little hand-drawn diagrams to help me explain things. Some examples:</summary></entry><entry><title type="html">Some Old Sorbet Compiler Notes</title><link href="https://blog.jez.io/old-compiler-notes/" rel="alternate" type="text/html" title="Some Old Sorbet Compiler Notes" /><published>2022-12-10T17:38:00-05:00</published><updated>2022-12-10T17:38:00-05:00</updated><id>https://blog.jez.io/old-compiler-notes</id><content type="html" xml:base="https://blog.jez.io/old-compiler-notes/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
   &lt;a href=&quot;/&quot;&gt;← Return home&lt;/a&gt;&lt;br&gt;
 &lt;/nav&gt;
 
@@ -2124,140 +2218,4 @@ of type-aware linter, so far there are many factors that present a
 pretty high barrier to building something like this. Hopefully this post
 sheds some light on why a type-aware linter for Sorbet does not
 currently exist.&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="sorbet" /><category term="ruby" /><category term="rubocop" /><summary type="html">← Return home This post represents my opinions at a point in time. It’s not necessarily the views of my team or my employer.</summary></entry><entry><title type="html">T::Enum Pros &amp;amp; Cons</title><link href="https://blog.jez.io/tenum-pro-con/" rel="alternate" type="text/html" title="T::Enum Pros &amp;amp; Cons" /><published>2022-03-17T19:13:16-04:00</published><updated>2022-03-17T19:13:16-04:00</updated><id>https://blog.jez.io/tenum-pro-con</id><content type="html" xml:base="https://blog.jez.io/tenum-pro-con/">&lt;nav id=&quot;TOC&quot; role=&quot;doc-toc&quot;&gt;
-  &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;&lt;br&gt;
-  &lt;strong&gt;Contents&lt;/strong&gt;&lt;label for=&quot;contents&quot;&gt;⊕&lt;/label&gt;
-  &lt;input type=&quot;checkbox&quot; id=&quot;contents&quot;&gt;
-  &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#tenum-cannot-be-combined-in-ad-hoc-unions.&quot;
-  id=&quot;toc-tenum-cannot-be-combined-in-ad-hoc-unions.&quot;&gt;👎
-  &lt;code&gt;T::Enum&lt;/code&gt; cannot be combined in ad hoc unions.&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#tenum-is-verbose.&quot; id=&quot;toc-tenum-is-verbose.&quot;&gt;👎
-  &lt;code&gt;T::Enum&lt;/code&gt; is verbose.&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#its-hard-to-have-one-tenum-be-a-subset-of-another.&quot;
-  id=&quot;toc-its-hard-to-have-one-tenum-be-a-subset-of-another.&quot;&gt;👎 It’s
-  hard to have one &lt;code&gt;T::Enum&lt;/code&gt; be a subset of another.&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#every-ide-feature-sorbet-supports-works-for-tenum.&quot;
-  id=&quot;toc-every-ide-feature-sorbet-supports-works-for-tenum.&quot;&gt;🚀 Every
-  IDE feature Sorbet supports works for &lt;code&gt;T::Enum&lt;/code&gt;.&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#tenum-guards-against-basically-all-typos.&quot;
-  id=&quot;toc-tenum-guards-against-basically-all-typos.&quot;&gt;🙊
-  &lt;code&gt;T::Enum&lt;/code&gt; guards against basically all typos.&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#it-requires-being-intentional.&quot;
-  id=&quot;toc-it-requires-being-intentional.&quot;&gt;🤝 It requires being
-  intentional.&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#its-easy-to-search-for.&quot;
-  id=&quot;toc-its-easy-to-search-for.&quot;&gt;🕵️ It’s easy to search for.&lt;/a&gt;&lt;/li&gt;
-  &lt;/ul&gt;
-&lt;/nav&gt;
-
-&lt;main&gt;
-&lt;p&gt;One feature that Sorbet doesn’t have&lt;span
-class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-0&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-0&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
-class=&quot;sidenote&quot;&gt;Yet. The biggest limitation is just that Sorbet’s
-approach to type inference is designed to run fast and be simple to
-understand, sometimes sacrificing power.&lt;br /&gt;
-&lt;br /&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span
-class=&quot;sidenote-wrapper&quot;&gt;&lt;label for=&quot;sn-1&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-1&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span
-class=&quot;sidenote&quot;&gt;… but actually Sorbet already has these types
-internally 😅 It’s just that it doesn’t have syntax for people to write
-them in type annotations. And lo, it’s &lt;a
-href=&quot;https://sorbet.run/#%23%20typed%3A%20true%0Ax%20%3D%20%3Adefault%0A%0A1.times%20do%0A%20%20%23%20Sorbet%20does%20not%20report%20an%20error%20here%0A%20%20%23%20%28it%20would%20have%20to%20start%20doing%20so%29%0A%20%20x%20%3D%20%3Afirst%0Aend%0A%0AT.reveal_type%28x%29%20%23%20Sorbet%20shows%20the%20wrong%20type%20here%0A%0A%23%20Sorbet%20can&amp;#39;t%20tell%20the%20difference%20bewteen%20a%20hash%20literal%0A%23%20with%20a%20variable%20key%20versus%20with%20a%20symbol%20literal%20key%0A%23%20at%20the%20time%20that%20inference%20happens.%0AT.reveal_type%28%7Bx%20%3D%3E%20nil%7D%29%0AT.reveal_type%28%7B%3Adefault%20%3D%3E%20nil%7D%29&quot;&gt;because
-they’re buggy&lt;/a&gt;, but for the things where Sorbet needs to use them
-internally we can intentionally work around the known bugs, so it hasn’t
-been worth the pain to fix.&lt;br /&gt;
-&lt;br /&gt;
-&lt;/span&gt;&lt;/span&gt; but gets requested frequently is support for literal
-string and symbol types. Something like
-&lt;code&gt;T.any(:left, :right)&lt;/code&gt;, which is a type that allows either
-the symbol literal &lt;code&gt;:left&lt;/code&gt; or &lt;code&gt;:right&lt;/code&gt;, but no
-other &lt;code&gt;Symbol&lt;/code&gt;s much less other types of values. The closest
-that Sorbet has to this right now is typed enums:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;dt&quot;&gt;LeftOrRight&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;&amp;lt;&lt;/span&gt; T&lt;span class=&quot;kw&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;dt&quot;&gt;Enum&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-2&quot;&gt;&lt;a href=&quot;#cb1-2&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  enums &lt;span class=&quot;cf&quot;&gt;do&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-3&quot;&gt;&lt;a href=&quot;#cb1-3&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;dt&quot;&gt;Left&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; new&lt;/span&gt;
-&lt;span id=&quot;cb1-4&quot;&gt;&lt;a href=&quot;#cb1-4&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;dt&quot;&gt;Right&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; new&lt;/span&gt;
-&lt;span id=&quot;cb1-5&quot;&gt;&lt;a href=&quot;#cb1-5&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;
-&lt;span id=&quot;cb1-6&quot;&gt;&lt;a href=&quot;#cb1-6&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;cf&quot;&gt;end&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;TypeScript, Flow, and Mypy all have literal types. You probably have
-felt yourself wanting this. I don’t really have to explain why they’re
-nice. But I’ll do it anyways, just to prove that I hear you.&lt;/p&gt;
-&lt;p&gt;&lt;br /&gt;
-&lt;/p&gt;
-&lt;h2 id=&quot;tenum-cannot-be-combined-in-ad-hoc-unions.&quot;&gt;👎
-&lt;code&gt;T::Enum&lt;/code&gt; cannot be combined in ad hoc unions.&lt;/h2&gt;
-&lt;p&gt;That’s a fancy way of saying we’d like to be able to write
-&lt;code&gt;T.any(:left, :right)&lt;/code&gt; in any type annotation, without first
-having to pre-declare the new union type to the world. I spoke at length
-about how the existence of ad hoc union types make handling exceptional
-conditions &lt;a href=&quot;/union-types-checked-exceptions/&quot;&gt;more pleasant than
-checked exceptions&lt;/a&gt;, so I’m right there with you in appreciating that
-feature.&lt;/p&gt;
-&lt;h2 id=&quot;tenum-is-verbose.&quot;&gt;👎 &lt;code&gt;T::Enum&lt;/code&gt; is verbose.&lt;/h2&gt;
-&lt;p&gt;Even if you wanted to pre-declare the enum type. Consider:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;dt&quot;&gt;LeftOrRight&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; T&lt;span class=&quot;at&quot;&gt;.type_alias&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;{&lt;/span&gt;T&lt;span class=&quot;at&quot;&gt;.any&lt;/span&gt;(&lt;span class=&quot;wa&quot;&gt;:left&lt;/span&gt;, &lt;span class=&quot;wa&quot;&gt;:right&lt;/span&gt;)&lt;span class=&quot;kw&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Boom. One line, no boilerplate. Wouldn’t that be nice?&lt;/p&gt;
-&lt;h2 id=&quot;its-hard-to-have-one-tenum-be-a-subset-of-another.&quot;&gt;👎 It’s hard
-to have one &lt;code&gt;T::Enum&lt;/code&gt; be a subset of another.&lt;/h2&gt;
-&lt;p&gt;This comes up so frequently that there’s &lt;a
-href=&quot;https://sorbet.org/docs/tenum#defining-one-enum-as-a-subset-of-another-enum&quot;&gt;an
-FAQ entry&lt;/a&gt; about it. The answer is yet more verbosity and
-boilerplate.&lt;/p&gt;
-&lt;p&gt;&lt;br /&gt;
-&lt;/p&gt;
-&lt;p&gt;So I hear you. But I wanted to say a few things in defense of
-&lt;code&gt;T::Enum&lt;/code&gt;, because I think that despite how nice it might be
-to have literal types (and again, we may yet build them one day), there
-are still &lt;em&gt;a lot of points&lt;/em&gt; in favor of &lt;code&gt;T::Enum&lt;/code&gt; as
-it exists today.&lt;/p&gt;
-&lt;p&gt;&lt;br /&gt;
-&lt;/p&gt;
-&lt;h2 id=&quot;every-ide-feature-sorbet-supports-works-for-tenum.&quot;&gt;🚀 Every IDE
-feature Sorbet supports works for &lt;code&gt;T::Enum&lt;/code&gt;.&lt;/h2&gt;
-&lt;p&gt;&lt;code&gt;T::Enum&lt;/code&gt;s are just normal constants. Sorbet supports
-finding all constant references, renaming constants, autocompleting
-constant names, jumping to a constant’s definition, hovering over a
-constant to see its documentation comment. Also all of those features
-work on both the enum class itself and each individual enum value.&lt;/p&gt;
-&lt;p&gt;We could &lt;em&gt;maybe&lt;/em&gt; support completion for symbol literals in
-limited circumstances, but it would be the first of its kind in Sorbet.
-Same goes for rename, and maybe find all references. Jump to Definition
-I guess would want to jump not to the actual definition, but rather to
-the signature that specified the literal type? It’s weird.&lt;/p&gt;
-&lt;h2 id=&quot;tenum-guards-against-basically-all-typos.&quot;&gt;🙊
-&lt;code&gt;T::Enum&lt;/code&gt; guards against basically all typos.&lt;/h2&gt;
-&lt;p&gt;Even in &lt;code&gt;# typed: false&lt;/code&gt; files! Even when calling methods
-that take don’t have signatures, or that have loose signatures like
-&lt;code&gt;Object&lt;/code&gt;! Incidentally, this is basically the same reason why
-find all references can work so well.&lt;/p&gt;
-&lt;h2 id=&quot;it-requires-being-intentional.&quot;&gt;🤝 It requires being
-intentional.&lt;/h2&gt;
-&lt;p&gt;Code gets out of hand really quickly when people try to cutely
-interpolate strings into other strings that hold meaning. I’d much
-rather deal with this:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb3&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb3-1&quot;&gt;&lt;a href=&quot;#cb3-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;direction &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;[&lt;/span&gt;left_or_right, up_or_down&lt;span class=&quot;kw&quot;&gt;]&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;than this:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb4&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb4-1&quot;&gt;&lt;a href=&quot;#cb4-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;direction &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;st&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;#{&lt;/span&gt;left_or_right&lt;span class=&quot;sc&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;st&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;#{&lt;/span&gt;up_or_down&lt;span class=&quot;sc&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;st&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;If you try to do this with &lt;code&gt;T::Enum&lt;/code&gt; you get strings that
-look like:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb5&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb5-1&quot;&gt;&lt;a href=&quot;#cb5-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;vs&quot;&gt;&amp;#39;#&amp;lt;LeftOrRight::Left&amp;gt;__#&amp;lt;UpOrDown::Up&amp;gt;&amp;#39;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;which confuses people, so they ask how to do the thing they’re trying
-to do, which is a perfect opportunity to talk them down from that cliff.
-If people decide that yes, this really is the API we need, we can be
-intentional about it with &lt;code&gt;.serialize&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&quot;sourceCode&quot; id=&quot;cb6&quot;&gt;&lt;pre
-class=&quot;sourceCode ruby&quot;&gt;&lt;code class=&quot;sourceCode ruby&quot;&gt;&lt;span id=&quot;cb6-1&quot;&gt;&lt;a href=&quot;#cb6-1&quot; aria-hidden=&quot;true&quot; tabindex=&quot;-1&quot;&gt;&lt;/a&gt;direction &lt;span class=&quot;kw&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;st&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;#{&lt;/span&gt;left_or_right&lt;span class=&quot;at&quot;&gt;.serialize&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;st&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;#{&lt;/span&gt;up_or_down&lt;span class=&quot;at&quot;&gt;.serialize&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;st&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2 id=&quot;its-easy-to-search-for.&quot;&gt;🕵️ It’s easy to search for.&lt;/h2&gt;
-&lt;p&gt;This is a small one, but I’ll mention it anyways. It’s quick to
-search the Sorbet docs for &lt;code&gt;T::Enum&lt;/code&gt; and get to the right
-page. It’s similarly easy to find examples of it being used in a given
-codebase, to learn from real code. There’s no unique piece of syntax in
-&lt;code&gt;T.any(:left, :right)&lt;/code&gt; that is a surefire thing to search
-for.&lt;/p&gt;
-&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="fragment" /><category term="sorbet" /><summary type="html">← Return home One feature that Sorbet doesn’t have[^yet][^but-actually] but gets requested frequently is support for literal string and symbol types. Something like T.any(:left, :right), which is a type that allows either the symbol literal :left or :right, but no other Symbols much less other types of values. The closest that Sorbet has to this right now is typed enums:</summary></entry></feed>
+&lt;/main&gt;</content><author><name>Jake Zimmerman</name></author><category term="sorbet" /><category term="ruby" /><category term="rubocop" /><summary type="html">← Return home This post represents my opinions at a point in time. It’s not necessarily the views of my team or my employer.</summary></entry></feed>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2022-12-13 17:10:22 -0500">
+<meta name="description" content="Here's how I draw the little diagrams that sometimes appear on my posts.">
+<title>My workflow for hand-drawn diagrams – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+    <link rel="stylesheet" href="/assets/css/extra.css">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">My workflow for hand-drawn diagrams</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2022-12-13 17:10:22 -0500">December 13, 2022</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">← Return home</a><br>
+</nav>
+
+<main>
+<p>One thing I’ve had a lot of fun with is little hand-drawn diagrams to
+help me explain things. Some examples:</p>
+<p>→ <a href="https://blog.jez.io/sorbet-rescue-control-flow/">Sorbet’s
+weird approach to exception handling</a><br />
+→ <a href="https://blog.jez.io/gc-compact-in-pictures/">GC.compact in
+Pictures</a><br />
+→ <a
+href="https://sorbet.run/talks/RubyConf2021/#/visualizing-api-latency-1">Compiling
+Ruby to Native Code with Sorbet and LLVM</a></p>
+<p>Here’s my workflow for drawing them:</p>
+<ol type="1">
+<li><p>I draw the diagrams with an Apple Pencil on a 12.9-inch iPad Pro
+(2nd generation) that I bought new in 2017—it still runs as well as the
+day I brought it home. It took a little time to get used to the feeling
+of drawing with plastic-on-glass instead of ink-on-paper, but I find
+that the super-low-latency of the screen helps a lot.</p></li>
+<li><p>I simply use the default Notes app. I tried some other apps but
+found that I kept coming back to Notes at the end of the day (I also use
+Notes for random notes I need to jot down).</p></li>
+<li><p>The text and lines are all free-form. I like the charm that it
+adds to posts—I don’t want something super polished looking like you’d
+get from another diagramming tool.</p></li>
+<li><p>To export a finished diagram for use in a post, I lasso-select
+the piece I want to export, copy and paste it into an iMessage with
+myself,<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">If you have tips for how to cut out this step and go
+straight from a selection to a file, I’d love to hear!<br />
+<br />
+</span></span> and then hop over to a laptop to save the image to a
+file.</p>
+<figure>
+<img src="/assets/img/light/hand-drawn-lasso.png"
+alt="A screenshot of the Notes app" />
+<figcaption aria-hidden="true">A screenshot of the Notes
+app</figcaption>
+</figure>
+<figure>
+<img src="/assets/img/dark/hand-drawn-lasso.png"
+alt="A screenshot of the Notes app" />
+<figcaption aria-hidden="true">A screenshot of the Notes
+app</figcaption>
+</figure>
+<p>The images are transparent by default (which is nice) and the
+lasso-select crops the export to the same size every time a selection is
+made (important for the next step).</p></li>
+<li><p>I really like that my blog has a high quality light <em>and</em>
+dark theme—try toggling on your device!—but all that work goes away if
+there’s a big white diagram on an otherwise dark-mode page.</p>
+<p>The fun thing about drawing in Notes is that I get light and dark
+versions of the diagrams for free. When I switch from light to dark mode
+on my iPad, the Notes app re-renders all my drawings to use
+dark-mode-friendly colors (for example, black lines become white
+lines).</p>
+<p>Here’s what it looks like in practice:</p>
+<div
+style="position:relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+<p><iframe
+    style="position: absolute; top: 0; left: 0; width: 100%; height:100%;"
+    src="https://www.youtube-nocookie.com/embed/CJ1tHoDdlWE"
+    title="YouTube video player"
+    frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen> </iframe></p>
+</div>
+<p>As long as the light and dark mode images have the same cropping
+(which they do, because of the the Notes lasso select) then the rendered
+page will look the same in light or dark.</p></li>
+<li><p>Once I have light and dark versions of both images, I have some
+CSS on my blog that lets me just put the two directly adjacent in the
+source, and one of them will get <code>display: none</code>. So this
+Markdown:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Here&#39;s an example image:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="al">![](/assets/img/light/example.png)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="al">![](/assets/img/dark/example.png)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>As you can see, ...</span></code></pre></div>
+<p>and <a
+href="https://github.com/jez/blog/blob/a5ccacacc0b38cfad79d6f08067dd09ba5ee8c7a/assets/css/extra.css#L1-L17">this
+CSS</a> combine to show the relevant image and hide the other.</p>
+<p>I like that it’s very light on additional markup in the
+page.</p></li>
+</ol>
+<p>That’s pretty much it 👌 It’s a bit clunky (it would be neat if I
+could streamline or even automate the export flow), but it’s not that
+bad. In any given post I’ll usually only have a two or three diagrams so
+it’s not super toilsome, and adds a nice bit of charm.</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#meta">meta</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script>
+  ;(function() {
+    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
+    var selector = '.task-list > li > input[type="checkbox"]';
+    var checkboxes = document.querySelectorAll(selector);
+    Array.from(checkboxes).forEach((checkbox) => {
+      var wasChecked = checkbox.checked;
+      checkbox.disabled = false;
+      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
+    });
+  })();
+  </script>
+
+  
+
+
+
+</body>
+</html>
+
