@@ -13,22 +13,9 @@
   <link rel="stylesheet" href="/assets/css/theme.css">
 <link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", function () {
-   var mathElements = document.getElementsByClassName("math");
-   var macros = [];
-   for (var i = 0; i < mathElements.length; i++) {
-    var texText = mathElements[i].firstChild;
-    if (mathElements[i].tagName == "SPAN") {
-     katex.render(texText.data, mathElements[i], {
-      displayMode: mathElements[i].classList.contains('display'),
-      throwOnError: false,
-      macros: macros,
-      fleqn: false
-     });
-  }}});
-  </script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" />
+  <script src="/assets/libs/KaTeX/0.11.1/katex.min.js"></script>
+  <script src="/assets/js/enable_katex.js"></script>
+  <link rel="stylesheet" href="/assets/libs/KaTeX/0.11.1/katex.min.css">
 
 
 
@@ -332,18 +319,7 @@ that powerful. Functions!</p>
       <p><a href="/">← Return home</a></p>
     </footer>
   
-    <script>
-  ;(function() {
-    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
-    var selector = '.task-list > li > input[type="checkbox"]';
-    var checkboxes = document.querySelectorAll(selector);
-    Array.from(checkboxes).forEach((checkbox) => {
-      var wasChecked = checkbox.checked;
-      checkbox.disabled = false;
-      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
-    });
-  })();
-  </script>
+    <script src="/assets/js/enable_checkboxes.js"></script>
 
   
 

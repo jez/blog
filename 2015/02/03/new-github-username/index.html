@@ -93,18 +93,7 @@ shoot me a message letting me know!</p>
       <p><a href="/">← Return home</a></p>
     </footer>
   
-    <script>
-  ;(function() {
-    // Non-essential if user has JavaScript off. Just makes checkboxes look nicer.
-    var selector = '.task-list > li > input[type="checkbox"]';
-    var checkboxes = document.querySelectorAll(selector);
-    Array.from(checkboxes).forEach((checkbox) => {
-      var wasChecked = checkbox.checked;
-      checkbox.disabled = false;
-      checkbox.addEventListener('click', (ev) => {ev.target.checked = wasChecked});
-    });
-  })();
-  </script>
+    <script src="/assets/js/enable_checkboxes.js"></script>
 
   
 
