@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2022-12-30 16:50:17 -0500">
+<meta name="description" content="I've been struggling to get the RSS version of my posts to look good in the presence of all the features my blog supports (side notes, line highlights on code blocks, light- and dark-mode images, etc.). With that in mind, I'm switching to share only a link and a post summary in the feed, omitting the full content.">
+<title>Moving to excerpt-only for feeds – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+    <link rel="stylesheet" href="/assets/css/extra.css">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">Moving to excerpt-only for feeds</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2022-12-30 16:50:17 -0500">December 30, 2022</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">← Return home</a><br>
+</nav>
+
+<main>
+<p>I’ve been struggling to get the RSS version of my posts to look good
+in the presence of all the features my blog supports (side notes, line
+highlights on code blocks, light- and dark-mode images, etc.). With that
+in mind, I’m switching to share only a link and a post summary in the
+feed, omitting the full content.</p>
+<!-- more -->
+<p>There were too many problems with the way posts rendered, and I
+didn’t have the patience to continue working around the problems. The
+way side notes render in a feed is particularly annoying:</p>
+<figure>
+<img src="/assets/img/light/rss-side-note.jpg" class="center"
+style="max-width: 390px;"
+alt="Highlighted: what would normally appear as a sidenote" />
+<figcaption aria-hidden="true">Highlighted: what would normally appear
+as a sidenote</figcaption>
+</figure>
+<figure>
+<img src="/assets/img/dark/rss-side-note.jpg" class="center"
+style="max-width: 390px;"
+alt="Highlighted: what would normally appear as a sidenote" />
+<figcaption aria-hidden="true">Highlighted: what would normally appear
+as a sidenote</figcaption>
+</figure>
+<p>I’ve taken this example from <a
+href="/sorbet-rescue-control-flow/">this post</a>. In that post, the
+side note appears in-line with a superscript number, and the paragraph
+continues after the side note anchor. But because of the HTML markup I’m
+using <a
+href="https://jez.io/pandoc-markdown-css-theme/features/#side-notes-and-margin-notes">to
+achieve that</a>, elements that ought to be hidden are not (in
+particular, the <code>&lt;input&gt;</code> element).</p>
+<p>A similar problem happens with light- and dark-mode images:</p>
+<figure>
+<img src="/assets/img/light/rss-double-image.jpg" class="center"
+style="max-width: 390px;"
+alt="A feed reader showing both light and dark images" />
+<figcaption aria-hidden="true">A feed reader showing both light and dark
+images</figcaption>
+</figure>
+<figure>
+<img src="/assets/img/dark/rss-double-image.jpg" class="center"
+style="max-width: 390px;"
+alt="A feed reader showing both light and dark images" />
+<figcaption aria-hidden="true">A feed reader showing both light and dark
+images</figcaption>
+</figure>
+<p>Feed readers don’t use the CSS (admittedly, by design) to know that
+one of the two versions of the images <a
+href="/hand-drawn-diagrams/">will have <code>display: none</code></a>,
+so it shows both. Because the dark-mode image uses white lines instead
+of black lines, a lot of the lines in the drawing aren’t even visible,
+making it hard to tell that the diagram is identical to the previous one
+(modulo colors).</p>
+<p>Another gripe was that code blocks on my site support highlighting
+individual lines, <a
+href="https://blog.jez.io/syntactic-control-flow/#cb2-25">like this</a>.
+Those get stripped by feed readers, stripping the context from any
+explanation that says “look at the highlighted lines.”</p>
+<p>And another gripe was that the way I render the table of contents was
+making it look like the navigation elements on the page were part of the
+post content. Every post’s preview in a feed reader always looked the
+same, starting with text like “← Return home” or “Home Contents…”,
+instead of the actual intro of the post.</p>
+<p>After spending some time, it ended up being more effort than I wanted
+to spend to render a post differently for the blog view or the feed
+view. I could have left it quirks and all, but I’d rather encourage
+people to read the posts on the web where they’ll be typeset as intended
+(especially considering that my blog theme is quite responsive at all
+screen sizes). Sorry for any inconveniences!</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#meta">meta</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#rss">rss</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script src="/assets/js/enable_checkboxes.js"></script>
+
+  
+
+
+
+</body>
+</html>
+
