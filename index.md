@@ -15,7 +15,10 @@ to programming languages and productivity tips.
 → 📺 [Talks I've given](https://jez.io/talks/)\
 → 💭 [Thoughts and opinion pieces](https://jez.io/thoughts/)
 
-Jump to [All Posts](#all-posts) or to [All Categories](categories/)
+Jump to [All Posts](#all-posts) or to [All Categories](categories/), or
+subscribe via [RSS].
+
+[RSS]: /atom.xml
 
 {% capture numposts %}{{ site.posts | size }}{% endcapture %}
 {% if numposts != '0' %}
@@ -24,12 +27,11 @@ Jump to [All Posts](#all-posts) or to [All Categories](categories/)
 
 {% assign pinned_posts = site.posts | where: "pinned", true %}
 {% for post in pinned_posts -%}
-## {{ post.title }}
+### {{ post.title }}
 
 > {{ post.date | date: '%B %-d, %Y' }}
 
-{{ post.description }}
-
+{{ post.description }}\
 _[Read more →]({{ post.url }})_
 
 {% endfor %}

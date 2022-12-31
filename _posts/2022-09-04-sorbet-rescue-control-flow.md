@@ -8,6 +8,7 @@ description:
   and some pretty pictures.
 math: false
 categories: ['ruby', 'sorbet', 'types']
+pinned: true
 # subtitle:
 # author:
 # author_url:

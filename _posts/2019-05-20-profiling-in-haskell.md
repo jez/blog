@@ -4,7 +4,7 @@ title: "Profiling in Haskell for a 10x Speedup"
 date: 2019-05-20 03:13:34 +0800
 comments: false
 share: false
-categories: ['haskell']
+categories: ['haskell', 'debugging']
 description: >
   I wrote up a toy project in Haskell and profiled it to learn about
   Haskell's profiling tools and about profiling code in general.

@@ -14,7 +14,6 @@ description: >
   is the result of using type variables in two ways within the same
   system.
 math: true
-pinned: true
 ---
 
 Variables are central[^central] to programming languages, yet they're
