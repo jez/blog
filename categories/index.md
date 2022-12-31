@@ -18,6 +18,8 @@ regenerate: true
 {% for category in categories_list %}
 # [{{ category[0] }}]{.smallcaps}
 
+([RSS](/feed/{{ category[0] }}.xml))
+
 {% assign pages_list = category[1] -%}
 {% for post in pages_list -%}
 - [{{ post.title }}]({{ site.baseurl }}{{ post.url }}), {{ post.date | date: '%B %-d, %Y' }}
