@@ -70,16 +70,16 @@ And then lots of small bloggers make no mention of RSS in the page, despite publ
 feeds (likely only because their blog software makes one by default, not because they're
 all avid RSS users). I don't really fault these people—it's their choice what they want to
 mention on their sites or not, and at least a lot of the time there _are_
-properly-formatted feeds, so much so that guess-and-check is a viable strategy.
+properly-formatted feeds (so much so that guess-and-check is a viable strategy).
 
 I'm not sure there's a solution here? Short of complaining loudly enough for browser
 vendors to add (back?) some sort of button to show when a page has an RSS `<link>` tag, it
 seems just like something to suffer through. You might say, "oh you can get an extension
 for this!" and well sure, but:
 
-- Every extension that does this will need _full page content access_ on every page, which
-  seems a bit excessive. I'd love to not have to trust another browser extension for what
-  my browser could do trivially with a simple `querySelectorAll` after the page loads.
+- Every extension that does this will need to be able to access the full page contents of
+  every page, which seems a bit excessive. I'd love to not have to trust another browser
+  extension for what my browser could do with a simple `querySelectorAll`.
 
 - That would only really work on desktop, probably? I read the most on my phone these
   days, and I'd really love for it to be obvious on my phone when an article has a
@@ -90,14 +90,18 @@ for this!" and well sure, but:
 Apart from my experience with feeds, I have some personal gripes with the clients I tried
 out.
 
-I really was hoping to basically have my feed reader built into the browser. When browsing
-the web, I prefer never leaving my web browser, open tabs to read next in the background.
+I really was hoping to have my feed reader built into the browser.[^app] When browsing the
+web, I prefer to never leave my web browser, opening tabs as I queue things up to read.
 I'd love if, for example, the iOS Safari "Reading List" would let me save feeds, not just
-individual articles. I just want a list of links that open as browser tabs and an unread
-article count.
+individual articles. I just want a list of links that open as browser tabs, plus a count
+of unread articles.
+
+[^app]:
+  {-} Or, short of that, to have it be a mobile-friendly web app with a mobile client for
+  badges.
 
 I installed [NetNewsWire] on iOS after ~10 minutes of research and started filling up my
-feeds, but I couldn't get it to behave like I wanted. I [filed an issue] and looked for
+feeds. I couldn't get it to behave like I wanted, so I [filed an issue] and looked for
 something else.[^oss] (Though I will say: the rest of the client was plain and simple,
 which I really liked. I think if it weren't for this one problem I would have had no
 complaints here.)
@@ -147,11 +151,12 @@ I tried a few "popular" feeds, and they updated way too much—all the content w
 stuff I didn't want to look at.
 
 I fell back on feeds of coworkers or former coworkers, whose posts I know I'd like to read
-if they posted. But of course, people are busy and I only got a few articles this way.
+if they posted. But of course, people are busy and I only saw a few new articles get
+posted from these people over the past week.
 
-I haven't been able to land between "fire hose of content" and "content desert," which has
-meant that I still find myself consuming content the way I used to (doom scrolling on
-Hacker News).
+I'm looking for some goldilocks area between "fire hose of content" and "content desert,"
+but I haven't found it yet. Which has meant that I still find myself consuming content the
+way I used to (doom scrolling on Hacker News).
 
 I have a feeling that maybe this will die down. I've been more willing to give small
 bloggers I discover more of an "innocent until proven guilty" approach—if I see a decent
@@ -162,7 +167,7 @@ It's probably a marathon not a sprint to finding good feeds.
 
 I realized that ever since I redesigned my blog to have all sorts of fancy features (like
 side notes, code block line highlights, dark mode images, table of contents, etc.), my RSS
-feed content has been broken.
+feed content has been broken. Sorry about that!
 
 I spent some time trying to make things better, but in the end I gave up. I wrote up some
 notes on that [in this post](/rss-excerpt-only/). The **tl;dr** is that I worked myself
@@ -171,13 +176,13 @@ to customize the markup that gets sent into my feed file, making my posts get ki
 garbled by a feed reader.
 
 Even if I could fix markup to not be egregiously bad, I don't want to have to write
-assuming the least common denominator feed reader feature set—I said earlier that I really
-want RSS to be a list of links that become tabs in my browser, and I really like the
-typesetting features I can use to compose my posts.
+assuming the feature set of the least common denominator feed reader—I said earlier that I
+really want RSS to be a list of links that become tabs in my browser, and I really like
+the typesetting features I currently use to compose my posts.
 
-So I stopped publishing full blog contents to the feed, and left only a summary plus a
-link to the post online. This means I selfishly don't have to spend time thinking about
-how my posts format in an RSS feed, but comes at the expense of readers not being able to
+So I stopped publishing full blog contents to the feed, leaving only the post summary plus
+a link to the post online. This means I (selfishly) don't have to spend time thinking
+about how my posts format in an RSS feed at the expense of readers not being able to
 easily save my posts to read offline.
 
 # Wrapping up
