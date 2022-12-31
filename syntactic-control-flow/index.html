@@ -62,9 +62,9 @@
 <p>People always ask me, “Why does Sorbet think this is nil? I just
 checked that it’s not!” So much so, that it’s at the very top of the <a
 href="https://sorbet.org/docs/faq">Sorbet FAQ</a></p>
-<p>That doc answers what is happening and what to do to fix it, but
-doesn’t really answer why its like that. A common follow up question
-looks something like this:</p>
+<p>That doc answers what’s happening and how to fix it, but it doesn’t
+really answer why it behaves this way. A common follow up question looks
+something like this:</p>
 <blockquote>
 <p>Having to use local variables as mentioned in Sorbet’s <a
 href="https://sorbet.org/docs/flow-sensitive#limitations-of-flow-sensitivity">limitations
@@ -72,7 +72,7 @@ of flow-sensitivity</a> docs is annoying. Idiomatic Ruby doesn’t use
 local variables nearly as much as Sorbet requires. What gives?</p>
 </blockquote>
 <p><strong>TL;DR</strong>: Sorbet’s type inference algorithm requires
-being given a fixed data structure modeling control flow inside a
+being given a fixed data structure that models control flow inside a
 method. Type inference doesn’t get to change that structure, so the
 things Sorbet learns while from inference don’t retroactively change
 Sorbet’s view of control flow. (This is in line with the other popular
