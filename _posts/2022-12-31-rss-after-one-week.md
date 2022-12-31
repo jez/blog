@@ -131,7 +131,7 @@ wanted. But on the other, I disliked almost everything else:
 - There were a lot of "social" features, like how many other Feedly users subscribe to
   this feed.
 
-- I kept getting onboarding "try out our AI-enhanced recommender" pop ups.
+- I kept getting pop ups saying things like"try out our AI-enhanced recommender."
 
 And to top it all off, the app was super sluggish and I didn't love the interface (all the
 buttons were tiny). So I went back to NetNewsWire and decided to just suck it up on the
