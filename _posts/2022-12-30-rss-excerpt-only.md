@@ -52,7 +52,7 @@ the previous one (modulo colors).
 [dark-mode-images]: /hand-drawn-diagrams/
 
 Another gripe was that code blocks on my site support highlighting individual lines, [like
-this][cb-hl]. Those get stripped by feed readers, stripping the context from any
+this][cb-hl]. Those get dropped by feed readers, stripping the context from any
 explanation that says "look at the highlighted lines."
 
 And another gripe was that the way I render the table of contents was making it look like

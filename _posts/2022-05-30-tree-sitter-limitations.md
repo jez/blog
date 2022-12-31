@@ -4,7 +4,7 @@ layout: post
 title: "Is tree-sitter good enough?"
 date: 2022-05-30T04:43:46-04:00
 description: >
-  While tree-sitter is a neat project with lots of valid use case, it isn't a silver
+  While tree-sitter is a neat project with lots of valid use cases, it isn't a silver
   bullet for all parsing-related projects.
 math: false
 categories: ['parsing', 'tree-sitter']

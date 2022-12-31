@@ -16,8 +16,8 @@ categories: ['ruby', 'sorbet', 'types']
 People always ask me, "Why does Sorbet think this is nil? I just checked that it's not!"
 So much so, that it's at the very top of the [Sorbet FAQ](https://sorbet.org/docs/faq)
 
-That doc answers what is happening and what to do to fix it, but doesn't really answer why
-its like that. A common follow up question looks something like this:
+That doc answers what's happening and how to fix it, but it doesn't really answer why it
+behaves this way. A common follow up question looks something like this:
 
 > Having to use local variables as mentioned in Sorbet's [limitations of
 > flow-sensitivity](https://sorbet.org/docs/flow-sensitive#limitations-of-flow-sensitivity)
@@ -25,11 +25,11 @@ its like that. A common follow up question looks something like this:
 > requires. What gives?
 
 **TL;DR**: Sorbet's type inference algorithm requires being given a fixed data structure
-modeling control flow inside a method. Type inference doesn't get to change that structure,
-so the things Sorbet learns while from inference don't retroactively change Sorbet's view
-of control flow. (This is in line with the other popular type systems for dynamically
-typed languages.) As a result control flow must be a function of local syntax alone
-(variables), not global nor semantic information (methods).
+that models control flow inside a method. Type inference doesn't get to change that
+structure, so the things Sorbet learns while from inference don't retroactively change
+Sorbet's view of control flow. (This is in line with the other popular type systems for
+dynamically typed languages.) As a result control flow must be a function of local syntax
+alone (variables), not global nor semantic information (methods).
 
 But that's packing a lot in at once, so let's take a step back.
 

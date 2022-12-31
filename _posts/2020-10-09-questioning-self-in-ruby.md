@@ -3,9 +3,10 @@
 layout: post
 title: "Questioning self in Ruby"
 date: 2020-10-09T21:12:03-05:00
-description: TODO
+description:
+  Some ramblings on what `class << self` and `def self.` mean in Ruby.
 math: false
-categories: ['TODO']
+categories: ['ruby']
 # subtitle:
 # author:
 # author_url:
