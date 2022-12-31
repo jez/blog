@@ -102,12 +102,11 @@ of unread articles.
 
 I installed [NetNewsWire] on iOS after ~10 minutes of research and started filling up my
 feeds. I couldn't get it to behave like I wanted, so I [filed an issue] and looked for
-something else.[^oss] (Though I will say: the rest of the client was plain and simple,
-which I really liked. I think if it weren't for this one problem I would have had no
-complaints here.)
+something else.[^oss] The rest of the client was plain and simple, which I really liked. I
+think if it weren't for this one problem I would have had no complaints here.
 
 [^oss]:
-  I will say, it was neat that I could file an issue in the first place.
+  {-} I will say, it was neat that I could file an issue in the first place.
 
 [NetNewsWire]: https://netnewswire.com/
 [filed an issue]: https://github.com/Ranchero-Software/NetNewsWire/issues/3791
