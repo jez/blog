@@ -123,19 +123,18 @@ despite publishing RSS feeds (likely only because their blog software
 makes one by default, not because they’re all avid RSS users). I don’t
 really fault these people—it’s their choice what they want to mention on
 their sites or not, and at least a lot of the time there <em>are</em>
-properly-formatted feeds, so much so that guess-and-check is a viable
-strategy.</p>
+properly-formatted feeds (so much so that guess-and-check is a viable
+strategy).</p>
 <p>I’m not sure there’s a solution here? Short of complaining loudly
 enough for browser vendors to add (back?) some sort of button to show
 when a page has an RSS <code>&lt;link&gt;</code> tag, it seems just like
 something to suffer through. You might say, “oh you can get an extension
 for this!” and well sure, but:</p>
 <ul>
-<li><p>Every extension that does this will need <em>full page content
-access</em> on every page, which seems a bit excessive. I’d love to not
-have to trust another browser extension for what my browser could do
-trivially with a simple <code>querySelectorAll</code> after the page
-loads.</p></li>
+<li><p>Every extension that does this will need to be able to access the
+full page contents of every page, which seems a bit excessive. I’d love
+to not have to trust another browser extension for what my browser could
+do with a simple <code>querySelectorAll</code>.</p></li>
 <li><p>That would only really work on desktop, probably? I read the most
 on my phone these days, and I’d really love for it to be obvious on my
 phone when an article has a corresponding feed.</p></li>
@@ -143,18 +142,23 @@ phone when an article has a corresponding feed.</p></li>
 <h1 id="on-clients">On clients</h1>
 <p>Apart from my experience with feeds, I have some personal gripes with
 the clients I tried out.</p>
-<p>I really was hoping to basically have my feed reader built into the
-browser. When browsing the web, I prefer never leaving my web browser,
-open tabs to read next in the background. I’d love if, for example, the
-iOS Safari “Reading List” would let me save feeds, not just individual
-articles. I just want a list of links that open as browser tabs and an
-unread article count.</p>
+<p>I really was hoping to have my feed reader built into the
+browser.<span
+class="sidenote-wrapper"><label for="sn-4" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
+class="marginnote">Or, short of that, to have it be a mobile-friendly
+web app with a mobile client for badges.<br />
+<br />
+</span></span> When browsing the web, I prefer to never leave my web
+browser, opening tabs as I queue things up to read. I’d love if, for
+example, the iOS Safari “Reading List” would let me save feeds, not just
+individual articles. I just want a list of links that open as browser
+tabs, plus a count of unread articles.</p>
 <p>I installed <a href="https://netnewswire.com/">NetNewsWire</a> on iOS
-after ~10 minutes of research and started filling up my feeds, but I
-couldn’t get it to behave like I wanted. I <a
+after ~10 minutes of research and started filling up my feeds. I
+couldn’t get it to behave like I wanted, so I <a
 href="https://github.com/Ranchero-Software/NetNewsWire/issues/3791">filed
 an issue</a> and looked for something else.<span
-class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
+class="sidenote-wrapper"><label for="sn-5" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-5" class="margin-toggle"/><span
 class="sidenote">I will say, it was neat that I could file an issue in
 the first place.<br />
 <br />
@@ -200,10 +204,12 @@ should just bUiLd My OwN.”</p>
 content was just stuff I didn’t want to look at.</p>
 <p>I fell back on feeds of coworkers or former coworkers, whose posts I
 know I’d like to read if they posted. But of course, people are busy and
-I only got a few articles this way.</p>
-<p>I haven’t been able to land between “fire hose of content” and
-“content desert,” which has meant that I still find myself consuming
-content the way I used to (doom scrolling on Hacker News).</p>
+I only saw a few new articles get posted from these people over the past
+week.</p>
+<p>I’m looking for some goldilocks area between “fire hose of content”
+and “content desert,” but I haven’t found it yet. Which has meant that I
+still find myself consuming content the way I used to (doom scrolling on
+Hacker News).</p>
 <p>I have a feeling that maybe this will die down. I’ve been more
 willing to give small bloggers I discover more of an “innocent until
 proven guilty” approach—if I see a decent post, I’ll add the feed and
@@ -212,8 +218,8 @@ a marathon not a sprint to finding good feeds.</p>
 <h1 id="rss-on-my-own-blog">RSS on my own blog</h1>
 <p>I realized that ever since I redesigned my blog to have all sorts of
 fancy features (like side notes, code block line highlights, dark mode
-images, table of contents, etc.), my RSS feed content has been
-broken.</p>
+images, table of contents, etc.), my RSS feed content has been broken.
+Sorry about that!</p>
 <p>I spent some time trying to make things better, but in the end I gave
 up. I wrote up some notes on that <a href="/rss-excerpt-only/">in this
 post</a>. The <strong>tl;dr</strong> is that I worked myself into a
@@ -221,15 +227,15 @@ corner with my Jekyll + <code>pandoc</code> rendering pipeline, which
 makes it kind of tricky to customize the markup that gets sent into my
 feed file, making my posts get kind of garbled by a feed reader.</p>
 <p>Even if I could fix markup to not be egregiously bad, I don’t want to
-have to write assuming the least common denominator feed reader feature
-set—I said earlier that I really want RSS to be a list of links that
-become tabs in my browser, and I really like the typesetting features I
-can use to compose my posts.</p>
-<p>So I stopped publishing full blog contents to the feed, and left only
-a summary plus a link to the post online. This means I selfishly don’t
-have to spend time thinking about how my posts format in an RSS feed,
-but comes at the expense of readers not being able to easily save my
-posts to read offline.</p>
+have to write assuming the feature set of the least common denominator
+feed reader—I said earlier that I really want RSS to be a list of links
+that become tabs in my browser, and I really like the typesetting
+features I currently use to compose my posts.</p>
+<p>So I stopped publishing full blog contents to the feed, leaving only
+the post summary plus a link to the post online. This means I
+(selfishly) don’t have to spend time thinking about how my posts format
+in an RSS feed at the expense of readers not being able to easily save
+my posts to read offline.</p>
 <h1 id="wrapping-up">Wrapping up</h1>
 <p>I’m sure a lot of these grips are just ignorance and lack of
 familiarity. If you see me blabbing on about an obviously-solved
