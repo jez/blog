@@ -34,8 +34,9 @@ Here's my workflow for drawing them:
     want something super polished looking like you'd get from another diagramming tool.
 
 1.  To export a finished diagram for use in a post, I lasso-select the piece I want to
-    export, copy and paste it into an iMessage with myself,[^save] and then hop over to a
-    laptop to save the image to a file.
+    export, copy it, and then switch to the Dropbox app on my iPad.[^imessage] Dropbox
+    lets you save an image on the clipboard as a file, and from there I can rename and
+    move it wherever I need to.
 
     ![A screenshot of the Notes app](/assets/img/light/hand-drawn-lasso.png)
 
@@ -93,6 +94,6 @@ That's pretty much it 👌 It's a bit clunky (it would be neat if I could stream
 automate the export flow), but it's not that bad. In any given post I'll usually only have
 a two or three diagrams so it's not super toilsome, and adds a nice bit of charm.
 
-[^save]:
-  If you have tips for how to cut out this step and go straight from a selection to a
-  file, I'd love to hear!
+[^imessage]:
+  Previously, I would paste the image into an iMessage with myself, then hop over to a
+  laptop to save it as a file.
