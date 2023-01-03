@@ -4,11 +4,11 @@ layout: post
 title: "Runtime type checking is great"
 date: 2023-01-03T13:15:03-05:00
 description:
-  Checking type annotations at runtime—in to statically—is a net win in a gradual type
-  system. In many cases runtime checking only _seems_ like it comes with more costs, when
-  in fact they're the same costs, paid earlier. When there are net-new costs, there are
-  ways to minimize them, and runtime-checked type annotations come with some key benefits
-  that makes working in a gradually-typed codebase easier.
+  Checking type annotations at runtime—in addition to statically—is a net win in a gradual
+  type system. In many cases runtime checking only _seems_ like it comes with more costs,
+  when in fact they're the same costs, paid earlier. When there are net-new costs, there
+  are ways to minimize them, and runtime-checked type annotations come with some key
+  benefits that makes working in a gradually-typed codebase easier.
 math: false
 categories: ['sorbet', 'types']
 # subtitle:
@@ -16,7 +16,7 @@ categories: ['sorbet', 'types']
 # author_url:
 ---
 
-Checking type annotations at runtime—in to statically—is a net win in a [gradual
+Checking type annotations at runtime—in addition to statically—is a net win in a [gradual
 type system]. In many cases runtime checking only _seems_ like it comes with more costs,
 when in fact they're the same costs, paid earlier. When there are net-new costs, there are
 ways to minimize them, and runtime-checked type annotations come with some key benefits
