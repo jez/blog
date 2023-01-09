@@ -2,7 +2,7 @@
 # vim:tw=90
 layout: post
 title: "Making Sorbet more incremental"
-date: 2023-01-09T21:23:45-05:00
+date: 2023-01-09T09:19:36-05:00
 description:
 math: false
 categories: ['sorbet', 'language-servers']
