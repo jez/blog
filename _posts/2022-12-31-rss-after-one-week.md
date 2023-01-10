@@ -186,7 +186,7 @@ easily save my posts to read offline.
 
 # Wrapping up
 
-I'm sure a lot of these grips are just ignorance and lack of familiarity. If you see me
+I'm sure a lot of these gripes are just ignorance and lack of familiarity. If you see me
 blabbing on about an obviously-solved problem, feel free to let me know.
 
 But on the other hand, I know that I definitely couldn't recommend this to my family
