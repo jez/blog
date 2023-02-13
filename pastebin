@@ -1,0 +1,25 @@
+
+- - - - -
+
+variance
+
+Flow has
+
+```js
+class A<+T> {
+  +x: T;
+  constructor(x: T) {
+    this.x = x;
+  }
+}
+```
+
+`constructor` is special, you can consider it being like read-only initialization of
+object literal.
+
+JavaScript private properties behave more like "normal" private.
+
+Java has use-site variance annotations, which side step the problem entirely (this problem
+is specific to definition-site variance).
+
+C# requires 
