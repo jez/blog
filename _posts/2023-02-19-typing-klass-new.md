@@ -425,7 +425,7 @@ automatically, in every class:
 
 ```ruby
 class MyClass
-  <AttachedClass> = type_member(:out) { {upper: MyClass} }
+  <AttachedClass> = type_template(:out) { {upper: MyClass} }
 end
 ```
 
