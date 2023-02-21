@@ -467,7 +467,7 @@ above.</p>
 declared something like this, automatically, in every class:</p>
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">MyClass</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;</span><span class="dt">AttachedClass</span><span class="kw">&gt;</span> <span class="kw">=</span> type_member(<span class="wa">:out</span>) <span class="kw">{</span> <span class="kw">{</span><span class="wa">upper: </span><span class="dt">MyClass</span><span class="kw">}</span> <span class="kw">}</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;</span><span class="dt">AttachedClass</span><span class="kw">&gt;</span> <span class="kw">=</span> type_template(<span class="wa">:out</span>) <span class="kw">{</span> <span class="kw">{</span><span class="wa">upper: </span><span class="dt">MyClass</span><span class="kw">}</span> <span class="kw">}</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>Those angle brackets in the name are not valid Ruby syntax, which
 ensures that people can’t write a type member with this name, and
