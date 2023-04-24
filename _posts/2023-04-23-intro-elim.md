@@ -16,20 +16,20 @@ categories: ['programming', 'plt', 'types']
 
 
 I took a course about programming languages in college. It was a very theory-oriented
-course, and honestly I only signed up to meet a requirement—the school wanted to ensure
-we took a smattering of theory courses before sending us out into the Real World. But as
-it turned out, I learned more practical skills about how to write good code from this
-theory course than many of my peers who took our school's software engineering elective.
+course, and honestly I only signed up to meet a requirement. But as luck would have it, I
+learned more about writing clean code from this theory course than many of my peers who
+took our school's software engineering elective.
 
 The biggest lesson? **Every type is defined by its intro and elim forms.**
 
 <!-- more -->
 
-It's a short lesson, but one that applies _all over the place_. To reword it into more
-familiar terms: when defining a new data structure, you have to declare how to
-construct—or "introduce"—values of that structure. You also have to declare what the data
-structure can do, which usually involves reading, transforming, or otherwise destructuring
-the data, which we can call "eliminating."
+It's a short lesson, but one that applies _all over the place_.
+
+To reword it into more familiar terms: when defining a new data structure, you have to
+declare how to construct—or "introduce"—values of that structure. You also have to declare
+what the data structure can do, which usually involves reading, transforming, or otherwise
+destructuring the data, which we can call "eliminating."
 
 Constructing and destructuring. Introducing and eliminating. Every type is defined by
 operations that do one of these two things, and we can call those operations "forms" for
@@ -42,10 +42,10 @@ bad for us software engineers! Sloppily-defined types make it hard to build a me
 of what the type does, which leads to confusion, misuse, and bugs.
 
 Even in languages without a static type system, this lesson still applies. We define data
-structures when writing code in all languages, and those data structures are defined by
-their intro and elim forms in every last one of them. The operations which create and
-transform data structures shape a programmer's mental model of a codebase, regardless of
-whether there's a type system to reify that mental model into type annotations.
+structures when writing code in all languages, and it's always done by defining intro and
+elim forms. The operations which create and transform data structures shape a programmer's
+mental model of a codebase, regardless of whether there's a type system to reify that
+mental model into type annotations.
 
 But this is the infuriating part: most real-world languages are cavalier when it comes to
 defining types. Sloppily-defined types are the **default**, and programmers usually have
@@ -85,16 +85,15 @@ A a{42};
 When defining a type, we should be explicit about which of these we want. Do we want the
 type to have an implicit "default" value? Do we want to allow omitting some of the
 values during initialization? Do we want to _prevent_ providing some values during
-initialization? Do we want to do any validation on these values, and fail to construct
-an instance if validation fails?
+initialization? Do we want to validate these values, aborting construction if validation
+fails?
 
 For some types, the answer to these questions will be, "yes, a default value is fine,"
 "yes, omitting some values is fine," "no, let them pass all the values if they
-want," and "no, we don't need validation." But other times our answers will be
-different, and in many languages it's too hard to remember all the things we have to
-retroactively lock down after defining a new type. It would be better if we could start
-from nothing and build up what's allowed, offering syntactic conveniences for
-commonly-defined operations.
+want," and "no, we don't need validation." But other times our answer will be different!
+In many languages it's too hard to remember all the things we have to retroactively lock
+down after defining a new type. It would be better if we could start from nothing and
+build up what's allowed, offering syntactic conveniences for commonly-defined operations.
 
 [^go-rust-contrast]:
   {-} It's even worse in Go, where there's nothing you can do to turn this "everything can
@@ -119,9 +118,9 @@ not, which is likely to cause a logic error.
 Second, the contract of this `==` method is that _any value_ can be compared for
 equality to _any other value_, even of a different class![^sorbet-eq] For many people,
 that amounts to a sloppy, bug-inducing definition of `==`: they'd rather know that
-they're comparing two completely incompatible things, than have the comparison silently
-evaluate to `false` and continue running. But the language has made this choice, and now
-all our types must inherit this possibly-unwanted elim form.[^rust-eq]
+they're comparing two completely incompatible things, instead of having the comparison
+quietly evaluate to `false`. But the language has made this choice, and now all our types
+must inherit this possibly-unwanted elim form.[^rust-eq]
 
 [^dup]:
   This can happen for very accidental reasons. Given `def ex; ->{1}; end` then `ex() ==
@@ -145,17 +144,17 @@ interface Foo {
   void foo();
 }
 ```
-This interface specifies how values of type `Foo` can be used (by calling `x.foo()`),
-but not how they can be created. You can settle for defining a constructor on a class
-(maybe even an abstract class), but this ties the abstract specification of a type with
-it's concrete implementation. Best to let a language's facilities for abstraction
-abstract over both intro and elim forms.[^ts-new]
+This interface specifies how values of type `Foo` can be used, but not how they can be
+created. You can settle for defining a constructor on a class (maybe even an abstract
+class), but this ties the abstract specification of a type with it's concrete
+implementation. Best to let a language's facilities for abstraction abstract over both
+intro and elim forms.[^ts-new]
 
 [^ts-new]:
   To temper people misinterpreting this as a Rust shill post, a TypeScript example this
-  time. TypeScript lets interfaces declare a `new()` method, which thus allows abstracting
-  over how a type is created. There's a few tricks to it, and [this post][ts-new-post]
-  outlines them as well or better than I could.
+  time. TypeScript lets interfaces declare a `new()` method, which allows abstracting over
+  how a type is created. There's a few tricks to it, and [this post][ts-new-post] outlines
+  them as well or better than I could.
 
 [sorbet-eq-post]: /problems-typing-ruby-equality/
 [ts-new-post]: https://fettblog.eu/typescript-interface-constructor-pattern/
