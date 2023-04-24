@@ -78,20 +78,19 @@
 <main>
 <p>I took a course about programming languages in college. It was a very
 theory-oriented course, and honestly I only signed up to meet a
-requirement—the school wanted to ensure we took a smattering of theory
-courses before we graduated. But as it turned out, I learned more
-practical skills about how to write good code from this theory course
-than many of my peers who took our school’s software engineering
-elective.</p>
+requirement. But as luck would have it, I learned more about writing
+clean code from this theory course than many of my peers who took our
+school’s software engineering elective.</p>
 <p>The biggest lesson? <strong>Every type is defined by its intro and
 elim forms.</strong></p>
 <!-- more -->
 <p>It’s a short lesson, but one that applies <em>all over the
-place</em>. To reword it into more familiar terms: when defining a new
-data structure, you have to declare how to construct—or
-“introduce”—values of that structure. You also have to declare what the
-data structure can do, which usually involves reading, transforming, or
-otherwise destructuring the data, which we can call “eliminating.”</p>
+place</em>.</p>
+<p>To reword it into more familiar terms: when defining a new data
+structure, you have to declare how to construct—or “introduce”—values of
+that structure. You also have to declare what the data structure can do,
+which usually involves reading, transforming, or otherwise destructuring
+the data, which we can call “eliminating.”</p>
 <p>Constructing and destructuring. Introducing and eliminating. Every
 type is defined by operations that do one of these two things, and we
 can call those operations “forms” for short.</p>
@@ -104,11 +103,10 @@ mental model of what the type does, which leads to confusion, misuse,
 and bugs.</p>
 <p>Even in languages without a static type system, this lesson still
 applies. We define data structures when writing code in all languages,
-and those data structures are defined by their intro and elim forms in
-every last one of them. The operations which create and transform data
-structures shape a programmer’s mental model of a codebase, regardless
-of whether there’s a type system to reify that mental model into type
-annotations.</p>
+and it’s always done by defining intro and elim forms. The operations
+which create and transform data structures shape a programmer’s mental
+model of a codebase, regardless of whether there’s a type system to
+reify that mental model into type annotations.</p>
 <p>But this is the infuriating part: most real-world languages are
 cavalier when it comes to defining types. Sloppily-defined types are the
 <strong>default</strong>, and programmers usually have to work to
@@ -147,12 +145,12 @@ class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#c
 want. Do we want the type to have an implicit “default” value? Do we
 want to allow omitting some of the values during initialization? Do we
 want to <em>prevent</em> providing some values during initialization? Do
-we want to do any validation on these values, and fail to construct an
-instance if validation fails?</p>
+we want to validate these values, aborting construction if validation
+fails?</p>
 <p>For some types, the answer to these questions will be, “yes, a
 default value is fine,” “yes, omitting some values is fine,” “no, let
 them pass all the values if they want,” and “no, we don’t need
-validation.” But other times our answers will be different, and in many
+validation.” But other times our answer will be different! In many
 languages it’s too hard to remember all the things we have to
 retroactively lock down after defining a new type. It would be better if
 we could start from nothing and build up what’s allowed, offering
@@ -183,10 +181,10 @@ class="sidenote">I wrote about the difficulty this causes for Sorbet in
 <br />
 </span></span> For many people, that amounts to a sloppy, bug-inducing
 definition of <code>==</code>: they’d rather know that they’re comparing
-two completely incompatible things, than have the comparison silently
-evaluate to <code>false</code> and continue running. But the language
-has made this choice, and now all our types must inherit this
-possibly-unwanted elim form.<span
+two completely incompatible things, instead of having the comparison
+quietly evaluate to <code>false</code>. But the language has made this
+choice, and now all our types must inherit this possibly-unwanted elim
+form.<span
 class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
 class="sidenote">Some languages, like Rust and Haskell, do not define
 <code>==</code> by default but can generate a default implementation
@@ -204,16 +202,16 @@ class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> <span class="fu">foo</span><span class="op">();</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>This interface specifies how values of type <code>Foo</code> can be
-used (by calling <code>x.foo()</code>), but not how they can be created.
-You can settle for defining a constructor on a class (maybe even an
-abstract class), but this ties the abstract specification of a type with
-it’s concrete implementation. Best to let a language’s facilities for
-abstraction abstract over both intro and elim forms.<span
+used, but not how they can be created. You can settle for defining a
+constructor on a class (maybe even an abstract class), but this ties the
+abstract specification of a type with it’s concrete implementation. Best
+to let a language’s facilities for abstraction abstract over both intro
+and elim forms.<span
 class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
 class="sidenote">To temper people misinterpreting this as a Rust shill
 post, a TypeScript example this time. TypeScript lets interfaces declare
-a <code>new()</code> method, which thus allows abstracting over how a
-type is created. There’s a few tricks to it, and <a
+a <code>new()</code> method, which allows abstracting over how a type is
+created. There’s a few tricks to it, and <a
 href="https://fettblog.eu/typescript-interface-constructor-pattern/">this
 post</a> outlines them as well or better than I could.<br />
 <br />
