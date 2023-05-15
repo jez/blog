@@ -14,6 +14,19 @@ categories: ['sorbet', 'ruby', 'types']
 # author_url:
 ---
 
+> **Update**: While writing this post, I had a series of realizations and ended up
+> building two features which make some of the parts of this post obsolete:
+> [`has_attached_class!`] and [`T::Class`].
+>
+> I've rewritten some of the post below in light of those new features, but the core
+> principles in this post are still useful, both to gain familiarity with Sorbet's
+> generic types and how to think about interface design in Sorbet.
+>
+> With that out of the way...
+
+[`has_attached_class!`]: https://sorbet.org/docs/attached-class#has_attached_class-tattached_class-in-module-instance-methods
+[`T::Class`]: https://sorbet.org/docs/class-of#tclass-vs-tclass_of
+
 A pattern like this comes up a lot in Ruby code:
 
 ```ruby
@@ -28,11 +41,9 @@ end
 surprised. Where I work, I see well over 100 matches just using the variable name `klass`
 alone.)
 
-The straightforward attempt at writing a [Sorbet] signature for this method doesn't work.
+The straightforward attempt at writing a Sorbet signature for this method doesn't work.
 The strategy that _does_ work uses abstract methods, which brings me to one of my
 most-offered tips for type-level design in Sorbet:
-
-[Sorbet]: https://sorbet.org
 
 :::{.note .yellow}
 
@@ -69,24 +80,36 @@ end
 ```
 
 This type **does not work**.[^syntax] Even though I can see why people might expect it to
-work, there are reasons why it should not work (at least, [not using the syntax
-above][62]). Specifically, `T.type_parameter(:U)` doesn't stand for "some unknown class,"
-it stands for "some unknown type." It could mean any of `T.any(Integer, String)`,
-`T::Array[Integer]`, `T.noreturn`, or any other type.
+work, there are reasons why it should not work, and the Sorbet docs [elaborate
+why](https://sorbet.org/docs/class-of#tclass-vs-tclass_of).
 
-Meanwhile, `T.class_of(...)` in Sorbet is defined very narrowly to mean "get the singleton
-class of `...`." For an arbitrary type, that might not exist. On occasion we have tossed
-around ideas for how to (partially) relax this constraint, but you don't have to wait for
-such a feature to arrive: abstract methods and interfaces are powerful enough to model
-this today.
+In short, `T.type_parameter(:U)` doesn't stand for "some unknown class," it stands for
+"some unknown type." It could mean any of `T.any(Integer, String)`, `T::Array[Integer]`,
+`T.noreturn`, or any other type. Meanwhile, `T.class_of(...)` is defined very narrowly to
+mean "get the singleton class of `...`." Arbitrary types don't have singleton class, only
+classes have singleton classes.
 
-[^syntax]:
-  {-} Sometimes I wish Sorbet had used the syntax `A.singleton_class` instead of
-  `T.class_of(A)`, because I think it might have made it more clear that you can't do this
-  on arbitrary types. Then again, maybe people would have just done `T.any(A,
-  B).singleton_class`
+# ⚠️&#xFE0F; How to mostly solve this with `T::Class`
 
-[62]: https://github.com/sorbet/sorbet/issues/62
+As of May 2023, Sorbet has a separate feature, called `T::Class[...]`, which _does_ work
+the way people have expected `T.class_of` to work:
+
+```ruby
+sig do
+  type_parameters(:U)
+    .params(klass: T::Class[T.type_parameter(:U)])
+    .returns(T.type_parameter(:U))
+end
+def instantiate_class(klass)
+  instance = klass.new
+  # ...
+  instance
+end
+```
+
+This code works, but it comes with the downside that the call to `new` is **not statically
+checked**. Here we passed no arguments, but it might be that `klass`'s constructor has one
+or more required arguments.
 
 # ✅ How to solve this with `abstract` methods
 
@@ -98,11 +121,13 @@ def instantiate_class(klass)
 end
 ```
 
-and we want to write a precise type here, what's critical is to notice that there is some
-de-facto API that `klass` is meant to conform to. That's exactly what interfaces are for.
+and we want to write a precise signature here, what's critical is to notice that there is
+some de-facto API that `klass` is meant to conform to. That's exactly what interfaces are
+for.
 
 In particular, the de-facto API is that `klass` has some method that tells us how to
-create instances. Let's translate that API to an interface:
+create instances, and that method takes no arguments. Let's translate that API to an
+interface:
 
 <figure class="left-align-caption">
 
@@ -111,9 +136,9 @@ module ThingFactory
   extend T::Generic
   interface!
 
-  Instance = type_member(:out)
+  has_attached_class!(:out)
 
-  sig {abstract.returns(Instance)}
+  sig {abstract.returns(T.attached_class)}
   def make_thing; end
 end
 
@@ -127,19 +152,17 @@ def instantiate_class(klass)
 end
 ```
 
-<figcaption>[→ View on sorbet.run](https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20Instance%20%3D%20type_member%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28Instance%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing%0Aend)</figcaption>
+<figcaption>[→ View on sorbet.run](https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20has_attached_class!%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing%0Aend)</figcaption>
 
 </figure>
 
-This `ThingFactory` has two notable definitions: a [`type_member`] called `Instance`
-(which means this is a _generic_ interface), and a method called `make_thing`.
+This `ThingFactory` has two notable definitions: a method called `make_thing`, and a call
+to [`has_attached_class!`] above that. `has_attached_class!` both allows using
+`T.attached_class` in instance methods of this module and makes this module generic in
+that attached class. It's a way for Sorbet to track the relationship between one type and
+the type of instances it constructs.
 
-[`type_member`]: https://sorbet.org/docs/generics#type_member--type_template
-
-As we'll see shortly, the `Instance` type member will act a bit like an "abstract"
-type—it'll be something that implementation classes fill in later.
-
-Calling the method `make_thing` (instead of `new`) is a slight sacrifice. Choosing a name
+Naming the method `make_thing` (instead of `new`) is a slight sacrifice. Choosing a name
 other than `new` helps Sorbet check that all classes accept the same number of constructor
 arguments, with compatible types. (Technically, we could use a method named `new` in our
 interface, but that runs into a [handful] of [fixable] or maybe [unfixable] bugs. It's
@@ -157,24 +180,20 @@ In any case, here's how we can implement that interface:
 
 <figure class="left-align-caption">
 
-```{.ruby .numberLines .hl-3 .hl-4 .hl-7 .hl-18}
+```{.ruby .numberLines .hl-2 .hl-5 .hl-14}
 class GoodThing
-  extend T::Generic
   extend ThingFactory
-  Instance = type_template(:out) { {fixed: GoodThing} }
 
-  sig {override.returns(Instance)}
+  sig {override.returns(T.attached_class)}
   def self.make_thing # ✅
     new
   end
 end
 
 class BadThing
-  extend T::Generic
   extend ThingFactory
-  Instance = type_template(:out) { {fixed: BadThing} }
 
-  sig {override.params(x: Integer).returns(Instance)}
+  sig {override.params(x: Integer).returns(T.attached_class)}
   def self.make_thing(x) # ⛔️ must accept no more than 0 required arguments
     new
   end
@@ -182,34 +201,21 @@ end
 ```
 
 <figcaption>
-[→ View complete example on sorbet.run](https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20Instance%20%3D%20type_member%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28Instance%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20GoodThing%7D%20%7D%0A%0A%20%20sig%20%7Boverride.returns%28Instance%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend%0A%0Aclass%20BadThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20BadThing%7D%20%7D%0A%0A%20%20sig%20%7Boverride.params%28x%3A%20Integer%29.returns%28Instance%29%7D%0A%20%20def%20self.make_thing%28x%29%20%23%20%E2%9B%94%EF%B8%8F%20must%20accept%20no%20more%20than%200%20required%20arguments%0A%20%20%20%20new%0A%20%20end%0Aend)
+[→ View complete example on sorbet.run](https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20has_attached_class!%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend%0A%0Aclass%20BadThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.params%28x%3A%20Integer%29.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%28x%29%20%23%20%E2%9B%94%EF%B8%8F%20must%20accept%20no%20more%20than%200%20required%20arguments%0A%20%20%20%20new%0A%20%20end%0Aend)
 </figcaption>
 </figure>
 
 See how the `BadThing` class attempts to incompatibly implement `make_thing`? Sorbet
-correctly reports an error on line 18 saying that `make_thing` must not accept an extra
+correctly reports an error on line 14 saying that `make_thing` must not accept an extra
 required argument.
-
-Earlier we mentioned that `Instance` would behave kind of like an abstract
-type,[^handwavy] and we see that happen on line 4. The code uses [`fixed`] to declare that
-`Instance` within this class is equivalent to `GoodThing`. Kind of like how abstract
-methods get concrete implementations, this `fixed` annotation acts almost like a concrete
-implementation of the interface's "abstract" type `Instance`.
-
-[`fixed`]: https://sorbet.org/docs/generics#bounds-on-type_members-and-type_templates-fixed-upper-lower
-
-[^handwavy]:
-  {-} This explanation largely appeals to intuition. _Abstract type_ has a specific
-  meaning in the theory that's different from the meaning I'm using here, which is why
-  I've scare-quoted or hedged my use of the term use in this post.
 
 Something else worth mentioning: we're implementing this interface on the **singleton
 class** of `GoodThing` and `BadThing`:
 
 - On line 3, we use `extend` (instead of `include`) to mix in the interface.
-- On line 4, what was a `type_member` in `ThingFactory` becomes a `type_template` in the
-  implementation.
-- On line 7, `def make_thing` from the interface becomes `def self.make_thing`.
+- On line 5, `def make_thing` from the interface becomes `def self.make_thing`. Also,
+  since it's now a singleton class method, we can use `T.attached_class` for free (no need
+  for an extra call to `has_attached_class!` or anything).
 
 So far so good: we've successfully annotated our `instantiate_class` method! But we can
 actually take it one step further.
@@ -285,7 +291,7 @@ end
 ```
 
 <figcaption>
-[→ View complete example on sorbet.run](https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20AbstractThing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20abstract!%0A%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0Aend%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20Instance%20%3D%20type_member%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28Instance%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class_bad%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.all%28AbstractThing%2C%20T.type_parameter%28%3AInstance%29%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20AbstractThing%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20GoodThing%7D%20%7D%0A%0A%20%20sig%20%7Boverride.returns%28Instance%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0Aend)
+[→ View complete example on sorbet.run](https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20AbstractThing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20abstract!%0A%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0Aend%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20has_attached_class!%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class_bad%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%20%23%20error%3A%20forgot%20%60T.all%60%0A%20%20instance%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.all%28AbstractThing%2C%20T.type_parameter%28%3AInstance%29%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20AbstractThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0Aend)
 </figcaption>
 </figure>
 
@@ -304,12 +310,12 @@ module ThingFactory
   extend T::Generic
   abstract!
 
-  Instance = type_member(:out) { {upper: AbstractThing} }
+  has_attached_class!(:out) { {upper: AbstractThing} }
 
-  sig {abstract.returns(Instance)}
+  sig {abstract.returns(T.attached_class)}
   def make_thing; end
 
-  sig {returns(Instance)}
+  sig {returns(T.attached_class)}
   def make_thing_and_call_foo
     instance = self.make_thing
     instance.foo # ✅ also OK
@@ -319,7 +325,7 @@ end
 ```
 
 <figcaption>
-[→ View complete example on sorbet.run](https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20AbstractThing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20abstract!%0A%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0Aend%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20abstract!%0A%0A%20%20Instance%20%3D%20type_member%28%3Aout%29%20%7B%20%7Bupper%3A%20AbstractThing%7D%20%7D%0A%0A%20%20sig%20%7Babstract.returns%28Instance%29%7D%0A%20%20def%20make_thing%3B%20end%0A%0A%20%20sig%20%7Breturns%28Instance%29%7D%0A%20%20def%20make_thing_and_call_foo%0A%20%20%20%20instance%20%3D%20self.make_thing%0A%20%20%20%20instance.foo%0A%20%20%20%20instance%0A%20%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class_bad%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.all%28AbstractThing%2C%20T.type_parameter%28%3AInstance%29%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing_and_call_foo%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20AbstractThing%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20GoodThing%7D%20%7D%0A%0A%20%20sig%20%7Boverride.returns%28Instance%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0Aend)
+[→ View complete example on sorbet.run](https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20AbstractThing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20abstract!%0A%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0Aend%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20abstract!%0A%0A%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20AbstractThing%7D%20%7D%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0A%0A%20%20sig%20%7Breturns%28T.attached_class%29%7D%0A%20%20def%20make_thing_and_call_foo%0A%20%20%20%20instance%20%3D%20self.make_thing%0A%20%20%20%20instance.foo%0A%20%20%20%20instance%0A%20%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class_bad%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.all%28AbstractThing%2C%20T.type_parameter%28%3AInstance%29%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing_and_call_foo%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20AbstractThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0Aend)
 </figcaption>
 
 </figure>
@@ -364,9 +370,9 @@ module Thing
     extend T::Generic
     interface!
 
-    Instance = type_member(:out) { {upper: Thing} }
+    has_attached_class!(:out) { {upper: Thing} }
 
-    sig {abstract.returns(Instance)}
+    sig {abstract.returns(T.attached_class)}
     def make_thing; end
   end
   mixes_in_class_methods(Factory)
@@ -382,12 +388,10 @@ class GoodThing
 end
 ```
 
-<figcaption>
-[→ View complete example on sorbet.run][final-example]
-
-[final-example]: https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20Thing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20interface!%0A%20%20%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0A%0A%20%20module%20Factory%0A%20%20%20%20extend%20T%3A%3AGeneric%0A%20%20%20%20interface!%0A%0A%20%20%20%20Instance%20%3D%20type_member%28%3Aout%29%20%7B%20%7Bupper%3A%20Thing%7D%20%7D%0A%0A%20%20%20%20sig%20%7Babstract.returns%28Instance%29%7D%0A%20%20%20%20def%20make_thing%3B%20end%0A%20%20end%0A%20%20mixes_in_class_methods%28Factory%29%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20klass%3A%20Thing%3A%3AFactory%5BT.all%28Thing%2C%20T.type_parameter%28%3AInstance%29%29%5D%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20Thing%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20GoodThing%7D%20%7D%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0A%0A%20%20sig%20%7Boverride.returns%28Instance%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend
-</figcaption>
+<figcaption>[→ View complete example on sorbet.run][final-example]</figcaption>
 </figure>
+
+[final-example]: https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20Thing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20interface!%0A%20%20%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0A%0A%20%20module%20Factory%0A%20%20%20%20extend%20T%3A%3AGeneric%0A%20%20%20%20interface!%0A%0A%20%20%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20Thing%7D%20%7D%0A%0A%20%20%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20%20%20def%20make_thing%3B%20end%0A%20%20end%0A%20%20mixes_in_class_methods%28Factory%29%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20klass%3A%20Thing%3A%3AFactory%5BT.all%28Thing%2C%20T.type_parameter%28%3AInstance%29%29%5D%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20Thing%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend
 
 By using `mixes_in_class_methods`, we replace an `include` + `extend` with just a single
 `include`. Also, it gives us an excuse to nest one module inside the other, so that we can
@@ -432,24 +436,16 @@ end
 Those angle brackets in the name are not valid Ruby syntax, which ensures that people can't
 write a type member with this name, and e.g. overwrite the meaning of `T.attached_class`.
 
-... but you could actually imagine wanting to let people define such a type member. In
-fact, if people _could_ declare a type member with this magical name in a module, then it
-would automatically be defined when `extend`'ing that module into a class:
+That's where `has_attached_class!` comes in! It essentially provides syntactic sugar to
+let people define these `<AttachedClass>` generic types, without having to conflict with
+any names of constants the user might already be using in that class.
 
-```ruby
-module ThingFactory
-  <AttachedClass> = type_member(:out)
-end
+Realizing that we could build `has_attached_class!` with just a syntactic rewrite was a
+key insight that unblocked most of the work on `T::Class` that had blocked us from making
+progress on this feature in the past. There's more context in [the original pull
+request][6757].
 
-class MyClass
-  extend ThingFactory
-
-  # ... no "Must redeclare `<AttachedClass>` type_member" error
-  # like we'd usually get, because Sorbet already did it for us
-end
-```
-
-Such a feature in Sorbet might alleviate some of the verbosity in the above approach.
+[6757]: https://github.com/sorbet/sorbet/pull/6757
 
 ## Two modules vs one class
 
@@ -464,8 +460,6 @@ class AbstractThing
 
   sig {abstract.returns(Integer)}
   def foo; end
-
-  Instance = type_template(:out) { {upper: AbstractThing} }
 end
 ```
 
@@ -490,24 +484,3 @@ a syntax, the type system would very easily admit such a feature (because `type_
 is literally just a `type_member` on the singleton class).
 
 But sometimes, bikeshedding syntax is the hardest part of language design.
-
-## Please don't do this
-
-Due to an accident of history in Sorbet, the keyword `self` is allowed in type syntax. No
-one knows this, and I'm pretty sure this is the first time outside of Sorbet's test suite
-that it's been written down. But the keyword `self` means "the class I'm in" and it's
-basically the same as writing the name of the enclosing class.
-
-Armed with this cursed knowledge, you can confuse all the people who will ever read your
-code but save on typing a few characters:
-
-```{.ruby .numberLines .hl-4}
-class GoodThing
-  extend T::Generic
-  extend ThingFactory
-  Instance = type_template(:out) { {fixed: self} }
-  #       basically the same as: { {fixed: GoodThing} }
-end
-```
-
-Please don't do this if you want people to understand your code 🙂
