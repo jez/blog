@@ -7,7 +7,7 @@ description:
   A quick post explaining why exception handling in Sorbet is weird, by way of a buggy program
   and some pretty pictures.
 math: false
-categories: ['ruby', 'sorbet', 'types']
+categories: ['ruby', 'sorbet', 'types', 'in-pictures']
 pinned: true
 # subtitle:
 # author:

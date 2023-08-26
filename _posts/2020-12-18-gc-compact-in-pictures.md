@@ -7,7 +7,7 @@ description: >-
   Ruby's opt-in GC compaction is both really cool and also kind of scary, so we're going
   to chat about both, with pictures.
 math: false
-categories: ['ruby']
+categories: ['ruby', 'in-pictures']
 # subtitle:
 # author:
 # author_url:

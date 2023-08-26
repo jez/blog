@@ -6,7 +6,7 @@ date: 2022-12-13T14:10:22-08:00
 description: >-
   Here's how I draw the little diagrams that sometimes appear on my posts.
 math: false
-categories: ['meta']
+categories: ['meta', 'in-pictures']
 # subtitle:
 # author:
 # author_url:
