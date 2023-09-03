@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+<meta name="dcterms.date" content="2023-09-03 11:06:27 -0400">
+<meta name="description" content="A brief explanation of why Ruby calls x&.foo "conditional send" and not "safe navigation."
+">
+<title>Ruby's Conditional Send is not Safe Navigation – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+    <link rel="stylesheet" href="/assets/css/extra.css">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">Ruby's Conditional Send is not Safe Navigation</h1>
+    <blockquote class="metadata">
+    <p class="date before-toc"><time datetime="2023-09-03 11:06:27 -0400">September 3, 2023</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">← Return home</a><br>
+</nav>
+
+<main>
+<p><strong>tl;dr</strong>: Ruby has a feature called “conditional send”
+which looks very similar to JavaScript’s “safe navigation” feature.
+Their key difference is short circuiting evaluation: Ruby chooses not to
+short circuit, because there <em>are</em> methods on <code>nil</code>,
+unlike <code>undefined</code> in JS.</p>
+<p>Let’s dive into an example. You can do this in Ruby:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount</span></span></code></pre></div>
+<p>which calls <code>.amount</code> if <code>invoice</code> is not
+<code>nil</code>, or else evaluates to <code>nil</code> (skipping the
+call). You can do something similar in JavaScript, just with
+<code>?</code> instead of <code>&amp;</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="op">?.</span><span class="at">amount</span></span></code></pre></div>
+<p>In my experience, most people first learn this feature in JavaScript,
+where it’s called “safe navigation,” and they bring the name with them
+when learning Ruby.</p>
+<p>In fact, the feature Ruby has is not safe navigation but something
+else, called <strong>conditional send</strong>.</p>
+<p>There’s a subtle difference, only noticeable in a longer chain:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="op">?.</span><span class="at">amount</span><span class="op">.</span><span class="fu">format</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount.format</span>()</span></code></pre></div>
+<ul>
+<li><p>The JavaScript version short circuits the entire remaining
+expression, if <code>invoice</code> is falsy. The <code>.format()</code>
+method is not called, and the whole expression evaluates to
+<code>undefined</code>.</p></li>
+<li><p>Meanwhile Ruby does the opposite: if <code>invoice</code> is
+<code>nil</code>, Ruby evaluates <code>invoice&amp;.amount</code> to
+<code>nil</code> and then keeps going. The call to
+<code>.format()</code> still happens, but the call happens on
+<code>nil</code> (which is probably a bug).</p></li>
+</ul>
+<p>To completely reproduce the JavaScript behavior in Ruby, we need to
+keep chaining the <code>&amp;</code>:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount</span><span class="kw">&amp;</span><span class="at">.format</span></span></code></pre></div>
+<p>Most Ruby linters will check for this and require programmers to put
+<code>&amp;</code> on all method calls downstream of the first
+conditional send.</p>
+<p>Why the difference? Or rather: why doesn’t Ruby do what JavaScript
+does?</p>
+<p>In JavaScript it never makes sense to access a property on
+<code>undefined</code>: <code>undefined</code> does not have any
+properties, nor is it possible to add any.</p>
+<p>But in Ruby, <code>nil</code> inherits from <code>Object</code> (and
+thus <code>Kernel</code> and <code>BasicObject</code>), which means it
+has all the methods available to all objects. For example:</p>
+<ul>
+<li><code>is_a?</code></li>
+<li><code>nil?</code></li>
+<li><code>hash</code></li>
+<li><code>to_s</code></li>
+</ul>
+<p>But even more: Ruby let’s users monkey patch more methods onto
+<code>nil</code>. Two common methods available on <code>nil</code> in
+codebases using Rails are <code>blank?</code> and
+<code>present?</code>.</p>
+<p>So Ruby chooses not to short circuit. There are enough methods
+available on <code>nil</code> that it would be too restrictive to
+unconditionally short circuit and not allow any further method
+calls.</p>
+<p>The names of both features reflect this choice:</p>
+<ul>
+<li><p>Safe navigation evokes an image of navigating with a map. If at
+some point the navigation takes you to the edge of a cliff, it’s time to
+stop.</p></li>
+<li><p>Conditional send refers to the object-oriented notion that
+calling a method can be thought of as sending a message to an object.
+It’s “conditional” because that message might not get sent, and this
+choice is made independently for every method call (or equivalently, for
+every message we might send).</p></li>
+</ul>
+<p>Inside the Ruby VM, Sorbet, and Rubocop rules, the AST node
+representing <code>x&amp;.foo</code> is named “csend.” And now you know
+why.</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#ruby">ruby</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#javascript">javascript</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#programming">programming</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script src="/assets/js/enable_checkboxes.js"></script>
+
+  
+
+
+
+</body>
+</html>
+
