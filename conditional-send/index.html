@@ -75,7 +75,7 @@ else, called <strong>conditional send</strong>.</p>
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount.format</span>()</span></code></pre></div>
 <ul>
 <li><p>The JavaScript version short circuits the entire remaining
-expression, if <code>invoice</code> is falsy. The <code>.format()</code>
+expression. If <code>invoice</code> is falsy, the <code>.format()</code>
 method is not called, and the whole expression evaluates to
 <code>undefined</code>.</p></li>
 <li><p>Meanwhile Ruby does the opposite: if <code>invoice</code> is
@@ -105,7 +105,7 @@ has all the methods available to all objects. For example:</p>
 <li><code>hash</code></li>
 <li><code>to_s</code></li>
 </ul>
-<p>But even more: Ruby let’s users monkey patch more methods onto
+<p>But even more: Ruby lets users monkey patch more methods onto
 <code>nil</code>. Two common methods available on <code>nil</code> in
 codebases using Rails are <code>blank?</code> and
 <code>present?</code>.</p>
