@@ -18,6 +18,8 @@ the input is `T.nilable`. But if the input is non-`nil`, then so is the output."
 
 With clever usage of Sorbet generics, this is possible!
 
+<figure class="left-align-caption">
+
 ```{.ruby .numberLines .hl-4}
 sig do
   type_parameters(:U)
@@ -34,6 +36,12 @@ def get_currency(amount)
   end
 end
 ```
+
+<figcaption>
+[Full example on sorbet.run →](https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Aclass%20Amount%20%3C%20T%3A%3AStruct%0A%20%20prop%20%3Aamount%2C%20BigDecimal%0A%20%20prop%20%3Acurrency%2C%20String%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AU%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20amount%3A%20T.any%28T.all%28T.type_parameter%28%3AU%29%2C%20NilClass%29%2C%20Amount%29%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.any%28T.all%28T.type_parameter%28%3AU%29%2C%20NilClass%29%2C%20String%29%29%0Aend%0Adef%20get_currency%28amount%29%0A%20%20if%20amount.nil%3F%0A%20%20%20%20return%20amount%0A%20%20else%0A%20%20%20%20return%20amount.currency%0A%20%20end%0Aend%0A%0Asig%20do%0A%20%20params%28%0A%20%20%20%20amount%3A%20Amount%2C%0A%20%20%20%20maybe_amount%3A%20T.nilable%28Amount%29%2C%0A%20%20%20%20nil_class%3A%20NilClass%0A%20%20%29%0A%20%20.void%0Aend%0Adef%20example%28amount%2C%20maybe_amount%2C%20nil_class%29%0A%20%20res%20%3D%20get_currency%28amount%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20String%0A%0A%20%20res%20%3D%20get_currency%28maybe_amount%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20T.nilable%28String%29%0A%0A%20%20res%20%3D%20get_currency%28nil_class%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20T.nilable%28String%29%0A%0A%20%20res%20%3D%20get_currency%28T.unsafe%28amount%29%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20T.nilable%28String%29%0Aend)
+</figcaption>
+
+</figure>
 
 And then calling this method looks like this:
 
