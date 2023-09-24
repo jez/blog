@@ -2,17 +2,19 @@
 
 set -euo pipefail
 
-if [ "$#" != 1 ] || [ "$1" = '-h'] || [ "$1" = '--help']; then
+if [ "$#" != 1 ] || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
   >&2 echo "usage: $0 <draft>"
   exit 1
 fi
 
 bundle exec octopress publish "$1"
 
+
 # Stash only untracked
+git add _posts
 git stash --quiet
 git stash --quiet --include-untracked
-git stash pop --quiet stash@{1}
+git stash pop --quiet "stash@{1}"
 trap 'git stash pop --quiet' EXIT
 
 bundle exec jekyll build
