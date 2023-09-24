@@ -13,4 +13,4 @@ if [ "${DISPLAY:-}" != "" ] && [ "$(uname)" = "Linux" ]; then
   args+=(--open-url)
 fi
 
-exec bundle exec jekyll serve "${args[@]}"
+bundle exec jekyll serve "${args[@]}"
