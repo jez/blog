@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 
-exec bundle exec jekyll serve \
-  --destination _serve \
-  --future \
-  --drafts \
-  --incremental \
-  --livereload \
+args=(
+  --destination _serve
+  --future
+  --drafts
+  --incremental
+  --livereload
   --host 0.0.0.0
+)
+
+if [ "${DISPLAY:-}" != "" ] && [ "$(uname)" = "Linux" ]; then
+  args+=(--open-url)
+fi
+
+exec bundle exec jekyll serve "${args[@]}"
