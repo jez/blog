@@ -46,7 +46,7 @@ _[Read more →]({{ post.url }})_
 
 ## {{ currentyear }}
 
-{% assign prevyear = currentyear %}{% endif %} - [{{ post.title }}]({{ site.baseurl }}{{ post.url }}), {{ post.date | date: '%B %-d' }}
+{% assign prevyear = currentyear %}{% endif %} - [{% if post.draft %}[DRAFT] {% endif %}{{ post.title }}]({{ site.baseurl }}{{ post.url }}), {{ post.date | date: '%B %-d' }}
 {% endfor %}
 {% else %}
 
