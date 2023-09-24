@@ -7,7 +7,7 @@ description: >-
   Figure out the main point, and then just say it (before anything else). This makes a
   piece of writing stronger.
 math: false
-categories: ['writing']
+categories: ['writing', 'practices']
 # subtitle:
 # author:
 # author_url:
