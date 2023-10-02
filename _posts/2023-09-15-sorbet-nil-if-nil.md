@@ -105,6 +105,41 @@ What's happening here is that Sorbet is inferring the `T.type_parameter(:U)` to
 `T.noreturn`, which then collapses into `String`, because `T.any(T.noreturn, String)` is
 just `String`.
 
+\
+
+- - - - -
+
+## Update, 2023-10-02
+
+I realized that the signature above gets a lot more clear if Sorbet were to support some
+sort of syntax for placing bounds on generic methods' type parameters. For example using a
+hypothetical syntax:
+
+```{.ruby .numberLines .hl-2}
+sig do
+  type_parameters(U: NilClass)
+    .params(amount: T.any(T.type_parameter(:U), Amount))
+    .returns(T.any(T.type_parameter(:U), String))
+end
+def get_currency(amount)
+  if amount.nil?
+    return amount
+  else
+    return amount.currency
+  end
+end
+```
+
+This signature says that the `T.type_parameter(:U)` is upper bounded by `NilClass` (and
+not lower bounded, and therefore assumes the normal lower bound of `T.noreturn`).
+
+Written like this, it becomes maybe more clear how this signature works:
+
+- If the caller passes in a possibly `nil` value, Sorbet infers `T.type_parameter(:U)` to
+  its upper bound.
+- Otherwise, Sorbet is free to leave the inferred type at the lower bound of `T.noreturn`,
+  and `T.any(T.noreturn, Amount)` is simply the same as `Amount`.
+
 
 [generic methods]: https://sorbet.org/docs/generics#generic-methods
 [doesn't support overloads]: https://sorbet.org/docs/error-reference#5040
