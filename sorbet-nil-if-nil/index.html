@@ -63,6 +63,8 @@
   id="toc-the-upper-bound-is-nilclass-not-t.nilableamount">The upper
   bound is <code>NilClass</code>, not
   <code>T.nilable(Amount)</code>!</a></li>
+  <li><a href="#update-2023-10-02" id="toc-update-2023-10-02">Update,
+  2023-10-02</a></li>
   </ul>
 </nav>
 
@@ -162,6 +164,40 @@ enough to know that <code>get_currency</code> returns
 <code>T.type_parameter(:U)</code> to <code>T.noreturn</code>, which then
 collapses into <code>String</code>, because
 <code>T.any(T.noreturn, String)</code> is just <code>String</code>.</p>
+<p><br />
+</p>
+<hr />
+<h2 id="update-2023-10-02">Update, 2023-10-02</h2>
+<p>I realized that the signature above gets a lot more clear if Sorbet
+were to support some sort of syntax for placing bounds on generic
+methods’ type parameters. For example using a hypothetical syntax:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode numberSource ruby numberLines hl-2"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a>sig <span class="cf">do</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>  type_parameters(<span class="wa">U: </span><span class="dt">NilClass</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a>    <span class="at">.params</span>(<span class="wa">amount: </span>T<span class="at">.any</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">Amount</span>))</span>
+<span id="cb4-4"><a href="#cb4-4"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">String</span>))</span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="cf">end</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="cf">def</span> get_currency(amount)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="cf">if</span> amount<span class="at">.nil?</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>    <span class="cf">return</span> amount</span>
+<span id="cb4-9"><a href="#cb4-9"></a>  <span class="cf">else</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a>    <span class="cf">return</span> amount<span class="at">.currency</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>  <span class="cf">end</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="cf">end</span></span></code></pre></div>
+<p>This signature says that the <code>T.type_parameter(:U)</code> is
+upper bounded by <code>NilClass</code> (and not lower bounded, and
+therefore assumes the normal lower bound of
+<code>T.noreturn</code>).</p>
+<p>Written like this, it becomes maybe more clear how this signature
+works:</p>
+<ul>
+<li>If the caller passes in a possibly <code>nil</code> value, Sorbet
+infers <code>T.type_parameter(:U)</code> to its upper bound.</li>
+<li>Otherwise, Sorbet is free to leave the inferred type at the lower
+bound of <code>T.noreturn</code>, and
+<code>T.any(T.noreturn, Amount)</code> is simply the same as
+<code>Amount</code>.</li>
+</ul>
 </main>
 
 
