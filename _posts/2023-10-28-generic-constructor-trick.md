@@ -22,10 +22,11 @@ T.reveal_type(set) # => T::Set[T.untyped]
 You'd hope[^bug] that Sorbet would **either** report an error, requiring a type annotation instead of implicitly assuming `T.untyped` (like how other type annotations are required in `# typed: strict` files), **or** be smart enough to infer a suitable type from the provided arguments. Some day it will.
 
 [^bug]:
-  {-} This is a bit of a longstanding bug. See [#3768] and [#4450].
+  {-} This is a bit of a longstanding bug. See [#3768] and [#4450]. To learn more about why this happens, see [this Sorbet internals doc][variance-defaulting].
 
 [#3768]: https://github.com/sorbet/sorbet/issues/3768
 [#4450]: https://github.com/sorbet/sorbet/issues/4450
+[variance-defaulting]: https://github.com/sorbet/sorbet/blob/master/docs/variance-defaulting.md
 
 But in the mean time, if you want to build your own generic classes that **don't** suffer from this limitation, there's another way forward: defining a custom constructor with a clever signature.
 
