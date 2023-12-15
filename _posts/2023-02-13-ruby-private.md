@@ -80,7 +80,7 @@ flip!
 ```{.ruby .numberLines .hl-3}
 class Parent
   attr_accessor :x
-  private :x
+  private :x, :x=
 
   def initialize(x)
     self.x = x
