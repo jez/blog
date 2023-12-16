@@ -109,7 +109,7 @@ Here's what Ruby's `private` keyword allows:
 1.  ✅ The member `x` can be accessed as `self.x` inside methods within the class body of `Parent`
 1.  ⛔️ The member `x` cannot be accessed on other instances of `Parent` within the class
     body of `Parent`, like `other.x`
-1.  ✅ The member `x` cannot be accessed in subclasses of `Parent`, like `Child`
+1.  ✅ The member `x` can be accessed in subclasses of `Parent`, like `Child`
 1.  ⛔️ The member `x` cannot be accessed outside of the inheritance hierarchy of `Parent`
 
 # Why is Ruby like this?
