@@ -68,6 +68,10 @@ href="https://api.rubyonrails.org/classes/ActiveSupport/Concern.html"><code>Acti
 module. How it behaves it surprised me a little bit, so I figured I’d
 write up what I learned.</p>
 <!-- more -->
+<p>If you only have a shaky understanding of <code>include</code> and
+<code>extend</code> in Ruby, you might want to <a
+href="/inheritance-in-ruby/">start with this post first</a>, which takes
+a deep dive into Ruby’s built-in tools for inheritance.</p>
 <p>Consider this snippet, using plain Ruby inheritance features:</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode numberSource ruby numberLines hl-5 hl-9"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
@@ -126,10 +130,12 @@ singleton class is inherited.</p></li>
 </ul>
 <p>Don’t ask me why there’s all these rules, this is just how Ruby
 behaves.</p>
-<p>From time to time, we might wish Ruby did something differently,
-allowing modules to define singleton class methods that can get mixed in
-alongside their instance methods. Luckily we don’t even have to wish:
-Ruby is nearly infinitely flexible, and so people created
+<p>From time to time, <a
+href="/inheritance-in-ruby/#wait-why-do-we-care-about-inheriting-both">we
+might wish</a> Ruby did something differently, allowing modules to
+define singleton class methods that can get mixed in alongside their
+instance methods. Luckily we don’t even have to wish: Ruby is nearly
+infinitely flexible, and so people created
 <code>ActiveSupport::Concern</code> to allow this (with only a few
 restrictions).</p>
 <p>Here’s how to use <code>ActiveSupport::Concern</code>:</p>
@@ -253,7 +259,8 @@ style="max-width: 883px;" /></p>
 <p>First of all, <code>ClassMethods</code> was <em>only</em>
 <code>extend</code>ed into <code>Parent</code>, not also into
 <code>IChild</code>. I suppose that makes sense; maybe there’s no real
-use for those <code>ClassMethods</code> to also end up on the (orphaned)
+use for those <code>ClassMethods</code> to also end up on the (<a
+href="/inheritance-in-ruby/#the-include-operator">childless</a>)
 singleton class of <code>IChild</code>. In all likelihood, those methods
 were going to be things like “create an instance of the current class”
 which is something that doesn’t make sense for module singleton class

@@ -137,9 +137,16 @@ class="sourceCode numberSource ruby numberLines hl-4"><code class="sourceCode ru
 <span id="cb2-9"><a href="#cb2-9"></a>  <span class="co"># ...</span></span>
 <span id="cb2-10"><a href="#cb2-10"></a>  instance</span>
 <span id="cb2-11"><a href="#cb2-11"></a><span class="cf">end</span></span></code></pre></div>
-<p>This type <strong>does not work</strong>.[^syntax] Even though I can
-see why people might expect it to work, there are reasons why it should
-not work, and the Sorbet docs <a
+<p>This type <strong>does not work</strong>.<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="marginnote">Sometimes I wish Sorbet had used the syntax
+<code>A.singleton_class</code> instead of <code>T.class_of(A)</code>,
+because I think it might have made it more clear that you can’t do this
+on arbitrary types. Then again, maybe people would have just done
+<code>T.any(A,   B).singleton_class</code><br />
+<br />
+</span></span> Even though I can see why people might expect it to work,
+there are reasons why it should not work, and the Sorbet docs <a
 href="https://sorbet.org/docs/class-of#tclass-vs-tclass_of">elaborate
 why</a>.</p>
 <p>In short, <code>T.type_parameter(:U)</code> doesn’t stand for “some
