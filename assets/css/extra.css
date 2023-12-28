@@ -20,3 +20,12 @@ img[src^="/assets/img/dark"] + figcaption {
     display: none;
   }
 }
+
+/*
+ * TODO(jez) Move this to upstream (no italic in comments)
+ *
+ * (If you could figure out a way to make sure that emoji are never italicized,
+ * we could make the rest of comments italic again.)
+ */
+code span.co { color: var(--solarized-base1);  font-weight: normal; font-style: normal; } /* Comment */
+code span.cv { color: var(--solarized-base1);  font-weight: normal; font-style: normal; } /* CommentVar */

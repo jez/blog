@@ -83,6 +83,12 @@ This type **does not work**.[^syntax] Even though I can see why people might exp
 work, there are reasons why it should not work, and the Sorbet docs [elaborate
 why](https://sorbet.org/docs/class-of#tclass-vs-tclass_of).
 
+[^syntax]:
+  {-} Sometimes I wish Sorbet had used the syntax `A.singleton_class` instead of
+  `T.class_of(A)`, because I think it might have made it more clear that you can't do this
+  on arbitrary types. Then again, maybe people would have just done `T.any(A,
+  B).singleton_class`
+
 In short, `T.type_parameter(:U)` doesn't stand for "some unknown class," it stands for
 "some unknown type." It could mean any of `T.any(Integer, String)`, `T::Array[Integer]`,
 `T.noreturn`, or any other type. Meanwhile, `T.class_of(...)` is defined very narrowly to

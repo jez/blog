@@ -20,6 +20,12 @@ surprised me a little bit, so I figured I'd write up what I learned.
 
 <!-- more -->
 
+If you only have a shaky understanding of `include` and `extend` in Ruby, you might want
+to [start with this post first], which takes a deep dive into Ruby's built-in tools for
+inheritance.
+
+[start with this post first]: /inheritance-in-ruby/
+
 Consider this snippet, using plain Ruby inheritance features:
 
 ```{.ruby .numberLines .hl-5 .hl-9}
@@ -82,10 +88,12 @@ Since the snippet was plain Ruby, hopefully everything we see is familiar:
 
 Don't ask me why there's all these rules, this is just how Ruby behaves.
 
-From time to time, we might wish Ruby did something differently, allowing modules to
+From time to time, [we might wish] Ruby did something differently, allowing modules to
 define singleton class methods that can get mixed in alongside their instance
 methods. Luckily we don't even have to wish: Ruby is nearly infinitely flexible, and so
 people created `ActiveSupport::Concern` to allow this (with only a few restrictions).
+
+[we might wish]: /inheritance-in-ruby/#wait-why-do-we-care-about-inheriting-both
 
 Here's how to use `ActiveSupport::Concern`:
 
@@ -211,11 +219,13 @@ Wait, _what_ is going _on_?
 
 First of all, `ClassMethods` was _only_ `extend`ed into `Parent`, not also into `IChild`.
 I suppose that makes sense; maybe there's no real use for those `ClassMethods` to also end
-up on the (orphaned) singleton class of `IChild`. In all likelihood, those methods were
+up on the ([childless]) singleton class of `IChild`. In all likelihood, those methods were
 going to be things like "create an instance of the current class" which is something that
 doesn't make sense for module singleton class methods to be doing. I will admit that
 my expectation was that `ClassMethods` would get `extend`'ed onto _every_ module singleton
 class that `include`'d the attached class, to mimic how it works when inheriting classes.
+
+[childless]: /inheritance-in-ruby/#the-include-operator
 
 **But what really surprised me**: despite _literally_ having the `include IParent` line in
 its class body, `IParent` is _not_ an ancestor of `IChild`. 🤯
