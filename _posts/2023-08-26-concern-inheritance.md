@@ -13,16 +13,20 @@ categories: ['ruby', 'in-pictures']
 # author_url:
 ---
 
-I spent some time digging into Rails' [`ActiveSupport::Concern`] module. How it behaves it
+I spent some time digging into Rails' [`ActiveSupport::Concern`] module. How it behaves
 surprised me a little bit, so I figured I'd write up what I learned.
 
 [`ActiveSupport::Concern`]: https://api.rubyonrails.org/classes/ActiveSupport/Concern.html
 
 <!-- more -->
 
-If you only have a shaky understanding of `include` and `extend` in Ruby, you might want
-to [start with this post first], which takes a deep dive into Ruby's built-in tools for
-inheritance.
+:::{.note .blue}
+
+------
+ℹ️ If you only have a shaky understanding of `include` and `extend` in Ruby, you might want to [start with this post first], which takes a deep dive into Ruby's built-in tools for inheritance.
+------
+
+:::
 
 [start with this post first]: /inheritance-in-ruby/
 
