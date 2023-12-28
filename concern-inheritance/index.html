@@ -68,10 +68,18 @@ href="https://api.rubyonrails.org/classes/ActiveSupport/Concern.html"><code>Acti
 module. How it behaves it surprised me a little bit, so I figured I’d
 write up what I learned.</p>
 <!-- more -->
-<p>If you only have a shaky understanding of <code>include</code> and
-<code>extend</code> in Ruby, you might want to <a
+<div class="note yellow">
+<table>
+<tbody>
+<tr class="odd">
+<td>ℹ️ If you only have a shaky understanding of <code>include</code>
+and <code>extend</code> in Ruby, you might want to <a
 href="/inheritance-in-ruby/">start with this post first</a>, which takes
-a deep dive into Ruby’s built-in tools for inheritance.</p>
+a deep dive into Ruby’s built-in tools for inheritance.</td>
+</tr>
+</tbody>
+</table>
+</div>
 <p>Consider this snippet, using plain Ruby inheritance features:</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode numberSource ruby numberLines hl-5 hl-9"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
