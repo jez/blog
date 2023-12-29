@@ -41,7 +41,7 @@ example(Child.new)
 
 This is as simple as it gets. Most languages use the `extends` keyword to inherit from a class. Ruby cutely uses the `<` token, but otherwise it's very straightforward. Given an instance of `Child` in the `example` method, we can call `child.on_parent` and Ruby finds the right method to call by walking the inheritance hierarchy up to where `on_parent` is defined on `Parent`.
 
-I picture Ruby's `<` operator working something like this:
+I picture Ruby's `<` operator as working something like this:
 
 [^multiple]
 
@@ -51,22 +51,20 @@ I picture Ruby's `<` operator working something like this:
 ![](/assets/img/light/inheritance-in-ruby/parent-child-class-instance.png){.center style="max-width:229px"}
 ![](/assets/img/dark/inheritance-in-ruby/parent-child-class-instance.png){.center style="max-width:229px"}
 
-I'll draw classes as puzzle pieces. The pieces have tabs and blanks[^jigsaw] which allow other classes to slot in, forming an inheritance hierarchy.
+In particular, I picture classes like puzzle pieces. The pieces have tabs and blanks[^jigsaw] which allow other classes to slot in, forming an inheritance hierarchy.
 
 [^jigsaw]:
   {-} "Tabs" and "blanks" are the [names Wikipedia uses] for these spots on jigsaw puzzles.
 
 [names Wikipedia uses]: https://en.wikipedia.org/wiki/Jigsaw_puzzle#Puzzle_pieces
 
-- Checking whether a class is a subclass of another amounts to following the chain
-  upwards. If you can reach `ClassB` from `ClassA`, then `a.is_a?(ClassB)`.
+Checking whether a class is a subclass of another amounts to following the chain upwards. If you can reach `ClassB` from `ClassA`, then `a.is_a?(ClassB)`.
 
-- Method dispatch does the same up-the-chain search, but looks in each class for a method
-  with the given name. Does `Child` have a method named `on_parent`? Nope, so let's go up and keep checking. Does `Parent`? Yep—let's dispatch to that definition.
+Method dispatch does the same up-the-chain search, stopping in each class to look for a method with the given name. Does `Child` have a method named `on_parent`? Nope, so let's go up and keep checking. Does `Parent`? Yep—let's dispatch to that definition.
 
 **Here's the first wrench Ruby throws into the inheritance mix**: the `<` operator not only sets up a relationship between the classes themselves, it **also** makes the singleton class of `Child` inherit from the singleton class of `Parent`.
 
-I'll show what I mean in code, using Sorbet types to drive the point home:
+I'll show what I mean in code first:
 
 ```{.ruby .numberLines .hl-2 .hl-8 .hl-13}
 class Parent
@@ -76,15 +74,12 @@ end
 class Child < Parent
 end
 
-sig {params(klass: T.class_of(Child)).void}
-def example(klass)
-  klass.on_parent # ✅
-end
-
-example(Child)
+Parent.new.on_parent # ❌
+Parent.on_parent     # ✅
+Child.on_parent      # ✅
 ```
 
-The `on_parent` method is on the singleton class now (`def self.` compared with just `def` before). When `example` declares its argument type as `T.class_of(Child)`, meaning "the type of the singleton class of `Child`," the call to `klass.on_parent` is valid. How? Because the `<` operator **also** set up an inheritance relationship on the singleton class.
+Now the `on_parent` method is on the singleton class because of the `def self.` (compared with just `def` before). Since it's defined on the singleton class, it's only possible to call it on the class object itself, not on instances of the class. And more than that, it's available on the singleton class of `Child`, because the `<` operator **also** set up an inheritance relationship on the singleton classes.
 
 Which means we need a slightly more involved picture to show what the `<` operator is doing, which I'll represent as this red/blue jigsaw piece:
 
@@ -104,7 +99,7 @@ Don't worry if that doesn't click yet, we'll get there. But first, a detour abou
 
 # Wait, why do we care about inheriting both?
 
-Ruby has a rich link between a class and its singleton class. Having the `<` operator preserve this link when inheriting a class is key to preserving that rich link. Let's unpack that observation.
+Ruby has a rich link between a class and its singleton class. The `<` operator just preserves this link across inherited classes. Let's unpack these observations.
 
 In Ruby, singleton classes are first-class objects. You can pass them around and call methods on them just like any other object:
 
@@ -124,7 +119,7 @@ a.class # => A
 To take it a step further: objects in Ruby are instantiated by calling `new`,[^new] a singleton class method:
 
 [^new]:
-  {-} In Ruby `new` is not a keyword, like in C++ or Java—it's a normal method!
+  {-} In Ruby `new` is not a keyword, it's a normal method! (It's unlike the `new` keyword in C++ or Java.)
 
 ```ruby
 class A; end
@@ -138,7 +133,7 @@ instantiate_me(A)
 instantiate_me(B)
 ```
 
-This means a class is intrinsically linked with its singleton class. This link powers all sorts of neat code in the wild. For example, [Sorbet's `T::Enum`][tenum] class looks something like this under the hood:
+These two methods form an intrinsic link between a class and its singleton class. They power all sorts of neat code in the wild, too. For example [Sorbet's `T::Enum`][tenum] class looks something like this under the hood:
 
 [tenum]: https://sorbet.org/docs/tenum
 
@@ -171,7 +166,7 @@ This `TypedEnum` class implements the typesafe enum pattern[^typedenum], which i
 [^typedenum]:
   {-} Popularized by Joshua Block in Effective Java, First Edition, Item 21, in response to the observation that much Java code would use magic integers to represent enumerations. (The same thing happens in Ruby, but with magic Symbols and Strings in addition to just Integers.)
 
-You'd define such an enum something like this:
+You'd define an enum using this abstraction something like this:
 
 ```ruby
 class Suit < TypedEnum
@@ -185,25 +180,25 @@ end
 It's so concise in Ruby[^concise]  because of the special relationship between a class and its singleton class:
 
 [^concise]:
-  {-} Concise versus the original Java pattern. Sorbet's `T::Enum` makes the pattern even more concise.
+  {-} "Concise" versus the original Java pattern. Sorbet's `T::Enum` makes the pattern even more concise.
 
 ![](/assets/img/light/inheritance-in-ruby/self-class-self-new.png){.center style="max-width:563.5px"}
 ![](/assets/img/dark/inheritance-in-ruby/self-class-self-new.png){.center style="max-width:563.5px"}
 
 First, the implementation of `initialize` can reflect back up to the class with `self.class.values` to share information across all instances of a class.
 
-Second, the singleton class method `make_value` calls `self.new`, which uses dynamic dispatch to instantiate an instance of whatever class `make_value` was called on (like `Suit` above). This dynamic dispatch **only works at all** because the `<` operator set up an inheritance relationship on **both** the class and it's singleton class!
+Second, the singleton class method `make_value` calls `self.new`, which uses **dynamic dispatch** to instantiate an instance of whatever class `make_value` was called on (like `Suit` above). This dynamic dispatch only works because the `<` operator set up an inheritance relationship on the singleton class, too!
 
 ![](/assets/img/dark/inheritance-in-ruby/typed-enum-suit.png){style="max-width:738.5px"}
 ![](/assets/img/light/inheritance-in-ruby/typed-enum-suit.png){style="max-width:739px"}
 
-And third, the `TypedEnum` class contains all of the logic encapsulating what it means to be a typesafe enum. The `Suit` class relies entirely on method resolution up the inheritance chain for its implementation.
+Third, the `TypedEnum` class encapsulates all of the logic for what it means to be a typesafe enum. The `Suit` class has no implementation of its own, relying entirely on method resolution up the inheritance chain.
 
 To recap: the cool part about attached classes and singleton classes and inheritance in Ruby is that there's this link between instance and singleton, via `self.class` and `self.new`. **This link is preserved** by having the `<` operator also create an inheritance relationship between singleton classes.
 
 ## Aside: `self.new` and `self.class` in the type system
 
-My main focus here is to show how Ruby itself models inheritance, but now's a perfect time to sneak in a note about how Sorbet works.
+My main focus here is to show how Ruby models inheritance, but now's a perfect time to sneak in a note about how Sorbet works.
 
 Because this `self.new`/`self.class` link is so special, Sorbet captures it in the type level, as well:
 
@@ -223,9 +218,9 @@ def initialize(n)
 end
 ```
 
-If you call `self.new` inside of a singleton class method, the type that you get back is what we call `T.attached_class`. This is a weird name: people who use Ruby are very familiar with having the singleton class called the singleton class. They usually _don't_ have a name for this other class, but it's called the attached class. It's the name that the Ruby VM uses, and it's also the name that Sorbet uses.
+If you call `self.new` inside of a singleton class method, the type that you get back is what's called `T.attached_class`. It's a weird name. People who use Ruby are very familiar with having the singleton class called the singleton class. They usually _don't_ have a name for this other class, but it's called the attached class: it's the name that the Ruby VM uses, and it's also the name that Sorbet uses.
 
-The way to think about what this type means: it is _the_ type in Sorbet that exists to model what `new` does. It models the linkage from a singleton class back down to its attached class. And it respects dynamic dispatch:
+Here's how to think about what this type means: it is _the_ type in Sorbet that exists to model what `new` does. It models the linkage from a singleton class back down to its attached class. And it respects dynamic dispatch:
 
 ```ruby
 class Parent
@@ -238,11 +233,11 @@ T.reveal_type(Parent.make) # => Parent
 T.reveal_type(Child.make)  # => Child
 ```
 
-Sorbet knows that if `make` is called on `Parent`, the expression will have type `Parent`, and if called on `Child` will have type `Child`.
+There's only one definition of the `make` method, but the two calls to `make` above have different types. Sorbet knows that if `make` is called on `Parent`, the expression will have type `Parent`, and if called on `Child` will have type `Child`. That's the power of `T.attached_class`, and it's precisely the type that captures how `new` works.
 
 In the opposite direction, `T.class_of(...)` is the type that represents following the link from the attached class up to the singleton class by way of `self.class`. It says, "Whatever class you are currently in, if you call `self.class` you will get `T.class_of(<whatever class you are currently in>)`."
 
-For our `initialize` method defined in the `TypedEnum` class, that meant `T.class_of(TypedEnum)`, which is the name Sorbet uses for the singleton class. The Ruby VM would use the name `#<Class:TypedEnum>`—it's the same concept, but with a different name.
+For our `initialize` method defined in the `TypedEnum` class, `self.class` has type `T.class_of(TypedEnum)`. It's the name Sorbet uses for the singleton class—the Ruby VM would use the name `#<Class:TypedEnum>`, instead. Sorbet and the Ruby VM represent the concept of a singleton class with different names.
 
 For more on these types, check out the Sorbet docs:
 
@@ -281,7 +276,7 @@ In picture form, `include` is a puzzle piece that only links up module instance 
 ![](/assets/img/light/inheritance-in-ruby/parent-child-include.png){style="max-width:466px"}
 ![](/assets/img/dark/inheritance-in-ruby/parent-child-include.png){style="max-width:465.5px"}
 
-There's something shocking here: not only do we _not_ have a puzzle piece that links up the singleton class of the module into the singleton class of the child, **there isn't even a tab** on `T.class_of(IParent)`. It is _not actually possible_ for a module's singleton class to be inherited. If we wanted to put a term to what's happening here: module singleton classes are **final**. They cannot be inherited.
+There's something shocking here: not only do we _not_ have a puzzle piece that links up the singleton class of the module into the singleton class of the child, **there isn't even a tab** on `T.class_of(IParent)`. It's smooth on the bottom. It is _not actually possible_ for a module's singleton class to be inherited. If we wanted to put a term to what's happening here: module singleton classes are **final**. They cannot be inherited.
 
 That comes with some interesting consequences.
 
@@ -307,15 +302,15 @@ That comes with some interesting consequences.
 - And finally, having no extension point **breaks the link** between `self.new`
   and `self.class`.
 
-  With a class's singleton and attached class pair, there would be a link via `self.class` and `self.new`. Modules do not have that—the singleton class is just like floating out in la la land. If a module instance method calls `self.class`, it's not clear which class that resolves to. If a module singleton method calls `self.new`, that will actually be a `NoMethodError` exception at runtime.
+  With a class's singleton and attached class pair, there would be a link via `self.class` and `self.new`. Modules do not have that—the singleton class is just, like, floating out in la la land. If a module instance method calls `self.class`, it's not clear which class that resolves to. If a module singleton method calls `self.new`, that will raise a `NoMethodError` exception at runtime.
 
-Sometimes these limitations are fine: for example this does not matter for [the `Enumerable` module][enumerable] in the Ruby standard library, which deals entirely with instance methods.
+Sometimes these limitations are fine: for example this does not matter for [the `Enumerable` module][enumerable] in the Ruby standard library, which deals entirely with instance methods. But sometimes they're not fine.
 
 [enumerable]: https://ruby-doc.org/3.2.2/Enumerable.html#module-Enumerable-label-Usage
 
 # The `extend` operator
 
-We might think, "Okay, well maybe this is just what Ruby's extend is meant to fix! Maybe `extend` is the thing that preserves this link."
+We might think, "Okay, well maybe this is just what Ruby's extend is meant to fix! Maybe `extend` is the thing that preserves that link."
 
 But no, even when using `extend` there's no way to get at the methods defined on the module's singleton class.
 
@@ -359,9 +354,9 @@ But with modules, **that link breaks down** and the only[^prepend] tools that we
 
 # Wait, why do we care if modules don't work like classes?
 
-It matters because sometimes a class already has a superclass. For example, every Ruby struct descends from the `Struct` class, every `activerecord` model in Rails descends from the `ActiveRecord::Base` class, etc. Sometimes we want to make reusable pieces of code that slot into any class, comprised of both instance and singleton class methods that link up with `self.new` and `self.class`.
+It matters because sometimes a class already has a superclass. For example, every Ruby struct descends from the `Struct` class, every `activerecord` model in Rails descends from the `ActiveRecord::Base` class, etc. Sometimes we want to make reusable units of code that slot into any class, comprised of both instance and singleton class methods, that link up using `self.new` and `self.class`.
 
-So what are we to do? What can we do if we need a **mixin** that also wants to mix in both instance and singleton class methods?
+So what are we to do? What if we need a **mixin** that wants to mix in both instance and singleton class methods?
 
 Well, one option is "just use two modules." This is gross, but it works:
 
@@ -369,7 +364,7 @@ Well, one option is "just use two modules." This is gross, but it works:
 module IParent
   def foo; end
 end
-module IParentClassMethods
+module IParentClass
   def bar; end
 end
 
@@ -382,11 +377,11 @@ Child.new.foo # ✅
 Child.bar     # ✅
 ```
 
-By convention, we could say that `IParent` contains all the instance methods, and then that `IParentClass` contains all the methods that are meant to be singleton class methods, and just _by convention_ make sure that `IParentClass` is extended wherever `IParent` is included. So anyone who wants to use this `IParent` abstraction has to be sure to always mention two class names, one with `include` and one with `extend`.
+By convention, we could say that `IParent` contains all the instance methods, and that `IParentClass` contains all the methods that are meant to be singleton class methods, and make sure _by convention_ that `IParentClass` is extended wherever `IParent` is included. So anyone who wants to use this `IParent` abstraction has to be sure to always mention two class names, one with `include` and one with `extend`.
 
 That works—that makes both of these methods available, where `foo` is an instance method and `bar` is a singleton class method on `Child`.
 
-If we look at the puzzle pieces again, include is doing one thing to one module, extend is doing something else to some other module, and it _kind_ of looks like our class inheritance puzzle piece:
+If we look at the puzzle pieces again, include is doing one thing to one module, extend is doing something else to some other module, and if we squint it _kind_ of looks like our class inheritance puzzle piece?
 
 ![](/assets/img/light/inheritance-in-ruby/include-plus-extend.png){style="max-width:704px"}
 ![](/assets/img/dark/inheritance-in-ruby/include-plus-extend.png){style="max-width:704PX"}
@@ -403,7 +398,7 @@ I've already written about one tool which changes the meaning of `include`:
 
 _If you don't use Sorbet, you probably just want to skip the rest of this post, and continue reading that one instead._
 
-For historical reasons that might make it into another post, Sorbet invents its own mechanism to achieve a similar result as `ActiveSupport::Concern` which it calls [`mixes_in_class_methods`]. The basic idea is to codify the "`include` + `extend`" convention from above:
+For historical reasons that might make it into another post, Sorbet invents its own mechanism to achieve a result similar to `ActiveSupport::Concern` which it calls [`mixes_in_class_methods`]. The basic idea is to codify the "`include` + `extend`" convention from above:
 
 [`mixes_in_class_methods`]: https://sorbet.org/docs/abstract#interfaces-and-the-included-hook
 
@@ -423,7 +418,7 @@ class Child
 end
 ```
 
-Sorbet provides this `mixes_in_class_methods` annotation that _changes the meaning_ of `include`, only for the module with the annotation. The new meaning of `include` is twofold:
+Sorbet provides this `mixes_in_class_methods` annotation, and using it in a module _changes the meaning_ of `include` for the module with the annotation. The new meaning of `include` is twofold:
 
 - The original `include` still happens like normal, so when `Child` has `include IParent` it will still inherit from `IParent`.
 
