@@ -12,9 +12,12 @@ categories: ['ruby', 'sorbet', 'types', 'in-pictures']
 # author_url:
 ---
 
-A solid grasp of the tools Ruby has for inheritance helps with writing better Ruby code, especially Ruby code typed with Sorbet where inheritance underlies things like abstract methods, interfaces, and generic types. On the other hand, when most people learn Ruby they learn just enough of what `include` and `extend` mean to get their job done (sometimes even less 🫣).
+A solid grasp of the tools Ruby has for inheritance helps with writing better code.[^esp]  On the other hand, when most people learn Ruby they learn just enough of what `include` and `extend` mean to get their job done (sometimes even less 🫣).
 
-I'd like to walk through some examples of inheritance in Ruby and draw little diagrams to drive their meaning home.
+[^esp]:
+  {-} Especially Ruby code typed with Sorbet where inheritance underlies things like abstract methods, interfaces, and generic types.
+
+I'd like to walk through some examples of inheritance in Ruby and draw little diagrams to drive their meaning home. The goal is to have inheritance in Ruby "click."
 
 # The `<` operator
 
@@ -512,7 +515,7 @@ But having done that, at least `T.class_of(Child)` now has the ancestor chain we
 ![](/assets/img/light/inheritance-in-ruby/mixes-in-class-methods-include-class-methods.png){.center style="max-width:469px"}
 ![](/assets/img/dark/inheritance-in-ruby/mixes-in-class-methods-include-class-methods.png){.center style="max-width:469px"}
 
-I should say: I consider that people have to know about this to be a design wart in Sorbet.[^wart] When we look at [how `ActiveSupport::Concern` works](/concern-inheritance/), it' more like what you'd expect: it's a bit more recursive or viral about linking up the `ClassMethods` classes when stacking modules on top of modules. Hopefully simply being aware of this sharp edge in `mixes_in_class_methods` is enough for now.
+I should say: I consider this to be a wart in Sorbet's design.[^wart] When we look at [how `ActiveSupport::Concern` works](/concern-inheritance/), it' more like what you'd expect: it's a bit more recursive or viral about linking up the `ClassMethods` classes when stacking modules on top of modules. Hopefully simply being aware of this sharp edge in `mixes_in_class_methods` is enough for now.
 
 [^wart]:
   {-} It's a long-term goal of mine to fix this one day, either by implementing support for `Concern` in Sorbet or even replacing `mixes_in_class_methods` with `Concern`, 
