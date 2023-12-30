@@ -102,19 +102,14 @@ inheritance in Ruby “click.”</p>
 <p>Before we can get to what <code>include</code> and
 <code>extend</code> do, let’s start with classes and superclasses.</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode numberSource ruby numberLines hl-5 hl-10"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
+class="sourceCode numberSource ruby numberLines hl-5 hl-8"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>  <span class="cf">def</span> on_parent; <span class="cf">end</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="cf">end</span></span>
 <span id="cb1-4"><a href="#cb1-4"></a></span>
 <span id="cb1-5"><a href="#cb1-5"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb1-6"><a href="#cb1-6"></a><span class="cf">end</span></span>
 <span id="cb1-7"><a href="#cb1-7"></a></span>
-<span id="cb1-8"><a href="#cb1-8"></a>sig <span class="kw">{</span>params(<span class="wa">child: </span><span class="dt">Child</span>)<span class="at">.void</span><span class="kw">}</span></span>
-<span id="cb1-9"><a href="#cb1-9"></a><span class="cf">def</span> example(child)</span>
-<span id="cb1-10"><a href="#cb1-10"></a>  child<span class="at">.on_parent</span></span>
-<span id="cb1-11"><a href="#cb1-11"></a><span class="cf">end</span></span>
-<span id="cb1-12"><a href="#cb1-12"></a></span>
-<span id="cb1-13"><a href="#cb1-13"></a>example(<span class="dt">Child</span><span class="at">.new</span>)</span></code></pre></div>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="dt">Child</span><span class="at">.new.on_parent</span></span></code></pre></div>
 <p>This is as simple as it gets. Most languages use the
 <code>extends</code> keyword to inherit from a class. Ruby cutely uses
 the <code>&lt;</code> token, but otherwise it’s very straightforward.
@@ -362,8 +357,8 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb9-1"><a href="
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span>; <span class="cf">end</span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>T<span class="at">.reveal_type</span>(<span class="dt">Parent</span><span class="at">.make</span>) <span class="co"># =&gt; Parent</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>T<span class="at">.reveal_type</span>(<span class="dt">Child</span><span class="at">.make</span>)  <span class="co"># =&gt; Child</span></span></code></pre></div>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>parent <span class="kw">=</span> <span class="dt">Parent</span><span class="at">.make</span>  <span class="co"># =&gt; Parent</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>child <span class="kw">=</span>  <span class="dt">Child</span><span class="at">.make</span>   <span class="co"># =&gt; Child</span></span></code></pre></div>
 <p>There’s only one definition of the <code>make</code> method, but the
 two calls to <code>make</code> above have different types. Sorbet knows
 that if <code>make</code> is called on <code>Parent</code>, the
@@ -448,6 +443,13 @@ Module singleton classes are final.</p></li>
 For example, <code>T.class_of(Child)</code> is a singleton class, but it
 is <strong>not</strong> a subtype of <code>T.class_of(IParent)</code>.
 In code:</p>
+<p><span
+class="sidenote-wrapper"><label for="sn-7" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-7" class="margin-toggle"/><span
+class="marginnote">You don’t even need to use Sorbet to show this point;
+you can observe the same thing by evaluating
+<code>p(Child &lt; IParent)</code> and see that it’s false.<br />
+<br />
+</span></span></p>
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span> params(<span class="wa">klass: </span>T<span class="at">.class_of</span>(<span class="dt">IParent</span>))<span class="at">.void</span> <span class="kw">}</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo(klass); <span class="cf">end</span></span>
@@ -521,7 +523,7 @@ methods. It’s cool because it preserves that link between instance and
 singleton.</p>
 <p>But with modules, <strong>that link breaks down</strong> and the
 only<span
-class="sidenote-wrapper"><label for="sn-7" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-7" class="margin-toggle"/><span
+class="sidenote-wrapper"><label for="sn-8" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-8" class="margin-toggle"/><span
 class="marginnote">You could argue these aren’t the “only” tools because
 there’s also <code>prepend</code>, but it doesn’t act different from
 <code>include</code> with respect to this link.<br />
@@ -733,11 +735,11 @@ class="center" style="max-width:469px" /> <img
 src="/assets/img/dark/inheritance-in-ruby/mixes-in-class-methods-include-class-methods.png"
 class="center" style="max-width:469px" /></p>
 <p>I should say: I consider this to be a wart in Sorbet’s design.<span
-class="sidenote-wrapper"><label for="sn-8" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-8" class="margin-toggle"/><span
+class="sidenote-wrapper"><label for="sn-9" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-9" class="margin-toggle"/><span
 class="marginnote">It’s a long-term goal of mine to fix this one day,
 either by implementing support for <code>Concern</code> in Sorbet or
 even replacing <code>mixes_in_class_methods</code> with
-<code>Concern</code>,<br />
+<code>Concern</code>.<br />
 <br />
 </span></span> When we look at <a href="/concern-inheritance/">how
 <code>ActiveSupport::Concern</code> works</a>, it’ more like what you’d
