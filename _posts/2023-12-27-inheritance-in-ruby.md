@@ -1,5 +1,5 @@
 ---
-# vim:tw=90 fo-=t
+# vim:tw=90 fo-=tc
 layout: post
 title: "Inheritance in Ruby, in pictures"
 date: 2023-12-28T12:31:20-08:00
@@ -23,7 +23,7 @@ I'd like to walk through some examples of inheritance in Ruby and draw little di
 
 Before we can get to what `include` and `extend` do, let's start with classes and superclasses.
 
-```{.ruby .numberLines .hl-5 .hl-10}
+```{.ruby .numberLines .hl-5 .hl-8}
 class Parent
   def on_parent; end
 end
@@ -31,12 +31,7 @@ end
 class Child < Parent
 end
 
-sig {params(child: Child).void}
-def example(child)
-  child.on_parent
-end
-
-example(Child.new)
+Child.new.on_parent
 ```
 
 This is as simple as it gets. Most languages use the `extends` keyword to inherit from a class. Ruby cutely uses the `<` token, but otherwise it's very straightforward. Given an instance of `Child` in the `example` method, we can call `child.on_parent` and Ruby finds the right method to call by walking the inheritance hierarchy up to where `on_parent` is defined on `Parent`.
@@ -229,8 +224,8 @@ class Parent
 end
 class Child < Parent; end
 
-T.reveal_type(Parent.make) # => Parent
-T.reveal_type(Child.make)  # => Child
+parent = Parent.make  # => Parent
+child =  Child.make   # => Child
 ```
 
 There's only one definition of the `make` method, but the two calls to `make` above have different types. Sorbet knows that if `make` is called on `Parent`, the expression will have type `Parent`, and if called on `Child` will have type `Child`. That's the power of `T.attached_class`, and it's precisely the type that captures how `new` works.
@@ -280,15 +275,13 @@ There's something shocking here: not only do we _not_ have a puzzle piece that l
 
 That comes with some interesting consequences.
 
-- It means a module's members are never inherited, so if you have this `self.bar` method,
-  you are never going to be able to call it other than by calling it directly like `IParent.bar`.
+- It means a module's members are never inherited, so if you have this `self.bar` method, you are never going to be able to call it other than by calling it directly like `IParent.bar`.
 
   I say "members" because it's not just the methods: classes can have other kinds of members, most notably generic types, which I'll revisit in a future post. But importantly, those members are never inherited. Module singleton classes are final.
 
-- It also has consequences for subtyping. When we look at the type `T.class_of(IParent)`
-  which represents the singleton class of `IParent`, there is no type that is a subtype of
-  that type. For example, `T.class_of(Child)` is a singleton class, but it is **not** a
-  subtype of `T.class_of(IParent)`. In code:
+- It also has consequences for subtyping. When we look at the type `T.class_of(IParent)` which represents the singleton class of `IParent`, there is no type that is a subtype of that type. For example, `T.class_of(Child)` is a singleton class, but it is **not** a subtype of `T.class_of(IParent)`. In code:
+
+  [^subtype_lt]
 
   ```ruby
   sig { params(klass: T.class_of(IParent)).void }
@@ -299,10 +292,12 @@ That comes with some interesting consequences.
 
   You cannot call `foo(Child)` because the `Child` object has type `T.class_of(Child)` which is not a subtype of the parameter's type `T.class_of(IParent)`.
 
-- And finally, having no extension point **breaks the link** between `self.new`
-  and `self.class`.
+- And finally, having no extension point **breaks the link** between `self.new` and `self.class`.
 
   With a class's singleton and attached class pair, there would be a link via `self.class` and `self.new`. Modules do not have that—the singleton class is just, like, floating out in la la land. If a module instance method calls `self.class`, it's not clear which class that resolves to. If a module singleton method calls `self.new`, that will raise a `NoMethodError` exception at runtime.
+
+[^subtype_lt]:
+  {-} You don't even need to use Sorbet to show this point; you can observe the same thing by evaluating `p(Child < IParent)` and see that it's false.
 
 Sometimes these limitations are fine: for example this does not matter for [the `Enumerable` module][enumerable] in the Ruby standard library, which deals entirely with instance methods. But sometimes they're not fine.
 
@@ -422,8 +417,7 @@ Sorbet provides this `mixes_in_class_methods` annotation, and using it in a modu
 
 - The original `include` still happens like normal, so when `Child` has `include IParent` it will still inherit from `IParent`.
 
-- But then **also**: the `include` will find the associated `ClassMethods` module and act
-  as though that module was `extend`'ed on line 12. So `T.class_of(Child)` will descend from `IParent::ClassMethods`.
+- But then **also**: the `include` will find the associated `ClassMethods` module and act as though that module was `extend`'ed on line 12. So `T.class_of(Child)` will descend from `IParent::ClassMethods`.
 
 In a picture:
 
@@ -513,7 +507,7 @@ But having done that, at least `T.class_of(Child)` now has the ancestor chain we
 I should say: I consider this to be a wart in Sorbet's design.[^wart] When we look at [how `ActiveSupport::Concern` works](/concern-inheritance/), it' more like what you'd expect: it's a bit more recursive or viral about linking up the `ClassMethods` classes when stacking modules on top of modules. Hopefully simply being aware of this sharp edge in `mixes_in_class_methods` is enough for now.
 
 [^wart]:
-  {-} It's a long-term goal of mine to fix this one day, either by implementing support for `Concern` in Sorbet or even replacing `mixes_in_class_methods` with `Concern`, 
+  {-} It's a long-term goal of mine to fix this one day, either by implementing support for `Concern` in Sorbet or even replacing `mixes_in_class_methods` with `Concern`.
 
 \
 
@@ -523,27 +517,17 @@ Some things we learned in this post:
 
 - It's cool that classes are first-class objects in Ruby.
 
-- Being first-class means that it's easy to follow the link from a singleton class down to
-  the attached class (with `self.new`) and back up (with `self.class`).
+- Being first-class means that it's easy to follow the link from a singleton class down to the attached class (with `self.new`) and back up (with `self.class`).
 
-- Ruby's `<` operator for inheriting classes preserves this link, by making a class's
-  singleton class descend from its parent's singleton class.
+- Ruby's `<` operator for inheriting classes preserves this link, by making a class's singleton class descend from its parent's singleton class.
 
-- That link breaks down for modules, because module singleton classes are final. No amount
-  of `include` nor `extend` change that fact.
+- That link breaks down for modules, because module singleton classes are final. No amount of `include` nor `extend` change that fact.
 
-- It's possible to use modules to approximate class inheritance in Ruby, using
-  `ClassMethods` modules either by convention or with things like `mixes_in_class_methods`.
+- It's possible to use modules to approximate class inheritance in Ruby, using `ClassMethods` modules either by convention or with things like `mixes_in_class_methods`.
 
-- Sorbet's `mixes_in_class_methods` isn't as smart as Rails' `ActiveSupport::Concern` when
-  it comes to mixing modules into other modules (but maybe one day will be).
+- Sorbet's `mixes_in_class_methods` isn't as smart as Rails' `ActiveSupport::Concern` when it comes to mixing modules into other modules (but maybe one day will be).
 
 It was only after internalizing these concepts that I started feeling _in control_ when working in Ruby codebases. Hopefully seeing things laid out this way makes you feel more in control as well.
-  
-
-
-
-
 
 \
 
@@ -563,8 +547,7 @@ Some links that I think are pretty interesting and relate to the topics covered 
 
   A follow-up post discussing how multiple inheritance can be implemented under the covers, discussing implementation considerations in C++, Java, C#, Go, and Rust, and the tradeoffs that each makes in service of the flavor of multiple inheritance each chooses to support.
 
-- [Versioning, Virtual, and Override: A Conversation with Anders Hejlsberg, Part
-  IV], interview with Bruce Eckle and Bill Venners
+- [Versioning, Virtual, and Override: A Conversation with Anders Hejlsberg, Part IV], interview with Bruce Eckle and Bill Venners
 
   "Anders Hejlsberg, the lead C# architect, talks about why C# instance methods are non-virtual by default and why programmers must explicitly indicate an override."
 
@@ -572,8 +555,7 @@ Some links that I think are pretty interesting and relate to the topics covered 
 
   Classes do not exist as objects in Java. With `myObject.getClass()` you get only a "description" of the class, not the class itself. The difference is subtle.
 
-- [Dynamic Productivity with Ruby: A Conversation with Yukihiro Matsumoto, Part II],
-  another interview with Bill Venners
+- [Dynamic Productivity with Ruby: A Conversation with Yukihiro Matsumoto, Part II], another interview with Bill Venners
 
   "Yukihiro Matsumoto, the creator of the Ruby programming language, talks about morphing interfaces, using mix-ins, and the productivity benefits of being concise in Ruby."
 
