@@ -113,10 +113,10 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="
 <p>This is as simple as it gets. Most languages use the
 <code>extends</code> keyword to inherit from a class. Ruby cutely uses
 the <code>&lt;</code> token, but otherwise it’s very straightforward.
-Given an instance of <code>Child</code> in the <code>example</code>
-method, we can call <code>child.on_parent</code> and Ruby finds the
-right method to call by walking the inheritance hierarchy up to where
-<code>on_parent</code> is defined on <code>Parent</code>.</p>
+When we call <code>on_parent</code> on an instance of
+<code>Child</code>, Ruby finds the right method to call by walking the
+inheritance hierarchy up to where that method is defined on
+<code>Parent</code>.</p>
 <p>I picture Ruby’s <code>&lt;</code> operator as working something like
 this:</p>
 <p><span
