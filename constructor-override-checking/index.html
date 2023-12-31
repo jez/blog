@@ -237,13 +237,13 @@ must declare some sort of constructor and explicitly call
 <code>super(...)</code> with whatever arguments the parent class’s
 constructor needs.</p>
 <div class="sourceCode" id="cb9"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Parent</span> <span class="kw">{</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Parent</span>(int x) <span class="kw">{}</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+class="sourceCode java"><code class="sourceCode java"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Parent <span class="op">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Parent</span><span class="op">(</span><span class="dt">int</span> x<span class="op">)</span> <span class="op">{}</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Child</span> extends <span class="dt">Parent</span> <span class="kw">{</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="ss">//</span> ❌must declare constructor <span class="cf">and</span> call <span class="in">`super(...)`</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div></li>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Child <span class="kw">extends</span> Parent <span class="op">{</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ❌must declare constructor and call `super(...)`</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
 </ul>
 <h1 id="ramifications-for-override-checking">Ramifications for override
 checking</h1>
@@ -252,6 +252,14 @@ typed, object-oriented languages like Java and Scala and C++ handle <a
 href="https://sorbet.org/docs/override-checking#a-note-on-variance">override
 compatibility checking</a> (Liskov substitution checking) for
 constructors.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Parent <span class="op">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">boolean</span> <span class="fu">foo</span><span class="op">()</span> <span class="op">{</span> <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span> <span class="op">}</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Child <span class="kw">extends</span> Parent <span class="op">{</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ❌ incompatible override</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> <span class="fu">foo</span><span class="op">()</span> <span class="op">{</span> <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span> <span class="op">}</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>The answer is: they don’t, because they don’t function like other
 instance methods. In fact, they’re almost entirely like static methods,
 except for the fact that they have <code>this</code> bound, via the
@@ -325,59 +333,59 @@ ramifications for generic type inference</h1>
 <p>The other reason why I wanted to look at this was to see how
 languages deal with the overlap between constructors and type
 inference:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode scala"><code class="sourceCode scala"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="ex">Box</span><span class="op">[</span><span class="bu">Value</span><span class="op">](</span>x<span class="op">:</span> <span class="bu">Value</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">val</span> value <span class="op">=</span> x</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>@main <span class="kw">def</span> <span class="fu">main</span><span class="op">()</span> <span class="op">=</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">val</span> box <span class="op">=</span> <span class="ex">Box</span><span class="op">(</span><span class="dv">0</span><span class="op">)</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">println</span><span class="op">(</span>box<span class="op">.</span>value<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode scala"><code class="sourceCode scala"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="ex">Box</span><span class="op">[</span><span class="bu">Value</span><span class="op">](</span>x<span class="op">:</span> <span class="bu">Value</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">val</span> value <span class="op">=</span> x</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>@main <span class="kw">def</span> <span class="fu">main</span><span class="op">()</span> <span class="op">=</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">val</span> box <span class="op">=</span> <span class="ex">Box</span><span class="op">(</span><span class="dv">0</span><span class="op">)</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">println</span><span class="op">(</span>box<span class="op">.</span>value<span class="op">)</span></span></code></pre></div>
 <p>This Scala program infers a type of <code>Box[int]</code> for the
 <code>box</code> variable. The corresponding program in Sorbet would
 look like</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Box</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Generic</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Value</span> <span class="kw">=</span> type_member</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span> params(<span class="wa">x: </span><span class="dt">Value</span>)<span class="at">.void</span> <span class="kw">}</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(x)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@value</span> <span class="kw">=</span> x</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>box <span class="kw">=</span> <span class="dt">Box</span><span class="at">.new</span>(<span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Box</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Generic</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Value</span> <span class="kw">=</span> type_member</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span> params(<span class="wa">x: </span><span class="dt">Value</span>)<span class="at">.void</span> <span class="kw">}</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> initialize(x)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@value</span> <span class="kw">=</span> x</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>box <span class="kw">=</span> <span class="dt">Box</span><span class="at">.new</span>(<span class="dv">0</span>)</span></code></pre></div>
 <p>Except that Sorbet doesn’t infer a type of <code>Box[Integer]</code>,
 it infers a type of <code>Box[T.untyped]</code>. The problem is that
 <code>initialize</code> isn’t a generic method, like</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:U</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.void</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> initialize(x); <span class="cf">end</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:U</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.void</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> initialize(x); <span class="cf">end</span></span></code></pre></div>
 <p>Sorbet only infers types for a method’s generic type parameters, not
 for the class’s generic type parameters used in a method. I was
 wondering if any other language addressed this by being clever and
 assuming that the “static part” of the constructor was actually a method
 in its own right, which had a signature mirroring the instance method
 part:</p>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Box</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Implicitly assume something like this method was defined:</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  sig <span class="cf">do</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    type_parameters(<span class="wa">:Value</span>)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:Value</span>))</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">.returns</span>(T<span class="at">.all</span>(T<span class="at">.attached_class</span>), <span class="dt">Box</span><span class="kw">[</span>T<span class="at">.type_parameter</span>(<span class="wa">:Value</span>)<span class="kw">]</span>)</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.new</span>(x)</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="dv">super</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Box</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Implicitly assume something like this method was defined:</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  sig <span class="cf">do</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    type_parameters(<span class="wa">:Value</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:Value</span>))</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">.returns</span>(T<span class="at">.all</span>(T<span class="at">.attached_class</span>), <span class="dt">Box</span><span class="kw">[</span>T<span class="at">.type_parameter</span>(<span class="wa">:Value</span>)<span class="kw">]</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.new</span>(x)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="dv">super</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>So for example, Sorbet would pretend like the singleton class
 <code>new</code> method would:</p>
 <ul>
