@@ -149,21 +149,33 @@ class Main {
       17: invokevirtual #24                 // Method java/io/PrintStream.println:(Ljava/lang/Object;)V
 ```
 
-These numbers like `#7` and `#11` are references into the constant pool, which is basically like static data in a class file. You can dump it with `javap -v` instead of `javap -c`, but it's long and basically just shows what's in the comment so I omitted it.
+These numbers like `#7` and `#11` are references into the constant pool, which is basically like static data in a class file. You can see the whole pool with `javap -v` instead of `javap -c`, but it's long and basically just shows what's in the comment so I omitted it.
 
 Some of my observations:
 
 - The "allocate memory" step and the "initialize the instance" step are separate bytecode instructions ([`new`][new-op] vs [`invokespecial`]). In Ruby, there's only one bytecode instruction (the call to the `.new` method), and the logic is hidden behind that method call. But otherwise, they both have these two steps.
 
-  This smells a lot like inlining even if it's technically not, and I'd bet that allows the JIT a better chance to optimize it (versus a Ruby JIT having to guess whether a call to `.new` is this very common "alloc + initialize" use case something else).
+  This smells a lot like inlining even if it's technically not, and I'd bet that allows the JIT a better chance to optimize it (versus a Ruby JIT having to guess whether a call to `.new` is this very common "alloc + initialize" use case or something else).
 
-- Just like how Ruby has this `initialize` method, in Java there's this special `<init>` method. Experience tells me that's a clever trick compilers/VMs use when they want to be able to use normal methods for something internally, but don't want that fact to leak to users.
+- Just like how Ruby has an `initialize` method, in Java there's this special `<init>` method. Experience tells me that's a clever trick compilers/VMs use when they want to be able to use normal methods for something internally, but don't want that fact to leak to users.
 
   For example, because `x.<init>()` is a syntax error, no one can ever call the constructor a second time. Meanwhile in Ruby, you can technically call `x.initialize` whenever you want.
 
-- It's using [`invokespecial`], which is basically a cross breed between static and dynamic dispatch. The dispatch target is resolved at compile time—it takes the method to call as a bytecode operand, like `#11`, which is a reference into the constant pool. In this way it's just like `inovkestatic`. But unlike `invokestatic`, `invokespecial` expects a method receiver to be on the VM stack in addition to the call's arguments, the same way that an instance method call would work. So despite doing essentially dynamic dispatch, it's still going to bind `this` to a value when the method runs.
+- It's using [`invokespecial`], which is basically a cross breed between static and dynamic dispatch. The dispatch target is resolved at compile time: it takes the method to call as a bytecode operand, like `#11`, which is a reference into the constant pool. In this way it's just like `inovkestatic`. But unlike `invokestatic`, `invokespecial` expects a method receiver to be on the VM stack in addition to the call's arguments, the same way that an instance method call would work. So despite essentially doing static dispatch, it's still going to bind `this` to a value when the method runs.
 
 - There's a default constructor, but it isn't called via dynamic dispatch up to the top of the object hierarchy (like `BasicObject#initialize` in Ruby). Rather, if a class doesn't have a user-defined constructor, the Java compiler emits an explicit `invokespecial` to the `Object."<init>"` method directly (or whatever the parent of the current class is).
+
+- If a child class does not have a constructor, and the parent class has a non-nullary constructor, that's an error—the child class must declare some sort of constructor and explicitly call `super(...)` with whatever arguments the parent class's constructor needs.
+
+  ```ruby
+  class Parent {
+    Parent(int x) {}
+  }
+
+  class Child extends Parent {
+    // ❌must declare constructor and call `super(...)`
+  }
+  ```
 
 [new-op]: https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.new
 [`invokespecial`]: https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.invokespecial
@@ -254,7 +266,7 @@ end
 def initialize(x); end
 ```
 
-Sorbet only infers types for a method's generic type parameters, not for the class's generic type parameters used in a method (because those should be a property of the method receiver). I was wondering if any other language addressed this by being clever and assuming that the static part of the constructor had a signature where the class generic types were replaced by method generic types:
+Sorbet only infers types for a method's generic type parameters, not for the class's generic type parameters used in a method. I was wondering if any other language addressed this by being clever and assuming that the "static part" of the constructor was actually a method in its own right, which had a signature mirroring the instance method part:
 
 ```ruby
 class Box
@@ -272,13 +284,13 @@ class Box
 end
 ```
 
-Where:
+So for example, Sorbet would pretend like the singleton class `new` method would:
 
-- There's one type parameter for every type member in the class.
-- Every occurrence of a type member in the signature gets replaced by the corresponding type parameter.
-- The return type uses [ths trick](/generic-constructor-trick/) for well-typed constructors that respect being called on a subclass of the current class.
+- Have one type parameter for every type member in the class.
+- Replace every occurrence of a type member in the signature with the corresponding type parameter.
+- Use [ths trick](/generic-constructor-trick/) for the return value, so it respects being called on a subclass of the current class.
 
-From looking into other languages, I mostly convinced myself that other languages' type inference algorithms are different enough from Sorbet that they simply represent the inference constraints in such a different way that it isn't worth asking whether other languages use an approach like (Sorbet somewhat famously does a very [simple form of inference] that doesn't generate constraints before solving them.) Regardless, I think that something along these lines could work for Sorbet in the future.
+From looking into other languages, I mostly convinced myself that other languages' type inference algorithms are different enough from Sorbet that they represent the inference constraints in such a different way that it isn't worth asking whether they do this (Sorbet somewhat famously does a very [simple form of inference] that doesn't generate constraints before solving them). Regardless, I think that something along these lines could work for Sorbet in the future.
 
 [simple form of inference]: https://blog.nelhage.com/post/why-sorbet-is-fast/#simple-type-inference
 
