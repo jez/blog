@@ -167,7 +167,7 @@ Some of my observations:
 
 - If a child class does not have a constructor, and the parent class has a non-nullary constructor, that's an error—the child class must declare some sort of constructor and explicitly call `super(...)` with whatever arguments the parent class's constructor needs.
 
-  ```ruby
+  ```java
   class Parent {
     Parent(int x) {}
   }
@@ -186,6 +186,16 @@ Some of my observations:
 I was looking into these things because I was curious about how typed, object-oriented languages like Java and Scala and C++ handle [override compatibility checking] (Liskov substitution checking) for constructors.
 
 [override compatibility checking]: https://sorbet.org/docs/override-checking#a-note-on-variance
+
+```java
+class Parent {
+  boolean foo() { return false; }
+}
+class Child extends Parent {
+  // ❌ incompatible override
+  int foo() { return 0; }
+}
+```
 
 The answer is: they don't, because they don't function like other instance methods. In fact, they're almost entirely like static methods, except for the fact that they have `this` bound, via the fancy `invokespecial` instruction.[^special] Just like static methods, these special `<init>` methods aren't inherited, can't be called via `super`, and don't get override checking.
 
