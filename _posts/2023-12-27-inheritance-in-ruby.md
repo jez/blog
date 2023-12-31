@@ -61,7 +61,7 @@ Method dispatch does the same up-the-chain search, stopping in each class to loo
 
 I'll show what I mean in code first:
 
-```{.ruby .numberLines .hl-2 .hl-8 .hl-13}
+```{.ruby .numberLines .hl-2 .hl-8}
 class Parent
   def self.on_parent; end
 end
