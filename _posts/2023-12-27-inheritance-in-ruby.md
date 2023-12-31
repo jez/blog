@@ -23,7 +23,7 @@ I'd like to walk through some examples of inheritance in Ruby and draw little di
 
 Before we can get to what `include` and `extend` do, let's start with classes and superclasses.
 
-```{.ruby .numberLines .hl-5 .hl-8}
+```ruby
 class Parent
   def on_parent; end
 end
