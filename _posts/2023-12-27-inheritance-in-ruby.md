@@ -34,7 +34,7 @@ end
 Child.new.on_parent
 ```
 
-This is as simple as it gets. Most languages use the `extends` keyword to inherit from a class. Ruby cutely uses the `<` token, but otherwise it's very straightforward. Given an instance of `Child` in the `example` method, we can call `child.on_parent` and Ruby finds the right method to call by walking the inheritance hierarchy up to where `on_parent` is defined on `Parent`.
+This is as simple as it gets. Most languages use the `extends` keyword to inherit from a class. Ruby cutely uses the `<` token, but otherwise it's very straightforward. When we call `on_parent` on an instance of `Child`, Ruby finds the right method to call by walking the inheritance hierarchy up to where that method is defined on `Parent`.
 
 I picture Ruby's `<` operator as working something like this:
 
