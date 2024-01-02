@@ -247,15 +247,16 @@ singleton class methods (in spite of all their problems). It’s possible
 to manually check whether a class object is abstract before calling the
 method:</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode numberSource ruby numberLines hl-3 hl-9"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a>sig <span class="kw">{</span> params(<span class="wa">klass: </span>T<span class="at">.class_of</span>(<span class="dt">AbstractParent</span>)) <span class="kw">}</span></span>
+class="sourceCode numberSource ruby numberLines hl-3 hl-10"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a>sig <span class="kw">{</span> params(<span class="wa">klass: </span>T<span class="at">.class_of</span>(<span class="dt">AbstractParent</span>)) <span class="kw">}</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="cf">def</span> example(klass)</span>
-<span id="cb4-3"><a href="#cb4-3"></a>  <span class="cf">return</span> <span class="cf">if</span> T<span class="kw">::</span><span class="dt">AbstractUtils</span><span class="at">.abstract_module?</span>(klass)</span>
-<span id="cb4-4"><a href="#cb4-4"></a>    </span>
-<span id="cb4-5"><a href="#cb4-5"></a>  klass<span class="at">.foo</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="cf">end</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a></span>
-<span id="cb4-8"><a href="#cb4-8"></a>example(<span class="dt">ConcreteChild</span>)</span>
-<span id="cb4-9"><a href="#cb4-9"></a>example(<span class="dt">AbstractParent</span>) <span class="co"># early return, before klass.foo</span></span></code></pre></div>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="cf">if</span> T<span class="kw">::</span><span class="dt">AbstractUtils</span><span class="at">.abstract_module?</span>(klass)</span>
+<span id="cb4-4"><a href="#cb4-4"></a>    <span class="cf">return</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="cf">end</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>  klass<span class="at">.foo</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="cf">end</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a></span>
+<span id="cb4-9"><a href="#cb4-9"></a>example(<span class="dt">ConcreteChild</span>)</span>
+<span id="cb4-10"><a href="#cb4-10"></a>example(<span class="dt">AbstractParent</span>) <span class="co"># early return, before klass.foo</span></span></code></pre></div>
 <p>This <code>abstract_module?</code> method doesn’t solve the original
 problem; nothing in Sorbet checks that it’s called before calling an
 abstract singleton class method. But it at least lets authors work
