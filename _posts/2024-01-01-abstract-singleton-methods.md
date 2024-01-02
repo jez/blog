@@ -148,11 +148,12 @@ Allowing existing methods like `foo` to be abstract at least requires subclasses
 
 There's an escape hatch for code which chooses to use abstract singleton class methods (in spite of all their problems). It's possible to manually check whether a class object is abstract before calling the method:
 
-```{.ruby .numberLines .hl-3 .hl-9}
+```{.ruby .numberLines .hl-3 .hl-10}
 sig { params(klass: T.class_of(AbstractParent)) }
 def example(klass)
-  return if T::AbstractUtils.abstract_module?(klass)
-    
+  if T::AbstractUtils.abstract_module?(klass)
+    return
+  end
   klass.foo
 end
 
