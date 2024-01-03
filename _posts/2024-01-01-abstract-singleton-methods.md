@@ -66,7 +66,7 @@ There are some alternatives to abstract singleton class methods. They all involv
 
     <figure class="left-align-caption">
 
-    ```{.ruby .numberLines .hl-12 .hl-17 .hl-23}
+    ```{.ruby .numberLines .hl-8 .hl-13 .hl-19}
     module HasFoo
       abstract!
       sig { abstract.void }
