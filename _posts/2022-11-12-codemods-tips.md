@@ -155,6 +155,11 @@ Alright cool now let's dive into some more tactical tips.
     JavaScript that already have a rich ecosystem of source-to-source translation tools,
     but it's possible to find them in other languages too.
 
+    Another option is to use a tool like [ast-grep], which bills itself as "a polyglot
+    tool for code structural search, lint, rewriting at large scale." It uses tree-sitter
+    grammars for a handful of languages, and allows doing find-and-replace at the AST
+    level.
+
 1.  Maybe use Vim?
 
     If you're already comfortable with Vim, it's a great way to partially automate the
@@ -213,6 +218,7 @@ Alright cool now let's dive into some more tactical tips.
 
 [ESLint]: https://eslint.org/docs/latest/developer-guide/working-with-rules#applying-fixes
 [Rubocop]: https://docs.rubocop.org/rubocop/development.html#autocorrect
+[ast-grep]: https://github.com/ast-grep/ast-grep
 
 [^publish]:
   A nice side effect of writing a custom linter rule is that it can remain behind in the
