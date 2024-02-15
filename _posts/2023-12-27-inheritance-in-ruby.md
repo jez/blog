@@ -220,7 +220,7 @@ Here's how to think about what this type means: it is _the_ type in Sorbet that 
 ```ruby
 class Parent
   sig { returns(T.attached_class) }
-  def make; self.new; end
+  def self.make; self.new; end
 end
 class Child < Parent; end
 
