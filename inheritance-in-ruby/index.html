@@ -353,7 +353,7 @@ class. And it respects dynamic dispatch:</p>
 <div class="sourceCode" id="cb9"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span> returns(T<span class="at">.attached_class</span>) <span class="kw">}</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> make; <span class="dv">self</span><span class="at">.new</span>; <span class="cf">end</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.make</span>; <span class="dv">self</span><span class="at">.new</span>; <span class="cf">end</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span>; <span class="cf">end</span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
