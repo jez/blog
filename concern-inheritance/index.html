@@ -51,38 +51,26 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#appendix-relationship-with-type-systems"
-  id="toc-appendix-relationship-with-type-systems">Appendix:
-  relationship with type systems</a></li>
-  <li><a href="#appendix-support-code"
-  id="toc-appendix-support-code">Appendix: support code</a></li>
-  <li><a href="#appendix-all-ancestor-information"
-  id="toc-appendix-all-ancestor-information">Appendix: all ancestor
-  information</a></li>
+  <li><a href="#appendix-relationship-with-type-systems">Appendix: relationship with type systems</a></li>
+  <li><a href="#appendix-support-code">Appendix: support code</a></li>
+  <li><a href="#appendix-all-ancestor-information">Appendix: all ancestor information</a></li>
   </ul>
 </nav>
 
 <main>
-<p>I spent some time digging into Rails’ <a
-href="https://api.rubyonrails.org/classes/ActiveSupport/Concern.html"><code>ActiveSupport::Concern</code></a>
-module. How it behaves surprised me a little bit, so I figured I’d write
-up what I learned.</p>
+<p>I spent some time digging into Rails’ <a href="https://api.rubyonrails.org/classes/ActiveSupport/Concern.html"><code>ActiveSupport::Concern</code></a> module. How it behaves surprised me a little bit, so I figured I’d write up what I learned.</p>
 <!-- more -->
 <div class="note blue">
 <table>
 <tbody>
 <tr class="odd">
-<td>ℹ️ If you only have a shaky understanding of <code>include</code>
-and <code>extend</code> in Ruby, you might want to <a
-href="/inheritance-in-ruby/">start with this post first</a>, which takes
-a deep dive into Ruby’s built-in tools for inheritance.</td>
+<td>ℹ️ If you only have a shaky understanding of <code>include</code> and <code>extend</code> in Ruby, you might want to <a href="/inheritance-in-ruby/">start with this post first</a>, which takes a deep dive into Ruby’s built-in tools for inheritance.</td>
 </tr>
 </tbody>
 </table>
 </div>
 <p>Consider this snippet, using plain Ruby inheritance features:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode numberSource ruby numberLines hl-5 hl-9"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-9"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="cf">end</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a></span>
 <span id="cb1-4"><a href="#cb1-4"></a><span class="cf">module</span> <span class="dt">IChild</span></span>
@@ -95,11 +83,7 @@ class="sourceCode numberSource ruby numberLines hl-5 hl-9"><code class="sourceCo
 <span id="cb1-11"><a href="#cb1-11"></a></span>
 <span id="cb1-12"><a href="#cb1-12"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb1-13"><a href="#cb1-13"></a><span class="cf">end</span></span></code></pre></div>
-<p>We can ask Ruby to print out the ancestor hierarchy for the classes
-in this snippet:<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">See the appendix for the code I used to generate
-these printouts<br />
+<p>We can ask Ruby to print out the ancestor hierarchy for the classes in this snippet:<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="marginnote">See the appendix for the code I used to generate these printouts<br />
 <br />
 </span></span></p>
 <pre class="wide"><code>ancestors of IChild          = [IParent]
@@ -110,45 +94,26 @@ ancestors of #&lt;Class:Parent&gt; = [...]
 ────────────────────────────────────────────────────────────────────────
 ancestors of Child          = [Parent, IChild, IParent, ...]
 ancestors of #&lt;Class:Child&gt; = [#&lt;Class:Parent&gt;, ...]</code></pre>
-<p>… but I don’t like printouts—I’d rather have pictures. So here’s a
-picture of the same thing:</p>
-<p><img src="/assets/img/light/concern-1.png"
-style="max-width: 854px;" /></p>
-<p><img src="/assets/img/dark/concern-1.png"
-style="max-width: 854px;" /></p>
+<p>… but I don’t like printouts—I’d rather have pictures. So here’s a picture of the same thing:</p>
+<p><img src="/assets/img/light/concern-1.png" style="max-width: 854px;" /></p>
+<p><img src="/assets/img/dark/concern-1.png" style="max-width: 854px;" /></p>
 <p>Some conventions in this picture:</p>
 <ul>
 <li>Classes and modules are boxes.</li>
-<li>A line from one box pointing to another shows ancestor
-information.</li>
+<li>A line from one box pointing to another shows ancestor information.</li>
 <li>The box being pointed to is the ancestor.</li>
-<li>All classes and modules have singleton classes (shown
-overlapping).</li>
+<li>All classes and modules have singleton classes (shown overlapping).</li>
 </ul>
-<p>Since the snippet was plain Ruby, hopefully everything we see is
-familiar:</p>
+<p>Since the snippet was plain Ruby, hopefully everything we see is familiar:</p>
 <ul>
-<li><p>Calling <code>include</code> immediately records an ancestor. We
-called <code>include</code> twice, once inside <code>IChild</code> (on
-line 5) and once inside Parent (on line 9). Wherever there was a call to
-<code>include</code>, there’s also an arrow.</p></li>
+<li><p>Calling <code>include</code> immediately records an ancestor. We called <code>include</code> twice, once inside <code>IChild</code> (on line 5) and once inside Parent (on line 9). Wherever there was a call to <code>include</code>, there’s also an arrow.</p></li>
 <li><p>Module singleton classes are never inherited.</p></li>
-<li><p>By contrast, when one class inherits from another, the parent’s
-singleton class is inherited.</p></li>
+<li><p>By contrast, when one class inherits from another, the parent’s singleton class is inherited.</p></li>
 </ul>
-<p>Don’t ask me why there’s all these rules, this is just how Ruby
-behaves.</p>
-<p>From time to time, <a
-href="/inheritance-in-ruby/#wait-why-do-we-care-about-inheriting-both">we
-might wish</a> Ruby did something differently, allowing modules to
-define singleton class methods that can get mixed in alongside their
-instance methods. Luckily we don’t even have to wish: Ruby is nearly
-infinitely flexible, and so people created
-<code>ActiveSupport::Concern</code> to allow this (with only a few
-restrictions).</p>
+<p>Don’t ask me why there’s all these rules, this is just how Ruby behaves.</p>
+<p>From time to time, <a href="/inheritance-in-ruby/#wait-why-do-we-care-about-inheriting-both">we might wish</a> Ruby did something differently, allowing modules to define singleton class methods that can get mixed in alongside their instance methods. Luckily we don’t even have to wish: Ruby is nearly infinitely flexible, and so people created <code>ActiveSupport::Concern</code> to allow this (with only a few restrictions).</p>
 <p>Here’s how to use <code>ActiveSupport::Concern</code>:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode numberSource ruby numberLines hl-5 hl-9 hl-20"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-9 hl-20"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="cf">end</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="cf">module</span> <span class="dt">IChild</span></span>
@@ -171,31 +136,15 @@ class="sourceCode numberSource ruby numberLines hl-5 hl-9 hl-20"><code class="so
 <span id="cb3-21"><a href="#cb3-21"></a></span>
 <span id="cb3-22"><a href="#cb3-22"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb3-23"><a href="#cb3-23"></a><span class="cf">end</span></span></code></pre></div>
-<p>In this example, let’s say that <code>IChild</code> wanted to declare
-some singleton class methods on whatever class it was eventually
-<code>include</code>’d into. All it has to do is
-<code>extend ActiveSupport::Concern</code> and then define
-<code>module ClassMethods</code><span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="marginnote">The <code>ClassMethods</code> name is special to
-<code>ActiveSupport::Concern</code>, not Ruby. It also allows defining a
-<code>class_methods do ... end</code> block, but that does nothing more
-than define this module and then run the block inside it.<br />
+<p>In this example, let’s say that <code>IChild</code> wanted to declare some singleton class methods on whatever class it was eventually <code>include</code>’d into. All it has to do is <code>extend ActiveSupport::Concern</code> and then define <code>module ClassMethods</code><span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="marginnote">The <code>ClassMethods</code> name is special to <code>ActiveSupport::Concern</code>, not Ruby. It also allows defining a <code>class_methods do ... end</code> block, but that does nothing more than define this module and then run the block inside it.<br />
 <br />
-</span></span> inside itself. The library will make sure that this
-module gets <code>extend</code>’ed into whichever class eventually
-writes <code>include IChild</code>.</p>
+</span></span> inside itself. The library will make sure that this module gets <code>extend</code>’ed into whichever class eventually writes <code>include IChild</code>.</p>
 <p>And to drive the point home, here’s a picture:</p>
-<p><img src="/assets/img/light/concern-2.png"
-style="max-width: 532px;" /></p>
-<p><img src="/assets/img/dark/concern-2.png"
-style="max-width: 532px;" /></p>
+<p><img src="/assets/img/light/concern-2.png" style="max-width: 532px;" /></p>
+<p><img src="/assets/img/dark/concern-2.png" style="max-width: 532px;" /></p>
 <p>Beautiful, just like we’d expect.</p>
-<p>One problem though: what if it’s not <code>IChild</code> that wants
-to define the singleton class methods, but rather
-<code>IParent</code>?</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode numberSource ruby numberLines hl-2 hl-4 hl-17"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
+<p>One problem though: what if it’s not <code>IChild</code> that wants to define the singleton class methods, but rather <code>IParent</code>?</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource ruby numberLines hl-2 hl-4 hl-17"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>  <span class="fu">extend</span> <span class="dt">ActiveSupport</span><span class="kw">::</span><span class="dt">Concern</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a></span>
 <span id="cb4-4"><a href="#cb4-4"></a>  <span class="cf">module</span> <span class="dt">ClassMethods</span></span>
@@ -215,28 +164,12 @@ class="sourceCode numberSource ruby numberLines hl-2 hl-4 hl-17"><code class="so
 <span id="cb4-18"><a href="#cb4-18"></a></span>
 <span id="cb4-19"><a href="#cb4-19"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb4-20"><a href="#cb4-20"></a><span class="cf">end</span></span></code></pre></div>
-<p>Suddenly this doesn’t work: the <code>ClassMethods</code> module gets
-<code>extend</code>ed at the point where the
-<code>include IParent</code> happens. That means that we’d be able to
-call <code>IChild.bar</code>, but that’s beside the point: we wanted
-those methods to be available as if they were singleton class methods on
-<code>Parent</code>. We can see where things went wrong in the
-picture:</p>
-<p><img src="/assets/img/light/concern-3.png"
-style="max-width: 554.5px;" /></p>
-<p><img src="/assets/img/dark/concern-3.png"
-style="max-width: 554.5px;" /></p>
-<p>And again, <code>ActiveSupport::Concern</code> has already thought of
-this case: it defers <code>extend</code>ing the
-<code>ClassMethods</code> all the way until the first
-non-<code>Concern</code>. So we can simply declare <code>IChild</code>
-as a <code>Concern</code> too (even if it doesn’t have any
-<code>ClassMethods</code>). That will ensure that
-<code>IParent::ClassMethods</code> end up on
-<code>#&lt;Class:Parent&gt;</code>.</p>
+<p>Suddenly this doesn’t work: the <code>ClassMethods</code> module gets <code>extend</code>ed at the point where the <code>include IParent</code> happens. That means that we’d be able to call <code>IChild.bar</code>, but that’s beside the point: we wanted those methods to be available as if they were singleton class methods on <code>Parent</code>. We can see where things went wrong in the picture:</p>
+<p><img src="/assets/img/light/concern-3.png" style="max-width: 554.5px;" /></p>
+<p><img src="/assets/img/dark/concern-3.png" style="max-width: 554.5px;" /></p>
+<p>And again, <code>ActiveSupport::Concern</code> has already thought of this case: it defers <code>extend</code>ing the <code>ClassMethods</code> all the way until the first non-<code>Concern</code>. So we can simply declare <code>IChild</code> as a <code>Concern</code> too (even if it doesn’t have any <code>ClassMethods</code>). That will ensure that <code>IParent::ClassMethods</code> end up on <code>#&lt;Class:Parent&gt;</code>.</p>
 <p>It’s a single-line change:</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode numberSource ruby numberLines hl-10 hl-19"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines hl-10 hl-19"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>  <span class="fu">extend</span> <span class="dt">ActiveSupport</span><span class="kw">::</span><span class="dt">Concern</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a></span>
 <span id="cb5-4"><a href="#cb5-4"></a>  <span class="cf">module</span> <span class="dt">ClassMethods</span></span>
@@ -259,100 +192,35 @@ class="sourceCode numberSource ruby numberLines hl-10 hl-19"><code class="source
 <span id="cb5-21"><a href="#cb5-21"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb5-22"><a href="#cb5-22"></a><span class="cf">end</span></span></code></pre></div>
 <p>And when we look at the picture:</p>
-<p><img src="/assets/img/light/concern-4.png"
-style="max-width: 883px;" /></p>
-<p><img src="/assets/img/dark/concern-4.png"
-style="max-width: 883px;" /></p>
+<p><img src="/assets/img/light/concern-4.png" style="max-width: 883px;" /></p>
+<p><img src="/assets/img/dark/concern-4.png" style="max-width: 883px;" /></p>
 <p>Wait, <em>what</em> is going <em>on</em>?</p>
-<p>First of all, <code>ClassMethods</code> was <em>only</em>
-<code>extend</code>ed into <code>Parent</code>, not also into
-<code>IChild</code>. I suppose that makes sense; maybe there’s no real
-use for those <code>ClassMethods</code> to also end up on the (<a
-href="/inheritance-in-ruby/#the-include-operator">childless</a>)
-singleton class of <code>IChild</code>. In all likelihood, those methods
-were going to be things like “create an instance of the current class”
-which is something that doesn’t make sense for module singleton class
-methods to be doing. I will admit that my expectation was that
-<code>ClassMethods</code> would get <code>extend</code>’ed onto
-<em>every</em> module singleton class that <code>include</code>’d the
-attached class, to mimic how it works when inheriting classes.</p>
-<p><strong>But what really surprised me</strong>: despite
-<em>literally</em> having the <code>include IParent</code> line in its
-class body, <code>IParent</code> is <em>not</em> an ancestor of
-<code>IChild</code>. 🤯</p>
-<p>Instead, it’s only when <code>IChild</code> is eventually
-<code>include</code>’d into <code>Parent</code> that that
-<code>include IParent</code> line has an effect. We see that there are
-two lines coming out of <code>Parent</code>: one directly to
-<code>IChild</code> (makes sense), and then one that skips directly from
-<code>Parent</code> to <code>IParent</code>.</p>
-<p>This is kind of wild to me,<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="marginnote">Even more wild is that it’s done all <a
-href="https://github.com/rails/rails/blob/55412cd9257dc27a8a9175529857ce5f2d81f92f/activesupport/lib/active_support/concern.rb#L112">in
-plain Ruby</a>, using <a
-href="https://docs.ruby-lang.org/en/master/Module.html#method-i-append_features">append_features</a>.<br />
+<p>First of all, <code>ClassMethods</code> was <em>only</em> <code>extend</code>ed into <code>Parent</code>, not also into <code>IChild</code>. I suppose that makes sense; maybe there’s no real use for those <code>ClassMethods</code> to also end up on the (<a href="/inheritance-in-ruby/#the-include-operator">childless</a>) singleton class of <code>IChild</code>. In all likelihood, those methods were going to be things like “create an instance of the current class” which is something that doesn’t make sense for module singleton class methods to be doing. I will admit that my expectation was that <code>ClassMethods</code> would get <code>extend</code>’ed onto <em>every</em> module singleton class that <code>include</code>’d the attached class, to mimic how it works when inheriting classes.</p>
+<p><strong>But what really surprised me</strong>: despite <em>literally</em> having the <code>include IParent</code> line in its class body, <code>IParent</code> is <em>not</em> an ancestor of <code>IChild</code>. 🤯</p>
+<p>Instead, it’s only when <code>IChild</code> is eventually <code>include</code>’d into <code>Parent</code> that that <code>include IParent</code> line has an effect. We see that there are two lines coming out of <code>Parent</code>: one directly to <code>IChild</code> (makes sense), and then one that skips directly from <code>Parent</code> to <code>IParent</code>.</p>
+<p>This is kind of wild to me,<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="marginnote">Even more wild is that it’s done all <a href="https://github.com/rails/rails/blob/55412cd9257dc27a8a9175529857ce5f2d81f92f/activesupport/lib/active_support/concern.rb#L112">in plain Ruby</a>, using <a href="https://docs.ruby-lang.org/en/master/Module.html#method-i-append_features">append_features</a>.<br />
 <br />
-</span></span> because it literally changes the meaning of
-<code>include</code> inside an <code>ActiveSupport::Concern</code>
-module.</p>
-<p>Full disclosure: I don’t know why this is. If you’ll allow me to
-guess, I’d say because <code>ActiveSupport::Concern</code> is not only
-designed to let you mix singleton class methods into the right place,
-but <em>also</em> to register callbacks to run arbitrary code once the
-concern is mixed in there. These callbacks might do things like “call a
-DSL method in the context of a database model,” or something. The
-methods that callback calls won’t exist until the very end of the
-<code>include</code> chain, when the <code>Concern</code> gets mixed
-into the model.</p>
+</span></span> because it literally changes the meaning of <code>include</code> inside an <code>ActiveSupport::Concern</code> module.</p>
+<p>Full disclosure: I don’t know why this is. If you’ll allow me to guess, I’d say because <code>ActiveSupport::Concern</code> is not only designed to let you mix singleton class methods into the right place, but <em>also</em> to register callbacks to run arbitrary code once the concern is mixed in there. These callbacks might do things like “call a DSL method in the context of a database model,” or something. The methods that callback calls won’t exist until the very end of the <code>include</code> chain, when the <code>Concern</code> gets mixed into the model.</p>
 <p><br />
 </p>
-<p>With any luck maybe that clears things up a bit. If I’ve gotten
-something wrong, or this leaves you with even more questions, feel free
-to reach out.</p>
+<p>With any luck maybe that clears things up a bit. If I’ve gotten something wrong, or this leaves you with even more questions, feel free to reach out.</p>
 <p><br />
 </p>
 <hr />
 <p><br />
 </p>
-<h1 id="appendix-relationship-with-type-systems">Appendix: relationship
-with type systems</h1>
-<p>Sorbet has a similar but different feature, called <a
-href="https://sorbet.org/docs/abstract#interfaces-and-the-included-hook"><code>mixes_in_class_methods</code></a>.
-I don’t know the history of it, nor why it appears to work so
-differently from <code>ActiveSupport::Concern</code> despite being
-clearly inspired by the <code>ClassMethods</code> pattern. I’ll have to
-ask around for the history on that.</p>
-<p>Separately, building Sorbet’s relatively new <a
-href="https://sorbet.org/docs/attached-class#has_attached_class-tattached_class-in-module-instance-methods"><code>has_attached_class!</code></a>
-feature, I kept finding it really clunky to use in combination with
-<code>mixes_in_class_methods</code>. The behavior
-<code>ActiveSupport::Concern</code> has around <code>ClassMethods</code>
-would make some annoyances with <code>has_attached_class!</code> go
-away. But at this rate, making a change to how
-<code>mixes_in_class_methods</code> is sure to break some other code.
-But maybe there’s a way to build better support for
-<code>Concern</code>-ish things more generally, so that new code might
-be able to move away from <code>mixes_in_class_methods</code>. I have
-not given this much thought.</p>
-<p>And as one final point: by changing how <code>include</code> works,
-it changes the meaning of this expression:
-<code>if IChild &lt; IParent</code>. This is a very not fun thing to
-think about the consequences of if you’re trying to build a type system
-for Ruby. I’m struggling to think of how to use this fact to come up
-with some sort of contradiction between what would be predicted by the
-type system and what would actually happen at runtime. If you can come
-up with one I’d be very curious to see it.</p>
+<h1 id="appendix-relationship-with-type-systems">Appendix: relationship with type systems</h1>
+<p>Sorbet has a similar but different feature, called <a href="https://sorbet.org/docs/abstract#interfaces-and-the-included-hook"><code>mixes_in_class_methods</code></a>. I don’t know the history of it, nor why it appears to work so differently from <code>ActiveSupport::Concern</code> despite being clearly inspired by the <code>ClassMethods</code> pattern. I’ll have to ask around for the history on that.</p>
+<p>Separately, building Sorbet’s relatively new <a href="https://sorbet.org/docs/attached-class#has_attached_class-tattached_class-in-module-instance-methods"><code>has_attached_class!</code></a> feature, I kept finding it really clunky to use in combination with <code>mixes_in_class_methods</code>. The behavior <code>ActiveSupport::Concern</code> has around <code>ClassMethods</code> would make some annoyances with <code>has_attached_class!</code> go away. But at this rate, making a change to how <code>mixes_in_class_methods</code> is sure to break some other code. But maybe there’s a way to build better support for <code>Concern</code>-ish things more generally, so that new code might be able to move away from <code>mixes_in_class_methods</code>. I have not given this much thought.</p>
+<p>And as one final point: by changing how <code>include</code> works, it changes the meaning of this expression: <code>if IChild &lt; IParent</code>. This is a very not fun thing to think about the consequences of if you’re trying to build a type system for Ruby. I’m struggling to think of how to use this fact to come up with some sort of contradiction between what would be predicted by the type system and what would actually happen at runtime. If you can come up with one I’d be very curious to see it.</p>
 <h1 id="appendix-support-code">Appendix: support code</h1>
-<p>I wrote some random helper functions to print the “ancestors of …”
-information that I used to figure out how to draw the pictures in this
-post. Here’s the code:</p>
+<p>I wrote some random helper functions to print the “ancestors of …” information that I used to figure out how to draw the pictures in this post. Here’s the code:</p>
 <details>
 <summary>
 Click to show code
 </summary>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode ruby wide"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;active_support/concern&#39;</span></span>
+<div class="sourceCode" id="cb6"><pre class="sourceCode ruby wide"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;active_support/concern&#39;</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> interesting_ancestors(mod)</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  non_self_ancestors <span class="kw">=</span> mod<span class="at">.ancestors</span><span class="kw">[</span><span class="dv">1</span><span class="kw">..]</span></span>
@@ -387,13 +255,10 @@ class="sourceCode ruby wide"><code class="sourceCode ruby"><span id="cb6-1"><a h
 <span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    first <span class="kw">=</span> <span class="dv">false</span></span>
 <span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>It’s not particularly pretty, but it works for the four snippets in
-this post.</p>
+<p>It’s not particularly pretty, but it works for the four snippets in this post.</p>
 </details>
-<h1 id="appendix-all-ancestor-information">Appendix: all ancestor
-information</h1>
-<p>I only showed the first printout, and then skipped straight to
-pictures. Here’s the printouts for all four examples:</p>
+<h1 id="appendix-all-ancestor-information">Appendix: all ancestor information</h1>
+<p>I only showed the first printout, and then skipped straight to pictures. Here’s the printouts for all four examples:</p>
 <details>
 <summary>
 Click to show all printouts

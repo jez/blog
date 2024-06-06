@@ -51,82 +51,40 @@
 </nav>
 
 <main>
-<p><strong>tl;dr</strong>: Ruby has a feature called “conditional send”
-which looks very similar to JavaScript’s “safe navigation” feature.
-Their key difference is short circuiting evaluation: Ruby chooses not to
-short circuit, because there <em>are</em> methods on <code>nil</code>,
-unlike <code>undefined</code> in JS.</p>
+<p><strong>tl;dr</strong>: Ruby has a feature called “conditional send” which looks very similar to JavaScript’s “safe navigation” feature. Their key difference is short circuiting evaluation: Ruby chooses not to short circuit, because there <em>are</em> methods on <code>nil</code>, unlike <code>undefined</code> in JS.</p>
 <p>Let’s dive into an example. You can do this in Ruby:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount</span></span></code></pre></div>
-<p>which calls <code>.amount</code> if <code>invoice</code> is not
-<code>nil</code>, or else evaluates to <code>nil</code> (skipping the
-call). You can do something similar in JavaScript, just with
-<code>?</code> instead of <code>&amp;</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount</span></span></code></pre></div>
+<p>which calls <code>.amount</code> if <code>invoice</code> is not <code>nil</code>, or else evaluates to <code>nil</code> (skipping the call). You can do something similar in JavaScript, just with <code>?</code> instead of <code>&amp;</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="op">?.</span><span class="at">amount</span></span></code></pre></div>
-<p>In my experience, most people first learn this feature in JavaScript,
-where it’s called “safe navigation,” and they bring the name with them
-when learning Ruby.</p>
-<p>In fact, the feature Ruby has is not safe navigation but something
-else, called <strong>conditional send</strong>.</p>
+<p>In my experience, most people first learn this feature in JavaScript, where it’s called “safe navigation,” and they bring the name with them when learning Ruby.</p>
+<p>In fact, the feature Ruby has is not safe navigation but something else, called <strong>conditional send</strong>.</p>
 <p>There’s a subtle difference, only noticeable in a longer chain:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="op">?.</span><span class="at">amount</span><span class="op">.</span><span class="fu">format</span>()</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount.format</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount.format</span>()</span></code></pre></div>
 <ul>
-<li><p>The JavaScript version short circuits the entire remaining
-expression. If <code>invoice</code> is falsy, the <code>.format()</code>
-method is not called, and the whole expression evaluates to
-<code>undefined</code>.</p></li>
-<li><p>Meanwhile Ruby does the opposite: if <code>invoice</code> is
-<code>nil</code>, Ruby evaluates <code>invoice&amp;.amount</code> to
-<code>nil</code> and then keeps going. The call to
-<code>.format()</code> still happens, but the call happens on
-<code>nil</code> (which is probably a bug).</p></li>
+<li><p>The JavaScript version short circuits the entire remaining expression. If <code>invoice</code> is falsy, the <code>.format()</code> method is not called, and the whole expression evaluates to <code>undefined</code>.</p></li>
+<li><p>Meanwhile Ruby does the opposite: if <code>invoice</code> is <code>nil</code>, Ruby evaluates <code>invoice&amp;.amount</code> to <code>nil</code> and then keeps going. The call to <code>.format()</code> still happens, but the call happens on <code>nil</code> (which is probably a bug).</p></li>
 </ul>
-<p>To completely reproduce the JavaScript behavior in Ruby, we need to
-keep chaining the <code>&amp;</code>:</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount</span><span class="kw">&amp;</span><span class="at">.format</span></span></code></pre></div>
-<p>Most Ruby linters will check for this and require programmers to put
-<code>&amp;</code> on all method calls downstream of the first
-conditional send.</p>
-<p>Why the difference? Or rather: why doesn’t Ruby do what JavaScript
-does?</p>
-<p>In JavaScript it never makes sense to access a property on
-<code>undefined</code>: <code>undefined</code> does not have any
-properties, nor is it possible to add any.</p>
-<p>But in Ruby, <code>nil</code> inherits from <code>Object</code> (and
-thus <code>Kernel</code> and <code>BasicObject</code>), which means it
-has all the methods available to all objects. For example:</p>
+<p>To completely reproduce the JavaScript behavior in Ruby, we need to keep chaining the <code>&amp;</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount</span><span class="kw">&amp;</span><span class="at">.format</span></span></code></pre></div>
+<p>Most Ruby linters will check for this and require programmers to put <code>&amp;</code> on all method calls downstream of the first conditional send.</p>
+<p>Why the difference? Or rather: why doesn’t Ruby do what JavaScript does?</p>
+<p>In JavaScript it never makes sense to access a property on <code>undefined</code>: <code>undefined</code> does not have any properties, nor is it possible to add any.</p>
+<p>But in Ruby, <code>nil</code> inherits from <code>Object</code> (and thus <code>Kernel</code> and <code>BasicObject</code>), which means it has all the methods available to all objects. For example:</p>
 <ul>
 <li><code>is_a?</code></li>
 <li><code>nil?</code></li>
 <li><code>hash</code></li>
 <li><code>to_s</code></li>
 </ul>
-<p>But even more: Ruby lets users monkey patch more methods onto
-<code>nil</code>. Two common methods available on <code>nil</code> in
-codebases using Rails are <code>blank?</code> and
-<code>present?</code>.</p>
-<p>So Ruby chooses not to short circuit. There are enough methods
-available on <code>nil</code> that it would be too restrictive to
-unconditionally short circuit and not allow any further method
-calls.</p>
+<p>But even more: Ruby lets users monkey patch more methods onto <code>nil</code>. Two common methods available on <code>nil</code> in codebases using Rails are <code>blank?</code> and <code>present?</code>.</p>
+<p>So Ruby chooses not to short circuit. There are enough methods available on <code>nil</code> that it would be too restrictive to unconditionally short circuit and not allow any further method calls.</p>
 <p>The names of both features reflect this choice:</p>
 <ul>
-<li><p>Safe navigation evokes an image of navigating with a map. If at
-some point the navigation takes you to the edge of a cliff, it’s time to
-stop.</p></li>
-<li><p>Conditional send refers to the object-oriented notion that
-calling a method can be thought of as sending a message to an object.
-It’s “conditional” because that message might not get sent, and this
-choice is made independently for every method call (or equivalently, for
-every message we might send).</p></li>
+<li><p>Safe navigation evokes an image of navigating with a map. If at some point the navigation takes you to the edge of a cliff, it’s time to stop.</p></li>
+<li><p>Conditional send refers to the object-oriented notion that calling a method can be thought of as sending a message to an object. It’s “conditional” because that message might not get sent, and this choice is made independently for every method call (or equivalently, for every message we might send).</p></li>
 </ul>
-<p>Inside the Ruby VM, Sorbet, and Rubocop rules, the AST node
-representing <code>x&amp;.foo</code> is named “csend.” And now you know
-why.</p>
+<p>Inside the Ruby VM, Sorbet, and Rubocop rules, the AST node representing <code>x&amp;.foo</code> is named “csend.” And now you know why.</p>
 </main>
 
 

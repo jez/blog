@@ -51,39 +51,15 @@
 
 <main>
 <blockquote>
-<p><strong>Disclaimer</strong>: this post was first drafted as a
-Stripe-internal email. On December 10, 2022 I republished it here,
-largely unchanged from the original. See <a
-href="/old-compiler-notes/">Some Old Sorbet Compiler Notes</a> for more.
-The Sorbet Compiler is still largely an experimental project: this post
-is available purely for curiosity’s sake.</p>
-<p>Any benchmark numbers included in this post are intended to be
-educational about how the Sorbet Compiler approaches speeding up code.
-They should not be taken as representative or predictive of any
-real-world workload, and are likely out-of-date with respect to
-improvements that have been made since this post originally
-appeared.</p>
+<p><strong>Disclaimer</strong>: this post was first drafted as a Stripe-internal email. On December 10, 2022 I republished it here, largely unchanged from the original. See <a href="/old-compiler-notes/">Some Old Sorbet Compiler Notes</a> for more. The Sorbet Compiler is still largely an experimental project: this post is available purely for curiosity’s sake.</p>
+<p>Any benchmark numbers included in this post are intended to be educational about how the Sorbet Compiler approaches speeding up code. They should not be taken as representative or predictive of any real-world workload, and are likely out-of-date with respect to improvements that have been made since this post originally appeared.</p>
 </blockquote>
-<p>I was looking at improving the performance of the Sorbet Compiler’s
-generated code on Stripe’s feature flag library this week. I was trying
-to diagnose which parts of the compiled code are faster and slower.
-Specifically, there were some profiler results that that seemed to
-suggest the <code>x[y]</code> operation for hashes and arrays (the Ruby
-VM calls this operation <code>aref</code>) might be a problem:</p>
+<p>I was looking at improving the performance of the Sorbet Compiler’s generated code on Stripe’s feature flag library this week. I was trying to diagnose which parts of the compiled code are faster and slower. Specifically, there were some profiler results that that seemed to suggest the <code>x[y]</code> operation for hashes and arrays (the Ruby VM calls this operation <code>aref</code>) might be a problem:</p>
 <!-- more -->
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>xs <span class="kw">=</span> <span class="kw">[</span><span class="dv">123</span><span class="kw">]</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>xs <span class="kw">=</span> <span class="kw">[</span><span class="dv">123</span><span class="kw">]</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span> xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span></code></pre></div>
-<p>To isolate for sure whether this was a problem or not, we wrote a
-benchmark. It turns out that we misinterpreted the <code>perf</code>
-profile! Array access is much faster in Sorbet:</p>
+<p>To isolate for sure whether this was a problem or not, we wrote a benchmark. It turns out that we misinterpreted the <code>perf</code> profile! Array access is much faster in Sorbet:</p>
 <table>
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">benchmark</th>
@@ -94,8 +70,7 @@ profile! Array access is much faster in Sorbet:</p>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><a
-href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/typed_array_aref.rb">typed_array_aref.rb</a></td>
+<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/typed_array_aref.rb">typed_array_aref.rb</a></td>
 <td style="text-align: right;">0.282s</td>
 <td style="text-align: right;">0.061s</td>
 <td style="text-align: right;">4.62x</td>
@@ -103,8 +78,7 @@ href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/
 </tbody>
 </table>
 <p>Here’s the full benchmark:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>xs <span class="kw">=</span> T<span class="at">.let</span>(<span class="kw">[</span><span class="dv">123</span><span class="kw">]</span>, T<span class="kw">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>)</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>xs <span class="kw">=</span> T<span class="at">.let</span>(<span class="kw">[</span><span class="dv">123</span><span class="kw">]</span>, T<span class="kw">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="kw">&lt;</span> <span class="dv">10_000_000</span></span>
@@ -113,17 +87,12 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span> xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span></code></pre></div>
-<p>But it turns out that the story doesn’t end there. I re-ran the
-benchmark with some slight modifications:</p>
+<p>But it turns out that the story doesn’t end there. I re-ran the benchmark with some slight modifications:</p>
 <ul>
 <li>the same test, but with an empty <code>while</code> loop body</li>
-<li>the same test, but marking the initial assignment to <code>xs</code>
-as untyped</li>
+<li>the same test, but marking the initial assignment to <code>xs</code> as untyped</li>
 </ul>
-<p>With these benchmarks, we tease apart how much of the speedup is
-explained by various parts of the compiled code. Namely, how much is
-explained by “the Sorbet Compiler just does loops faster” and how much
-is explained by knowing a type statically:</p>
+<p>With these benchmarks, we tease apart how much of the speedup is explained by various parts of the compiled code. Namely, how much is explained by “the Sorbet Compiler just does loops faster” and how much is explained by knowing a type statically:</p>
 <div class="wide extra-wide">
 <table style="width:98%;">
 <colgroup>
@@ -149,8 +118,7 @@ w/o while</th>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><a
-href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
+<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
 <td style="text-align: right;">0.205s</td>
 <td style="text-align: right;">0.048s</td>
 <td style="text-align: right;">—</td>
@@ -158,8 +126,7 @@ href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/
 <td style="text-align: right;">—</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><a
-href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/untyped_array_aref.rb">untyped_array_aref.rb</a></td>
+<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/untyped_array_aref.rb">untyped_array_aref.rb</a></td>
 <td style="text-align: right;">0.282s</td>
 <td style="text-align: right;">0.174s</td>
 <td style="text-align: right;">0.077s</td>
@@ -167,8 +134,7 @@ href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/
 <td style="text-align: right;">0.61x</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><a
-href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/typed_array_aref.rb">typed_array_aref.rb</a></td>
+<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/typed_array_aref.rb">typed_array_aref.rb</a></td>
 <td style="text-align: right;">0.282s</td>
 <td style="text-align: right;">0.061s</td>
 <td style="text-align: right;">0.077s</td>
@@ -178,54 +144,19 @@ href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/
 </tbody>
 </table>
 </div>
-<p>(I’ve linked to the specific benchmarks in the Sorbet compiler
-codebase if you want to see them.)</p>
-<p>What we see in this table is that Sorbet-compiled Ruby is still
-“faster” in absolute terms when the type of <code>xs</code> isn’t known
-(untyped_array_aref.rb, 0.282s vs 0.174s). But in fact, most of this
-absolute difference is because the compiled <code>while</code> loop was
-faster!</p>
-<p>If we subtract the compiled <code>while</code> loop timings from the
-compiled times, and the interpreted <code>while</code> loop timings from
-the interpreted timings, what’s left is how much time was actually spent
-in each benchmark doing the array access operation.</p>
-<p>After doing those subtractions and computing the speedups, we see two
-things:<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote"><strong>Editing note</strong>: These numbers are
-unchanged from when I first measured in August 2020. They do not
-necessarily reflect the Sorbet Compiler’s current performance.<br />
+<p>(I’ve linked to the specific benchmarks in the Sorbet compiler codebase if you want to see them.)</p>
+<p>What we see in this table is that Sorbet-compiled Ruby is still “faster” in absolute terms when the type of <code>xs</code> isn’t known (untyped_array_aref.rb, 0.282s vs 0.174s). But in fact, most of this absolute difference is because the compiled <code>while</code> loop was faster!</p>
+<p>If we subtract the compiled <code>while</code> loop timings from the compiled times, and the interpreted <code>while</code> loop timings from the interpreted timings, what’s left is how much time was actually spent in each benchmark doing the array access operation.</p>
+<p>After doing those subtractions and computing the speedups, we see two things:<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote"><strong>Editing note</strong>: These numbers are unchanged from when I first measured in August 2020. They do not necessarily reflect the Sorbet Compiler’s current performance.<br />
 <br />
 </span></span></p>
 <ul>
-<li><p>The array access operation is actually slower than the Ruby VM if
-Sorbet doesn’t have type information (0.61x speedup is less than 1, so
-it’s a slowdown). As it turns out, the Ruby VM has special optimizations
-for <code>xs[0]</code> when <code>xs</code> is an
-<code>Array</code>.</p></li>
-<li><p>With type information, Sorbet-compiled code is even faster than
-both the interpreted code and the compiled but untyped code.
-Specifically, the compiler only spent <code>0.013s</code> computing the
-array access given type information, vs the interpreter spent
-<code>0.077s</code>, and the compiled but untyped version took even more
-at <code>0.126s</code>.</p></li>
+<li><p>The array access operation is actually slower than the Ruby VM if Sorbet doesn’t have type information (0.61x speedup is less than 1, so it’s a slowdown). As it turns out, the Ruby VM has special optimizations for <code>xs[0]</code> when <code>xs</code> is an <code>Array</code>.</p></li>
+<li><p>With type information, Sorbet-compiled code is even faster than both the interpreted code and the compiled but untyped code. Specifically, the compiler only spent <code>0.013s</code> computing the array access given type information, vs the interpreter spent <code>0.077s</code>, and the compiled but untyped version took even more at <code>0.126s</code>.</p></li>
 </ul>
-<p>This means that with types, the <code>Array</code> index operation
-compiled by Sorbet is (currently) 5.92x faster than the interpreter! I
-say currently because: the Sorbet compiler is very much not finished. It
-could get faster or slower at any time.</p>
-<p>Hopefully this gives a glimpse of why we’re confident the compiler
-will have an impact. Certain Ruby features are type-agnostic, and can be
-sped up even if code is untyped (like <code>while</code> loops). Adding
-types (which are exceedingly common in Stripe’s codebase at this point)
-has the potential to make code even faster.</p>
-<p>The examples in this post are obviously contrived (no one is writing
-<code>while</code> loops like this in Stripe’s codebase) but the idea is
-that if Sorbet can showcase speedups on any individual part of a typed
-Ruby program, than all you have to do to do to get fast code is add a
-<code># compiled: true</code> comment to the top of a file and Sorbet
-will make every individual part faster, and the effects will compound.
-Performance for free!</p>
+<p>This means that with types, the <code>Array</code> index operation compiled by Sorbet is (currently) 5.92x faster than the interpreter! I say currently because: the Sorbet compiler is very much not finished. It could get faster or slower at any time.</p>
+<p>Hopefully this gives a glimpse of why we’re confident the compiler will have an impact. Certain Ruby features are type-agnostic, and can be sped up even if code is untyped (like <code>while</code> loops). Adding types (which are exceedingly common in Stripe’s codebase at this point) has the potential to make code even faster.</p>
+<p>The examples in this post are obviously contrived (no one is writing <code>while</code> loops like this in Stripe’s codebase) but the idea is that if Sorbet can showcase speedups on any individual part of a typed Ruby program, than all you have to do to do to get fast code is add a <code># compiled: true</code> comment to the top of a file and Sorbet will make every individual part faster, and the effects will compound. Performance for free!</p>
 </main>
 
 

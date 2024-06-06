@@ -51,60 +51,29 @@
 
 <main>
 <blockquote>
-<p><strong>Disclaimer</strong>: this post was first drafted as a
-Stripe-internal email. On December 10, 2022 I republished it here,
-largely unchanged from the original. See <a
-href="/old-compiler-notes/">Some Old Sorbet Compiler Notes</a> for more.
-The Sorbet Compiler is still largely an experimental project: this post
-is available purely for curiosity’s sake.</p>
-<p>Any benchmark numbers included in this post are intended to be
-educational about how the Sorbet Compiler approaches speeding up code.
-They should not be taken as representative or predictive of any
-real-world workload, and are likely out-of-date with respect to
-improvements that have been made since this post originally
-appeared.</p>
+<p><strong>Disclaimer</strong>: this post was first drafted as a Stripe-internal email. On December 10, 2022 I republished it here, largely unchanged from the original. See <a href="/old-compiler-notes/">Some Old Sorbet Compiler Notes</a> for more. The Sorbet Compiler is still largely an experimental project: this post is available purely for curiosity’s sake.</p>
+<p>Any benchmark numbers included in this post are intended to be educational about how the Sorbet Compiler approaches speeding up code. They should not be taken as representative or predictive of any real-world workload, and are likely out-of-date with respect to improvements that have been made since this post originally appeared.</p>
 </blockquote>
-<p>After an embarrassingly long break, we’re back with another post on
-compiled Ruby performance! Previously in this series:</p>
+<p>After an embarrassingly long break, we’re back with another post on compiled Ruby performance! Previously in this series:</p>
 <ul>
-<li><a href="/types-make-array-access-faster/">Types Make Array Access
-Faster</a></li>
-<li><a href="/another-look-at-typed-array-access/">Another Look at Typed
-Array Access</a></li>
-<li><a href="/fast-while-loops-in-ruby/">Fast While Loops in
-Ruby</a></li>
+<li><a href="/types-make-array-access-faster/">Types Make Array Access Faster</a></li>
+<li><a href="/another-look-at-typed-array-access/">Another Look at Typed Array Access</a></li>
+<li><a href="/fast-while-loops-in-ruby/">Fast While Loops in Ruby</a></li>
 </ul>
-<p>In this post, we’re going to look at something that I’ve hinted at
-for a long time and sort of taken for granted: the Sorbet Compiler is
-<strong>much faster at runtime type checks</strong> than the
-interpreter.</p>
-<p>Why do we care? In a compiler for a dynamically-typed language,
-runtime type checks are the name of the game—they show up in all kinds
-of places:</p>
+<p>In this post, we’re going to look at something that I’ve hinted at for a long time and sort of taken for granted: the Sorbet Compiler is <strong>much faster at runtime type checks</strong> than the interpreter.</p>
+<p>Why do we care? In a compiler for a dynamically-typed language, runtime type checks are the name of the game—they show up in all kinds of places:</p>
 <ul>
-<li>When checking that arguments provided at a call site match the
-method’s <code>sig</code></li>
-<li>When checking the value returned by a method against that method’s
-<code>sig</code></li>
-<li>In the implementation of <code>T.let</code> and <code>T.cast</code>
-annotations</li>
-<li><a href="https://sorbet.org/docs/flow-sensitive">Flow-sensitive
-checks</a> required by Sorbet, like in <code>case</code>
-expressions</li>
-<li>Internal “fast path” guards for speculative optimizations,
-including:
+<li>When checking that arguments provided at a call site match the method’s <code>sig</code></li>
+<li>When checking the value returned by a method against that method’s <code>sig</code></li>
+<li>In the implementation of <code>T.let</code> and <code>T.cast</code> annotations</li>
+<li><a href="https://sorbet.org/docs/flow-sensitive">Flow-sensitive checks</a> required by Sorbet, like in <code>case</code> expressions</li>
+<li>Internal “fast path” guards for speculative optimizations, including:
 <ul>
-<li>type-directed optimizations (e.g., <a
-href="/types-make-array-access-faster/">Types Make Array Access
-Faster</a>)</li>
-<li>direct calls for <a
-href="https://sorbet.org/docs/final#final-methods">final
-methods</a></li>
+<li>type-directed optimizations (e.g., <a href="/types-make-array-access-faster/">Types Make Array Access Faster</a>)</li>
+<li>direct calls for <a href="https://sorbet.org/docs/final#final-methods">final methods</a></li>
 </ul></li>
 </ul>
-<p>So, runtime type checks show up all over the place, but how much
-faster are they? Let’s zoom in on the runtime type checks that happen in
-<code>case</code> expressions with some benchmarks:</p>
+<p>So, runtime type checks show up all over the place, but how much faster are they? Let’s zoom in on the runtime type checks that happen in <code>case</code> expressions with some benchmarks:</p>
 <table style="width:81%;">
 <colgroup>
 <col style="width: 45%" />
@@ -120,14 +89,12 @@ faster are they? Let’s zoom in on the runtime type checks that happen in
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><a
-href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
+<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
 <td style="text-align: right;">0.212s</td>
 <td style="text-align: right;">0.070s</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><a
-href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/case_nil_str_obj.rb">case_nil_str_obj.rb</a></td>
+<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/case_nil_str_obj.rb">case_nil_str_obj.rb</a></td>
 <td style="text-align: right;">2.227s</td>
 <td style="text-align: right;">0.142s</td>
 </tr>
@@ -138,50 +105,28 @@ href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/
 </tr>
 </tbody>
 </table>
-<p>The first benchmark, <code>while_10_000_000.rb</code>, is our
-baseline. It’s just a Ruby <code>while</code> loop that increments a
-counter 10 million times and then prints the counter. We subtract the
-time it takes from other benchmarks to control for the fact that
-compiled <code>while</code> loops really fast (see <a
-href="/fast-while-loops-in-ruby">Fast While Loops in Ruby</a>).</p>
-<p>Our real benchmark is <code>case_nil_str_obj.rb</code>. It has a
-bunch of case expressions that basically look like this:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>res <span class="kw">=</span></span>
+<p>The first benchmark, <code>while_10_000_000.rb</code>, is our baseline. It’s just a Ruby <code>while</code> loop that increments a counter 10 million times and then prints the counter. We subtract the time it takes from other benchmarks to control for the fact that compiled <code>while</code> loops really fast (see <a href="/fast-while-loops-in-ruby">Fast While Loops in Ruby</a>).</p>
+<p>Our real benchmark is <code>case_nil_str_obj.rb</code>. It has a bunch of case expressions that basically look like this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>res <span class="kw">=</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">case</span> x</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">when</span> <span class="dt">String</span> <span class="cf">then</span> <span class="dv">true</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="dv">false</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span></code></pre></div>
-<p>for a selection of different classes (<code>NilClass</code>,
-<code>String</code>, and <code>Object</code>) and values
-(<code>nil</code> and <code>''</code>). After subtracting the baseline
-from both interpreted and compiled timings, we see that what takes the
-interpreter 2.015s to run takes the compiler just 72ms. (And in fact,
-nearly all of that comes from the two <code>case</code> expressions
-checking for <code>Object</code>—if we delete those two and leave just
-<code>NilClass</code> and <code>String</code> checks, the compiled time
-drops down to about 8ms 🤯).</p>
-<p>So the Sorbet compiler is <strong>much</strong> faster at runtime
-type checks than the Ruby VM… why is that? There are a few reasons:</p>
+<p>for a selection of different classes (<code>NilClass</code>, <code>String</code>, and <code>Object</code>) and values (<code>nil</code> and <code>''</code>). After subtracting the baseline from both interpreted and compiled timings, we see that what takes the interpreter 2.015s to run takes the compiler just 72ms. (And in fact, nearly all of that comes from the two <code>case</code> expressions checking for <code>Object</code>—if we delete those two and leave just <code>NilClass</code> and <code>String</code> checks, the compiled time drops down to about 8ms 🤯).</p>
+<p>So the Sorbet compiler is <strong>much</strong> faster at runtime type checks than the Ruby VM… why is that? There are a few reasons:</p>
 <ol type="1">
 <li>Sorbet’s type tests cut out the Ruby VM.</li>
 <li>Type tests for common Ruby classes have fast special cases.</li>
 <li>The power of LLVM gets us a lot of free wins.</li>
 </ol>
-<p>I’d love to cover all of these, but for the sake of keeping this note
-short and sweet, I’m only going to focus on the first two. (Let me know
-if you’d like to hear more about the power of LLVM though!)</p>
-<p>To see what “<strong>cutting out the Ruby VM</strong>” means, let’s
-dig into a specific example. Consider some code like we saw earlier:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res <span class="kw">=</span></span>
+<p>I’d love to cover all of these, but for the sake of keeping this note short and sweet, I’m only going to focus on the first two. (Let me know if you’d like to hear more about the power of LLVM though!)</p>
+<p>To see what “<strong>cutting out the Ruby VM</strong>” means, let’s dig into a specific example. Consider some code like we saw earlier:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res <span class="kw">=</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">case</span> x</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">when</span> <span class="dt">Integer</span> <span class="cf">then</span> <span class="dv">true</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="dv">false</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span></code></pre></div>
-<p>We can get the Ruby VM to tell us the bytecode instructions that it
-translates this Ruby program into with the <code>ruby</code> command
-line:</p>
+<p>We can get the Ruby VM to tell us the bytecode instructions that it translates this Ruby program into with the <code>ruby</code> command line:</p>
 <pre class="tight-code"><code>❯ ruby --dump=insns -e &quot;x = 0; case x when Integer then true else false end&quot;
 # ...
 0000 putobject_INT2FIX_0_                ─┐ x = 0
@@ -200,86 +145,39 @@ line:</p>
 0024 pop                                 ─┐
 0025 putobject                true        │ true branch
 0027 leave                               ─┘</code></pre>
-<p><em>(I’ve annotated hand-annotated the output. Run the provided
-command to see the original output.)</em></p>
-<p>If you’re not familiar with bytecode instructions, you can imagine
-this as a sort of assembly language that only the Ruby VM understands
-and that it evaluates in order to execute a Ruby program.</p>
-<p>So to do a type test in a <code>case</code> expression, the Ruby VM
-has to:</p>
+<p><em>(I’ve annotated hand-annotated the output. Run the provided command to see the original output.)</em></p>
+<p>If you’re not familiar with bytecode instructions, you can imagine this as a sort of assembly language that only the Ruby VM understands and that it evaluates in order to execute a Ruby program.</p>
+<p>So to do a type test in a <code>case</code> expression, the Ruby VM has to:</p>
 <ol type="1">
 <li>Store the local variable <code>x</code> onto the Ruby stack</li>
-<li>Load the constant named <code>:Integer</code> by doing a search on
-<code>Object</code> and caching the result
+<li>Load the constant named <code>:Integer</code> by doing a search on <code>Object</code> and caching the result
 <ul>
-<li>The cache will be shared across repeated invocations of the method,
-to speed up the search for next time.</li>
+<li>The cache will be shared across repeated invocations of the method, to speed up the search for next time.</li>
 </ul></li>
-<li>Run a <code>checkmatch</code> instruction to do the
-<code>when Integer</code> comparison, and then do a
-<code>branchif</code> conditional jump on the result.
+<li>Run a <code>checkmatch</code> instruction to do the <code>when Integer</code> comparison, and then do a <code>branchif</code> conditional jump on the result.
 <ul>
-<li>Not pictured: the <code>checkmatch</code> instruction involves
-searching for an <code>Integer.===</code> method definition, which is
-how the Ruby VM implements class matching.</li>
+<li>Not pictured: the <code>checkmatch</code> instruction involves searching for an <code>Integer.===</code> method definition, which is how the Ruby VM implements class matching.</li>
 </ul></li>
 <li>Use the result to jump to the corresponding branch</li>
 </ol>
-<p>The problem is that this is an absolute <strong>ton</strong> of slow
-code. Here’s a breakdown of all the things I can see that are slow, and
-how the Sorbet compiler makes them faster.</p>
-<p>First: storing variables on the stack (i.e., RAM) is much slower than
-registers (CPU). The compiler keeps things in registers as much as
-possible.</p>
-<p>Next up: searching for methods is slow. In this case,
-<code>Integer.===</code> is actually defined on <code>Module</code>,
-which means chasing a lot of superclass pointers to find the class with
-the <code>===</code> method:</p>
+<p>The problem is that this is an absolute <strong>ton</strong> of slow code. Here’s a breakdown of all the things I can see that are slow, and how the Sorbet compiler makes them faster.</p>
+<p>First: storing variables on the stack (i.e., RAM) is much slower than registers (CPU). The compiler keeps things in registers as much as possible.</p>
+<p>Next up: searching for methods is slow. In this case, <code>Integer.===</code> is actually defined on <code>Module</code>, which means chasing a lot of superclass pointers to find the class with the <code>===</code> method:</p>
 <pre class="plain"><code>❯ irb
 irb(main):001:0&gt; Integer.singleton_class.ancestors
 =&gt; [#&lt;Class:Integer&gt;, #&lt;Class:Numeric&gt;, #&lt;Class:Object&gt;, #&lt;Class:BasicObject&gt;, Class, Module, Object, Kernel, BasicObject]</code></pre>
-<p>Instead of searching, the compiler can just know. Sorbet knows that
-<code>String.===</code> dispatches to <code>Module#===</code>, and it
-knows that <code>Module#===</code> is implemented by a C function called
-<a
-href="https://github.com/ruby/ruby/blob/5445e0435260b449decf2ac16f9d09bae3cafe72/object.c#L1774-L1778"><code>rb_obj_is_kind_of</code></a>.
-Rather than doing a method search, it just calls
-<code>rb_obj_is_kind_of</code> directly.</p>
-<p>More than that, sometimes the <code>===</code> method isn’t even
-needed. The Ruby VM has special ways of doing type checks for the most
-common classes, like <code>Integer</code>, <code>NilClass</code>,
-<code>Array</code>, and more. For <code>Integer</code> specifically, if
-the <a
-href="https://github.com/ruby/ruby/blob/5445e0435260b449decf2ac16f9d09bae3cafe72/include/ruby/ruby.h#L444">least-significant
-bit</a> of a Ruby value is <code>1</code>, then it’s an
-<code>Integer</code>. Sorbet is aware of these <a
-href="https://github.com/sorbet/sorbet/blob/f03e6be0599f509524a24273c0d14738048d5bc7/compiler/IREmitter/Payload.cc#L198">optimized
-type tests</a> and can emit code to check them without even calling
-<code>rb_obj_is_kind_of</code>.</p>
-<p>And last, using a bytecode instruction for conditional branches is
-expensive. Sorbet compiles the conditional jump directly to an assembly
-instruction.</p>
-<p>Putting that all together, in this case, Sorbet is able to do the
-<code>Integer</code> type test with just three CPU instructions (I’m
-showing the corresponding LLVM IR instead of assembly to make it easier
-to read):</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode llvm"><code class="sourceCode llvm"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Take arg x (stored in register %rawArg_x) and bitwise AND with 0x1</span></span>
+<p>Instead of searching, the compiler can just know. Sorbet knows that <code>String.===</code> dispatches to <code>Module#===</code>, and it knows that <code>Module#===</code> is implemented by a C function called <a href="https://github.com/ruby/ruby/blob/5445e0435260b449decf2ac16f9d09bae3cafe72/object.c#L1774-L1778"><code>rb_obj_is_kind_of</code></a>. Rather than doing a method search, it just calls <code>rb_obj_is_kind_of</code> directly.</p>
+<p>More than that, sometimes the <code>===</code> method isn’t even needed. The Ruby VM has special ways of doing type checks for the most common classes, like <code>Integer</code>, <code>NilClass</code>, <code>Array</code>, and more. For <code>Integer</code> specifically, if the <a href="https://github.com/ruby/ruby/blob/5445e0435260b449decf2ac16f9d09bae3cafe72/include/ruby/ruby.h#L444">least-significant bit</a> of a Ruby value is <code>1</code>, then it’s an <code>Integer</code>. Sorbet is aware of these <a href="https://github.com/sorbet/sorbet/blob/f03e6be0599f509524a24273c0d14738048d5bc7/compiler/IREmitter/Payload.cc#L198">optimized type tests</a> and can emit code to check them without even calling <code>rb_obj_is_kind_of</code>.</p>
+<p>And last, using a bytecode instruction for conditional branches is expensive. Sorbet compiles the conditional jump directly to an assembly instruction.</p>
+<p>Putting that all together, in this case, Sorbet is able to do the <code>Integer</code> type test with just three CPU instructions (I’m showing the corresponding LLVM IR instead of assembly to make it easier to read):</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode llvm"><code class="sourceCode llvm"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Take arg x (stored in register %rawArg_x) and bitwise AND with 0x1</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">%17</span> = <span class="kw">and</span> <span class="dt">i64</span> <span class="fu">%rawArg_x</span>, <span class="dv">1</span>, !dbg !<span class="dv">35</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">; Compare whether %17 == 0</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">%18</span> = <span class="kw">icmp</span> <span class="kw">eq</span> <span class="dt">i64</span> <span class="fu">%17</span>, <span class="dv">0</span>, !dbg !<span class="dv">35</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">; Jump to one of two branches depending on what the comparison said</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">br</span> <span class="dt">i1</span> <span class="fu">%18</span>, <span class="dt">label</span> <span class="fu">%20</span>, <span class="dt">label</span> <span class="fu">%sorbet_isa_Integer.exit.thread</span>, !dbg !<span class="dv">35</span>, !prof !<span class="dv">36</span></span></code></pre></div>
 <p>Pretty amazing!</p>
-<p>Runtime type checks are so fast in compiled code that we can afford
-to always emit them. While most code at Stripe runs with runtime type
-checking enabled, there are a handful of performance-sensitive paths in
-Stripe’s codebase that use <code>.checked(:never)</code> annotations on
-<code>sig</code>s to completely disable runtime type checking. This
-makes the code run faster, but at the cost of runtime safety guarantees
-enjoyed by other parts of the codebase. With compiled code, the checks
-are so fast that we don’t have to strip them out to make the code
-fast.</p>
+<p>Runtime type checks are so fast in compiled code that we can afford to always emit them. While most code at Stripe runs with runtime type checking enabled, there are a handful of performance-sensitive paths in Stripe’s codebase that use <code>.checked(:never)</code> annotations on <code>sig</code>s to completely disable runtime type checking. This makes the code run faster, but at the cost of runtime safety guarantees enjoyed by other parts of the codebase. With compiled code, the checks are so fast that we don’t have to strip them out to make the code fast.</p>
 </main>
 
 

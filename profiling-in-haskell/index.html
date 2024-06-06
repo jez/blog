@@ -51,111 +51,55 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#problem-simulating-probabilities"
-  id="toc-problem-simulating-probabilities">Problem: simulating
-  probabilities</a></li>
-  <li><a href="#naive-solution" id="toc-naive-solution">Naive
-  solution</a></li>
-  <li><a href="#clever-but-not-in-the-right-ways"
-  id="toc-clever-but-not-in-the-right-ways">Clever, but not in the right
-  ways</a></li>
-  <li><a href="#how-to-profile-haskell-code"
-  id="toc-how-to-profile-haskell-code">How to profile Haskell
-  code</a></li>
-  <li><a href="#fast-prng-in-haskell" id="toc-fast-prng-in-haskell">Fast
-  PRNG in Haskell</a></li>
-  <li><a href="#further-speedups" id="toc-further-speedups">Further
-  speedups</a></li>
-  <li><a href="#appendix-links" id="toc-appendix-links">Appendix:
-  Links</a></li>
+  <li><a href="#problem-simulating-probabilities">Problem: simulating probabilities</a></li>
+  <li><a href="#naive-solution">Naive solution</a></li>
+  <li><a href="#clever-but-not-in-the-right-ways">Clever, but not in the right ways</a></li>
+  <li><a href="#how-to-profile-haskell-code">How to profile Haskell code</a></li>
+  <li><a href="#fast-prng-in-haskell">Fast PRNG in Haskell</a></li>
+  <li><a href="#further-speedups">Further speedups</a></li>
+  <li><a href="#appendix-links">Appendix: Links</a></li>
   </ul>
 </nav>
 
 <main>
-<p>I wrote up a toy project in Haskell and profiled it to learn about
-Haskell’s profiling tools and about profiling code in general. Profiling
-in Haskell with Stack is super easy; to prove it I’ll walk through the
-problem I was trying to solve, my slow first solution, and how I used
-Haskell’s profiling tools to find and fix some egregiously slow parts of
-the code.</p>
+<p>I wrote up a toy project in Haskell and profiled it to learn about Haskell’s profiling tools and about profiling code in general. Profiling in Haskell with Stack is super easy; to prove it I’ll walk through the problem I was trying to solve, my slow first solution, and how I used Haskell’s profiling tools to find and fix some egregiously slow parts of the code.</p>
 <!-- more -->
 <p>I had three takeaways from this little project:</p>
 <ul>
 <li>Guessing at how to make code faster works sometimes, but:</li>
-<li>profiling in Haskell is actually super painless, and is a way better
-use of my time than guessing at what’s slow.</li>
-<li>With repeated profiling it’s definitely possible to make reasonably
-fast Haskell.</li>
+<li>profiling in Haskell is actually super painless, and is a way better use of my time than guessing at what’s slow.</li>
+<li>With repeated profiling it’s definitely possible to make reasonably fast Haskell.</li>
 </ul>
-<p>The source code and profiling data for this project is all available
-<a href="https://github.com/jez/bingo-sim">on GitHub</a>. Also the
-Appendix below has a bunch of links to help you find the interesting
-parts of the code.</p>
-<h1 id="problem-simulating-probabilities">Problem: simulating
-probabilities</h1>
-<p>The problem I wanted to solve was to simulate the probability of
-winning one carnival game I got to play while on vacation recently. The
-game itself is super simple and purely luck-based. The rules:</p>
+<p>The source code and profiling data for this project is all available <a href="https://github.com/jez/bingo-sim">on GitHub</a>. Also the Appendix below has a bunch of links to help you find the interesting parts of the code.</p>
+<h1 id="problem-simulating-probabilities">Problem: simulating probabilities</h1>
+<p>The problem I wanted to solve was to simulate the probability of winning one carnival game I got to play while on vacation recently. The game itself is super simple and purely luck-based. The rules:</p>
 <ol type="1">
-<li>There’s a 6 × 6 grid, each with a special character identifying
-it.</li>
-<li>There are 36 tiles, each with a character matching one grid space
-(and there are no duplicates, so all characters are accounted for).</li>
+<li>There’s a 6 × 6 grid, each with a special character identifying it.</li>
+<li>There are 36 tiles, each with a character matching one grid space (and there are no duplicates, so all characters are accounted for).</li>
 <li>Initially, all tiles are placed face down.</li>
-<li>To play, a contestant chooses 15 of the 36 tiles and flips them
-over.</li>
-<li>The contestant then places the flipped tiles onto the correct
-spots.</li>
-<li>If placing the 15 tiles forms a bingo in any row, column, or full
-diagonal, it’s a win. Otherwise, it’s a loss.</li>
+<li>To play, a contestant chooses 15 of the 36 tiles and flips them over.</li>
+<li>The contestant then places the flipped tiles onto the correct spots.</li>
+<li>If placing the 15 tiles forms a bingo in any row, column, or full diagonal, it’s a win. Otherwise, it’s a loss.</li>
 </ol>
 <p>The game setup in real life looked something like this:</p>
-<p><a href="/assets/img/taiwan-carnival-bingo.jpg"><img
-src="/assets/img/taiwan-carnival-bingo.jpg"
-alt="Taiwan Carnival Bingo" /></a></p>
-<p>(<a
-href="https://www.b-kyu.com/2014/07/hua-yuan-night-market-tainan-taiwan.html">Image
-credit</a>)</p>
-<p>My question was: how lucky should we considider ourselves if we win?
-I’m sure I could have answered this exactly with some combinatorics, but
-that seemed boring. Instead, I wanted to write a program solve it:
-generate random boards, and check how many of them have bingos.</p>
+<p><a href="/assets/img/taiwan-carnival-bingo.jpg"><img src="/assets/img/taiwan-carnival-bingo.jpg" alt="Taiwan Carnival Bingo" /></a></p>
+<p>(<a href="https://www.b-kyu.com/2014/07/hua-yuan-night-market-tainan-taiwan.html">Image credit</a>)</p>
+<p>My question was: how lucky should we considider ourselves if we win? I’m sure I could have answered this exactly with some combinatorics, but that seemed boring. Instead, I wanted to write a program solve it: generate random boards, and check how many of them have bingos.</p>
 <h1 id="naive-solution">Naive solution</h1>
-<p>In the course of playing around with this problem, I implemented a
-bunch of different solutions—about 5 in total, each one faster than the
-last. At a high level, each solution followed this pattern:</p>
+<p>In the course of playing around with this problem, I implemented a bunch of different solutions—about 5 in total, each one faster than the last. At a high level, each solution followed this pattern:</p>
 <ul>
 <li>generate a board uniformly at random</li>
 <li>count how many of the generated boards had bingos</li>
 </ul>
-<p>All the solutions exploited the fact that we don’t care where the
-characters on the board are nor what characters are on the tiles. The
-only thing that matters is whether a tile ends up on a specific grid
-space, which means boards can just be vectors of bits.</p>
-<p><a href="https://github.com/jez/bingo-sim/commit/994481b">Attempt
-#1</a> was <em>really</em> slow, so we won’t talk about it 😅</p>
-<p><a
-href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt
-#2</a> was a little bit faster (but not by much, which made me
-disappointed—more on this later). The solution looked like this:</p>
+<p>All the solutions exploited the fact that we don’t care where the characters on the board are nor what characters are on the tiles. The only thing that matters is whether a tile ends up on a specific grid space, which means boards can just be vectors of bits.</p>
+<p><a href="https://github.com/jez/bingo-sim/commit/994481b">Attempt #1</a> was <em>really</em> slow, so we won’t talk about it 😅</p>
+<p><a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a> was a little bit faster (but not by much, which made me disappointed—more on this later). The solution looked like this:</p>
 <ul>
-<li><p>Our 6 × 6 grids are represented as bit-matrices in row-major
-order, so we can store them in a 64-bit unsigned int (<a
-href="http://hackage.haskell.org/package/base-4.12.0.0/docs/Data-Word.html#t:Word64"><code>Word64</code></a>)
-and only use the 36 least significant bits. A <code>1</code> on our
-board means “one of the 15 tiles we picked matched this grid
-spot.”</p></li>
-<li><p>To generate a random board, we start with a board of 15
-consecutive <code>1</code>’s (<code>0x7fff</code>) and then use the <a
-href="https://en.wikipedia.org/wiki/Fisher–Yates_shuffle">Fisher-Yates
-shuffle</a> to shuffle the bits amongst the 36 available bits.</p>
-<p>Fisher-Yates shuffle is actually really simple, which is nice. Here’s
-the <a
-href="https://github.com/jez/bingo-sim/blob/8886a66/src/BingoSim/Simulation.hs#L111-L126">six
-lines</a> to implement it in Haskell on a bit vector:</p></li>
+<li><p>Our 6 × 6 grids are represented as bit-matrices in row-major order, so we can store them in a 64-bit unsigned int (<a href="http://hackage.haskell.org/package/base-4.12.0.0/docs/Data-Word.html#t:Word64"><code>Word64</code></a>) and only use the 36 least significant bits. A <code>1</code> on our board means “one of the 15 tiles we picked matched this grid spot.”</p></li>
+<li><p>To generate a random board, we start with a board of 15 consecutive <code>1</code>’s (<code>0x7fff</code>) and then use the <a href="https://en.wikipedia.org/wiki/Fisher–Yates_shuffle">Fisher-Yates shuffle</a> to shuffle the bits amongst the 36 available bits.</p>
+<p>Fisher-Yates shuffle is actually really simple, which is nice. Here’s the <a href="https://github.com/jez/bingo-sim/blob/8886a66/src/BingoSim/Simulation.hs#L111-L126">six lines</a> to implement it in Haskell on a bit vector:</p></li>
 </ul>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">shuffleBits ::</span> <span class="dt">RandomGen</span> g <span class="ot">=&gt;</span> g <span class="ot">-&gt;</span> <span class="dt">Board</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Board</span>, g)</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">shuffleBits ::</span> <span class="dt">RandomGen</span> g <span class="ot">=&gt;</span> g <span class="ot">-&gt;</span> <span class="dt">Board</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Board</span>, g)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>shuffleBits gen board <span class="dv">1</span> <span class="ot">=</span> (board, gen)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>shuffleBits gen (<span class="dt">Board</span> bs) n <span class="ot">=</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- (Maybe) swap the current MSB with one of the lesser bits</span></span>
@@ -164,87 +108,38 @@ class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a 
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Recurse on the lesser bits</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span>  shuffleBits gen&#39; (<span class="dt">Board</span> bs&#39;) (n <span class="op">-</span> <span class="dv">1</span>)</span></code></pre></div>
 <ul>
-<li>With the above method, we generate 100,000 random boards using and
-check how many boards have at least one bingo.</li>
+<li>With the above method, we generate 100,000 random boards using and check how many boards have at least one bingo.</li>
 </ul>
-<h1 id="clever-but-not-in-the-right-ways">Clever, but not in the right
-ways</h1>
-<p>All told, I thought the approach in <a
-href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt
-#2</a> was pretty clever. It used a single <code>Word64</code> (instead
-of a larger structure like a list) to represent the board, so it
-shouldn’t have had needed many allocations. And because it was just a
-<code>Word64</code>, it could use bit operations to manipulate the board
-and check for bingos, avoiding the need to walk a large structure.</p>
-<p>But when I ran this on my 2017 MacBook Pro (i7-7920HQ CPU @ 3.10GHz,
-16 GB memory), it was still really slow:</p>
+<h1 id="clever-but-not-in-the-right-ways">Clever, but not in the right ways</h1>
+<p>All told, I thought the approach in <a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a> was pretty clever. It used a single <code>Word64</code> (instead of a larger structure like a list) to represent the board, so it shouldn’t have had needed many allocations. And because it was just a <code>Word64</code>, it could use bit operations to manipulate the board and check for bingos, avoiding the need to walk a large structure.</p>
+<p>But when I ran this on my 2017 MacBook Pro (i7-7920HQ CPU @ 3.10GHz, 16 GB memory), it was still really slow:</p>
 <pre><code>❯ time .stack-work/install/x86_64-osx/lts-13.21/8.6.5/bin/bingo-sim 100000
 Trials:   100000
 Bingos:   3529
 Hit rate: 0.03529
   0.71s user  0.02s system  98% cpu  0.738 total</code></pre>
-<p>(Note that we’re running <code>time</code> on the compiled binary
-directly, instead of running with <code>stack exec --</code>; we don’t
-care for the overhead from running via Stack).</p>
-<p>So even after using a bit vector for the board, it took 738ms. To be
-clear, these results for <a
-href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt
-#2</a> were an improvement over my even slower <a
-href="https://github.com/jez/bingo-sim/commit/994481b">Attempt #1</a>,
-but not by much—maybe by 200ms. 700ms+ seemed excessive.</p>
+<p>(Note that we’re running <code>time</code> on the compiled binary directly, instead of running with <code>stack exec --</code>; we don’t care for the overhead from running via Stack).</p>
+<p>So even after using a bit vector for the board, it took 738ms. To be clear, these results for <a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a> were an improvement over my even slower <a href="https://github.com/jez/bingo-sim/commit/994481b">Attempt #1</a>, but not by much—maybe by 200ms. 700ms+ seemed excessive.</p>
 <h1 id="how-to-profile-haskell-code">How to profile Haskell code</h1>
-<p>Determined to make it faster, at this point I resigned myself from
-guessing and looked up how to profile Haskell code. Turns out, with
-Stack it’s <strong>super</strong> simple:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rebuild with profiling information</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> stack build <span class="at">--profile</span></span>
+<p>Determined to make it faster, at this point I resigned myself from guessing and looked up how to profile Haskell code. Turns out, with Stack it’s <strong>super</strong> simple:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rebuild with profiling information</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">stack</span> build --profile</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the code with runtime profiling enabled</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> stack exec <span class="at">--</span> bingo-sim 100000 +RTS <span class="at">-p</span> <span class="at">-RTS</span></span></code></pre></div>
-<p>That’s all it took, and it generated a <code>bingo-sim.prof</code>
-file that had a bunch of lines that <a
-href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof#L112-L115">looked
-like this</a>:</p>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">stack</span> exec -- bingo-sim 100000 +RTS -p -RTS</span></code></pre></div>
+<p>That’s all it took, and it generated a <code>bingo-sim.prof</code> file that had a bunch of lines that <a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof#L112-L115">looked like this</a>:</p>
 <pre><code>COST CENTRE              MODULE  SRC  no.  entries  %time %alloc   %time %alloc
 ...
   randomR                ...     ...  ...  ...       0.8    0.0    84.9   83.5
   randomIvalIntegral     ...     ...  ...  ...       6.9   13.4    84.1   83.5
    randomIvalInteger     ...     ...  ...  ...      21.3   29.2    77.2   70.1
     randomIvalInteger.f  ...     ...  ...  ...      11.0    2.4    41.5   31.5</code></pre>
-<p>There’s a bunch of extra information in the actual <code>.prof</code>
-file (which you can <a
-href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof#L112-L115">see
-on GitHub</a>) but the important parts for me were the four columns at
-the end. The first two are the proporion of execution time and allocated
-memory attributable to this cost center specifically. The last two are
-the same, but summed over all child cost centers.</p>
-<p>(I found the <a
-href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html">GHC
-User Guide</a> <em>super</em> helpful to learn everything I wanted to
-know: what the columns mean, what a cost center is, and some tips for
-profiling in general).</p>
-<p>So the glaring realization in the data: we’re spending 85% of our
-738ms running time <strong>generating random numbers</strong>. All my
-effort spent optimizing memory, but it was the PRNG that was slow the
-whole time. 😣</p>
+<p>There’s a bunch of extra information in the actual <code>.prof</code> file (which you can <a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof#L112-L115">see on GitHub</a>) but the important parts for me were the four columns at the end. The first two are the proporion of execution time and allocated memory attributable to this cost center specifically. The last two are the same, but summed over all child cost centers.</p>
+<p>(I found the <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html">GHC User Guide</a> <em>super</em> helpful to learn everything I wanted to know: what the columns mean, what a cost center is, and some tips for profiling in general).</p>
+<p>So the glaring realization in the data: we’re spending 85% of our 738ms running time <strong>generating random numbers</strong>. All my effort spent optimizing memory, but it was the PRNG that was slow the whole time. 😣</p>
 <h1 id="fast-prng-in-haskell">Fast PRNG in Haskell</h1>
-<p>738ms × 0.849 ≈ 600ms+ spent generating random numbers seemed like an
-absurd abount of time. Non-cryptographically secure pseudo random number
-generation shouldn’t take this long. And indeed, after a bit of
-searching I came across <a
-href="https://www.reddit.com/r/haskell/comments/7ma9rd/in_your_professional_experience_how_suitable_is/">this
-reddit thread</a> complaining about how slow <code>System.Random</code>
-in Haskell is for PRNG, and then moments later I found <a
-href="https://nullprogram.com/blog/2017/09/21/">this article</a> from
-Chris Wellons comparing various PRNGs for performance… Exactly what I
-was looking for 👌</p>
-<p>So for <a
-href="https://github.com/jez/bingo-sim/commit/0a04839">Attempt #3</a>, I
-took his <a href="http://xoshiro.di.unimi.it/">suggested PRNG</a> and
-ported it from <a
-href="http://xoshiro.di.unimi.it/xoshiro256starstar.c">C</a> to <a
-href="https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs">Haskell</a>.</p>
+<p>738ms × 0.849 ≈ 600ms+ spent generating random numbers seemed like an absurd abount of time. Non-cryptographically secure pseudo random number generation shouldn’t take this long. And indeed, after a bit of searching I came across <a href="https://www.reddit.com/r/haskell/comments/7ma9rd/in_your_professional_experience_how_suitable_is/">this reddit thread</a> complaining about how slow <code>System.Random</code> in Haskell is for PRNG, and then moments later I found <a href="https://nullprogram.com/blog/2017/09/21/">this article</a> from Chris Wellons comparing various PRNGs for performance… Exactly what I was looking for 👌</p>
+<p>So for <a href="https://github.com/jez/bingo-sim/commit/0a04839">Attempt #3</a>, I took his <a href="http://xoshiro.di.unimi.it/">suggested PRNG</a> and ported it from <a href="http://xoshiro.di.unimi.it/xoshiro256starstar.c">C</a> to <a href="https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs">Haskell</a>.</p>
 <p>And lo and behold, it was faster. A lot faster:</p>
 <pre><code>❯ time .stack-work/install/x86_64-osx/lts-13.21/8.6.5/bin/bingo-sim 100000
 Trials:   100000
@@ -252,30 +147,11 @@ Bingos:   3670
 Hit rate: 0.0367
   0.11s user  0.01s system  90% cpu  0.126 total</code></pre>
 <p>Yep. That just went from 738ms to 126ms, for a 5.8x speedup 🤯</p>
-<p>With a result this good, we might ask ourselves what we had to give
-up in the process—things this good usually come at a price. The biggest
-one that I notice is that the API I provide for random number generation
-is far less generic.</p>
-<p>My <a
-href="https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs"><code>Prng.hs</code></a>
-is a direct translation of the C to Haskell. It only generates 64-bit
-unsigned ints. <code>System.Random</code> has an arguably nicer API,
-using type classes to generate random ints, characters, etc., allowing
-users to implement generators for their custom types, and having helpers
-for generating random values within a range and sequences of random
-numbers.</p>
-<p>It’s possible we could prune some of the fat from
-<code>System.Random</code>’s default implementations (without also
-changing the underlying random number generator) and see a considerable
-speedup. It’s also possible we could make <a
-href="https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs"><code>Prng.hs</code></a>
-export instances of the appropriate type classes, and again see a
-speedup.</p>
-<p>But considering that I wasn’t using any of that extra stuff, I
-figured I’d just keep it simple. The code to generate random boards
-hardly changed:</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">shuffleBits ::</span> <span class="dt">Prng.State</span> <span class="ot">-&gt;</span> <span class="dt">Board</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Board</span>, <span class="dt">Prng.State</span>)</span>
+<p>With a result this good, we might ask ourselves what we had to give up in the process—things this good usually come at a price. The biggest one that I notice is that the API I provide for random number generation is far less generic.</p>
+<p>My <a href="https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs"><code>Prng.hs</code></a> is a direct translation of the C to Haskell. It only generates 64-bit unsigned ints. <code>System.Random</code> has an arguably nicer API, using type classes to generate random ints, characters, etc., allowing users to implement generators for their custom types, and having helpers for generating random values within a range and sequences of random numbers.</p>
+<p>It’s possible we could prune some of the fat from <code>System.Random</code>’s default implementations (without also changing the underlying random number generator) and see a considerable speedup. It’s also possible we could make <a href="https://github.com/jez/bingo-sim/blob/0a04839/src/BingoSim/Prng.hs"><code>Prng.hs</code></a> export instances of the appropriate type classes, and again see a speedup.</p>
+<p>But considering that I wasn’t using any of that extra stuff, I figured I’d just keep it simple. The code to generate random boards hardly changed:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">shuffleBits ::</span> <span class="dt">Prng.State</span> <span class="ot">-&gt;</span> <span class="dt">Board</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Board</span>, <span class="dt">Prng.State</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>shuffleBits gen board <span class="dv">1</span> <span class="ot">=</span> (board, gen)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>shuffleBits gen (<span class="dt">Board</span> bs) n <span class="ot">=</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> n&#39;           <span class="ot">=</span> n <span class="op">-</span> <span class="dv">1</span></span>
@@ -285,68 +161,38 @@ class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a 
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      bs&#39;          <span class="ot">=</span> swapBits bs n&#39; (<span class="fu">fromIntegral</span> i)</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span>  shuffleBits gen&#39; (<span class="dt">Board</span> bs&#39;) n&#39;</span></code></pre></div>
 <h1 id="further-speedups">Further speedups</h1>
-<p>Spurred on by the thrill of the previous speedup, I kept going. By
-this time I’d learned the value in following the <code>.prof</code>
-output. The output led me to <a
-href="https://github.com/jez/bingo-sim/commit/4048469">Attempt #4</a>,
-which refactored the PRNG into CPS avoid allocating a tuple, and then <a
-href="https://github.com/jez/bingo-sim/commit/eafa39f">Attempt #5</a>,
-where I added some <code>BangPatterns</code>.</p>
+<p>Spurred on by the thrill of the previous speedup, I kept going. By this time I’d learned the value in following the <code>.prof</code> output. The output led me to <a href="https://github.com/jez/bingo-sim/commit/4048469">Attempt #4</a>, which refactored the PRNG into CPS avoid allocating a tuple, and then <a href="https://github.com/jez/bingo-sim/commit/eafa39f">Attempt #5</a>, where I added some <code>BangPatterns</code>.</p>
 <p>At the end of it all, my simulation ran in just 70ms!</p>
 <pre><code>❯ time .stack-work/install/x86_64-osx/lts-13.21/8.6.5/bin/bingo-sim 100000
 Trials:   100000
 Bingos:   3670
 Hit rate: 0.0367
   0.06s user   0.01s system   92% cpu   0.070 total</code></pre>
-<p>This is a 10x speedup over my dissapointing <a
-href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt
-#2</a>, and a 12.8x speedup over my super naive <a
-href="https://github.com/jez/bingo-sim/commit/994481b">Attempt #1</a>.
-Not bad for a first attempt at profiling in Haskell!</p>
-<p>I found this super encouraging. Given how easy the tooling is to get
-started with, how well documented things are, and my satisfaction with
-the results, I’m very likely to reach for profiling tools in the
-future.</p>
+<p>This is a 10x speedup over my dissapointing <a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a>, and a 12.8x speedup over my super naive <a href="https://github.com/jez/bingo-sim/commit/994481b">Attempt #1</a>. Not bad for a first attempt at profiling in Haskell!</p>
+<p>I found this super encouraging. Given how easy the tooling is to get started with, how well documented things are, and my satisfaction with the results, I’m very likely to reach for profiling tools in the future.</p>
 <h1 id="appendix-links">Appendix: Links</h1>
-<p>The entire source is <a href="https://github.com/jez/bingo-sim">on
-GitHub</a>.</p>
-<p>I wrote up all five of my attepts as separate GitHub commits, so if
-you want to compare and constrast the approaches feel free:</p>
+<p>The entire source is <a href="https://github.com/jez/bingo-sim">on GitHub</a>.</p>
+<p>I wrote up all five of my attepts as separate GitHub commits, so if you want to compare and constrast the approaches feel free:</p>
 <ul>
-<li><a href="https://github.com/jez/bingo-sim/commit/994481b">Attempt
-#1</a> (899ms)</li>
-<li><a
-href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt
-#2</a> (738ms)</li>
-<li><a href="https://github.com/jez/bingo-sim/commit/0a04839">Attempt
-#3</a> (126ms)</li>
-<li><a href="https://github.com/jez/bingo-sim/commit/4048469">Attempt
-#4</a> (101ms)</li>
-<li><a href="https://github.com/jez/bingo-sim/commit/eafa39f">Attempt
-#5</a> (70ms)</li>
+<li><a href="https://github.com/jez/bingo-sim/commit/994481b">Attempt #1</a> (899ms)</li>
+<li><a href="https://github.com/jez/bingo-sim/commit/8886a66#diff-35f3000e895e431b9c8e3b6454eadca5">Attempt #2</a> (738ms)</li>
+<li><a href="https://github.com/jez/bingo-sim/commit/0a04839">Attempt #3</a> (126ms)</li>
+<li><a href="https://github.com/jez/bingo-sim/commit/4048469">Attempt #4</a> (101ms)</li>
+<li><a href="https://github.com/jez/bingo-sim/commit/eafa39f">Attempt #5</a> (70ms)</li>
 </ul>
-<p>I also had never used Haddock before, so I used this project as an
-opportunity to learn how to build and write Haddock. I published the
-docs on GitHub pages if you want to browse them:</p>
+<p>I also had never used Haddock before, so I used this project as an opportunity to learn how to build and write Haddock. I published the docs on GitHub pages if you want to browse them:</p>
 <ul>
 <li><a href="https://jez.io/bingo-sim/">Docs</a></li>
 </ul>
-<p>And I also put the source for all the <code>.prof</code> files I
-generated for each attempt:</p>
+<p>And I also put the source for all the <code>.prof</code> files I generated for each attempt:</p>
 <ul>
-<li><a
-href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.1.prof"><code>bingo-sim.1.prof</code></a></li>
-<li><a
-href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof"><code>bingo-sim.2.prof</code></a></li>
-<li><a
-href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.3.prof"><code>bingo-sim.3.prof</code></a></li>
-<li><a
-href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.4.prof"><code>bingo-sim.4.prof</code></a></li>
-<li><a
-href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.5.prof"><code>bingo-sim.5.prof</code></a></li>
+<li><a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.1.prof"><code>bingo-sim.1.prof</code></a></li>
+<li><a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.2.prof"><code>bingo-sim.2.prof</code></a></li>
+<li><a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.3.prof"><code>bingo-sim.3.prof</code></a></li>
+<li><a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.4.prof"><code>bingo-sim.4.prof</code></a></li>
+<li><a href="https://github.com/jez/bingo-sim/blob/master/prof/bingo-sim.5.prof"><code>bingo-sim.5.prof</code></a></li>
 </ul>
-<p>If you have any questions about anything, feel free to <a
-href="https://jez.io/">reach out</a>!</p>
+<p>If you have any questions about anything, feel free to <a href="https://jez.io/">reach out</a>!</p>
 <!-- vim:tw=72
 -->
 </main>

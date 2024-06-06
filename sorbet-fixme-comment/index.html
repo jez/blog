@@ -54,41 +54,21 @@
 <p>
 </p>
 <!-- more -->
-<p>Sorbet has no way to ignore an error on a specific line with a magic
-comment. This is different from all other gradual static type checkers I
-know about:</p>
+<p>Sorbet has no way to ignore an error on a specific line with a magic comment. This is different from all other gradual static type checkers I know about:</p>
 <ul>
 <li>TypeScript: <code>// @ts-ignore</code></li>
 <li>Flow: <code>// $FlowFixMe</code></li>
 <li>Hack: <code>// HH_FIXME</code></li>
 <li>MyPy: <code># type: ignore</code></li>
 </ul>
-<p>When I first joined the team, I was skeptical. But having seen it
-play out in practice, it’s actually worked great.</p>
-<p>Instead of ignore comments, Sorbet has <code>T.unsafe</code>, which
-accepts anything and returns it unchanged (so for example
-<code>T.unsafe(3)</code> evaluates to <code>3</code>). The trick is that
-it forces Sorbet to forget the type of the input statically. This
-confers the power to silence most errors. For example:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="kw">+</span> <span class="ch">&#39;1&#39;</span>            <span class="co"># error: Expected `Integer` but found `String`</span></span>
+<p>When I first joined the team, I was skeptical. But having seen it play out in practice, it’s actually worked great.</p>
+<p>Instead of ignore comments, Sorbet has <code>T.unsafe</code>, which accepts anything and returns it unchanged (so for example <code>T.unsafe(3)</code> evaluates to <code>3</code>). The trick is that it forces Sorbet to forget the type of the input statically. This confers the power to silence most errors. For example:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="kw">+</span> <span class="ch">&#39;1&#39;</span>            <span class="co"># error: Expected `Integer` but found `String`</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>T<span class="at">.unsafe</span>(<span class="dv">1</span>) <span class="kw">+</span> <span class="ch">&#39;1&#39;</span>  <span class="co"># no error</span></span></code></pre></div>
-<p><a href="https://sorbet.run/#%20%20%20%20%20%20%20%20%201%20%20%2B%20'1'%20%20%23%20error%3A%20Expected%20%60Integer%60%20but%20found%20%60String%60%0AT.unsafe(1)%20%2B%20'1'%20%20%23%20no%20error">→
-View on sorbet.run</a></p>
-<p>In this example, Sorbet knows that calling <code>+</code> on an
-Integer with a String would raise an exception at runtime, and so it
-reports a static type error. But wrapping the <code>1</code> in a call
-to <code>T.unsafe</code> causes Sorbet to think that the expression
-<code>T.unsafe(1)</code> has type <code>T.untyped</code>. Then, like for
-all untyped code, Sorbet admits the addition.</p>
-<p>All Sorbet-typed Ruby programs must grapple with
-<code>T.untyped</code>. Every Sorbet user has to learn how it works and
-what the tradeoffs of using it are. In particular, that
-<code>T.untyped</code> is viral. Given a variable that’s
-<code>T.untyped</code>, all method calls on that variable will also be
-untyped:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># typed: true</span></span>
+<p><a href="https://sorbet.run/#%20%20%20%20%20%20%20%20%201%20%20%2B%20'1'%20%20%23%20error%3A%20Expected%20%60Integer%60%20but%20found%20%60String%60%0AT.unsafe(1)%20%2B%20'1'%20%20%23%20no%20error">→ View on sorbet.run</a></p>
+<p>In this example, Sorbet knows that calling <code>+</code> on an Integer with a String would raise an exception at runtime, and so it reports a static type error. But wrapping the <code>1</code> in a call to <code>T.unsafe</code> causes Sorbet to think that the expression <code>T.unsafe(1)</code> has type <code>T.untyped</code>. Then, like for all untyped code, Sorbet admits the addition.</p>
+<p>All Sorbet-typed Ruby programs must grapple with <code>T.untyped</code>. Every Sorbet user has to learn how it works and what the tradeoffs of using it are. In particular, that <code>T.untyped</code> is viral. Given a variable that’s <code>T.untyped</code>, all method calls on that variable will also be untyped:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># typed: true</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Sig</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span>params(<span class="wa">x: </span>T<span class="at">.untyped</span>)<span class="at">.void</span><span class="kw">}</span></span>
@@ -98,38 +78,17 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  z <span class="kw">= !</span>y</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ^ type: T.untyped</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p><a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20%7Bparams(x%3A%20T.untyped).void%7D%0Adef%20foo(x)%0A%20%20y%20%3D%20x.even%3F%0A%23%20%5E%20type%3A%20T.untyped%0A%20%20z%20%3D%20!y%0A%23%20%5E%20type%3A%20T.untyped%0Aend">→
-View on sorbet.run</a></p>
-<p>In this example <code>x</code> enters the method as
-<code>T.untyped</code>, so calling the method <code>.even?</code>
-propagates the <code>T.untyped</code> to <code>y</code>. Then again
-because <code>y</code> is untyped, calling<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">Did you know that <code>!x</code> in Ruby is syntactic
-sugar for <code>x.!()</code>, which means that you can override
-<code>!</code> to make it do something else?<br />
+<p><a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20%7Bparams(x%3A%20T.untyped).void%7D%0Adef%20foo(x)%0A%20%20y%20%3D%20x.even%3F%0A%23%20%5E%20type%3A%20T.untyped%0A%20%20z%20%3D%20!y%0A%23%20%5E%20type%3A%20T.untyped%0Aend">→ View on sorbet.run</a></p>
+<p>In this example <code>x</code> enters the method as <code>T.untyped</code>, so calling the method <code>.even?</code> propagates the <code>T.untyped</code> to <code>y</code>. Then again because <code>y</code> is untyped, calling<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">Did you know that <code>!x</code> in Ruby is syntactic sugar for <code>x.!()</code>, which means that you can override <code>!</code> to make it do something else?<br />
 <br />
-</span></span> <code>!</code> on it propgates the <code>T.untyped</code>
-to <code>z</code>. There are plenty of reasons to <a
-href="https://sorbet.org/docs/gradual">both embrace and avoid</a>
-<code>T.untyped</code> in a type system but the point is: Sorbet’s type
-system already has it.</p>
-<p>Re-using <code>T.untyped</code> as the way to silence errors plays
-nicely with everything else in Sorbet:</p>
+</span></span> <code>!</code> on it propgates the <code>T.untyped</code> to <code>z</code>. There are plenty of reasons to <a href="https://sorbet.org/docs/gradual">both embrace and avoid</a> <code>T.untyped</code> in a type system but the point is: Sorbet’s type system already has it.</p>
+<p>Re-using <code>T.untyped</code> as the way to silence errors plays nicely with everything else in Sorbet:</p>
 <ul>
-<li><p>Hover and jump to definition become tools to track down the
-source of silenced errors.</p></li>
-<li><p>Errors are effectively silenced at the source of the error. There
-are no errors downstream that only show up because an error was silenced
-earlier.</p></li>
-<li><p>We plan to eventually build a tool to show which parts of a file
-are untyped (to see things like which methods don’t have signatures).
-That tool will trivially take suppressed errors into account.</p></li>
+<li><p>Hover and jump to definition become tools to track down the source of silenced errors.</p></li>
+<li><p>Errors are effectively silenced at the source of the error. There are no errors downstream that only show up because an error was silenced earlier.</p></li>
+<li><p>We plan to eventually build a tool to show which parts of a file are untyped (to see things like which methods don’t have signatures). That tool will trivially take suppressed errors into account.</p></li>
 </ul>
-<p>The <a href="https://sorbet.org/docs/gradual">Sorbet docs</a> bill
-<code>T.untyped</code> as the way to “turn off the type system.” By
-reusing <code>T.untyped</code> to supress errors, silencing one error
-means silencing them all, which is a win for simplicity.</p>
+<p>The <a href="https://sorbet.org/docs/gradual">Sorbet docs</a> bill <code>T.untyped</code> as the way to “turn off the type system.” By reusing <code>T.untyped</code> to supress errors, silencing one error means silencing them all, which is a win for simplicity.</p>
 <!-- vim:tw=72
 -->
 </main>

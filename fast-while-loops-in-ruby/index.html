@@ -50,44 +50,23 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#appendix-compiled-while-program"
-  id="toc-appendix-compiled-while-program">Appendix: Compiled
-  <code>while</code> program</a></li>
-  <li><a href="#appendix-instruction-cache"
-  id="toc-appendix-instruction-cache">Appendix: Instruction
-  cache</a></li>
+  <li><a href="#appendix-compiled-while-program">Appendix: Compiled <code>while</code> program</a></li>
+  <li><a href="#appendix-instruction-cache">Appendix: Instruction cache</a></li>
   </ul>
 </nav>
 
 <main>
 <blockquote>
-<p><strong>Disclaimer</strong>: this post was first drafted as a
-Stripe-internal email. On December 10, 2022 I republished it here,
-largely unchanged from the original. See <a
-href="/old-compiler-notes/">Some Old Sorbet Compiler Notes</a> for more.
-The Sorbet Compiler is still largely an experimental project: this post
-is available purely for curiosity’s sake.</p>
-<p>Any benchmark numbers included in this post are intended to be
-educational about how the Sorbet Compiler approaches speeding up code.
-They should not be taken as representative or predictive of any
-real-world workload, and are likely out-of-date with respect to
-improvements that have been made since this post originally
-appeared.</p>
+<p><strong>Disclaimer</strong>: this post was first drafted as a Stripe-internal email. On December 10, 2022 I republished it here, largely unchanged from the original. See <a href="/old-compiler-notes/">Some Old Sorbet Compiler Notes</a> for more. The Sorbet Compiler is still largely an experimental project: this post is available purely for curiosity’s sake.</p>
+<p>Any benchmark numbers included in this post are intended to be educational about how the Sorbet Compiler approaches speeding up code. They should not be taken as representative or predictive of any real-world workload, and are likely out-of-date with respect to improvements that have been made since this post originally appeared.</p>
 </blockquote>
-<p>Let’s continue our series in comparing Ruby performance, interpreted
-vs compiled, on microbenchmarks. Previously in the series:</p>
+<p>Let’s continue our series in comparing Ruby performance, interpreted vs compiled, on microbenchmarks. Previously in the series:</p>
 <ul>
-<li><a href="/types-make-array-access-faster/">Types Make Array Access
-Faster</a></li>
-<li><a href="/another-look-at-typed-array-access/">Another Look at Typed
-Array Access</a></li>
+<li><a href="/types-make-array-access-faster/">Types Make Array Access Faster</a></li>
+<li><a href="/another-look-at-typed-array-access/">Another Look at Typed Array Access</a></li>
 </ul>
-<p>In both those posts, I mentioned that the Sorbet Compiler is able to
-speed up not only heavily typed code but also certain kinds of untyped
-code. One of the snippets we had compared was this <code>while</code>
-loop:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
+<p>In both those posts, I mentioned that the Sorbet Compiler is able to speed up not only heavily typed code but also certain kinds of untyped code. One of the snippets we had compared was this <code>while</code> loop:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="kw">&lt;</span> <span class="dv">10_000_000</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  i <span class="kw">+=</span> <span class="dv">1</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
@@ -107,17 +86,13 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><a
-href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
+<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
 <td style="text-align: right;">0.205s</td>
 <td style="text-align: right;">0.048s</td>
 </tr>
 </tbody>
 </table>
-<p>When the Ruby VM encounters a <code>while</code> loop like this, it
-first parses and translates that source text into <a
-href="https://en.wikipedia.org/wiki/Bytecode">bytecode instructions</a>
-that look something like this, simplified:</p>
+<p>When the Ruby VM encounters a <code>while</code> loop like this, it first parses and translates that source text into <a href="https://en.wikipedia.org/wiki/Bytecode">bytecode instructions</a> that look something like this, simplified:</p>
 <pre class="plain"><code>0007 jump          17
 0009 getlocal      i
 0011 putobject     1
@@ -127,149 +102,93 @@ that look something like this, simplified:</p>
 0019 putobject     10000000
 0021 opt_lt
 0024 branchif      9</code></pre>
-<p><em>(You can use <code>ruby --dump=insns foo.rb</code> to play around
-with full output.)</em></p>
-<p>This output almost looks like assembly! There are variable gets and
-sets, conditional branches, addition, comparison, etc. And assembly is
-fast right? So if Ruby builds this assembly-like representation of our
-code internally, why doesn’t it run as fast as the compiled code?</p>
-<p>To get these bytecode instructions to mean something, the Ruby VM
-interprets them on the fly. Somewhere in the Ruby VM, there’s
-essentially one big loop over each instruction type, where each
-instruction is implemented by arbitrarily complicated C code:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">((</span>next_instruction <span class="op">=</span> get_instruction<span class="op">())</span> <span class="op">{</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">switch</span> <span class="op">(</span>next_instruction<span class="op">-&gt;</span>type<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> getlocal<span class="op">:</span> vm_getlocal<span class="op">();</span> <span class="cf">break</span><span class="op">;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> opt_plus<span class="op">:</span> vm_opt_plus<span class="op">();</span> <span class="cf">break</span><span class="op">;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> opt_lt<span class="op">:</span>   vm_opt_lt<span class="op">();</span> <span class="cf">break</span><span class="op">;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> branchif<span class="op">:</span> vm_branchif<span class="op">();</span> <span class="cf">break</span><span class="op">;</span></span>
+<p><em>(You can use <code>ruby --dump=insns foo.rb</code> to play around with full output.)</em></p>
+<p>This output almost looks like assembly! There are variable gets and sets, conditional branches, addition, comparison, etc. And assembly is fast right? So if Ruby builds this assembly-like representation of our code internally, why doesn’t it run as fast as the compiled code?</p>
+<p>To get these bytecode instructions to mean something, the Ruby VM interprets them on the fly. Somewhere in the Ruby VM, there’s essentially one big loop over each instruction type, where each instruction is implemented by arbitrarily complicated C code:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> ((next_instruction = get_instruction()) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">switch</span> (next_instruction-&gt;type) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> getlocal: vm_getlocal(); <span class="cf">break</span>;</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> opt_plus: vm_opt_plus(); <span class="cf">break</span>;</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> opt_lt:   vm_opt_lt(); <span class="cf">break</span>;</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> branchif: vm_branchif(); <span class="cf">break</span>;</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><em>(It’s actually a lot messier; see <a
-href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/vm_exec.c#L113-L118">vm_exec.c</a>,
-<a
-href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/insns.def#L1088-L1100">insns.def</a>,
-and <a
-href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/vm_insnhelper.c#L4235-L4267">vm_insnhelper.c</a>
-if you want to poke around.)</em></p>
-<p>That arbitrarily complicated C code is almost always doing more than
-a few handfuls of pointer reads and writes to bookkeep runtime data
-structures. It’s full of conditional code paths that execute only part
-of the time. In our short Ruby program above, all we needed to happen
-was for the computer to do an integer comparison, an integer increment,
-and an assembly jump. When the Ruby VM runs our code, it does way more
-than just that.</p>
-<p>But with the Sorbet compiler, the integer comparison, increment, and
-jump are almost the only things executed. I’ve <a
-href="#appendix-compiled-while-program">included a snippet</a> of the
-Sorbet Compiler’s assembly output at the end of this post. It’s short
-enough to be understood in full, and in fact I’ve annotated each line
-with what the instructions all mean.</p>
-<p>This works in large part due to the magic of Sorbet’s type checking
-algorithm (which will have already mapped out the flow of control in a
-program before the compiler kicks in) and LLVM (which is really good at
-taking <a href="https://en.wikipedia.org/wiki/Control-flow_graph">maps
-of control flow</a> and removing the redundant parts).</p>
-<p>As for why the compiler is <strong>particularly</strong> good at
-speeding up this specific program:</p>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><em>(It’s actually a lot messier; see <a href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/vm_exec.c#L113-L118">vm_exec.c</a>, <a href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/insns.def#L1088-L1100">insns.def</a>, and <a href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/vm_insnhelper.c#L4235-L4267">vm_insnhelper.c</a> if you want to poke around.)</em></p>
+<p>That arbitrarily complicated C code is almost always doing more than a few handfuls of pointer reads and writes to bookkeep runtime data structures. It’s full of conditional code paths that execute only part of the time. In our short Ruby program above, all we needed to happen was for the computer to do an integer comparison, an integer increment, and an assembly jump. When the Ruby VM runs our code, it does way more than just that.</p>
+<p>But with the Sorbet compiler, the integer comparison, increment, and jump are almost the only things executed. I’ve <a href="#appendix-compiled-while-program">included a snippet</a> of the Sorbet Compiler’s assembly output at the end of this post. It’s short enough to be understood in full, and in fact I’ve annotated each line with what the instructions all mean.</p>
+<p>This works in large part due to the magic of Sorbet’s type checking algorithm (which will have already mapped out the flow of control in a program before the compiler kicks in) and LLVM (which is really good at taking <a href="https://en.wikipedia.org/wiki/Control-flow_graph">maps of control flow</a> and removing the redundant parts).</p>
+<p>As for why the compiler is <strong>particularly</strong> good at speeding up this specific program:</p>
 <ul>
-<li><p>The Ruby VM stores local variables on a stack-like data structure
-which lives on the heap. To read and write a variable, the Ruby VM has
-to follow pointers that end up touching the heap. The compiler keeps
-almost it’s entire working memory in registers.</p></li>
-<li><p>The compiler inlines the code for <code>+</code> and
-<code>&lt;</code> on <code>Integer</code> specifically, because given
-the static type annotations those are the most likely. Meanwhile, the
-Ruby VM has to handle the possibility that <code>+</code> is running on
-<code>Integer</code>, or <code>Float</code>, or <code>String</code>, or
-<code>Array</code>, or something else.</p>
-<p>This has huge consequences for the <a
-href="#appendix-instruction-cache">instruction cache</a>: the compiled
-code’s main loop spans only ~200 bytes. Meanwhile the VM’s
-implementation of <code>+</code> and <code>&lt;</code> are around ~700
-bytes each, and the core instruction processing loop is upwards of 32K
-bytes, only fractions of which are needed for this program.</p></li>
-<li><p>This Ruby code doesn’t take full advantage of the Ruby VM’s
-features. Ruby makes it easy to handle exceptions, call blocks, dispatch
-dynamically, reflect, and more. This script is taking absolutely zero
-advantage of those high-level features.</p></li>
+<li><p>The Ruby VM stores local variables on a stack-like data structure which lives on the heap. To read and write a variable, the Ruby VM has to follow pointers that end up touching the heap. The compiler keeps almost it’s entire working memory in registers.</p></li>
+<li><p>The compiler inlines the code for <code>+</code> and <code>&lt;</code> on <code>Integer</code> specifically, because given the static type annotations those are the most likely. Meanwhile, the Ruby VM has to handle the possibility that <code>+</code> is running on <code>Integer</code>, or <code>Float</code>, or <code>String</code>, or <code>Array</code>, or something else.</p>
+<p>This has huge consequences for the <a href="#appendix-instruction-cache">instruction cache</a>: the compiled code’s main loop spans only ~200 bytes. Meanwhile the VM’s implementation of <code>+</code> and <code>&lt;</code> are around ~700 bytes each, and the core instruction processing loop is upwards of 32K bytes, only fractions of which are needed for this program.</p></li>
+<li><p>This Ruby code doesn’t take full advantage of the Ruby VM’s features. Ruby makes it easy to handle exceptions, call blocks, dispatch dynamically, reflect, and more. This script is taking absolutely zero advantage of those high-level features.</p></li>
 </ul>
-<p>For the bread and butter of a programming language (control flow and
-local variables), the code the compiler emits is super low overhead. The
-assembly the Sorbet compiler emits reduces our simple program to its
-essence, cutting out the fatty parts of the Ruby VM and leaving behind a
-lean executable.</p>
-<h1 id="appendix-compiled-while-program">Appendix: Compiled
-<code>while</code> program</h1>
-<p>This is a snippet of the compiled output for the while program above.
-I’ve cut a large chunk of the compiled output, most of which is just
-book keeping to register C functions with the Ruby VM and pre-allocate
-some <code>String</code> and <code>Symbol</code> constants.</p>
-<p>But, I haven’t snipped anything out of the middle of the snippet
-below—it occurs contiguous in the compiled output.</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode gnuassembler tight-code"><code class="sourceCode gnuassembler"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">94c:</span>    mov    <span class="dv">$0</span>x1<span class="op">,%</span><span class="kw">ebp</span>                     <span class="co">#    i = 0</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">951:</span>    mov    <span class="dv">$0</span>x14<span class="op">,%</span><span class="kw">r13d</span>                   <span class="co">#    %r13 = Qtrue</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">957:</span>    <span class="cf">jmp</span>    97f <span class="op">&lt;</span>func_Object<span class="co">#jez+0xbf&gt;    #    jump to start of while loop</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">959:</span>    nopl   <span class="bn">0x0</span><span class="op">(%</span><span class="kw">rax</span><span class="op">)</span></span>
+<p>For the bread and butter of a programming language (control flow and local variables), the code the compiler emits is super low overhead. The assembly the Sorbet compiler emits reduces our simple program to its essence, cutting out the fatty parts of the Ruby VM and leaving behind a lean executable.</p>
+<h1 id="appendix-compiled-while-program">Appendix: Compiled <code>while</code> program</h1>
+<p>This is a snippet of the compiled output for the while program above. I’ve cut a large chunk of the compiled output, most of which is just book keeping to register C functions with the Ruby VM and pre-allocate some <code>String</code> and <code>Symbol</code> constants.</p>
+<p>But, I haven’t snipped anything out of the middle of the snippet below—it occurs contiguous in the compiled output.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode gnuassembler tight-code"><code class="sourceCode gnuassembler"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">94c:</span>    mov    $0x1,%ebp                     <span class="co">#    i = 0</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">951:</span>    mov    $0x14,%r13d                   <span class="co">#    %r13 = Qtrue</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">957:</span>    jmp    97f &lt;func_Object<span class="co">#jez+0xbf&gt;    #    jump to start of while loop</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">959:</span>    nopl   <span class="bn">0x0</span>(%rax)</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">960:</span>    mov    <span class="op">%</span><span class="kw">rbp</span><span class="op">,%</span><span class="kw">rdi</span>                     <span class="co"># ─┐</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">963:</span>    mov    <span class="op">%</span><span class="kw">r15</span><span class="op">,%</span><span class="kw">rsi</span>                     <span class="co">#  │</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">966:</span>    mov    <span class="dv">$0</span>x1<span class="op">,%</span><span class="kw">edx</span>                     <span class="co">#  │ slow path call to `+` (defensive,</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">96b:</span>    lea    <span class="bn">0x18</span><span class="op">(%</span><span class="kw">rsp</span><span class="op">),%</span><span class="kw">rcx</span>               <span class="co">#  │ in case static types are wrong)</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">970:</span>    lea    <span class="bn">0x2008a9</span><span class="op">(%</span><span class="kw">rip</span><span class="op">),%</span><span class="kw">r8</span>            <span class="co">#  │</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">977:</span>    <span class="cf">callq</span>  7d0 <span class="op">&lt;</span>sorbet_callFuncWithCache<span class="op">&gt;</span><span class="co">#  │ call back into the Ruby VM</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">97c:</span>    mov    <span class="op">%</span><span class="kw">rax</span><span class="op">,%</span><span class="kw">rbp</span>                     <span class="co"># ─┘</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="kw">960:</span>    mov    %rbp,%rdi                     <span class="co"># ─┐</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="kw">963:</span>    mov    %r15,%rsi                     <span class="co">#  │</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">966:</span>    mov    $0x1,%edx                     <span class="co">#  │ slow path call to `+` (defensive,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="kw">96b:</span>    lea    <span class="bn">0x18</span>(%rsp),%rcx               <span class="co">#  │ in case static types are wrong)</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="kw">970:</span>    lea    <span class="bn">0x2008a9</span>(%rip),%r8            <span class="co">#  │</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="kw">977:</span>    callq  7d0 &lt;sorbet_callFuncWithCache&gt;<span class="co">#  │ call back into the Ruby VM</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="kw">97c:</span>    mov    %rax,%rbp                     <span class="co"># ─┘</span></span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">97f:</span>    mov    <span class="op">%</span><span class="kw">r12</span><span class="op">,(%</span><span class="kw">rbx</span><span class="op">)</span>                   <span class="co"># ─┐ start of while loop</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">982:</span>    <span class="kw">movq</span>   <span class="dv">$0</span>x1312d01<span class="op">,</span><span class="bn">0x18</span><span class="op">(%</span><span class="kw">rsp</span><span class="op">)</span>         <span class="co">#  │ store Integer(10_000_000) to stack</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="fu">989:</span>                                         <span class="co">#  │</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="fu">98b:</span>    <span class="kw">test</span>   <span class="dv">$0</span>x1<span class="op">,%</span><span class="kw">bpl</span>                     <span class="co">#  │ i.is_a?(Integer)</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">98f:</span>    <span class="cf">je</span>     9de <span class="op">&lt;</span>func_Object<span class="co">#jez+0x11e&gt;   #  │ jump to slow path `&lt;` if not int</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="kw">97f:</span>    mov    %r12,(%rbx)                   <span class="co"># ─┐ start of while loop</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="kw">982:</span>    movq   $0x1312d01,<span class="bn">0x18</span>(%rsp)         <span class="co">#  │ store Integer(10_000_000) to stack</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="kw">989:</span>                                         <span class="co">#  │</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="kw">98b:</span>    test   $0x1,%bpl                     <span class="co">#  │ i.is_a?(Integer)</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="kw">98f:</span>    je     9de &lt;func_Object<span class="co">#jez+0x11e&gt;   #  │ jump to slow path `&lt;` if not int</span></span>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>                                             <span class="co">#  │</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="fu">991:</span>    cmp    <span class="dv">$0</span>x1312d00<span class="op">,%</span><span class="kw">rbp</span>               <span class="co">#  │ 10,000,000 &lt; i  (fast path)</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="fu">998:</span>    mov    <span class="dv">$0</span>x0<span class="op">,%</span><span class="kw">eax</span>                     <span class="co">#  │ store Qfalse in %rax if less,</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="fu">99d:</span>    <span class="kw">cmovl</span>  <span class="op">%</span><span class="kw">r13</span><span class="op">,%</span><span class="kw">rax</span>                     <span class="co">#  │ otherwise, store Qtrue</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="kw">991:</span>    cmp    $0x1312d00,%rbp               <span class="co">#  │ 10,000,000 &lt; i  (fast path)</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="kw">998:</span>    mov    $0x0,%eax                     <span class="co">#  │ store Qfalse in %rax if less,</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="kw">99d:</span>    cmovl  %r13,%rax                     <span class="co">#  │ otherwise, store Qtrue</span></span>
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>                                             <span class="co">#  │</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="fu">9a1:</span>    <span class="kw">test</span>   <span class="dv">$0</span>xfffffffffffffff7<span class="op">,%</span><span class="kw">rax</span>      <span class="co">#  │ bitwise AND with Qnil (Ruby nil)</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="fu">9a7:</span>    <span class="cf">je</span>     a04 <span class="op">&lt;</span>func_Object<span class="co">#jez+0x144&gt;   # ─┘ jump out of loop if AND is zero</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="kw">9a1:</span>    test   $0xfffffffffffffff7,%rax      <span class="co">#  │ bitwise AND with Qnil (Ruby nil)</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="kw">9a7:</span>    je     a04 &lt;func_Object<span class="co">#jez+0x144&gt;   # ─┘ jump out of loop if AND is zero</span></span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>                                             <span class="co">#    (i.e., %rax is Qfalse or Qnil)</span></span>
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="fu">9a9:</span>    mov    <span class="op">%</span><span class="kw">r14</span><span class="op">,(%</span><span class="kw">rbx</span><span class="op">)</span>                   <span class="co">#    set line numbers in VM</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="kw">9a9:</span>    mov    %r14,(%rbx)                   <span class="co">#    set line numbers in VM</span></span>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="fu">9ac:</span>    <span class="kw">movq</span>   <span class="dv">$0</span>x3<span class="op">,</span><span class="bn">0x18</span><span class="op">(%</span><span class="kw">rsp</span><span class="op">)</span>               <span class="co">#    store Integer(1) in a VALUE[]</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="kw">9ac:</span>    movq   $0x3,<span class="bn">0x18</span>(%rsp)               <span class="co">#    store Integer(1) in a VALUE[]</span></span>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>                                             <span class="co">#    on the stack (for slow path `+`)</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="fu">9b3:</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="fu">9b5:</span>    <span class="kw">test</span>   <span class="dv">$0</span>x1<span class="op">,%</span><span class="kw">bpl</span>                     <span class="co"># ─┐ i.is_a?(Integer)</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="fu">9b9:</span>    <span class="cf">je</span>     <span class="dv">960</span> <span class="op">&lt;</span>func_Object<span class="co">#jez+0xa0&gt;    # ─┘ jump to slow path `+` if not int</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="kw">9b3:</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="kw">9b5:</span>    test   $0x1,%bpl                     <span class="co"># ─┐ i.is_a?(Integer)</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="kw">9b9:</span>    je     <span class="dv">960</span> &lt;func_Object<span class="co">#jez+0xa0&gt;    # ─┘ jump to slow path `+` if not int</span></span>
 <span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>                                             <span class="co"># ─┐ i += 1          (fast path)</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="fu">9bb:</span>    add    <span class="dv">$0</span>x2<span class="op">,%</span><span class="kw">rbp</span>                     <span class="co">#  │ (LSB of Ruby ints are always 1,</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="kw">9bb:</span>    add    $0x2,%rbp                     <span class="co">#  │ (LSB of Ruby ints are always 1,</span></span>
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>                                             <span class="co"># ─┘  thus adding 0x2 adds 1)</span></span>
 <span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="fu">9bf:</span>    <span class="cf">jno</span>    97f <span class="op">&lt;</span>func_Object<span class="co">#jez+0xbf&gt;    # ─┐</span></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="fu">9c1:</span>    <span class="kw">sar</span>    <span class="op">%</span><span class="kw">rbp</span>                          <span class="co">#  │</span></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="fu">9c4:</span>    movabs <span class="dv">$0</span>x8000000000000000<span class="op">,%</span><span class="kw">rax</span>      <span class="co">#  │</span></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="fu">9cb:</span>                                         <span class="co">#  │</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="fu">9ce:</span>    <span class="kw">xor</span>    <span class="op">%</span><span class="kw">rax</span><span class="op">,%</span><span class="kw">rbp</span>                     <span class="co">#  ├─ promote int to Bignum</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="fu">9d1:</span>    mov    <span class="op">%</span><span class="kw">rbp</span><span class="op">,%</span><span class="kw">rdi</span>                     <span class="co">#  │  (if overflow)</span></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="fu">9d4:</span>    <span class="cf">callq</span>  <span class="dv">830</span> <span class="op">&lt;</span>rb_int2big<span class="co">@plt&gt;          #  │</span></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="fu">9d9:</span>    mov    <span class="op">%</span><span class="kw">rax</span><span class="op">,%</span><span class="kw">rbp</span>                     <span class="co">#  │</span></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="fu">9dc:</span>    <span class="cf">jmp</span>    97f <span class="op">&lt;</span>func_Object<span class="co">#jez+0xbf&gt;    # ─┘</span></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="fu">9de:</span>    mov    <span class="op">%</span><span class="kw">rbp</span><span class="op">,%</span><span class="kw">rdi</span>                     <span class="co"># ─┐</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="kw">9bf:</span>    jno    97f &lt;func_Object<span class="co">#jez+0xbf&gt;    # ─┐</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="kw">9c1:</span>    sar    %rbp                          <span class="co">#  │</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="kw">9c4:</span>    movabs $0x8000000000000000,%rax      <span class="co">#  │</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="kw">9cb:</span>                                         <span class="co">#  │</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="kw">9ce:</span>    xor    %rax,%rbp                     <span class="co">#  ├─ promote int to Bignum</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="kw">9d1:</span>    mov    %rbp,%rdi                     <span class="co">#  │  (if overflow)</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="kw">9d4:</span>    callq  <span class="dv">830</span> &lt;rb_int2big<span class="co">@plt&gt;          #  │</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="kw">9d9:</span>    mov    %rax,%rbp                     <span class="co">#  │</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="kw">9dc:</span>    jmp    97f &lt;func_Object<span class="co">#jez+0xbf&gt;    # ─┘</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="kw">9de:</span>    mov    %rbp,%rdi                     <span class="co"># ─┐</span></span>
 <span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>                                             <span class="co">#  │</span></span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="fu">9e1:</span>    mov    <span class="bn">0x8</span><span class="op">(%</span><span class="kw">rsp</span><span class="op">),%</span><span class="kw">rsi</span>                <span class="co">#  │</span></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="fu">9e6:</span>    mov    <span class="dv">$0</span>x1<span class="op">,%</span><span class="kw">edx</span>                     <span class="co">#  │ slow path call to `&lt;`</span></span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="fu">9eb:</span>    lea    <span class="bn">0x18</span><span class="op">(%</span><span class="kw">rsp</span><span class="op">),%</span><span class="kw">rcx</span>               <span class="co">#  │ (in case static types are wrong)</span></span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">9f0:</span>    lea    <span class="bn">0x200809</span><span class="op">(%</span><span class="kw">rip</span><span class="op">),%</span><span class="kw">r8</span>            <span class="co">#  │</span></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="fu">9f7:</span>    <span class="cf">callq</span>  7d0 <span class="op">&lt;</span>sorbet_callFuncWithCache<span class="op">&gt;</span><span class="co">#  │ call back into the Ruby VM</span></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="fu">9fc:</span>    <span class="kw">test</span>   <span class="dv">$0</span>xfffffffffffffff7<span class="op">,%</span><span class="kw">rax</span>      <span class="co">#  │</span></span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="fu">a02:</span>    <span class="cf">jne</span>    9a9 <span class="op">&lt;</span>func_Object<span class="co">#jez+0xe9&gt;    # ─┘</span></span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="fu">a04:</span>    ...                                  <span class="co">#    end of while loop (clean up, return)</span></span></code></pre></div>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="kw">9e1:</span>    mov    <span class="bn">0x8</span>(%rsp),%rsi                <span class="co">#  │</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="kw">9e6:</span>    mov    $0x1,%edx                     <span class="co">#  │ slow path call to `&lt;`</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="kw">9eb:</span>    lea    <span class="bn">0x18</span>(%rsp),%rcx               <span class="co">#  │ (in case static types are wrong)</span></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="kw">9f0:</span>    lea    <span class="bn">0x200809</span>(%rip),%r8            <span class="co">#  │</span></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="kw">9f7:</span>    callq  7d0 &lt;sorbet_callFuncWithCache&gt;<span class="co">#  │ call back into the Ruby VM</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="kw">9fc:</span>    test   $0xfffffffffffffff7,%rax      <span class="co">#  │</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="kw">a02:</span>    jne    9a9 &lt;func_Object<span class="co">#jez+0xe9&gt;    # ─┘</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="kw">a04:</span>    ...                                  <span class="co">#    end of while loop (clean up, return)</span></span></code></pre></div>
 <h1 id="appendix-instruction-cache">Appendix: Instruction cache</h1>
-<p>You can use <code>lscpu</code> to see how big your CPU’s instruction
-cache is:</p>
+<p>You can use <code>lscpu</code> to see how big your CPU’s instruction cache is:</p>
 <pre class="plain"><code>❯ lscpu
 Architecture:                    x86_64
 CPU(s):                          16
@@ -284,13 +203,7 @@ L1d cache:                       256 KiB
 L1i cache:                       256 KiB      # &lt;-- instruction cache
 L2 cache:                        4 MiB
 L3 cache:                        32 MiB</code></pre>
-<p>For my CPU (Ryzen 3700X), that 256 KiB is total for the whole chip,
-which means each of the 8 cores gets its own 32 KiB of L1 instruction
-cache. That cache is then shared for every program that gets scheduled
-onto that core (which is why it’s important for the kernel to have some
-sort of CPU affinity for processes when scheduling them—if a process
-gets scheduled back onto the CPU it just was on, its instructions might
-still be in the cache.)</p>
+<p>For my CPU (Ryzen 3700X), that 256 KiB is total for the whole chip, which means each of the 8 cores gets its own 32 KiB of L1 instruction cache. That cache is then shared for every program that gets scheduled onto that core (which is why it’s important for the kernel to have some sort of CPU affinity for processes when scheduling them—if a process gets scheduled back onto the CPU it just was on, its instructions might still be in the cache.)</p>
 </main>
 
 
