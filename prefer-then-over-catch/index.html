@@ -51,19 +51,24 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#problem">Problem</a></li>
-  <li><a href="#solution">Solution</a></li>
-  <li><a href="#caveats">Caveats</a></li>
+  <li><a href="#problem" id="toc-problem">Problem</a></li>
+  <li><a href="#solution" id="toc-solution">Solution</a></li>
+  <li><a href="#caveats" id="toc-caveats">Caveats</a></li>
   </ul>
 </nav>
 
 <main>
-<p>When designing asynchronous APIs that could error in Flow, prefer using <code>.then</code> for both successful and failure cases. Flow exposes a relatively unsafe library definition for the <code>.catch</code> method, so it’s best to avoid it if you can.</p>
+<p>When designing asynchronous APIs that could error in Flow, prefer
+using <code>.then</code> for both successful and failure cases. Flow
+exposes a relatively unsafe library definition for the
+<code>.catch</code> method, so it’s best to avoid it if you can.</p>
 <!-- more -->
 <h1 id="problem">Problem</h1>
-<p>What does this look like in practice? Say you’re thinking about writing code that looks similar to this:</p>
+<p>What does this look like in practice? Say you’re thinking about
+writing code that looks similar to this:</p>
 <figure>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource js numberLines"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">// &quot;Success&quot; and &quot;failure&quot; types (definitions omitted)</span></span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode numberSource js numberLines"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">// &quot;Success&quot; and &quot;failure&quot; types (definitions omitted)</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> type {OkResult<span class="op">,</span> ErrResult} <span class="im">from</span> <span class="st">&#39;src/types&#39;</span><span class="op">;</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a></span>
 <span id="cb1-4"><a href="#cb1-4"></a><span class="kw">const</span> doSomething <span class="op">=</span> ()<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span>OkResult<span class="op">&gt;</span> <span class="kw">=&gt;</span> {</span>
@@ -80,7 +85,11 @@
 Bad code; don’t do this
 </figcaption>
 </figure>
-<p>This is okay code, but not great. Why? Because Flow won’t prevent us from calling <code>reject(...)</code> with something that’s <strong>not</strong> of type <code>ErrResult</code>, and it won’t warn us when we try to use <code>err</code> incorrectly. Concretely, if we had this type definition:</p>
+<p>This is okay code, but not great. Why? Because Flow won’t prevent us
+from calling <code>reject(...)</code> with something that’s
+<strong>not</strong> of type <code>ErrResult</code>, and it won’t warn
+us when we try to use <code>err</code> incorrectly. Concretely, if we
+had this type definition:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>type ErrResult <span class="op">=</span> string<span class="op">;</span></span></code></pre></div>
 <p>Flow wouldn’t prevent us from doing this:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// number, not a string!</span></span>
@@ -89,9 +98,12 @@ Bad code; don’t do this
 <div class="sourceCode" id="cb4"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// boolean, not a string!</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span><span class="fu">catch</span>((err<span class="op">:</span> boolean) <span class="kw">=&gt;</span> <span class="op">...</span>)<span class="op">;</span></span></code></pre></div>
 <h1 id="solution">Solution</h1>
-<p>As mentioned, we can work around this by only using <code>resolve</code> and <code>.then</code>. For example, we can replace our code above with this:</p>
+<p>As mentioned, we can work around this by only using
+<code>resolve</code> and <code>.then</code>. For example, we can replace
+our code above with this:</p>
 <figure>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource js numberLines"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">// Helper function for exhaustiveness.</span></span>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode numberSource js numberLines"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">// Helper function for exhaustiveness.</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co">// See here: https://blog.jez.io/flow-exhaustiveness/</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="im">import</span> {absurd} <span class="im">from</span> <span class="st">&#39;src/absurd&#39;</span><span class="op">;</span></span>
 <span id="cb5-4"><a href="#cb5-4"></a></span>
@@ -132,13 +144,24 @@ Better code than before
 </figure>
 <p>There’s a lot of benefits in this newer code:</p>
 <ul>
-<li><p>Using <code>resolve</code> is much safer than <code>reject</code>. Flow will always warn us if we call <code>resolve</code> with an improperly-typed input.</p></li>
-<li><p>Using <code>.then</code> is the same. Flow will warn for improper usage, <strong>and</strong> even correctly infer the type of <code>res</code> in our handler.</p></li>
-<li><p>We got exhaustiveness as a bonus. We now handle all errors, whereas before it was easy to forget to include a <code>.catch</code>.</p></li>
+<li><p>Using <code>resolve</code> is much safer than
+<code>reject</code>. Flow will always warn us if we call
+<code>resolve</code> with an improperly-typed input.</p></li>
+<li><p>Using <code>.then</code> is the same. Flow will warn for improper
+usage, <strong>and</strong> even correctly infer the type of
+<code>res</code> in our handler.</p></li>
+<li><p>We got exhaustiveness as a bonus. We now handle all errors,
+whereas before it was easy to forget to include a
+<code>.catch</code>.</p></li>
 </ul>
 <h1 id="caveats">Caveats</h1>
-<p>Of course, there are some times when the you’re interfacing with code not under your control that exposes critical functionality over <code>.catch</code>. In these cases, it’s not an option to just “not use <code>.catch</code>”. Instead, you have two options.</p>
-<p>If you trust that the library you’re using will never “misbehave”, you can ascribe a narrow type to the <code>.catch</code> callback function:</p>
+<p>Of course, there are some times when the you’re interfacing with code
+not under your control that exposes critical functionality over
+<code>.catch</code>. In these cases, it’s not an option to just “not use
+<code>.catch</code>”. Instead, you have two options.</p>
+<p>If you trust that the library you’re using will never “misbehave”,
+you can ascribe a narrow type to the <code>.catch</code> callback
+function:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// If I know that throwNumber will always call `reject` with a</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">// number, I can stop the loose types from propagating further</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">// with an explicit annotation:</span></span>
@@ -146,7 +169,9 @@ Better code than before
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">then</span>(() <span class="kw">=&gt;</span> <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;Didn&#39;t throw!&quot;</span>))</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">//         ┌── explicit annotation</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">catch</span>((n<span class="op">:</span> number) <span class="kw">=&gt;</span> <span class="fu">handleWhenRejected</span>(n))</span></code></pre></div>
-<p>If you aren’t comfortable putting this much trust in the API, you should instead ascribe <code>mixed</code> to the result of the callback.</p>
+<p>If you aren’t comfortable putting this much trust in the API, you
+should instead ascribe <code>mixed</code> to the result of the
+callback.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>throwNumber</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">then</span>(() <span class="kw">=&gt;</span> <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;Didn&#39;t throw!&quot;</span>))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">//         ┌── defensive annotation</span></span>

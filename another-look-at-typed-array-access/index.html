@@ -51,12 +51,29 @@
 
 <main>
 <blockquote>
-<p><strong>Disclaimer</strong>: this post was first drafted as a Stripe-internal email. On December 10, 2022 I republished it here, largely unchanged from the original. See <a href="/old-compiler-notes/">Some Old Sorbet Compiler Notes</a> for more. The Sorbet Compiler is still largely an experimental project: this post is available purely for curiosity’s sake.</p>
-<p>Any benchmark numbers included in this post are intended to be educational about how the Sorbet Compiler approaches speeding up code. They should not be taken as representative or predictive of any real-world workload, and are likely out-of-date with respect to improvements that have been made since this post originally appeared.</p>
+<p><strong>Disclaimer</strong>: this post was first drafted as a
+Stripe-internal email. On December 10, 2022 I republished it here,
+largely unchanged from the original. See <a
+href="/old-compiler-notes/">Some Old Sorbet Compiler Notes</a> for more.
+The Sorbet Compiler is still largely an experimental project: this post
+is available purely for curiosity’s sake.</p>
+<p>Any benchmark numbers included in this post are intended to be
+educational about how the Sorbet Compiler approaches speeding up code.
+They should not be taken as representative or predictive of any
+real-world workload, and are likely out-of-date with respect to
+improvements that have been made since this post originally
+appeared.</p>
 </blockquote>
-<p>Last week in <a href="/types-make-array-access-faster">Types Make Array Access Faster</a> we compared the Ruby VM’s performance on array accesses with the Sorbet Compiler’s performance on array accesses, as an example of how making types available to the Sorbet Compiler let it speed up code. The snippet under scrutiny was basically this operation:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span></code></pre></div>
-<p>but repeated many (10M) times to make the performance difference obvious.</p>
+<p>Last week in <a href="/types-make-array-access-faster">Types Make
+Array Access Faster</a> we compared the Ruby VM’s performance on array
+accesses with the Sorbet Compiler’s performance on array accesses, as an
+example of how making types available to the Sorbet Compiler let it
+speed up code. The snippet under scrutiny was basically this
+operation:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span></code></pre></div>
+<p>but repeated many (10M) times to make the performance difference
+obvious.</p>
 <p>The data we collected looked like this:</p>
 <div class="wide extra-wide">
 <table style="width:98%;">
@@ -83,7 +100,8 @@ w/o while</th>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
+<td style="text-align: left;"><a
+href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
 <td style="text-align: right;">0.205s</td>
 <td style="text-align: right;">0.048s</td>
 <td style="text-align: right;">—</td>
@@ -91,7 +109,8 @@ w/o while</th>
 <td style="text-align: right;">—</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/untyped_array_aref.rb">untyped_array_aref.rb</a></td>
+<td style="text-align: left;"><a
+href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/untyped_array_aref.rb">untyped_array_aref.rb</a></td>
 <td style="text-align: right;">0.282s</td>
 <td style="text-align: right;">0.174s</td>
 <td style="text-align: right;">0.077s</td>
@@ -99,7 +118,8 @@ w/o while</th>
 <td style="text-align: right;">0.61x</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/typed_array_aref.rb">typed_array_aref.rb</a></td>
+<td style="text-align: left;"><a
+href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/typed_array_aref.rb">typed_array_aref.rb</a></td>
 <td style="text-align: right;">0.282s</td>
 <td style="text-align: right;">0.061s</td>
 <td style="text-align: right;">0.077s</td>
@@ -111,15 +131,22 @@ w/o while</th>
 </div>
 <p>And our ultimate conclusion was:</p>
 <blockquote>
-<p>With type information, Sorbet-compiled code is even faster than both the interpreted code and the compiled but untyped code.</p>
+<p>With type information, Sorbet-compiled code is even faster than both
+the interpreted code and the compiled but untyped code.</p>
 </blockquote>
 <p>But there was an interesting caveat along the way:</p>
 <blockquote>
-<p>The array access operation is actually slower than the Ruby VM if Sorbet doesn’t have type information (0.61x speedup is less than 1, so it’s a slowdown).</p>
+<p>The array access operation is actually slower than the Ruby VM if
+Sorbet doesn’t have type information (0.61x speedup is less than 1, so
+it’s a slowdown).</p>
 </blockquote>
-<p>The idea was that for our plain <code>xs[0]</code> program, the compiler was actually <strong>slower</strong> than the interpreter.</p>
+<p>The idea was that for our plain <code>xs[0]</code> program, the
+compiler was actually <strong>slower</strong> than the interpreter.</p>
 <p>Why was the compiler slower?</p>
-<p>It turns out that array access is one of the operations the Ruby VM is already pretty good at, because it’s special cased. We can check this looking at the <a href="https://en.wikipedia.org/wiki/Bytecode">bytecode instructions</a> that the Ruby VM uses to evaluate an array access:</p>
+<p>It turns out that array access is one of the operations the Ruby VM
+is already pretty good at, because it’s special cased. We can check this
+looking at the <a href="https://en.wikipedia.org/wiki/Bytecode">bytecode
+instructions</a> that the Ruby VM uses to evaluate an array access:</p>
 <pre class="plain"><code>❯ ruby --dump=insns -e &#39;xs = []; xs[0]&#39;
 == disasm: #&lt;ISeq:&lt;main&gt;@-e:1 (1,0)-(1,14)&gt; (catch: FALSE)
 local table (size: 1, argc: 0 [opts: 0, rest: -1, post: 0, block: -1, kw: -1@-1, kwrest: -1])
@@ -132,21 +159,44 @@ local table (size: 1, argc: 0 [opts: 0, rest: -1, post: 0, block: -1, kw: -1@-1,
 0010 leave</code></pre>
 <p>Here’s how to read this output:</p>
 <ul>
-<li><p>We used the special <code>--dump=insns</code> flag to the <code>ruby</code> command line. You can try this at home!</p></li>
-<li><p>Theres some stuff we don’t need on the first few lines, and then the bytecode instructions start with the line reading <code>0000</code>.</p></li>
-<li><p>The actual instruction that corresponds to the <code>xs[0]</code> instruction happens at index <code>0007</code>. The name of the instruction is <code>opt_aref</code>.</p></li>
+<li><p>We used the special <code>--dump=insns</code> flag to the
+<code>ruby</code> command line. You can try this at home!</p></li>
+<li><p>Theres some stuff we don’t need on the first few lines, and then
+the bytecode instructions start with the line reading
+<code>0000</code>.</p></li>
+<li><p>The actual instruction that corresponds to the <code>xs[0]</code>
+instruction happens at index <code>0007</code>. The name of the
+instruction is <code>opt_aref</code>.</p></li>
 </ul>
-<p>That’s interesting! Instead of treating array access like any other method call,<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">Did you know that square brackets are <a href="https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20MyClass%0A%20%20extend%20T%3A%3ASig%0A%0A%20%20sig%20%7Bparams%28arg0%3A%20Integer%29.returns%28String%29%7D%0A%20%20def%20%5B%5D%28arg0%29%0A%20%20%20%20arg0.to_s%0A%20%20end%0Aend%0A%0Ax%20%3D%20MyClass.new%0AT.reveal_type%28x%5B0%5D%29%20%23%20!!">just a method call</a> in Ruby?<br />
+<p>That’s interesting! Instead of treating array access like any other
+method call,<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">Did you know that square brackets are <a
+href="https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20MyClass%0A%20%20extend%20T%3A%3ASig%0A%0A%20%20sig%20%7Bparams%28arg0%3A%20Integer%29.returns%28String%29%7D%0A%20%20def%20%5B%5D%28arg0%29%0A%20%20%20%20arg0.to_s%0A%20%20end%0Aend%0A%0Ax%20%3D%20MyClass.new%0AT.reveal_type%28x%5B0%5D%29%20%23%20!!">just
+a method call</a> in Ruby?<br />
 <br />
-</span></span> it treats it as a special, optimized instruction called <code>opt_aref</code>. Checking <a href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/vm_insnhelper.c#L4523-L4549">the implementation of that instruction</a>, we find that the optimization only works if the method receiver (<code>xs</code> in this case) is <strong>exactly</strong> an instance of the <code>Array</code> or <code>Hash</code> class.</p>
-<p>In other words, it’s easy to defeat this optimization by subclassing <code>Array</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">MyArray</span> <span class="kw">&lt;</span> <span class="dt">Array</span></span>
+</span></span> it treats it as a special, optimized instruction called
+<code>opt_aref</code>. Checking <a
+href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/vm_insnhelper.c#L4523-L4549">the
+implementation of that instruction</a>, we find that the optimization
+only works if the method receiver (<code>xs</code> in this case) is
+<strong>exactly</strong> an instance of the <code>Array</code> or
+<code>Hash</code> class.</p>
+<p>In other words, it’s easy to defeat this optimization by subclassing
+<code>Array</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">MyArray</span> <span class="kw">&lt;</span> <span class="dt">Array</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>xs <span class="kw">=</span> <span class="dt">MyArray</span><span class="at">.new</span>(<span class="kw">[</span><span class="dv">2</span><span class="kw">]</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span></code></pre></div>
-<p>In this case, since <code>xs</code> is not exactly <code>Array</code> or <code>Hash</code> anymore, the optimization won’t apply, and <a href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/insns.def#L1305-L1309">the Ruby VM falls back</a> to calling a method named <code>[]</code> on <code>xs</code> with argument <code>0</code>.</p>
-<p>We can see the effect of this by writing another Sorbet compiler benchmark, and adding it to our table:</p>
+<p>In this case, since <code>xs</code> is not exactly <code>Array</code>
+or <code>Hash</code> anymore, the optimization won’t apply, and <a
+href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/insns.def#L1305-L1309">the
+Ruby VM falls back</a> to calling a method named <code>[]</code> on
+<code>xs</code> with argument <code>0</code>.</p>
+<p>We can see the effect of this by writing another Sorbet compiler
+benchmark, and adding it to our table:</p>
 <div class="wide extra-wide">
 <table style="width:98%;">
 <colgroup>
@@ -172,7 +222,8 @@ w/o while</th>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
+<td style="text-align: left;"><a
+href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
 <td style="text-align: right;">0.205s</td>
 <td style="text-align: right;">0.048s</td>
 <td style="text-align: right;">—</td>
@@ -180,7 +231,8 @@ w/o while</th>
 <td style="text-align: right;">—</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/untyped_array_aref.rb">untyped_array_aref.rb</a></td>
+<td style="text-align: left;"><a
+href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/untyped_array_aref.rb">untyped_array_aref.rb</a></td>
 <td style="text-align: right;">0.282s</td>
 <td style="text-align: right;">0.174s</td>
 <td style="text-align: right;">0.077s</td>
@@ -188,7 +240,8 @@ w/o while</th>
 <td style="text-align: right;">0.61x</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/typed_array_aref.rb">typed_array_aref.rb</a></td>
+<td style="text-align: left;"><a
+href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/typed_array_aref.rb">typed_array_aref.rb</a></td>
 <td style="text-align: right;">0.282s</td>
 <td style="text-align: right;">0.061s</td>
 <td style="text-align: right;">0.077s</td>
@@ -196,7 +249,8 @@ w/o while</th>
 <td style="text-align: right;">5.92x</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/untyped_array_subclass_aref.rb">untyped_array_subclass_aref.rb</a></td>
+<td style="text-align: left;"><a
+href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/untyped_array_subclass_aref.rb">untyped_array_subclass_aref.rb</a></td>
 <td style="text-align: right;">0.388s</td>
 <td style="text-align: right;">0.172s</td>
 <td style="text-align: right;">0.183s</td>
@@ -206,10 +260,23 @@ w/o while</th>
 </tbody>
 </table>
 </div>
-<p>By changing the untyped <code>Array</code> to an untyped subclass of <code>Array</code>, the interpreter slows down<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote"><strong>Editing note</strong>: These numbers are unchanged from when I first measured in September 2020. They do not necessarily reflect the Sorbet Compiler’s current performance.<br />
+<p>By changing the untyped <code>Array</code> to an untyped subclass of
+<code>Array</code>, the interpreter slows down<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote"><strong>Editing note</strong>: These numbers are
+unchanged from when I first measured in September 2020. They do not
+necessarily reflect the Sorbet Compiler’s current performance.<br />
 <br />
-</span></span> an extra 0.106ms, but our compiled version doesn’t care whether it was the <code>Array</code> case or <code>MyArray</code> case, because they’re both untyped.</p>
-<p>Now that the Ruby VM hasn’t effectively special cased our benchmark, the compiler starts to shine! This is another reason why we’re really optimistic about the impact of the compiler. Our initial plans were to speed up typed code, and count on other teams adding types everywhere. While adding types <strong>definitely</strong> helps (look at that 5.92x speedup!), the compiler can still speed up certain kinds of untyped code, too.</p>
+</span></span> an extra 0.106ms, but our compiled version doesn’t care
+whether it was the <code>Array</code> case or <code>MyArray</code> case,
+because they’re both untyped.</p>
+<p>Now that the Ruby VM hasn’t effectively special cased our benchmark,
+the compiler starts to shine! This is another reason why we’re really
+optimistic about the impact of the compiler. Our initial plans were to
+speed up typed code, and count on other teams adding types everywhere.
+While adding types <strong>definitely</strong> helps (look at that 5.92x
+speedup!), the compiler can still speed up certain kinds of untyped
+code, too.</p>
 </main>
 
 

@@ -51,49 +51,113 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#using-this-alias">Using This Alias</a></li>
-  <li><a href="#go-forth-and-git">Go Forth and Git</a></li>
+  <li><a href="#using-this-alias" id="toc-using-this-alias">Using This
+  Alias</a></li>
+  <li><a href="#go-forth-and-git" id="toc-go-forth-and-git">Go Forth and
+  Git</a></li>
   </ul>
 </nav>
 
 <main>
-<p>One of the first Git commands people learn is <code>git status</code>. It’s a great command to understand the state of your personal repository, but it tells you nothing about the structure of your teammates’ branches or remotes. Luckily, <code>git log</code> visualises the state of a Git repository at any time, so we can collaborate seamlessly.</p>
+<p>One of the first Git commands people learn is
+<code>git status</code>. It’s a great command to understand the state of
+your personal repository, but it tells you nothing about the structure
+of your teammates’ branches or remotes. Luckily, <code>git log</code>
+visualises the state of a Git repository at any time, so we can
+collaborate seamlessly.</p>
 <!-- more -->
 <p>This post is going to focus on this one, amazing command. Behold:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log --graph --oneline --abbrev-commit --decorate --all</span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--graph</span> <span class="at">--oneline</span> <span class="at">--abbrev-commit</span> <span class="at">--decorate</span> <span class="at">--all</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># That&#39;s borderlying fearsome! Let&#39;s make an alias:</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> gll=<span class="st">&quot;git log --graph --oneline --abbrev-commit --decorate --all&quot;</span></span></code></pre></div>
-<p>Don’t worry about what all the flags are; if you’re really curious, <code>git help log</code> explains them. What we care about is what information this gives us, and how we can leverage it to collaborate with confidence in a Git repo.</p>
-<p>Have you copied the alias into your <code>~/.bashrc</code> yet? There’s no time like the present.</p>
+<p>Don’t worry about what all the flags are; if you’re really curious,
+<code>git help log</code> explains them. What we care about is what
+information this gives us, and how we can leverage it to collaborate
+with confidence in a Git repo.</p>
+<p>Have you copied the alias into your <code>~/.bashrc</code> yet?
+There’s no time like the present.</p>
 <h1 id="using-this-alias">Using This Alias</h1>
-<p>When collaborating on a Git repo, it’s important to know how the branch you’re working on relates to <code>master</code>, and all your teammates’ branches. I might want to preview their code, combine the feature I’m working on with theirs, take over on a certain branch, etc. There are “black magic” Git incantations that will solve these problems for you. The trick is knowing which one you need.</p>
-<p>That’s where <code>git log</code> comes in. Git is really just a big directed graph of commits, each one pointing to the one that came before. At the top of the graph, sometimes these directed chains of commits break off from one another. When this happens, we say that two branches have “diverged.” Understanding where divergent branches are pretty much the only trick to collaborating on Git repos.</p>
-<p>So what does our <code>gll</code> alias do for us? It visualizes the commit structure. In particular, if there are divergent branches, we’ll see them:</p>
-<p><a href="/assets/img/gll-ale.png"><img src="/assets/img/gll-ale.png" /></a></p>
+<p>When collaborating on a Git repo, it’s important to know how the
+branch you’re working on relates to <code>master</code>, and all your
+teammates’ branches. I might want to preview their code, combine the
+feature I’m working on with theirs, take over on a certain branch, etc.
+There are “black magic” Git incantations that will solve these problems
+for you. The trick is knowing which one you need.</p>
+<p>That’s where <code>git log</code> comes in. Git is really just a big
+directed graph of commits, each one pointing to the one that came
+before. At the top of the graph, sometimes these directed chains of
+commits break off from one another. When this happens, we say that two
+branches have “diverged.” Understanding where divergent branches are
+pretty much the only trick to collaborating on Git repos.</p>
+<p>So what does our <code>gll</code> alias do for us? It visualizes the
+commit structure. In particular, if there are divergent branches, we’ll
+see them:</p>
+<p><a href="/assets/img/gll-ale.png"><img
+src="/assets/img/gll-ale.png" /></a></p>
 <p>Some points about what we’re seeing here:</p>
 <ul>
 <li>Each <code>*</code> represents a commit.
 <ul>
 <li>We can see information like commit hash and message next to it.</li>
 </ul></li>
-<li>The commits start with most recent at the top, and get older going down.</li>
-<li>Git is helpful enough to draw quaint little ASCII art lines connecting commits.</li>
-<li>Each commit is “decorated” with any references that point to that commit.
+<li>The commits start with most recent at the top, and get older going
+down.</li>
+<li>Git is helpful enough to draw quaint little ASCII art lines
+connecting commits.</li>
+<li>Each commit is “decorated” with any references that point to that
+commit.
 <ul>
-<li>For example, ref <code>origin/master</code> is equal to commit <code>80c7fbc</code> here.</li>
+<li>For example, ref <code>origin/master</code> is equal to commit
+<code>80c7fbc</code> here.</li>
 </ul></li>
 </ul>
-<p>And most importantly: with just a glance, we can see where the divergent branches are. Our <code>smlnj-cm-files</code> forked off from <code>master</code>. In the mean time, since we branched off, there were three commits to master. This means we can expect some sort of merge or rebase before including our code into <code>master</code>.</p>
-<p>I find this command nothing less than miraculous when working with Git. Between <code>git status</code> and <code>gll</code>, I can figure out what command I need, or make a well-informed Google search with what I’d like to do—these two commands answer all of my questions nearly without fail.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">Many people I know who are quite competent at Git manage to use it without <code>gll</code>. For me, <code>gll</code> is indispensible. My theory here is that these poor people have such intense muscle memory that they rarely, if ever, get their Git repository into a state they’re unsure of. Rather than suffer through that learning curve, here’s hoping that <code>gll</code> works as well for you as it has for me!<br />
+<p>And most importantly: with just a glance, we can see where the
+divergent branches are. Our <code>smlnj-cm-files</code> forked off from
+<code>master</code>. In the mean time, since we branched off, there were
+three commits to master. This means we can expect some sort of merge or
+rebase before including our code into <code>master</code>.</p>
+<p>I find this command nothing less than miraculous when working with
+Git. Between <code>git status</code> and <code>gll</code>, I can figure
+out what command I need, or make a well-informed Google search with what
+I’d like to do—these two commands answer all of my questions nearly
+without fail.<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">Many people I know who are quite competent at Git
+manage to use it without <code>gll</code>. For me, <code>gll</code> is
+indispensible. My theory here is that these poor people have such
+intense muscle memory that they rarely, if ever, get their Git
+repository into a state they’re unsure of. Rather than suffer through
+that learning curve, here’s hoping that <code>gll</code> works as well
+for you as it has for me!<br />
 <br />
 </span></span></p>
 <h1 id="go-forth-and-git">Go Forth and Git</h1>
-<p>To recap: whenever you’re stuck: <code>git status</code> first,<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">Why don’t I go in depth into <code>git status</code> as well? Because <code>git status</code> almost always tells you the command you want to run next! It’s actually pretty smart at this. Have you read your <code>git status</code> output carefully recently?<br />
+<p>To recap: whenever you’re stuck: <code>git status</code> first,<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">Why don’t I go in depth into <code>git status</code> as
+well? Because <code>git status</code> almost always tells you the
+command you want to run next! It’s actually pretty smart at this. Have
+you read your <code>git status</code> output carefully recently?<br />
 <br />
-</span></span> and <code>gll</code> if needed. I’d recommend running these commands even when you’re convinced you don’t need them just to start learning to recognize “normal” and “weird” graph shapes.</p>
-<p>Want to learn more about how to leverage Git branches? There’s an <strong><a href="http://pcottle.github.io/learnGitBranching/">excellent interactive tutorial</a></strong> that visualizes Git branches basically the same way we covered in this post (but simpler), and even has fancy animations. For a taste of how it works, there’s also a <a href="http://pcottle.github.io/learnGitBranching/?demo">non-interactive demo</a>. After I ran through this tutorial, I felt for the first time like I <em>really</em> knew Git. I’m a huge fan—give it a look!</p>
-<p>And if you’re hungry for more handy Git aliases or just some general ways to beef up your terminal experience, you can find these four aliases and more in the <strong><a href="https://github.com/jez/dotfiles/blob/5cda64644a5ef9400851c9ea5f0fe9719a4649eb/util/aliases.sh">aliases.sh</a></strong> file in my <strong><a href="https://github.com/jez/dotfiles">dotfiles repository</a></strong> on GitHub.</p>
+</span></span> and <code>gll</code> if needed. I’d recommend running
+these commands even when you’re convinced you don’t need them just to
+start learning to recognize “normal” and “weird” graph shapes.</p>
+<p>Want to learn more about how to leverage Git branches? There’s an
+<strong><a href="http://pcottle.github.io/learnGitBranching/">excellent
+interactive tutorial</a></strong> that visualizes Git branches basically
+the same way we covered in this post (but simpler), and even has fancy
+animations. For a taste of how it works, there’s also a <a
+href="http://pcottle.github.io/learnGitBranching/?demo">non-interactive
+demo</a>. After I ran through this tutorial, I felt for the first time
+like I <em>really</em> knew Git. I’m a huge fan—give it a look!</p>
+<p>And if you’re hungry for more handy Git aliases or just some general
+ways to beef up your terminal experience, you can find these four
+aliases and more in the <strong><a
+href="https://github.com/jez/dotfiles/blob/5cda64644a5ef9400851c9ea5f0fe9719a4649eb/util/aliases.sh">aliases.sh</a></strong>
+file in my <strong><a href="https://github.com/jez/dotfiles">dotfiles
+repository</a></strong> on GitHub.</p>
 </main>
 
 

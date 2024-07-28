@@ -51,63 +51,120 @@
 
 <main>
 <blockquote>
-<p><strong>Editing note</strong>: This post first appeared in a work-internal email. It was first cross-posted to this blog December 12, 2022.</p>
+<p><strong>Editing note</strong>: This post first appeared in a
+work-internal email. It was first cross-posted to this blog December 12,
+2022.</p>
 </blockquote>
-<p>At a high level, Ruby’s garbage collection algorithm is a mark-and-sweep collector. In Ruby 2.7, Ruby’s GC algorithm gets a little more sophisticated: not only does it mark-and-sweep, but it can be asked to compact memory!</p>
-<p>This is both really cool and also kind of scary, so we’re going to chat about both, with pictures.</p>
-<p>The Ruby VM manages memory on behalf of the programmer. Internally, it knows which parts of memory correspond to allocated and free things:</p>
+<p>At a high level, Ruby’s garbage collection algorithm is a
+mark-and-sweep collector. In Ruby 2.7, Ruby’s GC algorithm gets a little
+more sophisticated: not only does it mark-and-sweep, but it can be asked
+to compact memory!</p>
+<p>This is both really cool and also kind of scary, so we’re going to
+chat about both, with pictures.</p>
+<p>The Ruby VM manages memory on behalf of the programmer. Internally,
+it knows which parts of memory correspond to allocated and free
+things:</p>
 <p><img src="/assets/img/light/gc-compact-ruby-mem.png" /></p>
 <p><img src="/assets/img/dark/gc-compact-ruby-mem.png" /></p>
 <p>When you do something like</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>x <span class="kw">=</span> <span class="dt">MyClass</span><span class="at">.new</span></span></code></pre></div>
-<p>Ruby will allocate enough space to hold that value behind the scenes. When that object isn’t needed anymore, it’ll get freed. Over the life cycle of an application that allocates and frees a lot (read: literally every Ruby program), memory can get pretty fragmented: even though there might be space available, it might not all be contiguous. That means:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>x <span class="kw">=</span> <span class="dt">MyClass</span><span class="at">.new</span></span></code></pre></div>
+<p>Ruby will allocate enough space to hold that value behind the scenes.
+When that object isn’t needed anymore, it’ll get freed. Over the life
+cycle of an application that allocates and frees a lot (read: literally
+every Ruby program), memory can get pretty fragmented: even though there
+might be space available, it might not all be contiguous. That
+means:</p>
 <ul>
-<li>it’s not available for the operating system to give to someone else</li>
-<li>there might not be space for a “big” allocation if all that’s left are “small” holes</li>
+<li>it’s not available for the operating system to give to someone
+else</li>
+<li>there might not be space for a “big” allocation if all that’s left
+are “small” holes</li>
 </ul>
 <p>That second one can be pretty annoying:</p>
 <p><img src="/assets/img/light/gc-compact-oom.png" /></p>
 <p><img src="/assets/img/dark/gc-compact-oom.png" /></p>
-<p>A neat innovation in GC algorithms is what are called <strong>compacting garbage collection</strong> algorithms. These kinds of algorithms periodically (either automatically, on on request), shuffle all the allocated memory around so that it lines up nicely, with no gaps:</p>
+<p>A neat innovation in GC algorithms is what are called
+<strong>compacting garbage collection</strong> algorithms. These kinds
+of algorithms periodically (either automatically, on on request),
+shuffle all the allocated memory around so that it lines up nicely, with
+no gaps:</p>
 <p><img src="/assets/img/light/gc-compact-compaction.png" /></p>
 <p><img src="/assets/img/dark/gc-compact-compaction.png" /></p>
 <p>That’s what was added in Ruby 2.7! Just call:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cn">GC</span><span class="at">.compact</span></span></code></pre></div>
-<p>in a Ruby program to request that the VM runtime compact its heap. That’s great! It means our programs go out of memory less frequently, can run with more headroom (to handle spiky workloads), and can get better cache locality.</p>
-<p>If we had called <code>GC.compact</code> before we asked the Ruby VM to do a bunch of allocations (maybe, in between every handful of API requests), then there’s a greater chance that Ruby will be able to give us the memory we ask for:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cn">GC</span><span class="at">.compact</span></span></code></pre></div>
+<p>in a Ruby program to request that the VM runtime compact its heap.
+That’s great! It means our programs go out of memory less frequently,
+can run with more headroom (to handle spiky workloads), and can get
+better cache locality.</p>
+<p>If we had called <code>GC.compact</code> before we asked the Ruby VM
+to do a bunch of allocations (maybe, in between every handful of API
+requests), then there’s a greater chance that Ruby will be able to give
+us the memory we ask for:</p>
 <p><img src="/assets/img/light/gc-compact-no-oom.png" /></p>
 <p><img src="/assets/img/dark/gc-compact-no-oom.png" /></p>
 <p>… phew! So compacting garbage collection seems great, right?</p>
-<p>In theory yes. In practice, it’s a bit trickier, especially because many Ruby gems using Ruby’s C extension API.</p>
-<p>In a Ruby C extension, the extension has its own memory, and some of the things it stores can be pointers into the Ruby VM’s heap. As long as those values don’t move around on the heap, the pointers will be valid as long as the object is still alive.</p>
-<p>But in Ruby 2.7, <code>GC.compact</code> causes memory to shuffle around, which can have some really annoying consequences:</p>
+<p>In theory yes. In practice, it’s a bit trickier, especially because
+many Ruby gems using Ruby’s C extension API.</p>
+<p>In a Ruby C extension, the extension has its own memory, and some of
+the things it stores can be pointers into the Ruby VM’s heap. As long as
+those values don’t move around on the heap, the pointers will be valid
+as long as the object is still alive.</p>
+<p>But in Ruby 2.7, <code>GC.compact</code> causes memory to shuffle
+around, which can have some really annoying consequences:</p>
 <p><img src="/assets/img/light/gc-compact-mem-crash.png" /></p>
 <p><img src="/assets/img/dark/gc-compact-mem-crash.png" /></p>
-<p>In this example, we’ve got a Ruby C extension with a pointer into the Ruby VM’s heap. After one round of GC compaction, that pointer has been completely invalidated: the pointer is pointing at unallocated data 😱</p>
-<p>Scarier still, is that something could be allocated into that (now available) spot! In that case, it will appear to the C extension like its value just changed out of thin air to something else entirely. That can cause all sorts of wild problems. Some examples:</p>
+<p>In this example, we’ve got a Ruby C extension with a pointer into the
+Ruby VM’s heap. After one round of GC compaction, that pointer has been
+completely invalidated: the pointer is pointing at unallocated data
+😱</p>
+<p>Scarier still, is that something could be allocated into that (now
+available) spot! In that case, it will appear to the C extension like
+its value just changed out of thin air to something else entirely. That
+can cause all sorts of wild problems. Some examples:</p>
 <ul>
-<li>A <code>TypeError</code> or similar exception, because the new value is a completely different type</li>
-<li>Database corruption bugs, because maybe the new value is “good enough” that it doesn’t crash anything, and makes its way all the way to the database, even though it’s the wrong value.</li>
+<li>A <code>TypeError</code> or similar exception, because the new value
+is a completely different type</li>
+<li>Database corruption bugs, because maybe the new value is “good
+enough” that it doesn’t crash anything, and makes its way all the way to
+the database, even though it’s the wrong value.</li>
 </ul>
-<p>Probably the most annoying part: these bugs can be near impossible to reproduce. What gets allocated (or not allocated) into any given slot depends heavily on the arbitrary order in which objects are allocated and freed over the lifetime of a running service. This makes it hard (though not always impossible) to write test cases or reproduce the problems in a staging environment.</p>
-<p>This caused more than a handful of problems at work as we upgraded from Ruby 2.6 to Ruby 2.7. Of course, there’s a solution: the Ruby C extension API includes functions that declare which values the C extension expects not to move:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>VALUE my_global_hash;</span>
+<p>Probably the most annoying part: these bugs can be near impossible to
+reproduce. What gets allocated (or not allocated) into any given slot
+depends heavily on the arbitrary order in which objects are allocated
+and freed over the lifetime of a running service. This makes it hard
+(though not always impossible) to write test cases or reproduce the
+problems in a staging environment.</p>
+<p>This caused more than a handful of problems at work as we upgraded
+from Ruby 2.6 to Ruby 2.7. Of course, there’s a solution: the Ruby C
+extension API includes functions that declare which values the C
+extension expects not to move:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>VALUE my_global_hash<span class="op">;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Init_my_c_extension() {</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  my_global_hash = rb_hash_new();</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Init_my_c_extension<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  my_global_hash <span class="op">=</span> rb_hash_new<span class="op">();</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// (*) This requests that the GC not move this object:</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  rb_gc_mark(my_global_hash);</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>So far in the Ruby 2.7 upgrade, every problem we saw in production that wasn’t first caught by CI has been fixed by either patching a C extension to use <code>rb_gc_mark</code> in more places, or upgrading a gem that has already been fixed.</p>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  rb_gc_mark<span class="op">(</span>my_global_hash<span class="op">);</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>So far in the Ruby 2.7 upgrade, every problem we saw in production
+that wasn’t first caught by CI has been fixed by either patching a C
+extension to use <code>rb_gc_mark</code> in more places, or upgrading a
+gem that has already been fixed.</p>
 <p>If you want to read more about this sort of stuff:</p>
 <ul>
-<li>Aaron “tenderlove” Patterson (author of the 2.7 GC compaction changes) gave a talk about it:<br />
-→ <a href="https://www.youtube.com/watch?v=1F3gXYhQsAY">Compacting Heaps in Ruby 2.7</a></li>
-<li>Aaron’s ticket tracking the GC changes does a good job of explaining the intricacies<br />
-→ <a href="https://bugs.ruby-lang.org/issues/15626">Manual Compaction for MRI’s GC (<code>GC.compact</code>)</a></li>
+<li>Aaron “tenderlove” Patterson (author of the 2.7 GC compaction
+changes) gave a talk about it:<br />
+→ <a href="https://www.youtube.com/watch?v=1F3gXYhQsAY">Compacting Heaps
+in Ruby 2.7</a></li>
+<li>Aaron’s ticket tracking the GC changes does a good job of explaining
+the intricacies<br />
+→ <a href="https://bugs.ruby-lang.org/issues/15626">Manual Compaction
+for MRI’s GC (<code>GC.compact</code>)</a></li>
 <li>Alan Wu’s list of tips for debugging memory movement problems:<br />
-→ <a href="https://alanwu.space/post/check-compaction/">Checking Ruby C extensions for object movement crashes</a></li>
+→ <a href="https://alanwu.space/post/check-compaction/">Checking Ruby C
+extensions for object movement crashes</a></li>
 </ul>
 <p>And if you have any questions, please let me know!</p>
 </main>

@@ -51,11 +51,31 @@
 </nav>
 
 <main>
-<p>Conventional knowledge is that union types are common and intersection types are rare. But actually that’s not the case—intersection types show up in nearly every program Sorbet type checks thanks to control flow.</p>
-<p><a href="https://sorbet.org/docs/union-types">Union types</a> in Sorbet are incredibly common, which should be no surprise. In Sorbet, <code>T.nilable(...)</code> is sugar for <code>T.any(NilClass, ...)</code>. <code>T.nilable</code> shows up all over the place and probably catches more bugs than any other feature in Sorbet.</p>
-<p>Sorbet also has <a href="https://sorbet.org/docs/intersection-types">intersection types</a>. While union types mean “either this or that,” intersection types mean “both this and that.” On first glance, intersection types seem like some super niche feature which only benefits a handful of programs. In Stripe’s Ruby monorepo, the strings <code>T.any</code> and <code>T.nilable</code> occur nearly 300 times more than <code>T.all</code> does.</p>
-<p>But those numbers hide something critical: intersection types power Sorbet’s <a href="https://sorbet.org/docs/flow-sensitive">control flow-sensitive typing</a>. They’re actually present in every Ruby program, but just a little hard to spot. Let’s look at how pervasive they are with a few examples:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># typed: strict</span></span>
+<p>Conventional knowledge is that union types are common and
+intersection types are rare. But actually that’s not the
+case—intersection types show up in nearly every program Sorbet type
+checks thanks to control flow.</p>
+<p><a href="https://sorbet.org/docs/union-types">Union types</a> in
+Sorbet are incredibly common, which should be no surprise. In Sorbet,
+<code>T.nilable(...)</code> is sugar for
+<code>T.any(NilClass, ...)</code>. <code>T.nilable</code> shows up all
+over the place and probably catches more bugs than any other feature in
+Sorbet.</p>
+<p>Sorbet also has <a
+href="https://sorbet.org/docs/intersection-types">intersection
+types</a>. While union types mean “either this or that,” intersection
+types mean “both this and that.” On first glance, intersection types
+seem like some super niche feature which only benefits a handful of
+programs. In Stripe’s Ruby monorepo, the strings <code>T.any</code> and
+<code>T.nilable</code> occur nearly 300 times more than
+<code>T.all</code> does.</p>
+<p>But those numbers hide something critical: intersection types power
+Sorbet’s <a href="https://sorbet.org/docs/flow-sensitive">control
+flow-sensitive typing</a>. They’re actually present in every Ruby
+program, but just a little hard to spot. Let’s look at how pervasive
+they are with a few examples:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># typed: strict</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Sig</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Parent</span>; <span class="cf">end</span></span>
@@ -68,22 +88,65 @@
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    T<span class="at">.reveal_type</span>(x) <span class="co"># Revealed type: `Child`</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p><a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Aclass%20Parent%3B%20end%0Aclass%20Child%20%3C%20Parent%3B%20end%0A%0Asig%20%7Bparams(x%3A%20Parent).void%7D%0Adef%20example1(x)%0A%20%20case%20x%0A%20%20when%20Child%0A%20%20%20%20T.reveal_type(x)%20%23%20Revealed%20type%3A%20%60Child%60%0A%20%20end%0Aend">→ View on sorbet.run</a></p>
-<p>Here <code>x</code> starts out having type <code>Parent</code>, but inside the <code>case</code> statement Sorbet treats <code>x</code> as having the more specific type <code>Child</code>. There’s no <code>T.all</code> in sight, but that’s because it’s hiding. Sorbet doesn’t just throw away the fact that it knew <code>x &lt;: Parent</code>. Instead, it uses <code>T.all</code> to update its type for <code>x</code> to <code>T.all(Parent, Child)</code>.</p>
-<p><code>T.all(Parent, Child)</code> is equivalent to <code>Child</code> because <code>Child</code> is a subtype of <code>Parent</code>. If types represent sets of values, then the set of values represented by <code>Child</code> is a subset of the set of values represented by <code>Parent</code>, so the intersection of those two sets would just leave <code>Child</code>.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">If you’re not convinced, consider: with <code>T.all(Parent, Child)</code> we should be able to call all the methods on <code>Parent</code> and all the methods on <code>Child</code>. But <code>Child</code> inherits <code>Parent</code>’s methods, so any method <code>Parent</code> has will already be on <code>Child</code>. So <code>Child</code> is equivalently good as <code>T.all(Parent, Child)</code>.<br />
+<p><a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Aclass%20Parent%3B%20end%0Aclass%20Child%20%3C%20Parent%3B%20end%0A%0Asig%20%7Bparams(x%3A%20Parent).void%7D%0Adef%20example1(x)%0A%20%20case%20x%0A%20%20when%20Child%0A%20%20%20%20T.reveal_type(x)%20%23%20Revealed%20type%3A%20%60Child%60%0A%20%20end%0Aend">→
+View on sorbet.run</a></p>
+<p>Here <code>x</code> starts out having type <code>Parent</code>, but
+inside the <code>case</code> statement Sorbet treats <code>x</code> as
+having the more specific type <code>Child</code>. There’s no
+<code>T.all</code> in sight, but that’s because it’s hiding. Sorbet
+doesn’t just throw away the fact that it knew
+<code>x &lt;: Parent</code>. Instead, it uses <code>T.all</code> to
+update its type for <code>x</code> to
+<code>T.all(Parent, Child)</code>.</p>
+<p><code>T.all(Parent, Child)</code> is equivalent to <code>Child</code>
+because <code>Child</code> is a subtype of <code>Parent</code>. If types
+represent sets of values, then the set of values represented by
+<code>Child</code> is a subset of the set of values represented by
+<code>Parent</code>, so the intersection of those two sets would just
+leave <code>Child</code>.<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">If you’re not convinced, consider: with
+<code>T.all(Parent, Child)</code> we should be able to call all the
+methods on <code>Parent</code> and all the methods on
+<code>Child</code>. But <code>Child</code> inherits
+<code>Parent</code>’s methods, so any method <code>Parent</code> has
+will already be on <code>Child</code>. So <code>Child</code> is
+equivalently good as <code>T.all(Parent, Child)</code>.<br />
 <br />
 </span></span></p>
-<p>Sorbet attempts to simplify a large type to a smaller, equivalent type when it can for two reasons:</p>
+<p>Sorbet attempts to simplify a large type to a smaller, equivalent
+type when it can for two reasons:</p>
 <ul>
-<li><p><span class="smallcaps"><strong>Usability</strong></span> – Most users don’t know that <code>T.all</code> means “intersection type” or even what intersection types are. (And even those who do still end up drawing Venn diagrams from time to time!) It only gets more complicated when <code>T.all</code>s and <code>T.any</code>s nest inside each other.</p>
-<p>Meanwhile, <code>Child</code> is a super easy type to understand, and leads to nice, short error messages.</p></li>
-<li><p><span class="smallcaps"><strong>Performance</strong></span> – Checking whether one type is a subtype of another is a super common operation, so it has to be fast. By collapsing <code>T.all(Parent, Child)</code> to <code>Child</code>, Sorbet does at least half as much work when checking subtyping (probably more, because of some common path optimizations).</p>
-<p>When this simplification happens, Sorbet even skips an allocation entirely. Cnstructing <code>T.all(Parent, Child)</code> in Sorbet short circuits and returns a reference to the already allocated <code>Child</code> type that was passed as an argument (with ownership tracked via <code>std::shared_ptr</code><span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">If you’re looking for a good intro to modern C++ things like <code>shared_ptr</code>, I can’t recommend <a href="https://berthub.eu/articles/posts/cpp-intro/">this blog post series</a> enough.<br />
+<li><p><span class="smallcaps"><strong>Usability</strong></span> – Most
+users don’t know that <code>T.all</code> means “intersection type” or
+even what intersection types are. (And even those who do still end up
+drawing Venn diagrams from time to time!) It only gets more complicated
+when <code>T.all</code>s and <code>T.any</code>s nest inside each
+other.</p>
+<p>Meanwhile, <code>Child</code> is a super easy type to understand, and
+leads to nice, short error messages.</p></li>
+<li><p><span class="smallcaps"><strong>Performance</strong></span> –
+Checking whether one type is a subtype of another is a super common
+operation, so it has to be fast. By collapsing
+<code>T.all(Parent, Child)</code> to <code>Child</code>, Sorbet does at
+least half as much work when checking subtyping (probably more, because
+of some common path optimizations).</p>
+<p>When this simplification happens, Sorbet even skips an allocation
+entirely. Cnstructing <code>T.all(Parent, Child)</code> in Sorbet short
+circuits and returns a reference to the already allocated
+<code>Child</code> type that was passed as an argument (with ownership
+tracked via <code>std::shared_ptr</code><span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">If you’re looking for a good intro to modern C++ things
+like <code>shared_ptr</code>, I can’t recommend <a
+href="https://berthub.eu/articles/posts/cpp-intro/">this blog post
+series</a> enough.<br />
 <br />
 </span></span>).</p></li>
 </ul>
 <p>Let’s look at another example of control flow:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># typed: strict</span></span>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># typed: strict</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Sig</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A; <span class="cf">end</span></span>
@@ -96,9 +159,18 @@
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    T<span class="at">.reveal_type</span>(a_or_b) <span class="co"># Revealed type: `A`</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p><a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Aclass%20A%3B%20end%0Aclass%20B%3B%20end%0A%0Asig%20%7Bparams(a_or_b%3A%20T.any(A%2C%20B)).void%7D%0Adef%20example2(a_or_b)%0A%20%20case%20a_or_b%0A%20%20when%20A%0A%20%20%20%20T.reveal_type(a_or_b)%20%23%20Revealed%20type%3A%20%60A%60%0A%20%20end%0Aend">→ View on sorbet.run</a></p>
-<p>This example method accepts either <code>A</code> or <code>B</code> (<code>T.any(A, B)</code>) and then branches on whether <code>a_or_b</code> is an instance of <code>A</code>. Again: Sorbet doesn’t throw away that it knows <code>a_or_b &lt;: T.any(A, B)</code>. Instead it updates its knowledge of the type of <code>a_or_b</code> using <code>T.all</code> to get <code>T.all(T.any(A, B), A)</code>. Realizing that this is equivalent to <code>A</code> is a bit trickier:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>T<span class="at">.all</span>(T<span class="at">.any</span>(A, B), A)</span>
+<p><a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Aclass%20A%3B%20end%0Aclass%20B%3B%20end%0A%0Asig%20%7Bparams(a_or_b%3A%20T.any(A%2C%20B)).void%7D%0Adef%20example2(a_or_b)%0A%20%20case%20a_or_b%0A%20%20when%20A%0A%20%20%20%20T.reveal_type(a_or_b)%20%23%20Revealed%20type%3A%20%60A%60%0A%20%20end%0Aend">→
+View on sorbet.run</a></p>
+<p>This example method accepts either <code>A</code> or <code>B</code>
+(<code>T.any(A, B)</code>) and then branches on whether
+<code>a_or_b</code> is an instance of <code>A</code>. Again: Sorbet
+doesn’t throw away that it knows <code>a_or_b &lt;: T.any(A, B)</code>.
+Instead it updates its knowledge of the type of <code>a_or_b</code>
+using <code>T.all</code> to get <code>T.all(T.any(A, B), A)</code>.
+Realizing that this is equivalent to <code>A</code> is a bit
+trickier:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>T<span class="at">.all</span>(T<span class="at">.any</span>(A, B), A)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Distribute</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>T<span class="at">.any</span>( T<span class="at">.all</span>(A, A) , T<span class="at">.all</span>(B, A) )</span>
@@ -112,9 +184,18 @@
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># bottom is the identity of union</span></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>A</span></code></pre></div>
-<p>You can start to see how usability and performance and might get a little out of hand if Sorbet didn’t keep attempting to simplify things! The cumulative effect of all the control flow in a program would result in huge, unweidly types.</p>
-<p>Until now you could claim that I’ve been hyping up intersection types as the solution to problems that were self-imposed. That if we just invented some other method for modeling control flow, it would have been naturally usable or naturally performant, and we wouldn’t have had problems in the first place. So next let’s look at some examples to see why intersection types really are the most natural solution:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="cn">I1</span></span>
+<p>You can start to see how usability and performance and might get a
+little out of hand if Sorbet didn’t keep attempting to simplify things!
+The cumulative effect of all the control flow in a program would result
+in huge, unweidly types.</p>
+<p>Until now you could claim that I’ve been hyping up intersection types
+as the solution to problems that were self-imposed. That if we just
+invented some other method for modeling control flow, it would have been
+naturally usable or naturally performant, and we wouldn’t have had
+problems in the first place. So next let’s look at some examples to see
+why intersection types really are the most natural solution:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="cn">I1</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> foo1; <span class="cf">end</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="cn">I2</span></span>
@@ -130,22 +211,54 @@
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    x<span class="at">.foo2</span></span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p><a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Amodule%20I1%0A%20%20def%20foo1%3B%20end%0Aend%0Amodule%20I2%0A%20%20def%20foo2%3B%20end%0Aend%0A%0Asig%20%7Bparams(x%3A%20I1).void%7D%0Adef%20example3(x)%0A%20%20x.foo1%20%20%23%20Works%20outside%0A%20%20case%20x%0A%20%20when%20I2%0A%20%20%20%20x.foo1%20%20%23%20Should%20(and%20does)%20still%20work%20inside%0A%20%20%20%20x.foo2%0A%20%20end%0Aend%0A">→ View on sorbet.run</a></p>
-<p>Unlike in the other examples, this is the first example where had we tried to implement control-flow-sensitive typing by throwing away the old type and using the new type instead it wouldn’t have worked. The key thing to notice: this example uses modules. Outside the <code>case</code> of course calling <code>x.method_from_1</code> works because <code>x</code> starts out at type <code>I1</code>. But if we treated <code>x</code> as only <code>I2</code> inside the <code>when I2</code>, we’d start reporting an error for calling <code>x.method_from_1</code> because it doesn’t exist on <code>I2</code>.</p>
-<p>Unlike intersecting unrelated classes (our <code>T.all(B, A)</code> example from earlier), intersecting unrelated modules does’t collapse to <code>T.noreturn</code>. There’s nothing stopping some class from including both <code>I1</code> and <code>I2</code>. Instances of that class would be values of type <code>T.any(I1, I2)</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">SomeClass</span></span>
+<p><a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Amodule%20I1%0A%20%20def%20foo1%3B%20end%0Aend%0Amodule%20I2%0A%20%20def%20foo2%3B%20end%0Aend%0A%0Asig%20%7Bparams(x%3A%20I1).void%7D%0Adef%20example3(x)%0A%20%20x.foo1%20%20%23%20Works%20outside%0A%20%20case%20x%0A%20%20when%20I2%0A%20%20%20%20x.foo1%20%20%23%20Should%20(and%20does)%20still%20work%20inside%0A%20%20%20%20x.foo2%0A%20%20end%0Aend%0A">→
+View on sorbet.run</a></p>
+<p>Unlike in the other examples, this is the first example where had we
+tried to implement control-flow-sensitive typing by throwing away the
+old type and using the new type instead it wouldn’t have worked. The key
+thing to notice: this example uses modules. Outside the
+<code>case</code> of course calling <code>x.method_from_1</code> works
+because <code>x</code> starts out at type <code>I1</code>. But if we
+treated <code>x</code> as only <code>I2</code> inside the
+<code>when I2</code>, we’d start reporting an error for calling
+<code>x.method_from_1</code> because it doesn’t exist on
+<code>I2</code>.</p>
+<p>Unlike intersecting unrelated classes (our <code>T.all(B, A)</code>
+example from earlier), intersecting unrelated modules does’t collapse to
+<code>T.noreturn</code>. There’s nothing stopping some class from
+including both <code>I1</code> and <code>I2</code>. Instances of that
+class would be values of type <code>T.any(I1, I2)</code>:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">SomeClass</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="cn">I1</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="cn">I2</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># This type assertion is okay:</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>T<span class="at">.let</span>(<span class="dt">SomeClass</span><span class="at">.new</span>, T<span class="at">.all</span>(<span class="cn">I1</span>, <span class="cn">I2</span>))</span></code></pre></div>
-<p><a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Amodule%20I1%0A%20%20def%20foo1%3B%20end%0Aend%0Amodule%20I2%0A%20%20def%20foo2%3B%20end%0Aend%0A%0Asig%20%7Bparams(x%3A%20I1).void%7D%0Adef%20example3(x)%0A%20%20x.foo1%20%20%23%20Works%20outside%0A%20%20case%20x%0A%20%20when%20I2%0A%20%20%20%20x.foo1%20%20%23%20Should%20(and%20does)%20still%20work%20inside%0A%20%20%20%20x.foo2%0A%20%20end%0Aend%0A%0Aclass%20SomeClass%0A%20%20include%20I1%0A%20%20include%20I2%0Aend%0A%0A%23%20This%20type%20assertion%20is%20okay%3A%0AT.let(SomeClass.new%2C%20T.all(I1%2C%20I2))">→ View on sorbet.run</a></p>
-<p>So at least for implementing certain cases of flow sensitive typing, we’ll <em>need</em> intersection types anyways. Then for these certain cases we’d incur the usability and performance problems we discovered earlier and have to solve them.</p>
-<p>But more than that, intersection types are fundamentally easier to work with compared to some ad hoc approach to flow sensitive typing. Type system bugs are weird. It’s frquently harder to figure out whether the current behavior is buggy in the first place than it is to find the cause!</p>
-<p>In that light, intersection types present an elegant, robust model for arriving at what the correct behavior <em>should</em> be, independent of what Sorbet’s existing behavior is. It’s clear how intersection types interact with union types, and with subtyping, and with generics, and with variance, etc.</p>
-<p>By repurposing intersection types to model control flow sensitivity, when things go wrong there’s a framework for discovering what’s right.</p>
-<p>(Speaking of repurposing, intersection types also play an important role in how Sorbet <a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Amodule%20M%3B%20end%0Amodule%20N%3B%20end%0A%0Asig%20%7Bparams(m%3A%20M).void%7D%0Adef%20takes_m(m)%3B%20end%0Asig%20%7Bparams(n%3A%20N).void%7D%0Adef%20takes_n(n)%3B%20end%0A%0Adef%20needs_sig(x)%0A%20%20takes_m(x)%0A%20%20takes_n(x)%0Aend">suggests potential method signatures</a>! That’s three birds with one stone.)</p>
+<p><a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Amodule%20I1%0A%20%20def%20foo1%3B%20end%0Aend%0Amodule%20I2%0A%20%20def%20foo2%3B%20end%0Aend%0A%0Asig%20%7Bparams(x%3A%20I1).void%7D%0Adef%20example3(x)%0A%20%20x.foo1%20%20%23%20Works%20outside%0A%20%20case%20x%0A%20%20when%20I2%0A%20%20%20%20x.foo1%20%20%23%20Should%20(and%20does)%20still%20work%20inside%0A%20%20%20%20x.foo2%0A%20%20end%0Aend%0A%0Aclass%20SomeClass%0A%20%20include%20I1%0A%20%20include%20I2%0Aend%0A%0A%23%20This%20type%20assertion%20is%20okay%3A%0AT.let(SomeClass.new%2C%20T.all(I1%2C%20I2))">→
+View on sorbet.run</a></p>
+<p>So at least for implementing certain cases of flow sensitive typing,
+we’ll <em>need</em> intersection types anyways. Then for these certain
+cases we’d incur the usability and performance problems we discovered
+earlier and have to solve them.</p>
+<p>But more than that, intersection types are fundamentally easier to
+work with compared to some ad hoc approach to flow sensitive typing.
+Type system bugs are weird. It’s frquently harder to figure out whether
+the current behavior is buggy in the first place than it is to find the
+cause!</p>
+<p>In that light, intersection types present an elegant, robust model
+for arriving at what the correct behavior <em>should</em> be,
+independent of what Sorbet’s existing behavior is. It’s clear how
+intersection types interact with union types, and with subtyping, and
+with generics, and with variance, etc.</p>
+<p>By repurposing intersection types to model control flow sensitivity,
+when things go wrong there’s a framework for discovering what’s
+right.</p>
+<p>(Speaking of repurposing, intersection types also play an important
+role in how Sorbet <a
+href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Amodule%20M%3B%20end%0Amodule%20N%3B%20end%0A%0Asig%20%7Bparams(m%3A%20M).void%7D%0Adef%20takes_m(m)%3B%20end%0Asig%20%7Bparams(n%3A%20N).void%7D%0Adef%20takes_n(n)%3B%20end%0A%0Adef%20needs_sig(x)%0A%20%20takes_m(x)%0A%20%20takes_n(x)%0Aend">suggests
+potential method signatures</a>! That’s three birds with one stone.)</p>
 <!-- vim:tw=72
 -->
 </main>

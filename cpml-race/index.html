@@ -51,21 +51,44 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#setup-snippets-from-the-book">Setup: Snippets from the Book</a></li>
-  <li><a href="#a-trace-to-expose-the-problem">A trace to expose the problem</a></li>
-  <li><a href="#fixing-the-stale-read">Fixing the stale read</a></li>
+  <li><a href="#setup-snippets-from-the-book"
+  id="toc-setup-snippets-from-the-book">Setup: Snippets from the
+  Book</a></li>
+  <li><a href="#a-trace-to-expose-the-problem"
+  id="toc-a-trace-to-expose-the-problem">A trace to expose the
+  problem</a></li>
+  <li><a href="#fixing-the-stale-read"
+  id="toc-fixing-the-stale-read">Fixing the stale read</a></li>
   </ul>
 </nav>
 
 <main>
-<p>Lately I’ve been super interested in language models for concurrency, after hearing a fascinating talk from Adam Solove on <a href="https://medium.com/@asolove/synchronizable-abstractions-for-understandable-concurrency-64ae57cd61d1">synchronizable abstractions for UI</a>.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">Unfortunately, the talk isn’t online (Adam presented it at work), so the blog post linked above is the next best thing!<br />
+<p>Lately I’ve been super interested in language models for concurrency,
+after hearing a fascinating talk from Adam Solove on <a
+href="https://medium.com/@asolove/synchronizable-abstractions-for-understandable-concurrency-64ae57cd61d1">synchronizable
+abstractions for UI</a>.<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">Unfortunately, the talk isn’t online (Adam presented it
+at work), so the blog post linked above is the next best thing!<br />
 <br />
-</span></span> I’ve been working my way through a handful of books, including <a href="https://simonmar.github.io/pages/pcph.html">PCPH</a>, the Concurrency section of <a href="http://www.cs.cmu.edu/~rwh/pfpl.html">PFPL</a>, and most recently <a href="http://www.cambridge.org/gb/academic/subjects/computer-science/distributed-networked-and-mobile-computing/concurrent-programming-ml?format=AR">Concurrent Programming in ML</a>, by John Reppy.</p>
-<p>In particular, I think I’ve found a race condition in one of the code listings of Concurrent Programming in ML. After introducing the listing itself, we’ll walk through a trace that shows the errant behavior, then propose a small change that prevents it from happening.</p>
+</span></span> I’ve been working my way through a handful of books,
+including <a href="https://simonmar.github.io/pages/pcph.html">PCPH</a>,
+the Concurrency section of <a
+href="http://www.cs.cmu.edu/~rwh/pfpl.html">PFPL</a>, and most recently
+<a
+href="http://www.cambridge.org/gb/academic/subjects/computer-science/distributed-networked-and-mobile-computing/concurrent-programming-ml?format=AR">Concurrent
+Programming in ML</a>, by John Reppy.</p>
+<p>In particular, I think I’ve found a race condition in one of the code
+listings of Concurrent Programming in ML. After introducing the listing
+itself, we’ll walk through a trace that shows the errant behavior, then
+propose a small change that prevents it from happening.</p>
 <h1 id="setup-snippets-from-the-book">Setup: Snippets from the Book</h1>
-<p>Before we begin, here’s the listing in full. It’s a sample implementation of a 1-element concurrent buffer, using condition variables. It supports creation, insertion, and removal.</p>
+<p>Before we begin, here’s the listing in full. It’s a sample
+implementation of a 1-element concurrent buffer, using condition
+variables. It supports creation, insertion, and removal.</p>
 <figure>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource sml numberLines"><code class="sourceCode sml"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">datatype</span> &#39;a buffer = BUF <span class="kw">of</span> {</span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode numberSource sml numberLines"><code class="sourceCode sml"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">datatype</span> &#39;a buffer = BUF <span class="kw">of</span> {</span>
 <span id="cb1-2"><a href="#cb1-2"></a>  data      : &#39;a <span class="dt">option</span> <span class="dt">ref</span>,</span>
 <span id="cb1-3"><a href="#cb1-3"></a>  mu        : mutex,</span>
 <span id="cb1-4"><a href="#cb1-4"></a>  dataAvail : condition,</span>
@@ -101,28 +124,56 @@
 Concurrent Programming in ML, Listing 2.3
 </figcaption>
 </figure>
-<p>You might also want to reference this exerpt which explains the semantics of the concurrency primitives at play in the snippet above: locks and condition variables. Study the listing above and exerpt below for a moment. See if you can spot a race, or are convinced the code is correct.</p>
+<p>You might also want to reference this exerpt which explains the
+semantics of the concurrency primitives at play in the snippet above:
+locks and condition variables. Study the listing above and exerpt below
+for a moment. See if you can spot a race, or are convinced the code is
+correct.</p>
 <blockquote>
 <p>The semantics of the expression</p>
 <p><code>withLock mu f x</code></p>
-<p>are that first the lock mu is acquired, then the function f is applied to x, and then the function’s result is returned after releasing the lock.</p>
+<p>are that first the lock mu is acquired, then the function f is
+applied to x, and then the function’s result is returned after releasing
+the lock.</p>
 <p>The basic operations on condition variables are</p>
 <p><code>val wait : condition -&gt; unit</code></p>
 <p>which causes a process to block on the condition variable, and</p>
 <p><code>val signal : condition -&gt; unit</code></p>
-<p>which wakes up one waiting process. A condition variable is associated with a specific mutex lock, which must be held when performing a wait operation on the variable. The semantics of the wait operation are that the mutex lock is released, and then the process is blocked; when the condition is signaled, the next process in the condition’s waiting queue is unblocked and it reacquires the mutex lock and proceeds. A signal operation on a condition variable that has an empty waiting queue has no effect; in this sense condition variables are memoryless.</p>
+<p>which wakes up one waiting process. A condition variable is
+associated with a specific mutex lock, which must be held when
+performing a wait operation on the variable. The semantics of the wait
+operation are that the mutex lock is released, and then the process is
+blocked; when the condition is signaled, the next process in the
+condition’s waiting queue is unblocked and it reacquires the mutex lock
+and proceeds. A signal operation on a condition variable that has an
+empty waiting queue has no effect; in this sense condition variables are
+memoryless.</p>
 <p>— <em>Concurrent Programming in ML</em>, section 2.4.2</p>
 </blockquote>
-<h1 id="a-trace-to-expose-the-problem">A trace to expose the problem</h1>
-<p>The problem I see has to do with SML’s eager evaluation: before calling a function <code>f e</code>, we evaluate <code>e</code> to a value <code>v</code>. Then substitution kicks in and we substitute <code>v</code> into the body of <code>f</code>. For us, that means that in the definition of <code>insert</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sml"><code class="sourceCode sml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fun</span> insert <span class="co">(* ··· *)</span> =</span>
+<h1 id="a-trace-to-expose-the-problem">A trace to expose the
+problem</h1>
+<p>The problem I see has to do with SML’s eager evaluation: before
+calling a function <code>f e</code>, we evaluate <code>e</code> to a
+value <code>v</code>. Then substitution kicks in and we substitute
+<code>v</code> into the body of <code>f</code>. For us, that means that
+in the definition of <code>insert</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode sml"><code class="sourceCode sml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fun</span> insert <span class="co">(* ··· *)</span> =</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">(* ··· *)</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    withLock mu waitLp (!data)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">(* ··· *)</span></span></code></pre></div>
-<p>we evaluate <code>!data</code> to a value before we run the body of <code>withLock</code> to acquire the lock. When inserting into an empty queue, <code>!data</code> evaluates to <code>NONE</code>. And since this happens outside the <code>withLock</code> if two calls to insert attempt to acquire the lock at the same time, they’ll both think the queue is empty when they wake up! When this happens, the one to wake up second will unknowingly overwrite what the first one inserted.</p>
-<p>Here’s a sample trace of a program allocating a buffer and then doing two concurrent insertions:</p>
+<p>we evaluate <code>!data</code> to a value before we run the body of
+<code>withLock</code> to acquire the lock. When inserting into an empty
+queue, <code>!data</code> evaluates to <code>NONE</code>. And since this
+happens outside the <code>withLock</code> if two calls to insert attempt
+to acquire the lock at the same time, they’ll both think the queue is
+empty when they wake up! When this happens, the one to wake up second
+will unknowingly overwrite what the first one inserted.</p>
+<p>Here’s a sample trace of a program allocating a buffer and then doing
+two concurrent insertions:</p>
 <figure class="wide">
-<div class="sourceCode" id="cb3"><pre class="sourceCode sml"><code class="sourceCode sml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">(* &#39;=&gt;&#39; marks steps where two threads evolve concurrently  *)</span></span>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode sml"><code class="sourceCode sml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">(* &#39;=&gt;&#39; marks steps where two threads evolve concurrently  *)</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">(* &#39;-&gt;&#39; marks steps where just one thread evalautes        *)</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>-&gt; <span class="kw">val</span> buf = buffer ()</span>
@@ -158,11 +209,19 @@ Concurrent Programming in ML, Listing 2.3
 Sample trace, showing that first insert gets dropped
 </figcaption>
 </figure>
-<p>Notice how the stale read allowed two consecutive inserts. What we wanted was for the second insert to wake up, see that the buffer is full, then wait for the <code>dataEmpty</code> condition variable to wake it up. So having the <code>!data</code> outside the lock is not good.</p>
+<p>Notice how the stale read allowed two consecutive inserts. What we
+wanted was for the second insert to wake up, see that the buffer is
+full, then wait for the <code>dataEmpty</code> condition variable to
+wake it up. So having the <code>!data</code> outside the lock is not
+good.</p>
 <h1 id="fixing-the-stale-read">Fixing the stale read</h1>
-<p>The solution to this is to delay evaluating <code>!data</code> until the body of the <code>waitLp</code> function, which only executes when we have the lock. This ensures that we don’t read a stale value for the content of the buffer.</p>
+<p>The solution to this is to delay evaluating <code>!data</code> until
+the body of the <code>waitLp</code> function, which only executes when
+we have the lock. This ensures that we don’t read a stale value for the
+content of the buffer.</p>
 <figure>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource sml numberLines"><code class="sourceCode sml"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">datatype</span> &#39;a buffer = <span class="co">(* ··· *)</span></span>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode numberSource sml numberLines"><code class="sourceCode sml"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">datatype</span> &#39;a buffer = <span class="co">(* ··· *)</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="kw">fun</span> buffer () = <span class="co">(* ··· *)</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a></span>
 <span id="cb4-4"><a href="#cb4-4"></a><span class="kw">fun</span> insert (BUF {data, mu, dataAvail, dataEmpty}, v) =</span>
@@ -189,8 +248,16 @@ Sample trace, showing that first insert gets dropped
 Listing 2.3, updated to avoid race
 </figcaption>
 </figure>
-<p>Pretty small bug, and it doesn’t detract from the main point of the listing, which is to show how to use condition variables in a sort of “mutually recursive” style where <code>dataEmpty</code> wakes up <code>insert</code> which signals on <code>dataAvail</code> which wakes up <code>remove</code>.</p>
-<p>This also underscores how difficult it really is to ensure correctness in the presence of concurrency! That’s exactly why I’ve been reading about all these language models for concurrency, to better understand how we can leverage our programming language to ensure our programs are correct by construction.</p>
+<p>Pretty small bug, and it doesn’t detract from the main point of the
+listing, which is to show how to use condition variables in a sort of
+“mutually recursive” style where <code>dataEmpty</code> wakes up
+<code>insert</code> which signals on <code>dataAvail</code> which wakes
+up <code>remove</code>.</p>
+<p>This also underscores how difficult it really is to ensure
+correctness in the presence of concurrency! That’s exactly why I’ve been
+reading about all these language models for concurrency, to better
+understand how we can leverage our programming language to ensure our
+programs are correct by construction.</p>
 <!-- vim:tw=72
 -->
 </main>

@@ -51,11 +51,18 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#dsls-and-metaprogramming">DSLs and metaprogramming</a></li>
-  <li><a href="#modeling-mutation">Modeling mutation</a></li>
-  <li><a href="#beyond-mutation">Beyond mutation</a></li>
-  <li><a href="#appendix-a-by-comparison-with-typed-javascript">Appendix A: By comparison with typed JavaScript</a></li>
-  <li><a href="#appendix-b-more-things-that-are-actually-mutation">Appendix B: More things that are actually mutation</a></li>
+  <li><a href="#dsls-and-metaprogramming"
+  id="toc-dsls-and-metaprogramming">DSLs and metaprogramming</a></li>
+  <li><a href="#modeling-mutation" id="toc-modeling-mutation">Modeling
+  mutation</a></li>
+  <li><a href="#beyond-mutation" id="toc-beyond-mutation">Beyond
+  mutation</a></li>
+  <li><a href="#appendix-a-by-comparison-with-typed-javascript"
+  id="toc-appendix-a-by-comparison-with-typed-javascript">Appendix A: By
+  comparison with typed JavaScript</a></li>
+  <li><a href="#appendix-b-more-things-that-are-actually-mutation"
+  id="toc-appendix-b-more-things-that-are-actually-mutation">Appendix B:
+  More things that are actually mutation</a></li>
   </ul>
 </nav>
 
@@ -63,31 +70,50 @@
 <p>
 </p>
 <!-- more -->
-<p>Mutation makes typechecking Ruby harder than many other programming languages. Most people will immediately think I mean mutation in the sense of <code>x += 1</code> or something—that’s not what I’m referring to. In fact, that’s the easy kind of mutation to model in a type system.</p>
-<p>What I mean is that nearly everything worth knowing statically about a Ruby program involves mutation. Defining a class?</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<p>Mutation makes typechecking Ruby harder than many other programming
+languages. Most people will immediately think I mean mutation in the
+sense of <code>x += 1</code> or something—that’s not what I’m referring
+to. In fact, that’s the easy kind of mutation to model in a type
+system.</p>
+<p>What I mean is that nearly everything worth knowing statically about
+a Ruby program involves mutation. Defining a class?</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>That mutates the global namespace of constants. After those lines run, all code in the project can reference the class <code>A</code>.</p>
+<p>That mutates the global namespace of constants. After those lines
+run, all code in the project can reference the class <code>A</code>.</p>
 <p>Defining a method?</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> foo</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> <span class="vs">&#39;hello&#39;</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>The method <code>foo</code> is undefined just before the <code>def</code> block (at runtime!), but defined after—mutation again.</p>
-<p>Ruby provides things like <code>attr_reader</code> and <code>attr_accessor</code> to define getter and setter methods:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> B</span>
+<p>The method <code>foo</code> is undefined just before the
+<code>def</code> block (at runtime!), but defined after—mutation
+again.</p>
+<p>Ruby provides things like <code>attr_reader</code> and
+<code>attr_accessor</code> to define getter and setter methods:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> B</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">attr_reader</span> <span class="wa">:foo</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p><code>attr_reader</code> is not a Ruby keyword, contrary to popular belief: it’s a method on the singleton class which takes an argument. It defines an instance method called <code>foo</code> as a side effect by mutating the class <code>B</code>.</p>
+<p><code>attr_reader</code> is not a Ruby keyword, contrary to popular
+belief: it’s a method on the singleton class which takes an argument. It
+defines an instance method called <code>foo</code> as a side effect by
+mutating the class <code>B</code>.</p>
 <p>It’s the same for mixing modules into classes:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> M; <span class="cf">end</span></span>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> M; <span class="cf">end</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> C</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> M</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p><code>include</code> is another method disguised like a keyword which mutates the class’s list of ancestors.</p>
-<p>One of my least favorite Ruby features: you can <strong>redefine</strong> (not override) a method:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> D</span>
+<p><code>include</code> is another method disguised like a keyword which
+mutates the class’s list of ancestors.</p>
+<p>One of my least favorite Ruby features: you can
+<strong>redefine</strong> (not override) a method:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> D</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">attr_reader</span> <span class="wa">:foo</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  alias_method <span class="wa">:old_foo</span>, <span class="wa">:foo</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> foo</span>
@@ -95,42 +121,121 @@
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    old_foo</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>Because <code>D#foo</code> is defined by the <code>attr_reader</code> line, the subsequent <code>def</code> overwrites it (akin to mutating a local variable, like <code>x += 1</code>). Oh and that <code>alias_method</code>? Another method looking like a keyword which mutates the class.</p>
+<p>Because <code>D#foo</code> is defined by the <code>attr_reader</code>
+line, the subsequent <code>def</code> overwrites it (akin to mutating a
+local variable, like <code>x += 1</code>). Oh and that
+<code>alias_method</code>? Another method looking like a keyword which
+mutates the class.</p>
 <p>Even the way libraries work in Ruby is powered by mutation:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;some_gem&#39;</span></span></code></pre></div>
-<p><code>require</code> is a method (again, not a keyword) that looks up and runs arbitrary Ruby code, whose result we discard. It’s only convention that the primary side effect of the <code>require</code>’d code is to mutate the global namespace, defining more classes and methods.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;some_gem&#39;</span></span></code></pre></div>
+<p><code>require</code> is a method (again, not a keyword) that looks up
+and runs arbitrary Ruby code, whose result we discard. It’s only
+convention that the primary side effect of the <code>require</code>’d
+code is to mutate the global namespace, defining more classes and
+methods.</p>
 <h1 id="dsls-and-metaprogramming">DSLs and metaprogramming</h1>
-<p>It would be one thing if Ruby constrained the places where this mutation could occur. But instead, it provides first-class support for these features anywhere Ruby code runs. Everything we’ve seen so far can be hidden behind arbitrary computation at runtime:</p>
+<p>It would be one thing if Ruby constrained the places where this
+mutation could occur. But instead, it provides first-class support for
+these features anywhere Ruby code runs. Everything we’ve seen so far can
+be hidden behind arbitrary computation at runtime:</p>
 <ul>
-<li>With <code>Module#const_set</code>, a Ruby program can compute an arbitrary name and use it to create new constant at runtime.</li>
+<li>With <code>Module#const_set</code>, a Ruby program can compute an
+arbitrary name and use it to create new constant at runtime.</li>
 <li><code>Module#define_method</code> does the same for methods.</li>
-<li>Again <code>require</code> is a method, so it can occur wherever other methods are called.</li>
+<li>Again <code>require</code> is a method, so it can occur wherever
+other methods are called.</li>
 </ul>
-<p>It’s not uncommon to see Ruby libraries embrace this rather than avoid it (Rails definitely does). Ruby programs frequently build up large abstractions and do tons of computation which at the end of the day result in a <code>define_method</code> or a <code>const_set</code>.</p>
-<p>Rubyists call this “metaprogramming” or “building DSLs” but I call it like I see it: mutation.</p>
+<p>It’s not uncommon to see Ruby libraries embrace this rather than
+avoid it (Rails definitely does). Ruby programs frequently build up
+large abstractions and do tons of computation which at the end of the
+day result in a <code>define_method</code> or a
+<code>const_set</code>.</p>
+<p>Rubyists call this “metaprogramming” or “building DSLs” but I call it
+like I see it: mutation.</p>
 <h1 id="modeling-mutation">Modeling mutation</h1>
-<p>Type systems are notoriously bad at modelling this kind of mutation. Look at other typed, object-oriented languages: Java, Scala, C++, … Each of these languages <strong>forbids</strong> this kind of mutation. (Whether because it’s hard to implement support for it or because they’re making a value judgement is beyond me.)</p>
-<p>So how can Sorbet can model this? Mostly, it just cheats. Err, “approximates.” From my experience working on the Sorbet team, I can think of three main ways it cheats.</p>
-<p>First, Sorbet assumes that if a class or method might exist, it does exist, and universally throughout a project.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">Frequently this assumption is backed up by an autoloader. For example, Rails includes an autoloader that loads constants lazily on demand, so that the programmer doesn’t have to sprinkle require statements throughout the code. But how do autoloads work? Mutation again 🙂.<br />
+<p>Type systems are notoriously bad at modelling this kind of mutation.
+Look at other typed, object-oriented languages: Java, Scala, C++, … Each
+of these languages <strong>forbids</strong> this kind of mutation.
+(Whether because it’s hard to implement support for it or because
+they’re making a value judgement is beyond me.)</p>
+<p>So how can Sorbet can model this? Mostly, it just cheats. Err,
+“approximates.” From my experience working on the Sorbet team, I can
+think of three main ways it cheats.</p>
+<p>First, Sorbet assumes that if a class or method might exist, it does
+exist, and universally throughout a project.<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">Frequently this assumption is backed up by an
+autoloader. For example, Rails includes an autoloader that loads
+constants lazily on demand, so that the programmer doesn’t have to
+sprinkle require statements throughout the code. But how do autoloads
+work? Mutation again 🙂.<br />
 <br />
-</span></span> It pretends that all <code>include</code>, <code>extend</code>, and <code>alias_method</code> statements in a class run first, before all other code at the top-level of that class. It restricts method redefinitions—the old and new methods must take the same number and kinds of arguments. And it restricts <code>alias_method</code>: you can only alias to a method on your class, not to a parent class. Sorbet makes no attempt to model <code>undef_method</code> at all (another method-not-keyword!).</p>
-<p>Second, Sorbet cheats by implementing heuristics for the most common DSLs. To support <code>attr_reader</code>, Sorbet says, “Hey, this method call happens to be to some method named <code>attr_reader</code>. I’m not sure if it’s to <code>Module#attr_reader</code> or to some other <code>attr_reader</code> definition or to any definition at all, but it’s provided with a single Symbol argument, the result is discarded, and it’s called at the syntactic top-level of a class, so I bet that it is a call to <code>Module#attr_reader</code>.” It’s similar for many other popular DSLs: it makes decent educated guesses.</p>
-<p>But after all that, it sort of gives up. Sorbet makes no attempts to work backwards from a call to <code>define_method</code> or <code>const_set</code> inside a method body to learn that a class or method might have been defined somewhere. Instead, it cheats one last time and uses runtime information.</p>
-<p>As a part of initializing a Sorbet project, Sorbet <code>require</code>s (read: executes) as much code in a project as it can: all the gems listed in the Gemfile and all the Ruby files in the current folder. Afterwards, it can see the result of all that’s been mutated thus far (via reflection) and serialize what it sees into <a href="https://sorbet.org/docs/rbi">RBI files</a> to convey what it saw to the static checker. This is still imperfect (it completely misses things that are defined after <code>require</code> time), but empirically it finds most of the remaining undiscovered definitions.</p>
+</span></span> It pretends that all <code>include</code>,
+<code>extend</code>, and <code>alias_method</code> statements in a class
+run first, before all other code at the top-level of that class. It
+restricts method redefinitions—the old and new methods must take the
+same number and kinds of arguments. And it restricts
+<code>alias_method</code>: you can only alias to a method on your class,
+not to a parent class. Sorbet makes no attempt to model
+<code>undef_method</code> at all (another method-not-keyword!).</p>
+<p>Second, Sorbet cheats by implementing heuristics for the most common
+DSLs. To support <code>attr_reader</code>, Sorbet says, “Hey, this
+method call happens to be to some method named <code>attr_reader</code>.
+I’m not sure if it’s to <code>Module#attr_reader</code> or to some other
+<code>attr_reader</code> definition or to any definition at all, but
+it’s provided with a single Symbol argument, the result is discarded,
+and it’s called at the syntactic top-level of a class, so I bet that it
+is a call to <code>Module#attr_reader</code>.” It’s similar for many
+other popular DSLs: it makes decent educated guesses.</p>
+<p>But after all that, it sort of gives up. Sorbet makes no attempts to
+work backwards from a call to <code>define_method</code> or
+<code>const_set</code> inside a method body to learn that a class or
+method might have been defined somewhere. Instead, it cheats one last
+time and uses runtime information.</p>
+<p>As a part of initializing a Sorbet project, Sorbet
+<code>require</code>s (read: executes) as much code in a project as it
+can: all the gems listed in the Gemfile and all the Ruby files in the
+current folder. Afterwards, it can see the result of all that’s been
+mutated thus far (via reflection) and serialize what it sees into <a
+href="https://sorbet.org/docs/rbi">RBI files</a> to convey what it saw
+to the static checker. This is still imperfect (it completely misses
+things that are defined after <code>require</code> time), but
+empirically it finds most of the remaining undiscovered definitions.</p>
 <h1 id="beyond-mutation">Beyond mutation</h1>
-<p>Don’t get me wrong, those approximations are really useful and effective. But really, the way Sorbet handles mutation in a codebase is by incentivicing people to get rid of it.</p>
+<p>Don’t get me wrong, those approximations are really useful and
+effective. But really, the way Sorbet handles mutation in a codebase is
+by incentivicing people to get rid of it.</p>
 <ul>
-<li><p>Sorbet can type check a project in seconds, but it takes minutes to re-generate all RBIs files. When Sorbet can see things statically, there’s also a canonical place to write a type annotation for it.</p></li>
-<li><p>It’s a much better experience to click “Go to Definition” and jump to the actual source definition rather than to an auto-generated RBI file.</p></li>
-<li><p>And arguably, if it’s easy for Sorbet to understand what’s defined and where, it’s easier for a programmer to understand. Understandable code lets people iterate faster, is less brittle, and harder to break by accident.</p></li>
+<li><p>Sorbet can type check a project in seconds, but it takes minutes
+to re-generate all RBIs files. When Sorbet can see things statically,
+there’s also a canonical place to write a type annotation for
+it.</p></li>
+<li><p>It’s a much better experience to click “Go to Definition” and
+jump to the actual source definition rather than to an auto-generated
+RBI file.</p></li>
+<li><p>And arguably, if it’s easy for Sorbet to understand what’s
+defined and where, it’s easier for a programmer to understand.
+Understandable code lets people iterate faster, is less brittle, and
+harder to break by accident.</p></li>
 </ul>
-<p>Programming languages are tools to change and structure the way we think. In the long run, all code can be changed. We adopt type systems specifically to help guide these changes, which <a href="https://blog.jez.io/on-language-choice/">I’ve touched on before</a>. When it comes to mutation in Ruby, Sorbet makes a solid effort to model the helpful parts, while providing guide rails and suggestions to deal with the rest.</p>
+<p>Programming languages are tools to change and structure the way we
+think. In the long run, all code can be changed. We adopt type systems
+specifically to help guide these changes, which <a
+href="https://blog.jez.io/on-language-choice/">I’ve touched on
+before</a>. When it comes to mutation in Ruby, Sorbet makes a solid
+effort to model the helpful parts, while providing guide rails and
+suggestions to deal with the rest.</p>
 <hr />
-<h1 id="appendix-a-by-comparison-with-typed-javascript">Appendix A: By comparison with typed JavaScript</h1>
-<p>You might say, “the things that you’re talking about aren’t unique to Ruby! It’s the same for all dynamic programming languages!” But is that true in practice?</p>
+<h1 id="appendix-a-by-comparison-with-typed-javascript">Appendix A: By
+comparison with typed JavaScript</h1>
+<p>You might say, “the things that you’re talking about aren’t unique to
+Ruby! It’s the same for all dynamic programming languages!” But is that
+true in practice?</p>
 <p>Let’s compare our Ruby snippets from before with JavaScript.</p>
 <p>Ruby:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.my_dsl</span>(name)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    define_method(name) <span class="cf">do</span>; <span class="cf">end</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
@@ -141,23 +246,54 @@
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">this</span><span class="op">.</span><span class="at">prototype</span>[name] <span class="op">=</span> <span class="kw">function</span>() {}</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>First I’ll point out: the mutation becomes way more obvious in the JavaScript program! But second: both TypeScript and Flow report static errors on this program. They both complain that there’s no type annotation declaring that it’s ok to treat <code>this.prototype</code> as if it were a key-value mapping.</p>
-<p>The fact that both Flow and TypeScript report an error here speak to how common this idiom is in practice. It’s not common, and they’d rather not encourage programs like this, so they forbid it.</p>
+<p>First I’ll point out: the mutation becomes way more obvious in the
+JavaScript program! But second: both TypeScript and Flow report static
+errors on this program. They both complain that there’s no type
+annotation declaring that it’s ok to treat <code>this.prototype</code>
+as if it were a key-value mapping.</p>
+<p>The fact that both Flow and TypeScript report an error here speak to
+how common this idiom is in practice. It’s not common, and they’d rather
+not encourage programs like this, so they forbid it.</p>
 <p>Here’s another example, first in Ruby:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;some_gem&#39;</span></span>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;some_gem&#39;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">SomeNamespace</span><span class="kw">::</span><span class="dt">SomeClass</span><span class="at">.new</span></span></code></pre></div>
 <p>And then in JavaScript:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> someNamespace <span class="im">from</span> <span class="st">&#39;some_package&#39;</span><span class="op">;</span></span>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> someNamespace <span class="im">from</span> <span class="st">&#39;some_package&#39;</span><span class="op">;</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">new</span> someNamespace<span class="op">.</span><span class="fu">SomeClass</span>()<span class="op">;</span></span></code></pre></div>
-<p>With no RBI files declaring whether <code>SomeNamespace::SomeClass</code> exists or not, Sorbet will report an error that the class doesn’t exist. But in TypeScript and Flow, the code is just fine, even if there’s no type declaration file. Both can still see that whatever vale is imported will be bound to the <code>someNamespace</code> variable (even if it’s treated as <code>any</code>).</p>
-<p>Sorbet is thus forced to come up with ways to generate RBI files for all new projects, because without them Sorbet would be crippled: it would have no way to distinguish between a class name that has actually been typoed vs one that is typed correctly but for which there’s no visible definition. Meanwhile, TypeScript and Flow work completely fine in new codebases out of the box.</p>
-<p>So my claim is that: no, these problems <strong>are</strong> unique to Ruby, because the design of the language and the culture of its use so pervasively promote or require mutation.</p>
-<h1 id="appendix-b-more-things-that-are-actually-mutation">Appendix B: More things that are actually mutation</h1>
+<p>With no RBI files declaring whether
+<code>SomeNamespace::SomeClass</code> exists or not, Sorbet will report
+an error that the class doesn’t exist. But in TypeScript and Flow, the
+code is just fine, even if there’s no type declaration file. Both can
+still see that whatever vale is imported will be bound to the
+<code>someNamespace</code> variable (even if it’s treated as
+<code>any</code>).</p>
+<p>Sorbet is thus forced to come up with ways to generate RBI files for
+all new projects, because without them Sorbet would be crippled: it
+would have no way to distinguish between a class name that has actually
+been typoed vs one that is typed correctly but for which there’s no
+visible definition. Meanwhile, TypeScript and Flow work completely fine
+in new codebases out of the box.</p>
+<p>So my claim is that: no, these problems <strong>are</strong> unique
+to Ruby, because the design of the language and the culture of its use
+so pervasively promote or require mutation.</p>
+<h1 id="appendix-b-more-things-that-are-actually-mutation">Appendix B:
+More things that are actually mutation</h1>
 <ul>
-<li><p><code>freeze</code> (ironic: to prevent mutation on a class or object… we mutate it!)</p></li>
-<li><p><code>private</code> / <code>private_class_method</code> (not keywords! These are methods that take a <strong>Symbol</strong>; it just so happens that <code>def foo; end</code> is an expression that evaluates to the symbol <code>:foo</code>. Which is why there’s both <code>private</code> and <code>private_class_method</code>, because <code>def self.foo; end</code> also evaluates to <code>:foo</code>, so <code>private def self.foo; end</code> would attempt to mark an <strong>instance</strong> method named <code>:foo</code> private, even it didn’t exist!)</p></li>
+<li><p><code>freeze</code> (ironic: to prevent mutation on a class or
+object… we mutate it!)</p></li>
+<li><p><code>private</code> / <code>private_class_method</code> (not
+keywords! These are methods that take a <strong>Symbol</strong>; it just
+so happens that <code>def foo; end</code> is an expression that
+evaluates to the symbol <code>:foo</code>. Which is why there’s both
+<code>private</code> and <code>private_class_method</code>, because
+<code>def self.foo; end</code> also evaluates to <code>:foo</code>, so
+<code>private def self.foo; end</code> would attempt to mark an
+<strong>instance</strong> method named <code>:foo</code> private, even
+it didn’t exist!)</p></li>
 </ul>
 <!-- vim:tw=72
 -->
