@@ -2,13 +2,14 @@
 
 set -euo pipefail
 
-if [ "$#" != 1 ] || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
-  >&2 echo "usage: $0 <draft>"
+if [ "$#" = 0 ] || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+  >&2 echo "usage: $0 [<draft>]"
   exit 1
 fi
 
-bundle exec octopress publish "$1"
-
+if [ "${1:-}" != "" ]; then
+  bundle exec octopress publish "$1"
+fi
 
 # Stash only untracked
 git add _posts
