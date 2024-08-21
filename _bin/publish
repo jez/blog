@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-if [ "$#" = 0 ] || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+if [ "$#" -gt 1 ] || [ "${1:-}" = '-h' ] || [ "${1:-}" = '--help' ]; then
   >&2 echo "usage: $0 [<draft>]"
   exit 1
 fi
