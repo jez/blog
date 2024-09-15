@@ -75,7 +75,7 @@ It's impressive how well it already works—I wrote this whole post with just ph
 [^images]:
   To get the images in the post, I have Dropbox on both my phone and the home computer, and Image Magick to convert & resize the photos.
 
-But there's a few things holding this setup from being amazing.
+But there's a few things keeping this setup from being amazing.
 
 - For some reason, `Cmd-Tab` to switch to the most recently used app is one of the few keyboard shortcuts that **doesn't** transfer from macOS. It's crazy, because it works on iPadOS.
 
@@ -91,19 +91,19 @@ But there's a few things holding this setup from being amazing.
 
 - iOS Safari doesn't do the "AirPlay screen mirroring is external display" trick. If this worked, it would be absolutely **killer**.
 
-  It makes sense that iOS doesn't magically become full-screen by default—non power-users attempting to screen mirror would not expect it.
+  It makes sense that iOS Safari doesn't magically become full-screen by default—non power-users attempting to screen mirror would not expect it.
 
   But it would be incredible if an iPhone could drive a web browser at a full 4K resolution. Given how many things are already possible to do with nothing more than a desktop web browser, having one on my phone would be huge.
 
 - Some apps only work in portrait mode.
 
-  Slack and the iOS Settings app are the two that I find myself wanting to use the most while using this travel setup which don't support landscape.
+  Slack and the iOS Settings app are the two which don't support landscape that I find myself wanting to use the most with this travel setup.
 
   Slack is a double offender because it also doesn't support _any_ keyboard shortcuts on iOS that the desktop app supports, as far as I can tell.
 
 ## Work vs personal
 
-For personal use cases, where I'm basically only blogging or writing code in Vim and compiling at the terminal, this setup is great for light usage.
+For light use cases, where I'm basically only blogging or writing code in Vim and compiling at the terminal, this setup is great.
 
 But I have a dream of one day being able to use this setup for **work trips** too. Think of how cool it would be to travel to an office in another city, sit down at any desk, plug in my phone over USB-C and get to work. This is _almost_ possible.
 
