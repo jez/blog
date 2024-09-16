@@ -16,13 +16,13 @@ A while back I picked up a tiny, folding, wireless keyboard to turn my phone int
 
 ![Hard to use my phone for scale when I need it to take the picture](/assets/img/folding-keyboard-vs-airpods.jpg)
 
-I picked up this [wireless folding keyboard][keyboard] for \$25 on Amazon. It's only slight bigger than my phone itself (iPhone 12) and even fits in my jeans front pocket.
+I picked up this [wireless folding keyboard][keyboard] for \$25 on Amazon. It's only slight bigger than my phone itself (iPhone 12) and manages to fit in my jeans front pocket.
 
 [keyboard]: https://www.amazon.com/dp/B0BZLMG7SN/
 
 ![](/assets/img/folding-keyboard-folded.jpg)
 
-For many of my personal trips, bringing a full-sized laptop or even an iPad is overkill, especially if there's only a 10% chance that I'll end up using it. When I do wish I had a laptop, it's usually because suddenly I want to do a little blogging or light programming.[^chance] Now, all I have to do is tuck this keyboard somewhere in a carry-on.
+For many of my personal trips, bringing a full-sized laptop or even an iPad is overkill, especially if there's only a 10% chance that I'll end up using it. When I do wish I had a laptop, it's usually because I want to do a little blogging or light programming.[^chance] Now, all I have to do is tuck this keyboard somewhere in a carry-on.
 
 [^chance]:
   For example, the trip calls for nothing but day hiking, but one day we get rained out. Or the trip calls for nothing but skiing, but the first day I get injured.
@@ -120,12 +120,6 @@ I have one of the most powerful computers ever built in my pocket at all times. 
 
 Some of the keyboard shortcuts I noticed myself using the most while writing this post:
 
-- Vim
-  - `Ctrl-W` and `Ctrl-U` in insert mode to delete the previous word or line.
-  - `{`/`}` to move back/forward a paragraph.
-  - `[s`/`]s` to jump to the previous/next spelling mistake (lots of typos on this small keyboard with the lag).
-  - `z=1` (bound to `<leader>z`) to accept the first suggested spelling correction.
-  - `Ctrl-[`, which is the same as `Esc` in terminals.
 - iOS
   - `Opt-Backspace` and `Cmd-Backspace`, which delete the previous word or line.
   - `Cmd-Space`, to bring up "Siri Suggestions" (which I only use to launch apps).
@@ -135,13 +129,19 @@ Some of the keyboard shortcuts I noticed myself using the most while writing thi
   - `Cmd-T`/`Cmd-W` open and close tabs.
   - `Cmd-Opt-Left`/`Cmd-Opt-Right` to go to the previous/next tab.
   - `Cmd-[`/`Cmd-]` to go to back and forward in a tab's history.
+- Vim
+  - `Ctrl-W` and `Ctrl-U` in insert mode to delete the previous word or line.
+  - `{`/`}` to move back/forward a paragraph.
+  - `[s`/`]s` to jump to the previous/next spelling mistake (lots of typos on this small keyboard with the lag).
+  - `z=1` (bound to `<leader>z`) to accept the first suggested spelling correction.
+  - `Ctrl-[`, which is the same as `Esc` in terminals.
 - Blink
   - `Cmd-T`/`Cmd-W` open and close tabs.
   - `Cmd-O` to toggle focus between the phone and the external display in screen mirroring.
 
 [^esc]:
-  Actually typing `Esc` on this keyboard requires pressing <code>Shift-Fn-\`</code> which I find harder.
-
+  Actually typing `Esc` on this keyboard requires pressing <code>Shift-Fn-\`</code> which I find harder.\
+  \
   I don't know the origin of `Cmd-.` acting like `Esc` on macOS (and iOS by extension), but it's right there in the [Human Interface Guidelines].
 
 [Human Interface Guidelines]: https://developer.apple.com/design/human-interface-guidelines/keyboards/
