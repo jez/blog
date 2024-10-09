@@ -50,82 +50,38 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#properties-and-attributes-in-other-languages"
-  id="toc-properties-and-attributes-in-other-languages">Properties and
-  attributes in other languages</a></li>
-  <li><a href="#extra-thoughts" id="toc-extra-thoughts">Extra
-  thoughts</a></li>
+  <li><a href="#properties-and-attributes-in-other-languages">Properties and attributes in other languages</a></li>
+  <li><a href="#extra-thoughts">Extra thoughts</a></li>
   </ul>
 </nav>
 
 <main>
-<p>People always ask me, “Why does Sorbet think this is nil? I just
-checked that it’s not!” So much so, that it’s at the very top of the <a
-href="https://sorbet.org/docs/faq">Sorbet FAQ</a></p>
-<p>That doc answers what’s happening and how to fix it, but it doesn’t
-really answer why it behaves this way. A common follow up question looks
-something like this:</p>
+<p>People always ask me, “Why does Sorbet think this is nil? I just checked that it’s not!” So much so, that it’s at the very top of the <a href="https://sorbet.org/docs/faq">Sorbet FAQ</a></p>
+<p>That doc answers what’s happening and how to fix it, but it doesn’t really answer why it behaves this way. A common follow up question looks something like this:</p>
 <blockquote>
-<p>Having to use local variables as mentioned in Sorbet’s <a
-href="https://sorbet.org/docs/flow-sensitive#limitations-of-flow-sensitivity">limitations
-of flow-sensitivity</a> docs is annoying. Idiomatic Ruby doesn’t use
-local variables nearly as much as Sorbet requires. What gives?</p>
+<p>Having to use local variables as mentioned in Sorbet’s <a href="https://sorbet.org/docs/flow-sensitive#limitations-of-flow-sensitivity">limitations of flow-sensitivity</a> docs is annoying. Idiomatic Ruby doesn’t use local variables nearly as much as Sorbet requires. What gives?</p>
 </blockquote>
-<p><strong>TL;DR</strong>: Sorbet’s type inference algorithm requires
-being given a fixed data structure that models control flow inside a
-method. Type inference doesn’t get to change that structure, so the
-things Sorbet learns while from inference don’t retroactively change
-Sorbet’s view of control flow. (This is in line with the other popular
-type systems for dynamically typed languages.) As a result control flow
-must be a function of local syntax alone (variables), not global nor
-semantic information (methods).</p>
+<p><strong>TL;DR</strong>: Sorbet’s type inference algorithm requires being given a fixed data structure that models control flow inside a method. Type inference doesn’t get to change that structure, so the things Sorbet learns while from inference don’t retroactively change Sorbet’s view of control flow. (This is in line with the other popular type systems for dynamically typed languages.) As a result control flow must be a function of local syntax alone (variables), not global nor semantic information (methods).</p>
 <p>But that’s packing a lot in at once, so let’s take a step back.</p>
-<p>In this post whenever I say type inference I basically mean assigning
-types to variables, and using the types of variables to resolve calls to
-methods. Type inference in Sorbet needs two things:</p>
+<p>In this post whenever I say type inference I basically mean assigning types to variables, and using the types of variables to resolve calls to methods. Type inference in Sorbet needs two things:</p>
 <ul>
-<li><p>A symbol table, which maps names to global program definitions
-(like classes and methods, and their types). Sorbet spends a ton of time
-building a symbol table representing an entire codebase before it ever
-starts running type inference.</p></li>
-<li><p>A control flow graph, which is a data structure that models the
-flow of control through a single method. Sorbet builds these graphs on
-the fly right before running type inference.</p></li>
+<li><p>A symbol table, which maps names to global program definitions (like classes and methods, and their types). Sorbet spends a ton of time building a symbol table representing an entire codebase before it ever starts running type inference.</p></li>
+<li><p>A control flow graph, which is a data structure that models the flow of control through a single method. Sorbet builds these graphs on the fly right before running type inference.</p></li>
 </ul>
-<p>Since type inference requires the control flow graph, clearly
-building the control flow graph can’t require type inference. Instead,
-it has to build a control flow graph using only the method’s abstract
-syntax tree (or AST). Since all Sorbet has is an AST, the control flow
-only reflects syntax-only observations, like “these two variables are
-the same” and “an if condition branches on the value of this variable.”
-Sorbet can draw these observations exclusively from the syntactic
-structure of the current method, with no need to consult the symbol
-table, let alone run inference.</p>
-<p>This brings us to our central conflict: knowing which method (or
-methods!) a given call site resolves to is <strong>not</strong> a
-syntactic property. Consider this snippet:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[</span><span class="dv">true</span>, <span class="dv">false</span><span class="kw">]</span><span class="at">.sample</span></span>
+<p>Since type inference requires the control flow graph, clearly building the control flow graph can’t require type inference. Instead, it has to build a control flow graph using only the method’s abstract syntax tree (or AST). Since all Sorbet has is an AST, the control flow only reflects syntax-only observations, like “these two variables are the same” and “an if condition branches on the value of this variable.” Sorbet can draw these observations exclusively from the syntactic structure of the current method, with no need to consult the symbol table, let alone run inference.</p>
+<p>This brings us to our central conflict: knowing which method (or methods!) a given call site resolves to is <strong>not</strong> a syntactic property. Consider this snippet:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[</span><span class="dv">true</span>, <span class="dv">false</span><span class="kw">]</span><span class="at">.sample</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span> <span class="dv">0</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span> <span class="dv">nil</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>x<span class="at">.even?</span></span></code></pre></div>
-<p>The meaning of <code>x.even?</code> depends on the type of
-<code>x</code>, which depends on the earlier control flow in the method.
-That means that if a program branches on a <strong>method return
-value</strong>, Sorbet cannot draw any interesting observations about
-control flow.</p>
-<p>This gets to be a problem for methods whose meaning involves some
-claim like, “I always return the same thing every time I’m called.”
-Sorbet can’t know whether <code>x.foo</code> refers to one of those
-constant methods or a method that returns a random number every time, so
-it has to assume the worst.</p>
+<p>The meaning of <code>x.even?</code> depends on the type of <code>x</code>, which depends on the earlier control flow in the method. That means that if a program branches on a <strong>method return value</strong>, Sorbet cannot draw any interesting observations about control flow.</p>
+<p>This gets to be a problem for methods whose meaning involves some claim like, “I always return the same thing every time I’m called.” Sorbet can’t know whether <code>x.foo</code> refers to one of those constant methods or a method that returns a random number every time, so it has to assume the worst.</p>
 <p>Here’s a pathological example:</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode numberSource ruby numberLines hl-25 hl-26 hl-27"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">class</span> <span class="dt">FooIsAttr</span></span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource ruby numberLines hl-25 hl-26 hl-27"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">class</span> <span class="dt">FooIsAttr</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  sig <span class="kw">{</span>returns(T<span class="at">.nilable</span>(<span class="dt">Integer</span>))<span class="kw">}</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="ot">attr_accessor</span> <span class="wa">:foo</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="cf">end</span></span>
@@ -154,147 +110,55 @@ class="sourceCode numberSource ruby numberLines hl-25 hl-26 hl-27"><code class="
 <span id="cb2-27"><a href="#cb2-27"></a>  takes_integer(x<span class="at">.foo</span>) <span class="co"># error</span></span>
 <span id="cb2-28"><a href="#cb2-28"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a
-href="https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0Aextend%20T%3A%3ASig%0A%0Aclass%20FooIsAttr%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20attr_accessor%20%3Afoo%0Aend%0A%0Aclass%20FooIsMethod%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20def%20foo%0A%20%20%20%20%23%20Returns%20something%20different%20every%20call%0A%20%20%20%20%5B0%2C%20nil%5D.sample%0A%20%20end%0Aend%0A%0Asig%20%7Bparams%28x%3A%20Integer%29.void%7D%0Adef%20takes_integer%28x%29%3B%20end%0A%0A%23%20Have%20to%20run%20inference%20to%20get%20type%20of%20%60x%60%0A%23%20%28running%20inference%20requires%20control%20flow%29%0Aif%20%5Btrue%2C%20false%5D.sample%0A%20%20x%20%3D%20FooIsAttr.new%0Aelse%0A%20%20x%20%3D%20FooIsMethod.new%0Aend%0A%0A%23%20x.foo%20returns%20the%20same%20thing%20only%20if%20x%20is%20%60FooIsAttr%60%0Aif%20x.foo%0A%20%20takes_integer%28x.foo%29%20%23%20error%0Aend">→
-View on sorbet.run</a>
+<a href="https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0Aextend%20T%3A%3ASig%0A%0Aclass%20FooIsAttr%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20attr_accessor%20%3Afoo%0Aend%0A%0Aclass%20FooIsMethod%0A%20%20sig%20%7Breturns%28T.nilable%28Integer%29%29%7D%0A%20%20def%20foo%0A%20%20%20%20%23%20Returns%20something%20different%20every%20call%0A%20%20%20%20%5B0%2C%20nil%5D.sample%0A%20%20end%0Aend%0A%0Asig%20%7Bparams%28x%3A%20Integer%29.void%7D%0Adef%20takes_integer%28x%29%3B%20end%0A%0A%23%20Have%20to%20run%20inference%20to%20get%20type%20of%20%60x%60%0A%23%20%28running%20inference%20requires%20control%20flow%29%0Aif%20%5Btrue%2C%20false%5D.sample%0A%20%20x%20%3D%20FooIsAttr.new%0Aelse%0A%20%20x%20%3D%20FooIsMethod.new%0Aend%0A%0A%23%20x.foo%20returns%20the%20same%20thing%20only%20if%20x%20is%20%60FooIsAttr%60%0Aif%20x.foo%0A%20%20takes_integer%28x.foo%29%20%23%20error%0Aend">→ View on sorbet.run</a>
 </figcaption>
 </figure>
-<p>Note the two calls to <code>x.foo</code> at the very end of the
-snippet:</p>
+<p>Note the two calls to <code>x.foo</code> at the very end of the snippet:</p>
 <ul>
-<li>Knowing whether the second call to <code>x.foo</code> is non-nil
-requires knowing whether <code>x.foo</code> returns the same thing
-across subsequent calls.</li>
-<li>Knowing <em>that</em> requires knowing whether <code>foo</code>
-refers to an <code>attr_accessor</code> method or some other
-method.</li>
-<li>Knowing <em>that</em> requires knowing the type of
-<code>x</code>.</li>
-<li>Knowing <em>that</em> requires understanding the control flow in the
-method.</li>
-<li>So we can’t make understanding the control flow in the method
-require knowing whether the second call to <code>x.foo</code> returns
-the same thing.
+<li>Knowing whether the second call to <code>x.foo</code> is non-nil requires knowing whether <code>x.foo</code> returns the same thing across subsequent calls.</li>
+<li>Knowing <em>that</em> requires knowing whether <code>foo</code> refers to an <code>attr_accessor</code> method or some other method.</li>
+<li>Knowing <em>that</em> requires knowing the type of <code>x</code>.</li>
+<li>Knowing <em>that</em> requires understanding the control flow in the method.</li>
+<li>So we can’t make understanding the control flow in the method require knowing whether the second call to <code>x.foo</code> returns the same thing.
 <ul>
-<li>But we <em>can</em> make it require knowing whether a variable has
-been assigned to between two variable accesses.</li>
+<li>But we <em>can</em> make it require knowing whether a variable has been assigned to between two variable accesses.</li>
 </ul></li>
 </ul>
-<h1 id="properties-and-attributes-in-other-languages">Properties and
-attributes in other languages</h1>
-<p>Unfortunately, this all means that Sorbet can only track control
-flow-sensitive types on variables, not methods. This is the exact same
-limitation that other popular gradual type checkers
-<strong>except</strong> for one difference: both JavaScript and Python
-make a <strong>syntactic</strong> distinction between method calls
-(which have parentheses) versus property/attribute access (which
-don’t):</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x<span class="at">.foo</span>   <span class="co"># &lt;- syntactically a property (JS) or attribute (Python)</span></span>
+<h1 id="properties-and-attributes-in-other-languages">Properties and attributes in other languages</h1>
+<p>Unfortunately, this all means that Sorbet can only track control flow-sensitive types on variables, not methods. This is the exact same limitation that other popular gradual type checkers <strong>except</strong> for one difference: both JavaScript and Python make a <strong>syntactic</strong> distinction between method calls (which have parentheses) versus property/attribute access (which don’t):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x<span class="at">.foo</span>   <span class="co"># &lt;- syntactically a property (JS) or attribute (Python)</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>x<span class="at">.foo</span>() <span class="co"># &lt;- syntactically a method call</span></span></code></pre></div>
-<p>In Ruby, <strong>both</strong> <code>x.foo</code> and
-<code>x.foo()</code> correspond to method calls,<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">This is true even if <code>foo</code> was defined with
-<code>attr_reader :foo</code>!<br />
+<p>In Ruby, <strong>both</strong> <code>x.foo</code> and <code>x.foo()</code> correspond to method calls,<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">This is true even if <code>foo</code> was defined with <code>attr_reader :foo</code>!<br />
 <br />
-</span></span> so Sorbet models them as such. But in TypeScript, Flow,
-and Mypy,<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="sidenote">And maybe other control-flow sensitive type systems,
-too. Feel free to send me more examples.<br />
+</span></span> so Sorbet models them as such. But in TypeScript, Flow, and Mypy,<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">And maybe other control-flow sensitive type systems, too. Feel free to send me more examples.<br />
 <br />
-</span></span> that small, syntactic difference is enough to allow
-treating properties and attributes different from methods.</p>
-<p><a
-href="https://www.typescriptlang.org/play?#code/MYGwhgzhAECC0G8BQ1oQPYFsCmAFATugA7b4AuAngFzQB2ArpgEanQA+09tAJtgGYBLWtm4BuFGizYAstjIALdNwAUAShoNmrDl16Dh3RNHxz6+WqOgBfJDaR8uwMgPS1owLEXplssNTXhkVBMyMzdhAHc4NXEbB1onFzcyMABrbAgAOUYWfGUADw0c0lVECQ9aDBBsADoQdABzAtVYpHtHZ1dobHywTCJqgEZlMADSoOgBPmgRmowcAmJSSnGJVBT0rOK8sDmpRZJyChaJG3W0jOytHb2FwkOV1vaEzrcevoHsACY1MtQpmYefreXxqW54e7LY5-VDQDaXbbKIFeHx+VTgg5Qk6oM5wi5ba5IzwgtEYyFHE52eKJLrvfrVADMIzGMIBs3mMjkihUqlWsLxmyuuXZUlkCiUamx1gk8IJwt2HLF3MlsSAA">→
-View example in TypeScript Playground</a><br />
-<a
-href="https://flow.org/try/#0PQKgBAAgZgNg9gdzCYAoVBjGBDAzrsAQTAG9Uwxc4BbAUwAUAnOAB1sYBcBPALjAH4AdgFdqAI3YBucpRq0AsrQ4ALOABMAFAEo+Q0RMakAvqhOoowwRg4BLOILAYaLYR1qFtfYmQqMlwxgdBWiQPLWkTCytbezAObABrWlwAOX12DQAPPhFxdi1SGSdBKhhaADp4AHMs8NN0KOs7B1pM7GoWMoBGDWwvAp8wGygwXvKqOiZWdm4BmQp4pNT0xjGJhmY2Ti46ihMFxOS0vNXscbkprdmIhssm2Nb2ztoAJm1CimHRpw7Xd21zpNNjMdh8KHFDssThofi43GFARtpttdmB9hClscDDDnH8EetLiC6mZGjEWm0OmUAMy9fpgr5rOSKFTqbRzcEYo4rRl0ZmqTRaVHoxZc6FndZ81mCiJAA">→
-View example in Try Flow</a><br />
-<a
-href="https://mypy-play.net/?mypy=latest&amp;python=3.10&amp;flags=strict&amp;gist=3e149c861a4f10dc474fd473021b0345">→
-View example in mypy Playground</a><br />
+</span></span> that small, syntactic difference is enough to allow treating properties and attributes different from methods.</p>
+<p><a href="https://www.typescriptlang.org/play?#code/MYGwhgzhAECC0G8BQ1oQPYFsCmAFATugA7b4AuAngFzQB2ArpgEanQA+09tAJtgGYBLWtm4BuFGizYAstjIALdNwAUAShoNmrDl16Dh3RNHxz6+WqOgBfJDaR8uwMgPS1owLEXplssNTXhkVBMyMzdhAHc4NXEbB1onFzcyMABrbAgAOUYWfGUADw0c0lVECQ9aDBBsADoQdABzAtVYpHtHZ1dobHywTCJqgEZlMADSoOgBPmgRmowcAmJSSnGJVBT0rOK8sDmpRZJyChaJG3W0jOytHb2FwkOV1vaEzrcevoHsACY1MtQpmYefreXxqW54e7LY5-VDQDaXbbKIFeHx+VTgg5Qk6oM5wi5ba5IzwgtEYyFHE52eKJLrvfrVADMIzGMIBs3mMjkihUqlWsLxmyuuXZUlkCiUamx1gk8IJwt2HLF3MlsSAA">→ View example in TypeScript Playground</a><br />
+<a href="https://flow.org/try/#0PQKgBAAgZgNg9gdzCYAoVBjGBDAzrsAQTAG9Uwxc4BbAUwAUAnOAB1sYBcBPALjAH4AdgFdqAI3YBucpRq0AsrQ4ALOABMAFAEo+Q0RMakAvqhOoowwRg4BLOILAYaLYR1qFtfYmQqMlwxgdBWiQPLWkTCytbezAObABrWlwAOX12DQAPPhFxdi1SGSdBKhhaADp4AHMs8NN0KOs7B1pM7GoWMoBGDWwvAp8wGygwXvKqOiZWdm4BmQp4pNT0xjGJhmY2Ti46ihMFxOS0vNXscbkprdmIhssm2Nb2ztoAJm1CimHRpw7Xd21zpNNjMdh8KHFDssThofi43GFARtpttdmB9hClscDDDnH8EetLiC6mZGjEWm0OmUAMy9fpgr5rOSKFTqbRzcEYo4rRl0ZmqTRaVHoxZc6FndZ81mCiJAA">→ View example in Try Flow</a><br />
+<a href="https://mypy-play.net/?mypy=latest&amp;python=3.10&amp;flags=strict&amp;gist=3e149c861a4f10dc474fd473021b0345">→ View example in mypy Playground</a><br />
 </p>
-<p>In all the above examples, we see that the type of
-<code>variable.property</code> is aware of control flow, the types of
-<code>expression().property</code> and <code>variable.method()</code>
-are not.</p>
-<p>Unfortunately, the direct analogue to properties in Ruby are instance
-variables like <code>@property</code>, which have the limitation that
-they can can only be accessed inside their owning class. It’s like if
-JavaScript only allowed <code>this.property</code> instead of allowing
-the call site to be any arbitrary expression like
-<code>x.property</code>. In Ruby, you can’t write
-<code>x.@property</code>.<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="sidenote">You can do something similar:
-<code>x.instance_variable_get(:@property)</code>, but again this is a
-method, not a property access—someone could have overridden the
-<code>.instance_variable_get</code> method!<br />
+<p>In all the above examples, we see that the type of <code>variable.property</code> is aware of control flow, the types of <code>expression().property</code> and <code>variable.method()</code> are not.</p>
+<p>Unfortunately, the direct analogue to properties in Ruby are instance variables like <code>@property</code>, which have the limitation that they can can only be accessed inside their owning class. It’s like if JavaScript only allowed <code>this.property</code> instead of allowing the call site to be any arbitrary expression like <code>x.property</code>. In Ruby, you can’t write <code>x.@property</code>.<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">You can do something similar: <code>x.instance_variable_get(:@property)</code>, but again this is a method, not a property access—someone could have overridden the <code>.instance_variable_get</code> method!<br />
 <br />
 </span></span></p>
-<p>If you <strong>do</strong> use instance variables in Ruby with
-Sorbet, they behave comparably<span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="sidenote">There’s a <a
-href="https://github.com/sorbet/sorbet/issues/1374">known bug</a> in the
-implementation at the time of writing, but it occurs somewhat rarely in
-practice so we haven’t prioritized fixing it.<br />
+<p>If you <strong>do</strong> use instance variables in Ruby with Sorbet, they behave comparably<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="sidenote">There’s a <a href="https://github.com/sorbet/sorbet/issues/1374">known bug</a> in the implementation at the time of writing, but it occurs somewhat rarely in practice so we haven’t prioritized fixing it.<br />
 <br />
 </span></span> to their counterparts in other languages:</p>
-<p><a
-href="https://sorbet.run/#%23%20typed%3A%20strict%0A%0Aclass%20A%0A%20%20extend%20T%3A%3ASig%0A%0A%20%20sig%20%7Bvoid%7D%0A%20%20def%20initialize%0A%20%20%20%20%40some_property%20%3D%20T.let%28nil%2C%20T.nilable%28Integer%29%29%0A%20%20end%0A%0A%20%20sig%20%7Bparams%28x%3A%20Integer%29.void%7D%0A%20%20def%20takes_number%28x%29%0A%20%20%20%20puts%20x%0A%20%20end%0A%0A%20%20sig%20%7Bvoid%7D%0A%20%20def%20example1%0A%20%20%20%20if%20%40some_property%0A%20%20%20%20%20%20takes_number%28%40some_property%29%0A%20%20%20%20end%0A%20%20%20%20takes_number%28%40some_property%29%0A%20%20end%0Aend">→
-View example on sorbet.run</a></p>
-<p>Seen from this lens, I think it’s fair to say that Sorbet is doing
-the best it can with what it has. If you disagree and have a suggestion
-for how Sorbet could do better, feel free to reach out.</p>
+<p><a href="https://sorbet.run/#%23%20typed%3A%20strict%0A%0Aclass%20A%0A%20%20extend%20T%3A%3ASig%0A%0A%20%20sig%20%7Bvoid%7D%0A%20%20def%20initialize%0A%20%20%20%20%40some_property%20%3D%20T.let%28nil%2C%20T.nilable%28Integer%29%29%0A%20%20end%0A%0A%20%20sig%20%7Bparams%28x%3A%20Integer%29.void%7D%0A%20%20def%20takes_number%28x%29%0A%20%20%20%20puts%20x%0A%20%20end%0A%0A%20%20sig%20%7Bvoid%7D%0A%20%20def%20example1%0A%20%20%20%20if%20%40some_property%0A%20%20%20%20%20%20takes_number%28%40some_property%29%0A%20%20%20%20end%0A%20%20%20%20takes_number%28%40some_property%29%0A%20%20end%0Aend">→ View example on sorbet.run</a></p>
+<p>Seen from this lens, I think it’s fair to say that Sorbet is doing the best it can with what it has. If you disagree and have a suggestion for how Sorbet could do better, feel free to reach out.</p>
 <h1 id="extra-thoughts">Extra thoughts</h1>
-<p>It’s maybe worth noting that even the Ruby VM itself cheats a little
-here: yes <code>x.foo</code> is technically a method call, but if that
-method was defined via <code>attr_reader</code>, the Ruby VM has special
-handling to make it run much, much faster than had the method been
-defined manually. So while you can think of these two things as doing
-the same thing, the first one will run much faster:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">attr_reader</span> <span class="wa">:foo</span></span>
+<p>It’s maybe worth noting that even the Ruby VM itself cheats a little here: yes <code>x.foo</code> is technically a method call, but if that method was defined via <code>attr_reader</code>, the Ruby VM has special handling to make it run much, much faster than had the method been defined manually. So while you can think of these two things as doing the same thing, the first one will run much faster:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">attr_reader</span> <span class="wa">:foo</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo; <span class="ot">@foo</span>; <span class="cf">end</span></span></code></pre></div>
-<p>I take this to mean that even the Ruby VM itself realizes that there
-is value in having something property like. It just unfortunately didn’t
-make it into the language itself.</p>
-<p>It’s interesting to imagine a future where Sorbet treats
-<code>x.foo</code> and <code>x.foo()</code> separately. For example, it
-could <strong>require</strong> that non-constant, nullary methods be
-written with trailing <code>()</code> even though Ruby doesn’t require
-it. Then a follow up change might be able to build on that invariant, to
-treat <code>x.foo</code> like a property access instead of a method
-call.</p>
-<p>But not only are there some high-level design and low-level technical
-problems standing in the way of implementing this right now, there’s
-also a social problem: almost every Ruby style guide and linter requires
-the opposite, namely that nullary methods <strong>never</strong> be
-called with <code>()</code> explicitly. Solving social problems tends to
-involve waging holy wars, which is never all that fun.</p>
-<p>And to throw another wrench into the picture: recent versions of
-JavaScript added getters, which allow executing an arbitrary method on
-property access. Python has had computed <code>@property</code>
-declarations since version 2.2. Notably, TypeScript, Flow, and mypy
-simply do not implement getters the same way as methods, even though
-they arguably should for soundness:</p>
-<p><a
-href="https://www.typescriptlang.org/play?#code/MYGwhgzhAECC0G8BQ1oQPYFsCmAFATugA7b4AuAngFzQB2ArpgEanQA+09tAJtgGYBLWtm4BuFGizYAstjIALdNwAUAShoNmrDl16Dh3RNHxz6+WqOgBfCQHM5knAHE5ZUmo2MW+dpx78hEUQJVAE+aGVpMAUAOnwwHiw1aAAeaAAGGIBWVWDUfPyTMjNaaABGcQKraGwQCGw8gsLTc0r8m1QbGyQ+LmAyAXRS4CwiejdYDzhGopK6bAB3ODVxG17afsHSsjAAa2wIADkvdwAPTy18XORUEdoMEGwYkHRbZVPVVaQevoGhmtOYEwREeZWUYBosGuEjCETAMQwOAIxFIlGhBR2+yOJ3w4IRUmRJHIFE+Eg60ExB2OlzxiLwhCJaK+Pw2f1K2EBwMeACZkjdoLDlCNgeNsJNVPikQzUSTGqhKdiacKxhM1JL6SjiaTOhIFdTvELRqLxerCTLSd11pt-hygSDsABmcGQ9EC8K0qSyBRKNSu+V7Kk4j04L2KFSqbXWXUBxUG+F00M+iPMq1sgF2x4AFmdcFdgvjUhcZDcVzlFJj+vcBecrlIkfJeqD1ewRZLFqAA">→
-View example on TypeScript Playground</a><br />
-<a
-href="https://flow.org/try/#0PQKgBAAgZgNg9gdzCYAoVBjGBDAzrsAQTAG9Uwxc4BbAUwAUAnOAB1sYBcBPALjAH4AdgFdqAI3YBucpRq0AsrQ4ALOABMAFAEo+Q0RMakAvjIDmS2XQDiSju226R49qRkUAllDAb52FQDpGbEE1Gm0wAB4wAAZ-AFYtVwpk5MYlYUZBMABGaRSjMFoYXFoklNT0zLzkkwoTE1QoYUEMDnc4LIwaFmE7QgciMrSODKzBWiR+rWkTJpa2jrAObABrWlwAOX17AA8+JwNEsgouwSoYWn94Uw0d6dQGudb2rNod7GoWC+yNbD5CI4yTzebD+Kh0JisdjcQEpZZrTbbRi-MFySFsThce51GTw9ZbZzI0HghjMDEwmboJ4LV7vT4XABM4WOYGBGi6n16tCmqIhZOhWLKFDxiMJ7O6XJ5JPRAuxYFqS1W+KR4s5fW0vNJUMx90ezWeizeHy+tAAzL9-rDWV4USTFCp1NorcKlaKDLa5PbVJotHKFSKCe7iZ6lN6nZTGvqaYU6SaACwWohWtnB6y2djOxUIwP2VO0GwcOyMP24105omagtF3VAA">→
-View example on Try Flow</a><br />
-<a
-href="https://mypy-play.net/?mypy=latest&amp;python=3.10&amp;flags=strict&amp;gist=753c6fdd9c640d3c5cfba896894e95bd">→
-View example on mypy Playground</a><br />
+<p>I take this to mean that even the Ruby VM itself realizes that there is value in having something property like. It just unfortunately didn’t make it into the language itself.</p>
+<p>It’s interesting to imagine a future where Sorbet treats <code>x.foo</code> and <code>x.foo()</code> separately. For example, it could <strong>require</strong> that non-constant, nullary methods be written with trailing <code>()</code> even though Ruby doesn’t require it. Then a follow up change might be able to build on that invariant, to treat <code>x.foo</code> like a property access instead of a method call.</p>
+<p>But not only are there some high-level design and low-level technical problems standing in the way of implementing this right now, there’s also a social problem: almost every Ruby style guide and linter requires the opposite, namely that nullary methods <strong>never</strong> be called with <code>()</code> explicitly. Solving social problems tends to involve waging holy wars, which is never all that fun.</p>
+<p>And to throw another wrench into the picture: recent versions of JavaScript added getters, which allow executing an arbitrary method on property access. Python has had computed <code>@property</code> declarations since version 2.2. Notably, TypeScript, Flow, and mypy simply do not implement getters the same way as methods, even though they arguably should for soundness:</p>
+<p><a href="https://www.typescriptlang.org/play?#code/MYGwhgzhAECC0G8BQ1oQPYFsCmAFATugA7b4AuAngFzQB2ArpgEanQA+09tAJtgGYBLWtm4BuFGizYAstjIALdNwAUAShoNmrDl16Dh3RNHxz6+WqOgBfCQHM5knAHE5ZUmo2MW+dpx78hEUQJVAE+aGVpMAUAOnwwHiw1aAAeaAAGGIBWVWDUfPyTMjNaaABGcQKraGwQCGw8gsLTc0r8m1QbGyQ+LmAyAXRS4CwiejdYDzhGopK6bAB3ODVxG17afsHSsjAAa2wIADkvdwAPTy18XORUEdoMEGwYkHRbZVPVVaQevoGhmtOYEwREeZWUYBosGuEjCETAMQwOAIxFIlGhBR2+yOJ3w4IRUmRJHIFE+Eg60ExB2OlzxiLwhCJaK+Pw2f1K2EBwMeACZkjdoLDlCNgeNsJNVPikQzUSTGqhKdiacKxhM1JL6SjiaTOhIFdTvELRqLxerCTLSd11pt-hygSDsABmcGQ9EC8K0qSyBRKNSu+V7Kk4j04L2KFSqbXWXUBxUG+F00M+iPMq1sgF2x4AFmdcFdgvjUhcZDcVzlFJj+vcBecrlIkfJeqD1ewRZLFqAA">→ View example on TypeScript Playground</a><br />
+<a href="https://flow.org/try/#0PQKgBAAgZgNg9gdzCYAoVBjGBDAzrsAQTAG9Uwxc4BbAUwAUAnOAB1sYBcBPALjAH4AdgFdqAI3YBucpRq0AsrQ4ALOABMAFAEo+Q0RMakAvjIDmS2XQDiSju226R49qRkUAllDAb52FQDpGbEE1Gm0wAB4wAAZ-AFYtVwpk5MYlYUZBMABGaRSjMFoYXFoklNT0zLzkkwoTE1QoYUEMDnc4LIwaFmE7QgciMrSODKzBWiR+rWkTJpa2jrAObABrWlwAOX17AA8+JwNEsgouwSoYWn94Uw0d6dQGudb2rNod7GoWC+yNbD5CI4yTzebD+Kh0JisdjcQEpZZrTbbRi-MFySFsThce51GTw9ZbZzI0HghjMDEwmboJ4LV7vT4XABM4WOYGBGi6n16tCmqIhZOhWLKFDxiMJ7O6XJ5JPRAuxYFqS1W+KR4s5fW0vNJUMx90ezWeizeHy+tAAzL9-rDWV4USTFCp1NorcKlaKDLa5PbVJotHKFSKCe7iZ6lN6nZTGvqaYU6SaACwWohWtnB6y2djOxUIwP2VO0GwcOyMP24105omagtF3VAA">→ View example on Try Flow</a><br />
+<a href="https://mypy-play.net/?mypy=latest&amp;python=3.10&amp;flags=strict&amp;gist=753c6fdd9c640d3c5cfba896894e95bd">→ View example on mypy Playground</a><br />
 </p>
-<p>If it were not so common in Ruby for <strong>all</strong> nullary
-methods to be called without <code>()</code>, instead of just those
-defined with <code>attr_reader</code> or something similar, maybe Sorbet
-could have chosen the same trade-off.</p>
+<p>If it were not so common in Ruby for <strong>all</strong> nullary methods to be called without <code>()</code>, instead of just those defined with <code>attr_reader</code> or something similar, maybe Sorbet could have chosen the same trade-off.</p>
 </main>
 
 

@@ -51,172 +51,79 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#more-resources" id="toc-more-resources">More
-  Resources</a></li>
+  <li><a href="#more-resources">More Resources</a></li>
   </ul>
 </nav>
 
 <main>
-<p>I’ve been working on a small project in Haskell recently that uses
-the <a href="https://hackage.haskell.org/package/wreq">wreq</a> library.
-It’s an HTTP client library that exposes most of its functionality
-through lenses. Using this library is my first time really using lenses
-pervasively, so I’ve spent some time trying to understand how lenses
-really work.</p>
+<p>I’ve been working on a small project in Haskell recently that uses the <a href="https://hackage.haskell.org/package/wreq">wreq</a> library. It’s an HTTP client library that exposes most of its functionality through lenses. Using this library is my first time really using lenses pervasively, so I’ve spent some time trying to understand how lenses really work.</p>
 <!-- more -->
-<p>Lenses try to bring the concept of getters and setters into a
-functional setting. Here, “functional” means that lenses prioritize
-composition (chaining one lens after another) and immutability
-(returning a new data structure<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">It’s common to think that “immutable” means “copy the
-entire thing” and then change the parts you care about. But if you start
-with <strong>all data</strong> being immutable, then you only need to
-allocate new memory for the subcomponents of your data structure that
-<strong>actually</strong> changed. Everything else can be shared by the
-old and the new.<br />
+<p>Lenses try to bring the concept of getters and setters into a functional setting. Here, “functional” means that lenses prioritize composition (chaining one lens after another) and immutability (returning a new data structure<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">It’s common to think that “immutable” means “copy the entire thing” and then change the parts you care about. But if you start with <strong>all data</strong> being immutable, then you only need to allocate new memory for the subcomponents of your data structure that <strong>actually</strong> changed. Everything else can be shared by the old and the new.<br />
 <br />
 </span></span> instead of mutating the old one in place).</p>
-<p>In a functional setting, if we have a type <code>s</code> and we want
-to get some field of type <code>a</code> from it, a getter is just a
-function <code>s -&gt; a</code>.</p>
-<p>Similarly, a setter that updates that field has the type
-<code>s -&gt; a -&gt; s</code> which takes the old <code>s</code> and
-slots the <code>a</code> into it, giving us back a new
-<code>s</code>.</p>
-<p>Let’s see if we can build up some intuition, starting with these
-types and ending with the type of <code>Lens'</code> from the lens
-library:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Lens&#39;</span> s a <span class="ot">=</span> <span class="kw">forall</span> f<span class="op">.</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s)</span></code></pre></div>
+<p>In a functional setting, if we have a type <code>s</code> and we want to get some field of type <code>a</code> from it, a getter is just a function <code>s -&gt; a</code>.</p>
+<p>Similarly, a setter that updates that field has the type <code>s -&gt; a -&gt; s</code> which takes the old <code>s</code> and slots the <code>a</code> into it, giving us back a new <code>s</code>.</p>
+<p>Let’s see if we can build up some intuition, starting with these types and ending with the type of <code>Lens'</code> from the lens library:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Lens&#39;</span> s a <span class="ot">=</span> <span class="kw">forall</span> f<span class="op">.</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s)</span></code></pre></div>
 <p>In particular, let’s start with our getter:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> s <span class="ot">-&gt;</span> a</span></code></pre></div>
-<p>The first thing we can do is convert it to continuation-passing style
-(CPS). In CPS form, a function throws it’s return value to a
-user-specified callback function (or continuation) instead of returning
-its value directly. So our <code>s -&gt; a</code> becomes:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> r</span></code></pre></div>
-<p>After we’re done computing an <code>a</code> from the <code>s</code>
-we were given, we throw it to the continuation of type
-<code>a -&gt; r</code>. We then take <strong>that</strong> result and
-return it. I like to put parens around the second function:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> r)</span></code></pre></div>
-<p>But it’s kind of hard to do anything with this, because
-<code>r</code> is completely arbitrary. It’s chosen by whoever calls us,
-so we have no information about what can be done on an <code>r</code>.
-What if we instead require that the continuation result be a
-Functor?</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f r) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f r)</span></code></pre></div>
-<p>And while we’re at it, it was kind an arbitrary stipulation that the
-<code>f r</code> of the continuation’s callback be the same as the
-<code>f r</code> of our function’s result type, so let’s relax that:</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f b) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f t)</span></code></pre></div>
-<p>This relaxation makes sense as long as we know of some function with
-type <code>b -&gt; t</code>, because then we could</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> s <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p>The first thing we can do is convert it to continuation-passing style (CPS). In CPS form, a function throws it’s return value to a user-specified callback function (or continuation) instead of returning its value directly. So our <code>s -&gt; a</code> becomes:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> r</span></code></pre></div>
+<p>After we’re done computing an <code>a</code> from the <code>s</code> we were given, we throw it to the continuation of type <code>a -&gt; r</code>. We then take <strong>that</strong> result and return it. I like to put parens around the second function:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> (a <span class="ot">-&gt;</span> r) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> r)</span></code></pre></div>
+<p>But it’s kind of hard to do anything with this, because <code>r</code> is completely arbitrary. It’s chosen by whoever calls us, so we have no information about what can be done on an <code>r</code>. What if we instead require that the continuation result be a Functor?</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f r) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f r)</span></code></pre></div>
+<p>And while we’re at it, it was kind an arbitrary stipulation that the <code>f r</code> of the continuation’s callback be the same as the <code>f r</code> of our function’s result type, so let’s relax that:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f b) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f t)</span></code></pre></div>
+<p>This relaxation makes sense as long as we know of some function with type <code>b -&gt; t</code>, because then we could</p>
 <ul>
 <li>take the <code>s</code>,</li>
-<li>apply our <code>s -&gt; a</code> getter to get an
-<code>a</code>,</li>
-<li>throw this to the <code>a -&gt; f b</code> continuation to get an
-<code>f b</code>, and</li>
-<li><code>fmap</code> our <code>b -&gt; t</code> function over this to
-get an <code>f t</code>.</li>
+<li>apply our <code>s -&gt; a</code> getter to get an <code>a</code>,</li>
+<li>throw this to the <code>a -&gt; f b</code> continuation to get an <code>f b</code>, and</li>
+<li><code>fmap</code> our <code>b -&gt; t</code> function over this to get an <code>f t</code>.</li>
 </ul>
-<p>In general, we might not know of some <code>b -&gt; t</code>
-function. But remember that we do have our
-<code>s -&gt; a -&gt; s</code> function! So if we choose
-<code>b = a</code> and <code>s = t</code>, then we get:</p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s)</span></code></pre></div>
+<p>In general, we might not know of some <code>b -&gt; t</code> function. But remember that we do have our <code>s -&gt; a -&gt; s</code> function! So if we choose <code>b = a</code> and <code>s = t</code>, then we get:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fn ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> f a) <span class="ot">-&gt;</span> (s <span class="ot">-&gt;</span> f s)</span></code></pre></div>
 <p>With a function like this, we can</p>
 <ul>
 <li>take the <code>s</code>,</li>
-<li>apply our <code>s -&gt; a</code> getter to get an
-<code>a</code>,</li>
-<li>throw our <code>a</code> to the <code>a -&gt; f a</code>
-continuation to get an <code>f a</code>,</li>
-<li>partially apply our <code>s -&gt; a -&gt; s</code> setter with the
-<code>s</code> we were given,
+<li>apply our <code>s -&gt; a</code> getter to get an <code>a</code>,</li>
+<li>throw our <code>a</code> to the <code>a -&gt; f a</code> continuation to get an <code>f a</code>,</li>
+<li>partially apply our <code>s -&gt; a -&gt; s</code> setter with the <code>s</code> we were given,
 <ul>
 <li>(so we have an <code>a -&gt; s</code> now)</li>
 </ul></li>
-<li><code>fmap</code> this <code>a -&gt; s</code> function over the
-<code>f a</code> to get an <code>f s</code></li>
+<li><code>fmap</code> this <code>a -&gt; s</code> function over the <code>f a</code> to get an <code>f s</code></li>
 </ul>
-<p>And we’ve arrived at the type of <code>Lens'</code>! What really
-happened here was we marked the interesting<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="sidenote">In the same way that glass lenses focus light on a
-point, functional lenses focus a data structure on a point! Isn’t it
-neat how that name works out? It’s certainly a cooler name than
-“generalized getter/setter <a
-href="https://www.youtube.com/watch?v=pD_imYhNoQ4">wombo combo</a>”
-(video, language warning).<br />
+<p>And we’ve arrived at the type of <code>Lens'</code>! What really happened here was we marked the interesting<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">In the same way that glass lenses focus light on a point, functional lenses focus a data structure on a point! Isn’t it neat how that name works out? It’s certainly a cooler name than “generalized getter/setter <a href="https://www.youtube.com/watch?v=pD_imYhNoQ4">wombo combo</a>” (video, language warning).<br />
 <br />
-</span></span> part of our data structure with a Functor. So if we
-choose an interesting Functor instance, it’ll act on that point.</p>
-<p>What if the Functor we choose is <code>Const a</code>? Well, then
-it’s on us to provide an <code>a -&gt; f a</code> continuation. Since
-we’ve chosen <code>f = Const a</code> we have to come up with a function
-with type <code>a -&gt; Const a a</code>. This is a special case of the
-<code>Const</code> constructor:</p>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Const</span><span class="ot"> ::</span> <span class="kw">forall</span> b<span class="op">.</span> a <span class="ot">-&gt;</span> <span class="dt">Const</span> a b</span></code></pre></div>
-<p>So our continuation remembers the <code>a</code> it was given. After
-the last step, we’ll have a <code>Const a s</code>, which we can call
-<code>getConst</code> on to give us the <code>a</code> we stashed. So by
-choosing <code>Const</code>, our lens acts like a getter!</p>
-<p>What if the Functor we choose is <code>Identity</code>? Now we have
-to provide a function <code>a -&gt; Identity a</code>. At this point,
-you probably guessed this makes our lens a setter. If we’re trying to
-use a setter, then we’ll also have access to some new
-<code>y :: a</code> that we want to use to slot into our <code>s</code>.
-Let’s see what happens if we make this our continuation:</p>
-<div class="sourceCode" id="cb9"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inj ::</span> a <span class="ot">-&gt;</span> <span class="dt">Identity</span> a</span>
+</span></span> part of our data structure with a Functor. So if we choose an interesting Functor instance, it’ll act on that point.</p>
+<p>What if the Functor we choose is <code>Const a</code>? Well, then it’s on us to provide an <code>a -&gt; f a</code> continuation. Since we’ve chosen <code>f = Const a</code> we have to come up with a function with type <code>a -&gt; Const a a</code>. This is a special case of the <code>Const</code> constructor:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Const</span><span class="ot"> ::</span> <span class="kw">forall</span> b<span class="op">.</span> a <span class="ot">-&gt;</span> <span class="dt">Const</span> a b</span></code></pre></div>
+<p>So our continuation remembers the <code>a</code> it was given. After the last step, we’ll have a <code>Const a s</code>, which we can call <code>getConst</code> on to give us the <code>a</code> we stashed. So by choosing <code>Const</code>, our lens acts like a getter!</p>
+<p>What if the Functor we choose is <code>Identity</code>? Now we have to provide a function <code>a -&gt; Identity a</code>. At this point, you probably guessed this makes our lens a setter. If we’re trying to use a setter, then we’ll also have access to some new <code>y :: a</code> that we want to use to slot into our <code>s</code>. Let’s see what happens if we make this our continuation:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">inj ::</span> a <span class="ot">-&gt;</span> <span class="dt">Identity</span> a</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>inj x <span class="ot">=</span> <span class="dt">Identity</span> y</span></code></pre></div>
-<p>The <code>x :: a</code> is the old value of <code>x</code>. By
-dropping <code>x</code> on the floor and returning <code>y</code>
-instead, we’ve slotted <code>y</code> into our <code>s</code>. Remember
-that above we took the <code>f a</code> and our setter
-<code>s -&gt; a -&gt; s</code>, partially applied it to get
-<code>a -&gt; s</code>, and <code>fmap</code>’d this over the
-<code>f a</code>. Since our continuation now holds a wrapped up
-<code>y :: a</code>, we’ll reconstruct a new <code>s</code> using
-<code>y</code>. Great!</p>
+<p>The <code>x :: a</code> is the old value of <code>x</code>. By dropping <code>x</code> on the floor and returning <code>y</code> instead, we’ve slotted <code>y</code> into our <code>s</code>. Remember that above we took the <code>f a</code> and our setter <code>s -&gt; a -&gt; s</code>, partially applied it to get <code>a -&gt; s</code>, and <code>fmap</code>’d this over the <code>f a</code>. Since our continuation now holds a wrapped up <code>y :: a</code>, we’ll reconstruct a new <code>s</code> using <code>y</code>. Great!</p>
 <h1 id="more-resources">More Resources</h1>
-<p>These are some resources that helped make lenses less intimidating
-for me:</p>
+<p>These are some resources that helped make lenses less intimidating for me:</p>
 <ul>
-<li><a href="https://www.youtube.com/watch?v=cefnmjtAolY">Lenses, Folds,
-and Traversals</a> (video)
+<li><a href="https://www.youtube.com/watch?v=cefnmjtAolY">Lenses, Folds, and Traversals</a> (video)
 <ul>
 <li>by Edward Kmett, the author of the lens library</li>
 <li>highly technical, long, exhaustive</li>
 </ul></li>
-<li><a
-href="https://hackage.haskell.org/package/lens-4.16/docs/Control-Lens-Getter.html">Control.Lens.Getter</a>
-(hackage)
+<li><a href="https://hackage.haskell.org/package/lens-4.16/docs/Control-Lens-Getter.html">Control.Lens.Getter</a> (hackage)
 <ul>
 <li>in particular, the first few lines of the intro paragraph</li>
-<li>also: <code>(^.)</code> to see where the <code>f</code> becomes
-<code>Const a</code></li>
+<li>also: <code>(^.)</code> to see where the <code>f</code> becomes <code>Const a</code></li>
 </ul></li>
 <li><code>#haskell</code> on Freenode
 <ul>
-<li>Special thanks to <code>johnw_</code> and
-<code>dminuoso</code>!</li>
+<li>Special thanks to <code>johnw_</code> and <code>dminuoso</code>!</li>
 </ul></li>
 </ul>
-<p>Lenses seem intimidating at first, but in the end they’re just a
-really cool uses of functions. We use nothing more exotic here than the
-Functor type class and a couple of Functor instances, and in return we
-get such concise code!</p>
+<p>Lenses seem intimidating at first, but in the end they’re just a really cool uses of functions. We use nothing more exotic here than the Functor type class and a couple of Functor instances, and in return we get such concise code!</p>
 <!-- vim:tw=72
 -->
 </main>

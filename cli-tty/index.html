@@ -51,42 +51,21 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#isatty-in-other-languages"
-  id="toc-isatty-in-other-languages"><code>isatty</code> in other
-  languages</a></li>
+  <li><a href="#isatty-in-other-languages"><code>isatty</code> in other languages</a></li>
   </ul>
 </nav>
 
 <main>
-<p>One thing I like to do to improve the command-line programs I
-maintain is to make them aware of whether they’re being run
-interactively. In this post I’ll show off an easy trick to make programs
-running interactively more usable.</p>
+<p>One thing I like to do to improve the command-line programs I maintain is to make them aware of whether they’re being run interactively. In this post I’ll show off an easy trick to make programs running interactively more usable.</p>
 <!-- more -->
-<p>This always used to trip me up when I was first learning to use the
-terminal:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> grep <span class="st">&#39;def foo&#39;</span></span></code></pre></div>
-<p>I’d drop this into the command-line and what happens? It hangs… Is it
-because it’s taking a long time to search? Nope—I’ve forgetten to tell
-<code>grep</code> what files to search in!</p>
-<p>When <code>grep</code> is given only a pattern to search for and no
-files to search in, it assumes we want to search for that pattern on
-stdin. This is great for shell scripts and one-liners at the
-command-line, but it’s <strong>super</strong> annoying when we’re just
-grepping interactively.</p>
-<p>The thing is, it’s super easy to detect when the user might have made
-this mistake: if we’re defaulting to reading from stdin
-<strong>and</strong> the file corresponding to stdin represents a
-terminal (more specifically, a <a
-href="https://unix.stackexchange.com/questions/4126/">tty</a>). And once
-we’ve detected it, we can print a helpful message.</p>
-<p>Here’s how I did it when writing <a
-href="https://github.com/jez/diff-locs"><code>diff-locs</code></a>, one
-of the command-line programs I’ve been working on lately:</p>
+<p>This always used to trip me up when I was first learning to use the terminal:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>❯ <span class="fu">grep</span> <span class="st">&#39;def foo&#39;</span></span></code></pre></div>
+<p>I’d drop this into the command-line and what happens? It hangs… Is it because it’s taking a long time to search? Nope—I’ve forgetten to tell <code>grep</code> what files to search in!</p>
+<p>When <code>grep</code> is given only a pattern to search for and no files to search in, it assumes we want to search for that pattern on stdin. This is great for shell scripts and one-liners at the command-line, but it’s <strong>super</strong> annoying when we’re just grepping interactively.</p>
+<p>The thing is, it’s super easy to detect when the user might have made this mistake: if we’re defaulting to reading from stdin <strong>and</strong> the file corresponding to stdin represents a terminal (more specifically, a <a href="https://unix.stackexchange.com/questions/4126/">tty</a>). And once we’ve detected it, we can print a helpful message.</p>
+<p>Here’s how I did it when writing <a href="https://github.com/jez/diff-locs"><code>diff-locs</code></a>, one of the command-line programs I’ve been working on lately:</p>
 <figure>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode numberSource haskell numberLines"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1"></a>fileIn <span class="ot">&lt;-</span> <span class="kw">case</span> inputStyle <span class="kw">of</span></span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource haskell numberLines"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1"></a>fileIn <span class="ot">&lt;-</span> <span class="kw">case</span> inputStyle <span class="kw">of</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  <span class="dt">InputFromFile</span> filename <span class="ot">-&gt;</span> <span class="dt">IO</span><span class="op">.</span>openFile filename <span class="dt">IO</span><span class="op">.</span><span class="dt">ReadMode</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="dt">InputFromStdin</span>         <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a>    isTTY <span class="ot">&lt;-</span> hIsTerminalDevice <span class="dt">IO</span><span class="op">.</span>stdin</span>
@@ -97,41 +76,20 @@ class="sourceCode numberSource haskell numberLines"><code class="sourceCode hask
 Check if stdin is a tty in Haskell
 </figcaption>
 </figure>
-<p>If we’ve been given a file explicitly, just open it. Otherwise, fall
-back to reading from stdin. But first, check if <code>IO.stdin</code> is
-a terminal device and when it <strong>is</strong>, print a warning.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">We don’t really need to check whether the file we’re
-opening is a tty. If the user managed to pass in the <em>name</em> of a
-tty file, they probably know what they’re doing. [haskell-isatty]:
-https://github.com/jez/diff-locs/blob/743bff5cb1abb6e405b0369b195614aea6ec018d/app/Main.hs#L17-L24<br />
+<p>If we’ve been given a file explicitly, just open it. Otherwise, fall back to reading from stdin. But first, check if <code>IO.stdin</code> is a terminal device and when it <strong>is</strong>, print a warning.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">We don’t really need to check whether the file we’re opening is a tty. If the user managed to pass in the <em>name</em> of a tty file, they probably know what they’re doing. [haskell-isatty]: https://github.com/jez/diff-locs/blob/743bff5cb1abb6e405b0369b195614aea6ec018d/app/Main.hs#L17-L24<br />
 <br />
-</span></span> The complete file containing the snippet above is [on
-GitHub][haskell-isatty].</p>
-<p>I’ve implemented <code>diff-locs</code> as a standard Unix filter—it
-takes input on stdin and emits output on stdout. Normal usage looks
-something like this, where we pipe <code>git diff</code> into
-<code>diff-locs</code>:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> git diff <span class="kw">|</span> <span class="ex">diff-locs</span></span></code></pre></div>
-<p>But if someone is just playing around at the terminal (maybe, trying
-to get the help output to show up), they might run
-<code>diff-locs</code> without args, and then be greeted with this
-message:</p>
+</span></span> The complete file containing the snippet above is [on GitHub][haskell-isatty].</p>
+<p>I’ve implemented <code>diff-locs</code> as a standard Unix filter—it takes input on stdin and emits output on stdout. Normal usage looks something like this, where we pipe <code>git diff</code> into <code>diff-locs</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>❯ <span class="fu">git</span> diff <span class="kw">|</span> <span class="ex">diff-locs</span></span></code></pre></div>
+<p>But if someone is just playing around at the terminal (maybe, trying to get the help output to show up), they might run <code>diff-locs</code> without args, and then be greeted with this message:</p>
 <pre><code>❯ diff-locs
 Warning: reading from stdin, which is a tty.
 █</code></pre>
 <p>This is much better than just sitting there appearing to hang!</p>
-<h1 id="isatty-in-other-languages"><code>isatty</code> in other
-languages</h1>
-<p>The trick above works in pretty much every language that supports
-Unix programming. Under the hood, the Haskell snippet above is powered
-by the <code>isatty</code> function in the C standard library
-(<code>man 3 isatty</code>), which most other languages wrap in some
-way. For example, three other languages I’ve done this in recently:</p>
+<h1 id="isatty-in-other-languages"><code>isatty</code> in other languages</h1>
+<p>The trick above works in pretty much every language that supports Unix programming. Under the hood, the Haskell snippet above is powered by the <code>isatty</code> function in the C standard library (<code>man 3 isatty</code>), which most other languages wrap in some way. For example, three other languages I’ve done this in recently:</p>
 <figure>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode numberSource ruby numberLines"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">if</span> <span class="cn">STDIN</span><span class="at">.isatty?</span></span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">if</span> <span class="cn">STDIN</span><span class="at">.isatty?</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>  <span class="cn">STDERR</span><span class="at">.puts</span> <span class="vs">&#39;Warning: reading from stdin, which is a tty.&#39;</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
@@ -139,27 +97,22 @@ Ruby
 </figcaption>
 </figure>
 <figure>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">-t</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>  <span class="bu">echo</span> <span class="st">&#39;Warning: reading from stdin, which is a tty.&#39;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">if</span><span class="bu"> [</span> <span class="ot">-t</span> 0<span class="bu"> ]</span>; <span class="kw">then</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="bu">echo</span> <span class="st">&#39;Warning: reading from stdin, which is a tty.&#39;</span> <span class="op">&gt;&amp;2</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="ex">end</span></span></code></pre></div>
 <figcaption>
 Bash
 </figcaption>
 </figure>
 <figure>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode numberSource ocaml numberLines"><code class="sourceCode ocaml"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">if</span> Unix.isatty Unix.<span class="dt">stdin</span></span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource ocaml numberLines"><code class="sourceCode ocaml"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">if</span> Unix.isatty Unix.<span class="dt">stdin</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="kw">then</span> <span class="dt">prerr_endline</span> <span class="st">&quot;Warning: reading from stdin, which is a tty.&quot;</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="kw">else</span> ()</span></code></pre></div>
 <figcaption>
 OCaml
 </figcaption>
 </figure>
-<p>And again, a quick search for <code>isatty &lt;language&gt;</code>
-should suffice for any language that supports Unix programming. It’s
-little things like this that add up and make certain command-line
-utilities delightful to use.</p>
+<p>And again, a quick search for <code>isatty &lt;language&gt;</code> should suffice for any language that supports Unix programming. It’s little things like this that add up and make certain command-line utilities delightful to use.</p>
 </main>
 
 

@@ -51,72 +51,43 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#install-latex" id="toc-install-latex">Install LaTeX</a>
+  <li><a href="#install-latex">Install LaTeX</a>
   <ul>
-  <li><a href="#on-linux" id="toc-on-linux">On Linux</a></li>
-  <li><a href="#on-os-x" id="toc-on-os-x">On OS X</a></li>
+  <li><a href="#on-linux">On Linux</a></li>
+  <li><a href="#on-os-x">On OS X</a></li>
   </ul></li>
-  <li><a href="#use-vim" id="toc-use-vim">Use Vim</a></li>
-  <li><a href="#use-make" id="toc-use-make">Use Make</a></li>
-  <li><a href="#workflow-tips" id="toc-workflow-tips">Workflow
-  Tips</a></li>
-  <li><a href="#wrap-up" id="toc-wrap-up">Wrap Up</a></li>
-  <li><a href="#part-2" id="toc-part-2">Part 2!</a></li>
+  <li><a href="#use-vim">Use Vim</a></li>
+  <li><a href="#use-make">Use Make</a></li>
+  <li><a href="#workflow-tips">Workflow Tips</a></li>
+  <li><a href="#wrap-up">Wrap Up</a></li>
+  <li><a href="#part-2"><span>Part 2</span>!</a></li>
   </ul>
 </nav>
 
 <main>
-<p>While online clients like ShareLaTeX or writeLaTeX are popular for
-getting started with LaTeX quickly, developing LaTeX locally with Vim
-and the command line is my preferred LaTeX workflow. In this post, I’ll
-describe the changes I’ve made that make working with LaTeX on the
-command line a seamless experience.</p>
+<p>While online clients like ShareLaTeX or writeLaTeX are popular for getting started with LaTeX quickly, developing LaTeX locally with Vim and the command line is my preferred LaTeX workflow. In this post, I’ll describe the changes I’ve made that make working with LaTeX on the command line a seamless experience.</p>
 <!-- more -->
 <h1 id="install-latex">Install LaTeX</h1>
-<p>Obviously, to work with LaTeX locally, you’ll need LaTeX installed.
-To check if you already have it installed, you can run
-<code>which pdflatex</code>. If it’s installed, this command will tell
-you the path to program. Otherwise, it won’t print anything.</p>
+<p>Obviously, to work with LaTeX locally, you’ll need LaTeX installed. To check if you already have it installed, you can run <code>which pdflatex</code>. If it’s installed, this command will tell you the path to program. Otherwise, it won’t print anything.</p>
 <h2 id="on-linux">On Linux</h2>
-<p>Installing LaTeX on Linux isn’t too bad. Usually it’s included in
-your distribution’s package manager. I’ll be focusing on OS X for the
-majority of this post though, so Google around if you end up having
-trouble.</p>
+<p>Installing LaTeX on Linux isn’t too bad. Usually it’s included in your distribution’s package manager. I’ll be focusing on OS X for the majority of this post though, so Google around if you end up having trouble.</p>
 <h2 id="on-os-x">On OS X</h2>
-<p>To install LaTeX on a Mac, we’ll be installing MacTeX, which includes
-the command line LaTeX utilities as well as a couple graphical clients
-for LaTeX development. You can try compiling from source, but as
-Homebrew points out when you try to <code>brew install latex</code>:</p>
+<p>To install LaTeX on a Mac, we’ll be installing MacTeX, which includes the command line LaTeX utilities as well as a couple graphical clients for LaTeX development. You can try compiling from source, but as Homebrew points out when you try to <code>brew install latex</code>:</p>
 <pre class="plain"><code>$ brew install latex
 Error: No available formula for latex
 Installing TeX from source is weird and gross, requires a lot of patches,
 and only builds 32-bit (and thus can&#39;t use Homebrew deps on Snow Leopard.)
 
 We recommend using a MacTeX distribution: http://www.tug.org/mactex/</code></pre>
-<p>With that in mind, head on over to <a
-href="http://www.tug.org/mactex/">http://www.tug.org/mactex/</a> and
-download the file <code>MacTeX.pkg</code>. Once this has downloaded and
-you’ve clicked through the installer, you should be ready to go with
-LaTeX. Verify this by running <code>which pdflatex</code> again.</p>
+<p>With that in mind, head on over to <a href="http://www.tug.org/mactex/">http://www.tug.org/mactex/</a> and download the file <code>MacTeX.pkg</code>. Once this has downloaded and you’ve clicked through the installer, you should be ready to go with LaTeX. Verify this by running <code>which pdflatex</code> again.</p>
 <h1 id="use-vim">Use Vim</h1>
-<p>The biggest productivity improvement you gain from developing LaTeX
-locally is that you get to use Vim. Make sure you have a nice
-colorscheme for both your terminal and for Vim. <strong>I can’t stress
-enough how important it is to make your terminal look nice</strong>: you
-want to enjoy your terminal experience, and this is one of the easiest
-ways to do so.</p>
+<p>The biggest productivity improvement you gain from developing LaTeX locally is that you get to use Vim. Make sure you have a nice colorscheme for both your terminal and for Vim. <strong>I can’t stress enough how important it is to make your terminal look nice</strong>: you want to enjoy your terminal experience, and this is one of the easiest ways to do so.</p>
 <h1 id="use-make">Use Make</h1>
-<p>Compiling LaTeX is pretty straightforward. To generate a PDF, all you
-have to do is run the command</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> pdflatex <span class="op">&lt;</span>myfile<span class="op">&gt;</span>.tex</span></code></pre></div>
-<p>and you’ll get a file called <code>&lt;myfile&gt;.pdf</code> in the
-current directory, plus some intermediate files. We can go one step
-further and put a bunch of useful build targets into a Makefile and use
-it to build our PDF:</p>
+<p>Compiling LaTeX is pretty straightforward. To generate a PDF, all you have to do is run the command</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>$ <span class="ex">pdflatex</span> <span class="op">&lt;</span>myfile<span class="op">&gt;</span>.tex</span></code></pre></div>
+<p>and you’ll get a file called <code>&lt;myfile&gt;.pdf</code> in the current directory, plus some intermediate files. We can go one step further and put a bunch of useful build targets into a Makefile and use it to build our PDF:</p>
 <figure>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode numberSource make numberLines"><code class="sourceCode"><span id="cb3-1"><a href="#cb3-1"></a># NOTE: Change &quot;written&quot; to the name of your TeX file with no extension</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource make numberLines"><code class="sourceCode"><span id="cb3-1"><a href="#cb3-1"></a># NOTE: Change &quot;written&quot; to the name of your TeX file with no extension</span>
 <span id="cb3-2"><a href="#cb3-2"></a>TARGET=written</span>
 <span id="cb3-3"><a href="#cb3-3"></a></span>
 <span id="cb3-4"><a href="#cb3-4"></a>all: $(TARGET).pdf</span>
@@ -143,29 +114,17 @@ class="sourceCode numberSource make numberLines"><code class="sourceCode"><span 
 <span id="cb3-25"><a href="#cb3-25"></a></span>
 <span id="cb3-26"><a href="#cb3-26"></a>.PHONY: all clean veryclean view print</span></code></pre></div>
 <figcaption>
-<a href="https://gist.github.com/jez/b248a409d19c9f1c94cd">LaTeX
-Makefile</a>
+<a href="https://gist.github.com/jez/b248a409d19c9f1c94cd">LaTeX Makefile</a>
 </figcaption>
 </figure>
-<p>If you save this to a file called <code>Makefile</code> in the same
-directory as your LaTeX file, we can just run <code>make</code> instead
-of running <code>pdflatex &lt;myfile&gt;.tex</code>!</p>
+<p>If you save this to a file called <code>Makefile</code> in the same directory as your LaTeX file, we can just run <code>make</code> instead of running <code>pdflatex &lt;myfile&gt;.tex</code>!</p>
 <p>As you can see, there are a bunch of other handy targets here:</p>
 <ul>
-<li><code>make clean</code> will remove all intermediate files that are
-created.</li>
-<li><code>make veryclean</code> will remove all intermediate files and
-the compiled PDF file.</li>
-<li><code>make view</code> will compile the file and then open it up in
-a PDF viewer (if you’re on OS X, or on Linux and have
-<code>evince</code> installed).</li>
-<li><code>make print</code> will send your document to the default
-printer with the default options for that printer.</li>
-<li><code>make submit</code> will copy your file into the parent
-directory. This is handy when you’re working in a subfolder on an
-assignment to isolate the intermediate files, but your class has
-provided a handin script that needs the PDF file to be in the parent
-directory.</li>
+<li><code>make clean</code> will remove all intermediate files that are created.</li>
+<li><code>make veryclean</code> will remove all intermediate files and the compiled PDF file.</li>
+<li><code>make view</code> will compile the file and then open it up in a PDF viewer (if you’re on OS X, or on Linux and have <code>evince</code> installed).</li>
+<li><code>make print</code> will send your document to the default printer with the default options for that printer.</li>
+<li><code>make submit</code> will copy your file into the parent directory. This is handy when you’re working in a subfolder on an assignment to isolate the intermediate files, but your class has provided a handin script that needs the PDF file to be in the parent directory.</li>
 </ul>
 <h1 id="workflow-tips">Workflow Tips</h1>
 <p>Right now, our workflow looks like this:</p>
@@ -175,41 +134,26 @@ directory.</li>
 <li>Switch to terminal</li>
 <li>Run make view to compile and view</li>
 </ul>
-<p>We can actually optimize this workflow to one less step: we don’t
-have to get out of Vim to run make!</p>
-<p>Vim has a command <code>:make</code> that will look for a Makefile in
-the current directory and run it’s <code>all</code> target. It also
-takes a target as an optional argument, so we can do
-<code>:make view</code> to compile and view the document from within
-Vim!</p>
-<p>Taking this one step further, we can add a command to shorten this.
-If we add</p>
+<p>We can actually optimize this workflow to one less step: we don’t have to get out of Vim to run make!</p>
+<p>Vim has a command <code>:make</code> that will look for a Makefile in the current directory and run it’s <code>all</code> target. It also takes a target as an optional argument, so we can do <code>:make view</code> to compile and view the document from within Vim!</p>
+<p>Taking this one step further, we can add a command to shorten this. If we add</p>
 <figure>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode numberSource vim numberLines"><code class="sourceCode"><span id="cb4-1"><a href="#cb4-1"></a>command WV w | make view</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource vim numberLines"><code class="sourceCode"><span id="cb4-1"><a href="#cb4-1"></a>command WV w | make view</span></code></pre></div>
 <figcaption>
 Save, Compile and View in Vim
 </figcaption>
 </figure>
-<p>to our <code>.vimrc</code>, we’ll only have to type <code>:WV</code>
-to save, compile, and view our PDF output.</p>
+<p>to our <code>.vimrc</code>, we’ll only have to type <code>:WV</code> to save, compile, and view our PDF output.</p>
 <h1 id="wrap-up">Wrap Up</h1>
 <p>That’s it! I like this experience for a bunch of reasons:</p>
 <ul>
-<li><strong>It’s faster</strong>. Compiling LaTeX without having to wait
-for a web client to load is really nice.</li>
-<li><strong>It’s more stable</strong>. You can still edit, compile, and
-view your work if you don’t have access to the Internet.</li>
-<li><strong>It’s faster</strong>. Using Vim to edit text is much more
-convenient than a standard text editor.</li>
+<li><strong>It’s faster</strong>. Compiling LaTeX without having to wait for a web client to load is really nice.</li>
+<li><strong>It’s more stable</strong>. You can still edit, compile, and view your work if you don’t have access to the Internet.</li>
+<li><strong>It’s faster</strong>. Using Vim to edit text is much more convenient than a standard text editor.</li>
 </ul>
-<p>Do you have a LaTeX tip, a fancier Makefile, or a favorite vim plugin
-for LaTeX? Share it in the comments!</p>
-<h1 id="part-2"><a
-href="/2015/01/10/offline-latex-development-part-2/">Part 2</a>!</h1>
-<p>Actually that’s not it, there’s more! I wrote a <a
-href="/2015/01/10/offline-latex-development-part-2/">Part 2</a> to this
-post, which you should definitely check out.</p>
+<p>Do you have a LaTeX tip, a fancier Makefile, or a favorite vim plugin for LaTeX? Share it in the comments!</p>
+<h1 id="part-2"><a href="/2015/01/10/offline-latex-development-part-2/">Part 2</a>!</h1>
+<p>Actually that’s not it, there’s more! I wrote a <a href="/2015/01/10/offline-latex-development-part-2/">Part 2</a> to this post, which you should definitely check out.</p>
 </main>
 
 

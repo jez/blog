@@ -51,51 +51,32 @@
 </nav>
 
 <main>
-<p>I recently learned that linkers are really cool. It all started when
-I saw an error message that looked something like this:</p>
+<p>I recently learned that linkers are really cool. It all started when I saw an error message that looked something like this:</p>
 <pre><code>❯ rake test
 symbol lookup error: /home/jez/.../foo.so: undefined symbol bar</code></pre>
-<p>I <a href="/search-down-the-stack/">already wrote</a> about finding
-where this error was coming from. The tl;dr is that it was coming from
-GNU’s libc implementation:</p>
+<p>I <a href="/search-down-the-stack/">already wrote</a> about finding where this error was coming from. The tl;dr is that it was coming from GNU’s libc implementation:</p>
 <pre><code>❯ rg -t c &#39;symbol lookup error&#39;
 dl-lookup.c
 876:      _dl_signal_cexception (0, &amp;exception, N_(&quot;symbol lookup error&quot;));</code></pre>
-<p>That led me to a fun exploration of how linux linkers work, and how
-Ruby C extensions rely on them.</p>
-<p>I always knew that Ruby C extensions existed (that they <a
-href="https://twitter.com/asolove/status/1261339091485917184">break all
-the time</a> is a constant reminder…) but I never really connected the
-dots between “here’s some C code” and how Ruby actually runs that
-code.</p>
-<p>Ruby C extensions are just shared libraries following certain
-conventions. Specifically, a Ruby C extension might look like this:</p>
+<p>That led me to a fun exploration of how linux linkers work, and how Ruby C extensions rely on them.</p>
+<p>I always knew that Ruby C extensions existed (that they <a href="https://twitter.com/asolove/status/1261339091485917184">break all the time</a> is a constant reminder…) but I never really connected the dots between “here’s some C code” and how Ruby actually runs that code.</p>
+<p>Ruby C extensions are just shared libraries following certain conventions. Specifically, a Ruby C extension might look like this:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;ruby.h&quot;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>VALUE my_foo<span class="op">(</span>VALUE self<span class="op">,</span> VALUE val<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> rb_funcall<span class="op">(</span>self<span class="op">,</span> rb_intern<span class="op">(</span><span class="st">&quot;puts&quot;</span><span class="op">),</span> <span class="dv">1</span><span class="op">,</span> val<span class="op">)</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>VALUE my_foo(VALUE self, VALUE val) {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> rb_funcall(self, rb_intern(<span class="st">&quot;puts&quot;</span>), <span class="dv">1</span>, val)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">// This function&#39;s name matters:</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Init_my_lib<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  rb_define_method<span class="op">(</span>rb_cObject<span class="op">,</span> <span class="st">&quot;foo&quot;</span><span class="op">,</span> my_foo<span class="op">);</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>The important part is that the name of that <code>Init_my_lib</code>
-function matters. When Ruby sees a line like</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require_relative</span> <span class="vs">&#39;./my_lib&#39;</span></span></code></pre></div>
-<p>it looks for a file called <code>my_lib.so</code> (or
-<code>my_lib.bundle</code> on macOS), asks the operating system to load
-that file as a shared library, and then looks for a function with the
-name <code>Init_my_lib</code> inside the library it just loaded.</p>
-<p>When that function runs, it’s a chance for the C extension to do the
-same sorts of things that a normal Ruby file might have done if it had
-been <code>require</code>’d. In this example, it defines a method
-<code>foo</code> at the top level, almost like the user had written
-normal Ruby code like this:</p>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Init_my_lib() {</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  rb_define_method(rb_cObject, <span class="st">&quot;foo&quot;</span>, my_foo);</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>The important part is that the name of that <code>Init_my_lib</code> function matters. When Ruby sees a line like</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require_relative</span> <span class="vs">&#39;./my_lib&#39;</span></span></code></pre></div>
+<p>it looks for a file called <code>my_lib.so</code> (or <code>my_lib.bundle</code> on macOS), asks the operating system to load that file as a shared library, and then looks for a function with the name <code>Init_my_lib</code> inside the library it just loaded.</p>
+<p>When that function runs, it’s a chance for the C extension to do the same sorts of things that a normal Ruby file might have done if it had been <code>require</code>’d. In this example, it defines a method <code>foo</code> at the top level, almost like the user had written normal Ruby code like this:</p>
 <figure>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo(val)</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo(val)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> val</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
@@ -104,90 +85,58 @@ my_lib.rb
 </figure>
 <p>That’s kind of wild! That means:</p>
 <ul>
-<li>C programs can load libraries dynamically at runtime, using
-arbitrary user input.</li>
-<li>C programs can then ask if there’s a function defined in that
-library with an arbitrary name, and get a function pointer to call it if
-there is!</li>
+<li>C programs can load libraries dynamically at runtime, using arbitrary user input.</li>
+<li>C programs can then ask if there’s a function defined in that library with an arbitrary name, and get a function pointer to call it if there is!</li>
 </ul>
-<p>I was pretty shocked to learn this, because my mental model of how
-linking worked was that it split evenly into two parts:</p>
+<p>I was pretty shocked to learn this, because my mental model of how linking worked was that it split evenly into two parts:</p>
 <ul>
-<li><p>“My application is statically linked, where all the code and
-libraries my application depends on are compiled into my
-binary.”</p></li>
-<li><p>“My application is dynamically linked, which means my binary
-pre-declares some libraries that must be loaded before my program can
-start running.”</p></li>
+<li><p>“My application is statically linked, where all the code and libraries my application depends on are compiled into my binary.”</p></li>
+<li><p>“My application is dynamically linked, which means my binary pre-declares some libraries that must be loaded before my program can start running.”</p></li>
 </ul>
 <p>There’s actually a third option!</p>
-<p>Then I looked into what code Ruby actually calls to do this. I found
-the code in <code>dln.c</code>:</p>
+<p>Then I looked into what code Ruby actually calls to do this. I found the code in <code>dln.c</code>:</p>
 <figure>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">/* Load file */</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">((</span>handle <span class="op">=</span> <span class="op">(</span><span class="dt">void</span><span class="op">*)</span>dlopen<span class="op">(</span>file<span class="op">,</span> RTLD_LAZY<span class="op">|</span>RTLD_GLOBAL<span class="op">))</span> <span class="op">==</span> NULL<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> dln_strerror<span class="op">();</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">goto</span> failed<span class="op">;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> ((handle = (<span class="dt">void</span>*)dlopen(file, RTLD_LAZY|RTLD_GLOBAL)) == NULL) {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    error = dln_strerror();</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">goto</span> failed;</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <figcaption>
 dln.c
 </figcaption>
 </figure>
-<p><a
-href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1341">→
-View on github.com</a></p>
-<p>Ruby uses the <code>dlopen(3)</code> function in libc to request that
-an arbitrary user library be loaded. From the man page:</p>
+<p><a href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1341">→ View on github.com</a></p>
+<p>Ruby uses the <code>dlopen(3)</code> function in libc to request that an arbitrary user library be loaded. From the man page:</p>
 <blockquote>
-<p>The function dlopen() loads the dynamic shared object (shared
-library) file named by the null-terminated string filename and returns
-an opaque “handle” for the loaded object.</p>
+<p>The function dlopen() loads the dynamic shared object (shared library) file named by the null-terminated string filename and returns an opaque “handle” for the loaded object.</p>
 <p>— man dlopen</p>
 </blockquote>
-<p>The next thing Ruby does with this opaque <code>handle</code> is to
-find if the thing it just loaded has an <code>Init_&lt;...&gt;</code>
-function inside it:</p>
+<p>The next thing Ruby does with this opaque <code>handle</code> is to find if the thing it just loaded has an <code>Init_&lt;...&gt;</code> function inside it:</p>
 <figure>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>init_fct <span class="op">=</span> <span class="op">(</span><span class="dt">void</span><span class="op">(*)())(</span>VALUE<span class="op">)</span>dlsym<span class="op">(</span>handle<span class="op">,</span> buf<span class="op">);</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>init_fct <span class="op">==</span> NULL<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">size_t</span> errlen <span class="op">=</span> strlen<span class="op">(</span>error <span class="op">=</span> dln_strerror<span class="op">())</span> <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> memcpy<span class="op">(</span>ALLOCA_N<span class="op">(</span><span class="dt">char</span><span class="op">,</span> errlen<span class="op">),</span> error<span class="op">,</span> errlen<span class="op">);</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    dlclose<span class="op">(</span>handle<span class="op">);</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">goto</span> failed<span class="op">;</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>init_fct = (<span class="dt">void</span>(*)())(VALUE)dlsym(handle, buf);</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (init_fct == NULL) {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">size_t</span> errlen = strlen(error = dln_strerror()) + <span class="dv">1</span>;</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    error = memcpy(ALLOCA_N(<span class="dt">char</span>, errlen), error, errlen);</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    dlclose(handle);</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">goto</span> failed;</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <figcaption>
 dln.c
 </figcaption>
 </figure>
-<p><a
-href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1363-L1369">→
-View on github.com</a></p>
-<p>It uses <code>dlsym(3)</code> (again in libc) to look up a method
-with an arbitrary name (<code>buf</code>) inside the library it just
-opened (<code>handle</code>). That function must exist—if it doesn’t,
-it’s not a valid Ruby C extension and Ruby reports an error.</p>
-<p>If <code>dlsym</code> found a function with the right name, it stores
-a function pointer into <code>init_fct</code>, which Ruby immediately
-dereferences and calls:</p>
+<p><a href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1363-L1369">→ View on github.com</a></p>
+<p>It uses <code>dlsym(3)</code> (again in libc) to look up a method with an arbitrary name (<code>buf</code>) inside the library it just opened (<code>handle</code>). That function must exist—if it doesn’t, it’s not a valid Ruby C extension and Ruby reports an error.</p>
+<p>If <code>dlsym</code> found a function with the right name, it stores a function pointer into <code>init_fct</code>, which Ruby immediately dereferences and calls:</p>
 <figure>
 <div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">/* Call the init code */</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">(*</span>init_fct<span class="op">)();</span></span></code></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>(*init_fct)();</span></code></pre></div>
 <figcaption>
 dln.c
 </figcaption>
 </figure>
-<p><a
-href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1370-L1371">→
-View on github.com</a></p>
-<p>It’s still kind of mind bending to think that C provides this level
-of “dynamism.” I had always thought that being a compiled language meant
-that the set of functions a C program could call was fixed at compile
-time, but that’s not true at all!</p>
-<p>This search led me down a rabbit hole of learning more about linkers,
-and now I think they’re super cool—and far less cryptic! I
-<strong>highly</strong> recommend <em>Chapter 7: Linking</em> from <a
-href="http://www.csapp.cs.cmu.edu/">Computer Systems: A Programmer’s
-Perspective</a> if this was interesting to you.</p>
+<p><a href="https://github.com/ruby/ruby/blob/37c2cd3fa47c709570e22ec4dac723ca211f423a/dln.c#L1370-L1371">→ View on github.com</a></p>
+<p>It’s still kind of mind bending to think that C provides this level of “dynamism.” I had always thought that being a compiled language meant that the set of functions a C program could call was fixed at compile time, but that’s not true at all!</p>
+<p>This search led me down a rabbit hole of learning more about linkers, and now I think they’re super cool—and far less cryptic! I <strong>highly</strong> recommend <em>Chapter 7: Linking</em> from <a href="http://www.csapp.cs.cmu.edu/">Computer Systems: A Programmer’s Perspective</a> if this was interesting to you.</p>
 </main>
 
 

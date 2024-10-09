@@ -51,31 +51,21 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#source" id="toc-source">Source</a></li>
-  <li><a href="#motivations" id="toc-motivations">Motivations</a></li>
-  <li><a href="#wish-list" id="toc-wish-list">Wish List</a></li>
+  <li><a href="#source">Source</a></li>
+  <li><a href="#motivations">Motivations</a></li>
+  <li><a href="#wish-list">Wish List</a></li>
   </ul>
 </nav>
 
 <main>
-<p>A while back I was doing some spring cleaning of my Python packages.
-I noticed that there were a bunch of packages that I couldn’t recall
-installing. I wanted to know if I could safely remove them, so I wrote a
-simple bash script to tell me called <code>pip-uses</code>.</p>
+<p>A while back I was doing some spring cleaning of my Python packages. I noticed that there were a bunch of packages that I couldn’t recall installing. I wanted to know if I could safely remove them, so I wrote a simple bash script to tell me called <code>pip-uses</code>.</p>
 <!-- more -->
 <h1 id="source">Source</h1>
-<p>Rather than post the source here and let it get more out of date
-every time I change it, you can find the source <a
-href="https://github.com/jez/bin/blob/master/pip-uses">on GitHub</a>.
-It’s in my <a href="https://github.com/jez/bin">bin repository</a>,
-where I keep my notable helper scripts; feel free to poke around.</p>
+<p>Rather than post the source here and let it get more out of date every time I change it, you can find the source <a href="https://github.com/jez/bin/blob/master/pip-uses">on GitHub</a>. It’s in my <a href="https://github.com/jez/bin">bin repository</a>, where I keep my notable helper scripts; feel free to poke around.</p>
 <h1 id="motivations">Motivations</h1>
-<p>I was primarily influenced by Homebrew’s <code>brew uses</code>
-command. It does a nice job of giving you exactly the information you
-want, and I think the way the command is named makes sense.</p>
+<p>I was primarily influenced by Homebrew’s <code>brew uses</code> command. It does a nice job of giving you exactly the information you want, and I think the way the command is named makes sense.</p>
 <figure>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode numberSource plain numberLines"><code class="sourceCode"><span id="cb1-1"><a href="#cb1-1"></a>$ brew uses --installed pango</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource plain numberLines"><code class="sourceCode"><span id="cb1-1"><a href="#cb1-1"></a>$ brew uses --installed pango</span>
 <span id="cb1-2"><a href="#cb1-2"></a>imagemagick</span></code></pre></div>
 <figcaption>
 Homebrew: brew uses
@@ -83,47 +73,30 @@ Homebrew: brew uses
 </figure>
 <p><code>pip-uses</code> gives you basically the experience:</p>
 <figure>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode numberSource plain numberLines"><code class="sourceCode"><span id="cb2-1"><a href="#cb2-1"></a>$ pip-uses stevedore</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource plain numberLines"><code class="sourceCode"><span id="cb2-1"><a href="#cb2-1"></a>$ pip-uses stevedore</span>
 <span id="cb2-2"><a href="#cb2-2"></a>virtualenvwrapper</span></code></pre></div>
 <figcaption>
 Pip: pip-uses
 </figcaption>
 </figure>
-<p>In this example, the Python package <code>virtualenvwrapper</code>
-uses <code>stevedore</code>, just as <code>imagemagick</code> uses
-<code>pango</code>. Both commands can save you from accidentally
-removing a crucial dependency and answer the burning question, “How in
-the world did this thing get installed?”</p>
+<p>In this example, the Python package <code>virtualenvwrapper</code> uses <code>stevedore</code>, just as <code>imagemagick</code> uses <code>pango</code>. Both commands can save you from accidentally removing a crucial dependency and answer the burning question, “How in the world did this thing get installed?”</p>
 <h1 id="wish-list">Wish List</h1>
-<p>I’m not doing much Python development these days, but if I had some
-spare time I’d love for the script to also have these features:</p>
+<p>I’m not doing much Python development these days, but if I had some spare time I’d love for the script to also have these features:</p>
 <ul>
 <li>Recursive enumeration of dependencies
 <ul>
-<li>It’d be nice if <code>pip-uses</code> kept recursively searching
-until it found no more dependencies. This way, it’d be easy to see if
-you could safely uninstall a whole slew of packages that you’re no
-longer using.</li>
+<li>It’d be nice if <code>pip-uses</code> kept recursively searching until it found no more dependencies. This way, it’d be easy to see if you could safely uninstall a whole slew of packages that you’re no longer using.</li>
 </ul></li>
 <li>Operate on more than one package
 <ul>
-<li>I didn’t need it at the time, so I didn’t implement it, but it’d be
-nice if the command took a variable amount of arguments and ran the same
-logic on all supplied packages.</li>
+<li>I didn’t need it at the time, so I didn’t implement it, but it’d be nice if the command took a variable amount of arguments and ran the same logic on all supplied packages.</li>
 </ul></li>
 <li>Integrate with <code>pip</code>
 <ul>
-<li>Programs like <code>brew</code> and <code>pip</code> allow
-developers to add “external commands” by adding commands to the
-<code>PATH</code> that look like <code>brew-xyz</code> or
-<code>git-xyz</code>. I couldn’t find if there was a special way to add
-external commands to <code>pip</code>.</li>
+<li>Programs like <code>brew</code> and <code>pip</code> allow developers to add “external commands” by adding commands to the <code>PATH</code> that look like <code>brew-xyz</code> or <code>git-xyz</code>. I couldn’t find if there was a special way to add external commands to <code>pip</code>.</li>
 </ul></li>
 </ul>
-<p>If you find this script useful and end up implementing one of these
-feature or more on top of <code>pip-uses</code>, be sure to send me a
-Pull Request!</p>
+<p>If you find this script useful and end up implementing one of these feature or more on top of <code>pip-uses</code>, be sure to send me a Pull Request!</p>
 </main>
 
 
