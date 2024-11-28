@@ -50,48 +50,83 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#what-people-try-t.class_of">⛔️ What people try: <code>T.class_of</code></a></li>
-  <li><a href="#how-to-mostly-solve-this-with-tclass">⚠️️ How to mostly solve this with <code>T::Class</code></a></li>
-  <li><a href="#how-to-solve-this-with-abstract-methods">✅ How to solve this with <code>abstract</code> methods</a></li>
-  <li><a href="#extending-the-abstraction">🔧 Extending the abstraction</a></li>
-  <li><a href="#cleaning-up-the-code">🧹 Cleaning up the code</a></li>
-  <li><a href="#trivia">Trivia</a>
+  <li><a href="#what-people-try-t.class_of"
+  id="toc-what-people-try-t.class_of">⛔️ What people try:
+  <code>T.class_of</code></a></li>
+  <li><a href="#how-to-mostly-solve-this-with-tclass"
+  id="toc-how-to-mostly-solve-this-with-tclass">⚠️️ How to mostly solve
+  this with <code>T::Class</code></a></li>
+  <li><a href="#how-to-solve-this-with-abstract-methods"
+  id="toc-how-to-solve-this-with-abstract-methods">✅ How to solve this
+  with <code>abstract</code> methods</a></li>
+  <li><a href="#extending-the-abstraction"
+  id="toc-extending-the-abstraction">🔧 Extending the
+  abstraction</a></li>
+  <li><a href="#cleaning-up-the-code" id="toc-cleaning-up-the-code">🧹
+  Cleaning up the code</a></li>
+  <li><a href="#trivia" id="toc-trivia">Trivia</a>
   <ul>
-  <li><a href="#t.attached_class"><code>T.attached_class</code></a></li>
-  <li><a href="#two-modules-vs-one-class">Two modules vs one class</a></li>
+  <li><a href="#t.attached_class"
+  id="toc-t.attached_class"><code>T.attached_class</code></a></li>
+  <li><a href="#two-modules-vs-one-class"
+  id="toc-two-modules-vs-one-class">Two modules vs one class</a></li>
   </ul></li>
   </ul>
 </nav>
 
 <main>
 <blockquote>
-<p><strong>Update</strong>: While writing this post, I had a series of realizations and ended up building two features which make some of the parts of this post obsolete: <a href="https://sorbet.org/docs/attached-class#has_attached_class-tattached_class-in-module-instance-methods"><code>has_attached_class!</code></a> and <a href="https://sorbet.org/docs/class-of#tclass-vs-tclass_of"><code>T::Class</code></a>.</p>
-<p>I’ve rewritten some of the post below in light of those new features, but the core principles in this post are still useful, both to gain familiarity with Sorbet’s generic types and how to think about interface design in Sorbet.</p>
+<p><strong>Update</strong>: While writing this post, I had a series of
+realizations and ended up building two features which make some of the
+parts of this post obsolete: <a
+href="https://sorbet.org/docs/attached-class#has_attached_class-tattached_class-in-module-instance-methods"><code>has_attached_class!</code></a>
+and <a
+href="https://sorbet.org/docs/class-of#tclass-vs-tclass_of"><code>T::Class</code></a>.</p>
+<p>I’ve rewritten some of the post below in light of those new features,
+but the core principles in this post are still useful, both to gain
+familiarity with Sorbet’s generic types and how to think about interface
+design in Sorbet.</p>
 <p>With that out of the way…</p>
 </blockquote>
 <p>A pattern like this comes up a lot in Ruby code:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> instantiate_class(klass)</span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> instantiate_class(klass)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  instance <span class="kw">=</span> klass<span class="at">.new</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ... use `instance` somehow ...</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  instance</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>(If you don’t believe me, try grepping your codebase for <code>klass.new</code>—you might be surprised. Where I work, I see well over 100 matches just using the variable name <code>klass</code> alone.)</p>
-<p>The straightforward attempt at writing a Sorbet signature for this method doesn’t work. The strategy that <em>does</em> work uses abstract methods, which brings me to one of my most-offered tips for type-level design in Sorbet:</p>
+<p>(If you don’t believe me, try grepping your codebase for
+<code>klass.new</code>—you might be surprised. Where I work, I see well
+over 100 matches just using the variable name <code>klass</code>
+alone.)</p>
+<p>The straightforward attempt at writing a Sorbet signature for this
+method doesn’t work. The strategy that <em>does</em> work uses abstract
+methods, which brings me to one of my most-offered tips for type-level
+design in Sorbet:</p>
 <div class="note yellow">
 <table>
 <tbody>
-<tr class="odd">
+<tr>
 <td>🏆   You should be using more abstract methods.</td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>In this post, we’ll take a quick look<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="marginnote">If you’re short on time or don’t care for explanations, here’s the <a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20Thing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20interface!%0A%20%20%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0A%0A%20%20module%20Factory%0A%20%20%20%20extend%20T%3A%3AGeneric%0A%20%20%20%20interface!%0A%0A%20%20%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20Thing%7D%20%7D%0A%0A%20%20%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20%20%20def%20make_thing%3B%20end%0A%20%20end%0A%20%20mixes_in_class_methods%28Factory%29%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20klass%3A%20Thing%3A%3AFactory%5BT.all%28Thing%2C%20T.type_parameter%28%3AInstance%29%29%5D%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20Thing%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend">final code</a> we’ll build towards.<br />
+<p>In this post, we’ll take a quick look<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="marginnote">If you’re short on time or don’t care for
+explanations, here’s the <a
+href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20Thing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20interface!%0A%20%20%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0A%0A%20%20module%20Factory%0A%20%20%20%20extend%20T%3A%3AGeneric%0A%20%20%20%20interface!%0A%0A%20%20%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20Thing%7D%20%7D%0A%0A%20%20%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20%20%20def%20make_thing%3B%20end%0A%20%20end%0A%20%20mixes_in_class_methods%28Factory%29%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20klass%3A%20Thing%3A%3AFactory%5BT.all%28Thing%2C%20T.type_parameter%28%3AInstance%29%29%5D%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20Thing%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend">final
+code</a> we’ll build towards.<br />
 <br />
-</span></span> at the most common incorrect approach to annotate this method, discuss why that approach doesn’t work, then circle back and see how to use abstract methods to type this method.</p>
-<h1 id="what-people-try-t.class_of">⛔️ What people try: <code>T.class_of</code></h1>
+</span></span> at the most common incorrect approach to annotate this
+method, discuss why that approach doesn’t work, then circle back and see
+how to use abstract methods to type this method.</p>
+<h1 id="what-people-try-t.class_of">⛔️ What people try:
+<code>T.class_of</code></h1>
 <p>This is the method signature people try to write:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource ruby numberLines hl-4"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="cf">do</span></span>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode numberSource ruby numberLines hl-4"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="cf">do</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  type_parameters(<span class="wa">:U</span>)</span>
 <span id="cb2-3"><a href="#cb2-3"></a>    <span class="co"># !! This code does not work !!</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a>    <span class="at">.params</span>(<span class="wa">klass: </span>T<span class="at">.class_of</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>)))</span>
@@ -102,13 +137,32 @@
 <span id="cb2-9"><a href="#cb2-9"></a>  <span class="co"># ...</span></span>
 <span id="cb2-10"><a href="#cb2-10"></a>  instance</span>
 <span id="cb2-11"><a href="#cb2-11"></a><span class="cf">end</span></span></code></pre></div>
-<p>This type <strong>does not work</strong>.<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="marginnote">Sometimes I wish Sorbet had used the syntax <code>A.singleton_class</code> instead of <code>T.class_of(A)</code>, because I think it might have made it more clear that you can’t do this on arbitrary types. Then again, maybe people would have just done <code>T.any(A,   B).singleton_class</code><br />
+<p>This type <strong>does not work</strong>.<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="marginnote">Sometimes I wish Sorbet had used the syntax
+<code>A.singleton_class</code> instead of <code>T.class_of(A)</code>,
+because I think it might have made it more clear that you can’t do this
+on arbitrary types. Then again, maybe people would have just done
+<code>T.any(A,   B).singleton_class</code><br />
 <br />
-</span></span> Even though I can see why people might expect it to work, there are reasons why it should not work, and the Sorbet docs <a href="https://sorbet.org/docs/class-of#tclass-vs-tclass_of">elaborate why</a>.</p>
-<p>In short, <code>T.type_parameter(:U)</code> doesn’t stand for “some unknown class,” it stands for “some unknown type.” It could mean any of <code>T.any(Integer, String)</code>, <code>T::Array[Integer]</code>, <code>T.noreturn</code>, or any other type. Meanwhile, <code>T.class_of(...)</code> is defined very narrowly to mean “get the singleton class of <code>...</code>.” Arbitrary types don’t have singleton class, only classes have singleton classes.</p>
-<h1 id="how-to-mostly-solve-this-with-tclass">⚠️️ How to mostly solve this with <code>T::Class</code></h1>
-<p>As of May 2023, Sorbet has a separate feature, called <code>T::Class[...]</code>, which <em>does</em> work the way people have expected <code>T.class_of</code> to work:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
+</span></span> Even though I can see why people might expect it to work,
+there are reasons why it should not work, and the Sorbet docs <a
+href="https://sorbet.org/docs/class-of#tclass-vs-tclass_of">elaborate
+why</a>.</p>
+<p>In short, <code>T.type_parameter(:U)</code> doesn’t stand for “some
+unknown class,” it stands for “some unknown type.” It could mean any of
+<code>T.any(Integer, String)</code>, <code>T::Array[Integer]</code>,
+<code>T.noreturn</code>, or any other type. Meanwhile,
+<code>T.class_of(...)</code> is defined very narrowly to mean “get the
+singleton class of <code>...</code>.” Arbitrary types don’t have
+singleton class, only classes have singleton classes.</p>
+<h1 id="how-to-mostly-solve-this-with-tclass">⚠️️ How to mostly solve
+this with <code>T::Class</code></h1>
+<p>As of May 2023, Sorbet has a separate feature, called
+<code>T::Class[...]</code>, which <em>does</em> work the way people have
+expected <code>T.class_of</code> to work:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:U</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">klass: </span>T<span class="kw">::</span><span class="dt">Class</span><span class="kw">[</span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>)<span class="kw">]</span>)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
@@ -118,16 +172,26 @@
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  instance</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>This code works, but it comes with the downside that the call to <code>new</code> is <strong>not statically checked</strong>. Here we passed no arguments, but it might be that <code>klass</code>’s constructor has one or more required arguments.</p>
-<h1 id="how-to-solve-this-with-abstract-methods">✅ How to solve this with <code>abstract</code> methods</h1>
+<p>This code works, but it comes with the downside that the call to
+<code>new</code> is <strong>not statically checked</strong>. Here we
+passed no arguments, but it might be that <code>klass</code>’s
+constructor has one or more required arguments.</p>
+<h1 id="how-to-solve-this-with-abstract-methods">✅ How to solve this
+with <code>abstract</code> methods</h1>
 <p>When we see something like this:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> instantiate_class(klass)</span>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> instantiate_class(klass)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  klass<span class="at">.new</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>and we want to write a precise signature here, what’s critical is to notice that there is some de-facto API that <code>klass</code> is meant to conform to. That’s exactly what interfaces are for.</p>
-<p>In particular, the de-facto API is that <code>klass</code> has some method that tells us how to create instances, and that method takes no arguments. Let’s translate that API to an interface:</p>
+<p>and we want to write a precise signature here, what’s critical is to
+notice that there is some de-facto API that <code>klass</code> is meant
+to conform to. That’s exactly what interfaces are for.</p>
+<p>In particular, the de-facto API is that <code>klass</code> has some
+method that tells us how to create instances, and that method takes no
+arguments. Let’s translate that API to an interface:</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-7 hl-8 hl-17"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">module</span> <span class="dt">ThingFactory</span></span>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode numberSource ruby numberLines hl-5 hl-7 hl-8 hl-17"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">module</span> <span class="dt">ThingFactory</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Generic</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a>  interface!</span>
 <span id="cb5-4"><a href="#cb5-4"></a></span>
@@ -146,15 +210,40 @@
 <span id="cb5-17"><a href="#cb5-17"></a>  klass<span class="at">.make_thing</span></span>
 <span id="cb5-18"><a href="#cb5-18"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20has_attached_class!%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing%0Aend">→ View on sorbet.run</a>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20has_attached_class!%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing%0Aend">→
+View on sorbet.run</a>
 </figcaption>
 </figure>
-<p>This <code>ThingFactory</code> has two notable definitions: a method called <code>make_thing</code>, and a call to <a href="https://sorbet.org/docs/attached-class#has_attached_class-tattached_class-in-module-instance-methods"><code>has_attached_class!</code></a> above that. <code>has_attached_class!</code> both allows using <code>T.attached_class</code> in instance methods of this module and makes this module generic in that attached class. It’s a way for Sorbet to track the relationship between one type and the type of instances it constructs.</p>
-<p>Naming the method <code>make_thing</code> (instead of <code>new</code>) is a slight sacrifice. Choosing a name other than <code>new</code> helps Sorbet check that all classes accept the same number of constructor arguments, with compatible types. (Technically, we could use a method named <code>new</code> in our interface, but that runs into a <a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20Instance%20%3D%20type_member%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28Instance%29%7D%0A%20%20def%20new%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.new%0Aend%0A%0Aclass%20BadThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20BadThing%7D%20%7D%0A%0A%20%20sig%20%7Boverride.returns%28Instance%29%7D%0A%20%20def%20self.new%0A%20%20%20%20%23%20should%20be%20fine%2C%20maybe%3F%0A%20%20%20%20%23%20it&#39;s%20a%20valid%20override%20of%20ThingFactory%23new%2C%0A%20%20%20%20%23%20but%20an%20invalid%20override%20of%20Class%23new.%0A%0A%20%20%20%20%23%20https%3A%2F%2Fgithub.com%2Fsorbet%2Fsorbet%2Fissues%2F6564%0A%20%20%20%20super%0A%20%20end%0Aend">handful</a> of <a href="https://sorbet.run/?arg=--print=ast#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20Instance%20%3D%20type_member%0A%0A%20%20sig%20%7Babstract.params%28x%3A%20Integer%29.returns%28Instance%29%7D%0A%20%20def%20new%28x%29%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.new%280%29%0Aend%0A%0Aclass%20BadThing1%0A%20%20extend%20T%3A%3AGeneric%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20BadThing1%7D%20%7D%0A%0A%20%20%23%20Should%20be%20an%20error%20for%20forgetting%20to%20implement%20the%0A%20%20%23%20constructor%20%28which%20needs%20a%20required%20arg%2C%20so%20the%0A%20%20%23%20call%20to%20%60klass.new%280%29%60%20will%20fail%20at%20runtime%0A%0A%20%20%23%20https%3A%2F%2Fgithub.com%2Fsorbet%2Fsorbet%2Fissues%2F1317%0Aend%0A%0Aclass%20BadThing2%0A%20%20extend%20T%3A%3AGeneric%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20Integer%7D%20%7D%0A%0A%20%20sig%20%7Bvoid%7D%0A%20%20def%20self.example%0A%20%20%20%20x%20%3D%20new%280%29%0A%20%20%20%20T.reveal_type%28x%29%20%23%20%3D%3E%20Integer%0A%20%20%20%20%23%20%28x%20is%20an%20instance%20of%20%60BadThing2%60%20at%20runtime%29%0A%20%20%20%20%23%0A%20%20%20%20%23%20There%20should%20be%20some%20sort%20of%20error%20either%20on%20the%0A%20%20%20%20%23%20%60extend%60%20or%20the%20%60fixed%60%20that%20says%20this%20is%20a%20bad%0A%20%20%20%20%23%20override.%0A%0A%20%20%20%20%23%20https%3A%2F%2Fgithub.com%2Fsorbet%2Fsorbet%2Fissues%2F1317%0A%20%20end%0Aend">fixable</a> or maybe <a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20Instance%20%3D%20type_member%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28Instance%29%7D%0A%20%20def%20new%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.new%0Aend%0A%0Aclass%20BadThing1%0A%20%20extend%20T%3A%3AGeneric%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20BadThing1%7D%20%7D%0A%0A%20%20sig%20%7Bparams%28x%3A%20Integer%29.void%7D%0A%20%20def%20initialize%28x%29%0A%20%20%20%20%23%20should%20be%20an%20error%2C%20because%20this%20behaves%0A%20%20%20%20%23%20as%20if%20%60new%60%20has%20an%20extra%2C%20required%20param%20now%0A%0A%20%20%20%20%23%20%28no%20tracking%20issue%29%0A%20%20end%0Aend">unfixable</a> bugs. It’s kind of up to you whether you care about the convenience of using the name <code>new</code> everywhere at the cost of these bugs.)</p>
-<p>Personally, I like that choosing a different name makes implementing the interface more explicit, and thus easier for future readers to see what’s going on.</p>
+<p>This <code>ThingFactory</code> has two notable definitions: a method
+called <code>make_thing</code>, and a call to <a
+href="https://sorbet.org/docs/attached-class#has_attached_class-tattached_class-in-module-instance-methods"><code>has_attached_class!</code></a>
+above that. <code>has_attached_class!</code> both allows using
+<code>T.attached_class</code> in instance methods of this module and
+makes this module generic in that attached class. It’s a way for Sorbet
+to track the relationship between one type and the type of instances it
+constructs.</p>
+<p>Naming the method <code>make_thing</code> (instead of
+<code>new</code>) is a slight sacrifice. Choosing a name other than
+<code>new</code> helps Sorbet check that all classes accept the same
+number of constructor arguments, with compatible types. (Technically, we
+could use a method named <code>new</code> in our interface, but that
+runs into a <a
+href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20Instance%20%3D%20type_member%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28Instance%29%7D%0A%20%20def%20new%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.new%0Aend%0A%0Aclass%20BadThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20BadThing%7D%20%7D%0A%0A%20%20sig%20%7Boverride.returns%28Instance%29%7D%0A%20%20def%20self.new%0A%20%20%20%20%23%20should%20be%20fine%2C%20maybe%3F%0A%20%20%20%20%23%20it&#39;s%20a%20valid%20override%20of%20ThingFactory%23new%2C%0A%20%20%20%20%23%20but%20an%20invalid%20override%20of%20Class%23new.%0A%0A%20%20%20%20%23%20https%3A%2F%2Fgithub.com%2Fsorbet%2Fsorbet%2Fissues%2F6564%0A%20%20%20%20super%0A%20%20end%0Aend">handful</a>
+of <a
+href="https://sorbet.run/?arg=--print=ast#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20Instance%20%3D%20type_member%0A%0A%20%20sig%20%7Babstract.params%28x%3A%20Integer%29.returns%28Instance%29%7D%0A%20%20def%20new%28x%29%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.new%280%29%0Aend%0A%0Aclass%20BadThing1%0A%20%20extend%20T%3A%3AGeneric%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20BadThing1%7D%20%7D%0A%0A%20%20%23%20Should%20be%20an%20error%20for%20forgetting%20to%20implement%20the%0A%20%20%23%20constructor%20%28which%20needs%20a%20required%20arg%2C%20so%20the%0A%20%20%23%20call%20to%20%60klass.new%280%29%60%20will%20fail%20at%20runtime%0A%0A%20%20%23%20https%3A%2F%2Fgithub.com%2Fsorbet%2Fsorbet%2Fissues%2F1317%0Aend%0A%0Aclass%20BadThing2%0A%20%20extend%20T%3A%3AGeneric%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20Integer%7D%20%7D%0A%0A%20%20sig%20%7Bvoid%7D%0A%20%20def%20self.example%0A%20%20%20%20x%20%3D%20new%280%29%0A%20%20%20%20T.reveal_type%28x%29%20%23%20%3D%3E%20Integer%0A%20%20%20%20%23%20%28x%20is%20an%20instance%20of%20%60BadThing2%60%20at%20runtime%29%0A%20%20%20%20%23%0A%20%20%20%20%23%20There%20should%20be%20some%20sort%20of%20error%20either%20on%20the%0A%20%20%20%20%23%20%60extend%60%20or%20the%20%60fixed%60%20that%20says%20this%20is%20a%20bad%0A%20%20%20%20%23%20override.%0A%0A%20%20%20%20%23%20https%3A%2F%2Fgithub.com%2Fsorbet%2Fsorbet%2Fissues%2F1317%0A%20%20end%0Aend">fixable</a>
+or maybe <a
+href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20Instance%20%3D%20type_member%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28Instance%29%7D%0A%20%20def%20new%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.new%0Aend%0A%0Aclass%20BadThing1%0A%20%20extend%20T%3A%3AGeneric%0A%20%20extend%20ThingFactory%0A%20%20Instance%20%3D%20type_template%28%3Aout%29%20%7B%20%7Bfixed%3A%20BadThing1%7D%20%7D%0A%0A%20%20sig%20%7Bparams%28x%3A%20Integer%29.void%7D%0A%20%20def%20initialize%28x%29%0A%20%20%20%20%23%20should%20be%20an%20error%2C%20because%20this%20behaves%0A%20%20%20%20%23%20as%20if%20%60new%60%20has%20an%20extra%2C%20required%20param%20now%0A%0A%20%20%20%20%23%20%28no%20tracking%20issue%29%0A%20%20end%0Aend">unfixable</a>
+bugs. It’s kind of up to you whether you care about the convenience of
+using the name <code>new</code> everywhere at the cost of these
+bugs.)</p>
+<p>Personally, I like that choosing a different name makes implementing
+the interface more explicit, and thus easier for future readers to see
+what’s going on.</p>
 <p>In any case, here’s how we can implement that interface:</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource ruby numberLines hl-2 hl-5 hl-14"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1"></a><span class="cf">class</span> <span class="dt">GoodThing</span></span>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode numberSource ruby numberLines hl-2 hl-5 hl-14"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1"></a><span class="cf">class</span> <span class="dt">GoodThing</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">extend</span> <span class="dt">ThingFactory</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a></span>
 <span id="cb6-4"><a href="#cb6-4"></a>  sig <span class="kw">{</span>override<span class="at">.returns</span>(T<span class="at">.attached_class</span>)<span class="kw">}</span></span>
@@ -172,28 +261,49 @@
 <span id="cb6-16"><a href="#cb6-16"></a>  <span class="cf">end</span></span>
 <span id="cb6-17"><a href="#cb6-17"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20has_attached_class!%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend%0A%0Aclass%20BadThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.params%28x%3A%20Integer%29.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%28x%29%20%23%20%E2%9B%94%EF%B8%8F%20must%20accept%20no%20more%20than%200%20required%20arguments%0A%20%20%20%20new%0A%20%20end%0Aend">→ View complete example on sorbet.run</a>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20has_attached_class!%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend%0A%0Aclass%20BadThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.params%28x%3A%20Integer%29.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%28x%29%20%23%20%E2%9B%94%EF%B8%8F%20must%20accept%20no%20more%20than%200%20required%20arguments%0A%20%20%20%20new%0A%20%20end%0Aend">→
+View complete example on sorbet.run</a>
 </figcaption>
 </figure>
-<p>See how the <code>BadThing</code> class attempts to incompatibly implement <code>make_thing</code>? Sorbet correctly reports an error on line 14 saying that <code>make_thing</code> must not accept an extra required argument.</p>
-<p>Something else worth mentioning: we’re implementing this interface on the <strong>singleton class</strong> of <code>GoodThing</code> and <code>BadThing</code>:</p>
+<p>See how the <code>BadThing</code> class attempts to incompatibly
+implement <code>make_thing</code>? Sorbet correctly reports an error on
+line 14 saying that <code>make_thing</code> must not accept an extra
+required argument.</p>
+<p>Something else worth mentioning: we’re implementing this interface on
+the <strong>singleton class</strong> of <code>GoodThing</code> and
+<code>BadThing</code>:</p>
 <ul>
-<li>On line 3, we use <code>extend</code> (instead of <code>include</code>) to mix in the interface.</li>
-<li>On line 5, <code>def make_thing</code> from the interface becomes <code>def self.make_thing</code>. Also, since it’s now a singleton class method, we can use <code>T.attached_class</code> for free (no need for an extra call to <code>has_attached_class!</code> or anything).</li>
+<li>On line 3, we use <code>extend</code> (instead of
+<code>include</code>) to mix in the interface.</li>
+<li>On line 5, <code>def make_thing</code> from the interface becomes
+<code>def self.make_thing</code>. Also, since it’s now a singleton class
+method, we can use <code>T.attached_class</code> for free (no need for
+an extra call to <code>has_attached_class!</code> or anything).</li>
 </ul>
-<p>So far so good: we’ve successfully annotated our <code>instantiate_class</code> method! But we can actually take it one step further.</p>
+<p>So far so good: we’ve successfully annotated our
+<code>instantiate_class</code> method! But we can actually take it one
+step further.</p>
 <h1 id="extending-the-abstraction">🔧 Extending the abstraction</h1>
-<p>Sometimes, the snippet we’re trying to annotate isn’t <em>just</em> doing <code>klass.new</code>. Rather, it’s instantiating an object and then <strong>calling some method</strong> on that instance. The type we’ve written so far won’t allow that:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource ruby numberLines hl-4 hl-5"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># sig {...}</span></span>
+<p>Sometimes, the snippet we’re trying to annotate isn’t <em>just</em>
+doing <code>klass.new</code>. Rather, it’s instantiating an object and
+then <strong>calling some method</strong> on that instance. The type
+we’ve written so far won’t allow that:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode numberSource ruby numberLines hl-4 hl-5"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># sig {...}</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="cf">def</span> instantiate_class</span>
 <span id="cb7-3"><a href="#cb7-3"></a>  instance <span class="kw">=</span> klass<span class="at">.make_thing</span></span>
 <span id="cb7-4"><a href="#cb7-4"></a>  instance<span class="at">.foo</span></span>
 <span id="cb7-5"><a href="#cb7-5"></a>  <span class="co">#        ^^^ ⛔️ Call to method `foo` on unconstrained generic type</span></span>
 <span id="cb7-6"><a href="#cb7-6"></a>  instance</span>
 <span id="cb7-7"><a href="#cb7-7"></a><span class="cf">end</span></span></code></pre></div>
-<p>This is yet another another problem we can solve with abstract methods.</p>
-<p>First, we define some interface <code>AbstractThing</code> which has an abstract <code>foo</code> method on it. (Depending on the code we’re trying to annotate, such an interface might already exist!)</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource ruby numberLines hl-1 hl-5 hl-6 hl-13 hl-18"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1"></a><span class="cf">module</span> <span class="dt">AbstractThing</span></span>
+<p>This is yet another another problem we can solve with abstract
+methods.</p>
+<p>First, we define some interface <code>AbstractThing</code> which has
+an abstract <code>foo</code> method on it. (Depending on the code we’re
+trying to annotate, such an interface might already exist!)</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode numberSource ruby numberLines hl-1 hl-5 hl-6 hl-13 hl-18"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1"></a><span class="cf">module</span> <span class="dt">AbstractThing</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Helpers</span></span>
 <span id="cb8-3"><a href="#cb8-3"></a>  abstract!</span>
 <span id="cb8-4"><a href="#cb8-4"></a></span>
@@ -213,9 +323,12 @@
 <span id="cb8-18"><a href="#cb8-18"></a>  sig <span class="kw">{</span>override<span class="at">.returns</span>(<span class="dt">Integer</span>)<span class="kw">}</span></span>
 <span id="cb8-19"><a href="#cb8-19"></a>  <span class="cf">def</span> foo; <span class="dv">0</span>; <span class="cf">end</span></span>
 <span id="cb8-20"><a href="#cb8-20"></a><span class="cf">end</span></span></code></pre></div>
-<p>With that interface in hand, we use <a href="https://sorbet.org/docs/intersection-types"><code>T.all</code></a> to constrain the generic type argument to <code>ThingFactory</code>.</p>
+<p>With that interface in hand, we use <a
+href="https://sorbet.org/docs/intersection-types"><code>T.all</code></a>
+to constrain the generic type argument to <code>ThingFactory</code>.</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-12"><code class="sourceCode ruby"><span id="cb9-1"><a href="#cb9-1"></a>sig <span class="cf">do</span></span>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode numberSource ruby numberLines hl-5 hl-12"><code class="sourceCode ruby"><span id="cb9-1"><a href="#cb9-1"></a>sig <span class="cf">do</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>  type_parameters(<span class="wa">:Instance</span>)</span>
 <span id="cb9-3"><a href="#cb9-3"></a>    <span class="at">.params</span>(</span>
 <span id="cb9-4"><a href="#cb9-4"></a>      <span class="wa">klass: </span><span class="dt">ThingFactory</span><span class="kw">[</span></span>
@@ -230,13 +343,25 @@
 <span id="cb9-13"><a href="#cb9-13"></a>  instance</span>
 <span id="cb9-14"><a href="#cb9-14"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20AbstractThing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20abstract!%0A%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0Aend%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20has_attached_class!%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class_bad%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%20%23%20error%3A%20forgot%20%60T.all%60%0A%20%20instance%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.all%28AbstractThing%2C%20T.type_parameter%28%3AInstance%29%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20AbstractThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0Aend">→ View complete example on sorbet.run</a>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20AbstractThing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20abstract!%0A%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0Aend%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%0A%20%20has_attached_class!%28%3Aout%29%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class_bad%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%20%23%20error%3A%20forgot%20%60T.all%60%0A%20%20instance%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.all%28AbstractThing%2C%20T.type_parameter%28%3AInstance%29%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20AbstractThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0Aend">→
+View complete example on sorbet.run</a>
 </figcaption>
 </figure>
-<p>This has the effect of ensuring that the <code>foo</code> method we want to call is available on all instances, no matter which kind of instance it is. (For more reading, this use of <code>T.all</code> is how Sorbet <a href="https://sorbet.org/docs/generics#placing-bounds-on-generic-methods">approximates bounds on <code>T.type_parameter</code>s</a>.)</p>
-<p>If we find ourselves repeatedly calling <code>self.make_thing.foo</code>, we might want to pull that code into the <code>ThingFactory</code> interface. That’s totally fine, but it’ll mean that we’ll use <code>upper:</code> on the <code>Instance</code> type member to apply the bound, instead of <code>T.all</code>:</p>
+<p>This has the effect of ensuring that the <code>foo</code> method we
+want to call is available on all instances, no matter which kind of
+instance it is. (For more reading, this use of <code>T.all</code> is how
+Sorbet <a
+href="https://sorbet.org/docs/generics#placing-bounds-on-generic-methods">approximates
+bounds on <code>T.type_parameter</code>s</a>.)</p>
+<p>If we find ourselves repeatedly calling
+<code>self.make_thing.foo</code>, we might want to pull that code into
+the <code>ThingFactory</code> interface. That’s totally fine, but it’ll
+mean that we’ll use <code>upper:</code> on the <code>Instance</code>
+type member to apply the bound, instead of <code>T.all</code>:</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-11 hl-13"><code class="sourceCode ruby"><span id="cb10-1"><a href="#cb10-1"></a><span class="cf">module</span> <span class="dt">ThingFactory</span></span>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode numberSource ruby numberLines hl-5 hl-11 hl-13"><code class="sourceCode ruby"><span id="cb10-1"><a href="#cb10-1"></a><span class="cf">module</span> <span class="dt">ThingFactory</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Generic</span></span>
 <span id="cb10-3"><a href="#cb10-3"></a>  abstract!</span>
 <span id="cb10-4"><a href="#cb10-4"></a></span>
@@ -253,19 +378,40 @@
 <span id="cb10-15"><a href="#cb10-15"></a>  <span class="cf">end</span></span>
 <span id="cb10-16"><a href="#cb10-16"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20AbstractThing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20abstract!%0A%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0Aend%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20abstract!%0A%0A%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20AbstractThing%7D%20%7D%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0A%0A%20%20sig%20%7Breturns%28T.attached_class%29%7D%0A%20%20def%20make_thing_and_call_foo%0A%20%20%20%20instance%20%3D%20self.make_thing%0A%20%20%20%20instance.foo%0A%20%20%20%20instance%0A%20%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class_bad%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.all%28AbstractThing%2C%20T.type_parameter%28%3AInstance%29%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing_and_call_foo%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20AbstractThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0Aend">→ View complete example on sorbet.run</a>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20AbstractThing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20abstract!%0A%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0Aend%0A%0Amodule%20ThingFactory%0A%20%20extend%20T%3A%3AGeneric%0A%20%20abstract!%0A%0A%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20AbstractThing%7D%20%7D%0A%0A%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20def%20make_thing%3B%20end%0A%0A%20%20sig%20%7Breturns%28T.attached_class%29%7D%0A%20%20def%20make_thing_and_call_foo%0A%20%20%20%20instance%20%3D%20self.make_thing%0A%20%20%20%20instance.foo%0A%20%20%20%20instance%0A%20%20end%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.type_parameter%28%3AInstance%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class_bad%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28klass%3A%20ThingFactory%5BT.all%28AbstractThing%2C%20T.type_parameter%28%3AInstance%29%29%5D%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20klass.make_thing_and_call_foo%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20AbstractThing%0A%20%20extend%20ThingFactory%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0Aend">→
+View complete example on sorbet.run</a>
 </figcaption>
 </figure>
-<p>The takeaway is that if we want to call specific methods after instantiating some arbitrary class, we need an interface and a bound. Where to put the bound (on the method or on the type member) is up to personal preference. Some tradeoffs:</p>
+<p>The takeaway is that if we want to call specific methods after
+instantiating some arbitrary class, we need an interface and a bound.
+Where to put the bound (on the method or on the type member) is up to
+personal preference. Some tradeoffs:</p>
 <ul>
-<li><p>Bounding the type member means you can <em>only</em> use this <code>ThingFactory</code> interface with <code>AbstractThing</code>, preventing it from being used for anything else. Maybe that’s what you want, or maybe it isn’t.</p></li>
-<li><p>Bounding the type member might make for more obvious errors. For example, if someone accidentally wrote the wrong type in the <code>fixed</code> bound, a single error will show, right there. Had the bound been on the method, errors would appear at every call to <code>instantiate_class</code> (which is annoying because the proper fix will be to go back, find the <code>fixed</code>, and correct the typo).</p></li>
+<li><p>Bounding the type member means you can <em>only</em> use this
+<code>ThingFactory</code> interface with <code>AbstractThing</code>,
+preventing it from being used for anything else. Maybe that’s what you
+want, or maybe it isn’t.</p></li>
+<li><p>Bounding the type member might make for more obvious errors. For
+example, if someone accidentally wrote the wrong type in the
+<code>fixed</code> bound, a single error will show, right there. Had the
+bound been on the method, errors would appear at every call to
+<code>instantiate_class</code> (which is annoying because the proper fix
+will be to go back, find the <code>fixed</code>, and correct the
+typo).</p></li>
 </ul>
 <h1 id="cleaning-up-the-code">🧹 Cleaning up the code</h1>
-<p>Altogether, this code works, and I’ve presented it in such a way as to illustrate the concepts as plainly as possible. But it’s maybe not the most idiomatic Sorbet code imaginable.</p>
-<p>We have two interfaces (<code>AbstractThing</code> and <code>ThingFactory</code>) that are conceptually related, but not related in the code. Realistically, everything that implements one needs to implement both. We can make that connection explicit with <a href="https://sorbet.org/docs/abstract#interfaces-and-the-included-hook"><code>mixes_in_class_methods</code></a>.</p>
+<p>Altogether, this code works, and I’ve presented it in such a way as
+to illustrate the concepts as plainly as possible. But it’s maybe not
+the most idiomatic Sorbet code imaginable.</p>
+<p>We have two interfaces (<code>AbstractThing</code> and
+<code>ThingFactory</code>) that are conceptually related, but not
+related in the code. Realistically, everything that implements one needs
+to implement both. We can make that connection explicit with <a
+href="https://sorbet.org/docs/abstract#interfaces-and-the-included-hook"><code>mixes_in_class_methods</code></a>.</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource ruby numberLines hl-1 hl-8 hl-17 hl-24"><code class="sourceCode ruby"><span id="cb11-1"><a href="#cb11-1"></a><span class="cf">module</span> <span class="dt">Thing</span></span>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode numberSource ruby numberLines hl-1 hl-8 hl-17 hl-24"><code class="sourceCode ruby"><span id="cb11-1"><a href="#cb11-1"></a><span class="cf">module</span> <span class="dt">Thing</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Helpers</span></span>
 <span id="cb11-3"><a href="#cb11-3"></a>  interface!</span>
 <span id="cb11-4"><a href="#cb11-4"></a></span>
@@ -293,33 +439,68 @@
 <span id="cb11-26"><a href="#cb11-26"></a>  <span class="co"># ...</span></span>
 <span id="cb11-27"><a href="#cb11-27"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20Thing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20interface!%0A%20%20%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0A%0A%20%20module%20Factory%0A%20%20%20%20extend%20T%3A%3AGeneric%0A%20%20%20%20interface!%0A%0A%20%20%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20Thing%7D%20%7D%0A%0A%20%20%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20%20%20def%20make_thing%3B%20end%0A%20%20end%0A%20%20mixes_in_class_methods%28Factory%29%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20klass%3A%20Thing%3A%3AFactory%5BT.all%28Thing%2C%20T.type_parameter%28%3AInstance%29%29%5D%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20Thing%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend">→ View complete example on sorbet.run</a>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20Thing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20interface!%0A%20%20%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0A%0A%20%20module%20Factory%0A%20%20%20%20extend%20T%3A%3AGeneric%0A%20%20%20%20interface!%0A%0A%20%20%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20Thing%7D%20%7D%0A%0A%20%20%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20%20%20def%20make_thing%3B%20end%0A%20%20end%0A%20%20mixes_in_class_methods%28Factory%29%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20klass%3A%20Thing%3A%3AFactory%5BT.all%28Thing%2C%20T.type_parameter%28%3AInstance%29%29%5D%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20Thing%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend">→
+View complete example on sorbet.run</a>
 </figcaption>
 </figure>
-<p>By using <code>mixes_in_class_methods</code>, we replace an <code>include</code> + <code>extend</code> with just a single <code>include</code>. Also, it gives us an excuse to nest one module inside the other, so that we can have <code>Thing</code> and <code>Thing::Factory</code>, names which read more nicely in my opinion. (Of course, you’re free to use whatever names you like.)</p>
+<p>By using <code>mixes_in_class_methods</code>, we replace an
+<code>include</code> + <code>extend</code> with just a single
+<code>include</code>. Also, it gives us an excuse to nest one module
+inside the other, so that we can have <code>Thing</code> and
+<code>Thing::Factory</code>, names which read more nicely in my opinion.
+(Of course, you’re free to use whatever names you like.)</p>
 <p><br />
 </p>
 <p><br />
 </p>
-<p>That should be all you need to go forth and add types to code doing <code>klass.new</code>. One more time, here’s the complete final example:</p>
-<p><a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20Thing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20interface!%0A%20%20%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0A%0A%20%20module%20Factory%0A%20%20%20%20extend%20T%3A%3AGeneric%0A%20%20%20%20interface!%0A%0A%20%20%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20Thing%7D%20%7D%0A%0A%20%20%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20%20%20def%20make_thing%3B%20end%0A%20%20end%0A%20%20mixes_in_class_methods%28Factory%29%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20klass%3A%20Thing%3A%3AFactory%5BT.all%28Thing%2C%20T.type_parameter%28%3AInstance%29%29%5D%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20Thing%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend">→ View complete final example on sorbet.run</a></p>
-<p>That being said, the concepts presented in this post are quite advanced and also uncommonly discussed online. If reading this post left you feeling unclear or confused about something, <a href="https://jez.io">please reach out</a>. I’d love to update the post with your feedback.</p>
+<p>That should be all you need to go forth and add types to code doing
+<code>klass.new</code>. One more time, here’s the complete final
+example:</p>
+<p><a
+href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20Thing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20interface!%0A%20%20%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0A%0A%20%20module%20Factory%0A%20%20%20%20extend%20T%3A%3AGeneric%0A%20%20%20%20interface!%0A%0A%20%20%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20Thing%7D%20%7D%0A%0A%20%20%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20%20%20def%20make_thing%3B%20end%0A%20%20end%0A%20%20mixes_in_class_methods%28Factory%29%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20klass%3A%20Thing%3A%3AFactory%5BT.all%28Thing%2C%20T.type_parameter%28%3AInstance%29%29%5D%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20Thing%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend">→
+View complete final example on sorbet.run</a></p>
+<p>That being said, the concepts presented in this post are quite
+advanced and also uncommonly discussed online. If reading this post left
+you feeling unclear or confused about something, <a
+href="https://jez.io">please reach out</a>. I’d love to update the post
+with your feedback.</p>
 <p><br />
 </p>
 <hr />
 <h1 id="trivia">Trivia</h1>
-<p>This section is just “other neat things.” You should be able to safely skip it unless you want to learn more about some esoteric parts of the implementation of Sorbet which are related to concepts discussed above.</p>
+<p>This section is just “other neat things.” You should be able to
+safely skip it unless you want to learn more about some esoteric parts
+of the implementation of Sorbet which are related to concepts discussed
+above.</p>
 <h2 id="t.attached_class"><code>T.attached_class</code></h2>
-<p>Internally, <code>T.attached_class</code> is secretly a type_member, declared something like this, automatically, in every class:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">MyClass</span></span>
+<p>Internally, <code>T.attached_class</code> is secretly a type_member,
+declared something like this, automatically, in every class:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">MyClass</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;</span><span class="dt">AttachedClass</span><span class="kw">&gt;</span> <span class="kw">=</span> type_template(<span class="wa">:out</span>) <span class="kw">{</span> <span class="kw">{</span><span class="wa">upper: </span><span class="dt">MyClass</span><span class="kw">}</span> <span class="kw">}</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>Those angle brackets in the name are not valid Ruby syntax, which ensures that people can’t write a type member with this name, and e.g. overwrite the meaning of <code>T.attached_class</code>.</p>
-<p>That’s where <code>has_attached_class!</code> comes in! It essentially provides syntactic sugar to let people define these <code>&lt;AttachedClass&gt;</code> generic types, without having to conflict with any names of constants the user might already be using in that class.</p>
-<p>Realizing that we could build <code>has_attached_class!</code> with just a syntactic rewrite was a key insight that unblocked most of the work on <code>T::Class</code> that had blocked us from making progress on this feature in the past. There’s more context in <a href="https://github.com/sorbet/sorbet/pull/6757">the original pull request</a>.</p>
+<p>Those angle brackets in the name are not valid Ruby syntax, which
+ensures that people can’t write a type member with this name, and
+e.g. overwrite the meaning of <code>T.attached_class</code>.</p>
+<p>That’s where <code>has_attached_class!</code> comes in! It
+essentially provides syntactic sugar to let people define these
+<code>&lt;AttachedClass&gt;</code> generic types, without having to
+conflict with any names of constants the user might already be using in
+that class.</p>
+<p>Realizing that we could build <code>has_attached_class!</code> with
+just a syntactic rewrite was a key insight that unblocked most of the
+work on <code>T::Class</code> that had blocked us from making progress
+on this feature in the past. There’s more context in <a
+href="https://github.com/sorbet/sorbet/pull/6757">the original pull
+request</a>.</p>
 <h2 id="two-modules-vs-one-class">Two modules vs one class</h2>
-<p>In the <code>mixes_in_class_methods</code> example above, it’s reasonable to try to unify <code>Thing</code> and <code>Thing::Factory</code> into a single <code>AbstractThing</code> class:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># !! warning, doesn&#39;t work !!</span></span>
+<p>In the <code>mixes_in_class_methods</code> example above, it’s
+reasonable to try to unify <code>Thing</code> and
+<code>Thing::Factory</code> into a single <code>AbstractThing</code>
+class:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># !! warning, doesn&#39;t work !!</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">AbstractThing</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Generic</span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  abstract!</span>
@@ -327,8 +508,13 @@
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span>abstract<span class="at">.returns</span>(<span class="dt">Integer</span>)<span class="kw">}</span></span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> foo; <span class="cf">end</span></span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>From a type system perspective, this is actually totally fine. But the one problem is that there’s no replacement for what we used to be able to write with <code>Factory[...]</code>. Said another way: there’s no way to apply a type argument to a generic singleton class (i.e., to a type template). This is purely a question of syntax. Specifically:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ruby"><span id="cb14-1"><a href="#cb14-1"></a>sig <span class="cf">do</span></span>
+<p>From a type system perspective, this is actually totally fine. But
+the one problem is that there’s no replacement for what we used to be
+able to write with <code>Factory[...]</code>. Said another way: there’s
+no way to apply a type argument to a generic singleton class (i.e., to a
+type template). This is purely a question of syntax. Specifically:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ruby"><span id="cb14-1"><a href="#cb14-1"></a>sig <span class="cf">do</span></span>
 <span id="cb14-2"><a href="#cb14-2"></a>  type_parameters(<span class="wa">:Instance</span>)</span>
 <span id="cb14-3"><a href="#cb14-3"></a>    <span class="at">.params</span>(<span class="wa">klass: </span>T<span class="at">.class_of</span>(<span class="dt">AbstractThing</span>)<span class="kw">[</span>T<span class="at">.type_parameter</span>(<span class="wa">:Instance</span>)<span class="kw">]</span>)</span>
 <span id="cb14-4"><a href="#cb14-4"></a>    <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:Instance</span>))</span>
@@ -336,8 +522,12 @@
 <span id="cb14-6"><a href="#cb14-6"></a><span class="cf">def</span> instantiate_class(klass)</span>
 <span id="cb14-7"><a href="#cb14-7"></a>  <span class="co"># ...</span></span>
 <span id="cb14-8"><a href="#cb14-8"></a><span class="cf">end</span></span></code></pre></div>
-<p>This <code>T.class_of(AbstractThing)[...]</code> syntax isn’t parsed by Sorbet. If we can bikeshed on a syntax, the type system would very easily admit such a feature (because <code>type_template</code> is literally just a <code>type_member</code> on the singleton class).</p>
-<p>But sometimes, bikeshedding syntax is the hardest part of language design.</p>
+<p>This <code>T.class_of(AbstractThing)[...]</code> syntax isn’t parsed
+by Sorbet. If we can bikeshed on a syntax, the type system would very
+easily admit such a feature (because <code>type_template</code> is
+literally just a <code>type_member</code> on the singleton class).</p>
+<p>But sometimes, bikeshedding syntax is the hardest part of language
+design.</p>
 </main>
 
 

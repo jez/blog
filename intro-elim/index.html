@@ -50,118 +50,264 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#too-many-constructors">Too many constructors</a></li>
-  <li><a href="#too-many-common-methods">Too many common methods</a></li>
-  <li><a href="#types-are-not-their-elim-forms">Types are not their elim forms</a></li>
-  <li><a href="#appendix-tools-for-defining-intro-and-elim-forms">Appendix: tools for defining intro and elim forms</a>
+  <li><a href="#too-many-constructors"
+  id="toc-too-many-constructors">Too many constructors</a></li>
+  <li><a href="#too-many-common-methods"
+  id="toc-too-many-common-methods">Too many common methods</a></li>
+  <li><a href="#types-are-not-their-elim-forms"
+  id="toc-types-are-not-their-elim-forms">Types are not their elim
+  forms</a></li>
+  <li><a href="#appendix-tools-for-defining-intro-and-elim-forms"
+  id="toc-appendix-tools-for-defining-intro-and-elim-forms">Appendix:
+  tools for defining intro and elim forms</a>
   <ul>
-  <li><a href="#visibility-modifiers">Visibility modifiers</a></li>
-  <li><a href="#abstract-methods-and-interfaces">Abstract methods and interfaces</a></li>
-  <li><a href="#smart-constructors">Smart constructors</a></li>
+  <li><a href="#visibility-modifiers"
+  id="toc-visibility-modifiers">Visibility modifiers</a></li>
+  <li><a href="#abstract-methods-and-interfaces"
+  id="toc-abstract-methods-and-interfaces">Abstract methods and
+  interfaces</a></li>
+  <li><a href="#smart-constructors" id="toc-smart-constructors">Smart
+  constructors</a></li>
   </ul></li>
-  <li><a href="#appendix-operational-vs-denotational-semantics">Appendix: operational vs denotational semantics</a></li>
+  <li><a href="#appendix-operational-vs-denotational-semantics"
+  id="toc-appendix-operational-vs-denotational-semantics">Appendix:
+  operational vs denotational semantics</a></li>
   </ul>
 </nav>
 
 <main>
-<p>I took a course about programming languages in college. It was a very theory-oriented course, and honestly I only signed up to meet a requirement. But as luck would have it, I learned more about writing clean code from this theory course than many of my peers who took our school’s software engineering elective.</p>
-<p>The biggest lesson? <strong>Every type is defined by its intro and elim forms.</strong></p>
+<p>I took a course about programming languages in college. It was a very
+theory-oriented course, and honestly I only signed up to meet a
+requirement. But as luck would have it, I learned more about writing
+clean code from this theory course than many of my peers who took our
+school’s software engineering elective.</p>
+<p>The biggest lesson? <strong>Every type is defined by its intro and
+elim forms.</strong></p>
 <!-- more -->
-<p>It’s a short lesson, but one that applies <em>all over the place</em>.</p>
-<p>To reword it into more familiar terms: when defining a new data structure, you have to declare how to construct—or “introduce”—values of that structure. You also have to declare what the data structure can do, which usually involves reading, transforming, or otherwise destructuring the data, which we can call “eliminating.”</p>
-<p>Constructing and destructuring. Introducing and eliminating. Every type is defined by operations that do one of these two things, and we can call those operations “forms” for short.</p>
-<p>Importantly, if we’re sloppy in defining a type’s intro and elim forms, the type’s meaning is equally sloppy. Sloppy definitions are kind of obviously bad if you’re in the business of writing proofs about type systems. But what the course made me realize: they’re just as bad for us software engineers! Sloppily-defined types make it hard to build a mental model of what the type does, which leads to confusion, misuse, and bugs.</p>
-<p>Even in languages without a static type system, this lesson still applies. We define data structures when writing code in all languages, and it’s always done by defining intro and elim forms. The operations which create and transform data structures shape a programmer’s mental model of a codebase, regardless of whether there’s a type system to reify that mental model into type annotations.</p>
-<p>But this is the infuriating part: most real-world languages are cavalier when it comes to defining types. Sloppily-defined types are the <strong>default</strong>, and programmers usually have to work to overcome deficiencies in their language to define types well.</p>
-<p>To give some color, here are three common problems I see. (This is not an exhaustive list.)</p>
+<p>It’s a short lesson, but one that applies <em>all over the
+place</em>.</p>
+<p>To reword it into more familiar terms: when defining a new data
+structure, you have to declare how to construct—or “introduce”—values of
+that structure. You also have to declare what the data structure can do,
+which usually involves reading, transforming, or otherwise destructuring
+the data, which we can call “eliminating.”</p>
+<p>Constructing and destructuring. Introducing and eliminating. Every
+type is defined by operations that do one of these two things, and we
+can call those operations “forms” for short.</p>
+<p>Importantly, if we’re sloppy in defining a type’s intro and elim
+forms, the type’s meaning is equally sloppy. Sloppy definitions are kind
+of obviously bad if you’re in the business of writing proofs about type
+systems. But what the course made me realize: they’re just as bad for us
+software engineers! Sloppily-defined types make it hard to build a
+mental model of what the type does, which leads to confusion, misuse,
+and bugs.</p>
+<p>Even in languages without a static type system, this lesson still
+applies. We define data structures when writing code in all languages,
+and it’s always done by defining intro and elim forms. The operations
+which create and transform data structures shape a programmer’s mental
+model of a codebase, regardless of whether there’s a type system to
+reify that mental model into type annotations.</p>
+<p>But this is the infuriating part: most real-world languages are
+cavalier when it comes to defining types. Sloppily-defined types are the
+<strong>default</strong>, and programmers usually have to work to
+overcome deficiencies in their language to define types well.</p>
+<p>To give some color, here are three common problems I see. (This is
+not an exhaustive list.)</p>
 <h3 id="too-many-constructors">Too many constructors</h3>
-<p>Some languages automatically define a ton of ways to construct an object. For example, define a simple struct like this in C++:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> A {</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> x;</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  string y;</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> z;</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>};</span></code></pre></div>
+<p>Some languages automatically define a ton of ways to construct an
+object. For example, define a simple struct like this in C++:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> A <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> x<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  string y<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> z<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
 <p>and suddenly you’ve got all these options for instantiating it:</p>
-<p><span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="marginnote">It’s even worse in Go, where there’s nothing you can do to turn this “everything can be zero-initialized” behavior off.<br />
+<p><span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="marginnote">It’s even worse in Go, where there’s nothing you can
+do to turn this “everything can be zero-initialized” behavior off.<br />
 <br />
-By contrast, Rust allows writing <code>#[derive(Default)]</code> above a struct to opt into zero-initialization.<br />
+By contrast, Rust allows writing <code>#[derive(Default)]</code> above a
+struct to opt into zero-initialization.<br />
 <br />
 </span></span></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Initialize all the fields to their default/zero value.</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>A a;</span>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Initialize all the fields to their default/zero value.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>A a<span class="op">;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Initialize by providing values for all the fields.</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>A a{.x = <span class="dv">1</span>, .y = <span class="st">&quot;hey&quot;</span>, .z = <span class="kw">true</span>};</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>A a<span class="op">{.</span>x <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> <span class="op">.</span>y <span class="op">=</span> <span class="st">&quot;hey&quot;</span><span class="op">,</span> <span class="op">.</span>z <span class="op">=</span> <span class="kw">true</span><span class="op">};</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Initialize by providing only some of the fields</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>A a{<span class="dv">42</span>};</span></code></pre></div>
-<p>When defining a type, we should be explicit about which of these we want. Do we want the type to have an implicit “default” value? Do we want to allow omitting some of the values during initialization? Do we want to <em>prevent</em> providing some values during initialization? Do we want to validate these values, aborting construction if validation fails?</p>
-<p>For some types, the answer to these questions will be, “yes, a default value is fine,” “yes, omitting some values is fine,” “no, let them pass all the values if they want,” and “no, we don’t need validation.” But other times our answer will be different! In many languages it’s too hard to remember all the things we have to retroactively lock down after defining a new type. It would be better if we could start from nothing and build up what’s allowed, offering syntactic conveniences for commonly-defined operations.</p>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>A a<span class="op">{</span><span class="dv">42</span><span class="op">};</span></span></code></pre></div>
+<p>When defining a type, we should be explicit about which of these we
+want. Do we want the type to have an implicit “default” value? Do we
+want to allow omitting some of the values during initialization? Do we
+want to <em>prevent</em> providing some values during initialization? Do
+we want to validate these values, aborting construction if validation
+fails?</p>
+<p>For some types, the answer to these questions will be, “yes, a
+default value is fine,” “yes, omitting some values is fine,” “no, let
+them pass all the values if they want,” and “no, we don’t need
+validation.” But other times our answer will be different! In many
+languages it’s too hard to remember all the things we have to
+retroactively lock down after defining a new type. It would be better if
+we could start from nothing and build up what’s allowed, offering
+syntactic conveniences for commonly-defined operations.</p>
 <h3 id="too-many-common-methods">Too many common methods</h3>
-<p>Many languages default to providing certain elim forms for <em>all</em> types. For example, in Ruby every value descends from <code>BasicObject</code>, which defines the <code>==</code> method. But there are a couple problems with this method.</p>
-<p>First, not every value wants to allow equality comparisons! The classic example of this is function values—since we can’t solve the halting problem, the only real way of defining <code>==</code> for lambda values is reference equality. But then if a lambda is ever duplicated for some reason,<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">This can happen for very accidental reasons. Given <code>def ex; -&gt;{1}; end</code> then <code>ex() ==   ex()</code> is <code>false</code>.<br />
+<p>Many languages default to providing certain elim forms for
+<em>all</em> types. For example, in Ruby every value descends from
+<code>BasicObject</code>, which defines the <code>==</code> method. But
+there are a couple problems with this method.</p>
+<p>First, not every value wants to allow equality comparisons! The
+classic example of this is function values—since we can’t solve the
+halting problem, the only real way of defining <code>==</code> for
+lambda values is reference equality. But then if a lambda is ever
+duplicated for some reason,<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">This can happen for very accidental reasons. Given
+<code>def ex; -&gt;{1}; end</code> then <code>ex() ==   ex()</code> is
+<code>false</code>.<br />
 <br />
-</span></span> suddenly two things which are conceptually equal are not, which is likely to cause a logic error.</p>
-<p>Second, the contract of this <code>==</code> method is that <em>any value</em> can be compared for equality to <em>any other value</em>, even of a different class!<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">I wrote about the difficulty this causes for Sorbet in <a href="/problems-typing-ruby-equality/">this post</a>.<br />
+</span></span> suddenly two things which are conceptually equal are not,
+which is likely to cause a logic error.</p>
+<p>Second, the contract of this <code>==</code> method is that <em>any
+value</em> can be compared for equality to <em>any other value</em>,
+even of a different class!<span
+class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
+class="sidenote">I wrote about the difficulty this causes for Sorbet in
+<a href="/problems-typing-ruby-equality/">this post</a>.<br />
 <br />
-</span></span> For many people, that amounts to a sloppy, bug-inducing definition of <code>==</code>: they’d rather know that they’re comparing two completely incompatible things, instead of having the comparison quietly evaluate to <code>false</code>. But the language has made this choice, and now all our types must inherit this possibly-unwanted elim form.<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="sidenote">Some languages, like Rust and Haskell, do not define <code>==</code> by default but can generate a default implementation easily, on request.<br />
+</span></span> For many people, that amounts to a sloppy, bug-inducing
+definition of <code>==</code>: they’d rather know that they’re comparing
+two completely incompatible things, instead of having the comparison
+quietly evaluate to <code>false</code>. But the language has made this
+choice, and now all our types must inherit this possibly-unwanted elim
+form.<span
+class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
+class="sidenote">Some languages, like Rust and Haskell, do not define
+<code>==</code> by default but can generate a default implementation
+easily, on request.<br />
 <br />
 </span></span></p>
-<h3 id="types-are-not-their-elim-forms">Types are not their elim forms</h3>
-<p>Some languages equate “defining a type” with “defining an interface.” But that’s akin to saying that it’s enough to define a type by only specifying its elim forms! For example, in Java there’s basically no way to abstract over how a type is created:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> Foo {</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> <span class="fu">foo</span>();</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>This interface specifies how values of type <code>Foo</code> can be used, but not how they can be created. You can settle for defining a constructor on a class (maybe even an abstract class), but this ties the abstract specification of a type with it’s concrete implementation. Best to let a language’s facilities for abstraction abstract over both intro and elim forms.<span class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span class="sidenote">To temper people misinterpreting this as a Rust shill post, a TypeScript example this time. TypeScript lets interfaces declare a <code>new()</code> method, which allows abstracting over how a type is created. There’s a few tricks to it, and <a href="https://fettblog.eu/typescript-interface-constructor-pattern/">this post</a> outlines them as well or better than I could.<br />
+<h3 id="types-are-not-their-elim-forms">Types are not their elim
+forms</h3>
+<p>Some languages equate “defining a type” with “defining an interface.”
+But that’s akin to saying that it’s enough to define a type by only
+specifying its elim forms! For example, in Java there’s basically no way
+to abstract over how a type is created:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> Foo <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> <span class="fu">foo</span><span class="op">();</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This interface specifies how values of type <code>Foo</code> can be
+used, but not how they can be created. You can settle for defining a
+constructor on a class (maybe even an abstract class), but this ties the
+abstract specification of a type with it’s concrete implementation. Best
+to let a language’s facilities for abstraction abstract over both intro
+and elim forms.<span
+class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
+class="sidenote">To temper people misinterpreting this as a Rust shill
+post, a TypeScript example this time. TypeScript lets interfaces declare
+a <code>new()</code> method, which allows abstracting over how a type is
+created. There’s a few tricks to it, and <a
+href="https://fettblog.eu/typescript-interface-constructor-pattern/">this
+post</a> outlines them as well or better than I could.<br />
 <br />
 </span></span></p>
 <p><br />
 </p>
-<p>I’ve listed these three as personal pet peeves, but if you start to pay attention, you’ll find more. When defining types, start asking yourself:</p>
+<p>I’ve listed these three as personal pet peeves, but if you start to
+pay attention, you’ll find more. When defining types, start asking
+yourself:</p>
 <ul>
 <li>How can someone create values of this type?</li>
 <li>Is that the <em>only</em> way?</li>
 <li>What should be possible to do with this type?</li>
-<li>Is my language implicitly defining unwanted operations on my type by default?</li>
+<li>Is my language implicitly defining unwanted operations on my type by
+default?</li>
 </ul>
-<p>We rarely get to choose the language we use, and even when we do, every language has its own warts. None are going to offer the exacting precision for defining types that exists in the world of theory.</p>
-<p>And yet, we can familiarize ourselves with those warts and the tools the language <em>does</em> offer. That learned familiarity, and a constant eye towards intro and elim forms, lets us sharpen the meaning of our types, making the code we write more powerful.</p>
+<p>We rarely get to choose the language we use, and even when we do,
+every language has its own warts. None are going to offer the exacting
+precision for defining types that exists in the world of theory.</p>
+<p>And yet, we can familiarize ourselves with those warts and the tools
+the language <em>does</em> offer. That learned familiarity, and a
+constant eye towards intro and elim forms, lets us sharpen the meaning
+of our types, making the code we write more powerful.</p>
 <p><br />
 </p>
 <hr />
 <p><br />
 </p>
-<h1 id="appendix-tools-for-defining-intro-and-elim-forms">Appendix: tools for defining intro and elim forms</h1>
-<p>An informal and non-exhaustive list of some features that many languages have around controlling intro and elim forms. If you have any common tricks, feel free to tell me about them! I may update this list over time.</p>
+<h1 id="appendix-tools-for-defining-intro-and-elim-forms">Appendix:
+tools for defining intro and elim forms</h1>
+<p>An informal and non-exhaustive list of some features that many
+languages have around controlling intro and elim forms. If you have any
+common tricks, feel free to tell me about them! I may update this list
+over time.</p>
 <h3 id="visibility-modifiers">Visibility modifiers</h3>
-<p>If you make a method private, that removes an elim form from your type.<br />
-If you make a constructor private, that removes an intro form from your type.</p>
-<h3 id="abstract-methods-and-interfaces">Abstract methods and interfaces</h3>
-<p>Even though in many languages these only allow specifying elim forms, they’re still wildly useful. My personal experience also tells me that they’re wildly underused.</p>
-<p>Interfaces allow multiple classes to share the same elim forms. They also allow a form of “self control,” where a method promises to only use some of the elim forms that a type might otherwise have. Providing fewer elim forms makes a type’s mental model smaller and more understandable.</p>
+<p>If you make a method private, that removes an elim form from your
+type.<br />
+If you make a constructor private, that removes an intro form from your
+type.</p>
+<h3 id="abstract-methods-and-interfaces">Abstract methods and
+interfaces</h3>
+<p>Even though in many languages these only allow specifying elim forms,
+they’re still wildly useful. My personal experience also tells me that
+they’re wildly underused.</p>
+<p>Interfaces allow multiple classes to share the same elim forms. They
+also allow a form of “self control,” where a method promises to only use
+some of the elim forms that a type might otherwise have. Providing fewer
+elim forms makes a type’s mental model smaller and more
+understandable.</p>
 <h3 id="smart-constructors">Smart constructors</h3>
-<p>Usually just a clever use of visibility modifiers and static methods, not something built into the language. Most languages don’t allow specifying the return type of a constructor, which places limits on what kinds of intro forms you can define. You can get around this by marking the constructor private, providing your own static method which creates instances of the class (which may have an arbitrary return type).</p>
-<p>In this C++ example, we see the <code>CardNumber::make</code> method returns <code>optional&lt;CardNumber&gt;</code>, in effect saying that constructing a <code>CardNumber</code> might fail:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource cpp numberLines hl-7 hl-9"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">class</span> CardNumber {</span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">private</span>:</span>
-<span id="cb4-3"><a href="#cb4-3"></a>  string <span class="va">number_</span>;</span>
-<span id="cb4-4"><a href="#cb4-4"></a>  CardNumber(string number) : <span class="va">number_</span>(number) {}</span>
+<p>Usually just a clever use of visibility modifiers and static methods,
+not something built into the language. Most languages don’t allow
+specifying the return type of a constructor, which places limits on what
+kinds of intro forms you can define. You can get around this by marking
+the constructor private, providing your own static method which creates
+instances of the class (which may have an arbitrary return type).</p>
+<p>In this C++ example, we see the <code>CardNumber::make</code> method
+returns <code>optional&lt;CardNumber&gt;</code>, in effect saying that
+constructing a <code>CardNumber</code> might fail:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode numberSource cpp numberLines hl-7 hl-9"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">class</span> CardNumber <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">private</span><span class="op">:</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>  string <span class="va">number_</span><span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>  CardNumber<span class="op">(</span>string number<span class="op">)</span> <span class="op">:</span> <span class="va">number_</span><span class="op">(</span>number<span class="op">)</span> <span class="op">{}</span></span>
 <span id="cb4-5"><a href="#cb4-5"></a></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="kw">public</span>:</span>
-<span id="cb4-7"><a href="#cb4-7"></a>  <span class="at">static</span> optional&lt;CardNumber&gt; make(string number) {</span>
-<span id="cb4-8"><a href="#cb4-8"></a>    <span class="cf">if</span> (!luhnCheck(number)) {</span>
-<span id="cb4-9"><a href="#cb4-9"></a>      <span class="cf">return</span> nullopt;</span>
-<span id="cb4-10"><a href="#cb4-10"></a>    }</span>
-<span id="cb4-11"><a href="#cb4-11"></a>    <span class="cf">return</span> CardNumber(number);</span>
-<span id="cb4-12"><a href="#cb4-12"></a>  }</span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="at">static</span> optional<span class="op">&lt;</span>CardNumber<span class="op">&gt;</span> make<span class="op">(</span>string number<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>    <span class="cf">if</span> <span class="op">(!</span>luhnCheck<span class="op">(</span>number<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>      <span class="cf">return</span> nullopt<span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a>    <span class="op">}</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>    <span class="cf">return</span> CardNumber<span class="op">(</span>number<span class="op">);</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a>  <span class="op">}</span></span>
 <span id="cb4-13"><a href="#cb4-13"></a></span>
-<span id="cb4-14"><a href="#cb4-14"></a>  string number() { <span class="cf">return</span> <span class="kw">this</span>-&gt;<span class="va">number_</span>; }</span>
-<span id="cb4-15"><a href="#cb4-15"></a>}</span></code></pre></div>
-<p>The only way to introduce a value of type <code>CardNumber</code> is to call <code>make</code>. That function will return <code>nullopt</code> if the provided number is invalid according to the <a href="https://en.wikipedia.org/wiki/Luhn_algorithm">Luhn algorithm</a>.</p>
-<h1 id="appendix-operational-vs-denotational-semantics">Appendix: operational vs denotational semantics</h1>
-<p>If you want to get <em>very</em> into the weeds, the idea that all types are defined by introduction and elimination forms assumes you’re approaching type theory from an <a href="https://en.wikipedia.org/wiki/Operational_semantics">operational semantics</a> viewpoint.</p>
-<p>Simply as a disclaimer, I want to note that this is not the only viewpoint from which to approach type theory. Another popular approach uses <a href="https://en.wikipedia.org/wiki/Denotational_semantics">denotational semantics</a>, where instead of describing a type by what it does, you describe a type by what mathematical properties all elements of that type have.</p>
-<p>There are fun real-world insights to draw from denotational semantics too, but that’ll have to be some other post.</p>
+<span id="cb4-14"><a href="#cb4-14"></a>  string number<span class="op">()</span> <span class="op">{</span> <span class="cf">return</span> <span class="kw">this</span><span class="op">-&gt;</span><span class="va">number_</span><span class="op">;</span> <span class="op">}</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="op">}</span></span></code></pre></div>
+<p>The only way to introduce a value of type <code>CardNumber</code> is
+to call <code>make</code>. That function will return
+<code>nullopt</code> if the provided number is invalid according to the
+<a href="https://en.wikipedia.org/wiki/Luhn_algorithm">Luhn
+algorithm</a>.</p>
+<h1 id="appendix-operational-vs-denotational-semantics">Appendix:
+operational vs denotational semantics</h1>
+<p>If you want to get <em>very</em> into the weeds, the idea that all
+types are defined by introduction and elimination forms assumes you’re
+approaching type theory from an <a
+href="https://en.wikipedia.org/wiki/Operational_semantics">operational
+semantics</a> viewpoint.</p>
+<p>Simply as a disclaimer, I want to note that this is not the only
+viewpoint from which to approach type theory. Another popular approach
+uses <a
+href="https://en.wikipedia.org/wiki/Denotational_semantics">denotational
+semantics</a>, where instead of describing a type by what it does, you
+describe a type by what mathematical properties all elements of that
+type have.</p>
+<p>There are fun real-world insights to draw from denotational semantics
+too, but that’ll have to be some other post.</p>
 </main>
 
 

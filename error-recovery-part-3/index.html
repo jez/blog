@@ -52,48 +52,91 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#read-the-docs">Read the docs</a></li>
-  <li><a href="#enable-traces-and-make-them-good">Enable traces, and make them good</a></li>
-  <li><a href="#diff-traces-for-good-and-bad-parses">Diff traces for good and bad parses</a></li>
+  <li><a href="#read-the-docs" id="toc-read-the-docs">Read the
+  docs</a></li>
+  <li><a href="#enable-traces-and-make-them-good"
+  id="toc-enable-traces-and-make-them-good">Enable traces, and make them
+  good</a></li>
+  <li><a href="#diff-traces-for-good-and-bad-parses"
+  id="toc-diff-traces-for-good-and-bad-parses">Diff traces for good and
+  bad parses</a></li>
   </ul>
 </nav>
 
 <main>
-<p>This is the third post in a series about “things I’ve learned while making improvements to Sorbet’s parser.” Previously I discussed high level questions like why it’s an important problem for Sorbet to solve and some approaches I decided not to take. This post switches gears to focus on specific tips and techniques I found useful while making parser changes.</p>
+<p>This is the third post in a series about “things I’ve learned while
+making improvements to Sorbet’s parser.” Previously I discussed high
+level questions like why it’s an important problem for Sorbet to solve
+and some approaches I decided not to take. This post switches gears to
+focus on specific tips and techniques I found useful while making parser
+changes.</p>
 <!-- more -->
 <ul>
-<li><a href="/error-recovery-part-1/">Part 1: Why Recover from Syntax Errors</a></li>
+<li><a href="/error-recovery-part-1/">Part 1: Why Recover from Syntax
+Errors</a></li>
 <li><a href="/error-recovery-part-2/">Part 2: What I Didn’t Do</a></li>
-<li><strong><a href="/error-recovery-part-3/">Part 3: Tools and Techniques for Debugging a (Bison) Parser</a></strong></li>
-<li><a href="/error-recovery-part-4/">Part 4: Bison’s <code>error</code> Token</a></li>
+<li><strong><a href="/error-recovery-part-3/">Part 3: Tools and
+Techniques for Debugging a (Bison) Parser</a></strong></li>
+<li><a href="/error-recovery-part-4/">Part 4: Bison’s <code>error</code>
+Token</a></li>
 <li>(<em>coming soon</em>) Part 5: Backtracking, aka Lexer Hacks</li>
-<li>(<em>coming soon</em>) Part 6: Falling Back on Indentation, aka More Lexer Hacks</li>
+<li>(<em>coming soon</em>) Part 6: Falling Back on Indentation, aka More
+Lexer Hacks</li>
 </ul>
 <p>With that all out of the way, let’s dive into the tips.</p>
 <h1 id="read-the-docs">Read the docs</h1>
-<p>Haha! You probably thought that by Googling for things you’d be able to find something that lets you avoid reading the official docs. But it’s boring for me to repeat everything that’s in the docs, and honestly the Bison and Ragel docs are rather comprehensive as far as software documentation goes these days:</p>
-<p>→ <a href="https://www.colm.net/files/ragel/ragel-guide-6.9.pdf">Ragel User Guide</a><br />
-→ <a href="https://www.gnu.org/software/bison/manual/bison.html">Bison User Guide</a></p>
-<p>But I will give you some tips for <strong>how</strong> to read the docs:</p>
+<p>Haha! You probably thought that by Googling for things you’d be able
+to find something that lets you avoid reading the official docs. But
+it’s boring for me to repeat everything that’s in the docs, and honestly
+the Bison and Ragel docs are rather comprehensive as far as software
+documentation goes these days:</p>
+<p>→ <a
+href="https://www.colm.net/files/ragel/ragel-guide-6.9.pdf">Ragel User
+Guide</a><br />
+→ <a href="https://www.gnu.org/software/bison/manual/bison.html">Bison
+User Guide</a></p>
+<p>But I will give you some tips for <strong>how</strong> to read the
+docs:</p>
 <ul>
-<li><p>You ~always want the “HTML entirely on one web page” version of the Bison docs—it’s way easier to ⌘F around one page.</p></li>
-<li><p>Bison actually gets new, interesting features from version to version. Double check that the version of the docs you’re reading actually match the version of Bison you’re using. I haven’t found an easy way to read old Bison docs online, so I usually just <code>grep</code> for things in the docs’ sources:</p>
+<li><p>You ~always want the “HTML entirely on one web page” version of
+the Bison docs—it’s way easier to ⌘F around one page.</p></li>
+<li><p>Bison actually gets new, interesting features from version to
+version. Double check that the version of the docs you’re reading
+actually match the version of Bison you’re using. I haven’t found an
+easy way to read old Bison docs online, so I usually just
+<code>grep</code> for things in the docs’ sources:</p>
 <pre><code>❯ git clone https://github.com/akimd/bison
 ❯ git checkout v3.3.2
 ❯ grep -r &#39;error.*token&#39; doc/
 doc/bison.texi:error.  If there is a @samp{..} token before the next
 doc/bison.texi:value of the error token is 256, unless you explicitly assigned 256
 ... many more results ...</code></pre></li>
-<li><p>I’ve found it valuable to actually take my time while reading the Bison docs. I’ve found a lot of things that turned out to be relevant later on because I took the time to read parts of the docs that didn’t look immediately relevant.</p></li>
+<li><p>I’ve found it valuable to actually take my time while reading the
+Bison docs. I’ve found a lot of things that turned out to be relevant
+later on because I took the time to read parts of the docs that didn’t
+look immediately relevant.</p></li>
 </ul>
-<p>But that’s enough soapbox standing, now we return to regularly scheduled tips.</p>
-<h1 id="enable-traces-and-make-them-good">Enable traces, and make them good</h1>
-<p>Before I started working on this project, I treated Sorbet’s parser like a black box. In the spirit of “<a href="https://blog.nelhage.com/post/computers-can-be-understood/">Computers can be understood</a>,” the first thing I did was enable traces for our parser. Easy enough:</p>
+<p>But that’s enough soapbox standing, now we return to regularly
+scheduled tips.</p>
+<h1 id="enable-traces-and-make-them-good">Enable traces, and make them
+good</h1>
+<p>Before I started working on this project, I treated Sorbet’s parser
+like a black box. In the spirit of “<a
+href="https://blog.nelhage.com/post/computers-can-be-understood/">Computers
+can be understood</a>,” the first thing I did was enable traces for our
+parser. Easy enough:</p>
 <ul>
-<li>Define the <a href="https://www.gnu.org/software/bison/manual/bison.html#Tracing"><code>parse.trace</code></a> variable in the grammar</li>
-<li>Call <a href="https://www.gnu.org/software/bison/manual/bison.html#index-set_005fdebug_005flevel-on-parser"><code>set_debug_level</code></a> on the generated parser</li>
+<li>Define the <a
+href="https://www.gnu.org/software/bison/manual/bison.html#Tracing"><code>parse.trace</code></a>
+variable in the grammar</li>
+<li>Call <a
+href="https://www.gnu.org/software/bison/manual/bison.html#index-set_005fdebug_005flevel-on-parser"><code>set_debug_level</code></a>
+on the generated parser</li>
 </ul>
-<p>Here’s <a href="https://github.com/sorbet/sorbet/pull/4985/files?w=1#diff-63fada7036ffcba42e6615c3b85615cb81d47aafbf88122a552a34fb799c06b5R17">the PR in Sorbet</a>, which might help to make these two steps more concrete.</p>
+<p>Here’s <a
+href="https://github.com/sorbet/sorbet/pull/4985/files?w=1#diff-63fada7036ffcba42e6615c3b85615cb81d47aafbf88122a552a34fb799c06b5R17">the
+PR in Sorbet</a>, which might help to make these two steps more
+concrete.</p>
 <p>The trace output looks something like this:</p>
 <pre><code>❯ sorbet --trace-parser -e &#39;def foo; end&#39;
 Starting parse
@@ -106,9 +149,16 @@ Shifting token tIDENTIFIER ()
 Entering state 184
 
 ...</code></pre>
-<p>The output is somewhat useful as is, but it can be better. First, all the trailing <code>()</code> on the “Next token is …” lines are present because there aren’t any <code>%printer</code>’s for those tokens–we can easily get the trace to not only show that it read a <code>tIDENTIFIER</code> token, but also what the name of that variable was. After adding one for <code>tIDENTIFIER</code> like this:</p>
+<p>The output is somewhat useful as is, but it can be better. First, all
+the trailing <code>()</code> on the “Next token is …” lines are present
+because there aren’t any <code>%printer</code>’s for those tokens–we can
+easily get the trace to not only show that it read a
+<code>tIDENTIFIER</code> token, but also what the name of that variable
+was. After adding one for <code>tIDENTIFIER</code> like this:</p>
 <pre><code>%printer { yyo &lt;&lt; $$-&gt;view(); } tIDENTIFIER</code></pre>
-<p>The <code>$$-&gt;view();</code> bit calls the <code>view</code> method on Sorbet’s token type, converting it to a string. Now our traces look better:</p>
+<p>The <code>$$-&gt;view();</code> bit calls the <code>view</code>
+method on Sorbet’s token type, converting it to a string. Now our traces
+look better:</p>
 <pre><code>❯ sorbet --trace-parser -e &#39;def foo; end&#39;
 Starting parse
 Entering state 0
@@ -123,25 +173,52 @@ Reducing stack by rule 125 (line 1140):
    $1 = token tIDENTIFIER (foo)
 -&gt; $$ = nterm fname ()
 ...</code></pre>
-<p>So far I’ve been adding these <code>%printer</code>s only as I encounter the tokens that show up, mostly because I’m too lazy to exhaustively define printers for all the tokens—Ruby has a lot of tokens. You’ll note that Bison even lets you register <code>%printer</code>s for non-terminals (not pictured, but the same mechanism). You could use this to, like, print the currently reduced AST for that non-terminal, or some other summary.</p>
-<p>The next step is to actually understand what these traces mean, because it looks like there’s a lot of magic names and numbers. The long answer is that you’ll have to look in the textual report that Bison generates about all the intermediate states in your parser. This is documented in the <a href="https://www.gnu.org/software/bison/manual/bison.html#Understanding">Understanding Your Parser</a> section of the Bison docs.</p>
-<p>But if you’re impatient, there’s a bit of a short cut that can work in many cases.</p>
-<h1 id="diff-traces-for-good-and-bad-parses">Diff traces for good and bad parses</h1>
+<p>So far I’ve been adding these <code>%printer</code>s only as I
+encounter the tokens that show up, mostly because I’m too lazy to
+exhaustively define printers for all the tokens—Ruby has a lot of
+tokens. You’ll note that Bison even lets you register
+<code>%printer</code>s for non-terminals (not pictured, but the same
+mechanism). You could use this to, like, print the currently reduced AST
+for that non-terminal, or some other summary.</p>
+<p>The next step is to actually understand what these traces mean,
+because it looks like there’s a lot of magic names and numbers. The long
+answer is that you’ll have to look in the textual report that Bison
+generates about all the intermediate states in your parser. This is
+documented in the <a
+href="https://www.gnu.org/software/bison/manual/bison.html#Understanding">Understanding
+Your Parser</a> section of the Bison docs.</p>
+<p>But if you’re impatient, there’s a bit of a short cut that can work
+in many cases.</p>
+<h1 id="diff-traces-for-good-and-bad-parses">Diff traces for good and
+bad parses</h1>
 <p>This code is a syntax error in Ruby:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo(x,); <span class="cf">end</span></span></code></pre></div>
-<p>Bison has a fancy <code>error</code> token that we can use to recover from cases like this, but it’s hard to know where to add that <code>error</code> token into the grammar. Printing the trace file would likely help us figure out where, but even when we’re staring at the trace file it’s not entirely clear.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo(x,); <span class="cf">end</span></span></code></pre></div>
+<p>Bison has a fancy <code>error</code> token that we can use to recover
+from cases like this, but it’s hard to know where to add that
+<code>error</code> token into the grammar. Printing the trace file would
+likely help us figure out where, but even when we’re staring at the
+trace file it’s not entirely clear.</p>
 <p>Luckily there’s a short cut:</p>
 <ol type="1">
 <li>Record a parser trace for the invalid parse.</li>
-<li>“Fix” the file so that it parses by only adding tokens, and record a trace for that parse.
+<li>“Fix” the file so that it parses by only adding tokens, and record a
+trace for that parse.
 <ul>
-<li>This ensures that all the tokens present in the bad parse are also present in the good parse.</li>
+<li>This ensures that all the tokens present in the bad parse are also
+present in the good parse.</li>
 </ul></li>
-<li><code>diff</code> (or <code>vimdiff</code>) the two traces, and add an error recovery rule to the place where the trace differs.</li>
+<li><code>diff</code> (or <code>vimdiff</code>) the two traces, and add
+an error recovery rule to the place where the trace differs.</li>
 </ol>
-<p>In our case, I want <code>def foo(x,); end</code> to parse as if the user had properly written two arguments, so that I can record the fact that the user started to introduce a second argument. I’ll record a trace for the program <code>def foo(x, y); end</code>, and diff it. The diff looks like this:</p>
+<p>In our case, I want <code>def foo(x,); end</code> to parse as if the
+user had properly written two arguments, so that I can record the fact
+that the user started to introduce a second argument. I’ll record a
+trace for the program <code>def foo(x, y); end</code>, and diff it. The
+diff looks like this:</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource diff numberLines hl-30 hl-31 hl-32 hl-33 hl-34"><code class="sourceCode diff"><span id="cb6-1"><a href="#cb6-1"></a>❯ sorbet --trace-parser -e &#39;def foo(x,); end&#39; 2&gt; trace-bad.txt;</span>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode numberSource diff numberLines hl-30 hl-31 hl-32 hl-33 hl-34"><code class="sourceCode diff"><span id="cb6-1"><a href="#cb6-1"></a>❯ sorbet --trace-parser -e &#39;def foo(x,); end&#39; 2&gt; trace-bad.txt;</span>
 <span id="cb6-2"><a href="#cb6-2"></a>  sorbet --trace-parser -e &#39;def foo(x, y); end&#39; 2&gt; trace-good.txt;</span>
 <span id="cb6-3"><a href="#cb6-3"></a>  diff -u trace-bad.txt trace-good.txt</span>
 <span id="cb6-4"><a href="#cb6-4"></a><span class="kw">--- trace-bad.txt       2022-01-16 14:40:51.168977798 -0800</span></span>
@@ -177,12 +254,22 @@ Reducing stack by rule 125 (line 1140):
 <span id="cb6-34"><a href="#cb6-34"></a><span class="va">+-&gt; $$ = nterm f_arg ()</span></span>
 <span id="cb6-35"><a href="#cb6-35"></a>...</span></code></pre></div>
 <figcaption>
-This example shows <code>diff -u</code> in the command line, but when I’m looking at these traces I almost exclusively use <code>vimdiff</code>, because it lets me expand surrounding context, search for keywords, etc. And it looks nicer.
+This example shows <code>diff -u</code> in the command line, but when
+I’m looking at these traces I almost exclusively use
+<code>vimdiff</code>, because it lets me expand surrounding context,
+search for keywords, etc. And it looks nicer.
 </figcaption>
 </figure>
-<p>Looking at the highlighted lines near the bottom, we see that eventually the good parse was able to reduce <code>nterm f_arg</code> by combining <code>f_arg</code>, <code>","</code>, and <code>f_arg_item</code>. The trace tells us that this happened in <code>rule 665 (line 2428)</code>. That line number is the actual source line number in our <code>*.ypp</code> grammar file.</p>
-<p>All we have to do is go to that line and add an error case, which is pretty easy:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource diff numberLines hl-11 hl-12 hl-13 hl-14"><code class="sourceCode diff"><span id="cb7-1"><a href="#cb7-1"></a>           f_arg: f_arg_item</span>
+<p>Looking at the highlighted lines near the bottom, we see that
+eventually the good parse was able to reduce <code>nterm f_arg</code> by
+combining <code>f_arg</code>, <code>","</code>, and
+<code>f_arg_item</code>. The trace tells us that this happened in
+<code>rule 665 (line 2428)</code>. That line number is the actual source
+line number in our <code>*.ypp</code> grammar file.</p>
+<p>All we have to do is go to that line and add an error case, which is
+pretty easy:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode numberSource diff numberLines hl-11 hl-12 hl-13 hl-14"><code class="sourceCode diff"><span id="cb7-1"><a href="#cb7-1"></a>           f_arg: f_arg_item</span>
 <span id="cb7-2"><a href="#cb7-2"></a>                    {</span>
 <span id="cb7-3"><a href="#cb7-3"></a>                      $$ = driver.alloc.node_list($1);</span>
 <span id="cb7-4"><a href="#cb7-4"></a>                    }</span>
@@ -196,7 +283,8 @@ This example shows <code>diff -u</code> in the command line, but when I’m look
 <span id="cb7-12"><a href="#cb7-12"></a><span class="va">+                   {</span></span>
 <span id="cb7-13"><a href="#cb7-13"></a><span class="va">+                     $$ = $1;</span></span>
 <span id="cb7-14"><a href="#cb7-14"></a><span class="va">+                   }</span></span></code></pre></div>
-<p>And now the parser reports the error but continues to recover from the error:</p>
+<p>And now the parser reports the error but continues to recover from
+the error:</p>
 <pre><code>❯ sorbet -p parse-tree-whitequark -e &#39;def foo(x,); end&#39;
 s(:def, :foo,
   s(:args,
@@ -205,13 +293,24 @@ s(:def, :foo,
      1 |def foo(x,); end
                   ^
 Errors: 1</code></pre>
-<p>This technique of comparing the trace for “what it currently does” against “what I wish it did” has been super useful, because it often shows exactly the point where the trace diverged, along with the reason. In this example, the <code>f_arg_item</code> was never reduced, but sometimes the difference will be something like “the lexer didn’t read a token” or “the lexer read a token, but because of the state the lexer was in, it was the wrong token.” Whatever the cause, comparing traces usually shows the problem.</p>
-<p>This particular example also showed an example of using Bison’s <code>error</code> token. I’ll talk more about what this <code>error</code> token means in the next post.</p>
+<p>This technique of comparing the trace for “what it currently does”
+against “what I wish it did” has been super useful, because it often
+shows exactly the point where the trace diverged, along with the reason.
+In this example, the <code>f_arg_item</code> was never reduced, but
+sometimes the difference will be something like “the lexer didn’t read a
+token” or “the lexer read a token, but because of the state the lexer
+was in, it was the wrong token.” Whatever the cause, comparing traces
+usually shows the problem.</p>
+<p>This particular example also showed an example of using Bison’s
+<code>error</code> token. I’ll talk more about what this
+<code>error</code> token means in the next post.</p>
 <p style="width: 50%; float: left; text-align: left;">
-<a href="/error-recovery-part-2/">← Part 2: Why Recover from Syntax Errors</a>
+<a href="/error-recovery-part-2/">← Part 2: Why Recover from Syntax
+Errors</a>
 </p>
 <p style="width: 50%; float: right; text-align: right;">
-<a href="/error-recovery-part-4/">Part 4: Bison’s <code>error</code> Token →</a>
+<a href="/error-recovery-part-4/">Part 4: Bison’s <code>error</code>
+Token →</a>
 </p>
 <p><br></p>
 </main>

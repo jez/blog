@@ -50,10 +50,16 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#background-sorbets-union-types">Background: Sorbet’s union types</a></li>
-  <li><a href="#example-from-checked-exceptions-to-union-types">Example: From checked exceptions to union types</a></li>
-  <li><a href="#analysis">Analysis: Why the union types approach is better</a></li>
-  <li><a href="#appendix">Appendix: Checked Exceptions</a></li>
+  <li><a href="#background-sorbets-union-types"
+  id="toc-background-sorbets-union-types">Background: Sorbet’s union
+  types</a></li>
+  <li><a href="#example-from-checked-exceptions-to-union-types"
+  id="toc-example-from-checked-exceptions-to-union-types">Example: From
+  checked exceptions to union types</a></li>
+  <li><a href="#analysis" id="toc-analysis">Analysis: Why the union
+  types approach is better</a></li>
+  <li><a href="#appendix" id="toc-appendix">Appendix: Checked
+  Exceptions</a></li>
   </ul>
 </nav>
 
@@ -62,47 +68,86 @@
 <blockquote>
 <p>Does Sorbet support checked exceptions, like Java?</p>
 </blockquote>
-<p>(In fact, this was the <a href="https://youtu.be/odmlf_ezsBo?t=1921">first question</a> I was asked at my <a href="https://jez.io/talks/state-of-sorbet-2019/">first conference talk</a>.)</p>
-<p>The answer: Sorbet doesn’t support checked exceptions, and I don’t think it ever should.</p>
+<p>(In fact, this was the <a
+href="https://youtu.be/odmlf_ezsBo?t=1921">first question</a> I was
+asked at my <a href="https://jez.io/talks/state-of-sorbet-2019/">first
+conference talk</a>.)</p>
+<p>The answer: Sorbet doesn’t support checked exceptions, and I don’t
+think it ever should.</p>
 <!-- more -->
-<p>Before I dive in, there are two pretexts I’m assuming: either you asked this question and someone linked you this post, or the post title was enough to catch your attention. Either way, I’m going to take for granted that you know what I mean by “checked exceptions.” If you want a quick refresher, jump down to the <a href="#appendix">Appendix</a> and then come back.</p>
-<p>My claim is that checked exceptions are a poor man’s ad hoc union types, that since Sorbet has ad hoc union types it doesn’t need checked exceptions. I’ll discuss this claim in three parts:</p>
+<p>Before I dive in, there are two pretexts I’m assuming: either you
+asked this question and someone linked you this post, or the post title
+was enough to catch your attention. Either way, I’m going to take for
+granted that you know what I mean by “checked exceptions.” If you want a
+quick refresher, jump down to the <a href="#appendix">Appendix</a> and
+then come back.</p>
+<p>My claim is that checked exceptions are a poor man’s ad hoc union
+types, that since Sorbet has ad hoc union types it doesn’t need checked
+exceptions. I’ll discuss this claim in three parts:</p>
 <ul>
-<li>I’ll give some background on what it means for union types to be “ad hoc,” which applies to Sorbet’s union types but are somewhat rare.</li>
-<li>I’ll describe a translation from checked exceptions in Java to union-typed returns in Ruby with a concrete example.</li>
+<li>I’ll give some background on what it means for union types to be “ad
+hoc,” which applies to Sorbet’s union types but are somewhat rare.</li>
+<li>I’ll describe a translation from checked exceptions in Java to
+union-typed returns in Ruby with a concrete example.</li>
 <li>I’ll give evidence for why the union types approach is better.</li>
 </ul>
-<p>(If you want to skip straight to the good stuff, the analysis <a href="#analysis">is down here</a>.)</p>
-<h1 id="background-sorbets-union-types">Background: Sorbet’s union types</h1>
+<p>(If you want to skip straight to the good stuff, the analysis <a
+href="#analysis">is down here</a>.)</p>
+<h1 id="background-sorbets-union-types">Background: Sorbet’s union
+types</h1>
 <blockquote>
-<p>The throws clause is the only point in the entire Java language that allows union types. You can tack “throws A,B,C” onto a method signature meaning it might throw A or B or C, but outside of the throws clause you cannot say “type A or B or C” in Java.</p>
-<p>— James Iry, <em><a href="http://james-iry.blogspot.com/2012/02/checked-exceptions-might-have-their.html">Checked Exceptions Might Have Their Place, But It Isn’t In Java</a></em> (2012)</p>
+<p>The throws clause is the only point in the entire Java language that
+allows union types. You can tack “throws A,B,C” onto a method signature
+meaning it might throw A or B or C, but outside of the throws clause you
+cannot say “type A or B or C” in Java.</p>
+<p>— James Iry, <em><a
+href="http://james-iry.blogspot.com/2012/02/checked-exceptions-might-have-their.html">Checked
+Exceptions Might Have Their Place, But It Isn’t In Java</a></em>
+(2012)</p>
 </blockquote>
-<p>Sorbet supports <a href="https://sorbet.org/docs/union-types">union types</a>. More specifically, Sorbet’s union types are ad hoc: any number of types can be unioned together on demand:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span>returns(T<span class="at">.any</span>(A, B, C))<span class="kw">}</span></span>
+<p>Sorbet supports <a href="https://sorbet.org/docs/union-types">union
+types</a>. More specifically, Sorbet’s union types are ad hoc: any
+number of types can be unioned together on demand:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span>returns(T<span class="at">.any</span>(A, B, C))<span class="kw">}</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo; <span class="kw">...</span>; <span class="cf">end</span></span></code></pre></div>
-<p>By contrast, many languages with union types require predeclaring a union’s variants, for example in Rust:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">enum</span> AorBorC <span class="op">{</span></span>
+<p>By contrast, many languages with union types require predeclaring a
+union’s variants, for example in Rust:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode rust"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">enum</span> AorBorC <span class="op">{</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    A(A)<span class="op">,</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    B(B)<span class="op">,</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    C(C)<span class="op">,</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>That Sorbet allows defining union types on demand is similar to Java’s <code>throws</code> clause, but more powerful: <code>throws A, B, C</code> is not a type, while <code>T.any(A, B, C)</code> is. We’ll see why that matters below.</p>
-<h1 id="example-from-checked-exceptions-to-union-types">Example: From checked exceptions to union types</h1>
-<p>Using Sorbet’s ad hoc union types, it’s mechanical to convert Java-style checked exceptions to Sorbet-annotated Ruby. To demonstrate:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Currency</span> <span class="fu">parseCurrency</span>(<span class="bu">String</span> currencyStr) <span class="kw">throws</span> <span class="bu">ParseException</span> {</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Currency</span> currency = KNOWN_CURRENCIES.<span class="fu">get</span>(currencyStr);</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> (currency == <span class="kw">null</span>) {</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">throw</span> <span class="kw">new</span> <span class="bu">ParseException</span>(</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;&#39;&quot;</span> currencyStr + <span class="st">&quot;&#39; is not a valid currency&quot;</span>, <span class="dv">0</span>);</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    }</span>
+<p>That Sorbet allows defining union types on demand is similar to
+Java’s <code>throws</code> clause, but more powerful:
+<code>throws A, B, C</code> is not a type, while
+<code>T.any(A, B, C)</code> is. We’ll see why that matters below.</p>
+<h1 id="example-from-checked-exceptions-to-union-types">Example: From
+checked exceptions to union types</h1>
+<p>Using Sorbet’s ad hoc union types, it’s mechanical to convert
+Java-style checked exceptions to Sorbet-annotated Ruby. To
+demonstrate:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Currency</span> <span class="fu">parseCurrency</span><span class="op">(</span><span class="bu">String</span> currencyStr<span class="op">)</span> <span class="kw">throws</span> <span class="bu">ParseException</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Currency</span> currency <span class="op">=</span> KNOWN_CURRENCIES<span class="op">.</span><span class="fu">get</span><span class="op">(</span>currencyStr<span class="op">);</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>currency <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">ParseException</span><span class="op">(</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;&#39;&quot;</span> currencyStr <span class="op">+</span> <span class="st">&quot;&#39; is not a valid currency&quot;</span><span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> currency;</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>This is a somewhat contrived Java method, but it’ll be good enough to demonstrate the concepts.</p>
-<p>If <code>parseCurrency</code> is given a string it can’t handle, it raises a <code>ParseException</code>. It declares this with <code>throws</code> because <code>ParseException</code> is a checked exception. If the currency string is recognized, it returns some <code>Currency</code> object.</p>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> currency<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This is a somewhat contrived Java method, but it’ll be good enough to
+demonstrate the concepts.</p>
+<p>If <code>parseCurrency</code> is given a string it can’t handle, it
+raises a <code>ParseException</code>. It declares this with
+<code>throws</code> because <code>ParseException</code> is a checked
+exception. If the currency string is recognized, it returns some
+<code>Currency</code> object.</p>
 <p>Here’s how we’d write that in Sorbet:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (0) Ruby&#39;s standard library doesn&#39;t have `ParseException`,</span></span>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (0) Ruby&#39;s standard library doesn&#39;t have `ParseException`,</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># so I&#39;ve re-implemented it.</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ParseError</span> <span class="kw">&lt;</span> T<span class="kw">::</span><span class="dt">Struct</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  const <span class="wa">:message</span>, <span class="dt">String</span></span>
@@ -129,17 +174,25 @@
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>The important changes:</p>
 <ol type="1">
-<li>Where Java had a return type and a <code>throws</code> clause, Sorbet just has a return type.</li>
-<li>Sorbet’s return type is a union type (<code>T.any(...)</code>). It mentions the Java method’s return type and all the exceptions mentioned in the <code>throws</code>.</li>
-<li>Where the Java example uses <code>throw</code>, the Ruby example uses <code>return</code>.</li>
+<li>Where Java had a return type and a <code>throws</code> clause,
+Sorbet just has a return type.</li>
+<li>Sorbet’s return type is a union type (<code>T.any(...)</code>). It
+mentions the Java method’s return type and all the exceptions mentioned
+in the <code>throws</code>.</li>
+<li>Where the Java example uses <code>throw</code>, the Ruby example
+uses <code>return</code>.</li>
 </ol>
-<p>Our translation isn’t complete until we see how the <code>parseCurrency</code> caller side changes. In Java, we call <code>parseCurrency</code> like this:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Charge <span class="fu">createCharge</span>(<span class="dt">int</span> amount, <span class="bu">String</span> currencyStr) <span class="kw">throws</span> <span class="bu">ParseException</span> {</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Currency</span> currency = <span class="fu">parseCurrency</span>(currencyStr);</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="kw">new</span> <span class="fu">Charge</span>(amount, currency);</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Our translation isn’t complete until we see how the
+<code>parseCurrency</code> caller side changes. In Java, we call
+<code>parseCurrency</code> like this:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Charge <span class="fu">createCharge</span><span class="op">(</span><span class="dt">int</span> amount<span class="op">,</span> <span class="bu">String</span> currencyStr<span class="op">)</span> <span class="kw">throws</span> <span class="bu">ParseException</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Currency</span> currency <span class="op">=</span> <span class="fu">parseCurrency</span><span class="op">(</span>currencyStr<span class="op">);</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">new</span> <span class="fu">Charge</span><span class="op">(</span>amount<span class="op">,</span> currency<span class="op">);</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>With Sorbet, this snippet becomes:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  params(<span class="wa">amount: </span><span class="dt">Integer</span>, <span class="wa">currency_str: </span><span class="dt">String</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(<span class="dt">Charge</span>, <span class="dt">ParseError</span>))</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
@@ -149,25 +202,53 @@
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Charge</span><span class="at">.new</span>(<span class="wa">amount: </span>amount, <span class="wa">currency: </span>currency)</span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>As before, the <code>throws</code> clause in Java becomes a union-typed return in Ruby.</p>
-<p>The new bit is the explicit <code>return ... unless ...</code>. Whereas uncaught exceptions implicitly bubble up to the caller, return values only bubble up if explicitly returned. This is a key benefit of the union types approach, which brings us to our next section.</p>
+<p>As before, the <code>throws</code> clause in Java becomes a
+union-typed return in Ruby.</p>
+<p>The new bit is the explicit <code>return ... unless ...</code>.
+Whereas uncaught exceptions implicitly bubble up to the caller, return
+values only bubble up if explicitly returned. This is a key benefit of
+the union types approach, which brings us to our next section.</p>
 <h1 id="analysis">Analysis: Why the union types approach is better</h1>
-<p>To recap, Sorbet’s union types are ad hoc, much in the same sense as the classes mentioned in Java’s <code>throws</code> clause. When converting from <code>Java</code> to <code>Ruby</code>, a single, union-typed return takes the place of a separate return type and <code>throws</code> clause.</p>
-<p>First off, this translation preserves the best parts of checked exceptions:</p>
+<p>To recap, Sorbet’s union types are ad hoc, much in the same sense as
+the classes mentioned in Java’s <code>throws</code> clause. When
+converting from <code>Java</code> to <code>Ruby</code>, a single,
+union-typed return takes the place of a separate return type and
+<code>throws</code> clause.</p>
+<p>First off, this translation preserves the best parts of checked
+exceptions:</p>
 <ul>
-<li><p>A method’s failure modes still appear in an <strong>explicit, public API</strong>.</p>
-<p>In both Java and Ruby, the method signature behaves as machine-checked error documentation.</p></li>
-<li><p>Ad hoc error specifications enable <strong>low-friction composition</strong>.</p>
-<p>In both Java and Ruby, if our method is the first to combine two methods with unrelated failure modes, there’s no ceremony to predeclare that combination. Instead, we just mention one more class in the method’s signature.</p></li>
+<li><p>A method’s failure modes still appear in an <strong>explicit,
+public API</strong>.</p>
+<p>In both Java and Ruby, the method signature behaves as
+machine-checked error documentation.</p></li>
+<li><p>Ad hoc error specifications enable <strong>low-friction
+composition</strong>.</p>
+<p>In both Java and Ruby, if our method is the first to combine two
+methods with unrelated failure modes, there’s no ceremony to predeclare
+that combination. Instead, we just mention one more class in the
+method’s signature.</p></li>
 </ul>
 <p>But this approach is not only as good, it’s better, because:</p>
 <ul>
-<li><p>As a language feature, <strong>union types are not special</strong>.</p>
-<p>Union types are types. Like other types, we can store them in variables. We can factor common error recovery code into helper functions. We can map functions returning union types over lists. We can write type aliases that abbreviate commonly-grouped error classes. We can’t do any of this with checked exceptions, and this is the most common complaint against them.</p></li>
-<li><p>Union types have <strong>call-site granularity</strong>, not method-body granularity.</p>
-<p>The union types approach forces a choice of how to handle errors at each call site. This is more robust in the face of changing code, because new call sites should not necessarily inherit the error handling logic of existing call sites. Just because one <code>ParseException</code> was uncaught and mentioned in the <code>throws</code> does not mean all of them should be.</p></li>
+<li><p>As a language feature, <strong>union types are not
+special</strong>.</p>
+<p>Union types are types. Like other types, we can store them in
+variables. We can factor common error recovery code into helper
+functions. We can map functions returning union types over lists. We can
+write type aliases that abbreviate commonly-grouped error classes. We
+can’t do any of this with checked exceptions, and this is the most
+common complaint against them.</p></li>
+<li><p>Union types have <strong>call-site granularity</strong>, not
+method-body granularity.</p>
+<p>The union types approach forces a choice of how to handle errors at
+each call site. This is more robust in the face of changing code,
+because new call sites should not necessarily inherit the error handling
+logic of existing call sites. Just because one
+<code>ParseException</code> was uncaught and mentioned in the
+<code>throws</code> does not mean all of them should be.</p></li>
 </ul>
-<p>And finally, let me get out ahead of some common counter arguments.</p>
+<p>And finally, let me get out ahead of some common counter
+arguments.</p>
 <blockquote>
 <p>The union types approach requires more typing at the call site!</p>
 </blockquote>
@@ -175,34 +256,74 @@
 <blockquote>
 <p>But real-world Ruby code already uses exceptions!</p>
 </blockquote>
-<p>Yep. But in Java too, the world is already split into checked and unchecked exceptions. In both Java and Ruby, exceptions are a fact of life, and you’ll always need a way to deal with unexpected exceptions (e.g., comprehensive tests, automated production alerting, etc.).</p>
+<p>Yep. But in Java too, the world is already split into checked and
+unchecked exceptions. In both Java and Ruby, exceptions are a fact of
+life, and you’ll always need a way to deal with unexpected exceptions
+(e.g., comprehensive tests, automated production alerting, etc.).</p>
 <blockquote>
 <p>With checked exceptions, I could handle all the failures at once!</p>
 </blockquote>
-<p>That’s true; with checked exceptions, it’s easy to write a single <code>catch</code> statement that handles all failures due to, say, a <code>ParseException</code> in a whole region of code, avoiding the need for code repetition.</p>
-<p>The upshot is that with union types, we can just use functions. Take everything in the <code>catch</code> body, put it in a helper function, and call it at each call site. This cuts down on duplication, and I already mentioned how call-site granularity is a win.</p>
-<p>That’s pretty much it. Sorbet doesn’t need checked exceptions, it already has ad hoc union types.</p>
+<p>That’s true; with checked exceptions, it’s easy to write a single
+<code>catch</code> statement that handles all failures due to, say, a
+<code>ParseException</code> in a whole region of code, avoiding the need
+for code repetition.</p>
+<p>The upshot is that with union types, we can just use functions. Take
+everything in the <code>catch</code> body, put it in a helper function,
+and call it at each call site. This cuts down on duplication, and I
+already mentioned how call-site granularity is a win.</p>
+<p>That’s pretty much it. Sorbet doesn’t need checked exceptions, it
+already has ad hoc union types.</p>
 <hr />
 <h1 id="appendix">Appendix: Checked Exceptions</h1>
-<p>As a quick refresher, <a href="https://en.wikibooks.org/wiki/Java_Programming/Checked_Exceptions">checked exceptions</a> are a feature popularized by Java. The syntax looks like this:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">doThing</span>() <span class="kw">throws</span> MyException {</span>
+<p>As a quick refresher, <a
+href="https://en.wikibooks.org/wiki/Java_Programming/Checked_Exceptions">checked
+exceptions</a> are a feature popularized by Java. The syntax looks like
+this:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">doThing</span><span class="op">()</span> <span class="kw">throws</span> MyException <span class="op">{</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>The <code>throws</code> keyword is a part of the method’s signature, just like argument and return types. It declares that this method might throw <code>MyException</code>.</p>
-<p>Since it’s a part of this method’s signature the <code>throws</code> annotation will be checked at all call sites (just like argument and return types). A method containing calls to <code>doThing</code> must either <code>catch</code> all mentioned exceptions or repeat any maybe-thrown-but-uncaught exceptions in its own <code>throws</code> clause.</p>
-<p>If a method throws multiple classes of exceptions, they can all be listed:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">doThing</span>() <span class="kw">throws</span> MyException, YourException, AnotherException {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The <code>throws</code> keyword is a part of the method’s signature,
+just like argument and return types. It declares that this method might
+throw <code>MyException</code>.</p>
+<p>Since it’s a part of this method’s signature the <code>throws</code>
+annotation will be checked at all call sites (just like argument and
+return types). A method containing calls to <code>doThing</code> must
+either <code>catch</code> all mentioned exceptions or repeat any
+maybe-thrown-but-uncaught exceptions in its own <code>throws</code>
+clause.</p>
+<p>If a method throws multiple classes of exceptions, they can all be
+listed:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">doThing</span><span class="op">()</span> <span class="kw">throws</span> MyException<span class="op">,</span> YourException<span class="op">,</span> AnotherException <span class="op">{</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>The argument in favor of checked exceptions is that they’re explicit and machine-checked. Users don’t have to guess at what a method might throw, or hope that there’s accurate documentation—all benefits shared by static typing in general, which is a sympathetic goal.</p>
-<p>Checked exceptions seem like a good feature on paper. In practice, they’re generally regretted. I’m nowhere near the first person to come to this conclusion, so instead I’ll link you to some previous discussions:</p>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The argument in favor of checked exceptions is that they’re explicit
+and machine-checked. Users don’t have to guess at what a method might
+throw, or hope that there’s accurate documentation—all benefits shared
+by static typing in general, which is a sympathetic goal.</p>
+<p>Checked exceptions seem like a good feature on paper. In practice,
+they’re generally regretted. I’m nowhere near the first person to come
+to this conclusion, so instead I’ll link you to some previous
+discussions:</p>
 <ul>
-<li><a href="https://www.artima.com/articles/the-trouble-with-checked-exceptions">The Trouble with Checked Exceptions</a>, A Conversation with Anders Hejlsberg</li>
-<li><a href="http://james-iry.blogspot.com/2012/02/checked-exceptions-might-have-their.html">Checked Exceptions Might Have Their Place, But It Isn’t In Java</a>, by James Iry</li>
-<li><a href="https://ericlippert.com/2008/09/10/vexing-exceptions/">Vexing Exceptions</a>, by Eric Lippert</li>
+<li><a
+href="https://www.artima.com/articles/the-trouble-with-checked-exceptions">The
+Trouble with Checked Exceptions</a>, A Conversation with Anders
+Hejlsberg</li>
+<li><a
+href="http://james-iry.blogspot.com/2012/02/checked-exceptions-might-have-their.html">Checked
+Exceptions Might Have Their Place, But It Isn’t In Java</a>, by James
+Iry</li>
+<li><a
+href="https://ericlippert.com/2008/09/10/vexing-exceptions/">Vexing
+Exceptions</a>, by Eric Lippert</li>
 </ul>
-<p>(The last one isn’t actually about checked exceptions: it’s just about exceptions and I like it, so I included it.)</p>
-<p>Java has been copied and imitated for decades. Among all the features we see other languages copy from Java, checked exceptions are absent.</p>
+<p>(The last one isn’t actually about checked exceptions: it’s just
+about exceptions and I like it, so I included it.)</p>
+<p>Java has been copied and imitated for decades. Among all the features
+we see other languages copy from Java, checked exceptions are
+absent.</p>
 </main>
 
 

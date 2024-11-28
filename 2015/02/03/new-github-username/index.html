@@ -50,21 +50,34 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#updating-your-git-remotes">Updating your Git remotes</a></li>
+  <li><a href="#updating-your-git-remotes"
+  id="toc-updating-your-git-remotes">Updating your Git remotes</a></li>
   </ul>
 </nav>
 
 <main>
-<p>I’ve changed my GitHub username from Z1MM32M4N to jez (hopefully it’ll be a little easier to type now!). Make sure you update any remote URLs for repos of mine that you’ve cloned.</p>
+<p>I’ve changed my GitHub username from Z1MM32M4N to jez (hopefully
+it’ll be a little easier to type now!). Make sure you update any remote
+URLs for repos of mine that you’ve cloned.</p>
 <!-- more -->
 <h1 id="updating-your-git-remotes">Updating your Git remotes</h1>
-<p>If you’ve cloned one of my repositories, you can update it’s URL by running</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>$ <span class="fu">git</span> remote -v</span></code></pre></div>
-<p>to check the current remote URL, which should look something like <code>https://github.com/Z1MM32M4N/&lt;repo name&gt;</code>. Then, you can run</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>$ <span class="fu">git</span> remote set-url origin https://github.com/jez/<span class="op">&lt;</span>repo name<span class="op">&gt;</span></span></code></pre></div>
+<p>If you’ve cloned one of my repositories, you can update it’s URL by
+running</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git remote <span class="at">-v</span></span></code></pre></div>
+<p>to check the current remote URL, which should look something like
+<code>https://github.com/Z1MM32M4N/&lt;repo name&gt;</code>. Then, you
+can run</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git remote set-url origin https://github.com/jez/<span class="op">&lt;</span>repo name<span class="op">&gt;</span></span></code></pre></div>
 <p>to actually change the URL.</p>
-<p>Because of the way that GitHub handles username changes, you should be able to continue using the current URLs at least for the time being, but any time you pull you’ll get a message from GitHub asking to update the remote URLs.</p>
-<p>I tried to update all links referencing Z1MM32M4N to use the new username, but I’m sure I’ve missed a few. If you find a “broken” link, shoot me a message letting me know!</p>
+<p>Because of the way that GitHub handles username changes, you should
+be able to continue using the current URLs at least for the time being,
+but any time you pull you’ll get a message from GitHub asking to update
+the remote URLs.</p>
+<p>I tried to update all links referencing Z1MM32M4N to use the new
+username, but I’m sure I’ve missed a few. If you find a “broken” link,
+shoot me a message letting me know!</p>
 </main>
 
 

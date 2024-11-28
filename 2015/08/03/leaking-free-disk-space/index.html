@@ -51,27 +51,43 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#solution">Solution</a></li>
+  <li><a href="#solution" id="toc-solution">Solution</a></li>
   </ul>
 </nav>
 
 <main>
-<p>I’ve been watching a disk space leakage creep slowly upwards for months now; finally, I figured out where it was going!</p>
+<p>I’ve been watching a disk space leakage creep slowly upwards for
+months now; finally, I figured out where it was going!</p>
 <!-- more -->
-<p>Whenever I set up a VPS, I follow Brian Kennedy’s excellent <a href="http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers">My First 5 Minutes On A Server; Or, Essential Security for Linux Servers</a>. It covers setting up a number of initial tools that make server administration much easier:</p>
+<p>Whenever I set up a VPS, I follow Brian Kennedy’s excellent <a
+href="http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers">My
+First 5 Minutes On A Server; Or, Essential Security for Linux
+Servers</a>. It covers setting up a number of initial tools that make
+server administration much easier:</p>
 <ul>
 <li>fail2ban, for blocking suspicious log in activity</li>
 <li>setting up a non-root user</li>
 <li>ufw, a simple firewall program</li>
-<li>unattended-upgrades, which installs security upgrades periodically</li>
-<li>logwatch, so you can read a digest of what’s happened in your logs</li>
+<li>unattended-upgrades, which installs security upgrades
+periodically</li>
+<li>logwatch, so you can read a digest of what’s happened in your
+logs</li>
 </ul>
-<p>Ever since I set up my VPS, I’d seen the disk space creep up in the daily logwatch digest. I had looked a few times and figured it must be related to some sort of misconfiguration of the Ruby app server I have running on it right now.</p>
-<p>Recently, it got up to more than half of my disk space gone. For a VPS that I used maybe twice a month, this was ridiculous. I investigated once more and finally came up with the culprit: <code>unattended-upgrades</code> wasn’t autoremoving packages. I had gigabytes worth of packages that could be autoremoved.</p>
+<p>Ever since I set up my VPS, I’d seen the disk space creep up in the
+daily logwatch digest. I had looked a few times and figured it must be
+related to some sort of misconfiguration of the Ruby app server I have
+running on it right now.</p>
+<p>Recently, it got up to more than half of my disk space gone. For a
+VPS that I used maybe twice a month, this was ridiculous. I investigated
+once more and finally came up with the culprit:
+<code>unattended-upgrades</code> wasn’t autoremoving packages. I had
+gigabytes worth of packages that could be autoremoved.</p>
 <h1 id="solution">Solution</h1>
-<p>There’s a one-line config file fix. Add this to /etc/apt/apt.conf.d/50unattended-upgrades:</p>
+<p>There’s a one-line config file fix. Add this to
+/etc/apt/apt.conf.d/50unattended-upgrades:</p>
 <figure>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource plain numberLines"><code class="sourceCode"><span id="cb1-1"><a href="#cb1-1"></a>...</span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode numberSource plain numberLines"><code class="sourceCode"><span id="cb1-1"><a href="#cb1-1"></a>...</span>
 <span id="cb1-2"><a href="#cb1-2"></a>// Do automatic removal of new unused dependencies after the upgrade</span>
 <span id="cb1-3"><a href="#cb1-3"></a>// (equivalent to apt-get autoremove)</span>
 <span id="cb1-4"><a href="#cb1-4"></a>Unattended-Upgrade::Remove-Unused-Dependencies &quot;true&quot;;</span>
@@ -80,8 +96,13 @@
 /etc/apt/apt.conf.d/50unattended-upgrades
 </figcaption>
 </figure>
-<p>Update: It looks like a bug in unattented-upgrades is <a href="https://bugs.launchpad.net/ubuntu/+source/unattended-upgrades/+bug/1267059">preventing it from automatically removing header packages</a>. For the time being you will have to either manually auto-remove these packages, or add <code>sudo apt-get autoremove -y</code> to your crontab.</p>
-<p>Update: The bug has been addressed and closed. It now correctly removes header packages!</p>
+<p>Update: It looks like a bug in unattented-upgrades is <a
+href="https://bugs.launchpad.net/ubuntu/+source/unattended-upgrades/+bug/1267059">preventing
+it from automatically removing header packages</a>. For the time being
+you will have to either manually auto-remove these packages, or add
+<code>sudo apt-get autoremove -y</code> to your crontab.</p>
+<p>Update: The bug has been addressed and closed. It now correctly
+removes header packages!</p>
 </main>
 
 

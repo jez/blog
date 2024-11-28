@@ -51,36 +51,97 @@
 </nav>
 
 <main>
-<p><strong>tl;dr</strong>: no, or at the very least, “not for every use case.” (Though I really wish it were for the use cases I have, because it would save me a lot of work.)</p>
+<p><strong>tl;dr</strong>: no, or at the very least, “not for every use
+case.” (Though I really wish it were for the use cases I have, because
+it would save me a lot of work.)</p>
 <!-- more -->
 <blockquote>
-<p>I’m guessing you already know what tree-sitter is because you clicked on the title. If you clicked because you were hoping to find out: <a href="https://tree-sitter.github.io/tree-sitter/">tree-sitter</a> is a relatively<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">Is it still new? The GitHub repo has commits dating back to 2013, though I only first heard about it in 2017. It still has a feeling of newness about it, but I digress.<br />
+<p>I’m guessing you already know what tree-sitter is because you clicked
+on the title. If you clicked because you were hoping to find out: <a
+href="https://tree-sitter.github.io/tree-sitter/">tree-sitter</a> is a
+relatively<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">Is it still new? The GitHub repo has commits dating
+back to 2013, though I only first heard about it in 2017. It still has a
+feeling of newness about it, but I digress.<br />
 <br />
-</span></span> new project which aims to make writing fast, error-tolerant parsers take less work. To do that, it provides both pre-built parsers for common programming languages and a toolkit for building new parsers. It’s known for use in various GitHub features by way of their <a href="https://github.com/github/semantic">semantic</a> tool, which powers the code navigation tooltips that you sometimes see on GitHub.<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">The semantic repo actually has a <a href="https://github.com/github/semantic/blob/master/docs/why-tree-sitter.md">short overview</a> of why they chose tree-sitter, along with some drawbacks.<br />
+</span></span> new project which aims to make writing fast,
+error-tolerant parsers take less work. To do that, it provides both
+pre-built parsers for common programming languages and a toolkit for
+building new parsers. It’s known for use in various GitHub features by
+way of their <a href="https://github.com/github/semantic">semantic</a>
+tool, which powers the code navigation tooltips that you sometimes see
+on GitHub.<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">The semantic repo actually has a <a
+href="https://github.com/github/semantic/blob/master/docs/why-tree-sitter.md">short
+overview</a> of why they chose tree-sitter, along with some
+drawbacks.<br />
 <br />
 </span></span></p>
 </blockquote>
-<p>For a lot of projects, tree-sitter is really nice! <em>Especially</em> for projects where the quality of the parser is less important than the quantity of languages supported. For example: an editor syntax highlighter. It’s more important that the editor highlight lots of languages’ syntax than it is that every language is highlighted perfectly. Another example: building something like <a href="https://www.emacswiki.org/emacs/ParEdit">ParEdit</a> for arbitrary languages. Or providing jump-to-def that’s mostly better than plain-text code search.<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">Another neat use case, from work: every time a commit is pushed to an approved PR, the approval is dismissed, unless (using tree-sitter) the CI system detects that the parse tree hasn’t changed. This spares comment and formatting changes the toil of a re-review.<br />
+<p>For a lot of projects, tree-sitter is really nice!
+<em>Especially</em> for projects where the quality of the parser is less
+important than the quantity of languages supported. For example: an
+editor syntax highlighter. It’s more important that the editor highlight
+lots of languages’ syntax than it is that every language is highlighted
+perfectly. Another example: building something like <a
+href="https://www.emacswiki.org/emacs/ParEdit">ParEdit</a> for arbitrary
+languages. Or providing jump-to-def that’s mostly better than plain-text
+code search.<span
+class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
+class="sidenote">Another neat use case, from work: every time a commit
+is pushed to an approved PR, the approval is dismissed, unless (using
+tree-sitter) the CI system detects that the parse tree hasn’t changed.
+This spares comment and formatting changes the toil of a
+re-review.<br />
 <br />
-</span></span> For a lot of these applications it’s actually <em>completely fine</em> if there’s a flagrant bug in one of the grammars, because the project is still so useful in all the other languages.</p>
-<p>But when the goals are flipped—it has to work for exactly one language, and the quality of the parser is paramount—tree-sitter becomes less attractive. There are two questions I would pose to anyone curious about using tree-sitter for their parser:</p>
+</span></span> For a lot of these applications it’s actually
+<em>completely fine</em> if there’s a flagrant bug in one of the
+grammars, because the project is still so useful in all the other
+languages.</p>
+<p>But when the goals are flipped—it has to work for exactly one
+language, and the quality of the parser is paramount—tree-sitter becomes
+less attractive. There are two questions I would pose to anyone curious
+about using tree-sitter for their parser:</p>
 <ol type="1">
 <li><p>Is serving autocompletion requests a key use cases?</p>
-<p>Serving autocompletion requests requires an unnaturally high parse fidelity, even when the buffer is ridiculed with syntax errors.</p></li>
-<li><p>How much do you care about crafting custom messages for syntax errors?</p>
-<p>Customizing syntax error messages becomes context-dependent very quickly. It’s easy to maintain that context when your parser allows running arbitrary code, and hard when the parser is constrained to a declarative DSL.</p></li>
+<p>Serving autocompletion requests requires an unnaturally high parse
+fidelity, even when the buffer is ridiculed with syntax errors.</p></li>
+<li><p>How much do you care about crafting custom messages for syntax
+errors?</p>
+<p>Customizing syntax error messages becomes context-dependent very
+quickly. It’s easy to maintain that context when your parser allows
+running arbitrary code, and hard when the parser is constrained to a
+declarative DSL.</p></li>
 </ol>
-<p>If either of these goals are important, I’d recommend rolling your own parser (using the technique of your choice). It comes down to flexibility: a tree-sitter grammar, with it’s declarative specification, provides a lot of neat features for free (like error recovery), but places a ceiling on possibilities for future improvement.</p>
-<p>Let me show some examples.<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="sidenote">It’s entirely possible that I’ve just been <em>really</em> unlucky, and that the problems I’ve found are all fixable with a few bug reports and a little ingenuity. But if it’s going to take ingenuity anyways, isn’t that the same as writing a parser myself?<br />
+<p>If either of these goals are important, I’d recommend rolling your
+own parser (using the technique of your choice). It comes down to
+flexibility: a tree-sitter grammar, with it’s declarative specification,
+provides a lot of neat features for free (like error recovery), but
+places a ceiling on possibilities for future improvement.</p>
+<p>Let me show some examples.<span
+class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
+class="sidenote">It’s entirely possible that I’ve just been
+<em>really</em> unlucky, and that the problems I’ve found are all
+fixable with a few bug reports and a little ingenuity. But if it’s going
+to take ingenuity anyways, isn’t that the same as writing a parser
+myself?<br />
 <br />
-</span></span> The snippets of code below are exactly the kinds of programs that people type in their editors, but which tree-sitter doesn’t parse well enough. You can follow along on the <a href="https://tree-sitter.github.io/tree-sitter/playground">tree-sitter online playground</a>.</p>
+</span></span> The snippets of code below are exactly the kinds of
+programs that people type in their editors, but which tree-sitter
+doesn’t parse well enough. You can follow along on the <a
+href="https://tree-sitter.github.io/tree-sitter/playground">tree-sitter
+online playground</a>.</p>
 <p><br />
 </p>
 <p>Let’s start with a Ruby program, alongside its parse result:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>f <span class="kw">=</span> <span class="kw">-&gt;</span>(x) <span class="kw">{</span></span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>f <span class="kw">=</span> <span class="kw">-&gt;</span>(x) <span class="kw">{</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  x<span class="kw">.</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource numberLines hl-8 hl-9"><code class="sourceCode"><span id="cb2-1"><a href="#cb2-1"></a>program [0, 0] - [3, 0]</span>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode numberSource numberLines hl-8 hl-9"><code class="sourceCode"><span id="cb2-1"><a href="#cb2-1"></a>program [0, 0] - [3, 0]</span>
 <span id="cb2-2"><a href="#cb2-2"></a>  assignment [0, 0] - [2, 1]</span>
 <span id="cb2-3"><a href="#cb2-3"></a>    left: identifier [0, 0] - [0, 1]</span>
 <span id="cb2-4"><a href="#cb2-4"></a>    right: lambda [0, 4] - [2, 1]</span>
@@ -90,10 +151,12 @@
 <span id="cb2-8"><a href="#cb2-8"></a>        identifier [1, 2] - [1, 3]</span>
 <span id="cb2-9"><a href="#cb2-9"></a>        ERROR [1, 3] - [1, 4]</span></code></pre></div>
 <p>Here’s what a comparable, syntactically-valid parse looks like:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>f <span class="kw">=</span> <span class="kw">-&gt;</span>(x) <span class="kw">{</span></span>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>f <span class="kw">=</span> <span class="kw">-&gt;</span>(x) <span class="kw">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  x<span class="at">.foo</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource numberLines hl-8 hl-9 hl-10"><code class="sourceCode"><span id="cb4-1"><a href="#cb4-1"></a>program [0, 0] - [3, 0]</span>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode numberSource numberLines hl-8 hl-9 hl-10"><code class="sourceCode"><span id="cb4-1"><a href="#cb4-1"></a>program [0, 0] - [3, 0]</span>
 <span id="cb4-2"><a href="#cb4-2"></a>  assignment [0, 0] - [2, 1]</span>
 <span id="cb4-3"><a href="#cb4-3"></a>    left: identifier [0, 0] - [0, 1]</span>
 <span id="cb4-4"><a href="#cb4-4"></a>    right: lambda [0, 4] - [2, 1]</span>
@@ -103,19 +166,27 @@
 <span id="cb4-8"><a href="#cb4-8"></a>        call [1, 2] - [1, 7]</span>
 <span id="cb4-9"><a href="#cb4-9"></a>          receiver: identifier [1, 2] - [1, 3]</span>
 <span id="cb4-10"><a href="#cb4-10"></a>          method: identifier [1, 4] - [1, 7]</span></code></pre></div>
-<p>In the good parse, tree-sitter produces a <code>call</code> node. In the bad parse, it just produces a <code>block</code> that has a list containing two elements. Ideally, what we’d see here is something like this:</p>
+<p>In the good parse, tree-sitter produces a <code>call</code> node. In
+the bad parse, it just produces a <code>block</code> that has a list
+containing two elements. Ideally, what we’d see here is something like
+this:</p>
 <pre><code>call
   receiver: identifier
   method: ERROR</code></pre>
-<p>Which tells us that there was a method call, what the receiver of the method call was so we know where to start looking for methods to autocomplete, and that the syntax error was localized to the method call.</p>
+<p>Which tells us that there was a method call, what the receiver of the
+method call was so we know where to start looking for methods to
+autocomplete, and that the syntax error was localized to the method
+call.</p>
 <p>There’s a similar problem with constant accesses:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>f <span class="kw">=</span> <span class="kw">-&gt;</span>(x) <span class="kw">{</span></span>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>f <span class="kw">=</span> <span class="kw">-&gt;</span>(x) <span class="kw">{</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  A<span class="kw">::</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>g <span class="kw">=</span> <span class="kw">-&gt;</span>(x) <span class="kw">{</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  A<span class="kw">::</span><span class="cn">B</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb7-1"><a href="#cb7-1"></a>program [0, 0] - [6, 0]</span>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb7-1"><a href="#cb7-1"></a>program [0, 0] - [6, 0]</span>
 <span id="cb7-2"><a href="#cb7-2"></a>  # ...</span>
 <span id="cb7-3"><a href="#cb7-3"></a>      body: block [0, 10] - [2, 1]</span>
 <span id="cb7-4"><a href="#cb7-4"></a>        constant [1, 2] - [1, 3]</span>
@@ -125,10 +196,14 @@
 <span id="cb7-8"><a href="#cb7-8"></a>        scope_resolution [4, 2] - [4, 6]</span>
 <span id="cb7-9"><a href="#cb7-9"></a>          scope: constant [4, 2] - [4, 3]</span>
 <span id="cb7-10"><a href="#cb7-10"></a>          name: constant [4, 5] - [4, 6]</span></code></pre></div>
-<p>… and a similar problem with <code>@</code> (the start of an instance variable access), and with <code>x =</code> (the start of an assignment).</p>
+<p>… and a similar problem with <code>@</code> (the start of an instance
+variable access), and with <code>x =</code> (the start of an
+assignment).</p>
 <p><br />
 </p>
-<p>Maybe this example was a little contrived? Comparable programs written in JavaScript actually parse the good way, so maybe that’s just an indictment of tree-sitter-ruby, not tree-sitter itself.</p>
+<p>Maybe this example was a little contrived? Comparable programs
+written in JavaScript actually parse the good way, so maybe that’s just
+an indictment of tree-sitter-ruby, not tree-sitter itself.</p>
 <p>But this next snippet reproduces in both Ruby and JavaScript:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> A {</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">foo</span>() {</span>
@@ -149,8 +224,10 @@
               function: identifier [3, 2] - [3, 5]
               arguments: arguments [3, 5] - [3, 7]
             ERROR [3, 8] - [3, 9]</code></pre>
-<p>To make it more obvious why this parse tree is not great, it’s basically the same parse tree as produced by this program:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> A {</span>
+<p>To make it more obvious why this parse tree is not great, it’s
+basically the same parse tree as produced by this program:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> A {</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">foo</span>() {</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bar</span>()<span class="op">;</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    {</span>
@@ -158,21 +235,54 @@
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Some points:</p>
 <ul>
-<li>Even though <code>bar() { ... }</code> is valid method syntax, there’s no definition of a method called <code>bar</code> in the parse. Instead, the parser thinks that there was a <strong>function call</strong> to a function named <code>bar</code> that doesn’t exist.</li>
-<li>The syntax error shows up after the imagined call to <code>bar</code> (associated with the <code>{</code> immediately after the call to <code>bar</code>), not associated with the <code>foo</code> method.</li>
+<li>Even though <code>bar() { ... }</code> is valid method syntax,
+there’s no definition of a method called <code>bar</code> in the parse.
+Instead, the parser thinks that there was a <strong>function
+call</strong> to a function named <code>bar</code> that doesn’t
+exist.</li>
+<li>The syntax error shows up after the imagined call to
+<code>bar</code> (associated with the <code>{</code> immediately after
+the call to <code>bar</code>), not associated with the <code>foo</code>
+method.</li>
 </ul>
-<p>If the user’s cursor was inside the <code>bar</code> method and asking for completion results, we’d be forced to serve them completion results as though their cursor was inside the half-formed <code>foo</code> method, which produces completely wrong results.</p>
-<p>This behavior is not unique to JavaScript. I’ve reproduced it almost verbatim in Ruby and Java, and partially in most other tree-sitter parsers (C#, C++, Rust, etc.).</p>
-<p>The best behavior here would be to point out that the curly braces are mismatched,<span class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span class="sidenote">Indeed, that’s <a href="https://play.rust-lang.org/?version=stable&amp;mode=debug&amp;edition=2021&amp;gist=872bd946a8789aba9d49e07aef614819">exactly the error</a> on a comparable Rust example. (Rust’s parser is hand-written.)<br />
+<p>If the user’s cursor was inside the <code>bar</code> method and
+asking for completion results, we’d be forced to serve them completion
+results as though their cursor was inside the half-formed
+<code>foo</code> method, which produces completely wrong results.</p>
+<p>This behavior is not unique to JavaScript. I’ve reproduced it almost
+verbatim in Ruby and Java, and partially in most other tree-sitter
+parsers (C#, C++, Rust, etc.).</p>
+<p>The best behavior here would be to point out that the curly braces
+are mismatched,<span
+class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
+class="sidenote">Indeed, that’s <a
+href="https://play.rust-lang.org/?version=stable&amp;mode=debug&amp;edition=2021&amp;gist=872bd946a8789aba9d49e07aef614819">exactly
+the error</a> on a comparable Rust example. (Rust’s parser is
+hand-written.)<br />
 <br />
-</span></span> and then recover assuming that the user fixed that mismatch, preserving the <code>bar</code> method.</p>
+</span></span> and then recover assuming that the user fixed that
+mismatch, preserving the <code>bar</code> method.</p>
 <p><br />
 </p>
-<p>I could turn this into a post full of weird code snippets and poor parse results, but that’s not useful. What I’m trying to show is that when the demands are, “The one specific language I care about has lots of idiosyncratic but common parse errors that I want to handle well,” then prepare to devote a substantial amount of time to tweaking anyways. I prefer doing that in a setting that gives me maximum flexibility, so that I can be as clever as I need to eke out good parse results.</p>
-<p>Don’t get me wrong, I still think tree-sitter is a great project with a neat new idea. I also haven’t shown how surprisingly good tree-sitter was on a lot of the examples I tried! All I’m saying is that tree-sitter comes with tradeoffs, and that it’s not useful to respond to every complaint about an existing parser with, “If you just used tree-sitter, your problems would go away,” because that’s not true. For a certain class of parsing problems, tree-sitter is not quite good enough.</p>
+<p>I could turn this into a post full of weird code snippets and poor
+parse results, but that’s not useful. What I’m trying to show is that
+when the demands are, “The one specific language I care about has lots
+of idiosyncratic but common parse errors that I want to handle well,”
+then prepare to devote a substantial amount of time to tweaking anyways.
+I prefer doing that in a setting that gives me maximum flexibility, so
+that I can be as clever as I need to eke out good parse results.</p>
+<p>Don’t get me wrong, I still think tree-sitter is a great project with
+a neat new idea. I also haven’t shown how surprisingly good tree-sitter
+was on a lot of the examples I tried! All I’m saying is that tree-sitter
+comes with tradeoffs, and that it’s not useful to respond to every
+complaint about an existing parser with, “If you just used tree-sitter,
+your problems would go away,” because that’s not true. For a certain
+class of parsing problems, tree-sitter is not quite good enough.</p>
 <p><br />
 </p>
-<p><em>If I’ve overlooked something, please let me know and I’ll happily update this post (and maybe even start using tree-sitter in my projects).</em></p>
+<p><em>If I’ve overlooked something, please let me know and I’ll happily
+update this post (and maybe even start using tree-sitter in my
+projects).</em></p>
 </main>
 
 

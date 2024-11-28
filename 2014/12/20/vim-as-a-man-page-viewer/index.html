@@ -51,51 +51,90 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#the-plugin">The Plugin</a></li>
-  <li><a href="#why">Why?</a>
+  <li><a href="#the-plugin" id="toc-the-plugin">The Plugin</a></li>
+  <li><a href="#why" id="toc-why">Why?</a>
   <ul>
-  <li><a href="#mouse-support">Mouse Support</a></li>
-  <li><a href="#syntax-highlighting">Syntax Highlighting</a></li>
-  <li><a href="#all-the-benefits-of-vim">All the benefits of Vim</a></li>
+  <li><a href="#mouse-support" id="toc-mouse-support">Mouse
+  Support</a></li>
+  <li><a href="#syntax-highlighting" id="toc-syntax-highlighting">Syntax
+  Highlighting</a></li>
+  <li><a href="#all-the-benefits-of-vim"
+  id="toc-all-the-benefits-of-vim">All the benefits of Vim</a></li>
   </ul></li>
-  <li><a href="#mine-doesnt-look-like-yours">Mine doesn’t look like yours!</a></li>
-  <li><a href="#feedback">Feedback</a></li>
+  <li><a href="#mine-doesnt-look-like-yours"
+  id="toc-mine-doesnt-look-like-yours">Mine doesn’t look like
+  yours!</a></li>
+  <li><a href="#feedback" id="toc-feedback">Feedback</a></li>
   </ul>
 </nav>
 
 <main>
-<p>Man pages are an essential part of every developer’s workflow. Unfortunately, the default system pager <code>less</code> isn’t the best interface. That’s why I wrote a Vim plugin and a short shell function to take care of opening man pages in Vim.</p>
+<p>Man pages are an essential part of every developer’s workflow.
+Unfortunately, the default system pager <code>less</code> isn’t the best
+interface. That’s why I wrote a Vim plugin and a short shell function to
+take care of opening man pages in Vim.</p>
 <!-- more -->
 <h1 id="the-plugin">The Plugin</h1>
-<p>If you’re eager to dive right into the source or to install the plugin, head on over to the <a href="https://github.com/jez/vim-superman">GitHub repository</a>. It’s a whopping 32 SLOC, so feel free to peek under the hood.</p>
+<p>If you’re eager to dive right into the source or to install the
+plugin, head on over to the <a
+href="https://github.com/jez/vim-superman">GitHub repository</a>. It’s a
+whopping 32 SLOC, so feel free to peek under the hood.</p>
 <h1 id="why">Why?</h1>
-<p>You might be thinking, “But Jake, <code>man</code> works just fine for me, why would I switch?” I’m glad you asked!</p>
+<p>You might be thinking, “But Jake, <code>man</code> works just fine
+for me, why would I switch?” I’m glad you asked!</p>
 <h2 id="mouse-support">Mouse Support</h2>
-<p>The first reason why I was interested in getting man pages to open in Vim was because I wanted to be able to scroll with the mouse. When I have to read man pages for a long time, usually as a part of some more all-encompasing bit of research, I find scrolling to be a much better interface for quickly perusing the content of a man page.</p>
+<p>The first reason why I was interested in getting man pages to open in
+Vim was because I wanted to be able to scroll with the mouse. When I
+have to read man pages for a long time, usually as a part of some more
+all-encompasing bit of research, I find scrolling to be a much better
+interface for quickly perusing the content of a man page.</p>
 <h2 id="syntax-highlighting">Syntax Highlighting</h2>
-<p>As it turns out, man pages have a syntax to them, and Vim does a pretty excellent job at highlighting them. Rather than talk about it, here are some screenshots. Note how code samples (C system calls and library functions) are also syntax highlighted appropriately.</p>
+<p>As it turns out, man pages have a syntax to them, and Vim does a
+pretty excellent job at highlighting them. Rather than talk about it,
+here are some screenshots. Note how code samples (C system calls and
+library functions) are also syntax highlighted appropriately.</p>
 <figure>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="ex">vman</span> vim</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="ex">vman</span> vim</span></code></pre></div>
 <figcaption>
 Example 1
 </figcaption>
 </figure>
-<p><a href="/assets/img/vim.1.png"><img src="/assets/img/vim.1.png" /></a></p>
+<p><a href="/assets/img/vim.1.png"><img
+src="/assets/img/vim.1.png" /></a></p>
 <figure>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="ex">vman</span> 3 printf</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="ex">vman</span> 3 printf</span></code></pre></div>
 <figcaption>
 Example 2
 </figcaption>
 </figure>
-<p><a href="/assets/img/printf.3.png"><img src="/assets/img/printf.3.png" /></a></p>
+<p><a href="/assets/img/printf.3.png"><img
+src="/assets/img/printf.3.png" /></a></p>
 <h2 id="all-the-benefits-of-vim">All the benefits of Vim</h2>
-<p>While <code>less</code> makes a good effort to emulate certain Vim keybindings (or maybe it’s the other way around, I don’t know which came first), <code>less</code> certainly falls short of the full power of Vim.</p>
-<p>For example, once you’ve opened a man page in Vim, you can open a new tab or split side-by-side with the man page. Especially if you’re switching between Vim and the man page often, being able to open man pages in tabs or splits is invaluable.</p>
+<p>While <code>less</code> makes a good effort to emulate certain Vim
+keybindings (or maybe it’s the other way around, I don’t know which came
+first), <code>less</code> certainly falls short of the full power of
+Vim.</p>
+<p>For example, once you’ve opened a man page in Vim, you can open a new
+tab or split side-by-side with the man page. Especially if you’re
+switching between Vim and the man page often, being able to open man
+pages in tabs or splits is invaluable.</p>
 <h1 id="mine-doesnt-look-like-yours">Mine doesn’t look like yours!</h1>
-<p>A couple of my other plugins are showing in the screenshots above. I’m using the <a href="https://github.com/altercation/vim-colors-solarized">Solarized Dark color scheme</a>, the plugin <a href="https://github.com/bling/vim-airline">vim-airline</a> to take over the statuslines at the very top and bottom, and iTerm2 on Mac OS X 10.10.</p>
-<p>You can see my complete configuration <a href="https://github.com/jez/dotfiles">on GitHub</a>.</p>
+<p>A couple of my other plugins are showing in the screenshots above.
+I’m using the <a
+href="https://github.com/altercation/vim-colors-solarized">Solarized
+Dark color scheme</a>, the plugin <a
+href="https://github.com/bling/vim-airline">vim-airline</a> to take over
+the statuslines at the very top and bottom, and iTerm2 on Mac OS X
+10.10.</p>
+<p>You can see my complete configuration <a
+href="https://github.com/jez/dotfiles">on GitHub</a>.</p>
 <h1 id="feedback">Feedback</h1>
-<p>As a matter of fact, this was my first Vim plugin! If you notice anything out of place, even if it’s a small detail, I’d love to hear it. Make no assumptions about the reasoning behind why certain decisions were made, because I have none XD</p>
+<p>As a matter of fact, this was my first Vim plugin! If you notice
+anything out of place, even if it’s a small detail, I’d love to hear it.
+Make no assumptions about the reasoning behind why certain decisions
+were made, because I have none XD</p>
 </main>
 
 
