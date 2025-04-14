@@ -3,9 +3,11 @@
 layout: post
 title: "Typing instance variables in mixins"
 date: 2025-04-14T17:09:03-04:00
-description: TODO
+description: >
+  Sorbet does not (yet?) have "abstract instance variables" for use inside abstract
+  modules, but abstract methods are a close approximation.
 math: false
-categories: ['TODO']
+categories: ['ruby', 'sorbet']
 # subtitle:
 # author:
 # author_url:
