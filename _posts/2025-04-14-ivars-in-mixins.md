@@ -120,6 +120,8 @@ In this example, we use `||= T.let` to declare `@user_id` to `@user_id`, relying
 
 This is worse because Sorbet does not allow instance variables to be declared non-`nil` outside of the constructor—the abstract method approach allows declaring non-`nil` types.
 
+It's also worse because it doesn't actually get Sorbet to check that whatever class `Auditable` is mixed into actually has a `user_id` field. That is: the `T.must` might fail at runtime!
+
 ## Using `requires_ancestor`
 
 First off, the [experimental `requires_ancestor` feature](https://sorbet.org/docs/requires-ancestor) only applies to methods, not instance variables.
