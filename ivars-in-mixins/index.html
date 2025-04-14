@@ -141,6 +141,7 @@
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>In this example, we use <code>||= T.let</code> to declare <code>@user_id</code> to <code>@user_id</code>, relying on the fact that instance variables that have not yet been assigned will evaluate to <code>nil</code>.</p>
 <p>This is worse because Sorbet does not allow instance variables to be declared non-<code>nil</code> outside of the constructor—the abstract method approach allows declaring non-<code>nil</code> types.</p>
+<p>It’s also worse because it doesn’t actually get Sorbet to check that whatever class <code>Auditable</code> is mixed into actually has a <code>user_id</code> field. That is: the <code>T.must</code> might fail at runtime!</p>
 <h2 id="using-requires_ancestor">Using <code>requires_ancestor</code></h2>
 <p>First off, the <a href="https://sorbet.org/docs/requires-ancestor">experimental <code>requires_ancestor</code> feature</a> only applies to methods, not instance variables.</p>
 <p>Even if that were changed, <code>requires_ancestor</code> is <strong>anti-modular</strong>: if you ever want to use the interface with some <em>other</em> ancestor that provides a <code>user_id</code> , you’d need to edit the definition of <code>Auditable</code> to mention both <code>T.any(User, ThatOtherClass)</code>.</p>
