@@ -51,29 +51,17 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#features" id="toc-features">Features</a></li>
-  <li><a href="#the-core-setup" id="toc-the-core-setup">The core
-  setup</a></li>
-  <li><a href="#why-write-a-whole-build-tool"
-  id="toc-why-write-a-whole-build-tool">Why write a whole build
-  tool?</a></li>
-  <li><a href="#why-standard-ml-in-the-first-place"
-  id="toc-why-standard-ml-in-the-first-place">Why Standard ML in the
-  first place?</a></li>
+  <li><a href="#features">Features</a></li>
+  <li><a href="#the-core-setup">The core setup</a></li>
+  <li><a href="#why-write-a-whole-build-tool">Why write a whole build tool?</a></li>
+  <li><a href="#why-standard-ml-in-the-first-place">Why Standard ML in the first place?</a></li>
   </ul>
 </nav>
 
 <main>
-<p>For one of my recent projects (<a
-href="https://github.com/jez/multi-grep"><code>multi-grep</code></a>) I
-went through the work to get Standard ML building in Travis CI. It
-turned out to be not too hard—in fact, the hardest part is already done,
-and I’m happy to share how it works.</p>
+<p>For one of my recent projects (<a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a>) I went through the work to get Standard ML building in Travis CI. It turned out to be not too hard—in fact, the hardest part is already done, and I’m happy to share how it works.</p>
 <!-- more -->
-<p><a href="https://travis-ci.org/">Travis CI</a> is a service that lets
-a project run arbitrary code when someone commits and pushes a change.
-This code can do things like make sure the tests pass, build and publish
-releases, and even deploy the code somewhere.</p>
+<p><a href="https://travis-ci.org/">Travis CI</a> is a service that lets a project run arbitrary code when someone commits and pushes a change. This code can do things like make sure the tests pass, build and publish releases, and even deploy the code somewhere.</p>
 <h1 id="features">Features</h1>
 <p>The way I set up my builds for SML with Travis CI, I can:</p>
 <ul>
@@ -82,100 +70,50 @@ releases, and even deploy the code somewhere.</p>
 <li>create executables, even with SML/NJ</li>
 <li>publish the resulting builds to GitHub as releases</li>
 </ul>
-<p>Apart from some scripts to install things on each operating system,
-under the hood it’s powered by <a
-href="https://github.com/jez/symbol">Symbol</a>, which is a build tool
-for Standard ML I wrote which factors out most of the project-agnostic
-stuff.</p>
+<p>Apart from some scripts to install things on each operating system, under the hood it’s powered by <a href="https://github.com/jez/symbol">Symbol</a>, which is a build tool for Standard ML I wrote which factors out most of the project-agnostic stuff.</p>
 <h1 id="the-core-setup">The core setup</h1>
-<p>Rather than paste the code into a snippet here and wait for it to get
-out of date, see my <a
-href="https://github.com/jez/multi-grep"><code>multi-grep</code></a>
-project on GitHub for all the up-to-date files. In total, there are
-three files in that repo which set the whole thing up:</p>
+<p>Rather than paste the code into a snippet here and wait for it to get out of date, see my <a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a> project on GitHub for all the up-to-date files. In total, there are three files in that repo which set the whole thing up:</p>
 <ol type="1">
-<li><a
-href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/.travis.yml">.travis.yml</a>
-(kicks off the build)</li>
-<li><a
-href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/Brewfile">Brewfile</a>
-(deps for macOS build)</li>
-<li><a
-href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/tests/travis-install.sh">tests/travis-install.sh</a>
-(deps for Linux build)</li>
+<li><a href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/.travis.yml">.travis.yml</a> (kicks off the build)</li>
+<li><a href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/Brewfile">Brewfile</a> (deps for macOS build)</li>
+<li><a href="https://github.com/jez/multi-grep/blob/b6a42719b1ffca389556655982e6c4b7fa19c9a1/tests/travis-install.sh">tests/travis-install.sh</a> (deps for Linux build)</li>
 </ol>
-<p>If you haven’t used Travis CI before, you’ll probably also want to
-check out the <a href="https://docs.travis-ci.com/">Travis CI docs</a>
-to get a feel for how to actually set things up, and where these pieces
-fit in.</p>
-<p>After installing the deps on each box (like SML/NJ and MLton) and
-running the tests, the command which actually builds the the whole
-project is</p>
+<p>If you haven’t used Travis CI before, you’ll probably also want to check out the <a href="https://docs.travis-ci.com/">Travis CI docs</a> to get a feel for how to actually set things up, and where these pieces fit in.</p>
+<p>After installing the deps on each box (like SML/NJ and MLton) and running the tests, the command which actually builds the the whole project is</p>
 <pre><code>./symbol install</code></pre>
-<p>This command is provided by <a
-href="https://github.com/jez/symbol">Symbol</a>, a build tool I wrote
-for Standard ML. I talk a little bit more about it in the section
-below.</p>
+<p>This command is provided by <a href="https://github.com/jez/symbol">Symbol</a>, a build tool I wrote for Standard ML. I talk a little bit more about it in the section below.</p>
 <h1 id="why-write-a-whole-build-tool">Why write a whole build tool?</h1>
-<p>I mentioned above that I’d written a build tool for Standard ML,
-called <a href="https://github.com/jez/symbol">Symbol</a>. Why? It
-started as a shell script + <code>Makefile</code> for <a
-href="https://github.com/jez/multi-grep"><code>multi-grep</code></a> and
-then I realized that these scripts could be useful in any Standard ML
-project.</p>
-<p>SML/NJ and MLton are already great compilers with their own build
-tools. It’s useful to be able to build a project with both (SML/NJ for
-faster builds and a REPL, and MLton for faster compiled executables).
-All Symbol really does is put SML/NJ and MLton behind a unified, very
-stripped down interface. It doesn’t try to hide that, so that it’s still
-possible to fall back to those programs for more complex workflows.</p>
-<p>There’s more information <a href="https://github.com/jez/symbol">in
-the README</a>, but some key points:</p>
+<p>I mentioned above that I’d written a build tool for Standard ML, called <a href="https://github.com/jez/symbol">Symbol</a>. Why? It started as a shell script + <code>Makefile</code> for <a href="https://github.com/jez/multi-grep"><code>multi-grep</code></a> and then I realized that these scripts could be useful in any Standard ML project.</p>
+<p>SML/NJ and MLton are already great compilers with their own build tools. It’s useful to be able to build a project with both (SML/NJ for faster builds and a REPL, and MLton for faster compiled executables). All Symbol really does is put SML/NJ and MLton behind a unified, very stripped down interface. It doesn’t try to hide that, so that it’s still possible to fall back to those programs for more complex workflows.</p>
+<p>There’s more information <a href="https://github.com/jez/symbol">in the README</a>, but some key points:</p>
 <ul>
-<li>Symbol makes it easy to build and install executables, even with
-SML/NJ which traditionally uses heap images.</li>
-<li>Symbol is built on <code>make</code>, so if <strong>no</strong>
-source files change, even recompiling with MLton is instant (e.g.,
-changing a test and re-running the tests doesn’t require re-building
-everything).</li>
-<li>Symbol also supports scaffolding new Standard ML projects, which is
-nicer than starting from scratch.</li>
+<li>Symbol makes it easy to build and install executables, even with SML/NJ which traditionally uses heap images.</li>
+<li>Symbol is built on <code>make</code>, so if <strong>no</strong> source files change, even recompiling with MLton is instant (e.g., changing a test and re-running the tests doesn’t require re-building everything).</li>
+<li>Symbol also supports scaffolding new Standard ML projects, which is nicer than starting from scratch.</li>
 </ul>
 <p>The usage looks something like this:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># initialize a new project:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> symbol-new hello</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> cd hello</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># initialize a new project:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">symbol-new</span> hello</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>❯ <span class="bu">cd</span> hello</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># build with SML/NJ:</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> ./symbol make</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> .symbol-work/bin/hello</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Hello,</span> world!</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">./symbol</span> make</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">.symbol-work/bin/hello</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Hello</span>, world!</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># or, build with MLton:</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> ./symbol make with=mlton</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> .symbol-work/bin/hello</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Hello,</span> world!</span></code></pre></div>
-<p>Again, there’s way more information <a
-href="https://github.com/jez/symbol">in the README</a>, so definitely
-check it out if you’re thinking about setting up a new Standard ML
-project.</p>
-<h1 id="why-standard-ml-in-the-first-place">Why Standard ML in the first
-place?</h1>
-<p>I’ll probably get around to <a href="/surgery-on-code/">writing about
-<code>multi-grep</code></a> (and related tools like
-<code>diff-locs</code> and <code>multi-sub</code>) but at the end of the
-day: SML is a really pleasant language to use in a lot of ways:</p>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">./symbol</span> make with=mlton</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>❯ <span class="ex">.symbol-work/bin/hello</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Hello</span>, world!</span></code></pre></div>
+<p>Again, there’s way more information <a href="https://github.com/jez/symbol">in the README</a>, so definitely check it out if you’re thinking about setting up a new Standard ML project.</p>
+<h1 id="why-standard-ml-in-the-first-place">Why Standard ML in the first place?</h1>
+<p>I’ll probably get around to <a href="/surgery-on-code/">writing about <code>multi-grep</code></a> (and related tools like <code>diff-locs</code> and <code>multi-sub</code>) but at the end of the day: SML is a really pleasant language to use in a lot of ways:</p>
 <ul>
 <li>Type inference in Standard ML is a breath of fresh air.</li>
 <li>Data types let me wonder less about how things work.</li>
 <li>Pattern matching makes for concise, clean, and correct code.</li>
 </ul>
-<p>Standard ML was my most commonly used programming language throughout
-all of my university courses, so there’s a definite soft spot in my
-heart for it. There are features that I wish it had sometimes, but it’s
-the only language that I’ve used that doesn’t feel fundamentally broken
-in some way.</p>
+<p>Standard ML was my most commonly used programming language throughout all of my university courses, so there’s a definite soft spot in my heart for it. There are features that I wish it had sometimes, but it’s the only language that I’ve used that doesn’t feel fundamentally broken in some way.</p>
 <!-- vim:tw=72
 -->
 </main>

@@ -52,149 +52,44 @@
 </nav>
 
 <main>
-<p>This is the second post in a series about “things I’ve learned while
-making improvements to Sorbet’s parser.” Specifically, it’s about
-approaches I considered but decided against.</p>
+<p>This is the second post in a series about “things I’ve learned while making improvements to Sorbet’s parser.” Specifically, it’s about approaches I considered but decided against.</p>
 <!-- more -->
 <ul>
-<li><a href="/error-recovery-part-1/">Part 1: Why Recover from Syntax
-Errors</a></li>
-<li><strong><a href="/error-recovery-part-2/">Part 2: What I Didn’t
-Do</a></strong></li>
-<li><a href="/error-recovery-part-3/">Part 3: Tools and Techniques for
-Debugging a (Bison) Parser</a></li>
-<li><a href="/error-recovery-part-4/">Part 4: Bison’s <code>error</code>
-Token</a></li>
+<li><a href="/error-recovery-part-1/">Part 1: Why Recover from Syntax Errors</a></li>
+<li><strong><a href="/error-recovery-part-2/">Part 2: What I Didn’t Do</a></strong></li>
+<li><a href="/error-recovery-part-3/">Part 3: Tools and Techniques for Debugging a (Bison) Parser</a></li>
+<li><a href="/error-recovery-part-4/">Part 4: Bison’s <code>error</code> Token</a></li>
 <li>(<em>coming soon</em>) Part 5: Backtracking, aka Lexer Hacks</li>
-<li>(<em>coming soon</em>) Part 6: Falling Back on Indentation, aka More
-Lexer Hacks</li>
+<li>(<em>coming soon</em>) Part 6: Falling Back on Indentation, aka More Lexer Hacks</li>
 </ul>
-<p>Before we get started, I should say: I’m not, like, an expert at
-writing parsers. In fact of all the changes I’ve made to Sorbet, it’s
-definitely up there for “changes I’ve been least qualified to have
-made.” But at the end of the day my test cases passed <span
-class="emoji" data-emoji="upside_down_face">🙃</span> Take my
-experiences with as many or as few grains of salt as you’d like. This
-also means that if you want to suggest other alternatives or otherwise
-teach me something new, I’m all ears!</p>
-<p>First, a little bit of history. Sorbet’s parser was originally a part
-of the <a href="https://github.com/typedruby/typedruby">TypedRuby</a>
-project.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote"><a
-href="https://github.com/typedruby/typedruby">TypedRuby</a> was an
-aspirational Ruby type checker implemented in Rust that predated Sorbet.
-It is now abandoned.<br />
+<p>Before we get started, I should say: I’m not, like, an expert at writing parsers. In fact of all the changes I’ve made to Sorbet, it’s definitely up there for “changes I’ve been least qualified to have made.” But at the end of the day my test cases passed <span class="emoji" data-emoji="upside_down_face">🙃</span> Take my experiences with as many or as few grains of salt as you’d like. This also means that if you want to suggest other alternatives or otherwise teach me something new, I’m all ears!</p>
+<p>First, a little bit of history. Sorbet’s parser was originally a part of the <a href="https://github.com/typedruby/typedruby">TypedRuby</a> project.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote"><a href="https://github.com/typedruby/typedruby">TypedRuby</a> was an aspirational Ruby type checker implemented in Rust that predated Sorbet. It is now abandoned.<br />
 <br />
-</span></span> In turn, TypedRuby sourced its parser by porting the
-grammar file in the <a
-href="https://github.com/whitequark/parser">whitequark parser</a> from
-<a href="https://rubygems.org/gems/racc">Racc</a> (a Yacc-like parser
-generator for Ruby) to <a
-href="https://www.gnu.org/software/bison/">Bison</a> (a Yacc-like parser
-generator for C/C++). Sorbet imported the source code of the TypedRuby
-parser and continued to modify it over time as Ruby syntax evolved. The
-lexer uses <a href="http://www.colm.net/open-source/ragel/">Ragel</a>
-(also inherited from whitequark by way of TypedRuby) and tends to be
-quite stateful compared to other lexers I’ve seen—a point which we’ll
-come back to in future posts.</p>
+</span></span> In turn, TypedRuby sourced its parser by porting the grammar file in the <a href="https://github.com/whitequark/parser">whitequark parser</a> from <a href="https://rubygems.org/gems/racc">Racc</a> (a Yacc-like parser generator for Ruby) to <a href="https://www.gnu.org/software/bison/">Bison</a> (a Yacc-like parser generator for C/C++). Sorbet imported the source code of the TypedRuby parser and continued to modify it over time as Ruby syntax evolved. The lexer uses <a href="http://www.colm.net/open-source/ragel/">Ragel</a> (also inherited from whitequark by way of TypedRuby) and tends to be quite stateful compared to other lexers I’ve seen—a point which we’ll come back to in future posts.</p>
 <p>Importantly…</p>
 <ul>
-<li><p>Sorbet’s parser does not use <a
-href="https://ruby-doc.org/stdlib-2.7.3/libdoc/ripper/rdoc/Ripper.html">Ripper</a>,
-the parser built into the Ruby VM itself.</p>
-<p>Ripper is meant to be used as a library from Ruby code, not from C++
-like Sorbet needs for performance.</p>
-<p>Okay technically that’s a lie. The <a
-href="https://github.com/penelopezone/rubyfmt">rubyfmt</a> project
-manages to depend on Ripper from Rust by exposing it via Ruby’s support
-for native (C) extensions. <strong>But</strong> doing that comes with <a
-href="https://github.com/penelopezone/rubyfmt/blob/trunk/librubyfmt/build.rs">significant
-build complexity</a>, because it has the effect of basically importing
-Ruby’s whole <code>configure &amp;&amp; make</code> build step.</p>
-<p>Meanwhile it was super easy to import the TypedRuby parser as a
-self-contained unit with basically no questions asked (and remember:
-Sorbet predates rubyfmt). It’s also nice to be free from upstream<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="sidenote">I should note that I’m not opposed to upstreaming the
-changes I’ve made to Sorbet’s parser. Some of them intentionally break
-Ruby compatibility (in minor ways), and even the changes that don’t
-would likely require effort to get them merged properly. If you find my
-changes and want to submit them upstream, please go ahead!<br />
+<li><p>Sorbet’s parser does not use <a href="https://ruby-doc.org/stdlib-2.7.3/libdoc/ripper/rdoc/Ripper.html">Ripper</a>, the parser built into the Ruby VM itself.</p>
+<p>Ripper is meant to be used as a library from Ruby code, not from C++ like Sorbet needs for performance.</p>
+<p>Okay technically that’s a lie. The <a href="https://github.com/penelopezone/rubyfmt">rubyfmt</a> project manages to depend on Ripper from Rust by exposing it via Ruby’s support for native (C) extensions. <strong>But</strong> doing that comes with <a href="https://github.com/penelopezone/rubyfmt/blob/trunk/librubyfmt/build.rs">significant build complexity</a>, because it has the effect of basically importing Ruby’s whole <code>configure &amp;&amp; make</code> build step.</p>
+<p>Meanwhile it was super easy to import the TypedRuby parser as a self-contained unit with basically no questions asked (and remember: Sorbet predates rubyfmt). It’s also nice to be free from upstream<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">I should note that I’m not opposed to upstreaming the changes I’ve made to Sorbet’s parser. Some of them intentionally break Ruby compatibility (in minor ways), and even the changes that don’t would likely require effort to get them merged properly. If you find my changes and want to submit them upstream, please go ahead!<br />
 <br />
-</span></span> constraints: I can mess around in Sorbet’s parser as much
-as I want and the only people I have to defend my choices to are my
-teammates, not the Ruby maintainers.</p></li>
-<li><p>Sorbet’s parser does not use <a
-href="https://tree-sitter.github.io/tree-sitter/">tree-sitter</a>.</p>
-<p>Tree-sitter is tool whose main goals are basically 100% aligned with
-Sorbet’s needs in a parser: fast enough to run on every keystoke, robust
-enough to handle syntax errors, and native-code friendly. It would seem
-like a no-brainer for Sorbet to use.</p>
-<p>Unfortunately when I looked closely, it didn’t actually pan out. I
-used the <a
-href="https://tree-sitter.github.io/tree-sitter/playground">tree-sitter
-playground</a> to test a bunch of syntax errors where I wanted to be
-able to respond to completion requests for to see what the parse result
-looked like. In some cases it worked okay, but for the cases I cared
-about the most (mostly those involving <code>x.</code>), the results
-weren’t good enough. If I was going to have to manually hack on a parser
-to get it to do what I wanted, I figured I’d rather just stick with what
-Sorbet already had.</p>
-<p>On top of that tree-sitter is still pretty young, and almost everyone
-who is using tree-sitter right now is using it for two use cases: syntax
-highlighting, and code navigation. If the parse result generates the
-wrong thing (imagine there’s a bug in the grammar file that no one else
-has reported yet), oh well, maybe the colors are wrong or the
-jump-to-def goes to the wrong place. In Sorbet, it would mean either
-reporting an error when there isn’t one, or not reporting an error when
-there is one, both of which are particularly bad.</p>
-<p>Given that it was both (1) going to take extra hacks<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="sidenote">After publishing this post, I wrote more about my <a
-href="/tree-sitter-limitations/">thoughts on tree-sitter</a>.<br />
+</span></span> constraints: I can mess around in Sorbet’s parser as much as I want and the only people I have to defend my choices to are my teammates, not the Ruby maintainers.</p></li>
+<li><p>Sorbet’s parser does not use <a href="https://tree-sitter.github.io/tree-sitter/">tree-sitter</a>.</p>
+<p>Tree-sitter is tool whose main goals are basically 100% aligned with Sorbet’s needs in a parser: fast enough to run on every keystoke, robust enough to handle syntax errors, and native-code friendly. It would seem like a no-brainer for Sorbet to use.</p>
+<p>Unfortunately when I looked closely, it didn’t actually pan out. I used the <a href="https://tree-sitter.github.io/tree-sitter/playground">tree-sitter playground</a> to test a bunch of syntax errors where I wanted to be able to respond to completion requests for to see what the parse result looked like. In some cases it worked okay, but for the cases I cared about the most (mostly those involving <code>x.</code>), the results weren’t good enough. If I was going to have to manually hack on a parser to get it to do what I wanted, I figured I’d rather just stick with what Sorbet already had.</p>
+<p>On top of that tree-sitter is still pretty young, and almost everyone who is using tree-sitter right now is using it for two use cases: syntax highlighting, and code navigation. If the parse result generates the wrong thing (imagine there’s a bug in the grammar file that no one else has reported yet), oh well, maybe the colors are wrong or the jump-to-def goes to the wrong place. In Sorbet, it would mean either reporting an error when there isn’t one, or not reporting an error when there is one, both of which are particularly bad.</p>
+<p>Given that it was both (1) going to take extra hacks<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">After publishing this post, I wrote more about my <a href="/tree-sitter-limitations/">thoughts on tree-sitter</a>.<br />
 <br />
-</span></span> to get working instead of being a drop-in solution and
-(2) potentially trade Sorbet’s mature parser for a less-mature parser,
-it didn’t seem worth pursuing.</p></li>
-<li><p>Sorbet’s parser is not hand-written with <a
-href="https://en.wikipedia.org/wiki/Recursive_descent_parser">recursive
-descent</a>.</p>
-<p>Many people whose opinions I respect have told me that there’s a
-reason why so many people hand-write their parsers: error recovery is
-easier when given the flexibility to bend the whole parser to your
-will.</p>
-<p>But there isn’t an existing hand-written Ruby parser I could start
-from, and I didn’t want to completely stall progress with a bug-for-bug
-rewrite when I already had some ideas for how to make the existing
-parser better. Basically this approach has the same tradeoffs as
-adopting tree-sitter (lots of work with too many unknowns).</p></li>
+</span></span> to get working instead of being a drop-in solution and (2) potentially trade Sorbet’s mature parser for a less-mature parser, it didn’t seem worth pursuing.</p></li>
+<li><p>Sorbet’s parser is not hand-written with <a href="https://en.wikipedia.org/wiki/Recursive_descent_parser">recursive descent</a>.</p>
+<p>Many people whose opinions I respect have told me that there’s a reason why so many people hand-write their parsers: error recovery is easier when given the flexibility to bend the whole parser to your will.</p>
+<p>But there isn’t an existing hand-written Ruby parser I could start from, and I didn’t want to completely stall progress with a bug-for-bug rewrite when I already had some ideas for how to make the existing parser better. Basically this approach has the same tradeoffs as adopting tree-sitter (lots of work with too many unknowns).</p></li>
 </ul>
-<p>All of these claims about Sorbet’s parser were true when I started,
-and they haven’t changed. You’ll notice that in most cases the
-justification is “I don’t have time to do X” and not “doing X is wrong.”
-My biggest constraint in improving the parser has been making small,
-fast, iterative improvements. I wanted to be left with something to show
-even if I had to stop working on the parser sooner than expected. It’s
-possible that someone with more time or more patience will want to
-revisit one of these approaches in the future, and if you do I’d love to
-hear about it!</p>
-<p>Anyways, that rules out the most common refrains from onlookers. But
-there was another, more unconventional approach I considered and decided
-against: using <a
-href="https://github.com/zombocom/dead_end">dead_end</a>.
-<code>dead_end</code> isn’t a Ruby parser but rather a tool that hijacks
-Ruby’s syntax error reporting mechanism<span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="sidenote">It turns out, all (“all”) you have to do is is monkey
-patch <code>require</code> to <code>rescue   SyntaxError</code>. Thanks
-Ruby <span class="emoji"
-data-emoji="slightly_smiling_face">🙂</span><br />
+<p>All of these claims about Sorbet’s parser were true when I started, and they haven’t changed. You’ll notice that in most cases the justification is “I don’t have time to do X” and not “doing X is wrong.” My biggest constraint in improving the parser has been making small, fast, iterative improvements. I wanted to be left with something to show even if I had to stop working on the parser sooner than expected. It’s possible that someone with more time or more patience will want to revisit one of these approaches in the future, and if you do I’d love to hear about it!</p>
+<p>Anyways, that rules out the most common refrains from onlookers. But there was another, more unconventional approach I considered and decided against: using <a href="https://github.com/zombocom/dead_end">dead_end</a>. <code>dead_end</code> isn’t a Ruby parser but rather a tool that hijacks Ruby’s syntax error reporting mechanism<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="sidenote">It turns out, all (“all”) you have to do is is monkey patch <code>require</code> to <code>rescue   SyntaxError</code>. Thanks Ruby <span class="emoji" data-emoji="slightly_smiling_face">🙂</span><br />
 <br />
-</span></span> to improve the message for certain syntax errors.
-Specifically, it’ll try to show error messages in cases like this:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode numberSource ruby numberLines hl-4 hl-8"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> A</span>
+</span></span> to improve the message for certain syntax errors. Specifically, it’ll try to show error messages in cases like this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource ruby numberLines hl-4 hl-8"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> A</span>
 <span id="cb1-2"><a href="#cb1-2"></a>  <span class="cf">def</span> foo</span>
 <span id="cb1-3"><a href="#cb1-3"></a>    <span class="co"># ... lots of code ...</span></span>
 <span id="cb1-4"><a href="#cb1-4"></a>  <span class="co"># ← dead_end error: missing `end` keyword</span></span>
@@ -202,62 +97,24 @@ class="sourceCode numberSource ruby numberLines hl-4 hl-8"><code class="sourceCo
 <span id="cb1-6"><a href="#cb1-6"></a>  <span class="cf">def</span> bar</span>
 <span id="cb1-7"><a href="#cb1-7"></a>  <span class="cf">end</span></span>
 <span id="cb1-8"><a href="#cb1-8"></a><span class="cf">end</span> <span class="co"># ← ruby default error: unexpected token &quot;end of file&quot;</span></span></code></pre></div>
-<p>Missing an <code>end</code> keyword is a super common class of Ruby
-syntax errors,<span
-class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
-class="sidenote">One of my biggest Ruby syntax gripes is that it isn’t a
-curly brace language like C or JavaScript. Any sensibly editor will
-<strong>immediately</strong> insert the matching <code>}</code> after
-first typing <code>{</code>. But most Ruby editors will only insert the
-<code>end</code> matching some statement after a full line has been
-typed and <code>&lt;Enter&gt;</code> has been pressed, if anything. This
-means that unclosed
-<code>if</code>/<code>while</code>/<code>do</code>/<code>def</code>/<code>class</code>
-statements are <strong>abundantly</strong> common in Ruby, and this
-class of error (mismatched pairs) is trickier than the average
-error.<br />
+<p>Missing an <code>end</code> keyword is a super common class of Ruby syntax errors,<span class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span class="sidenote">One of my biggest Ruby syntax gripes is that it isn’t a curly brace language like C or JavaScript. Any sensibly editor will <strong>immediately</strong> insert the matching <code>}</code> after first typing <code>{</code>. But most Ruby editors will only insert the <code>end</code> matching some statement after a full line has been typed and <code>&lt;Enter&gt;</code> has been pressed, if anything. This means that unclosed <code>if</code>/<code>while</code>/<code>do</code>/<code>def</code>/<code>class</code> statements are <strong>abundantly</strong> common in Ruby, and this class of error (mismatched pairs) is trickier than the average error.<br />
 <br />
-</span></span> and <code>dead_end</code> already works particularly well
-at reporting them, so it was tempting to <del>steal</del> reuse either
-the code or the ideas.</p>
-<p>Early on I had decided not to use the code directly (it’s written in
-Ruby, and I didn’t want to add a runtime dependency on Ruby to Sorbet).
-But in the end, I decided not to use its recovery algorithm either.</p>
-<p>The algorithm is <a
-href="https://schneems.com/2020/12/01/squash-unexpectedend-errors-with-syntaxsearch/">described
-in more detail here</a>, but the tl;dr is that it uses indentation to
-search for mismatched snippets, expanding and discarding lines from the
-search frontier when it finds portions of a Ruby file that properly
-parse at a given indentation level.</p>
-<p>The problem with taking that idea verbatim is that the end result is
-basically just a set of lines in the source file that contain the error.
-But knowing those lines, there’s still no parse result for those lines.
-For example:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">def</span> foo</span>
+</span></span> and <code>dead_end</code> already works particularly well at reporting them, so it was tempting to <del>steal</del> reuse either the code or the ideas.</p>
+<p>Early on I had decided not to use the code directly (it’s written in Ruby, and I didn’t want to add a runtime dependency on Ruby to Sorbet). But in the end, I decided not to use its recovery algorithm either.</p>
+<p>The algorithm is <a href="https://schneems.com/2020/12/01/squash-unexpectedend-errors-with-syntaxsearch/">described in more detail here</a>, but the tl;dr is that it uses indentation to search for mismatched snippets, expanding and discarding lines from the search frontier when it finds portions of a Ruby file that properly parse at a given indentation level.</p>
+<p>The problem with taking that idea verbatim is that the end result is basically just a set of lines in the source file that contain the error. But knowing those lines, there’s still no parse result for those lines. For example:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">def</span> foo</span>
 <span id="cb2-2"><a href="#cb2-2"></a>  <span class="co"># ... code before ...</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="cf">if</span> arbitrary_expression()<span class="kw">.</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a>  <span class="co"># ... code after ...</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a><span class="cf">end</span></span></code></pre></div>
-<p><code>dead_end</code> could point to line 3 as the problem, but then
-I’d still have to parse that line to be able to e.g. service a
-completion request after the <code>.</code>, which is <em>basically</em>
-the situation we started with, because the parser would still be on the
-hook for the full complexity of what that
-<code>arbitrary_expression()</code> could represent. So I put the
-<code>dead_end</code> algorithm itself aside as well.</p>
-<p><strong>But!</strong> the general idea of using indentation to guide
-recovery proved out to be pretty useful—most Ruby editors will
-auto-indent and -dedent correctly for most edits—and there was another
-way to take advantage of it in Sorbet’s parser, along with some other
-tricks. The next few posts will discuss those tricks!</p>
+<p><code>dead_end</code> could point to line 3 as the problem, but then I’d still have to parse that line to be able to e.g. service a completion request after the <code>.</code>, which is <em>basically</em> the situation we started with, because the parser would still be on the hook for the full complexity of what that <code>arbitrary_expression()</code> could represent. So I put the <code>dead_end</code> algorithm itself aside as well.</p>
+<p><strong>But!</strong> the general idea of using indentation to guide recovery proved out to be pretty useful—most Ruby editors will auto-indent and -dedent correctly for most edits—and there was another way to take advantage of it in Sorbet’s parser, along with some other tricks. The next few posts will discuss those tricks!</p>
 <p style="width: 50%; float: left; text-align: left;">
-<a href="/error-recovery-part-1/">← Part 1: Why Recover from Syntax
-Errors</a>
+<a href="/error-recovery-part-1/">← Part 1: Why Recover from Syntax Errors</a>
 </p>
 <p style="width: 50%; float: right; text-align: right;">
-<a href="/error-recovery-part-3/">Part 3: Tools and Techniques for
-Debugging a (Bison) Parser →</a>
+<a href="/error-recovery-part-3/">Part 3: Tools and Techniques for Debugging a (Bison) Parser →</a>
 </p>
 <p><br></p>
 </main>

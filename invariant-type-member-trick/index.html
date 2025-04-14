@@ -51,48 +51,25 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#statement-of-the-problem"
-  id="toc-statement-of-the-problem">Statement of the problem</a></li>
-  <li><a href="#what-we-can-do-instead-and-what-we-give-up"
-  id="toc-what-we-can-do-instead-and-what-we-give-up">What we can do
-  instead, and what we give up</a></li>
+  <li><a href="#statement-of-the-problem">Statement of the problem</a></li>
+  <li><a href="#what-we-can-do-instead-and-what-we-give-up">What we can do instead, and what we give up</a></li>
   </ul>
 </nav>
 
 <main>
-<p>There’s a neat trick for using generic methods to get around some of
-the limitations that invariant type members in generic classes
-carry.</p>
+<p>There’s a neat trick for using generic methods to get around some of the limitations that invariant type members in generic classes carry.</p>
 <p>The problem I’m trying to solve:</p>
 <ul>
-<li><p>Sometimes my generic class (say, <code>Box</code>) needs a
-<code>type_member</code> (say, <code>Elem</code>) to be invariant,
-because the type member is used in both <a
-href="https://sorbet.org/docs/generics#input-and-output-positions">input
-and output positions</a>. For example, maybe this is a generic, mutable
-container (as contrasted with an immutable, read-only
-container).</p></li>
-<li><p>… but I still want to allow covariant subtyping in methods that
-take this generic type as an argument. For example, if I write a method
-that takes a <code>Box[Numeric]</code>, you should be able to call it if
-you have a <code>Box[Integer]</code>. Normally, the fact that
-<code>Elem</code> is invariant prevents this.</p></li>
+<li><p>Sometimes my generic class (say, <code>Box</code>) needs a <code>type_member</code> (say, <code>Elem</code>) to be invariant, because the type member is used in both <a href="https://sorbet.org/docs/generics#input-and-output-positions">input and output positions</a>. For example, maybe this is a generic, mutable container (as contrasted with an immutable, read-only container).</p></li>
+<li><p>… but I still want to allow covariant subtyping in methods that take this generic type as an argument. For example, if I write a method that takes a <code>Box[Numeric]</code>, you should be able to call it if you have a <code>Box[Integer]</code>. Normally, the fact that <code>Elem</code> is invariant prevents this.</p></li>
 </ul>
-<p>The solution is to change the parameter type from
-<code>Box[Numeric]</code> to the more generic
-<code>Box[T.all(T.type_parameter(:Elem), Numeric)]</code>.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">You’ll recognize this type (rather verbose) type as
-typical of a method which wants to <a
-href="https://sorbet.org/docs/generics#placing-bounds-on-generic-methods">place
-bounds on generic methods</a>.<br />
+<p>The solution is to change the parameter type from <code>Box[Numeric]</code> to the more generic <code>Box[T.all(T.type_parameter(:Elem), Numeric)]</code>.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="marginnote">You’ll recognize this type (rather verbose) type as typical of a method which wants to <a href="https://sorbet.org/docs/generics#placing-bounds-on-generic-methods">place bounds on generic methods</a>.<br />
 <br />
 </span></span></p>
 <p>At this point, let’s just look at code.</p>
 <h2 id="statement-of-the-problem">Statement of the problem</h2>
 <p>Here’s our mutable, invariant <code>Box</code> class:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode numberSource ruby numberLines hl-8 hl-16 hl-20"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> <span class="dt">Box</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource ruby numberLines hl-8 hl-16 hl-20"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> <span class="dt">Box</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Sig</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Generic</span></span>
 <span id="cb1-4"><a href="#cb1-4"></a></span>
@@ -114,10 +91,8 @@ class="sourceCode numberSource ruby numberLines hl-8 hl-16 hl-20"><code class="s
 <span id="cb1-20"><a href="#cb1-20"></a>  <span class="co">#                 ^^^^ input position</span></span>
 <span id="cb1-21"><a href="#cb1-21"></a>  <span class="ot">attr_writer</span> <span class="wa">:val</span></span>
 <span id="cb1-22"><a href="#cb1-22"></a><span class="cf">end</span></span></code></pre></div>
-<p>A method which operates on <code>Box[Numeric]</code> is allowed to do
-things like this:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode numberSource ruby numberLines hl-4 hl-8"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="kw">{</span> params(<span class="wa">box: </span><span class="dt">Box</span><span class="kw">[</span><span class="dt">Numeric</span><span class="kw">]</span>)<span class="at">.void</span> <span class="kw">}</span></span>
+<p>A method which operates on <code>Box[Numeric]</code> is allowed to do things like this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource ruby numberLines hl-4 hl-8"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="kw">{</span> params(<span class="wa">box: </span><span class="dt">Box</span><span class="kw">[</span><span class="dt">Numeric</span><span class="kw">]</span>)<span class="at">.void</span> <span class="kw">}</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="cf">def</span> mutates_numeric_box(box)</span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="co"># Can call arbitrary Numeric methods:</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a>  <span class="fu">raise</span> <span class="cf">unless</span> box<span class="at">.val.zero?</span></span>
@@ -127,40 +102,19 @@ class="sourceCode numberSource ruby numberLines hl-4 hl-8"><code class="sourceCo
 <span id="cb2-8"><a href="#cb2-8"></a>  box<span class="at">.val</span> <span class="kw">=</span> (<span class="dv">1</span> <span class="kw">/</span> <span class="dv">2</span>r)</span>
 <span id="cb2-9"><a href="#cb2-9"></a>  <span class="co">#         ^^^^^^^^ instance of Rational</span></span>
 <span id="cb2-10"><a href="#cb2-10"></a><span class="cf">end</span></span></code></pre></div>
-<p>Recall that because of invariance, Sorbet has to reject things like
-this:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>complex_box <span class="kw">=</span> <span class="dt">Box</span><span class="kw">[</span><span class="dt">Complex</span><span class="kw">]</span><span class="at">.new</span>(<span class="dv">3</span> <span class="kw">+</span> <span class="dv">4</span>i)</span>
+<p>Recall that because of invariance, Sorbet has to reject things like this:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>complex_box <span class="kw">=</span> <span class="dt">Box</span><span class="kw">[</span><span class="dt">Complex</span><span class="kw">]</span><span class="at">.new</span>(<span class="dv">3</span> <span class="kw">+</span> <span class="dv">4</span>i)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mutates_numeric_box(complex_box)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                   ^^^^^^^^^^^ ❌ Box[Complex] is not a subtype of Box[Numeric]</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>radius <span class="kw">=</span> complex_box<span class="at">.val.polar.fetch</span>(<span class="dv">0</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                        ^^^^^ runtime: 💥 Method `polar` does not exist on `Rational`</span></span></code></pre></div>
-<p>Sorbet must report an error on the call to
-<code>mutates_numeric_box</code>: after the call, Sorbet still thinks
-that <code>complex_box</code> has type <code>Box[Complex]</code> but it
-actually holds a <code>Rational</code> value. Allowing the program to
-continue is disastrous, and the program crashes with an exception on the
-call to <code>polar</code> on the next line.</p>
-<p>It’s frustrating because the only way to get from a
-<code>Box[Complex]</code> to a <code>Box[Numeric]</code> (so that we can
-call this method at all) is to make an entirely new box, with an
-explicitly wider type:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>numeric_box <span class="kw">=</span> <span class="dt">Box</span><span class="kw">[</span><span class="dt">Numeric</span><span class="kw">]</span><span class="at">.new</span>(complex_box<span class="at">.val</span>)</span></code></pre></div>
-<p>… which is annoying on its own (imagine having to do this for every
-call to <code>mutates_numeric_box</code>!) but having done this, there’s
-no way to safely recover the fact that this <code>Box[Numeric]</code>
-started with a <code>Complex</code>. That fact has been forgotten.</p>
-<h2 id="what-we-can-do-instead-and-what-we-give-up">What we can do
-instead, and what we give up</h2>
-<p>We can define our method using <code>type_parameters</code> (with a
-<a
-href="https://sorbet.org/docs/generics#placing-bounds-on-generic-methods">pseudo
-bound</a>), which allows being called with <code>Box[Complex]</code>,
-but places more constraints on what we’re allowed to do inside the
-method itself.</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode numberSource ruby numberLines hl-15 hl-16 hl-17"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a>sig <span class="cf">do</span></span>
+<p>Sorbet must report an error on the call to <code>mutates_numeric_box</code>: after the call, Sorbet still thinks that <code>complex_box</code> has type <code>Box[Complex]</code> but it actually holds a <code>Rational</code> value. Allowing the program to continue is disastrous, and the program crashes with an exception on the call to <code>polar</code> on the next line.</p>
+<p>It’s frustrating because the only way to get from a <code>Box[Complex]</code> to a <code>Box[Numeric]</code> (so that we can call this method at all) is to make an entirely new box, with an explicitly wider type:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>numeric_box <span class="kw">=</span> <span class="dt">Box</span><span class="kw">[</span><span class="dt">Numeric</span><span class="kw">]</span><span class="at">.new</span>(complex_box<span class="at">.val</span>)</span></code></pre></div>
+<p>… which is annoying on its own (imagine having to do this for every call to <code>mutates_numeric_box</code>!) but having done this, there’s no way to safely recover the fact that this <code>Box[Numeric]</code> started with a <code>Complex</code>. That fact has been forgotten.</p>
+<h2 id="what-we-can-do-instead-and-what-we-give-up">What we can do instead, and what we give up</h2>
+<p>We can define our method using <code>type_parameters</code> (with a <a href="https://sorbet.org/docs/generics#placing-bounds-on-generic-methods">pseudo bound</a>), which allows being called with <code>Box[Complex]</code>, but places more constraints on what we’re allowed to do inside the method itself.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines hl-15 hl-16 hl-17"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a>sig <span class="cf">do</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>  type_parameters(<span class="wa">:Elem</span>)</span>
 <span id="cb5-3"><a href="#cb5-3"></a>    <span class="at">.params</span>(</span>
 <span id="cb5-4"><a href="#cb5-4"></a>      <span class="wa">box: </span><span class="dt">Box</span><span class="kw">[</span>T<span class="at">.all</span>(T<span class="at">.type_parameter</span>(<span class="wa">:Elem</span>), <span class="dt">Numeric</span>)<span class="kw">]</span>,</span>
@@ -188,49 +142,23 @@ class="sourceCode numberSource ruby numberLines hl-15 hl-16 hl-17"><code class="
 <span id="cb5-26"><a href="#cb5-26"></a>  <span class="co"># ... and we CAN set val to its original value:</span></span>
 <span id="cb5-27"><a href="#cb5-27"></a>  box<span class="at">.val</span> <span class="kw">=</span> initial_value</span>
 <span id="cb5-28"><a href="#cb5-28"></a><span class="cf">end</span></span></code></pre></div>
-<p>Note the new constraints on this implementation. We’re no longer able
-to overwrite <code>val</code> with an arbitrary <code>Numeric</code>
-value, like we could before with <code>Rational</code>. It’s not like we
-can’t set this field at all: we just need something with the right type.
-As I discuss in <a
-href="https://blog.jez.io/sorbet-parametricity/">Sorbet, Generics, and
-Parametricity</a>, this limits us to only set <code>val</code> to
-something we’ve been given as an argument. In our case, we’ve been given
-<code>box.val</code> and <code>elem</code>—those are the
-<strong>only</strong> two things we’re allowed to assign to
-<code>val</code>.</p>
-<p>This is… not all that limiting in practice? Especially considering
-that it means we’re now allowed to use subtyping at the call site:</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>complex_box <span class="kw">=</span> <span class="dt">Box</span><span class="kw">[</span><span class="dt">Complex</span><span class="kw">]</span><span class="at">.new</span>(<span class="dv">3</span> <span class="kw">+</span> <span class="dv">4</span>i)</span>
+<p>Note the new constraints on this implementation. We’re no longer able to overwrite <code>val</code> with an arbitrary <code>Numeric</code> value, like we could before with <code>Rational</code>. It’s not like we can’t set this field at all: we just need something with the right type. As I discuss in <a href="https://blog.jez.io/sorbet-parametricity/">Sorbet, Generics, and Parametricity</a>, this limits us to only set <code>val</code> to something we’ve been given as an argument. In our case, we’ve been given <code>box.val</code> and <code>elem</code>—those are the <strong>only</strong> two things we’re allowed to assign to <code>val</code>.</p>
+<p>This is… not all that limiting in practice? Especially considering that it means we’re now allowed to use subtyping at the call site:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>complex_box <span class="kw">=</span> <span class="dt">Box</span><span class="kw">[</span><span class="dt">Complex</span><span class="kw">]</span><span class="at">.new</span>(<span class="dv">3</span> <span class="kw">+</span> <span class="dv">4</span>i)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>mutates_generic_numeric_box(complex_box, <span class="dv">4</span> <span class="kw">+</span> <span class="dv">3</span>i) <span class="co"># ✅</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>radius <span class="kw">=</span> complex_box<span class="at">.val.polar.fetch</span>(<span class="dv">0</span>)          <span class="co"># ✅</span></span></code></pre></div>
 <p><br />
 </p>
 <p><br />
 </p>
-<p>The only real tradeoff with this approach is that the generic
-signature with <code>type_parameters</code> is quite verbose.<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="marginnote">I have some ideas for what the new syntax should be,
-it’s mostly just an open question of whether the feature should be more
-or less syntactic sugar for the current syntax with <code>T.all</code>
-and have bad error messages, or whether we should expand Sorbet’s type
-system to track bounds on type parameters, possibly introducing uncaught
-bugs.<br />
+<p>The only real tradeoff with this approach is that the generic signature with <code>type_parameters</code> is quite verbose.<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="marginnote">I have some ideas for what the new syntax should be, it’s mostly just an open question of whether the feature should be more or less syntactic sugar for the current syntax with <code>T.all</code> and have bad error messages, or whether we should expand Sorbet’s type system to track bounds on type parameters, possibly introducing uncaught bugs.<br />
 <br />
-</span></span> Verbosity aside, the tradeoffs which limit what kinds of
-method implementations are allowed are not typically show-stopping
-limitations in real-world code.</p>
+</span></span> Verbosity aside, the tradeoffs which limit what kinds of method implementations are allowed are not typically show-stopping limitations in real-world code.</p>
 <ul>
-<li><p>For more information on variance and generics in Sorbet, see the
-docs:<br />
-<a href="https://sorbet.org/docs/generics">Generic Classes and Methods
-→</a></p></li>
+<li><p>For more information on variance and generics in Sorbet, see the docs:<br />
+<a href="https://sorbet.org/docs/generics">Generic Classes and Methods →</a></p></li>
 <li><p>For the full code in this post in sorbet.run:<br />
-<a
-href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Aclass%20Box%0A%20%20extend%20T%3A%3ASig%0A%20%20extend%20T%3A%3AGeneric%0A%0A%20%20%23%20Needs%20to%20be%20invariant%3A%20this%20type%20supports%20reading%0A%20%20%23%20and%20writing%20the%20%60val%60%20field%0A%20%20%23%20%28appears%20in%20both%20input%20and%20output%20positions%29%0A%20%20Elem%20%3D%20type_member%0A%0A%20%20sig%20%7B%20params%28val%3A%20Elem%29.void%20%7D%0A%20%20def%20initialize%28val%29%0A%20%20%20%20%40val%20%3D%20val%0A%20%20end%0A%0A%20%20sig%20%7B%20returns%28Elem%29%20%7D%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%20output%20position%0A%20%20attr_reader%20%3Aval%0A%0A%20%20sig%20%7B%20params%28val%3A%20Elem%29.returns%28Elem%29%20%7D%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%20input%20position%0A%20%20attr_writer%20%3Aval%0Aend%0A%0Asig%20%7B%20params%28box%3A%20Box%5BNumeric%5D%29.void%20%7D%0Adef%20mutates_numeric_box%28box%29%0A%20%20%23%20Can%20call%20arbitrary%20Numeric%20methods%3A%0A%20%20raise%20unless%20box.val.zero%3F%0A%0A%20%20%23%20Can%20set%20the%20value%20of%20the%20box%20to%20any%20Numeric%2C%0A%20%20%23%20regardless%20of%20what%20was%20in%20it%20before.%0A%20%20box.val%20%3D%20%281%20%2F%202r%29%0A%20%20%23%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%5E%5E%5E%5E%20instance%20of%20Rational%0Aend%0A%0Acomplex_box%20%3D%20Box%5BComplex%5D.new%283%20%2B%204i%29%0Amutates_numeric_box%28complex_box%29%0A%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%5E%5E%5E%5E%5E%5E%5E%20%E2%9D%8C%20Box%5BComplex%5D%20is%20not%20a%20subtype%20of%20Box%5BNumeric%5D%0Aradius%20%3D%20complex_box.val.polar.fetch%280%29%0A%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%5E%20runtime%3A%20%F0%9F%92%A5%20Method%20%60polar%60%20does%20not%20exist%20on%20%60Rational%60%0A%0Anumeric_box%20%3D%20Box%5BNumeric%5D.new%28complex_box.val%29%0Amutates_numeric_box%28numeric_box%29%0A%0A%23%20------------------------------------------%0A%0Asig%20do%0A%20%20type_parameters%28%3AElem%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20box%3A%20Box%5BT.all%28T.type_parameter%28%3AElem%29%2C%20Numeric%29%5D%2C%0A%20%20%20%20%20%20elem%3A%20T.all%28T.type_parameter%28%3AElem%29%2C%20Numeric%29%0A%20%20%20%20%29%0A%20%20%20%20.void%0Aend%0Adef%20mutates_generic_numeric_box%28box%2C%20elem%29%0A%20%20initial_value%20%3D%20box.val%0A%0A%20%20%23%20Can%20still%20call%20arbitrary%20Numeric%20methods%3A%0A%20%20raise%20unless%20box.val.zero%3F%0A%0A%20%20%23%20CAN&#39;T%20set%20val%20to%20an%20arbitrary%20Numeric%20value%0A%20%20%23%20%28It%20might%20not%20have%20been%20a%20Box%20that%20holds%20strings!%29%0A%20%20box.val%20%3D%20%281%20%2F%202r%29%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%5E%5E%20%E2%9D%8C%20Rational%20is%20not%20a%20subtype%20of%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20T.all%28T.type_parameter%28%3AElem%29%2C%20Numeric%29%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%28because%20Rational%20is%20not%20a%20subtype%20of%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20T.type_parameter%28%3AElem%29%29%0A%0A%20%20%23%20...%20but%20we%20CAN%20set%20val%20to%20a%20user-provided%20value%3A%0A%20%20box.val%20%3D%20elem%0A%0A%20%20%23%20...%20and%20we%20CAN%20set%20val%20to%20its%20original%20value%3A%0A%20%20box.val%20%3D%20initial_value%0Aend%0A%0Acomplex_box%20%3D%20Box%5BComplex%5D.new%283%20%2B%204i%29%0Amutates_generic_numeric_box%28complex_box%2C%204%20%2B%203i%29%20%23%20%E2%9C%85%0Aradius%20%3D%20complex_box.val.polar.fetch%280%29%20%20%20%20%20%20%20%20%20%20%23%20%E2%9C%85%0A">View
-in sorbet.run →</a></p></li>
+<a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aextend%20T%3A%3ASig%0A%0Aclass%20Box%0A%20%20extend%20T%3A%3ASig%0A%20%20extend%20T%3A%3AGeneric%0A%0A%20%20%23%20Needs%20to%20be%20invariant%3A%20this%20type%20supports%20reading%0A%20%20%23%20and%20writing%20the%20%60val%60%20field%0A%20%20%23%20%28appears%20in%20both%20input%20and%20output%20positions%29%0A%20%20Elem%20%3D%20type_member%0A%0A%20%20sig%20%7B%20params%28val%3A%20Elem%29.void%20%7D%0A%20%20def%20initialize%28val%29%0A%20%20%20%20%40val%20%3D%20val%0A%20%20end%0A%0A%20%20sig%20%7B%20returns%28Elem%29%20%7D%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%20output%20position%0A%20%20attr_reader%20%3Aval%0A%0A%20%20sig%20%7B%20params%28val%3A%20Elem%29.returns%28Elem%29%20%7D%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%20input%20position%0A%20%20attr_writer%20%3Aval%0Aend%0A%0Asig%20%7B%20params%28box%3A%20Box%5BNumeric%5D%29.void%20%7D%0Adef%20mutates_numeric_box%28box%29%0A%20%20%23%20Can%20call%20arbitrary%20Numeric%20methods%3A%0A%20%20raise%20unless%20box.val.zero%3F%0A%0A%20%20%23%20Can%20set%20the%20value%20of%20the%20box%20to%20any%20Numeric%2C%0A%20%20%23%20regardless%20of%20what%20was%20in%20it%20before.%0A%20%20box.val%20%3D%20%281%20%2F%202r%29%0A%20%20%23%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%5E%5E%5E%5E%20instance%20of%20Rational%0Aend%0A%0Acomplex_box%20%3D%20Box%5BComplex%5D.new%283%20%2B%204i%29%0Amutates_numeric_box%28complex_box%29%0A%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%5E%5E%5E%5E%5E%5E%5E%20%E2%9D%8C%20Box%5BComplex%5D%20is%20not%20a%20subtype%20of%20Box%5BNumeric%5D%0Aradius%20%3D%20complex_box.val.polar.fetch%280%29%0A%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%5E%20runtime%3A%20%F0%9F%92%A5%20Method%20%60polar%60%20does%20not%20exist%20on%20%60Rational%60%0A%0Anumeric_box%20%3D%20Box%5BNumeric%5D.new%28complex_box.val%29%0Amutates_numeric_box%28numeric_box%29%0A%0A%23%20------------------------------------------%0A%0Asig%20do%0A%20%20type_parameters%28%3AElem%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20box%3A%20Box%5BT.all%28T.type_parameter%28%3AElem%29%2C%20Numeric%29%5D%2C%0A%20%20%20%20%20%20elem%3A%20T.all%28T.type_parameter%28%3AElem%29%2C%20Numeric%29%0A%20%20%20%20%29%0A%20%20%20%20.void%0Aend%0Adef%20mutates_generic_numeric_box%28box%2C%20elem%29%0A%20%20initial_value%20%3D%20box.val%0A%0A%20%20%23%20Can%20still%20call%20arbitrary%20Numeric%20methods%3A%0A%20%20raise%20unless%20box.val.zero%3F%0A%0A%20%20%23%20CAN&#39;T%20set%20val%20to%20an%20arbitrary%20Numeric%20value%0A%20%20%23%20%28It%20might%20not%20have%20been%20a%20Box%20that%20holds%20strings!%29%0A%20%20box.val%20%3D%20%281%20%2F%202r%29%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%5E%5E%5E%5E%5E%5E%20%E2%9D%8C%20Rational%20is%20not%20a%20subtype%20of%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20T.all%28T.type_parameter%28%3AElem%29%2C%20Numeric%29%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%28because%20Rational%20is%20not%20a%20subtype%20of%0A%20%20%23%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20T.type_parameter%28%3AElem%29%29%0A%0A%20%20%23%20...%20but%20we%20CAN%20set%20val%20to%20a%20user-provided%20value%3A%0A%20%20box.val%20%3D%20elem%0A%0A%20%20%23%20...%20and%20we%20CAN%20set%20val%20to%20its%20original%20value%3A%0A%20%20box.val%20%3D%20initial_value%0Aend%0A%0Acomplex_box%20%3D%20Box%5BComplex%5D.new%283%20%2B%204i%29%0Amutates_generic_numeric_box%28complex_box%2C%204%20%2B%203i%29%20%23%20%E2%9C%85%0Aradius%20%3D%20complex_box.val.polar.fetch%280%29%20%20%20%20%20%20%20%20%20%20%23%20%E2%9C%85%0A">View in sorbet.run →</a></p></li>
 </ul>
 </main>
 
