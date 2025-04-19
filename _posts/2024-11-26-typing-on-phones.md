@@ -14,7 +14,7 @@ categories: ['fragment']
 
 I keep coming back to this idea: what if we had better text input for mobile devices?
 
-With a little practice, anyone can get to 100 wpm typing on a computer keyboard. Many can get much higher than that. And it's not just raw text input speed: the precision of a mouse and ubiquity of keyboard shortcuts allow effortlessly editing already written.
+With a little practice, anyone can get to 100 wpm typing on a computer keyboard. Many can get much higher than that. And it's not just raw text input speed: the precision of a mouse and ubiquity of keyboard shortcuts allow effortlessly editing already-written text.
 
 By contrast, text input on phones is sluggish. Innovations like autocorrect, swiping, and predictive text input help, but even the fastest, mobile-native users struggle to get faster than 70 wpm.[^palin2019typing] I top out around 50 wpm despite consistently beating 130 wpm on a desktop keyboard.
 
@@ -35,7 +35,7 @@ My commute is about 30 minutes of either riding on or waiting for transit... why
 - reviewing my teammate's code?
 - polishing that project brief?
 
-It's **not** because I can't use my phone for these—I have! I drafted this whole post in [a markdown app][1writer] on my phone. [Blink Shell] gives me a whole Linux environment to build code, even on iOS. [Tailscale] lets me build a website at home and access it anywhere. GitHub, Gmail, and Google Docs all have mobile apps.
+It's **not** because I can't use my phone for these—I have! People usually like to bash iOS, saying things like, "it's just not possible to write the apps to do all this in the first place..." but for me, all the apps actually exist! I drafted this whole post in [a markdown app][1writer] on my phone. [Blink Shell] gives me a whole Linux environment to build code, even on iOS. [Tailscale] lets me build a website at home and access it anywhere. GitHub, Gmail, and Google Docs all have mobile apps.
 
 [1writer]: http://1writerapp.com
 [blink shell]: https://blink.sh
