@@ -51,18 +51,25 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#why-does-sorbet-have-this-weird-error">Why does Sorbet have this weird error?</a></li>
-  <li><a href="#okay-but-why-not-just-assume-that-true-and-false-are-tboolean">Okay, but why not just assume that <code>true</code> and <code>false</code> are <code>T::Boolean</code>?</a></li>
+  <li><a href="#why-does-sorbet-have-this-weird-error"
+  id="toc-why-does-sorbet-have-this-weird-error">Why does Sorbet have
+  this weird error?</a></li>
+  <li><a
+  href="#okay-but-why-not-just-assume-that-true-and-false-are-tboolean"
+  id="toc-okay-but-why-not-just-assume-that-true-and-false-are-tboolean">Okay,
+  but why not just assume that <code>true</code> and <code>false</code>
+  are <code>T::Boolean</code>?</a></li>
   </ul>
 </nav>
 
 <main>
 <p>Here’s something everyone who’s new to Sorbet trips over:</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>found_it <span class="kw">=</span> <span class="dv">false</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>items<span class="at">.each</span> <span class="cf">do</span> <span class="kw">|</span>item<span class="kw">|</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> item <span class="kw">==</span> thing</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    found_it <span class="kw">=</span> <span class="dv">true</span></span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>found_it <span class="op">=</span> <span class="dv">false</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>items<span class="at">.each</span> <span class="cf">do</span> <span class="op">|</span>item<span class="op">|</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> item <span class="op">==</span> thing</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    found_it <span class="op">=</span> <span class="dv">true</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">#          ^^^^ error:</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Changing the type of a variable is not permitted</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Existing variable has type: `FalseClass`</span></span>
@@ -70,66 +77,160 @@
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20%7Bparams%28items%3A%20T%3A%3AArray%5BString%5D%2C%20thing%3A%20String%29.void%7D%0Adef%20example%28items%2C%20thing%29%0A%20%20found_it%20%3D%20false%0A%20%20items.each%20do%20%7Citem%7C%0A%20%20%20%20if%20item%20%3D%3D%20thing%0A%20%20%20%20%20%20found_it%20%3D%20true%0A%20%20%20%20end%0A%20%20end%0Aend%0A">View on sorbet.run →</a>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20%7Bparams%28items%3A%20T%3A%3AArray%5BString%5D%2C%20thing%3A%20String%29.void%7D%0Adef%20example%28items%2C%20thing%29%0A%20%20found_it%20%3D%20false%0A%20%20items.each%20do%20%7Citem%7C%0A%20%20%20%20if%20item%20%3D%3D%20thing%0A%20%20%20%20%20%20found_it%20%3D%20true%0A%20%20%20%20end%0A%20%20end%0Aend%0A">View
+on sorbet.run →</a>
 </figcaption>
 </figure>
-<p>The fix is to change <code>found_it = false</code> to <code>found_it = T.let(false, T::Boolean)</code>.</p>
-<p>But this is annoying and confusing, especially because basically no other type checker works this way. That makes it a good candidate to change so that Sorbet spends less time getting in people’s way.</p>
-<p>And in fact, I <em>have</em> tried changing it! I want to talk about why this error exists at all, and my failed attempts at improving this.</p>
-<h2 id="why-does-sorbet-have-this-weird-error">Why does Sorbet have this weird error?</h2>
+<p>The fix is to change <code>found_it = false</code> to
+<code>found_it = T.let(false, T::Boolean)</code>.</p>
+<p>But this is annoying and confusing, especially because basically no
+other type checker works this way. That makes it a good candidate to
+change so that Sorbet spends less time getting in people’s way.</p>
+<p>And in fact, I <em>have</em> tried changing it! I want to talk about
+why this error exists at all, and my failed attempts at improving
+this.</p>
+<h2 id="why-does-sorbet-have-this-weird-error">Why does Sorbet have this
+weird error?</h2>
 <p>For performance and understandability.</p>
-<p>As Nelson mentions in <a href="https://blog.nelhage.com/post/why-sorbet-is-fast/#forward-only-inference">Why Sorbet is Fast</a>, Sorbet’s inference algorithm is forward-only. This means that Sorbet inspects every piece of code in a method body at most once during inference, never revisiting a piece of code it’s already typechecked. Not only does this approach mean doing a linear amount of work, it means doing <em>one</em> unit of work per piece of code—the constant factors matter! It also means code at the bottom of a method never affects a type Sorbet inferred 100 lines earlier.</p>
-<p>But “forward-only” is weird, because control flow graphs in Sorbet<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="marginnote">For more idiosyncrasies of Sorbet’s CFGs, see <a href="/sorbet-rescue-control-flow/">Sorbet’s weird approach to exception handling</a> or <a href="/syntactic-control-flow/">Control Flow in Sorbet is Syntactic</a>.<br />
+<p>As Nelson mentions in <a
+href="https://blog.nelhage.com/post/why-sorbet-is-fast/#forward-only-inference">Why
+Sorbet is Fast</a>, Sorbet’s inference algorithm is forward-only. This
+means that Sorbet inspects every piece of code in a method body at most
+once during inference, never revisiting a piece of code it’s already
+typechecked. Not only does this approach mean doing a linear amount of
+work, it means doing <em>one</em> unit of work per piece of code—the
+constant factors matter! It also means code at the bottom of a method
+never affects a type Sorbet inferred 100 lines earlier.</p>
+<p>But “forward-only” is weird, because control flow graphs in
+Sorbet<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="marginnote">For more idiosyncrasies of Sorbet’s CFGs, see <a
+href="/sorbet-rescue-control-flow/">Sorbet’s weird approach to exception
+handling</a> or <a href="/syntactic-control-flow/">Control Flow in
+Sorbet is Syntactic</a>.<br />
 <br />
-</span></span> can have cycles! It’s not possible to strictly sort code in a Sorbet CFG from start to finish. Consider this program:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource ruby numberLines hl-1 hl-4 hl-5"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>x <span class="kw">=</span> <span class="dv">42</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="cf">while</span> i <span class="kw">&lt;</span> <span class="dv">2</span></span>
+</span></span> can have cycles! It’s not possible to strictly sort code
+in a Sorbet CFG from start to finish. Consider this program:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode numberSource ruby numberLines hl-1 hl-4 hl-5"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>x <span class="op">=</span> <span class="dv">42</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>i <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="cf">while</span> i <span class="op">&lt;</span> <span class="dv">2</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a>  takes_integer(x)</span>
-<span id="cb2-5"><a href="#cb2-5"></a>  x <span class="kw">=</span> <span class="dv">nil</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a>  i <span class="kw">+=</span> <span class="dv">1</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>  x <span class="op">=</span> <span class="dv">nil</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>  i <span class="op">+=</span> <span class="dv">1</span></span>
 <span id="cb2-7"><a href="#cb2-7"></a><span class="cf">end</span></span></code></pre></div>
-<p>The CFG for this snippet looks something like this:<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="marginnote">If you really want to dive into Sorbet’s internals, you can get it to print the exact CFG for a piece of code. See <a href="https://github.com/sorbet/sorbet/blob/master/docs/internals.md#cfg">docs/internals.md: CFG</a>.<br />
+<p>The CFG for this snippet looks something like this:<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="marginnote">If you really want to dive into Sorbet’s internals,
+you can get it to print the exact CFG for a piece of code. See <a
+href="https://github.com/sorbet/sorbet/blob/master/docs/internals.md#cfg">docs/internals.md:
+CFG</a>.<br />
 <br />
 </span></span></p>
-<p><img src="/assets/img/light/t-let-boolean-cfg.png" style="max-width: 575px;" /></p>
-<p><img src="/assets/img/dark/t-let-boolean-cfg.png" style="max-width: 575px;" /></p>
-<p>On line 1, Sorbet infers that <code>x</code> is <code>Integer</code>. This means the call to <code>takes_integer</code> on line 4 typechecks. But then on line 5, Sorbet realizes that inferring a type of <code>Integer</code> for <code>x</code> was a mistake: it should have inferred <code>T.nilable(Integer)</code>, but it’s too late–Sorbet isn’t going to go back to line one and infer that <code>x</code> has type <code>T.nilable(Integer)</code>. Sorbet has already missed an error it should have reported: the call to <code>takes_integer</code> (the second time through this loop, the call to <code>takes_integer</code> will actually pass <code>nil</code> instead of an <code>Integer</code>). To prevent this snippet from sneaking through without <em>any</em> errors, it reports an error when it sees the incompatible assignment to <code>x</code> on line 5. Better late than never.</p>
-<p>Importantly, Sorbet only needs this if the assignment happens inside a loop, because it’s the cycles in the CFG that cause problems. Also, Sorbet always assumes that blocks are loops, because Sorbet can’t know how many times a method will call a block. If the assignment which widens the type happens in non-cyclic code, there’s no type annotation needed.</p>
-<p><strong>TL;DR</strong>: Sorbet has this “incompatible assignment” error because without it, it would either miss reporting important type errors, or have to use a slower type inference algorithm with more action at a distance.</p>
-<h2 id="okay-but-why-not-just-assume-that-true-and-false-are-tboolean">Okay, but why not just assume that <code>true</code> and <code>false</code> are <code>T::Boolean</code>?</h2>
+<p><img src="/assets/img/light/t-let-boolean-cfg.png"
+style="max-width: 575px;" /></p>
+<p><img src="/assets/img/dark/t-let-boolean-cfg.png"
+style="max-width: 575px;" /></p>
+<p>On line 1, Sorbet infers that <code>x</code> is <code>Integer</code>.
+This means the call to <code>takes_integer</code> on line 4 typechecks.
+But then on line 5, Sorbet realizes that inferring a type of
+<code>Integer</code> for <code>x</code> was a mistake: it should have
+inferred <code>T.nilable(Integer)</code>, but it’s too late–Sorbet isn’t
+going to go back to line one and infer that <code>x</code> has type
+<code>T.nilable(Integer)</code>. Sorbet has already missed an error it
+should have reported: the call to <code>takes_integer</code> (the second
+time through this loop, the call to <code>takes_integer</code> will
+actually pass <code>nil</code> instead of an <code>Integer</code>). To
+prevent this snippet from sneaking through without <em>any</em> errors,
+it reports an error when it sees the incompatible assignment to
+<code>x</code> on line 5. Better late than never.</p>
+<p>Importantly, Sorbet only needs this if the assignment happens inside
+a loop, because it’s the cycles in the CFG that cause problems. Also,
+Sorbet always assumes that blocks are loops, because Sorbet can’t know
+how many times a method will call a block. If the assignment which
+widens the type happens in non-cyclic code, there’s no type annotation
+needed.</p>
+<p><strong>TL;DR</strong>: Sorbet has this “incompatible assignment”
+error because without it, it would either miss reporting important type
+errors, or have to use a slower type inference algorithm with more
+action at a distance.</p>
+<h2
+id="okay-but-why-not-just-assume-that-true-and-false-are-tboolean">Okay,
+but why not just assume that <code>true</code> and <code>false</code>
+are <code>T::Boolean</code>?</h2>
 <p>This compromises the expressive power of Sorbet’s type system.</p>
-<p>You’ll notice the original error mentioned <code>TrueClass</code> and <code>FalseClass</code>:</p>
+<p>You’ll notice the original error mentioned <code>TrueClass</code> and
+<code>FalseClass</code>:</p>
 <pre><code>Existing variable has type: `FalseClass`
 Attempting to change type to: `TrueClass`</code></pre>
-<p>That exposes that Sorbet tracks in which environments a variable is known to be exactly <code>true</code> or <code>false</code>, in addition to when it’s <code>T::Boolean</code>.</p>
-<p>Maybe this is the problem? Maybe Sorbet should just assume that <code>x = true</code> results in <code>x</code> having type <code>T::Boolean</code>, which would avoid the need for the <code>T.let</code>.</p>
-<p>But that causes other problems. Sorbet is really good at modeling situations where one variable being truthy implies some <em>other</em> variable has a particular type.<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="marginnote">I’m told this is one of the particularly novel parts of Sorbet’s inference algorithms—<a href="https://github.com/DarkDimius">Dmitry</a>, who built it, speaks highly of it. It’s probably worth writing about more in the future.<br />
+<p>That exposes that Sorbet tracks in which environments a variable is
+known to be exactly <code>true</code> or <code>false</code>, in addition
+to when it’s <code>T::Boolean</code>.</p>
+<p>Maybe this is the problem? Maybe Sorbet should just assume that
+<code>x = true</code> results in <code>x</code> having type
+<code>T::Boolean</code>, which would avoid the need for the
+<code>T.let</code>.</p>
+<p>But that causes other problems. Sorbet is really good at modeling
+situations where one variable being truthy implies some <em>other</em>
+variable has a particular type.<span
+class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
+class="marginnote">I’m told this is one of the particularly novel parts
+of Sorbet’s inference algorithms—<a
+href="https://github.com/DarkDimius">Dmitry</a>, who built it, speaks
+highly of it. It’s probably worth writing about more in the
+future.<br />
 <br />
 </span></span> For example:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-7 hl-12"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a>sig <span class="kw">{</span>params(<span class="wa">bank_acct: </span>T<span class="at">.nilable</span>(<span class="dt">String</span>))<span class="at">.void</span><span class="kw">}</span></span>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode numberSource ruby numberLines hl-5 hl-7 hl-12"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a>sig <span class="op">{</span>params(<span class="wa">bank_acct:</span> <span class="cn">T</span><span class="at">.nilable</span>(<span class="dt">String</span>))<span class="at">.void</span><span class="op">}</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="cf">def</span> example(bank_acct)</span>
-<span id="cb4-3"><a href="#cb4-3"></a>  check_balance <span class="kw">=</span> <span class="dv">false</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>  check_balance <span class="op">=</span> <span class="dv">false</span></span>
 <span id="cb4-4"><a href="#cb4-4"></a></span>
 <span id="cb4-5"><a href="#cb4-5"></a>  <span class="cf">if</span> bank_acct   <span class="co"># now we know it&#39;s not nil</span></span>
 <span id="cb4-6"><a href="#cb4-6"></a>    <span class="cf">if</span> is_special_account(bank_acct)</span>
-<span id="cb4-7"><a href="#cb4-7"></a>      check_balance <span class="kw">=</span> <span class="dv">true</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>      check_balance <span class="op">=</span> <span class="dv">true</span></span>
 <span id="cb4-8"><a href="#cb4-8"></a>    <span class="cf">end</span></span>
 <span id="cb4-9"><a href="#cb4-9"></a>  <span class="cf">end</span></span>
 <span id="cb4-10"><a href="#cb4-10"></a></span>
 <span id="cb4-11"><a href="#cb4-11"></a>  <span class="cf">if</span> check_balance</span>
-<span id="cb4-12"><a href="#cb4-12"></a>    T<span class="at">.reveal_type</span>(bank_acct) <span class="co"># error: `String`</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a>    <span class="cn">T</span><span class="at">.reveal_type</span>(bank_acct) <span class="co"># error: `String`</span></span>
 <span id="cb4-13"><a href="#cb4-13"></a>  <span class="cf">end</span></span>
 <span id="cb4-14"><a href="#cb4-14"></a><span class="cf">end</span></span></code></pre></div>
-<p>On line 12, Sorbet is smart enough to see that <code>bank_acct</code> is not <code>nil</code>, because we’ve we’re in an environment where <code>check_balance</code> is truthy, and we know that <code>check_balance</code> was only set to a truthy value in environments where <code>bank_acct</code> was not <code>nil</code>. Altogether, this allows the user to omit a redundant check to assert that <code>bank_acct</code> is not <code>nil</code> directly on line 11.</p>
-<p>If we changed Sorbet to treat <code>check_balance = true</code> as having type <code>T::Boolean</code> instead of <code>FalseClass</code>, that would prevent Sorbet from modeling complex control-flow situations like this.</p>
-<p>I actually <a href="https://github.com/sorbet/sorbet/pull/4368">tried building something</a> that did that, and it caused many problems in real world code that looked just like the code above. In the end, we decided against landing the change, with the reasoning that the error message for changing a variable in a loop is very clear, has an autocorrect, and the resulting <code>T.let</code>’d code is very obvious.</p>
-<p>By contrast, the error message if we did it the other way would have non-obvious error messages. There would have been workarounds to get code like the above to type check, but they would have contorted the code, making it substantially less obvious why the code was written like it was. And it would likely have been impossible to write autocorrects to introduce those workarounds, so people would have had to learn them by reading the docs, not via error messages.</p>
+<p>On line 12, Sorbet is smart enough to see that <code>bank_acct</code>
+is not <code>nil</code>, because we’ve we’re in an environment where
+<code>check_balance</code> is truthy, and we know that
+<code>check_balance</code> was only set to a truthy value in
+environments where <code>bank_acct</code> was not <code>nil</code>.
+Altogether, this allows the user to omit a redundant check to assert
+that <code>bank_acct</code> is not <code>nil</code> directly on line
+11.</p>
+<p>If we changed Sorbet to treat <code>check_balance = true</code> as
+having type <code>T::Boolean</code> instead of <code>FalseClass</code>,
+that would prevent Sorbet from modeling complex control-flow situations
+like this.</p>
+<p>I actually <a href="https://github.com/sorbet/sorbet/pull/4368">tried
+building something</a> that did that, and it caused many problems in
+real world code that looked just like the code above. In the end, we
+decided against landing the change, with the reasoning that the error
+message for changing a variable in a loop is very clear, has an
+autocorrect, and the resulting <code>T.let</code>’d code is very
+obvious.</p>
+<p>By contrast, the error message if we did it the other way would have
+non-obvious error messages. There would have been workarounds to get
+code like the above to type check, but they would have contorted the
+code, making it substantially less obvious why the code was written like
+it was. And it would likely have been impossible to write autocorrects
+to introduce those workarounds, so people would have had to learn them
+by reading the docs, not via error messages.</p>
 <p><br />
 </p>
 <p><br />
 </p>
-<p>So that’s why Sorbet is like this, and what we’ve tried to do to fix this in the past. This is still probably one of the most annoying parts of Sorbet, so it’s not unreasonable to hope it’ll get fixed one day. If you think you have a solution, feel free to let me know!</p>
+<p>So that’s why Sorbet is like this, and what we’ve tried to do to fix
+this in the past. This is still probably one of the most annoying parts
+of Sorbet, so it’s not unreasonable to hope it’ll get fixed one day. If
+you think you have a solution, feel free to let me know!</p>
 </main>
 
 

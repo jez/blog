@@ -51,23 +51,37 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#its-using-sorbets-support-for-generic-methods.">It’s using Sorbet’s support for <span>generic methods</span>.</a></li>
-  <li><a href="#it-uses-t.all-an-intersection-type-to-approximate-bounded-method-generics.">It uses <code>T.all</code> (an <span>intersection type</span>) to approximate <span>bounded method generics</span>.</a></li>
-  <li><a href="#the-upper-bound-is-nilclass-not-t.nilableamount">The upper bound is <code>NilClass</code>, not <code>T.nilable(Amount)</code>!</a></li>
-  <li><a href="#update-2023-10-02">Update, 2023-10-02</a></li>
+  <li><a href="#its-using-sorbets-support-for-generic-methods."
+  id="toc-its-using-sorbets-support-for-generic-methods.">It’s using
+  Sorbet’s support for generic methods.</a></li>
+  <li><a
+  href="#it-uses-t.all-an-intersection-type-to-approximate-bounded-method-generics."
+  id="toc-it-uses-t.all-an-intersection-type-to-approximate-bounded-method-generics.">It
+  uses <code>T.all</code> (an intersection type) to approximate bounded
+  method generics.</a></li>
+  <li><a href="#the-upper-bound-is-nilclass-not-t.nilableamount"
+  id="toc-the-upper-bound-is-nilclass-not-t.nilableamount">The upper
+  bound is <code>NilClass</code>, not
+  <code>T.nilable(Amount)</code>!</a></li>
+  <li><a href="#update-2023-10-02" id="toc-update-2023-10-02">Update,
+  2023-10-02</a></li>
   </ul>
 </nav>
 
 <main>
-<p>Sometimes you might want a Sorbet method signature like, “Returns <code>T.nilable</code> <strong>only if</strong> the input is <code>T.nilable</code>. But if the input is non-<code>nil</code>, then so is the output.”</p>
+<p>Sometimes you might want a Sorbet method signature like, “Returns
+<code>T.nilable</code> <strong>only if</strong> the input is
+<code>T.nilable</code>. But if the input is non-<code>nil</code>, then
+so is the output.”</p>
 <p>With clever usage of Sorbet generics, this is possible!</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource ruby numberLines hl-4"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a>sig <span class="cf">do</span></span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode numberSource ruby numberLines hl-4"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a>sig <span class="cf">do</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>  type_parameters(<span class="wa">:U</span>)</span>
 <span id="cb1-3"><a href="#cb1-3"></a>    <span class="at">.params</span>(</span>
-<span id="cb1-4"><a href="#cb1-4"></a>      <span class="wa">amount: </span>T<span class="at">.any</span>(T<span class="at">.all</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>), <span class="dt">Amount</span>)</span>
+<span id="cb1-4"><a href="#cb1-4"></a>      <span class="wa">amount:</span> <span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.all</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>), <span class="dt">Amount</span>)</span>
 <span id="cb1-5"><a href="#cb1-5"></a>    )</span>
-<span id="cb1-6"><a href="#cb1-6"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(T<span class="at">.all</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>), <span class="dt">String</span>))</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.all</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>), <span class="dt">String</span>))</span>
 <span id="cb1-7"><a href="#cb1-7"></a><span class="cf">end</span></span>
 <span id="cb1-8"><a href="#cb1-8"></a><span class="cf">def</span> get_currency(amount)</span>
 <span id="cb1-9"><a href="#cb1-9"></a>  <span class="cf">if</span> amount<span class="at">.nil?</span></span>
@@ -77,53 +91,91 @@
 <span id="cb1-13"><a href="#cb1-13"></a>  <span class="cf">end</span></span>
 <span id="cb1-14"><a href="#cb1-14"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Aclass%20Amount%20%3C%20T%3A%3AStruct%0A%20%20prop%20%3Aamount%2C%20BigDecimal%0A%20%20prop%20%3Acurrency%2C%20String%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AU%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20amount%3A%20T.any%28T.all%28T.type_parameter%28%3AU%29%2C%20NilClass%29%2C%20Amount%29%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.any%28T.all%28T.type_parameter%28%3AU%29%2C%20NilClass%29%2C%20String%29%29%0Aend%0Adef%20get_currency%28amount%29%0A%20%20if%20amount.nil%3F%0A%20%20%20%20return%20amount%0A%20%20else%0A%20%20%20%20return%20amount.currency%0A%20%20end%0Aend%0A%0Asig%20do%0A%20%20params%28%0A%20%20%20%20amount%3A%20Amount%2C%0A%20%20%20%20maybe_amount%3A%20T.nilable%28Amount%29%2C%0A%20%20%20%20nil_class%3A%20NilClass%0A%20%20%29%0A%20%20.void%0Aend%0Adef%20example%28amount%2C%20maybe_amount%2C%20nil_class%29%0A%20%20res%20%3D%20get_currency%28amount%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20String%0A%0A%20%20res%20%3D%20get_currency%28maybe_amount%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20T.nilable%28String%29%0A%0A%20%20res%20%3D%20get_currency%28nil_class%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20T.nilable%28String%29%0A%0A%20%20res%20%3D%20get_currency%28T.unsafe%28amount%29%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20T.nilable%28String%29%0Aend">Full example on sorbet.run →</a>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Aclass%20Amount%20%3C%20T%3A%3AStruct%0A%20%20prop%20%3Aamount%2C%20BigDecimal%0A%20%20prop%20%3Acurrency%2C%20String%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AU%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20amount%3A%20T.any%28T.all%28T.type_parameter%28%3AU%29%2C%20NilClass%29%2C%20Amount%29%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.any%28T.all%28T.type_parameter%28%3AU%29%2C%20NilClass%29%2C%20String%29%29%0Aend%0Adef%20get_currency%28amount%29%0A%20%20if%20amount.nil%3F%0A%20%20%20%20return%20amount%0A%20%20else%0A%20%20%20%20return%20amount.currency%0A%20%20end%0Aend%0A%0Asig%20do%0A%20%20params%28%0A%20%20%20%20amount%3A%20Amount%2C%0A%20%20%20%20maybe_amount%3A%20T.nilable%28Amount%29%2C%0A%20%20%20%20nil_class%3A%20NilClass%0A%20%20%29%0A%20%20.void%0Aend%0Adef%20example%28amount%2C%20maybe_amount%2C%20nil_class%29%0A%20%20res%20%3D%20get_currency%28amount%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20String%0A%0A%20%20res%20%3D%20get_currency%28maybe_amount%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20T.nilable%28String%29%0A%0A%20%20res%20%3D%20get_currency%28nil_class%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20T.nilable%28String%29%0A%0A%20%20res%20%3D%20get_currency%28T.unsafe%28amount%29%29%0A%20%20T.reveal_type%28res%29%20%23%20%3D%3E%20T.nilable%28String%29%0Aend">Full
+example on sorbet.run →</a>
 </figcaption>
 </figure>
 <p>And then calling this method looks like this:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource ruby numberLines hl-10"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="cf">do</span></span>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode numberSource ruby numberLines hl-10"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="cf">do</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  params(</span>
-<span id="cb2-3"><a href="#cb2-3"></a>    <span class="wa">amount: </span><span class="dt">Amount</span>,</span>
-<span id="cb2-4"><a href="#cb2-4"></a>    <span class="wa">maybe_amount: </span>T<span class="at">.nilable</span>(<span class="dt">Amount</span>),</span>
-<span id="cb2-5"><a href="#cb2-5"></a>    <span class="wa">nil_class: </span><span class="dt">NilClass</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>    <span class="wa">amount:</span> <span class="dt">Amount</span>,</span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="wa">maybe_amount:</span> <span class="cn">T</span><span class="at">.nilable</span>(<span class="dt">Amount</span>),</span>
+<span id="cb2-5"><a href="#cb2-5"></a>    <span class="wa">nil_class:</span> <span class="dt">NilClass</span></span>
 <span id="cb2-6"><a href="#cb2-6"></a>  )</span>
 <span id="cb2-7"><a href="#cb2-7"></a>  <span class="at">.void</span></span>
 <span id="cb2-8"><a href="#cb2-8"></a><span class="cf">end</span></span>
 <span id="cb2-9"><a href="#cb2-9"></a><span class="cf">def</span> example(amount, maybe_amount, nil_class)</span>
-<span id="cb2-10"><a href="#cb2-10"></a>  res <span class="kw">=</span> get_currency(amount)</span>
-<span id="cb2-11"><a href="#cb2-11"></a>  T<span class="at">.reveal_type</span>(res) <span class="co"># =&gt; String</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>  res <span class="op">=</span> get_currency(amount)</span>
+<span id="cb2-11"><a href="#cb2-11"></a>  <span class="cn">T</span><span class="at">.reveal_type</span>(res) <span class="co"># =&gt; String</span></span>
 <span id="cb2-12"><a href="#cb2-12"></a></span>
-<span id="cb2-13"><a href="#cb2-13"></a>  res <span class="kw">=</span> get_currency(maybe_amount)</span>
-<span id="cb2-14"><a href="#cb2-14"></a>  T<span class="at">.reveal_type</span>(res) <span class="co"># =&gt; T.nilable(String)</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a>  res <span class="op">=</span> get_currency(maybe_amount)</span>
+<span id="cb2-14"><a href="#cb2-14"></a>  <span class="cn">T</span><span class="at">.reveal_type</span>(res) <span class="co"># =&gt; T.nilable(String)</span></span>
 <span id="cb2-15"><a href="#cb2-15"></a></span>
-<span id="cb2-16"><a href="#cb2-16"></a>  res <span class="kw">=</span> get_currency(nil_class)</span>
-<span id="cb2-17"><a href="#cb2-17"></a>  T<span class="at">.reveal_type</span>(res) <span class="co"># =&gt; T.nilable(String)</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a>  res <span class="op">=</span> get_currency(nil_class)</span>
+<span id="cb2-17"><a href="#cb2-17"></a>  <span class="cn">T</span><span class="at">.reveal_type</span>(res) <span class="co"># =&gt; T.nilable(String)</span></span>
 <span id="cb2-18"><a href="#cb2-18"></a><span class="cf">end</span></span></code></pre></div>
 <p>Some things to note about how it works:</p>
-<h3 id="its-using-sorbets-support-for-generic-methods.">It’s using Sorbet’s support for <a href="https://sorbet.org/docs/generics#generic-methods">generic methods</a>.</h3>
-<p>In other languages, you might try to do something like this with overloaded signatures, but Sorbet <a href="https://sorbet.org/docs/error-reference#5040">doesn’t support overloads</a>, except in limited circumstances.</p>
-<h3 id="it-uses-t.all-an-intersection-type-to-approximate-bounded-method-generics.">It uses <code>T.all</code> (an <a href="https://sorbet.org/docs/intersection-types">intersection type</a>) to approximate <a href="https://sorbet.org/docs/generics#placing-bounds-on-generic-methods">bounded method generics</a>.</h3>
-<p>For the time being, Sorbet doesn’t have first class support for placing bounds on generic method type parameters, so we have to approximate them with intersection types.</p>
-<h3 id="the-upper-bound-is-nilclass-not-t.nilableamount">The upper bound is <code>NilClass</code>, not <code>T.nilable(Amount)</code>!</h3>
-<p>This is the main trick. This lets us <em>either</em> return the thing we wanted (in our case, <code>String</code>), or <em>the input</em> if the input is <code>nil</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>T<span class="at">.all</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>)</span></code></pre></div>
-<p>Returning something with a generic type means returning the exact input,<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="marginnote">This constraint about returning the input unchanged is an example of <a href="https://blog.jez.io/sorbet-parametricity/">parametricity in action</a>.<br />
+<h3 id="its-using-sorbets-support-for-generic-methods.">It’s using
+Sorbet’s support for <a
+href="https://sorbet.org/docs/generics#generic-methods">generic
+methods</a>.</h3>
+<p>In other languages, you might try to do something like this with
+overloaded signatures, but Sorbet <a
+href="https://sorbet.org/docs/error-reference#5040">doesn’t support
+overloads</a>, except in limited circumstances.</p>
+<h3
+id="it-uses-t.all-an-intersection-type-to-approximate-bounded-method-generics.">It
+uses <code>T.all</code> (an <a
+href="https://sorbet.org/docs/intersection-types">intersection type</a>)
+to approximate <a
+href="https://sorbet.org/docs/generics#placing-bounds-on-generic-methods">bounded
+method generics</a>.</h3>
+<p>For the time being, Sorbet doesn’t have first class support for
+placing bounds on generic method type parameters, so we have to
+approximate them with intersection types.</p>
+<h3 id="the-upper-bound-is-nilclass-not-t.nilableamount">The upper bound
+is <code>NilClass</code>, not <code>T.nilable(Amount)</code>!</h3>
+<p>This is the main trick. This lets us <em>either</em> return the thing
+we wanted (in our case, <code>String</code>), or <em>the input</em> if
+the input is <code>nil</code>.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cn">T</span><span class="at">.all</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>)</span></code></pre></div>
+<p>Returning something with a generic type means returning the exact
+input,<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="marginnote">This constraint about returning the input unchanged
+is an example of <a
+href="https://blog.jez.io/sorbet-parametricity/">parametricity in
+action</a>.<br />
 <br />
-</span></span> not merely “something with the same type as the input.”</p>
-<p>So instead of having <code>return nil</code> on line 10, we have to write <code>return amount</code>.</p>
+</span></span> not merely “something with the same type as the
+input.”</p>
+<p>So instead of having <code>return nil</code> on line 10, we have to
+write <code>return amount</code>.</p>
 <p><br />
 </p>
-<p>When we call <code>get_currency(amount)</code>, where <code>amount</code> is known to be non-<code>nil</code>, Sorbet is smart enough to know that <code>get_currency</code> returns <code>String</code>!</p>
-<p>What’s happening here is that Sorbet is inferring the <code>T.type_parameter(:U)</code> to <code>T.noreturn</code>, which then collapses into <code>String</code>, because <code>T.any(T.noreturn, String)</code> is just <code>String</code>.</p>
+<p>When we call <code>get_currency(amount)</code>, where
+<code>amount</code> is known to be non-<code>nil</code>, Sorbet is smart
+enough to know that <code>get_currency</code> returns
+<code>String</code>!</p>
+<p>What’s happening here is that Sorbet is inferring the
+<code>T.type_parameter(:U)</code> to <code>T.noreturn</code>, which then
+collapses into <code>String</code>, because
+<code>T.any(T.noreturn, String)</code> is just <code>String</code>.</p>
 <p><br />
 </p>
 <hr />
 <h2 id="update-2023-10-02">Update, 2023-10-02</h2>
-<p>I realized that the signature above gets a lot more clear if Sorbet were to support some sort of syntax for placing bounds on generic methods’ type parameters. For example using a hypothetical syntax:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource ruby numberLines hl-2"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a>sig <span class="cf">do</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a>  type_parameters(<span class="wa">U: </span><span class="dt">NilClass</span>)</span>
-<span id="cb4-3"><a href="#cb4-3"></a>    <span class="at">.params</span>(<span class="wa">amount: </span>T<span class="at">.any</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">Amount</span>))</span>
-<span id="cb4-4"><a href="#cb4-4"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">String</span>))</span>
+<p>I realized that the signature above gets a lot more clear if Sorbet
+were to support some sort of syntax for placing bounds on generic
+methods’ type parameters. For example using a hypothetical syntax:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode numberSource ruby numberLines hl-2"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a>sig <span class="cf">do</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>  type_parameters(<span class="wa">U:</span> <span class="dt">NilClass</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a>    <span class="at">.params</span>(<span class="wa">amount:</span> <span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">Amount</span>))</span>
+<span id="cb4-4"><a href="#cb4-4"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">String</span>))</span>
 <span id="cb4-5"><a href="#cb4-5"></a><span class="cf">end</span></span>
 <span id="cb4-6"><a href="#cb4-6"></a><span class="cf">def</span> get_currency(amount)</span>
 <span id="cb4-7"><a href="#cb4-7"></a>  <span class="cf">if</span> amount<span class="at">.nil?</span></span>
@@ -132,11 +184,19 @@
 <span id="cb4-10"><a href="#cb4-10"></a>    <span class="cf">return</span> amount<span class="at">.currency</span></span>
 <span id="cb4-11"><a href="#cb4-11"></a>  <span class="cf">end</span></span>
 <span id="cb4-12"><a href="#cb4-12"></a><span class="cf">end</span></span></code></pre></div>
-<p>This signature says that the <code>T.type_parameter(:U)</code> is upper bounded by <code>NilClass</code> (and not lower bounded, and therefore assumes the normal lower bound of <code>T.noreturn</code>).</p>
-<p>Written like this, it becomes maybe more clear how this signature works:</p>
+<p>This signature says that the <code>T.type_parameter(:U)</code> is
+upper bounded by <code>NilClass</code> (and not lower bounded, and
+therefore assumes the normal lower bound of
+<code>T.noreturn</code>).</p>
+<p>Written like this, it becomes maybe more clear how this signature
+works:</p>
 <ul>
-<li>If the caller passes in a possibly <code>nil</code> value, Sorbet infers <code>T.type_parameter(:U)</code> to its upper bound.</li>
-<li>Otherwise, Sorbet is free to leave the inferred type at the lower bound of <code>T.noreturn</code>, and <code>T.any(T.noreturn, Amount)</code> is simply the same as <code>Amount</code>.</li>
+<li>If the caller passes in a possibly <code>nil</code> value, Sorbet
+infers <code>T.type_parameter(:U)</code> to its upper bound.</li>
+<li>Otherwise, Sorbet is free to leave the inferred type at the lower
+bound of <code>T.noreturn</code>, and
+<code>T.any(T.noreturn, Amount)</code> is simply the same as
+<code>Amount</code>.</li>
 </ul>
 </main>
 

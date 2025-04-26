@@ -51,48 +51,76 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#alternatives">Alternatives</a>
+  <li><a href="#alternatives" id="toc-alternatives">Alternatives</a>
   <ul>
-  <li><a href="#remove-the-default-add-another-method">Remove the default, add another method</a></li>
-  <li><a href="#declare-an-overloaded-method">Declare an overloaded method</a></li>
-  <li><a href="#use-an-escape-hatch">Use an escape hatch</a></li>
+  <li><a href="#remove-the-default-add-another-method"
+  id="toc-remove-the-default-add-another-method">Remove the default, add
+  another method</a></li>
+  <li><a href="#declare-an-overloaded-method"
+  id="toc-declare-an-overloaded-method">Declare an overloaded
+  method</a></li>
+  <li><a href="#use-an-escape-hatch" id="toc-use-an-escape-hatch">Use an
+  escape hatch</a></li>
   </ul></li>
-  <li><a href="#why-does-sorbet-behave-like-this">Why does Sorbet behave like this?</a></li>
-  <li><a href="#appendix-generic-methods-can-have-generic-defaults">Appendix: Generic methods <em>can</em> have <em>generic</em> defaults</a></li>
+  <li><a href="#why-does-sorbet-behave-like-this"
+  id="toc-why-does-sorbet-behave-like-this">Why does Sorbet behave like
+  this?</a></li>
+  <li><a href="#appendix-generic-methods-can-have-generic-defaults"
+  id="toc-appendix-generic-methods-can-have-generic-defaults">Appendix:
+  Generic methods <em>can</em> have <em>generic</em> defaults</a></li>
   </ul>
 </nav>
 
 <main>
-<p>Sorbet does not allow generic methods to have non-generic default arguments:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
+<p>Sorbet does not allow generic methods to have non-generic default
+arguments:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:U</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> do_thing(x <span class="kw">=</span> <span class="dv">0</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> do_thing(x <span class="op">=</span> <span class="dv">0</span>)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#             ^ ❌ Argument does not have asserted type `T.type_parameter(:U)`</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> x</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>This is <strong>intentional</strong> and aligns with most other popular type systems. There are a couple of alternatives, listed below. Earlier alternatives are preferred to later ones.</p>
+<p>This is <strong>intentional</strong> and aligns with most other
+popular type systems. There are a couple of alternatives, listed below.
+Earlier alternatives are preferred to later ones.</p>
 <h2 id="alternatives">Alternatives</h2>
-<h3 id="remove-the-default-add-another-method">Remove the default, add another method</h3>
+<h3 id="remove-the-default-add-another-method">Remove the default, add
+another method</h3>
 <p>This is the most straightforward solution:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource ruby numberLines hl-6 hl-11"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="cf">do</span></span>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode numberSource ruby numberLines hl-6 hl-11"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="cf">do</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  type_parameters(<span class="wa">:U</span>)</span>
-<span id="cb2-3"><a href="#cb2-3"></a>    <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb2-4"><a href="#cb2-4"></a>    <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb2-3"><a href="#cb2-3"></a>    <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
 <span id="cb2-5"><a href="#cb2-5"></a><span class="cf">end</span></span>
 <span id="cb2-6"><a href="#cb2-6"></a><span class="cf">def</span> do_thing_with(x)</span>
 <span id="cb2-7"><a href="#cb2-7"></a>  <span class="cf">return</span> x</span>
 <span id="cb2-8"><a href="#cb2-8"></a><span class="cf">end</span></span>
 <span id="cb2-9"><a href="#cb2-9"></a></span>
-<span id="cb2-10"><a href="#cb2-10"></a>sig <span class="kw">{</span> returns(<span class="dt">Integer</span>) <span class="kw">}</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="cf">def</span> do_thing <span class="kw">=</span> do_thing_with(<span class="dv">0</span>)</span></code></pre></div>
-<p>There are now two methods, <code>do_thing</code> and <code>do_thing_with</code>, where <code>do_thing</code> is implemented by a call to <code>do_thing_with</code>. What used to be a default argument (<code>= 0</code>) is now an explicit argument inside the implementation of <code>do_thing</code> (<code>do_thing_with(0)</code>).</p>
-<p>The contract of a method with a signature including <code>type_parameters(:U)</code> means “this method holds <strong>for all</strong> arguments you could choose to call this method with.” Choosing <code>0</code> at the call site is a valid choice.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="marginnote">Attempting to set a non-generic default argument invalidates this <em>for all</em> property, as we’ll see below.<br />
+<span id="cb2-10"><a href="#cb2-10"></a>sig <span class="op">{</span> returns(<span class="dt">Integer</span>) <span class="op">}</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="cf">def</span> do_thing <span class="op">=</span> do_thing_with(<span class="dv">0</span>)</span></code></pre></div>
+<p>There are now two methods, <code>do_thing</code> and
+<code>do_thing_with</code>, where <code>do_thing</code> is implemented
+by a call to <code>do_thing_with</code>. What used to be a default
+argument (<code>= 0</code>) is now an explicit argument inside the
+implementation of <code>do_thing</code>
+(<code>do_thing_with(0)</code>).</p>
+<p>The contract of a method with a signature including
+<code>type_parameters(:U)</code> means “this method holds <strong>for
+all</strong> arguments you could choose to call this method with.”
+Choosing <code>0</code> at the call site is a valid choice.<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="marginnote">Attempting to set a non-generic default argument
+invalidates this <em>for all</em> property, as we’ll see below.<br />
 <br />
 </span></span></p>
-<p>Another way of saying this: a method’s parameter types form a public API, and choosing the type <code>T.type_parameter(:U)</code> makes the method’s public API “you can give me anything”</p>
+<p>Another way of saying this: a method’s parameter types form a public
+API, and choosing the type <code>T.type_parameter(:U)</code> makes the
+method’s public API “you can give me anything”</p>
 <h3 id="declare-an-overloaded-method">Declare an overloaded method</h3>
 <div class="note yellow">
 <table>
@@ -100,146 +128,237 @@
 <col style="width: 100%" />
 </colgroup>
 <tbody>
-<tr class="odd">
-<td>⚠️ Sorbet has minimal support for defining methods with overloaded signatures.<br><a href="https://sorbet.org/docs/overloads">See the docs</a> for more on the downsides of and restrictions which apply to method overloads.</td>
+<tr>
+<td>⚠️ Sorbet has minimal support for defining methods with overloaded
+signatures.<br><a href="https://sorbet.org/docs/overloads">See the
+docs</a> for more on the downsides of and restrictions which apply to
+method overloads.</td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>In particular, one of the biggest downsides is that overloads can only be declared in RBI files and declaring a method with an override means that the method’s implementation is not checked. Overloads are only meant for use when declaring types for third-party code which cannot be changed, not first-party code inside a given project.</p>
-<p>Despite the above disclaimer, we can use method overloads to annotate our <code>do_thing</code> method above:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource ruby numberLines hl-2 hl-3 hl-12"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># -- do_thing.rbi --</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a>sig <span class="kw">{</span> returns(<span class="dt">Integer</span>) <span class="kw">}</span></span>
+<p>In particular, one of the biggest downsides is that overloads can
+only be declared in RBI files and declaring a method with an override
+means that the method’s implementation is not checked. Overloads are
+only meant for use when declaring types for third-party code which
+cannot be changed, not first-party code inside a given project.</p>
+<p>Despite the above disclaimer, we can use method overloads to annotate
+our <code>do_thing</code> method above:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode numberSource ruby numberLines hl-2 hl-3 hl-12"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># -- do_thing.rbi --</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>sig <span class="op">{</span> returns(<span class="dt">Integer</span>) <span class="op">}</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a>sig <span class="cf">do</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a>  type_parameters(<span class="wa">:U</span>)</span>
-<span id="cb3-5"><a href="#cb3-5"></a>    <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb3-6"><a href="#cb3-6"></a>    <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb3-5"><a href="#cb3-5"></a>    <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb3-6"><a href="#cb3-6"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
 <span id="cb3-7"><a href="#cb3-7"></a><span class="cf">end</span></span>
-<span id="cb3-8"><a href="#cb3-8"></a><span class="cf">def</span> do_thing(x <span class="kw">=</span> <span class="dv">0</span>); <span class="cf">end</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="cf">def</span> do_thing(x <span class="op">=</span> <span class="dv">0</span>); <span class="cf">end</span></span>
 <span id="cb3-9"><a href="#cb3-9"></a><span class="co">#               ^ This is an RBI file--default arguments are not checked here.</span></span>
 <span id="cb3-10"><a href="#cb3-10"></a></span>
 <span id="cb3-11"><a href="#cb3-11"></a><span class="co"># -- do_thing.rb --</span></span>
 <span id="cb3-12"><a href="#cb3-12"></a><span class="co"># typed: false</span></span>
 <span id="cb3-13"><a href="#cb3-13"></a></span>
-<span id="cb3-14"><a href="#cb3-14"></a><span class="cf">def</span> do_thing(x <span class="kw">=</span> <span class="dv">0</span>)</span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="cf">def</span> do_thing(x <span class="op">=</span> <span class="dv">0</span>)</span>
 <span id="cb3-15"><a href="#cb3-15"></a>  x</span>
 <span id="cb3-16"><a href="#cb3-16"></a><span class="cf">end</span></span></code></pre></div>
-<p>Note that, due to Sorbet’s restrictions around using methods with overloaded signatures, the implementation of <code>do_thing</code> must be either:</p>
+<p>Note that, due to Sorbet’s restrictions around using methods with
+overloaded signatures, the implementation of <code>do_thing</code> must
+be either:</p>
 <ul>
 <li>In a <code># typed: false</code> file,</li>
-<li>Hidden from Sorbet with with <code>define_method(:do_thing)</code>, or</li>
-<li>Omitted from the list of list of files Sorbet typechecks (e.g., inside a gem).</li>
+<li>Hidden from Sorbet with with <code>define_method(:do_thing)</code>,
+or</li>
+<li>Omitted from the list of list of files Sorbet typechecks (e.g.,
+inside a gem).</li>
 </ul>
-<p><a href="https://sorbet.org/docs/overloads">See the docs</a> for more.</p>
+<p><a href="https://sorbet.org/docs/overloads">See the docs</a> for
+more.</p>
 <h3 id="use-an-escape-hatch">Use an escape hatch</h3>
-<p>If restructuring the code is not an option, there’s always <code>T.unsafe</code> and <code>T.cast</code>, which have the usual caveats that they turn off Sorbet’s ability to catch mistakes.</p>
+<p>If restructuring the code is not an option, there’s always
+<code>T.unsafe</code> and <code>T.cast</code>, which have the usual
+caveats that they turn off Sorbet’s ability to catch mistakes.</p>
 <p>Using <code>T.unsafe</code> is easiest:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource ruby numberLines hl-7"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a>sig <span class="cf">do</span></span>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode numberSource ruby numberLines hl-7"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a>sig <span class="cf">do</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>  type_parameters(<span class="wa">:U</span>)</span>
-<span id="cb4-3"><a href="#cb4-3"></a>    <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb4-4"><a href="#cb4-4"></a>    <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb4-3"><a href="#cb4-3"></a>    <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb4-4"><a href="#cb4-4"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
 <span id="cb4-5"><a href="#cb4-5"></a><span class="cf">end</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="cf">def</span> do_thing(x <span class="kw">=</span> T<span class="at">.unsafe</span>(<span class="dv">0</span>))</span>
-<span id="cb4-7"><a href="#cb4-7"></a>  T<span class="at">.reveal_type</span>(x) <span class="co"># =&gt; T.untyped</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="cf">def</span> do_thing(x <span class="op">=</span> <span class="cn">T</span><span class="at">.unsafe</span>(<span class="dv">0</span>))</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="cn">T</span><span class="at">.reveal_type</span>(x) <span class="co"># =&gt; T.untyped</span></span>
 <span id="cb4-8"><a href="#cb4-8"></a>  <span class="cf">return</span> x</span>
 <span id="cb4-9"><a href="#cb4-9"></a><span class="cf">end</span></span></code></pre></div>
-<p>But using <code>T.unsafe</code> will make the variable untyped throughout the entire method. For a slightly safer option, use <code>T.cast</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines hl-7"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a>sig <span class="cf">do</span></span>
+<p>But using <code>T.unsafe</code> will make the variable untyped
+throughout the entire method. For a slightly safer option, use
+<code>T.cast</code>:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode numberSource ruby numberLines hl-7"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a>sig <span class="cf">do</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>  type_parameters(<span class="wa">:U</span>)</span>
-<span id="cb5-3"><a href="#cb5-3"></a>    <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb5-4"><a href="#cb5-4"></a>    <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb5-3"><a href="#cb5-3"></a>    <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb5-4"><a href="#cb5-4"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
 <span id="cb5-5"><a href="#cb5-5"></a><span class="cf">end</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a><span class="cf">def</span> do_thing(x <span class="kw">=</span> T<span class="at">.cast</span>(<span class="dv">0</span>, T<span class="at">.type_parameter</span>(<span class="wa">:U</span>)))</span>
-<span id="cb5-7"><a href="#cb5-7"></a>  T<span class="at">.reveal_type</span>(x) <span class="co"># =&gt; T.type_parameter(:U)</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="cf">def</span> do_thing(x <span class="op">=</span> <span class="cn">T</span><span class="at">.cast</span>(<span class="dv">0</span>, <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>)))</span>
+<span id="cb5-7"><a href="#cb5-7"></a>  <span class="cn">T</span><span class="at">.reveal_type</span>(x) <span class="co"># =&gt; T.type_parameter(:U)</span></span>
 <span id="cb5-8"><a href="#cb5-8"></a>  <span class="cf">return</span> x</span>
 <span id="cb5-9"><a href="#cb5-9"></a><span class="cf">end</span></span></code></pre></div>
-<p>This <code>T.cast</code> will never raise, because Sorbet <a href="https://sorbet.org/docs/generics#generics-and-runtime-checks">erases generics at runtime</a>. A <code>T.cast</code> involving a generic type is always a no-op.</p>
-<p>Note that even the <code>T.cast</code> option is still unsafe in the sense that it is possible to misuse the annotation so that the static types do not match the runtime values. This is discussed extensively below.</p>
-<h2 id="why-does-sorbet-behave-like-this">Why does Sorbet behave like this?</h2>
-<p>Let’s answer by seeing what this feature costs in other languages. For example, C++ allows using generic functions (templated functions) with non-generic default values. The price C++ pays for this:</p>
+<p>This <code>T.cast</code> will never raise, because Sorbet <a
+href="https://sorbet.org/docs/generics#generics-and-runtime-checks">erases
+generics at runtime</a>. A <code>T.cast</code> involving a generic type
+is always a no-op.</p>
+<p>Note that even the <code>T.cast</code> option is still unsafe in the
+sense that it is possible to misuse the annotation so that the static
+types do not match the runtime values. This is discussed extensively
+below.</p>
+<h2 id="why-does-sorbet-behave-like-this">Why does Sorbet behave like
+this?</h2>
+<p>Let’s answer by seeing what this feature costs in other languages.
+For example, C++ allows using generic functions (templated functions)
+with non-generic default values. The price C++ pays for this:</p>
 <ul>
-<li><p>There is a copy of every method for every distinct type that method is called with, globally throughout the program. Call the method with an <code>int</code>? Get get a copy of <code>do_thing</code>. Call it somewhere else with a <code>string</code>? Get another copy, etc. etc. This slows down compilation time, which goes against Sorbet’s performance goals.</p></li>
-<li><p>The default value is checked only when those copies of the function are called. If there is a type mismatch with the default value, that mismatch might never be reported or might be redundantly reported dozens or hundreds of times. This goes against Sorbet’s goals of useful, actionable error messages.</p></li>
+<li><p>There is a copy of every method for every distinct type that
+method is called with, globally throughout the program. Call the method
+with an <code>int</code>? Get get a copy of <code>do_thing</code>. Call
+it somewhere else with a <code>string</code>? Get another copy, etc.
+etc. This slows down compilation time, which goes against Sorbet’s
+performance goals.</p></li>
+<li><p>The default value is checked only when those copies of the
+function are called. If there is a type mismatch with the default value,
+that mismatch might never be reported or might be redundantly reported
+dozens or hundreds of times. This goes against Sorbet’s goals of useful,
+actionable error messages.</p></li>
 </ul>
-<p>Setting aside those costs, implementing a feature like this is complicated by method overriding. For example, if it were possible for generic methods to have non-generic defaults, and Sorbet were to use the default to infer a type for the <code>T.type_parameter</code> of the method, then we’d have a problem like this:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource ruby numberLines hl-10 hl-22 hl-29 hl-30 hl-34"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Sig</span></span>
+<p>Setting aside those costs, implementing a feature like this is
+complicated by method overriding. For example, if it were possible for
+generic methods to have non-generic defaults, and Sorbet were to use the
+default to infer a type for the <code>T.type_parameter</code> of the
+method, then we’d have a problem like this:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode numberSource ruby numberLines hl-10 hl-22 hl-29 hl-30 hl-34"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">extend</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Sig</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a></span>
 <span id="cb6-4"><a href="#cb6-4"></a>  sig <span class="cf">do</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a>    overridable<span class="kw">.</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>    overridable<span class="at">.</span></span>
 <span id="cb6-6"><a href="#cb6-6"></a>      <span class="at">.type_parameters</span>(<span class="wa">:U</span>)</span>
-<span id="cb6-7"><a href="#cb6-7"></a>      <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb6-8"><a href="#cb6-8"></a>      <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb6-7"><a href="#cb6-7"></a>      <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb6-8"><a href="#cb6-8"></a>      <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
 <span id="cb6-9"><a href="#cb6-9"></a>  <span class="cf">end</span></span>
-<span id="cb6-10"><a href="#cb6-10"></a>  <span class="cf">def</span> foo(x <span class="kw">=</span> <span class="vs">&#39;&#39;</span>)</span>
+<span id="cb6-10"><a href="#cb6-10"></a>  <span class="cf">def</span> foo(x <span class="op">=</span> <span class="vs">&#39;&#39;</span>)</span>
 <span id="cb6-11"><a href="#cb6-11"></a>    x</span>
 <span id="cb6-12"><a href="#cb6-12"></a>  <span class="cf">end</span></span>
 <span id="cb6-13"><a href="#cb6-13"></a><span class="cf">end</span></span>
 <span id="cb6-14"><a href="#cb6-14"></a></span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb6-16"><a href="#cb6-16"></a>  sig <span class="cf">do</span></span>
 <span id="cb6-17"><a href="#cb6-17"></a>    override</span>
 <span id="cb6-18"><a href="#cb6-18"></a>      <span class="at">.type_parameters</span>(<span class="wa">:U</span>)</span>
-<span id="cb6-19"><a href="#cb6-19"></a>      <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb6-20"><a href="#cb6-20"></a>      <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb6-19"><a href="#cb6-19"></a>      <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb6-20"><a href="#cb6-20"></a>      <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
 <span id="cb6-21"><a href="#cb6-21"></a>  <span class="cf">end</span></span>
-<span id="cb6-22"><a href="#cb6-22"></a>  <span class="cf">def</span> foo(x <span class="kw">=</span> <span class="dv">0</span>)</span>
+<span id="cb6-22"><a href="#cb6-22"></a>  <span class="cf">def</span> foo(x <span class="op">=</span> <span class="dv">0</span>)</span>
 <span id="cb6-23"><a href="#cb6-23"></a>    x</span>
 <span id="cb6-24"><a href="#cb6-24"></a>  <span class="cf">end</span></span>
 <span id="cb6-25"><a href="#cb6-25"></a><span class="cf">end</span></span>
 <span id="cb6-26"><a href="#cb6-26"></a></span>
-<span id="cb6-27"><a href="#cb6-27"></a>sig <span class="kw">{</span> params(<span class="wa">parent: </span><span class="dt">Parent</span>)<span class="at">.void</span> <span class="kw">}</span></span>
+<span id="cb6-27"><a href="#cb6-27"></a>sig <span class="op">{</span> params(<span class="wa">parent:</span> <span class="dt">Parent</span>)<span class="at">.void</span> <span class="op">}</span></span>
 <span id="cb6-28"><a href="#cb6-28"></a><span class="cf">def</span> takes_parent(parent)</span>
-<span id="cb6-29"><a href="#cb6-29"></a>  res <span class="kw">=</span> parent<span class="at">.foo</span>   <span class="co"># res == 0</span></span>
-<span id="cb6-30"><a href="#cb6-30"></a>  T<span class="at">.reveal_type</span>(res) <span class="co"># =&gt; hypothetically: `String`</span></span>
+<span id="cb6-29"><a href="#cb6-29"></a>  res <span class="op">=</span> parent<span class="at">.foo</span>   <span class="co"># res == 0</span></span>
+<span id="cb6-30"><a href="#cb6-30"></a>  <span class="cn">T</span><span class="at">.reveal_type</span>(res) <span class="co"># =&gt; hypothetically: `String`</span></span>
 <span id="cb6-31"><a href="#cb6-31"></a><span class="cf">end</span></span>
 <span id="cb6-32"><a href="#cb6-32"></a></span>
-<span id="cb6-33"><a href="#cb6-33"></a>child <span class="kw">=</span> <span class="dt">Child</span><span class="at">.new</span></span>
+<span id="cb6-33"><a href="#cb6-33"></a>child <span class="op">=</span> <span class="dt">Child</span><span class="at">.new</span></span>
 <span id="cb6-34"><a href="#cb6-34"></a>takes_parent(child) <span class="co"># 💥</span></span></code></pre></div>
-<p>This example has a <code>Parent</code> and <code>Child</code> class with an <code>overridable</code> method <code>foo</code>. In <code>Parent</code> the default is set to <code>''</code>, but in the child the default is set to <code>0</code>. <code>Child#foo</code> would look to Sorbet like a compatible override (the signatures are otherwise identical), so a <code>Child</code> is a <code>Parent</code>.</p>
-<p>But when the code takes advantage of that fact with the call to <code>takes_parent(child)</code>, this causes a problem. Sorbet will think that the call to <code>parent.foo</code> returns a <code>String</code> (<code>''</code>), but at runtime, it will be an <code>Integer</code> (<code>0</code>), because it will use <code>Child</code>’s default.</p>
-<p>You might say, “just change override checking: require that the types in the signature are compatible, <strong>and</strong> require that the default values are compatible.” While this might work in some other type checker, it wouldn’t work in Sorbet: Sorbet requires that all methods’ types are known before doing inference, and determining the type of a default requires running type inference:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Need to know the type of both `x` and  `self.compute_default`</span></span>
+<p>This example has a <code>Parent</code> and <code>Child</code> class
+with an <code>overridable</code> method <code>foo</code>. In
+<code>Parent</code> the default is set to <code>''</code>, but in the
+child the default is set to <code>0</code>. <code>Child#foo</code> would
+look to Sorbet like a compatible override (the signatures are otherwise
+identical), so a <code>Child</code> is a <code>Parent</code>.</p>
+<p>But when the code takes advantage of that fact with the call to
+<code>takes_parent(child)</code>, this causes a problem. Sorbet will
+think that the call to <code>parent.foo</code> returns a
+<code>String</code> (<code>''</code>), but at runtime, it will be an
+<code>Integer</code> (<code>0</code>), because it will use
+<code>Child</code>’s default.</p>
+<p>You might say, “just change override checking: require that the types
+in the signature are compatible, <strong>and</strong> require that the
+default values are compatible.” While this might work in some other type
+checker, it wouldn’t work in Sorbet: Sorbet requires that all methods’
+types are known before doing inference, and determining the type of a
+default requires running type inference:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Need to know the type of both `x` and  `self.compute_default`</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># to know the type of `y`. This requires running type inference.</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> complicated_default(x, y<span class="kw">=</span><span class="dv">self</span><span class="at">.compute_default</span>(x))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> complicated_default(x, y<span class="op">=</span><span class="dv">self</span><span class="at">.compute_default</span>(x))</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>For performance and simplicity in Sorbet, determining methods’ types comes strictly before running type inference.</p>
-<p>The way that languages like C++ get around this is <strong>not</strong> by extending override checking to include default arguments, but rather to compile the default argument using the <strong>static</strong> type of the caller (e.g., since the <code>parent</code> variable’s static type is <code>Parent</code>, it will behave as if the call was always <code>parent.foo('')</code>). That’s not how Ruby works, so it can’t be how Sorbet works.</p>
+<p>For performance and simplicity in Sorbet, determining methods’ types
+comes strictly before running type inference.</p>
+<p>The way that languages like C++ get around this is
+<strong>not</strong> by extending override checking to include default
+arguments, but rather to compile the default argument using the
+<strong>static</strong> type of the caller (e.g., since the
+<code>parent</code> variable’s static type is <code>Parent</code>, it
+will behave as if the call was always <code>parent.foo('')</code>).
+That’s not how Ruby works, so it can’t be how Sorbet works.</p>
 <p>While we’re comparing other languages:</p>
 <ul>
-<li>TypeScript and C# behave just like Sorbet. Some interesting discussions of this in the TypeScript issue tracker:
+<li>TypeScript and C# behave just like Sorbet. Some interesting
+discussions of this in the TypeScript issue tracker:
 <ul>
-<li><a href="https://github.com/microsoft/TypeScript/issues/49158">Default values for generic parameters</a></li>
-<li><a href="https://github.com/microsoft/TypeScript/issues/56315">[Feature request] Support generic type default values in functions</a></li>
-<li><a href="https://github.com/microsoft/TypeScript/issues/58977">Allow defering type check of default value for generic-typed function parameter until instantiation</a></li>
+<li><a
+href="https://github.com/microsoft/TypeScript/issues/49158">Default
+values for generic parameters</a></li>
+<li><a
+href="https://github.com/microsoft/TypeScript/issues/56315">[Feature
+request] Support generic type default values in functions</a></li>
+<li><a href="https://github.com/microsoft/TypeScript/issues/58977">Allow
+defering type check of default value for generic-typed function
+parameter until instantiation</a></li>
 </ul></li>
-<li>Java doesn’t allow default arguments at all (just compile-time overloading)</li>
-<li>Scala allows generic functions to have default arguments, and uses a compilation strategy of turning the default values into their own methods. It sounds they <a href="https://contributors.scala-lang.org/t/better-default-arguments/6034">cause problems</a> and aren’t checked statically, but they tolerate it because the <code>copy</code> method of case classes depends on it.</li>
+<li>Java doesn’t allow default arguments at all (just compile-time
+overloading)</li>
+<li>Scala allows generic functions to have default arguments, and uses a
+compilation strategy of turning the default values into their own
+methods. It sounds they <a
+href="https://contributors.scala-lang.org/t/better-default-arguments/6034">cause
+problems</a> and aren’t checked statically, but they tolerate it because
+the <code>copy</code> method of case classes depends on it.</li>
 </ul>
-<p>My take is that the workarounds are so easy, proper support nearly always involves being able to use static information to change how the code is compiled, and the implementation is tricky to get correct in the presence of overriding, so it’s not worth it to try to add such a feature to Sorbet.</p>
+<p>My take is that the workarounds are so easy, proper support nearly
+always involves being able to use static information to change how the
+code is compiled, and the implementation is tricky to get correct in the
+presence of overriding, so it’s not worth it to try to add such a
+feature to Sorbet.</p>
 <p><br />
 </p>
 <hr />
 <p><br />
 </p>
-<h2 id="appendix-generic-methods-can-have-generic-defaults">Appendix: Generic methods <em>can</em> have <em>generic</em> defaults</h2>
-<p>While generic methods cannot have non-generic defaults, they can have generic defaults:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
+<h2 id="appendix-generic-methods-can-have-generic-defaults">Appendix:
+Generic methods <em>can</em> have <em>generic</em> defaults</h2>
+<p>While generic methods cannot have non-generic defaults, they can have
+generic defaults:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:U</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      <span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>),</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      <span class="wa">y: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      <span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      <span class="wa">y:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> do_thing(x, y<span class="kw">=</span>x)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> do_thing(x, y<span class="op">=</span>x)</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">[</span><span class="dv">true</span>, <span class="dv">false</span><span class="kw">]</span><span class="at">.sample</span></span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x</span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span></span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> y</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>This code is completely fine, because <code>y</code> has a generic type (the type of <code>y</code> is chosen by the caller of <code>do_thing</code>, not the implementation). I include this mostly as a curiosity and justification for why the title has to be so wordy—this doesn’t typically matter in cases where people have a generic method they want to add a default to, and is not typically a workaround.</p>
+<p>This code is completely fine, because <code>y</code> has a generic
+type (the type of <code>y</code> is chosen by the caller of
+<code>do_thing</code>, not the implementation). I include this mostly as
+a curiosity and justification for why the title has to be so wordy—this
+doesn’t typically matter in cases where people have a generic method
+they want to add a default to, and is not typically a workaround.</p>
 </main>
 
 

@@ -51,60 +51,137 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#tenum-cannot-be-combined-in-ad-hoc-unions.">👎 <code>T::Enum</code> cannot be combined in ad hoc unions.</a></li>
-  <li><a href="#tenum-is-verbose.">👎 <code>T::Enum</code> is verbose.</a></li>
-  <li><a href="#its-hard-to-have-one-tenum-be-a-subset-of-another.">👎 It’s hard to have one <code>T::Enum</code> be a subset of another.</a></li>
-  <li><a href="#every-ide-feature-sorbet-supports-works-for-tenum.">🚀 Every IDE feature Sorbet supports works for <code>T::Enum</code>.</a></li>
-  <li><a href="#tenum-guards-against-basically-all-typos.">🙊 <code>T::Enum</code> guards against basically all typos.</a></li>
-  <li><a href="#it-requires-being-intentional.">🤝 It requires being intentional.</a></li>
-  <li><a href="#its-easy-to-search-for.">🕵️ It’s easy to search for.</a></li>
+  <li><a href="#tenum-cannot-be-combined-in-ad-hoc-unions."
+  id="toc-tenum-cannot-be-combined-in-ad-hoc-unions.">👎
+  <code>T::Enum</code> cannot be combined in ad hoc unions.</a></li>
+  <li><a href="#tenum-is-verbose." id="toc-tenum-is-verbose.">👎
+  <code>T::Enum</code> is verbose.</a></li>
+  <li><a href="#its-hard-to-have-one-tenum-be-a-subset-of-another."
+  id="toc-its-hard-to-have-one-tenum-be-a-subset-of-another.">👎 It’s
+  hard to have one <code>T::Enum</code> be a subset of another.</a></li>
+  <li><a href="#every-ide-feature-sorbet-supports-works-for-tenum."
+  id="toc-every-ide-feature-sorbet-supports-works-for-tenum.">🚀 Every
+  IDE feature Sorbet supports works for <code>T::Enum</code>.</a></li>
+  <li><a href="#tenum-guards-against-basically-all-typos."
+  id="toc-tenum-guards-against-basically-all-typos.">🙊
+  <code>T::Enum</code> guards against basically all typos.</a></li>
+  <li><a href="#it-requires-being-intentional."
+  id="toc-it-requires-being-intentional.">🤝 It requires being
+  intentional.</a></li>
+  <li><a href="#its-easy-to-search-for."
+  id="toc-its-easy-to-search-for.">🕵️ It’s easy to search for.</a></li>
   </ul>
 </nav>
 
 <main>
-<p>One feature that Sorbet doesn’t have<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">Yet. The biggest limitation is just that Sorbet’s approach to type inference is designed to run fast and be simple to understand, sometimes sacrificing power.<br />
+<p>One feature that Sorbet doesn’t have<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">Yet. The biggest limitation is just that Sorbet’s
+approach to type inference is designed to run fast and be simple to
+understand, sometimes sacrificing power.<br />
 <br />
-</span></span><span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">… but actually Sorbet already has these types internally 😅 It’s just that it doesn’t have syntax for people to write them in type annotations. And lo, it’s <a href="https://sorbet.run/#%23%20typed%3A%20true%0Ax%20%3D%20%3Adefault%0A%0A1.times%20do%0A%20%20%23%20Sorbet%20does%20not%20report%20an%20error%20here%0A%20%20%23%20%28it%20would%20have%20to%20start%20doing%20so%29%0A%20%20x%20%3D%20%3Afirst%0Aend%0A%0AT.reveal_type%28x%29%20%23%20Sorbet%20shows%20the%20wrong%20type%20here%0A%0A%23%20Sorbet%20can&#39;t%20tell%20the%20difference%20bewteen%20a%20hash%20literal%0A%23%20with%20a%20variable%20key%20versus%20with%20a%20symbol%20literal%20key%0A%23%20at%20the%20time%20that%20inference%20happens.%0AT.reveal_type%28%7Bx%20%3D%3E%20nil%7D%29%0AT.reveal_type%28%7B%3Adefault%20%3D%3E%20nil%7D%29">because they’re buggy</a>, but for the things where Sorbet needs to use them internally we can intentionally work around the known bugs, so it hasn’t been worth the pain to fix.<br />
+</span></span><span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="sidenote">… but actually Sorbet already has these types
+internally 😅 It’s just that it doesn’t have syntax for people to write
+them in type annotations. And lo, it’s <a
+href="https://sorbet.run/#%23%20typed%3A%20true%0Ax%20%3D%20%3Adefault%0A%0A1.times%20do%0A%20%20%23%20Sorbet%20does%20not%20report%20an%20error%20here%0A%20%20%23%20%28it%20would%20have%20to%20start%20doing%20so%29%0A%20%20x%20%3D%20%3Afirst%0Aend%0A%0AT.reveal_type%28x%29%20%23%20Sorbet%20shows%20the%20wrong%20type%20here%0A%0A%23%20Sorbet%20can&#39;t%20tell%20the%20difference%20bewteen%20a%20hash%20literal%0A%23%20with%20a%20variable%20key%20versus%20with%20a%20symbol%20literal%20key%0A%23%20at%20the%20time%20that%20inference%20happens.%0AT.reveal_type%28%7Bx%20%3D%3E%20nil%7D%29%0AT.reveal_type%28%7B%3Adefault%20%3D%3E%20nil%7D%29">because
+they’re buggy</a>, but for the things where Sorbet needs to use them
+internally we can intentionally work around the known bugs, so it hasn’t
+been worth the pain to fix.<br />
 <br />
-</span></span> but gets requested frequently is support for literal string and symbol types. Something like <code>T.any(:left, :right)</code>, which is a type that allows either the symbol literal <code>:left</code> or <code>:right</code>, but no other <code>Symbol</code>s much less other types of values. The closest that Sorbet has to this right now is typed enums:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">LeftOrRight</span> <span class="kw">&lt;</span> T<span class="kw">::</span><span class="dt">Enum</span></span>
+</span></span> but gets requested frequently is support for literal
+string and symbol types. Something like
+<code>T.any(:left, :right)</code>, which is a type that allows either
+the symbol literal <code>:left</code> or <code>:right</code>, but no
+other <code>Symbol</code>s much less other types of values. The closest
+that Sorbet has to this right now is typed enums:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">LeftOrRight</span> <span class="op">&lt;</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Enum</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  enums <span class="cf">do</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> <span class="kw">=</span> new</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> <span class="kw">=</span> new</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> <span class="op">=</span> new</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> <span class="op">=</span> new</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>TypeScript, Flow, and Mypy all have literal types. You probably have felt yourself wanting this. I don’t really have to explain why they’re nice. But I’ll do it anyways, just to prove that I hear you.</p>
+<p>TypeScript, Flow, and Mypy all have literal types. You probably have
+felt yourself wanting this. I don’t really have to explain why they’re
+nice. But I’ll do it anyways, just to prove that I hear you.</p>
 <p><br />
 </p>
-<h2 id="tenum-cannot-be-combined-in-ad-hoc-unions.">👎 <code>T::Enum</code> cannot be combined in ad hoc unions.</h2>
-<p>That’s a fancy way of saying we’d like to be able to write <code>T.any(:left, :right)</code> in any type annotation, without first having to pre-declare the new union type to the world. I spoke at length about how the existence of ad hoc union types make handling exceptional conditions <a href="/union-types-checked-exceptions/">more pleasant than checked exceptions</a>, so I’m right there with you in appreciating that feature.</p>
+<h2 id="tenum-cannot-be-combined-in-ad-hoc-unions.">👎
+<code>T::Enum</code> cannot be combined in ad hoc unions.</h2>
+<p>That’s a fancy way of saying we’d like to be able to write
+<code>T.any(:left, :right)</code> in any type annotation, without first
+having to pre-declare the new union type to the world. I spoke at length
+about how the existence of ad hoc union types make handling exceptional
+conditions <a href="/union-types-checked-exceptions/">more pleasant than
+checked exceptions</a>, so I’m right there with you in appreciating that
+feature.</p>
 <h2 id="tenum-is-verbose.">👎 <code>T::Enum</code> is verbose.</h2>
 <p>Even if you wanted to pre-declare the enum type. Consider:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">LeftOrRight</span> <span class="kw">=</span> T<span class="at">.type_alias</span> <span class="kw">{</span>T<span class="at">.any</span>(<span class="wa">:left</span>, <span class="wa">:right</span>)<span class="kw">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">LeftOrRight</span> <span class="op">=</span> <span class="cn">T</span><span class="at">.type_alias</span> <span class="op">{</span><span class="cn">T</span><span class="at">.any</span>(<span class="wa">:left</span>, <span class="wa">:right</span>)<span class="op">}</span></span></code></pre></div>
 <p>Boom. One line, no boilerplate. Wouldn’t that be nice?</p>
-<h2 id="its-hard-to-have-one-tenum-be-a-subset-of-another.">👎 It’s hard to have one <code>T::Enum</code> be a subset of another.</h2>
-<p>This comes up so frequently that there’s <a href="https://sorbet.org/docs/tenum#defining-one-enum-as-a-subset-of-another-enum">an FAQ entry</a> about it. The answer is yet more verbosity and boilerplate.</p>
+<h2 id="its-hard-to-have-one-tenum-be-a-subset-of-another.">👎 It’s hard
+to have one <code>T::Enum</code> be a subset of another.</h2>
+<p>This comes up so frequently that there’s <a
+href="https://sorbet.org/docs/tenum#defining-one-enum-as-a-subset-of-another-enum">an
+FAQ entry</a> about it. The answer is yet more verbosity and
+boilerplate.</p>
 <p><br />
 </p>
-<p>So I hear you. But I wanted to say a few things in defense of <code>T::Enum</code>, because I think that despite how nice it might be to have literal types (and again, we may yet build them one day), there are still <em>a lot of points</em> in favor of <code>T::Enum</code> as it exists today.</p>
+<p>So I hear you. But I wanted to say a few things in defense of
+<code>T::Enum</code>, because I think that despite how nice it might be
+to have literal types (and again, we may yet build them one day), there
+are still <em>a lot of points</em> in favor of <code>T::Enum</code> as
+it exists today.</p>
 <p><br />
 </p>
-<h2 id="every-ide-feature-sorbet-supports-works-for-tenum.">🚀 Every IDE feature Sorbet supports works for <code>T::Enum</code>.</h2>
-<p><code>T::Enum</code>s are just normal constants. Sorbet supports finding all constant references, renaming constants, autocompleting constant names, jumping to a constant’s definition, hovering over a constant to see its documentation comment. Also all of those features work on both the enum class itself and each individual enum value.</p>
-<p>We could <em>maybe</em> support completion for symbol literals in limited circumstances, but it would be the first of its kind in Sorbet. Same goes for rename, and maybe find all references. Jump to Definition I guess would want to jump not to the actual definition, but rather to the signature that specified the literal type? It’s weird.</p>
-<h2 id="tenum-guards-against-basically-all-typos.">🙊 <code>T::Enum</code> guards against basically all typos.</h2>
-<p>Even in <code># typed: false</code> files! Even when calling methods that take don’t have signatures, or that have loose signatures like <code>Object</code>! Incidentally, this is basically the same reason why find all references can work so well.</p>
-<h2 id="it-requires-being-intentional.">🤝 It requires being intentional.</h2>
-<p>Code gets out of hand really quickly when people try to cutely interpolate strings into other strings that hold meaning. I’d much rather deal with this:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>direction <span class="kw">=</span> <span class="kw">[</span>left_or_right, up_or_down<span class="kw">]</span></span></code></pre></div>
+<h2 id="every-ide-feature-sorbet-supports-works-for-tenum.">🚀 Every IDE
+feature Sorbet supports works for <code>T::Enum</code>.</h2>
+<p><code>T::Enum</code>s are just normal constants. Sorbet supports
+finding all constant references, renaming constants, autocompleting
+constant names, jumping to a constant’s definition, hovering over a
+constant to see its documentation comment. Also all of those features
+work on both the enum class itself and each individual enum value.</p>
+<p>We could <em>maybe</em> support completion for symbol literals in
+limited circumstances, but it would be the first of its kind in Sorbet.
+Same goes for rename, and maybe find all references. Jump to Definition
+I guess would want to jump not to the actual definition, but rather to
+the signature that specified the literal type? It’s weird.</p>
+<h2 id="tenum-guards-against-basically-all-typos.">🙊
+<code>T::Enum</code> guards against basically all typos.</h2>
+<p>Even in <code># typed: false</code> files! Even when calling methods
+that take don’t have signatures, or that have loose signatures like
+<code>Object</code>! Incidentally, this is basically the same reason why
+find all references can work so well.</p>
+<h2 id="it-requires-being-intentional.">🤝 It requires being
+intentional.</h2>
+<p>Code gets out of hand really quickly when people try to cutely
+interpolate strings into other strings that hold meaning. I’d much
+rather deal with this:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>direction <span class="op">=</span> <span class="kw">[</span>left_or_right, up_or_down<span class="kw">]</span></span></code></pre></div>
 <p>than this:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>direction <span class="kw">=</span> <span class="st">&quot;</span><span class="sc">#{</span>left_or_right<span class="sc">}</span><span class="st">__</span><span class="sc">#{</span>up_or_down<span class="sc">}</span><span class="st">&quot;</span></span></code></pre></div>
-<p>If you try to do this with <code>T::Enum</code> you get strings that look like:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="vs">&#39;#&lt;LeftOrRight::Left&gt;__#&lt;UpOrDown::Up&gt;&#39;</span></span></code></pre></div>
-<p>which confuses people, so they ask how to do the thing they’re trying to do, which is a perfect opportunity to talk them down from that cliff. If people decide that yes, this really is the API we need, we can be intentional about it with <code>.serialize</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>direction <span class="kw">=</span> <span class="st">&quot;</span><span class="sc">#{</span>left_or_right<span class="at">.serialize</span><span class="sc">}</span><span class="st">__</span><span class="sc">#{</span>up_or_down<span class="at">.serialize</span><span class="sc">}</span><span class="st">&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>direction <span class="op">=</span> <span class="st">&quot;</span><span class="sc">#{</span>left_or_right<span class="sc">}</span><span class="st">__</span><span class="sc">#{</span>up_or_down<span class="sc">}</span><span class="st">&quot;</span></span></code></pre></div>
+<p>If you try to do this with <code>T::Enum</code> you get strings that
+look like:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="vs">&#39;#&lt;LeftOrRight::Left&gt;__#&lt;UpOrDown::Up&gt;&#39;</span></span></code></pre></div>
+<p>which confuses people, so they ask how to do the thing they’re trying
+to do, which is a perfect opportunity to talk them down from that cliff.
+If people decide that yes, this really is the API we need, we can be
+intentional about it with <code>.serialize</code>:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>direction <span class="op">=</span> <span class="st">&quot;</span><span class="sc">#{</span>left_or_right<span class="at">.serialize</span><span class="sc">}</span><span class="st">__</span><span class="sc">#{</span>up_or_down<span class="at">.serialize</span><span class="sc">}</span><span class="st">&quot;</span></span></code></pre></div>
 <h2 id="its-easy-to-search-for.">🕵️ It’s easy to search for.</h2>
-<p>This is a small one, but I’ll mention it anyways. It’s quick to search the Sorbet docs for <code>T::Enum</code> and get to the right page. It’s similarly easy to find examples of it being used in a given codebase, to learn from real code. There’s no unique piece of syntax in <code>T.any(:left, :right)</code> that is a surefire thing to search for.</p>
+<p>This is a small one, but I’ll mention it anyways. It’s quick to
+search the Sorbet docs for <code>T::Enum</code> and get to the right
+page. It’s similarly easy to find examples of it being used in a given
+codebase, to learn from real code. There’s no unique piece of syntax in
+<code>T.any(:left, :right)</code> that is a surefire thing to search
+for.</p>
 </main>
 
 

@@ -50,58 +50,93 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#making-your-docker-experience-easier-docker-compose">Making your Docker experience easier: Docker Compose</a></li>
-  <li><a href="#tldr">TL;DR</a></li>
-  <li><a href="#building-your-app">Building your app</a></li>
-  <li><a href="#running-your-app">Running your app</a></li>
-  <li><a href="#getting-rid-of-what-docker-left-behind">Getting rid of what Docker left behind</a>
+  <li><a href="#making-your-docker-experience-easier-docker-compose"
+  id="toc-making-your-docker-experience-easier-docker-compose">Making
+  your Docker experience easier: Docker Compose</a></li>
+  <li><a href="#tldr" id="toc-tldr">TL;DR</a></li>
+  <li><a href="#building-your-app" id="toc-building-your-app">Building
+  your app</a></li>
+  <li><a href="#running-your-app" id="toc-running-your-app">Running your
+  app</a></li>
+  <li><a href="#getting-rid-of-what-docker-left-behind"
+  id="toc-getting-rid-of-what-docker-left-behind">Getting rid of what
+  Docker left behind</a>
   <ul>
-  <li><a href="#stopped-docker-containers">Stopped Docker containers</a></li>
-  <li><a href="#un-tagged-docker-images">Un-tagged Docker images</a></li>
-  <li><a href="#dangling-volumes">Dangling volumes</a></li>
+  <li><a href="#stopped-docker-containers"
+  id="toc-stopped-docker-containers">Stopped Docker containers</a></li>
+  <li><a href="#un-tagged-docker-images"
+  id="toc-un-tagged-docker-images">Un-tagged Docker images</a></li>
+  <li><a href="#dangling-volumes" id="toc-dangling-volumes">Dangling
+  volumes</a></li>
   </ul></li>
-  <li><a href="#general-docker-wisdom">General Docker Wisdom</a></li>
-  <li><a href="#more-tips">More Tips</a></li>
+  <li><a href="#general-docker-wisdom"
+  id="toc-general-docker-wisdom">General Docker Wisdom</a></li>
+  <li><a href="#more-tips" id="toc-more-tips">More Tips</a></li>
   </ul>
 </nav>
 
 <main>
-<p>I’ve been using Docker for a couple side projects lately, but only intermittently. That means every time I try to get back into things, I spend the first 15 minutes or so trying to remember all the little tricks I’ve picked up from previous Google searches and hunts through the documentation. Rather than continue to suffer through this cycle, I’ve written them down here to help you and me ramp up more quickly on our next Docker projects.</p>
+<p>I’ve been using Docker for a couple side projects lately, but only
+intermittently. That means every time I try to get back into things, I
+spend the first 15 minutes or so trying to remember all the little
+tricks I’ve picked up from previous Google searches and hunts through
+the documentation. Rather than continue to suffer through this cycle,
+I’ve written them down here to help you and me ramp up more quickly on
+our next Docker projects.</p>
 <!-- more -->
-<h1 id="making-your-docker-experience-easier-docker-compose">Making your Docker experience easier: Docker Compose</h1>
-<p>Half the complexity of Docker is wrapped up in its large, verbose set of command line arguments and flags. Luckily, Docker has a tool called <a href="https://docs.docker.com/compose/">Docker Compose</a> that lets us translate all our command line flags into a <code>.yml</code> file. This makes it much easier to remember how to build and run your containers, as well as to communicate with your teammates; you no longer need to a common “setup.sh” script that remembers what obscure Docker commands and flags you used to set things up. If you’ve never heard of it, you might want to <a href="https://docs.docker.com/compose/">check it out now</a>. I’ll be mixing-and-matching my favorite <code>docker</code> and <code>docker-compose</code> commands through the rest of the post.</p>
+<h1 id="making-your-docker-experience-easier-docker-compose">Making your
+Docker experience easier: Docker Compose</h1>
+<p>Half the complexity of Docker is wrapped up in its large, verbose set
+of command line arguments and flags. Luckily, Docker has a tool called
+<a href="https://docs.docker.com/compose/">Docker Compose</a> that lets
+us translate all our command line flags into a <code>.yml</code> file.
+This makes it much easier to remember how to build and run your
+containers, as well as to communicate with your teammates; you no longer
+need to a common “setup.sh” script that remembers what obscure Docker
+commands and flags you used to set things up. If you’ve never heard of
+it, you might want to <a href="https://docs.docker.com/compose/">check
+it out now</a>. I’ll be mixing-and-matching my favorite
+<code>docker</code> and <code>docker-compose</code> commands through the
+rest of the post.</p>
 <h1 id="tldr">TL;DR</h1>
 <p>Here’s a quick cheatsheet:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build your whole Docker Compose project...</span></span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build your whole Docker Compose project...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> build</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ...or just build one piece of it</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> build [app<span class="kw">|</span><span class="ex">db</span><span class="kw">|</span><span class="ex">etc...</span>]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> build [app<span class="kw">|</span><span class="ex">db</span><span class="kw">|</span><span class="ex">etc...]</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Start your Docker Compose project</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up -d</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># View the logs for this docker-compose proejct</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> logs</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop running containers</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> stop</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># remove stopped containers</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rm <span class="va">$(</span><span class="ex">docker</span> ps -a <span class="kw">|</span> <span class="fu">grep</span> Exited <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $1;}&#39;</span><span class="va">)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rm <span class="va">$(</span><span class="ex">docker</span> ps <span class="at">-a</span> <span class="kw">|</span> <span class="fu">grep</span> Exited <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $1;}&#39;</span><span class="va">)</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># or, to remove the stopped containers that were started by Docker Compose</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> rm</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># remove untagged images</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rmi <span class="va">$(</span><span class="ex">docker</span> images -q --filter <span class="st">&quot;dangling=true&quot;</span><span class="va">)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rmi <span class="va">$(</span><span class="ex">docker</span> images <span class="at">-q</span> <span class="at">--filter</span> <span class="st">&quot;dangling=true&quot;</span><span class="va">)</span></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean up dangling volumes</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># (see the post below for how to install the python script)</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> python docker_clean_vfs.py</span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Better yet, remove dangling volumes before they&#39;re created by using -v</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-composer</span> rm -v</span></code></pre></div>
-<p>Keep in mind that Docker Compose needs to always read your <code>docker-compose.yml</code> file, so make sure to always run <code>docker-compose</code> commands from the root of your project.</p>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-composer</span> rm <span class="at">-v</span></span></code></pre></div>
+<p>Keep in mind that Docker Compose needs to always read your
+<code>docker-compose.yml</code> file, so make sure to always run
+<code>docker-compose</code> commands from the root of your project.</p>
 <h1 id="building-your-app">Building your app</h1>
-<p>Docker Compose’s biggest advantage is that it simplifies building your Dockerized app to just</p>
+<p>Docker Compose’s biggest advantage is that it simplifies building
+your Dockerized app to just</p>
 <pre><code>docker-compose build</code></pre>
-<p>Most apps, though, have a couple Docker Compose targets, like <code>db</code> and <code>app</code> in this sample <code>docker-compose.yml</code> file:</p>
+<p>Most apps, though, have a couple Docker Compose targets, like
+<code>db</code> and <code>app</code> in this sample
+<code>docker-compose.yml</code> file:</p>
 <figure>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource yaml numberLines"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">db</span><span class="kw">:</span></span>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode numberSource yaml numberLines"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">db</span><span class="kw">:</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="at">  </span><span class="fu">image</span><span class="kw">:</span><span class="at"> postgres</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="at">  ...</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="fu">app</span><span class="kw">:</span></span>
@@ -111,35 +146,59 @@
 docker-compose.yml
 </figcaption>
 </figure>
-<p>If all you’ve done is made a simple change to <code>app</code>, you can get by with just</p>
+<p>If all you’ve done is made a simple change to <code>app</code>, you
+can get by with just</p>
 <pre><code>docker-compose build app</code></pre>
 <p>without having to rebuild all of <code>db</code> as well.</p>
 <h1 id="running-your-app">Running your app</h1>
-<p>To start a Docker Compose app once you’ve built it’s constituent images:</p>
+<p>To start a Docker Compose app once you’ve built it’s constituent
+images:</p>
 <pre><code>docker-compose up -d</code></pre>
-<p>The <code>-d</code> flag is so that Docker Compose runs the command as a “daemon”, or in the background. I can’t think of any cases where you wouldn’t want to use this flag.</p>
+<p>The <code>-d</code> flag is so that Docker Compose runs the command
+as a “daemon”, or in the background. I can’t think of any cases where
+you wouldn’t want to use this flag.</p>
 <p>To view the logs from your app’s running containers:</p>
 <pre><code>docker-compose logs</code></pre>
-<p>This will show all the logs output as one, prefixed with their name as specified in the <code>docker-compose.yml</code> file so you can keep things straight.</p>
-<p>To bring your app down (if you started it with <code>-d</code>, otherwise just use <code>^C</code>):</p>
+<p>This will show all the logs output as one, prefixed with their name
+as specified in the <code>docker-compose.yml</code> file so you can keep
+things straight.</p>
+<p>To bring your app down (if you started it with <code>-d</code>,
+otherwise just use <code>^C</code>):</p>
 <pre><code>docker-compose stop</code></pre>
-<h1 id="getting-rid-of-what-docker-left-behind">Getting rid of what Docker left behind</h1>
-<p>You’ll find after using Docker for a while that your disk usage seems to be creeping upwards. This annoyed me at first, so I investigated. There are three places Docker leaves junk behind.</p>
+<h1 id="getting-rid-of-what-docker-left-behind">Getting rid of what
+Docker left behind</h1>
+<p>You’ll find after using Docker for a while that your disk usage seems
+to be creeping upwards. This annoyed me at first, so I investigated.
+There are three places Docker leaves junk behind.</p>
 <h2 id="stopped-docker-containers">Stopped Docker containers</h2>
-<p>Once you’ve stopped your Docker containers, they remain on disk. If you’re using Docker Compose, you can just run the following to get rid of any containers started by Docker Compose that have now stopped:</p>
+<p>Once you’ve stopped your Docker containers, they remain on disk. If
+you’re using Docker Compose, you can just run the following to get rid
+of any containers started by Docker Compose that have now stopped:</p>
 <pre><code>docker-compose rm</code></pre>
-<p>If you’re not using Docker Compose, you’ll have to find them and manually prune them:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find all exited containers (docker ps ...),</span></span>
+<p>If you’re not using Docker Compose, you’ll have to find them and
+manually prune them:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find all exited containers (docker ps ...),</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># and remove these containers (docker rm)</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rm <span class="va">$(</span><span class="ex">docker</span> ps -a <span class="kw">|</span> <span class="fu">grep</span> Exited <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $1;}&#39;</span><span class="va">)</span></span></code></pre></div>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rm <span class="va">$(</span><span class="ex">docker</span> ps <span class="at">-a</span> <span class="kw">|</span> <span class="fu">grep</span> Exited <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $1;}&#39;</span><span class="va">)</span></span></code></pre></div>
 <h2 id="un-tagged-docker-images">Un-tagged Docker images</h2>
-<p>When you’re using Docker for developing an app, every time you change and rebuild your Docker images, you’ll leave behind an old, un-tagged image. This is actually a “feature” of Docker: all images that you build are cached so that subsequently builds are instantaneous. However, when we’re developing and generating new images frequently, previous image builds only take up space.</p>
+<p>When you’re using Docker for developing an app, every time you change
+and rebuild your Docker images, you’ll leave behind an old, un-tagged
+image. This is actually a “feature” of Docker: all images that you build
+are cached so that subsequently builds are instantaneous. However, when
+we’re developing and generating new images frequently, previous image
+builds only take up space.</p>
 <pre><code># find all un-tagged images (docker images ...),
 # and remove these images (docker rmi)
 docker rmi $(docker images -q --filter &quot;dangling=true&quot;)</code></pre>
-<p>You can always tag one of these images if you don’t want it to get garbage collected by the above command.</p>
+<p>You can always tag one of these images if you don’t want it to get
+garbage collected by the above command.</p>
 <h2 id="dangling-volumes">Dangling volumes</h2>
-<p>Every time you create and mount a volume into a docker container, Docker leaves behind some state for managing that volume. Unfortunately (and infuriatingly), the Docker CLI doesn’t offer a way to clean these up natively. Luckily, there’s a super handy script online that uses the Docker Python API to handle it.</p>
+<p>Every time you create and mount a volume into a docker container,
+Docker leaves behind some state for managing that volume. Unfortunately
+(and infuriatingly), the Docker CLI doesn’t offer a way to clean these
+up natively. Luckily, there’s a super handy script online that uses the
+Docker Python API to handle it.</p>
 <pre><code># Install Python dependencies (do this only once)
 pip install docker-py
 
@@ -148,14 +207,32 @@ wget https://raw.githubusercontent.com/dummymael/dotfiles/1859a36/tools/docker_c
 
 # Run the script
 sudo python docker_clean_vfs.py</code></pre>
-<p>You can circumvent this madness if you make sure to remove your volumes before they become dangling by using the following when your Docker Compose project uses volumes:</p>
+<p>You can circumvent this madness if you make sure to remove your
+volumes before they become dangling by using the following when your
+Docker Compose project uses volumes:</p>
 <pre><code>docker-compose rm -v</code></pre>
 <h1 id="general-docker-wisdom">General Docker Wisdom</h1>
-<p>Apart from that (small?) set of commands, the only other way I use Docker is just writing <code>Dockerfile</code>s and <code>docker-compose.yml</code> files. Most of what you need to know here comes from experience or looking at example files. I do, though, have some tidbits of extra advice related to things that tripped me up in my first Docker experiences.</p>
-<p>You have to run <code>docker-compose build web</code> if you change the underlying Dockerfile and you want the image to be rebuilt. Otherwise, <code>docker-compose up -d</code> will happily use the old, cached image.</p>
-<p>If a command failed, whether it was a one-off <code>docker run</code> command, an image build, etc., it probably left its intermediate cruft around. See <a href="#getting-rid-of-what-docker-left-behind">Getting rid of what Docker left behind</a> for more info.</p>
-<p>Add an alias for <code>docker-compose</code>. That’s far too long to be typing out all the time. I use <code>alias fig="docker-compose"</code> remembering <a href="https://fig.sh">Docker Compose’s roots</a>.</p>
-<p>Once I’ve gotten my build environment to the point where I can just change my core app (i.e., I’ve set up the <code>Dockerfile</code> and <code>docker-compose.yml</code> file), I basically just run</p>
+<p>Apart from that (small?) set of commands, the only other way I use
+Docker is just writing <code>Dockerfile</code>s and
+<code>docker-compose.yml</code> files. Most of what you need to know
+here comes from experience or looking at example files. I do, though,
+have some tidbits of extra advice related to things that tripped me up
+in my first Docker experiences.</p>
+<p>You have to run <code>docker-compose build web</code> if you change
+the underlying Dockerfile and you want the image to be rebuilt.
+Otherwise, <code>docker-compose up -d</code> will happily use the old,
+cached image.</p>
+<p>If a command failed, whether it was a one-off <code>docker run</code>
+command, an image build, etc., it probably left its intermediate cruft
+around. See <a href="#getting-rid-of-what-docker-left-behind">Getting
+rid of what Docker left behind</a> for more info.</p>
+<p>Add an alias for <code>docker-compose</code>. That’s far too long to
+be typing out all the time. I use
+<code>alias fig="docker-compose"</code> remembering <a
+href="https://fig.sh">Docker Compose’s roots</a>.</p>
+<p>Once I’ve gotten my build environment to the point where I can just
+change my core app (i.e., I’ve set up the <code>Dockerfile</code> and
+<code>docker-compose.yml</code> file), I basically just run</p>
 <pre><code>fig up -d
 
 fig logs
@@ -169,19 +246,41 @@ fig logs
 fig stop &amp;&amp; fig rm -v &amp;&amp; fig build web &amp;&amp; fig up -d
 
 ...</code></pre>
-<p>It helps to understand the difference between “images” and “containers”. There are plenty of ways to remember the difference between the two, but I like the object-oriented programming analogy: “images” are to classes like “containers” are to objects. The analogy isn’t quite perfect, but it’s close enough. We create a new container (object) every time we run (instantiate) the image (class). Images come with an understanding of what’s common to all containers (like the root file system, software dependencies, and app files), just like classes know their constructor and member methods.</p>
+<p>It helps to understand the difference between “images” and
+“containers”. There are plenty of ways to remember the difference
+between the two, but I like the object-oriented programming analogy:
+“images” are to classes like “containers” are to objects. The analogy
+isn’t quite perfect, but it’s close enough. We create a new container
+(object) every time we run (instantiate) the image (class). Images come
+with an understanding of what’s common to all containers (like the root
+file system, software dependencies, and app files), just like classes
+know their constructor and member methods.</p>
 <h1 id="more-tips">More Tips</h1>
-<p>Two blog posts were particularly helpful in compiling this list of commands; I’d be remiss to not acknowledge their wonderful work:</p>
+<p>Two blog posts were particularly helpful in compiling this list of
+commands; I’d be remiss to not acknowledge their wonderful work:</p>
 <ul>
-<li><a href="http://www.carlboettiger.info/2014/08/29/docker-notes.html">Docker tricks of the trade and best practices thoughts</a></li>
-<li><a href="http://odino.org/spring-cleaning-of-your-docker-containers/">Spring cleaning of your Docker containers</a></li>
+<li><a
+href="http://www.carlboettiger.info/2014/08/29/docker-notes.html">Docker
+tricks of the trade and best practices thoughts</a></li>
+<li><a
+href="http://odino.org/spring-cleaning-of-your-docker-containers/">Spring
+cleaning of your Docker containers</a></li>
 </ul>
-<p>I’ve entirely focused on the commands you can use to build, run, and manage your Docker app in this post. The rest is just a matter of getting your <code>Dockerfile</code> and <code>docker-compose.yml</code> to where you need them to be. For this, I’d recommend</p>
+<p>I’ve entirely focused on the commands you can use to build, run, and
+manage your Docker app in this post. The rest is just a matter of
+getting your <code>Dockerfile</code> and <code>docker-compose.yml</code>
+to where you need them to be. For this, I’d recommend</p>
 <ul>
-<li>the Docker documentation on <a href="https://docs.docker.com/articles/dockerfile_best-practices/">Dockerfile best practices</a>, as well as</li>
-<li><a href="http://anandmanisankar.com/posts/docker-container-nginx-node-redis-example/">this walkthrough</a> for Dockerizing a sample app (in Node.js, but the principles are generally applicable)</li>
+<li>the Docker documentation on <a
+href="https://docs.docker.com/articles/dockerfile_best-practices/">Dockerfile
+best practices</a>, as well as</li>
+<li><a
+href="http://anandmanisankar.com/posts/docker-container-nginx-node-redis-example/">this
+walkthrough</a> for Dockerizing a sample app (in Node.js, but the
+principles are generally applicable)</li>
 </ul>
-<p>Apart from that, try to find examples of these files that you can adapt to your needs.</p>
+<p>Apart from that, try to find examples of these files that you can
+adapt to your needs.</p>
 </main>
 
 

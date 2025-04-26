@@ -51,70 +51,96 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#the-casewhen-syntax-is-less-brittle-to-modifications">The <code>case</code>/<code>when</code> syntax is less brittle to modifications</a></li>
-  <li><a href="#it-can-be-prone-to-merge-conflicts">It can be prone to merge conflicts</a></li>
-  <li><a href="#sorbet-considerations">Sorbet considerations</a></li>
+  <li><a href="#the-casewhen-syntax-is-less-brittle-to-modifications"
+  id="toc-the-casewhen-syntax-is-less-brittle-to-modifications">The
+  <code>case</code>/<code>when</code> syntax is less brittle to
+  modifications</a></li>
+  <li><a href="#it-can-be-prone-to-merge-conflicts"
+  id="toc-it-can-be-prone-to-merge-conflicts">It can be prone to merge
+  conflicts</a></li>
+  <li><a href="#sorbet-considerations"
+  id="toc-sorbet-considerations">Sorbet considerations</a></li>
   </ul>
 </nav>
 
 <main>
-<p>A quick, loosely-formed note on why I prefer Ruby’s <code>case</code>/<code>when</code> syntax to the new pattern matching syntax with <code>case</code>/<code>in</code>.</p>
-<h3 id="the-casewhen-syntax-is-less-brittle-to-modifications">The <code>case</code>/<code>when</code> syntax is less brittle to modifications</h3>
+<p>A quick, loosely-formed note on why I prefer Ruby’s
+<code>case</code>/<code>when</code> syntax to the new pattern matching
+syntax with <code>case</code>/<code>in</code>.</p>
+<h3 id="the-casewhen-syntax-is-less-brittle-to-modifications">The
+<code>case</code>/<code>when</code> syntax is less brittle to
+modifications</h3>
 <p>Let’s say you start with this:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>A <span class="kw">=</span> <span class="dt">Struct</span><span class="at">.new</span>(<span class="wa">:foo</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>B <span class="kw">=</span> <span class="dt">Struct</span><span class="at">.new</span>(<span class="wa">:bar</span>)</span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cn">A</span> <span class="op">=</span> <span class="dt">Struct</span><span class="at">.new</span>(<span class="wa">:foo</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cn">B</span> <span class="op">=</span> <span class="dt">Struct</span><span class="at">.new</span>(<span class="wa">:bar</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> example(a_or_b)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">case</span> a_or_b</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">in</span> A(foo)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">in</span> <span class="cn">A</span>(foo)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">p</span>(foo)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">in</span> B(bar)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">in</span> <span class="cn">B</span>(bar)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">p</span>(bar)</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>example(A<span class="at">.new</span>(<span class="dv">0</span>))</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>example(B<span class="at">.new</span>(<span class="dv">1</span>))</span></code></pre></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>example(<span class="cn">A</span><span class="at">.new</span>(<span class="dv">0</span>))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>example(<span class="cn">B</span><span class="at">.new</span>(<span class="dv">1</span>))</span></code></pre></div>
 <p>And you want to add another field to <code>B</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>B <span class="kw">=</span> <span class="dt">Struct</span><span class="at">.new</span>(<span class="wa">:bar</span>, <span class="wa">:qux</span>)</span>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cn">B</span> <span class="op">=</span> <span class="dt">Struct</span><span class="at">.new</span>(<span class="wa">:bar</span>, <span class="wa">:qux</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>example(B<span class="at">.new</span>(<span class="dv">1</span>, <span class="vs">&#39;&#39;</span>))</span></code></pre></div>
-<p>This requires changing the case that handles <code>B</code> in <code>example</code>, even though it doesn’t touch the new <code>qux</code> field. If you don’t change it, you’ll get a <code>NoMatchingPatternError</code> exception at runtime:</p>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>example(<span class="cn">B</span><span class="at">.new</span>(<span class="dv">1</span>, <span class="vs">&#39;&#39;</span>))</span></code></pre></div>
+<p>This requires changing the case that handles <code>B</code> in
+<code>example</code>, even though it doesn’t touch the new
+<code>qux</code> field. If you don’t change it, you’ll get a
+<code>NoMatchingPatternError</code> exception at runtime:</p>
 <pre><code>❯ ruby example.rb
 0
 example.rb:7:in `example&#39;: #&lt;struct B bar=1, qux=2&gt; (NoMatchingPatternError)
         from example.rb:16:in `&lt;main&gt;&#39;</code></pre>
 <p>There are two ways to deal with this this:</p>
 <ul>
-<li><p>Only use keyword-based patterns (requires defining the struct with <code>keyword_init: true</code>). Sometimes out of your control.</p></li>
+<li><p>Only use keyword-based patterns (requires defining the struct
+with <code>keyword_init: true</code>). Sometimes out of your
+control.</p></li>
 <li><p>Use normal <code>case</code>/<code>when</code> statements.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">case</span> a_or_b</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">when</span> A</span>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">case</span> a_or_b</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">when</span> <span class="cn">A</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(a_or_b<span class="at">.foo</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">when</span> B</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">when</span> <span class="cn">B</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(a_or_b<span class="at">.bar</span>)</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div></li>
 </ul>
-<p>I find it annoying that adding new features triggers “breaking” changes in unrelated, downstream code.</p>
-<h3 id="it-can-be-prone-to-merge-conflicts">It can be prone to merge conflicts</h3>
-<p>If you and a colleague are working on the same piece of code, you can easy end up in a situation where you both add a new field. Consider starting with this:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">AStructWithManyOptionalFields</span> <span class="kw">=</span> <span class="dt">Struct</span><span class="at">.new</span>(</span>
+<p>I find it annoying that adding new features triggers “breaking”
+changes in unrelated, downstream code.</p>
+<h3 id="it-can-be-prone-to-merge-conflicts">It can be prone to merge
+conflicts</h3>
+<p>If you and a colleague are working on the same piece of code, you can
+easy end up in a situation where you both add a new field. Consider
+starting with this:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">AStructWithManyOptionalFields</span> <span class="op">=</span> <span class="dt">Struct</span><span class="at">.new</span>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="wa">:a</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="wa">:struct</span>,</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="wa">:with</span>,</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="wa">:many</span>,</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="wa">:fields</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="wa">keyword_init: </span><span class="dv">true</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="wa">keyword_init:</span> <span class="dv">true</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="cf">case</span> x</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="cf">when</span> <span class="dt">AStructWithManyOptionalFields</span>(a:)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="cf">when</span> <span class="dt">AStructWithManyOptionalFields</span>(<span class="wa">a:</span>)</span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>The <code>case</code> statement only reads the field <code>a</code>. But maybe you and a colleague add a field and use it in this <code>case</code> statement at the same time:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-7"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1"></a><span class="dt">AStructWithManyOptionalFields</span> <span class="kw">=</span> <span class="dt">Struct</span><span class="at">.new</span>(</span>
+<p>The <code>case</code> statement only reads the field <code>a</code>.
+But maybe you and a colleague add a field and use it in this
+<code>case</code> statement at the same time:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode numberSource ruby numberLines hl-5 hl-7"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1"></a><span class="dt">AStructWithManyOptionalFields</span> <span class="op">=</span> <span class="dt">Struct</span><span class="at">.new</span>(</span>
 <span id="cb6-2"><a href="#cb6-2"></a>  <span class="wa">:a</span>,</span>
 <span id="cb6-3"><a href="#cb6-3"></a>  <span class="wa">:struct</span>,</span>
 <span id="cb6-4"><a href="#cb6-4"></a>  <span class="wa">:with</span>,</span>
@@ -122,27 +148,58 @@ example.rb:7:in `example&#39;: #&lt;struct B bar=1, qux=2&gt; (NoMatchingPattern
 <span id="cb6-6"><a href="#cb6-6"></a>  <span class="wa">:many</span>,</span>
 <span id="cb6-7"><a href="#cb6-7"></a>  <span class="wa">:optional</span>,</span>
 <span id="cb6-8"><a href="#cb6-8"></a>  <span class="wa">:fields</span></span>
-<span id="cb6-9"><a href="#cb6-9"></a>  <span class="wa">keyword_init: </span><span class="dv">true</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>  <span class="wa">keyword_init:</span> <span class="dv">true</span></span>
 <span id="cb6-10"><a href="#cb6-10"></a>)</span></code></pre></div>
 <p>You edit the <code>case</code> statement like this:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">when</span> <span class="dt">AStructWithManyOptionalFields</span>(a:, very:)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">when</span> <span class="dt">AStructWithManyOptionalFields</span>(<span class="wa">a:</span>, <span class="wa">very:</span>)</span></code></pre></div>
 <p>And your colleague like this:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">when</span> <span class="dt">AStructWithManyOptionalFields</span>(a:, optional:)</span></code></pre></div>
-<p>Even if the two changes wouldn’t have conflicted on their own (based on how the body of the method was written), now they’re going to conflict.</p>
-<p>Maybe in practice there would have already been a conflict (because of where these options are passed when <code>AStructWithManyOptionalFields</code> is constructed, or because of the structure of the body of the <code>case</code> arms). But had we used <code>case</code>/<code>when</code> statements, there would have been one fewer location with the potential to introduce a merge conflict.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">when</span> <span class="dt">AStructWithManyOptionalFields</span>(<span class="wa">a:</span>, <span class="wa">optional:</span>)</span></code></pre></div>
+<p>Even if the two changes wouldn’t have conflicted on their own (based
+on how the body of the method was written), now they’re going to
+conflict.</p>
+<p>Maybe in practice there would have already been a conflict (because
+of where these options are passed when
+<code>AStructWithManyOptionalFields</code> is constructed, or because of
+the structure of the body of the <code>case</code> arms). But had we
+used <code>case</code>/<code>when</code> statements, there would have
+been one fewer location with the potential to introduce a merge
+conflict.</p>
 <h3 id="sorbet-considerations">Sorbet considerations</h3>
-<p>You could argue that I shouldn’t be allowed to complain about this, because it’s within my power to change Sorbet. So instead of complaining, I’ll just list the current limitations (that one day we’ll improve).</p>
+<p>You could argue that I shouldn’t be allowed to complain about this,
+because it’s within my power to change Sorbet. So instead of
+complaining, I’ll just list the current limitations (that one day we’ll
+improve).</p>
 <ul>
-<li><p>Sorbet doesn’t support types for patterns. All variables introduced by Ruby pattern match statements are untyped.</p></li>
-<li><p>There isn’t autocompletion for field names in patterns, regardless of whether the field is a positional or keyword field. (Autocompletion for getter methods is trivial, because they’re just normal methods.)</p></li>
-<li><p>Neither Find All References nor Rename Symbol currently see the pattern names, meaning that these editor features won’t work as well as if the code just used getter methods.</p></li>
+<li><p>Sorbet doesn’t support types for patterns. All variables
+introduced by Ruby pattern match statements are untyped.</p></li>
+<li><p>There isn’t autocompletion for field names in patterns,
+regardless of whether the field is a positional or keyword field.
+(Autocompletion for getter methods is trivial, because they’re just
+normal methods.)</p></li>
+<li><p>Neither Find All References nor Rename Symbol currently see the
+pattern names, meaning that these editor features won’t work as well as
+if the code just used getter methods.</p></li>
 </ul>
-<p>All of this being said, I spot checked other languages’ IDE support for these features, and despite having typed support for pattern matching, many of them (especially Python type checkers) did not yet have support for these IDE features.</p>
-<p>In defense of pattern matching, the fact that it raises a <code>NoMatchingPatternError</code> will one day be a <strong>benefit</strong> to type safety—these patterns will have opt-out exhaustiveness checking, instead of the opt-in exhaustiveness checking that exists with <code>T.absurd</code> today.<br />
+<p>All of this being said, I spot checked other languages’ IDE support
+for these features, and despite having typed support for pattern
+matching, many of them (especially Python type checkers) did not yet
+have support for these IDE features.</p>
+<p>In defense of pattern matching, the fact that it raises a
+<code>NoMatchingPatternError</code> will one day be a
+<strong>benefit</strong> to type safety—these patterns will have opt-out
+exhaustiveness checking, instead of the opt-in exhaustiveness checking
+that exists with <code>T.absurd</code> today.<br />
 </p>
 <p><br />
 </p>
-<p>Taken all together, these are small grievances, but the thing is that I don’t personally feel like the benefit of being able to use a pattern statement to shorten something like <code>x.foo</code> to <code>foo</code> is worth the cost of these paper cuts. I’ll keep using <code>case</code>/<code>when</code> in my own code for the time being.</p>
+<p>Taken all together, these are small grievances, but the thing is that
+I don’t personally feel like the benefit of being able to use a pattern
+statement to shorten something like <code>x.foo</code> to
+<code>foo</code> is worth the cost of these paper cuts. I’ll keep using
+<code>case</code>/<code>when</code> in my own code for the time
+being.</p>
 </main>
 
 
