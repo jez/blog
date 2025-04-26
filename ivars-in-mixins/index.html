@@ -53,35 +53,21 @@
   <ul>
   <li><a href="#setup" id="toc-setup">Setup</a></li>
   <li><a href="#solution" id="toc-solution">Solution</a></li>
-  <li><a href="#worse-alternatives" id="toc-worse-alternatives">Worse
-  alternatives</a>
+  <li><a href="#worse-alternatives" id="toc-worse-alternatives">Worse alternatives</a>
   <ul>
-  <li><a href="#declaring-the-instance-variables-type-with-t.let"
-  id="toc-declaring-the-instance-variables-type-with-t.let">Declaring
-  the instance variable’s type with T.let</a></li>
-  <li><a href="#using-requires_ancestor"
-  id="toc-using-requires_ancestor">Using
-  <code>requires_ancestor</code></a></li>
+  <li><a href="#declaring-the-instance-variables-type-with-t.let" id="toc-declaring-the-instance-variables-type-with-t.let">Declaring the instance variable’s type with T.let</a></li>
+  <li><a href="#using-requires_ancestor" id="toc-using-requires_ancestor">Using <code>requires_ancestor</code></a></li>
   </ul></li>
-  <li><a href="#appendix-what-about-self-contained-instance-variables"
-  id="toc-appendix-what-about-self-contained-instance-variables">Appendix:
-  What about “self-contained” instance variables?</a></li>
+  <li><a href="#appendix-what-about-self-contained-instance-variables" id="toc-appendix-what-about-self-contained-instance-variables">Appendix: What about “self-contained” instance variables?</a></li>
   </ul>
 </nav>
 
 <main>
-<p><strong>Problem</strong>: you’re using Sorbet, and there’s a module
-or interface whose implementation depends on an instance variable having
-been initialized by the class that it’s eventually mixed into.</p>
-<p><strong>Solution</strong>: make the interface depend on an abstract
-method instead (not an instance variable). Replace references of the
-instance variable in the module with the abstract method, and implement
-the abstract method by producing the instance variable.</p>
+<p><strong>Problem</strong>: you’re using Sorbet, and there’s a module or interface whose implementation depends on an instance variable having been initialized by the class that it’s eventually mixed into.</p>
+<p><strong>Solution</strong>: make the interface depend on an abstract method instead (not an instance variable). Replace references of the instance variable in the module with the abstract method, and implement the abstract method by producing the instance variable.</p>
 <h1 id="setup">Setup</h1>
-<p>Let’s say we’ve got some code like this, modeling a hierarchy of
-different kinds of users:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode numberSource ruby numberLines hl-14"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> <span class="dt">User</span></span>
+<p>Let’s say we’ve got some code like this, modeling a hierarchy of different kinds of users:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource ruby numberLines hl-14"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> <span class="dt">User</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>  <span class="cf">def</span> initialize(user_id)</span>
 <span id="cb1-3"><a href="#cb1-3"></a>    <span class="ot">@user_id</span> <span class="op">=</span> user_id</span>
 <span id="cb1-4"><a href="#cb1-4"></a>  <span class="cf">end</span></span>
@@ -98,20 +84,9 @@ class="sourceCode numberSource ruby numberLines hl-14"><code class="sourceCode r
 <span id="cb1-15"><a href="#cb1-15"></a>    <span class="cf">yield</span></span>
 <span id="cb1-16"><a href="#cb1-16"></a>  <span class="cf">end</span></span>
 <span id="cb1-17"><a href="#cb1-17"></a><span class="cf">end</span></span></code></pre></div>
-<p>We might want to make a <code>with_audit_log</code> helper method
-that we include in certain kinds of users that will do a lot of
-auditable actions. In that module we know that the <code>@user_id</code>
-method exists (because we’re only going to include it in contexts where
-it exists), but Sorbet doesn’t know that.</p>
+<p>We might want to make a <code>with_audit_log</code> helper method that we include in certain kinds of users that will do a lot of auditable actions. In that module we know that the <code>@user_id</code> method exists (because we’re only going to include it in contexts where it exists), but Sorbet doesn’t know that.</p>
 <h1 id="solution">Solution</h1>
-<p>Sorbet does not have a concept of abstract instance variables.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">This is mostly for simplicity—I’m not aware of any
-appeal to soundness why it could not gain them one day. Many other
-object-oriented languages do not make a distinction between methods and
-instance variables. For example, Scala traits can have abstract
-<code>val</code> declarations the same as it can have abstract
-<code>def</code> declarations.<br />
+<p>Sorbet does not have a concept of abstract instance variables.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">This is mostly for simplicity—I’m not aware of any appeal to soundness why it could not gain them one day. Many other object-oriented languages do not make a distinction between methods and instance variables. For example, Scala traits can have abstract <code>val</code> declarations the same as it can have abstract <code>def</code> declarations.<br />
 <br />
 </span></span> To work around this, we need to:</p>
 <ol type="1">
@@ -119,11 +94,9 @@ instance variables. For example, Scala traits can have abstract
 <li>update usages of the instance variable to the method</li>
 <li>implement the abstract method</li>
 </ol>
-<p>This way Sorbet can check that all the required information is
-present every time we include the module somewhere.</p>
+<p>This way Sorbet can check that all the required information is present every time we include the module somewhere.</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode numberSource ruby numberLines hl-5 hl-6 hl-9 hl-16"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">module</span> <span class="dt">Auditable</span></span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-6 hl-9 hl-16"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">module</span> <span class="dt">Auditable</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  <span class="fu">extend</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Helpers</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a>  abstract!</span>
 <span id="cb2-4"><a href="#cb2-4"></a></span>
@@ -141,36 +114,20 @@ class="sourceCode numberSource ruby numberLines hl-5 hl-6 hl-9 hl-16"><code clas
 <span id="cb2-16"><a href="#cb2-16"></a>  <span class="at">private</span> <span class="ot">attr_reader</span> <span class="wa">:user_id</span>   <span class="co"># (3)</span></span>
 <span id="cb2-17"><a href="#cb2-17"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a
-href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Aclass%20UserID%3B%20end%0A%0Aclass%20User%0A%20%20sig%20%7B%20params%28user_id%3A%20UserID%29.void%20%7D%0A%20%20def%20initialize%28user_id%29%0A%20%20%20%20%40user_id%20%3D%20user_id%0A%20%20end%0A%0A%20%20sig%20%7B%20returns%28UserID%29%20%7D%0A%20%20attr_reader%20%3Auser_id%0A%20%20private%20%3Auser_id%0Aend%0A%0Amodule%20Auditable%0A%20%20extend%20T%3A%3AHelpers%0A%20%20abstract!%0A%0A%20%20sig%20%7B%20abstract.returns%28UserID%29%20%7D%0A%20%20private%20def%20user_id%3B%20end%0A%0A%20%20sig%20do%0A%20%20%20%20type_parameters%28%3AU%29%0A%20%20%20%20%20%20.params%28%0A%20%20%20%20%20%20%20%20action%3A%20String%2C%0A%20%20%20%20%20%20%20%20blk%3A%20T.proc.returns%28T.type_parameter%28%3AU%29%29%0A%20%20%20%20%20%20%29%0A%20%20%20%20%20%20.returns%28T.type_parameter%28%3AU%29%29%0A%20%20end%0A%20%20def%20with_audit_log%28action%2C%20%26blk%29%0A%20%20%20%20Kernel.puts%28%22user%3D%23%7Buser_id%7D%20starting%20action%20%23%7Baction%7D%22%29%0A%20%20%20%20yield%0A%20%20end%0Aend%0A%0Amodule%20NotAUser%20%23%20error%3A%20Missing%20definition%20for%20abstract%20method%0A%20%20include%20Auditable%0Aend">View
-full example on sorbet.run →</a>
+<a href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Aclass%20UserID%3B%20end%0A%0Aclass%20User%0A%20%20sig%20%7B%20params%28user_id%3A%20UserID%29.void%20%7D%0A%20%20def%20initialize%28user_id%29%0A%20%20%20%20%40user_id%20%3D%20user_id%0A%20%20end%0A%0A%20%20sig%20%7B%20returns%28UserID%29%20%7D%0A%20%20attr_reader%20%3Auser_id%0A%20%20private%20%3Auser_id%0Aend%0A%0Amodule%20Auditable%0A%20%20extend%20T%3A%3AHelpers%0A%20%20abstract!%0A%0A%20%20sig%20%7B%20abstract.returns%28UserID%29%20%7D%0A%20%20private%20def%20user_id%3B%20end%0A%0A%20%20sig%20do%0A%20%20%20%20type_parameters%28%3AU%29%0A%20%20%20%20%20%20.params%28%0A%20%20%20%20%20%20%20%20action%3A%20String%2C%0A%20%20%20%20%20%20%20%20blk%3A%20T.proc.returns%28T.type_parameter%28%3AU%29%29%0A%20%20%20%20%20%20%29%0A%20%20%20%20%20%20.returns%28T.type_parameter%28%3AU%29%29%0A%20%20end%0A%20%20def%20with_audit_log%28action%2C%20%26blk%29%0A%20%20%20%20Kernel.puts%28%22user%3D%23%7Buser_id%7D%20starting%20action%20%23%7Baction%7D%22%29%0A%20%20%20%20yield%0A%20%20end%0Aend%0A%0Amodule%20NotAUser%20%23%20error%3A%20Missing%20definition%20for%20abstract%20method%0A%20%20include%20Auditable%0Aend">View full example on sorbet.run →</a>
 </figcaption>
 </figure>
-<p>When we include this into the <code>AdminUser</code> class, Sorbet
-knows that the <code>user_id</code> method exists, because it came from
-the parent <code>User</code> class—no change to <code>AdminUser</code>
-is required, because <a
-href="https://sorbet.org/docs/abstract#letting-abstract-methods-be-implemented-via-inheritance">Sorbet
-allows implementing abstract methods via inheritance</a>.</p>
-<p>If someone attempts to include this interface somewhere else, Sorbet
-will report an error:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">NotAUser</span> <span class="co"># error: Missing definition for abstract method</span></span>
+<p>When we include this into the <code>AdminUser</code> class, Sorbet knows that the <code>user_id</code> method exists, because it came from the parent <code>User</code> class—no change to <code>AdminUser</code> is required, because <a href="https://sorbet.org/docs/abstract#letting-abstract-methods-be-implemented-via-inheritance">Sorbet allows implementing abstract methods via inheritance</a>.</p>
+<p>If someone attempts to include this interface somewhere else, Sorbet will report an error:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">NotAUser</span> <span class="co"># error: Missing definition for abstract method</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="dt">Auditable</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p><strong>Note</strong>: the <code>user_id</code> methods are
-<code>private</code>, which prevents people from calling it directly.
-That mimics how instance variables work (private methods and instance
-variables have the same visibility rules). This is optional: if you’d
-like the method to be public, make it public.</p>
+<p><strong>Note</strong>: the <code>user_id</code> methods are <code>private</code>, which prevents people from calling it directly. That mimics how instance variables work (private methods and instance variables have the same visibility rules). This is optional: if you’d like the method to be public, make it public.</p>
 <h1 id="worse-alternatives">Worse alternatives</h1>
-<p>There are some worse ways to solve this problem, and I want to take
-the time to point them out and also why they aren’t as good.</p>
-<h2 id="declaring-the-instance-variables-type-with-t.let">Declaring the
-instance variable’s type with T.let</h2>
+<p>There are some worse ways to solve this problem, and I want to take the time to point them out and also why they aren’t as good.</p>
+<h2 id="declaring-the-instance-variables-type-with-t.let">Declaring the instance variable’s type with T.let</h2>
 <p>Something like this can be tempting:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">Auditable</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">Auditable</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  sig <span class="op">{</span> returns(<span class="dt">UserID</span>) <span class="op">}</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">private</span> <span class="cf">def</span> user_id</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@user_id</span> <span class="op">||=</span> <span class="cn">T</span><span class="at">.let</span>(<span class="ot">@user_id</span>, <span class="cn">T</span><span class="at">.nilable</span>(<span class="dt">UserID</span>))</span>
@@ -182,52 +139,22 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">yield</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>In this example, we use <code>||= T.let</code> to declare
-<code>@user_id</code> to <code>@user_id</code>, relying on the fact that
-instance variables that have not yet been assigned will evaluate to
-<code>nil</code>.</p>
-<p>This is worse because Sorbet does not allow instance variables to be
-declared non-<code>nil</code> outside of the constructor—the abstract
-method approach allows declaring non-<code>nil</code> types.</p>
-<p>It’s also worse because it doesn’t actually get Sorbet to check that
-whatever class <code>Auditable</code> is mixed into actually has a
-<code>user_id</code> field. That is: the <code>T.must</code> might fail
-at runtime!</p>
-<h2 id="using-requires_ancestor">Using
-<code>requires_ancestor</code></h2>
-<p>First off, the <a
-href="https://sorbet.org/docs/requires-ancestor">experimental
-<code>requires_ancestor</code> feature</a> only applies to methods, not
-instance variables.</p>
-<p>Even if that were changed, <code>requires_ancestor</code> is
-<strong>anti-modular</strong>: if you ever want to use the interface
-with some <em>other</em> ancestor that provides a <code>user_id</code> ,
-you’d need to edit the definition of <code>Auditable</code> to mention
-both <code>T.any(User, ThatOtherClass)</code>.</p>
-<p>In some sense, using abstract methods like this achieves a sort of
-duck typing. It doesn’t matter which class provides the method: as long
-as it’s called <code>user_id</code> and it has the right type, this
-module can be mixed into anything.</p>
-<p>(Ultimately, <code>requires_ancestor</code> itself is experimental
-because the approach itself is problematic.)</p>
-<h1 id="appendix-what-about-self-contained-instance-variables">Appendix:
-What about “self-contained” instance variables?</h1>
-<p>If the module defines its own instance variables, e.g. for the
-purpose of caching some sort of state, there should be no problem. Just
-use <code>||=</code> like normal:</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sig <span class="op">{</span> returns(<span class="dt">Integer</span>) <span class="op">}</span></span>
+<p>In this example, we use <code>||= T.let</code> to declare <code>@user_id</code> to <code>@user_id</code>, relying on the fact that instance variables that have not yet been assigned will evaluate to <code>nil</code>.</p>
+<p>This is worse because Sorbet does not allow instance variables to be declared non-<code>nil</code> outside of the constructor—the abstract method approach allows declaring non-<code>nil</code> types.</p>
+<p>It’s also worse because it doesn’t actually get Sorbet to check that whatever class <code>Auditable</code> is mixed into actually has a <code>user_id</code> field. That is: the <code>T.must</code> might fail at runtime!</p>
+<h2 id="using-requires_ancestor">Using <code>requires_ancestor</code></h2>
+<p>First off, the <a href="https://sorbet.org/docs/requires-ancestor">experimental <code>requires_ancestor</code> feature</a> only applies to methods, not instance variables.</p>
+<p>Even if that were changed, <code>requires_ancestor</code> is <strong>anti-modular</strong>: if you ever want to use the interface with some <em>other</em> ancestor that provides a <code>user_id</code> , you’d need to edit the definition of <code>Auditable</code> to mention both <code>T.any(User, ThatOtherClass)</code>.</p>
+<p>In some sense, using abstract methods like this achieves a sort of duck typing. It doesn’t matter which class provides the method: as long as it’s called <code>user_id</code> and it has the right type, this module can be mixed into anything.</p>
+<p>(Ultimately, <code>requires_ancestor</code> itself is experimental because the approach itself is problematic.)</p>
+<h1 id="appendix-what-about-self-contained-instance-variables">Appendix: What about “self-contained” instance variables?</h1>
+<p>If the module defines its own instance variables, e.g. for the purpose of caching some sort of state, there should be no problem. Just use <code>||=</code> like normal:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sig <span class="op">{</span> returns(<span class="dt">Integer</span>) <span class="op">}</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="ot">@foo</span> <span class="op">||=</span> <span class="cn">T</span><span class="at">.let</span>(compute_foo, <span class="cn">T</span><span class="at">.nilable</span>(<span class="dt">Integer</span>))</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>(Things only get problematic when a module expects an instance
-variable to have already been set outside of its own logic.)</p>
-<p>Note that in this case, as long as <code>compute_foo</code> returns
-<code>Integer</code>, the <code>foo</code> method can also return
-<code>Integer</code> without needing <code>T.must</code>—Sorbet knows
-that if the value is <code>nil</code>, it will be computed with
-<code>compute_foo</code>, so the method unconditionally returns a
-non-<code>nil</code> value.</p>
+<p>(Things only get problematic when a module expects an instance variable to have already been set outside of its own logic.)</p>
+<p>Note that in this case, as long as <code>compute_foo</code> returns <code>Integer</code>, the <code>foo</code> method can also return <code>Integer</code> without needing <code>T.must</code>—Sorbet knows that if the value is <code>nil</code>, it will be computed with <code>compute_foo</code>, so the method unconditionally returns a non-<code>nil</code> value.</p>
 </main>
 
 

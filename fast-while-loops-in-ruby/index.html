@@ -50,44 +50,32 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#appendix-compiled-while-program"
-  id="toc-appendix-compiled-while-program">Appendix: Compiled
-  <code>while</code> program</a></li>
-  <li><a href="#appendix-instruction-cache"
-  id="toc-appendix-instruction-cache">Appendix: Instruction
-  cache</a></li>
+  <li><a href="#appendix-compiled-while-program" id="toc-appendix-compiled-while-program">Appendix: Compiled <code>while</code> program</a></li>
+  <li><a href="#appendix-instruction-cache" id="toc-appendix-instruction-cache">Appendix: Instruction cache</a></li>
   </ul>
 </nav>
 
 <main>
 <blockquote>
-<p><strong>Disclaimer</strong>: this post was first drafted as a
-Stripe-internal email. On December 10, 2022 I republished it here,
-largely unchanged from the original. See <a
-href="/old-compiler-notes/">Some Old Sorbet Compiler Notes</a> for more.
-The Sorbet Compiler is still largely an experimental project: this post
-is available purely for curiosity’s sake.</p>
-<p>Any benchmark numbers included in this post are intended to be
-educational about how the Sorbet Compiler approaches speeding up code.
-They should not be taken as representative or predictive of any
-real-world workload, and are likely out-of-date with respect to
-improvements that have been made since this post originally
-appeared.</p>
+<p><strong>Disclaimer</strong>: this post was first drafted as a Stripe-internal email. On December 10,
+2022 I republished it here, largely unchanged from the original. See <a href="/old-compiler-notes/">Some Old Sorbet
+Compiler Notes</a> for more. The Sorbet Compiler is still largely an
+experimental project: this post is available purely for curiosity’s sake.</p>
+<p>Any benchmark numbers included in this post are intended to be educational about how the
+Sorbet Compiler approaches speeding up code. They should not be taken as representative
+or predictive of any real-world workload, and are likely out-of-date with respect to
+improvements that have been made since this post originally appeared.</p>
 </blockquote>
-<p>Let’s continue our series in comparing Ruby performance, interpreted
-vs compiled, on microbenchmarks. Previously in the series:</p>
+<p>Let’s continue our series in comparing Ruby performance, interpreted vs compiled, on
+microbenchmarks. Previously in the series:</p>
 <ul>
-<li><a href="/types-make-array-access-faster/">Types Make Array Access
-Faster</a></li>
-<li><a href="/another-look-at-typed-array-access/">Another Look at Typed
-Array Access</a></li>
+<li><a href="/types-make-array-access-faster/">Types Make Array Access Faster</a></li>
+<li><a href="/another-look-at-typed-array-access/">Another Look at Typed Array Access</a></li>
 </ul>
-<p>In both those posts, I mentioned that the Sorbet Compiler is able to
-speed up not only heavily typed code but also certain kinds of untyped
-code. One of the snippets we had compared was this <code>while</code>
-loop:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">0</span></span>
+<p>In both those posts, I mentioned that the Sorbet Compiler is able to speed up not only
+heavily typed code but also certain kinds of untyped code. One of the snippets we had
+compared was this <code>while</code> loop:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="op">&lt;</span> <span class="dv">10_000_000</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  i <span class="op">+=</span> <span class="dv">1</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
@@ -107,17 +95,15 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;"><a
-href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
+<td style="text-align: left;"><a href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
 <td style="text-align: right;">0.205s</td>
 <td style="text-align: right;">0.048s</td>
 </tr>
 </tbody>
 </table>
-<p>When the Ruby VM encounters a <code>while</code> loop like this, it
-first parses and translates that source text into <a
-href="https://en.wikipedia.org/wiki/Bytecode">bytecode instructions</a>
-that look something like this, simplified:</p>
+<p>When the Ruby VM encounters a <code>while</code> loop like this, it first parses and translates that
+source text into <a href="https://en.wikipedia.org/wiki/Bytecode">bytecode instructions</a> that look
+something like this, simplified:</p>
 <pre class="plain"><code>0007 jump          17
 0009 getlocal      i
 0011 putobject     1
@@ -127,16 +113,14 @@ that look something like this, simplified:</p>
 0019 putobject     10000000
 0021 opt_lt
 0024 branchif      9</code></pre>
-<p><em>(You can use <code>ruby --dump=insns foo.rb</code> to play around
-with full output.)</em></p>
-<p>This output almost looks like assembly! There are variable gets and
-sets, conditional branches, addition, comparison, etc. And assembly is
-fast right? So if Ruby builds this assembly-like representation of our
-code internally, why doesn’t it run as fast as the compiled code?</p>
-<p>To get these bytecode instructions to mean something, the Ruby VM
-interprets them on the fly. Somewhere in the Ruby VM, there’s
-essentially one big loop over each instruction type, where each
-instruction is implemented by arbitrarily complicated C code:</p>
+<p><em>(You can use <code>ruby --dump=insns foo.rb</code> to play around with full output.)</em></p>
+<p>This output almost looks like assembly! There are variable gets and sets, conditional
+branches, addition, comparison, etc. And assembly is fast right? So if Ruby builds this
+assembly-like representation of our code internally, why doesn’t it run as fast as the
+compiled code?</p>
+<p>To get these bytecode instructions to mean something, the Ruby VM interprets them on the
+fly. Somewhere in the Ruby VM, there’s essentially one big loop over each instruction
+type, where each instruction is implemented by arbitrarily complicated C code:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">((</span>next_instruction <span class="op">=</span> get_instruction<span class="op">())</span> <span class="op">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">switch</span> <span class="op">(</span>next_instruction<span class="op">-&gt;</span>type<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> getlocal<span class="op">:</span> vm_getlocal<span class="op">();</span> <span class="cf">break</span><span class="op">;</span></span>
@@ -146,70 +130,47 @@ instruction is implemented by arbitrarily complicated C code:</p>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><em>(It’s actually a lot messier; see <a
-href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/vm_exec.c#L113-L118">vm_exec.c</a>,
-<a
-href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/insns.def#L1088-L1100">insns.def</a>,
-and <a
-href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/vm_insnhelper.c#L4235-L4267">vm_insnhelper.c</a>
-if you want to poke around.)</em></p>
-<p>That arbitrarily complicated C code is almost always doing more than
-a few handfuls of pointer reads and writes to bookkeep runtime data
-structures. It’s full of conditional code paths that execute only part
-of the time. In our short Ruby program above, all we needed to happen
-was for the computer to do an integer comparison, an integer increment,
-and an assembly jump. When the Ruby VM runs our code, it does way more
-than just that.</p>
-<p>But with the Sorbet compiler, the integer comparison, increment, and
-jump are almost the only things executed. I’ve <a
-href="#appendix-compiled-while-program">included a snippet</a> of the
-Sorbet Compiler’s assembly output at the end of this post. It’s short
-enough to be understood in full, and in fact I’ve annotated each line
-with what the instructions all mean.</p>
-<p>This works in large part due to the magic of Sorbet’s type checking
-algorithm (which will have already mapped out the flow of control in a
-program before the compiler kicks in) and LLVM (which is really good at
-taking <a href="https://en.wikipedia.org/wiki/Control-flow_graph">maps
-of control flow</a> and removing the redundant parts).</p>
-<p>As for why the compiler is <strong>particularly</strong> good at
-speeding up this specific program:</p>
+<p><em>(It’s actually a lot messier; see <a href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/vm_exec.c#L113-L118">vm_exec.c</a>, <a href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/insns.def#L1088-L1100">insns.def</a>, and <a href="https://github.com/ruby/ruby/blob/a0c7c23c9cec0d0ffcba012279cd652d28ad5bf3/vm_insnhelper.c#L4235-L4267">vm_insnhelper.c</a> if you want to poke around.)</em></p>
+<p>That arbitrarily complicated C code is almost always doing more than a few handfuls of
+pointer reads and writes to bookkeep runtime data structures. It’s full of conditional
+code paths that execute only part of the time. In our short Ruby program above, all we
+needed to happen was for the computer to do an integer comparison, an integer increment,
+and an assembly jump. When the Ruby VM runs our code, it does way more than just that.</p>
+<p>But with the Sorbet compiler, the integer comparison, increment, and jump are almost the
+only things executed. I’ve <a href="#appendix-compiled-while-program">included a snippet</a>
+of the Sorbet Compiler’s assembly output at the end of this post. It’s short enough to be
+understood in full, and in fact I’ve annotated each line with what the instructions all
+mean.</p>
+<p>This works in large part due to the magic of Sorbet’s type checking algorithm (which will
+have already mapped out the flow of control in a program before the compiler kicks in) and
+LLVM (which is really good at taking <a href="https://en.wikipedia.org/wiki/Control-flow_graph">maps of control
+flow</a> and removing the redundant parts).</p>
+<p>As for why the compiler is <strong>particularly</strong> good at speeding up this specific program:</p>
 <ul>
-<li><p>The Ruby VM stores local variables on a stack-like data structure
-which lives on the heap. To read and write a variable, the Ruby VM has
-to follow pointers that end up touching the heap. The compiler keeps
-almost it’s entire working memory in registers.</p></li>
-<li><p>The compiler inlines the code for <code>+</code> and
-<code>&lt;</code> on <code>Integer</code> specifically, because given
-the static type annotations those are the most likely. Meanwhile, the
-Ruby VM has to handle the possibility that <code>+</code> is running on
-<code>Integer</code>, or <code>Float</code>, or <code>String</code>, or
+<li><p>The Ruby VM stores local variables on a stack-like data structure which lives on the
+heap. To read and write a variable, the Ruby VM has to follow pointers that end up
+touching the heap. The compiler keeps almost it’s entire working memory in registers.</p></li>
+<li><p>The compiler inlines the code for <code>+</code> and <code>&lt;</code> on <code>Integer</code> specifically, because given
+the static type annotations those are the most likely. Meanwhile, the Ruby VM has to
+handle the possibility that <code>+</code> is running on <code>Integer</code>, or <code>Float</code>, or <code>String</code>, or
 <code>Array</code>, or something else.</p>
-<p>This has huge consequences for the <a
-href="#appendix-instruction-cache">instruction cache</a>: the compiled
-code’s main loop spans only ~200 bytes. Meanwhile the VM’s
-implementation of <code>+</code> and <code>&lt;</code> are around ~700
-bytes each, and the core instruction processing loop is upwards of 32K
-bytes, only fractions of which are needed for this program.</p></li>
-<li><p>This Ruby code doesn’t take full advantage of the Ruby VM’s
-features. Ruby makes it easy to handle exceptions, call blocks, dispatch
-dynamically, reflect, and more. This script is taking absolutely zero
-advantage of those high-level features.</p></li>
+<p>This has huge consequences for the <a href="#appendix-instruction-cache">instruction cache</a>:
+the compiled code’s main loop spans only ~200 bytes. Meanwhile the VM’s
+implementation of <code>+</code> and <code>&lt;</code> are around ~700 bytes each, and the core instruction
+processing loop is upwards of 32K bytes, only fractions of which are needed for this
+program.</p></li>
+<li><p>This Ruby code doesn’t take full advantage of the Ruby VM’s features. Ruby makes it
+easy to handle exceptions, call blocks, dispatch dynamically, reflect, and more. This
+script is taking absolutely zero advantage of those high-level features.</p></li>
 </ul>
-<p>For the bread and butter of a programming language (control flow and
-local variables), the code the compiler emits is super low overhead. The
-assembly the Sorbet compiler emits reduces our simple program to its
-essence, cutting out the fatty parts of the Ruby VM and leaving behind a
-lean executable.</p>
-<h1 id="appendix-compiled-while-program">Appendix: Compiled
-<code>while</code> program</h1>
-<p>This is a snippet of the compiled output for the while program above.
-I’ve cut a large chunk of the compiled output, most of which is just
-book keeping to register C functions with the Ruby VM and pre-allocate
-some <code>String</code> and <code>Symbol</code> constants.</p>
-<p>But, I haven’t snipped anything out of the middle of the snippet
-below—it occurs contiguous in the compiled output.</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode gnuassembler tight-code"><code class="sourceCode gnuassembler"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">94c:</span>    mov    <span class="dv">$0</span>x1<span class="op">,%</span><span class="kw">ebp</span>                     <span class="co">#    i = 0</span></span>
+<p>For the bread and butter of a programming language (control flow and local variables), the
+code the compiler emits is super low overhead. The assembly the Sorbet compiler emits
+reduces our simple program to its essence, cutting out the fatty parts of the Ruby VM and
+leaving behind a lean executable.</p>
+<h1 id="appendix-compiled-while-program">Appendix: Compiled <code>while</code> program</h1>
+<p>This is a snippet of the compiled output for the while program above. I’ve cut a large chunk of the compiled output, most of which is just book keeping to register C functions with the Ruby VM and pre-allocate some <code>String</code> and <code>Symbol</code> constants.</p>
+<p>But, I haven’t snipped anything out of the middle of the snippet below—it occurs contiguous in the compiled output.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode gnuassembler tight-code"><code class="sourceCode gnuassembler"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">94c:</span>    mov    <span class="dv">$0</span>x1<span class="op">,%</span><span class="kw">ebp</span>                     <span class="co">#    i = 0</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">951:</span>    mov    <span class="dv">$0</span>x14<span class="op">,%</span><span class="kw">r13d</span>                   <span class="co">#    %r13 = Qtrue</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">957:</span>    <span class="cf">jmp</span>    <span class="dv">97</span>f <span class="op">&lt;</span>func_Object<span class="co">#jez+0xbf&gt;    #    jump to start of while loop</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">959:</span>    nopl   <span class="bn">0x0</span><span class="op">(%</span><span class="kw">rax</span><span class="op">)</span></span>
@@ -268,8 +229,7 @@ class="sourceCode gnuassembler tight-code"><code class="sourceCode gnuassembler"
 <span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="fu">a02:</span>    <span class="cf">jne</span>    <span class="dv">9</span>a9 <span class="op">&lt;</span>func_Object<span class="co">#jez+0xe9&gt;    # ─┘</span></span>
 <span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="fu">a04:</span>    ...                                  <span class="co">#    end of while loop (clean up, return)</span></span></code></pre></div>
 <h1 id="appendix-instruction-cache">Appendix: Instruction cache</h1>
-<p>You can use <code>lscpu</code> to see how big your CPU’s instruction
-cache is:</p>
+<p>You can use <code>lscpu</code> to see how big your CPU’s instruction cache is:</p>
 <pre class="plain"><code>❯ lscpu
 Architecture:                    x86_64
 CPU(s):                          16
@@ -284,13 +244,12 @@ L1d cache:                       256 KiB
 L1i cache:                       256 KiB      # &lt;-- instruction cache
 L2 cache:                        4 MiB
 L3 cache:                        32 MiB</code></pre>
-<p>For my CPU (Ryzen 3700X), that 256 KiB is total for the whole chip,
-which means each of the 8 cores gets its own 32 KiB of L1 instruction
-cache. That cache is then shared for every program that gets scheduled
-onto that core (which is why it’s important for the kernel to have some
-sort of CPU affinity for processes when scheduling them—if a process
-gets scheduled back onto the CPU it just was on, its instructions might
-still be in the cache.)</p>
+<p>For my CPU (Ryzen 3700X), that 256 KiB is total for the whole chip, which means each of
+the 8 cores gets its own 32 KiB of L1 instruction cache. That cache is then shared for
+every program that gets scheduled onto that core (which is why it’s important for the
+kernel to have some sort of CPU affinity for processes when scheduling them—if a process
+gets scheduled back onto the CPU it just was on, its instructions might still be in the
+cache.)</p>
 </main>
 
 

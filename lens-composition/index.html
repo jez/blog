@@ -54,11 +54,8 @@
 <p>
 </p>
 <!-- more -->
-<p>A lens is really just a function <code>a -&gt; b</code> that we
-represent backwards<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">I’m exaggerating a bit here 😅 To see what I
-<em>really</em> mean, see <a href="/lens-intuition">this post</a>.<br />
+<p>A lens is really just a function <code>a -&gt; b</code> that we represent
+backwards<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">I’m exaggerating a bit here 😅 To see what I <em>really</em> mean, see <a href="/lens-intuition">this post</a>.<br />
 <br />
 </span></span> and with an extra <code>Functor f</code> parameter lying
 around:</p>
@@ -66,38 +63,30 @@ around:</p>
 <p><strong>What does this mean for function composition?</strong></p>
 <!-- more -->
 <p>Normal function composition looks like this:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(.) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> c)</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(.) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> c)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> a <span class="ot">-&gt;</span> b</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ot">g ::</span> b <span class="ot">-&gt;</span> c</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>g <span class="op">.</span><span class="ot"> f ::</span> (a <span class="ot">-&gt;</span> c)</span></code></pre></div>
 <p>We often have to read code that looks like this:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">.</span> f <span class="op">$</span> x</span></code></pre></div>
-<p>This means “start with <code>x</code>, then run <code>f</code> on it,
-and run <code>g</code> after that.” This sentence reads opposite from
-how the code reads!</p>
-<p>What about for lenses? Here we have <code>f'</code> and
-<code>g'</code> which behave similarly in some sense to <code>f</code>
-and <code>g</code> from before:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f&#39; ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (b <span class="ot">-&gt;</span> f b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> f a)</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">.</span> f <span class="op">$</span> x</span></code></pre></div>
+<p>This means “start with <code>x</code>, then run <code>f</code> on it, and run <code>g</code> after that.”
+This sentence reads opposite from how the code reads!</p>
+<p>What about for lenses? Here we have <code>f'</code> and <code>g'</code> which behave similarly
+in some sense to <code>f</code> and <code>g</code> from before:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f&#39; ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (b <span class="ot">-&gt;</span> f b) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> f a)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">--  ≈ a -&gt; b</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ot">g&#39; ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (c <span class="ot">-&gt;</span> f c) <span class="ot">-&gt;</span> (b <span class="ot">-&gt;</span> f b)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">--  ≈ b -&gt; c</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>f&#39; <span class="op">.</span><span class="ot"> g&#39; ::</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> (c <span class="ot">-&gt;</span> f c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> f a)</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">--       ≈ a -&gt; c</span></span></code></pre></div>
-<p>In the lens world, <code>^.</code> behaves kind of like a flipped
-<code>$</code> that turns lenses into getters, which lets us write code
-like this:</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">^.</span> f&#39; <span class="op">.</span> g&#39;</span></code></pre></div>
-<p>This means “start with <code>x</code>, then get <code>f'</code> from
-it, then get <code>g'</code> after that.” The sentence reads just like
-the code!</p>
+<p>In the lens world, <code>^.</code> behaves kind of like a flipped <code>$</code> that turns
+lenses into getters, which lets us write code like this:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">^.</span> f&#39; <span class="op">.</span> g&#39;</span></code></pre></div>
+<p>This means “start with <code>x</code>, then get <code>f'</code> from it, then get <code>g'</code> after
+that.” The sentence reads just like the code!</p>
 <p>This is pretty cool, because it means that lenses (which are
 “functional” getters) read almost exactly like property access (which
 are “imperative” getters). Same concise syntax, but with an elegant

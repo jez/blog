@@ -51,187 +51,84 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#how-it-could-be-amazing"
-  id="toc-how-it-could-be-amazing">How it could be amazing</a></li>
-  <li><a href="#work-vs-personal" id="toc-work-vs-personal">Work vs
-  personal</a></li>
-  <li><a href="#appendix-fun-keyboard-shortcuts"
-  id="toc-appendix-fun-keyboard-shortcuts">Appendix: Fun keyboard
-  shortcuts</a></li>
+  <li><a href="#how-it-could-be-amazing" id="toc-how-it-could-be-amazing">How it could be amazing</a></li>
+  <li><a href="#work-vs-personal" id="toc-work-vs-personal">Work vs personal</a></li>
+  <li><a href="#appendix-fun-keyboard-shortcuts" id="toc-appendix-fun-keyboard-shortcuts">Appendix: Fun keyboard shortcuts</a></li>
   </ul>
 </nav>
 
 <main>
-<p>A while back I picked up a tiny, folding, wireless keyboard to turn
-my phone into a passable laptop replacement when traveling (thanks to
-some excellent apps and the power of SSH). It’s already incredible, and
-only one or two features are missing from iOS which would make it really
-amazing.</p>
+<p>A while back I picked up a tiny, folding, wireless keyboard to turn my phone into a passable laptop replacement when traveling (thanks to some excellent apps and the power of SSH). It’s already incredible, and only one or two features are missing from iOS which would make it really amazing.</p>
 <figure>
-<img src="/assets/img/folding-keyboard-vs-airpods.jpg"
-alt="Hard to use my phone for scale when I need it to take the picture" />
-<figcaption aria-hidden="true">Hard to use my phone for scale when I
-need it to take the picture</figcaption>
+<img src="/assets/img/folding-keyboard-vs-airpods.jpg" alt="Hard to use my phone for scale when I need it to take the picture" />
+<figcaption aria-hidden="true">Hard to use my phone for scale when I need it to take the picture</figcaption>
 </figure>
-<p>I picked up this <a
-href="https://www.amazon.com/dp/B0BZLMG7SN/">wireless folding
-keyboard</a> for $25 on Amazon. It’s only slight bigger than my phone
-itself (iPhone 12) and manages to fit in my jeans front pocket.</p>
+<p>I picked up this <a href="https://www.amazon.com/dp/B0BZLMG7SN/">wireless folding keyboard</a> for $25 on Amazon. It’s only slight bigger than my phone itself (iPhone 12) and manages to fit in my jeans front pocket.</p>
 <p><img src="/assets/img/folding-keyboard-folded.jpg" /></p>
-<p>For many of my personal trips, bringing a full-sized laptop or even
-an iPad is overkill, especially if there’s only a 10% chance that I’ll
-end up using it. When I do wish I had a laptop, it’s usually because I
-want to do a little blogging or light programming.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">For example, the trip calls for nothing but day hiking,
-but one day we get rained out. Or the trip calls for nothing but skiing,
-but the first day I get injured.<br />
+<p>For many of my personal trips, bringing a full-sized laptop or even an iPad is overkill, especially if there’s only a 10% chance that I’ll end up using it. When I do wish I had a laptop, it’s usually because I want to do a little blogging or light programming.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">For example, the trip calls for nothing but day hiking, but one day we get rained out. Or the trip calls for nothing but skiing, but the first day I get injured.<br />
 <br />
-</span></span> Now, all I have to do is tuck this keyboard somewhere in
-a carry-on.</p>
-<p>It’s the software that makes this setup workable as a short-term
-laptop replacement:</p>
+</span></span> Now, all I have to do is tuck this keyboard somewhere in a carry-on.</p>
+<p>It’s the software that makes this setup workable as a short-term laptop replacement:</p>
 <ul>
 <li><p>At home, I have a computer running SSH.</p>
-<p>It happens that it’s a desktop running Linux, but it could just as
-easily be a laptop running macOS with Remote Login enabled in the system
-settings.</p></li>
-<li><p>I have <a href="https://tailscale.com">Tailscale</a> installed on
-both my phone and the computer at home, filling the role of a VPN.</p>
-<p>This lets my phone SSH to the computer while traveling without having
-to deal with setting up port forwarding (and thus exposing the computer
-to the public internet).</p></li>
-<li><p>I have <a href="https://blink.sh">Blink Shell</a> installed on my
-phone. Blink has a ton of features, but I basically only use it for the
-terminal SSH client.</p></li>
+<p>It happens that it’s a desktop running Linux, but it could just as easily be a laptop running macOS with Remote Login enabled in the system settings.</p></li>
+<li><p>I have <a href="https://tailscale.com">Tailscale</a> installed on both my phone and the computer at home, filling the role of a VPN.</p>
+<p>This lets my phone SSH to the computer while traveling without having to deal with setting up port forwarding (and thus exposing the computer to the public internet).</p></li>
+<li><p>I have <a href="https://blink.sh">Blink Shell</a> installed on my phone. Blink has a ton of features, but I basically only use it for the terminal SSH client.</p></li>
 </ul>
 <p>There’s a lot of things I love about this setup:</p>
 <ul>
-<li><p>I have access to every (headless) program installed on my
-computer.</p>
-<p>I use Vim for blogging and programming, so I don’t need a graphical
-text editor, <strong>but</strong> Blink <a
-href="https://docs.blink.sh/advanced/code#starting-blink-code">embeds VS
-Code</a> for those who don’t. Blink’s copy of VS Code allows remotely
-editing files on any host that it can SSH into. I haven’t used it
-extensively, but it works <em>shockingly</em> well from what I’ve
-tried.</p></li>
+<li><p>I have access to every (headless) program installed on my computer.</p>
+<p>I use Vim for blogging and programming, so I don’t need a graphical text editor, <strong>but</strong> Blink <a href="https://docs.blink.sh/advanced/code#starting-blink-code">embeds VS Code</a> for those who don’t. Blink’s copy of VS Code allows remotely editing files on any host that it can SSH into. I haven’t used it extensively, but it works <em>shockingly</em> well from what I’ve tried.</p></li>
 <li><p>Tailscale gives me access to my blog preview.</p>
-<p>Each device on a tailnet gets an IP address, so I can just point iOS
-Safari at <code>&lt;computer-tailnet-ip&gt;:4000</code> and preview my
-blog while I write.<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="sidenote">Side benefit: I’m reading the mobile version of my post
-while I write, making it less likely that the post looks bad on mobile
-(due to something like a super long line of code or wordy
-heading).<br />
+<p>Each device on a tailnet gets an IP address, so I can just point iOS Safari at <code>&lt;computer-tailnet-ip&gt;:4000</code> and preview my blog while I write.<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">Side benefit: I’m reading the mobile version of my post while I write, making it less likely that the post looks bad on mobile (due to something like a super long line of code or wordy heading).<br />
 <br />
 </span></span></p></li>
-<li><p>Blink pairs <strong>perfectly</strong> with AirPlay screen
-mirroring.</p>
-<p>With the Blink app open in iOS screen mirroring mode, Blink magically
-uses the connected display as a full-resolution, non-mirrored external
-display. It turns any random smart TV into a 4K external monitor.</p>
+<li><p>Blink pairs <strong>perfectly</strong> with AirPlay screen mirroring.</p>
+<p>With the Blink app open in iOS screen mirroring mode, Blink magically uses the connected display as a full-resolution, non-mirrored external display. It turns any random smart TV into a 4K external monitor.</p>
 <!-- TODO(jez) picture of Blink on a TV -->
-<p>Without AirPlay, Blink plus the iPhone in landscape mode is passable:
-there’s plenty of horizontal space, but vertical space comes at a
-premium.<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="sidenote">I can get a 107x21 terminal with my phone on my lap and
-the text at a comfortable size. Plenty big enough for 80-character code
-lines plus some space for line numbers, but tedious when four of the
-rows are taken up with status lines and tab bars from Vim &amp;
-Tmux.<br />
+<p>Without AirPlay, Blink plus the iPhone in landscape mode is passable: there’s plenty of horizontal space, but vertical space comes at a premium.<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">I can get a 107x21 terminal with my phone on my lap and the text at a comfortable size. Plenty big enough for 80-character code lines plus some space for line numbers, but tedious when four of the rows are taken up with status lines and tab bars from Vim &amp; Tmux.<br />
 <br />
 </span></span></p></li>
 </ul>
 <h2 id="how-it-could-be-amazing">How it could be amazing</h2>
-<p>It’s impressive how well it already works—I wrote this whole post
-with just phone and keyboard while waiting in an airport terminal!<span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="sidenote">To get the images in the post, I have Dropbox on both
-my phone and the home computer, and Image Magick to convert &amp; resize
-the photos.<br />
+<p>It’s impressive how well it already works—I wrote this whole post with just phone and keyboard while waiting in an airport terminal!<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="sidenote">To get the images in the post, I have Dropbox on both my phone and the home computer, and Image Magick to convert &amp; resize the photos.<br />
 <br />
 </span></span></p>
 <p>But there’s a few things keeping this setup from being amazing.</p>
 <ul>
-<li><p>For some reason, <code>Cmd-Tab</code> to switch to the most
-recently used app is one of the few keyboard shortcuts that
-<strong>doesn’t</strong> transfer from macOS. It’s crazy, because it
-works on iPadOS.</p>
-<p>This seems like an oversight? Surely someone at Apple could sneak
-this into a future iOS update.</p>
-<p>Right now, my workaround is to use <code>Cmd-Space</code> to bring up
-“Siri Suggestions” (aka Spotlight-for-iOS) and type the name of the app
-I want to switch to.</p></li>
+<li><p>For some reason, <code>Cmd-Tab</code> to switch to the most recently used app is one of the few keyboard shortcuts that <strong>doesn’t</strong> transfer from macOS. It’s crazy, because it works on iPadOS.</p>
+<p>This seems like an oversight? Surely someone at Apple could sneak this into a future iOS update.</p>
+<p>Right now, my workaround is to use <code>Cmd-Space</code> to bring up “Siri Suggestions” (aka Spotlight-for-iOS) and type the name of the app I want to switch to.</p></li>
 <li><p>The input latency stacks up.</p>
-<p>I haven’t isolated where the typing latency comes from, but I imagine
-it’s smeared across lots of things (my top hunches right now are:
-physical distance to the computer at home, lag in AirPlay screen
-mirroring, and lag in the Blink terminal emulator).</p>
-<p>I try to minimize how much the lag affects me by using lots of
-keyboard shortcuts. I’ve included some of my favorites in the <a
-href="#appendix-fun-keyboard-shortcuts">Appendix</a> below.</p></li>
-<li><p>iOS Safari doesn’t do the “AirPlay screen mirroring is external
-display” trick. If this worked, it would be absolutely
-<strong>killer</strong>.</p>
-<p>It makes sense that iOS Safari doesn’t magically become full-screen
-by default—non power-users attempting to screen mirror would not expect
-it.</p>
-<p>But it would be incredible if an iPhone could drive a web browser at
-a full 4K resolution. Given how many things are already possible to do
-with nothing more than a desktop web browser, having one on my phone
-would be huge.</p></li>
+<p>I haven’t isolated where the typing latency comes from, but I imagine it’s smeared across lots of things (my top hunches right now are: physical distance to the computer at home, lag in AirPlay screen mirroring, and lag in the Blink terminal emulator).</p>
+<p>I try to minimize how much the lag affects me by using lots of keyboard shortcuts. I’ve included some of my favorites in the <a href="#appendix-fun-keyboard-shortcuts">Appendix</a> below.</p></li>
+<li><p>iOS Safari doesn’t do the “AirPlay screen mirroring is external display” trick. If this worked, it would be absolutely <strong>killer</strong>.</p>
+<p>It makes sense that iOS Safari doesn’t magically become full-screen by default—non power-users attempting to screen mirror would not expect it.</p>
+<p>But it would be incredible if an iPhone could drive a web browser at a full 4K resolution. Given how many things are already possible to do with nothing more than a desktop web browser, having one on my phone would be huge.</p></li>
 <li><p>Some apps only work in portrait mode.</p>
-<p>Slack and the iOS Settings app are the two which don’t support
-landscape that I find myself wanting to use the most with this travel
-setup.</p>
-<p>Slack is a double offender because it also doesn’t support
-<em>any</em> keyboard shortcuts on iOS that the desktop app supports, as
-far as I can tell.</p></li>
+<p>Slack and the iOS Settings app are the two which don’t support landscape that I find myself wanting to use the most with this travel setup.</p>
+<p>Slack is a double offender because it also doesn’t support <em>any</em> keyboard shortcuts on iOS that the desktop app supports, as far as I can tell.</p></li>
 </ul>
 <h2 id="work-vs-personal">Work vs personal</h2>
-<p>For light use cases, where I’m basically only blogging or writing
-code in Vim and compiling at the terminal, this setup is great.</p>
-<p>But I have a dream of one day being able to use this setup for
-<strong>work trips</strong> too. Think of how cool it would be to travel
-to an office in another city, sit down at any desk, plug in my phone
-over USB-C and get to work. This is <em>almost</em> possible.</p>
-<p>For me, the things holding it back are all related to where I work
-(where we can’t connect our phones to the corporate VPN) and how
-important Slack is for work trips (Slack doesn’t support iOS landscape
-mode, let alone the magical Blink external display mode). It’s so close
-to being a reality!</p>
+<p>For light use cases, where I’m basically only blogging or writing code in Vim and compiling at the terminal, this setup is great.</p>
+<p>But I have a dream of one day being able to use this setup for <strong>work trips</strong> too. Think of how cool it would be to travel to an office in another city, sit down at any desk, plug in my phone over USB-C and get to work. This is <em>almost</em> possible.</p>
+<p>For me, the things holding it back are all related to where I work (where we can’t connect our phones to the corporate VPN) and how important Slack is for work trips (Slack doesn’t support iOS landscape mode, let alone the magical Blink external display mode). It’s so close to being a reality!</p>
 <p><br />
 </p>
-<p>I have one of the most powerful computers ever built in my pocket at
-all times. It would be <strong>so cool</strong> if I use it like one,
-and we’re so close to being there.</p>
+<p>I have one of the most powerful computers ever built in my pocket at all times. It would be <strong>so cool</strong> if I use it like one, and we’re so close to being there.</p>
 <p><br />
 </p>
-<h2 id="appendix-fun-keyboard-shortcuts">Appendix: Fun keyboard
-shortcuts</h2>
-<p>Some of the keyboard shortcuts I noticed myself using the most while
-writing this post:</p>
+<h2 id="appendix-fun-keyboard-shortcuts">Appendix: Fun keyboard shortcuts</h2>
+<p>Some of the keyboard shortcuts I noticed myself using the most while writing this post:</p>
 <ul>
 <li>iOS
 <ul>
-<li><code>Opt-Backspace</code> and <code>Cmd-Backspace</code>, which
-delete the previous word or line.</li>
-<li><code>Cmd-Space</code>, to bring up “Siri Suggestions” (which I only
-use to launch apps).</li>
-<li><code>Cmd-.</code>, which usually does whatever <code>Esc</code>
-does on iOS.<span
-class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
-class="sidenote">Actually typing <code>Esc</code> on this keyboard
-requires pressing <code>Shift-Fn-`</code> which I find harder.<br />
+<li><code>Opt-Backspace</code> and <code>Cmd-Backspace</code>, which delete the previous word or line.</li>
+<li><code>Cmd-Space</code>, to bring up “Siri Suggestions” (which I only use to launch apps).</li>
+<li><code>Cmd-.</code>, which usually does whatever <code>Esc</code> does on iOS.<span class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span class="sidenote">Actually typing <code>Esc</code> on this keyboard requires pressing <code>Shift-Fn-`</code> which I find harder.<br />
 <br />
-I don’t know the origin of <code>Cmd-.</code> acting like
-<code>Esc</code> on macOS (and iOS by extension), but it’s right there
-in the <a
-href="https://developer.apple.com/design/human-interface-guidelines/keyboards/">Human
-Interface Guidelines</a>.<br />
+I don’t know the origin of <code>Cmd-.</code> acting like <code>Esc</code> on macOS (and iOS by extension), but it’s right there in the <a href="https://developer.apple.com/design/human-interface-guidelines/keyboards/">Human Interface Guidelines</a>.<br />
 <br />
 </span></span></li>
 </ul></li>
@@ -239,33 +136,24 @@ Interface Guidelines</a>.<br />
 <ul>
 <li><code>Cmd-L</code> to focus the address bar in Safari.</li>
 <li><code>Cmd-T</code>/<code>Cmd-W</code> open and close tabs.</li>
-<li><code>Cmd-Opt-Left</code>/<code>Cmd-Opt-Right</code> to go to the
-previous/next tab.</li>
-<li><code>Cmd-[</code>/<code>Cmd-]</code> to go to back and forward in a
-tab’s history.</li>
+<li><code>Cmd-Opt-Left</code>/<code>Cmd-Opt-Right</code> to go to the previous/next tab.</li>
+<li><code>Cmd-[</code>/<code>Cmd-]</code> to go to back and forward in a tab’s history.</li>
 </ul></li>
 <li>Vim
 <ul>
-<li><code>Ctrl-W</code> and <code>Ctrl-U</code> in insert mode to delete
-the previous word or line.</li>
+<li><code>Ctrl-W</code> and <code>Ctrl-U</code> in insert mode to delete the previous word or line.</li>
 <li><code>{</code>/<code>}</code> to move back/forward a paragraph.</li>
-<li><code>[s</code>/<code>]s</code> to jump to the previous/next
-spelling mistake (lots of typos on this small keyboard with the
-lag).</li>
-<li><code>z=1</code> (bound to <code>&lt;leader&gt;z</code>) to accept
-the first suggested spelling correction.</li>
-<li><code>Ctrl-[</code>, which is the same as <code>Esc</code> in
-terminals.</li>
+<li><code>[s</code>/<code>]s</code> to jump to the previous/next spelling mistake (lots of typos on this small keyboard with the lag).</li>
+<li><code>z=1</code> (bound to <code>&lt;leader&gt;z</code>) to accept the first suggested spelling correction.</li>
+<li><code>Ctrl-[</code>, which is the same as <code>Esc</code> in terminals.</li>
 </ul></li>
 <li>Blink
 <ul>
 <li><code>Cmd-T</code>/<code>Cmd-W</code> open and close tabs.</li>
-<li><code>Cmd-O</code> to toggle focus between the phone and the
-external display in screen mirroring.</li>
+<li><code>Cmd-O</code> to toggle focus between the phone and the external display in screen mirroring.</li>
 </ul></li>
 </ul>
-<p>In general, I’ve had great success by blindly trying macOS keyboard
-shortcuts and having them also work on iOS.</p>
+<p>In general, I’ve had great success by blindly trying macOS keyboard shortcuts and having them also work on iOS.</p>
 </main>
 
 

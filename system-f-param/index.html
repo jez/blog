@@ -56,35 +56,27 @@
   <input type="checkbox" id="contents">
   <ul>
   <li><a href="#questions" id="toc-questions">Questions</a></li>
-  <li><a href="#system-fω" id="toc-system-fω">System
-  F<sub>ω</sub></a></li>
-  <li><a href="#defining-the-list-constructor"
-  id="toc-defining-the-list-constructor">Defining the <code>list</code>
-  Constructor</a></li>
-  <li><a href="#defining-polymorphic-lists"
-  id="toc-defining-polymorphic-lists">Defining Polymorphic
-  Lists</a></li>
-  <li><a href="#variables-parameterization"
-  id="toc-variables-parameterization">Variables &amp;
-  Parameterization</a></li>
+  <li><a href="#system-fω" id="toc-system-fω">System F<sub>ω</sub></a></li>
+  <li><a href="#defining-the-list-constructor" id="toc-defining-the-list-constructor">Defining the <code>list</code> Constructor</a></li>
+  <li><a href="#defining-polymorphic-lists" id="toc-defining-polymorphic-lists">Defining Polymorphic Lists</a></li>
+  <li><a href="#variables-parameterization" id="toc-variables-parameterization">Variables &amp; Parameterization</a></li>
   </ul>
 </nav>
 
 <main>
 <p>When I first learned about System F<sub>ω</sub>, I was confused about
-the difference between <code>∀(t.τ)</code> (forall types) and
-<code>λ(u.c)</code> (type abstractions) for a long time, but recently I
-finally grasped the difference! Both of these constructs have to do with
-parameterization (factoring out a variable so that it’s bound), but the
-two types have drastically different meanings.</p>
+the difference between <code>∀(t.τ)</code> (forall types) and <code>λ(u.c)</code> (type
+abstractions) for a long time, but recently I finally grasped the
+difference! Both of these constructs have to do with parameterization
+(factoring out a variable so that it’s bound), but the two types have
+drastically different meanings.</p>
 <!-- more -->
 <h1 id="questions">Questions</h1>
 <p>We’ll start off with some questions to keep in mind throughout these
 notes. Our goals by the end are to understand what the questions are
 asking, and have at least a partial—if not complete—answer to each.</p>
 <p>First, consider this code.</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode sml"><code class="sourceCode sml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">datatype</span> &#39;a <span class="dt">list</span> = Nil | Cons <span class="kw">of</span> &#39;a * &#39;a <span class="dt">list</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sml"><code class="sourceCode sml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">datatype</span> &#39;a <span class="dt">list</span> = Nil | Cons <span class="kw">of</span> &#39;a * &#39;a <span class="dt">list</span></span></code></pre></div>
 <ul>
 <li>What really is “<code>list</code>” in this code?</li>
 <li>Or put another way, how would we define <code>list</code> in System
@@ -93,8 +85,7 @@ F<sub>ω</sub>?</li>
 <p>Thinking more broadly,</p>
 <ul>
 <li>What separates <code>∀(t.τ)</code> and <code>λ(u.c)</code>?</li>
-<li>What is parameterization, and how does it relate to these
-things?</li>
+<li>What is parameterization, and how does it relate to these things?</li>
 </ul>
 <h1 id="system-fω">System F<sub>ω</sub></h1>
 <p>The answers to most of these questions rely on a solid definition of
@@ -109,50 +100,43 @@ Con c  ::= ···
          | app(c₁; c₂)    c₁(c₂)        (Con, Con)Con</code></pre>
 <p>Some points to note:</p>
 <ul>
-<li><code>∀(u ∷ κ). c</code> and <code>λ(u ∷ κ). c</code> have the same
-arity.</li>
-<li><code>∀(u ∷ κ). c</code> and <code>λ(u ∷ κ). c</code> both
-<em>bind</em> a constructor variable. This makes these two operators
-<em>parametric</em>.</li>
-<li>Only <code>λ(u ∷ κ). c</code> has a matching elim form:
-<code>c₁(c₂)</code>. (There are no elim forms for <code>c₁ → c₂</code>
-and <code>∀(u ∷ κ). c</code>, because they construct types of kind
-<code>*</code>. This will be important later.)</li>
+<li><code>∀(u ∷ κ). c</code> and <code>λ(u ∷ κ). c</code> have the same arity.</li>
+<li><code>∀(u ∷ κ). c</code> and <code>λ(u ∷ κ). c</code> both <em>bind</em> a constructor variable.
+This makes these two operators <em>parametric</em>.</li>
+<li>Only <code>λ(u ∷ κ). c</code> has a matching elim form: <code>c₁(c₂)</code>.
+(There are no elim forms for <code>c₁ → c₂</code> and <code>∀(u ∷ κ). c</code>, because they
+construct types of kind <code>*</code>. This will be important later.)</li>
 </ul>
-<p>It’ll also be important to have these two inference rules for
-kinding:</p>
+<p>It’ll also be important to have these two inference rules for kinding:</p>
 <p><span class="math display">
 \frac{
   \Delta, u :: \kappa \vdash c :: *
 }{
   \Delta \vdash \forall(u :: \kappa). \, c :: *
 }\;(\texttt{forall-kind})
-</span> <span class="math display">
+</span>
+<span class="math display">
 \frac{
   \Delta, u :: \kappa \vdash c :: \kappa&#39;
 }{
   \Delta \vdash \lambda(u :: \kappa). \, c :: \kappa \to \kappa&#39;
 }\;(\texttt{lambda-kind})
 </span></p>
-<h1 id="defining-the-list-constructor">Defining the <code>list</code>
-Constructor</h1>
+<h1 id="defining-the-list-constructor">Defining the <code>list</code> Constructor</h1>
 <p>Let’s take another look at this datatype definition from above:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode sml"><code class="sourceCode sml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">datatype</span> &#39;a <span class="dt">list</span> = Nil | Cons <span class="kw">of</span> &#39;a * &#39;a <span class="dt">list</span></span></code></pre></div>
-<p>We’ve <a href="/variables-in-types/">already seen</a> how to encode
-the type of lists of integers using inductive types:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sml"><code class="sourceCode sml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">datatype</span> &#39;a <span class="dt">list</span> = Nil | Cons <span class="kw">of</span> &#39;a * &#39;a <span class="dt">list</span></span></code></pre></div>
+<p>We’ve <a href="/variables-in-types/">already seen</a> how to encode the type of lists
+of integers using inductive types:</p>
 <pre><code>intlist = μ(t. 1 + (int × t))</code></pre>
-<p>Knowing what we know about System F (the
-“<strong>polymorphic</strong> lambda calculus”), our next question
-should be “how do we encode <strong>polymorphic</strong> lists?” Or more
-specifically, which of these two operators (<code>λ</code> or
-<code>∀</code>) should we pick, and why?</p>
-<p>First, we should be more specific, because there’s a difference
-between <code>list</code> and <code>'a list</code>. Let’s start off with
-defining <code>list</code> in particular. From what we know of
-programming in Standard ML, we can do things like:</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode sml"><code class="sourceCode sml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">(* Apply &#39;int&#39; to &#39;list&#39; function! *)</span></span>
+<p>Knowing what we know about System F (the “<strong>polymorphic</strong> lambda
+calculus”), our next question should be “how do we encode
+<strong>polymorphic</strong> lists?” Or more specifically, which of these two
+operators (<code>λ</code> or <code>∀</code>) should we pick, and why?</p>
+<p>First, we should be more specific, because there’s a difference between
+<code>list</code> and <code>'a list</code>. Let’s start off with defining <code>list</code> in
+particular. From what we know of programming in Standard ML, we can do
+things like:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sml"><code class="sourceCode sml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">(* Apply &#39;int&#39; to &#39;list&#39; function! *)</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> grades = <span class="dt">int</span> <span class="dt">list</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> key = <span class="dt">string</span></span>
@@ -160,26 +144,13 @@ class="sourceCode sml"><code class="sourceCode sml"><span id="cb5-1"><a href="#c
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">(* Apply &#39;(key, val)&#39; to &#39;list&#39; function! *)</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> updates = (key, <span class="kw">val</span>) <span class="dt">list</span></span></code></pre></div>
-<p>If we look really closely, what’s actually happening here is that
-<code>list</code> is a type-level <em>function</em> that returns a type
-(and we use the <code>type foo = ...</code> syntax to store that
-returned type in a variable).<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">It’s easy to not notice at first that type definitions
-are really function calls because in Standard ML, the type function
-applications are backwards. Instead of <code>f(x)</code>, it’s
-<code>x f</code>. This is more similar to how we actually think when we
-see a function. Consider <code>h(g(f(x)))</code> (or another way:
-<code>h . g . f $ x</code>). We read this as “take x, do f, pass that to
-g, and pass that to h”. Why not write <code>x f g h</code> in the first
-place?<br />
+<p>If we look really closely, what’s actually happening here is that <code>list</code>
+is a type-level <em>function</em> that returns a type (and we use the <code>type foo = ...</code> syntax to store that returned type in a variable).<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">It’s easy to not notice at first that type definitions are really function calls because in Standard ML, the type function applications are backwards. Instead of <code>f(x)</code>, it’s <code>x f</code>. This is more similar to how we actually think when we see a function. Consider <code>h(g(f(x)))</code> (or another way: <code>h . g . f $ x</code>). We read this as “take x, do f, pass that to g, and pass that to h”. Why not write <code>x f g h</code> in the first place?<br />
 <br />
 </span></span></p>
-<p>Since <code>list</code> is actually a function from types to types,
-it must have an arrow kind: <code>* → *</code>. Looking back at our two
-inference rules for kinding, we see only one rule that lets us introduce
-an arrow kind: <code>λ(u ∷ κ). c</code>. On the other hand,
-<code>∀(u ∷ κ). c</code> must have kind <code>*</code>; it
+<p>Since <code>list</code> is actually a function from types to types, it must have
+an arrow kind: <code>* → *</code>. Looking back at our two inference rules for
+kinding, we see only one rule that lets us introduce an arrow kind: <code>λ(u ∷ κ). c</code>. On the other hand, <code>∀(u ∷ κ). c</code> must have kind <code>*</code>; it
 <em>can’t</em> be used to define type constructors.</p>
 <p>Step 1: define list constructor? Check:</p>
 <pre><code>list = λ(α ∷ *). μ(t. 1 + (α × t)))</code></pre>
@@ -187,111 +158,87 @@ an arrow kind: <code>λ(u ∷ κ). c</code>. On the other hand,
 <p>It doesn’t stop with the above definition, because it’s still not
 <em>polymorphic</em>. In particular, we can’t just go write functions on
 polymorphic lists with code like this:</p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode sml"><code class="sourceCode sml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fun</span> foo (x : <span class="dt">list</span>) = <span class="co">(* ··· *)</span></span></code></pre></div>
-<p>We can’t say <code>x : list</code> because all intermediate terms in
-a given program have to type check as a type of kind <code>*</code>,
-whereas <code>list ∷ * → *</code>. Another way of saying this: there
-isn’t any way to introduce a value of type <code>list</code> because
-there’s no way to introduce values with arrow kinds.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sml"><code class="sourceCode sml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fun</span> foo (x : <span class="dt">list</span>) = <span class="co">(* ··· *)</span></span></code></pre></div>
+<p>We can’t say <code>x : list</code> because all intermediate terms in a given
+program have to type check as a type of kind <code>*</code>, whereas <code>list ∷ * → *</code>. Another way of saying this: there isn’t any way to introduce a value
+of type <code>list</code> because there’s no way to introduce values with arrow
+kinds.</p>
 <p>Meanwhile, we <em>can</em> write this:</p>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode sml"><code class="sourceCode sml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fun</span> foo (x : &#39;a <span class="dt">list</span>) = <span class="co">(* ··· *)</span></span></code></pre></div>
-<p>When you get down to it, this is actually kind of weird. Why is it
-okay to use <code>'a list</code>? I never defined <code>'a</code>
-anywhere, so wouldn’t that make it an unbound variable?</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sml"><code class="sourceCode sml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fun</span> foo (x : &#39;a <span class="dt">list</span>) = <span class="co">(* ··· *)</span></span></code></pre></div>
+<p>When you get down to it, this is actually kind of weird. Why is it okay
+to use <code>'a list</code>? I never defined <code>'a</code> anywhere, so wouldn’t that make
+it an unbound variable?</p>
 <p>It turns out that when we use type variables like this, SML
-automatically binds them for us by inserting <code>∀</code>s into our
-code. In particular, it implicitly infers a type like this:</p>
-<div class="sourceCode" id="cb9"><pre
-class="sourceCode sml"><code class="sourceCode sml"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> foo : forall &#39;a. &#39;a <span class="dt">list</span> -&gt; ()</span></code></pre></div>
-<p>SML inserts this <code>forall</code> automatically because its type
-system is a bit less polymorphic than System F<sub>ω</sub>’s. Some might
-call this a drawback, though it does save us from typing
-<code>forall</code> annotations ourselves. And really, for most anything
-else we’d call a “drawback” of this design, SML makes up the difference
-with modules.<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="sidenote">Other languages (like Haskell or PureScript) have a
-language feature called “Rank-N Types” which is really just a fancy way
-of saying “you can put the <code>forall a.</code> anywhere you want.”
-Oftentimes, this makes it harder for the compiler to infer where the
-variable bindings are, so you sometimes have to use more annotations
-than you might if you weren’t using Rank-N types.<br />
+automatically binds them for us by inserting <code>∀</code>s into our code. In
+particular, it implicitly infers a type like this:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sml"><code class="sourceCode sml"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> foo : forall &#39;a. &#39;a <span class="dt">list</span> -&gt; ()</span></code></pre></div>
+<p>SML inserts this <code>forall</code> automatically because its type system is a bit
+less polymorphic than System F<sub>ω</sub>’s. Some might call this a
+drawback, though it does save us from typing <code>forall</code> annotations
+ourselves. And really, for most anything else we’d call a “drawback” of
+this design, SML makes up the difference with modules.<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">Other languages (like Haskell or PureScript) have a language feature called “Rank-N Types” which is really just a fancy way of saying “you can put the <code>forall a.</code> anywhere you want.” Oftentimes, this makes it harder for the compiler to infer where the variable bindings are, so you sometimes have to use more annotations than you might if you weren’t using Rank-N types.<br />
 <br />
 </span></span></p>
 <p>Step 2: make polymorphic list for use in annotation? Check:</p>
 <pre><code>α list = ∀(α ∷ *). list(α)</code></pre>
-<h1 id="variables-parameterization">Variables &amp;
-Parameterization</h1>
-<p>Tada! We’ve figured out how to take a list datatype from SML and
-encode it in System F<sub>ω</sub>, using these two definitions:</p>
+<h1 id="variables-parameterization">Variables &amp; Parameterization</h1>
+<p>Tada! We’ve figured out how to take a list datatype from SML and encode
+it in System F<sub>ω</sub>, using these two definitions:</p>
 <pre><code>  list = λ(α ∷ *). μ(t. 1 + (α × t)))
 α list = ∀(α ∷ *). list(α)</code></pre>
 <p>We could end here, but there’s one more interesting point. If we look
-back, we started out with the <code>∀</code> and <code>λ</code>
-operators having the same arity, but somewhere along the way their
-behaviors differed. <code>λ</code> was used to create type constructors,
-while <code>∀</code> was used to introduce polymorphism.</p>
-<p>Where did this split come from? What distinguishes <code>∀</code> as
-being the go-to type for polymorphism, while <code>λ</code> makes type
-constructors (type-to-type functions)? Recall one of the earliest ideas
-we teach in <a
-href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312</a>:</p>
+back, we started out with the <code>∀</code> and <code>λ</code> operators having the same
+arity, but somewhere along the way their behaviors differed. <code>λ</code> was
+used to create type constructors, while <code>∀</code> was used to introduce
+polymorphism.</p>
+<p>Where did this split come from? What distinguishes <code>∀</code> as being the
+go-to type for polymorphism, while <code>λ</code> makes type constructors
+(type-to-type functions)? Recall one of the earliest ideas we teach in
+<a href="http://www.cs.cmu.edu/~rwh/courses/ppl/">15-312</a>:</p>
 <blockquote>
-<p>… the core idea carries over from school mathematics, namely that
-<strong>a variable is an unknown, or a place-holder, whose meaning is
+<p>… the core idea carries over from school mathematics, namely
+that <strong>a variable is an unknown, or a place-holder, whose meaning is
 given by substitution.</strong></p>
-<p>– Harper, <em>Practical Foundations for Programming
-Languages</em></p>
+<p>– Harper, <em>Practical Foundations for Programming Languages</em></p>
 </blockquote>
 <p>Variables are given meaning by substitution, so we can look to the
 appropriate substitutions to uncover the meaning and the differences
-between <code>λ</code> and <code>∀</code>. Let’s first look at the
-substitution for <code>λ</code>:</p>
+between <code>λ</code> and <code>∀</code>. Let’s first look at the substitution for <code>λ</code>:</p>
 <p><span class="math display">
 \frac{
   \Delta, u :: \kappa_1 \vdash c_2 :: \kappa_2 \qquad \Delta \vdash c_1
   :: \kappa_1
 }{
-  \Delta \vdash (\lambda(u :: \kappa_1). \, c_2)(c_1) \equiv  [c_1/u]c_2
-:: \kappa_2
+  \Delta \vdash (\lambda(u :: \kappa_1). \, c_2)(c_1) \equiv  [c_1/u]c_2 :: \kappa_2
 }
 </span></p>
-<p>We can think of this as saying “when you apply one type to another,
-the second type gets full access to the first type to construct a new
-type.” We notice that the substitution here is completely
-<strong>internal to the type system</strong>.<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="sidenote">It’s not super relevant to this discussion, but this
-inference rule is for the judgement defining equality of type
-constructors. This comes up all over the place when you’re writing a
-compiler for SML. If this sounds interesting, definitely take 15-417 HOT
-Compilation!<br />
+<p>We can think of this as saying “when you apply one type to another, the
+second type gets full access to the first type to construct a new type.”
+We notice that the substitution here is completely <strong>internal to the
+type system</strong>.<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="sidenote">It’s not super relevant to this discussion, but this inference rule is for the judgement defining equality of type constructors. This comes up all over the place when you’re writing a compiler for SML. If this sounds interesting, definitely take 15-417 HOT Compilation!<br />
 <br />
 </span></span></p>
-<p>On the other hand, the substitution for <code>∀</code>
-<strong>bridges the gap</strong> from types to terms:</p>
+<p>On the other hand, the substitution for <code>∀</code> <strong>bridges the gap</strong> from
+types to terms:</p>
 <p><span class="math display">
 \frac{
-  \Delta \, \Gamma, e : \forall (u :: \kappa). \tau \qquad \Delta \vdash
-c :: \kappa
+  \Delta \, \Gamma, e : \forall (u :: \kappa). \tau \qquad \Delta \vdash c :: \kappa
 }{
   \Delta \, \Gamma \vdash e[c] : [c/u]\tau
 }
-</span> <span class="math display">
+</span>
+<span class="math display">
 \frac{
   \quad{}
 }{
   (\Lambda u. \, e)[\tau] \mapsto [\tau / u]e
 }
 </span></p>
-<p>When we’re type checking a polymorphic type application, we don’t get
-to know anything about the type parameter <code>u</code> other than its
-kind. But when we’re running a program and get to the evaluation of a
-polymorphic type application, we substitute the concrete <code>τ</code>
-directly in for <code>u</code> in <code>e</code>, which bridges the gap
-from the type-level to the term-level.</p>
+<p>When we’re type checking a polymorphic type application, we don’t get to
+know anything about the type parameter <code>u</code> other than its kind. But when
+we’re running a program and get to the evaluation of a polymorphic type
+application, we substitute the concrete <code>τ</code> directly in for <code>u</code> in <code>e</code>,
+which bridges the gap from the type-level to the term-level.</p>
 <p>At the end of the day, all the interesting stuff came from using
 functions (aka, something parameterized by a value) in cool ways. Isn’t
 that baffling? Functions are so powerful that they seem to always pop up

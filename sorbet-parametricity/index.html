@@ -53,8 +53,7 @@
 <p>Consider this snippet of Ruby code using Sorbet:</p>
 <!-- more -->
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode numberSource ruby numberLines hl-11"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># typed: true</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource ruby numberLines hl-11"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># typed: true</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">extend</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Sig</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a></span>
 <span id="cb1-4"><a href="#cb1-4"></a>sig <span class="cf">do</span></span>
@@ -70,52 +69,40 @@ class="sourceCode numberSource ruby numberLines hl-11"><code class="sourceCode r
 <span id="cb1-14"><a href="#cb1-14"></a>  <span class="cf">end</span></span>
 <span id="cb1-15"><a href="#cb1-15"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a
-href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20do%0A%20%20type_parameters%28%3AU%29%0A%20%20%20%20.params%28x%3A%20T.type_parameter%28%3AU%29%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AU%29%29%0Aend%0Adef%20fake_identity_function%28x%29%0A%20%20case%20x%0A%20%20when%20Integer%20then%20return%200%0A%20%20else%20return%20x%0A%20%20end%0Aend">→
-View on sorbet.run</a>
+<a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20do%0A%20%20type_parameters%28%3AU%29%0A%20%20%20%20.params%28x%3A%20T.type_parameter%28%3AU%29%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AU%29%29%0Aend%0Adef%20fake_identity_function%28x%29%0A%20%20case%20x%0A%20%20when%20Integer%20then%20return%200%0A%20%20else%20return%20x%0A%20%20end%0Aend">→ View on sorbet.run</a>
 </figcaption>
 </figure>
-<p>It has the same signature as the identity function (which returns its
-argument unchanged), but doesn’t actually do that in all cases. In
-particular, on the highlighted line it checks the type of <code>x</code>
-at runtime, and if it’s an <code>Integer</code>, it always returns
-<code>0</code>, regardless of the input.</p>
-<p>Sorbet flags this as an error (see the full error message in the
-sorbet.run link). Sometimes I get asked: “why?” The reasoning for why
-people think this <em>shouldn’t</em> be an error usually looks like
-this: the signature just says that the output has to be the same as the
-input, and <code>Integer</code> is the same as <code>Integer</code>.</p>
-<p>But the fun thing is that this signature makes a stronger constraint
-on the implementation of the method—in this case the signature
-<strong>mandates</strong> that the result is the input. The hand-wavy
-intuition for how to think about what’s going on is to mentally read the
-<code>type_parameters(:U)</code> in the signature as “for all,”
-specifically, “the behavior of this function is the same <em>for
-all</em> choices of the type parameters.”</p>
-<p>In that light, generics put a pretty hefty constraint on the
-implementation of a generic method—which is actually a good thing! It
-means that the caller of the method can make stronger guarantees about
-what the method can or cannot do, even seeing only the types. For
-example:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
+<p>It has the same signature as the identity function (which returns its argument unchanged),
+but doesn’t actually do that in all cases. In particular, on the highlighted line it
+checks the type of <code>x</code> at runtime, and if it’s an <code>Integer</code>, it always returns <code>0</code>,
+regardless of the input.</p>
+<p>Sorbet flags this as an error (see the full error message in the sorbet.run link).
+Sometimes I get asked: “why?” The reasoning for why people think this <em>shouldn’t</em> be an
+error usually looks like this: the signature just says that the output has to be the same
+as the input, and <code>Integer</code> is the same as <code>Integer</code>.</p>
+<p>But the fun thing is that this signature makes a stronger constraint on the implementation
+of the method—in this case the signature <strong>mandates</strong> that the result is the input. The
+hand-wavy intuition for how to think about what’s going on is to mentally read the
+<code>type_parameters(:U)</code> in the signature as “for all,” specifically, “the behavior of this
+function is the same <em>for all</em> choices of the type parameters.”</p>
+<p>In that light, generics put a pretty hefty constraint on the implementation of a generic
+method—which is actually a good thing! It means that the caller of the method can make
+stronger guarantees about what the method can or cannot do, even seeing only the types. For example:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:U</span>, <span class="wa">:V</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="wa">y:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:V</span>))</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:V</span>)))</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>From this signature we’re guaranteed that the method has to return
-exactly one of the arguments we provided (<code>x</code> or
-<code>y</code>) and nothing else. It can’t invent some third value and
+<p>From this signature we’re guaranteed that the method has to return exactly one of the
+arguments we provided (<code>x</code> or <code>y</code>) and nothing else. It can’t invent some third value and
 return that.</p>
-<p>But the constraints come within reason: the types don’t say anything
-about what side effects the function might have. This isn’t particularly
-unique to generics (Sorbet doesn’t track side effects no matter the
-types), but it is worth noting as a sneaky way that methods can do
-different things with different arguments. Going back to our
+<p>But the constraints come within reason: the types don’t say anything about what side
+effects the function might have. This isn’t particularly unique to generics (Sorbet
+doesn’t track side effects no matter the types), but it is worth noting as a sneaky way
+that methods can do different things with different arguments. Going back to our
 <code>fake_identity_function</code> example from earlier:</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode numberSource ruby numberLines hl-12 hl-15"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># typed: true</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource ruby numberLines hl-12 hl-15"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># typed: true</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">extend</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Sig</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a></span>
 <span id="cb3-4"><a href="#cb3-4"></a>sig <span class="cf">do</span></span>
@@ -134,37 +121,25 @@ class="sourceCode numberSource ruby numberLines hl-12 hl-15"><code class="source
 <span id="cb3-17"><a href="#cb3-17"></a>  <span class="cf">end</span></span>
 <span id="cb3-18"><a href="#cb3-18"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a
-href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20do%0A%20%20type_parameters%28%3AU%29%0A%20%20%20%20.params%28x%3A%20T.type_parameter%28%3AU%29%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AU%29%29%0Aend%0Adef%20fake_identity_function%28x%29%0A%20%20case%20x%0A%20%20when%20Integer%0A%20%20%20%20x.even%3F%0A%20%20%20%20x%0A%20%20else%0A%20%20%20%20x.even%3F%0A%20%20%20%20x%0A%20%20end%0Aend">→
-View on sorbet.run</a>
+<a href="https://sorbet.run/#%23%20typed%3A%20true%0Aextend%20T%3A%3ASig%0A%0Asig%20do%0A%20%20type_parameters%28%3AU%29%0A%20%20%20%20.params%28x%3A%20T.type_parameter%28%3AU%29%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AU%29%29%0Aend%0Adef%20fake_identity_function%28x%29%0A%20%20case%20x%0A%20%20when%20Integer%0A%20%20%20%20x.even%3F%0A%20%20%20%20x%0A%20%20else%0A%20%20%20%20x.even%3F%0A%20%20%20%20x%0A%20%20end%0Aend">→ View on sorbet.run</a>
 </figcaption>
 </figure>
-<p>In this example, the side effect of calling
-<code>puts(x.even?)</code> only happens if the type is
-<code>Integer</code>, breaking the intuition that the behavior of this
-function is uniform for all input types.</p>
-<p>If Sorbet wanted,<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">Unlike everything we’ve discussed so far, I’m not
-actually sure whether that was a conscious decision or an accident. But
-it is a pretty useful feature in practice.<br />
+<p>In this example, the side effect of calling <code>puts(x.even?)</code> only happens if the type is
+<code>Integer</code>, breaking the intuition that the behavior of this function is uniform for all
+input types.</p>
+<p>If Sorbet wanted,<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">Unlike everything we’ve discussed so far, I’m not actually sure whether that was a
+conscious decision or an accident. But it is a pretty useful feature in practice.<br />
 <br />
-</span></span> it could prevent this particular form of anti-uniformity
-by not allowing any <a
-href="https://sorbet.org/docs/flow-sensitive">control-flow-sensitive</a>
-type updates. But it wouldn’t change the fact that, for example, one
-implementation of <code>fake_identity_function</code> could always print
-one log line, while another implementation could always print two log
-lines. The only uniformity guarantees we get are about specifically
-what’s captured in the input and output types.</p>
-<p>It turns out that there’s a name for this property of generic
-functions: <a
-href="https://en.wikipedia.org/wiki/Parametricity">parametricity</a>.
-It’s a fancy word but it basically means what we’ve talked about here:
-the implementation of generic functions are constrained to basically
-only do one thing, modulo side-effects. It goes further than just
-intuition though, and people have done interesting work to formalize the
-intuitions into proofs.</p>
+</span></span> it could prevent this particular form of anti-uniformity by not
+allowing any <a href="https://sorbet.org/docs/flow-sensitive">control-flow-sensitive</a> type updates. But it wouldn’t change the fact that,
+for example, one implementation of <code>fake_identity_function</code> could always print one log
+line, while another implementation could always print two log lines. The only uniformity
+guarantees we get are about specifically what’s captured in the input and output types.</p>
+<p>It turns out that there’s a name for this property of generic functions: <a href="https://en.wikipedia.org/wiki/Parametricity">parametricity</a>.
+It’s a fancy word but it basically means what we’ve talked about here: the implementation
+of generic functions are constrained to basically only do one thing, modulo side-effects.
+It goes further than just intuition though, and people have done interesting work to
+formalize the intuitions into proofs.</p>
 </main>
 
 

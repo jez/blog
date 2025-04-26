@@ -52,19 +52,15 @@
   <input type="checkbox" id="contents">
   <ul>
   <li><a href="#tldr" id="toc-tldr">TL;DR</a></li>
-  <li><a href="#how-exhaustiveness-behaves-in-flow"
-  id="toc-how-exhaustiveness-behaves-in-flow">How Exhaustiveness Behaves
-  in Flow</a></li>
+  <li><a href="#how-exhaustiveness-behaves-in-flow" id="toc-how-exhaustiveness-behaves-in-flow">How Exhaustiveness Behaves in Flow</a></li>
   </ul>
 </nav>
 
 <main>
-<p>Compared to some other languages, <a
-href="https://flow.org/">Flow</a>’s story around exhaustiveness checking
-within <code>if / else</code> and <code>switch</code> statements leaves
-something to be desired. By default, Flow doesn’t do any exhaustiveness
-checks! But we <strong>can</strong> opt-in to exhaustiveness checking
-one statement at a time.</p>
+<p>Compared to some other languages, <a href="https://flow.org/">Flow</a>’s story around exhaustiveness
+checking within <code>if / else</code> and <code>switch</code> statements leaves something to
+be desired. By default, Flow doesn’t do any exhaustiveness checks! But
+we <strong>can</strong> opt-in to exhaustiveness checking one statement at a time.</p>
 <!-- more -->
 <p>In this post, we’ll discover from the ground up how Flow’s
 exhaustiveness checking behaves. But if you’re just looking for the
@@ -96,11 +92,8 @@ result, here’s a snippet:</p>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">absurd</span>(x)<span class="op">;</span></span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<h1 id="how-exhaustiveness-behaves-in-flow">How Exhaustiveness Behaves
-in Flow</h1>
-<p><a
-href="https://flow.org/try/#0PTAEAEDMBsHsHcBQiQrACQKYCdOnngBYCGAbnsaAC4CeADngOQCCs2AQo-gJZWHXxYoUsWzdiAOyoBnNIloNQzUAF5QAbyrEA5gC5QAImYGAvgG559PO1Uatew+1MWFeVh1vKAPqHYXEAMawEtJUoJASAIy2ABQAHvru7ACU+qFiEtqqAHwaiKCg3JDxAHT2qipqRgbJ6vkFoLhUAK7YEoYAku0ARtiSAfzGFgUmoJjQ0nh1DY2YLW2dPX0SA74Gw6AmiFtyIErQ0Pjjh5IAJqDasLCnADSg3c1h8CRhRUegxKfnlBKY8KABYiTAD8aFAADE2GM4sQALZ0aCYO4EWaQYgBKhQvgUbqwcjhbiI0AAPWoQmx93GCF0cksigAwrZNDp9AZ6c46W42Ow2Iy1N5fKAfPT-EEQmEIgAmWIJJTc3mpUDpbiZHJ5ApFUrlSpVYzJdUNJqtdoGLr3ZarIb1UbjSYGgpGhampb9fhODZbHaoPYAdWIvA+SswYtuhTCrgBhGDAGtpABCMEAFRejGklMBzTtKMzmG+AOIVAGAFpiAdQIxbZguL1XSVdmAfS9CpB3rDiNG8Jh0fwayt+Jg4gjuAFeKDUGCAKIAJSnAHkp-oZkvl6BADCkgABSQBtpIA4P6VVAy2hKoGT3DTEdPhRWsHhBe43SJ8F4-EkhXh0GHvGgNCLjt+52aEinJgkAqrmdZiqE4QSAAzDKiTytg9KKsqqoqLk0zNlqOgVLqNT2rM8wmmavaWus1pjBMeBvFhWQ6o4eEYQ6czGos5qumsHrbMg3pgAAClG8B3NIQi8KmsywiqpwqlkmbUE2BCMLgoASLAYRBOQB4fGWFKApM0h1nsAAycxiZ85wUr8-yMPSXC6ZgNLjns05zguK5uQUG47nuB5HieZ5WIUaYqkEN5UHeD5Ph87TcG+H5UF+P7MW0uagABQEgX+4HBJBEQACxwXKHAKmk+7SWqGGanEZTYXR1T6oxBEsc6bF9koZEjBRdrUVV2qVPR9X1ExhGsSRbrtZsnVUS2NE4YY7IDTMv4jRa-DspxXrAGCfoBpQkwhiUB1hnuhKHHwKqxnJBattw2iEGES1pcBoGnAmezsI8RyMPi6Uqrw4w0ACeI4ClpanVG+Z6UeuhnRI0bSQA+miAT2fWoCNldKL0swAByoCnCJaZmYG6XEM00BqUCSL3B9QLRhCcD-JioC8XOABqE6XU8eCAhIjBhNocxycDDmbYE2UShIACsBVJMV3llWhBqVdVtF9XV+FLc1o1tR6k3NqAM21U4C2GklREuq17rkZW+uG2r80a2by3sWt1uUfh8T6Jg8K0MkGwFHw2AIMpfygBO2BB9gMSMMQ3TSK0pyMH71pcajyZMIHweWWHEdsFw76-B8uL4o+Za-BpjQAXc3TBqTkxgqJaYqWEdCwNI0jhXgTMQfuzQYoGIjQM0eCwC2EYVj7NCMGCMQGOnSmiHgKnCKWw9Be0FLe3QtBBlQNSox0LYop8sDb3JF50AWVA4O0mAaTQzzA8iVbnJMXeEBeOCR6AsKYO3OiYAbkfPAkA2CXHDEIImFlQ52XCFCekItkA9yggANhlghJCJVNKKwqsUHqNU1Z6kdsNLWK0dZuy6tNfBqsqjG2IU1YiZCrYdRtg1PY9JfIf38ooC8wVryXzCvePAj4+BjEnnWGYnsxHbxoMnGYmd-jZ3DpHaOsd47YETnIzYqceL02DtfA4aZZIGCwDQO4HQ4FpUDPSOMoAADKQgLFBDJqcXmLcg74j4FdM6aZpAiNWPAIE0ISCZjCuQEoBhUbvXDFw0AAjr4LAvNId8t14oA0kCpGgZUmY5mrrXHMYc7GGRVGpfh0B-QhBFqAXIKkiwARzKcIsA46C4HbtwbK+gJyDmDNfb47QgQd20BIX+UhQBQkgABDE7T2iAjLGcS8oQuyv2IP8F8zTWkd2CAZTavpuYvhAnEc+aZugAyRpiTSFJ4k30vEzSgUZoAMGwOESZYVgiILBDHOOCcuAXgsnCbm15YTBC-KlSY5xKyPyUqAp5PjnkrFeRII8kInkDjhAiFGew7pUDoNIXQIASABGjAAkoJBpAdgOCUMBwBL6EoAcAUgsBuCNIAAwlAAOwlEiMAfGARpDAAACIFmIEWVmjLTgkqoLCaAABiUgug1EJzFuKIu6jzhqAADyJmyFIrevt9CJnKvUBRId-jKLYKor5Gik4WHMEg8WUE2XoKKohZCpVULoXqMrXquETZDQYRbUiusbbdRVrNAwdCGqa0YexZhE1g1UNDbVB2kanakJduNG07sU3DQVRo+IWjPSDSXEqnKEgAAcTqeQuqwQrD1Go8GJsIQxItUaA2DAzXrEN3r+r0KdNGy2HbWFFvYZw35AVeFXlCp3HgojN7dIxClS+fRYTUACqPaRtAJGmxzZa04+b1pAA"><strong>Read
-on flow.org/try/</strong></a></p>
+<h1 id="how-exhaustiveness-behaves-in-flow">How Exhaustiveness Behaves in Flow</h1>
+<p><a href="https://flow.org/try/#0PTAEAEDMBsHsHcBQiQrACQKYCdOnngBYCGAbnsaAC4CeADngOQCCs2AQo-gJZWHXxYoUsWzdiAOyoBnNIloNQzUAF5QAbyrEA5gC5QAImYGAvgG559PO1Uatew+1MWFeVh1vKAPqHYXEAMawEtJUoJASAIy2ABQAHvru7ACU+qFiEtqqAHwaiKCg3JDxAHT2qipqRgbJ6vkFoLhUAK7YEoYAku0ARtiSAfzGFgUmoJjQ0nh1DY2YLW2dPX0SA74Gw6AmiFtyIErQ0Pjjh5IAJqDasLCnADSg3c1h8CRhRUegxKfnlBKY8KABYiTAD8aFAADE2GM4sQALZ0aCYO4EWaQYgBKhQvgUbqwcjhbiI0AAPWoQmx93GCF0cksigAwrZNDp9AZ6c46W42Ow2Iy1N5fKAfPT-EEQmEIgAmWIJJTc3mpUDpbiZHJ5ApFUrlSpVYzJdUNJqtdoGLr3ZarIb1UbjSYGgpGhampb9fhODZbHaoPYAdWIvA+SswYtuhTCrgBhGDAGtpABCMEAFRejGklMBzTtKMzmG+AOIVAGAFpiAdQIxbZguL1XSVdmAfS9CpB3rDiNG8Jh0fwayt+Jg4gjuAFeKDUGCAKIAJSnAHkp-oZkvl6BADCkgABSQBtpIA4P6VVAy2hKoGT3DTEdPhRWsHhBe43SJ8F4-EkhXh0GHvGgNCLjt+52aEinJgkAqrmdZiqE4QSAAzDKiTytg9KKsqqoqLk0zNlqOgVLqNT2rM8wmmavaWus1pjBMeBvFhWQ6o4eEYQ6czGos5qumsHrbMg3pgAAClG8B3NIQi8KmsywiqpwqlkmbUE2BCMLgoASLAYRBOQB4fGWFKApM0h1nsAAycxiZ85wUr8-yMPSXC6ZgNLjns05zguK5uQUG47nuB5HieZ5WIUaYqkEN5UHeD5Ph87TcG+H5UF+P7MW0uagABQEgX+4HBJBEQACxwXKHAKmk+7SWqGGanEZTYXR1T6oxBEsc6bF9koZEjBRdrUVV2qVPR9X1ExhGsSRbrtZsnVUS2NE4YY7IDTMv4jRa-DspxXrAGCfoBpQkwhiUB1hnuhKHHwKqxnJBattw2iEGES1pcBoGnAmezsI8RyMPi6Uqrw4w0ACeI4ClpanVG+Z6UeuhnRI0bSQA+miAT2fWoCNldKL0swAByoCnCJaZmYG6XEM00BqUCSL3B9QLRhCcD-JioC8XOABqE6XU8eCAhIjBhNocxycDDmbYE2UShIACsBVJMV3llWhBqVdVtF9XV+FLc1o1tR6k3NqAM21U4C2GklREuq17rkZW+uG2r80a2by3sWt1uUfh8T6Jg8K0MkGwFHw2AIMpfygBO2BB9gMSMMQ3TSK0pyMH71pcajyZMIHweWWHEdsFw76-B8uL4o+Za-BpjQAXc3TBqTkxgqJaYqWEdCwNI0jhXgTMQfuzQYoGIjQM0eCwC2EYVj7NCMGCMQGOnSmiHgKnCKWw9Be0FLe3QtBBlQNSox0LYop8sDb3JF50AWVA4O0mAaTQzzA8iVbnJMXeEBeOCR6AsKYO3OiYAbkfPAkA2CXHDEIImFlQ52XCFCekItkA9yggANhlghJCJVNKKwqsUHqNU1Z6kdsNLWK0dZuy6tNfBqsqjG2IU1YiZCrYdRtg1PY9JfIf38ooC8wVryXzCvePAj4+BjEnnWGYnsxHbxoMnGYmd-jZ3DpHaOsd47YETnIzYqceL02DtfA4aZZIGCwDQO4HQ4FpUDPSOMoAADKQgLFBDJqcXmLcg74j4FdM6aZpAiNWPAIE0ISCZjCuQEoBhUbvXDFw0AAjr4LAvNId8t14oA0kCpGgZUmY5mrrXHMYc7GGRVGpfh0B-QhBFqAXIKkiwARzKcIsA46C4HbtwbK+gJyDmDNfb47QgQd20BIX+UhQBQkgABDE7T2iAjLGcS8oQuyv2IP8F8zTWkd2CAZTavpuYvhAnEc+aZugAyRpiTSFJ4k30vEzSgUZoAMGwOESZYVgiILBDHOOCcuAXgsnCbm15YTBC-KlSY5xKyPyUqAp5PjnkrFeRII8kInkDjhAiFGew7pUDoNIXQIASABGjAAkoJBpAdgOCUMBwBL6EoAcAUgsBuCNIAAwlAAOwlEiMAfGARpDAAACIFmIEWVmjLTgkqoLCaAABiUgug1EJzFuKIu6jzhqAADyJmyFIrevt9CJnKvUBRId-jKLYKor5Gik4WHMEg8WUE2XoKKohZCpVULoXqMrXquETZDQYRbUiusbbdRVrNAwdCGqa0YexZhE1g1UNDbVB2kanakJduNG07sU3DQVRo+IWjPSDSXEqnKEgAAcTqeQuqwQrD1Go8GJsIQxItUaA2DAzXrEN3r+r0KdNGy2HbWFFvYZw35AVeFXlCp3HgojN7dIxClS+fRYTUACqPaRtAJGmxzZa04+b1pAA"><strong>Read on flow.org/try/</strong></a></p>
 <p>Here we have a type <code>AorB</code> with two variants;</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>type A <span class="op">=</span> {<span class="dt">tag</span><span class="op">:</span> <span class="st">&quot;A&quot;</span>}<span class="op">;</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>type B <span class="op">=</span> {<span class="dt">tag</span><span class="op">:</span> <span class="st">&quot;B&quot;</span>}<span class="op">;</span></span>
@@ -113,8 +106,8 @@ on flow.org/try/</strong></a></p>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot;In branch B&quot;</span><span class="op">;</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>All well and good, but what if we add a new case? For example, what
-if we take the snippet above and add this:</p>
+<p>All well and good, but what if we add a new case?
+For example, what if we take the snippet above and add this:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>type C <span class="op">=</span> {<span class="dt">tag</span><span class="op">:</span> <span class="st">&quot;C&quot;</span>}<span class="op">;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>type AorBorC <span class="op">=</span> A <span class="op">|</span> B <span class="op">|</span> C<span class="op">;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -126,8 +119,8 @@ if we take the snippet above and add this:</p>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Wait a second, it type checks!</p>
-<p>That’s because we used a catch-all <code>else</code> branch. What if
-we make each branch explicit?</p>
+<p>That’s because we used a catch-all <code>else</code> branch. What if we make each
+branch explicit?</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ERROR:                 ┌─▶︎ string. This type is incompatible with an implicitly-returned undefined.</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> fn3 <span class="op">=</span> (x<span class="op">:</span> AorBorC)<span class="op">:</span> string <span class="kw">=&gt;</span> {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(x<span class="op">.</span><span class="at">tag</span> <span class="op">===</span> <span class="st">&quot;A&quot;</span>) {</span>
@@ -148,11 +141,10 @@ Let’s add the new <code>C</code> case:</p>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot;In branch C&quot;</span><span class="op">;</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>Hmm: it still thinks that we might return <code>undefined</code>,
-even though we’ve definitely covered all the cases… 🤔</p>
-<p>What we <strong>can</strong> do is add a default case, but ask Flow
-to <strong>prove</strong> that we can’t get there, using Flow’s
-<code>empty</code> type:</p>
+<p>Hmm: it still thinks that we might return <code>undefined</code>, even though we’ve
+definitely covered all the cases… 🤔</p>
+<p>What we <strong>can</strong> do is add a default case, but ask Flow to <strong>prove</strong> that
+we can’t get there, using Flow’s <code>empty</code> type:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> fn5 <span class="op">=</span> (x<span class="op">:</span> AorBorC)<span class="op">:</span> string <span class="kw">=&gt;</span> {</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(x<span class="op">.</span><span class="at">tag</span> <span class="op">===</span> <span class="st">&quot;A&quot;</span>) {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot;In branch A&quot;</span><span class="op">;</span></span>
@@ -165,17 +157,13 @@ to <strong>prove</strong> that we can’t get there, using Flow’s
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;This will never run!&#39;</span>)<span class="op">;</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>The <code>throw new Error</code> line above will never run, because
-it’s not possible to construct a value of type <code>empty</code>.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">Of course, this presumes that Flow’s type system is
-sound, which it isn’t. It’s possible to accidentally inhabit
-<code>empty</code> if you use <code>any</code>! Moral of the story: be
-<em>very</em> diligent about eradicating <code>any</code>.<br />
+<p>The <code>throw new Error</code> line above will never run, because it’s not
+possible to construct a value of type <code>empty</code>.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">Of course, this presumes that Flow’s type system is sound, which it isn’t. It’s possible to accidentally inhabit <code>empty</code> if you use <code>any</code>! Moral of the story: be <em>very</em> diligent about eradicating <code>any</code>.<br />
 <br />
-</span></span> (“There are no values in the empty set.”)</p>
-<p>If we adopt this pattern everywhere, we’d see this error message if
-we forgot to add the new case for <code>C</code>:</p>
+</span></span> (“There are no
+values in the empty set.”)</p>
+<p>If we adopt this pattern everywhere, we’d see this error message if we
+forgot to add the new case for <code>C</code>:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> fn6 <span class="op">=</span> (x<span class="op">:</span> AorBorC)<span class="op">:</span> string <span class="kw">=&gt;</span> {</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(x<span class="op">.</span><span class="at">tag</span> <span class="op">===</span> <span class="st">&quot;A&quot;</span>) {</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot;In branch A&quot;</span><span class="op">;</span></span>
@@ -189,11 +177,10 @@ we forgot to add the new case for <code>C</code>:</p>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Flow tells us “Hey, I found a C! So I couldn’t prove that this switch
 was exhaustive.”</p>
-<p>But this pattern is slightly annoying to use, because ESLint
-complains:</p>
+<p>But this pattern is slightly annoying to use, because ESLint complains:</p>
 <pre><code>no-unused-expressions: Expected an assignment or function call and instead saw an expression.</code></pre>
-<p>We can fix this by factoring that <code>empty ... throw</code>
-pattern into a helper function:</p>
+<p>We can fix this by factoring that <code>empty ... throw</code> pattern into a
+helper function:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// &#39;absurd&#39; is the name commonly used elsewhere for this function. For example:</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">// https://hackage.haskell.org/package/void-0.7.1/docs/Data-Void.html#v:absurd</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> absurd <span class="op">=</span> <span class="op">&lt;</span>T<span class="op">&gt;</span>(x<span class="op">:</span> empty)<span class="op">:</span> T <span class="kw">=&gt;</span> {</span>
@@ -222,11 +209,11 @@ pattern into a helper function:</p>
 <span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">absurd</span>(x)<span class="op">;</span></span>
 <span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>So there you have it! You can put that helper function
-(<code>absurd</code>) in a file somewhere and import it anywhere. You
-could even give it a different name if you want! I’ve been using this
-pattern in all the Flow code I write these days and it’s been nice to
-rely on it when doing refactors.</p>
+<p>So there you have it! You can put that helper function (<code>absurd</code>) in a
+file somewhere and import it anywhere. You could even give it a
+different name if you want! I’ve been using this pattern in all the Flow
+code I write these days and it’s been nice to rely on it when doing
+refactors.</p>
 <!-- vim:tw=72
 -->
 </main>

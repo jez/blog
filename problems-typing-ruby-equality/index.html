@@ -53,20 +53,15 @@
   <li><a href="#heuristic-1" id="toc-heuristic-1">Heuristic 1</a></li>
   <li><a href="#heuristic-2" id="toc-heuristic-2">Heuristic 2</a></li>
   <li><a href="#heuristic-3" id="toc-heuristic-3">Heuristic 3</a></li>
-  <li><a href="#a-manual-approach" id="toc-a-manual-approach">A manual
-  approach?</a></li>
-  <li><a href="#appendix-what-do-other-languages-do"
-  id="toc-appendix-what-do-other-languages-do">Appendix: What do other
-  languages do?</a></li>
+  <li><a href="#a-manual-approach" id="toc-a-manual-approach">A manual approach?</a></li>
+  <li><a href="#appendix-what-do-other-languages-do" id="toc-appendix-what-do-other-languages-do">Appendix: What do other languages do?</a></li>
   </ul>
 </nav>
 
 <main>
-<p>TypeScript has this really handy error that flags when it looks like
-two values of unrelated types are getting compared:</p>
+<p>TypeScript has this really handy error that flags when it looks like two values of unrelated types are getting compared:</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">f</span>(x<span class="op">:</span> <span class="dt">number</span><span class="op">,</span> y<span class="op">:</span> <span class="dt">string</span>) {</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">f</span>(x<span class="op">:</span> <span class="dt">number</span><span class="op">,</span> y<span class="op">:</span> <span class="dt">string</span>) {</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (x <span class="op">===</span> y) {</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">//  ^^^ error: This comparison appears to be unintentional because</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">//             the types &#39;number&#39; and &#39;string&#39; have no overlap.</span></span>
@@ -74,74 +69,38 @@ class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb1-
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <figcaption>
-<a
-href="https://www.typescriptlang.org/play?#code/GYVwdgxgLglg9mABMAFADwFyLCAtgIwFMAnAGkQE8sBnKYmMAcwEpEBvAKEURmEXUQBeYZVadu3CAmpwANoQB0suI3TkKzANxdEAXw66gA">View
-in TypeScript Playground →</a>
+<a href="https://www.typescriptlang.org/play?#code/GYVwdgxgLglg9mABMAFADwFyLCAtgIwFMAnAGkQE8sBnKYmMAcwEpEBvAKEURmEXUQBeYZVadu3CAmpwANoQB0suI3TkKzANxdEAXw66gA">View in TypeScript Playground →</a>
 </figcaption>
 </figure>
-<p>I would love to build the same error into Sorbet, but there are two
-features which make that hard: custom overrides of <code>==</code> and
-subtyping. Here are some heuristics we might consider building in
-Sorbet, and why they don’t work.</p>
+<p>I would love to build the same error into Sorbet, but there are two features which make that hard: custom overrides of <code>==</code> and subtyping. Here are some heuristics we might consider building in Sorbet, and why they don’t work.</p>
 <h1 id="heuristic-1">Heuristic 1</h1>
 <blockquote>
-<p>Reject all calls to <code>==</code> when the operand types don’t
-overlap.</p>
+<p>Reject all calls to <code>==</code> when the operand types don’t overlap.</p>
 </blockquote>
-<p>The problem: Ruby equality methods make liberal use of implicit type
-conversions and other tricks. Some examples in the standard library:</p>
+<p>The problem: Ruby equality methods make liberal use of implicit type conversions and other tricks. Some examples in the standard library:</p>
 <ul>
-<li><p><code>Array</code>, <code>Hash</code>, and <code>String</code>
-allow the right operand to implement a method (<code>to_ary</code>,
-<code>to_hash</code>, or <code>to_str</code>, respectively) that gets
-called implicitly on arguments whose type does not match the
-receiver.</p></li>
-<li><p>In addition to implicit conversions, most numeric types (for
-example, <code>Integer</code> and <code>Float</code>) will call
-<code>other == self</code> whenever <code>self == other</code> initially
-returns <code>false</code>. Here’s an example:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
+<li><p><code>Array</code>, <code>Hash</code>, and <code>String</code> allow the right operand to implement a method (<code>to_ary</code>, <code>to_hash</code>, or <code>to_str</code>, respectively) that gets called implicitly on arguments whose type does not match the receiver.</p></li>
+<li><p>In addition to implicit conversions, most numeric types (for example, <code>Integer</code> and <code>Float</code>) will call <code>other == self</code> whenever <code>self == other</code> initially returns <code>false</code>. Here’s an example:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="op">==</span>(other)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    other<span class="at">.is_a?</span>(<span class="cn">A</span>) <span class="op">||</span> other <span class="op">==</span> <span class="dv">0</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">p</span>(<span class="dv">0</span> <span class="op">==</span> <span class="cn">A</span><span class="at">.new</span>) <span class="co"># =&gt; true</span></span></code></pre></div>
-<p>This allows classes like <code>Process::Status</code><span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">In one sense, it’s neat: you can have methods like
-<code>status.success?</code> without monkey patching
-<code>Integer</code>, and while still allowing code like
-<code>0 == status</code>.<br />
+<p>This allows classes like <code>Process::Status</code><span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="marginnote">In one sense, it’s neat: you can have methods like <code>status.success?</code> without monkey patching <code>Integer</code>, and while still allowing code like <code>0 == status</code>.<br />
 <br />
-</span></span> in the standard library to be compared interchangeably
-with <code>Integer</code>.</p></li>
+</span></span> in the standard library to be compared interchangeably with <code>Integer</code>.</p></li>
 </ul>
-<p>Library and application authors pattern their code off of precedents
-set in the standard library. Implicit conversions like these surface
-throughout real-world Ruby code.</p>
+<p>Library and application authors pattern their code off of precedents set in the standard library. Implicit conversions like these surface throughout real-world Ruby code.</p>
 <h1 id="heuristic-2">Heuristic 2</h1>
 <blockquote>
-<p>Reject all calls to <code>==</code> when the operand types don’t
-overlap, as long as the types being compared don’t have a custom
-<code>==</code> method.</p>
+<p>Reject all calls to <code>==</code> when the operand types don’t overlap, as long as the types being compared don’t have a custom <code>==</code> method.</p>
 </blockquote>
-<p>Maybe we pessimistically assume that <strong>any</strong> override of
-<code>==</code> might do something wacky. In response, we could limit
-the check to calls on types that don’t override
-<code>BasicObject#==</code>.</p>
-<p>First of all, that’s almost crippling on its own! When
-<code>==</code> isn’t overridden it defaults to reference equality, but
-people use <code>==</code> most often to compare structures, not
-references! Ruby provides <code>equal?</code> for reference
-equality—seeing a call to <code>==</code> (not to <code>equal?</code>)
-is a strong indicator that the author doesn’t want reference
-equality.</p>
-<p>Even if we were satisfied with how limiting this heuristic is, it’s
-still not enough, this time because of subtyping:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode numberSource ruby numberLines hl-2 hl-3 hl-9"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a><span class="cf">class</span> <span class="dt">Foo</span>; <span class="cf">end</span></span>
+<p>Maybe we pessimistically assume that <strong>any</strong> override of <code>==</code> might do something wacky. In response, we could limit the check to calls on types that don’t override <code>BasicObject#==</code>.</p>
+<p>First of all, that’s almost crippling on its own! When <code>==</code> isn’t overridden it defaults to reference equality, but people use <code>==</code> most often to compare structures, not references! Ruby provides <code>equal?</code> for reference equality—seeing a call to <code>==</code> (not to <code>equal?</code>) is a strong indicator that the author doesn’t want reference equality.</p>
+<p>Even if we were satisfied with how limiting this heuristic is, it’s still not enough, this time because of subtyping:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource ruby numberLines hl-2 hl-3 hl-9"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a><span class="cf">class</span> <span class="dt">Foo</span>; <span class="cf">end</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="cf">class</span> <span class="dt">FooChild</span> <span class="op">&lt;</span> <span class="dt">Foo</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a>  <span class="cf">def</span> <span class="op">==</span>(other); <span class="dv">true</span>; <span class="cf">end</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="cf">end</span></span>
@@ -153,55 +112,20 @@ class="sourceCode numberSource ruby numberLines hl-2 hl-3 hl-9"><code class="sou
 <span id="cb3-10"><a href="#cb3-10"></a>    <span class="fu">p</span>(x, y)</span>
 <span id="cb3-11"><a href="#cb3-11"></a>  <span class="cf">end</span></span>
 <span id="cb3-12"><a href="#cb3-12"></a><span class="cf">end</span></span></code></pre></div>
-<p>In this case, <code>Foo</code> and <code>Bar</code> do not
-overlap<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="marginnote">Note that <code>Foo</code> and <code>Bar</code> do
-not overlap because they are classes. If one of them had been a module,
-<a
-href="https://sorbet.org/docs/intersection-types#understanding-how-intersection-types-collapse">they
-would overlap</a>, also defeating the equality check.<br />
+<p>In this case, <code>Foo</code> and <code>Bar</code> do not overlap<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="marginnote">Note that <code>Foo</code> and <code>Bar</code> do not overlap because they are classes. If one of them had been a module, <a href="https://sorbet.org/docs/intersection-types#understanding-how-intersection-types-collapse">they would overlap</a>, also defeating the equality check.<br />
 <br />
-</span></span> <code>Foo</code> does not override <code>==</code>.
-Unfortunately that says nothing about what subclasses of
-<code>Foo</code> might do. In this example, <code>Foo</code> has a
-subclass called <code>FooChild</code> with a custom override that
-misbehaves. (I’ve made it always return <code>true</code> for
-simplicity, but you can just as well imagine it doing some sort of
-implicit conversion.) Thus, subtyping has defeated our heuristic.</p>
-<p>If the left operand had been <a
-href="https://sorbet.org/docs/final"><code>final!</code></a> Sorbet
-could rule out caveats like this, but then our heuristic would be so
-limited as to be surprising: few classes are <code>final!</code>, and
-few classes which rely on <code>==</code> do so for reference equality.
-Someone may see this class of error once, assume it applies more widely
-than it does, and then be shocked when a problem sneaks past the
-check.</p>
+</span></span> <code>Foo</code> does not override <code>==</code>. Unfortunately that says nothing about what subclasses of <code>Foo</code> might do. In this example, <code>Foo</code> has a subclass called <code>FooChild</code> with a custom override that misbehaves. (I’ve made it always return <code>true</code> for simplicity, but you can just as well imagine it doing some sort of implicit conversion.) Thus, subtyping has defeated our heuristic.</p>
+<p>If the left operand had been <a href="https://sorbet.org/docs/final"><code>final!</code></a> Sorbet could rule out caveats like this, but then our heuristic would be so limited as to be surprising: few classes are <code>final!</code>, and few classes which rely on <code>==</code> do so for reference equality. Someone may see this class of error once, assume it applies more widely than it does, and then be shocked when a problem sneaks past the check.</p>
 <h1 id="heuristic-3">Heuristic 3</h1>
 <blockquote>
-<p>Add custom logic for <code>==</code> which knows about the implicit
-conversions specific standard library classes do.</p>
+<p>Add custom logic for <code>==</code> which knows about the implicit conversions specific standard library classes do.</p>
 </blockquote>
-<p>Maybe trying to be as general as possible is the wrong approach? We
-could try picking only a few important classes in the standard library
-and special case the check for those types.</p>
-<p>For example,<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="marginnote">This is not merely an example—this is the approach
-we’ve implemented it <a
-href="https://github.com/sorbet/sorbet/pull/6649">here</a>.<br />
+<p>Maybe trying to be as general as possible is the wrong approach? We could try picking only a few important classes in the standard library and special case the check for those types.</p>
+<p>For example,<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="marginnote">This is not merely an example—this is the approach we’ve implemented it <a href="https://github.com/sorbet/sorbet/pull/6649">here</a>.<br />
 <br />
-</span></span> if we pretend that <code>Symbol</code> is final (it’s not
-but maybe we pretend anyways), we could require that the right operand’s
-type overlaps with <code>Symbol</code>, catching attempts to compare for
-equality against <code>String</code> (super common).</p>
-<p>This only gets us as far as types that don’t do implicit conversions.
-For a type like <code>String</code>, even though we know it allows
-comparisons against “anything that defines <code>to_str</code>” and
-Sorbet can look up whether such a method exists during inference,
-subtyping once again gets in our way:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode numberSource ruby numberLines hl-2 hl-3 hl-8"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a><span class="cf">class</span> <span class="dt">AbstractParent</span>; <span class="cf">end</span></span>
+</span></span> if we pretend that <code>Symbol</code> is final (it’s not but maybe we pretend anyways), we could require that the right operand’s type overlaps with <code>Symbol</code>, catching attempts to compare for equality against <code>String</code> (super common).</p>
+<p>This only gets us as far as types that don’t do implicit conversions. For a type like <code>String</code>, even though we know it allows comparisons against “anything that defines <code>to_str</code>” and Sorbet can look up whether such a method exists during inference, subtyping once again gets in our way:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource ruby numberLines hl-2 hl-3 hl-8"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a><span class="cf">class</span> <span class="dt">AbstractParent</span>; <span class="cf">end</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">AbstractParent</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a>  <span class="cf">def</span> to_str; <span class="st">&quot;&quot;</span>; <span class="cf">end</span></span>
 <span id="cb4-4"><a href="#cb4-4"></a><span class="cf">end</span></span>
@@ -212,25 +136,11 @@ class="sourceCode numberSource ruby numberLines hl-2 hl-3 hl-8"><code class="sou
 <span id="cb4-9"><a href="#cb4-9"></a>    <span class="fu">p</span>(x, y)</span>
 <span id="cb4-10"><a href="#cb4-10"></a>  <span class="cf">end</span></span>
 <span id="cb4-11"><a href="#cb4-11"></a><span class="cf">end</span></span></code></pre></div>
-<p>In the comparison of <code>String</code> and
-<code>AbstractParent</code>, the types don’t overlap
-<strong>and</strong> <code>AbstractParent</code> doesn’t implement
-<code>to_str</code>. But <code>Child</code> does, which defeats the
-heuristic.</p>
-<p>Sorbet could both assume <code>String</code> is <code>final!</code>
-<strong>and</strong> check that the right operand is
-<code>final!</code>, and then implement the check (the last time
-subtyping got in our way, it was only with the left operand). Adding one
-more constraint makes this heuristic even less useful and more
-surprising than the previous.</p>
+<p>In the comparison of <code>String</code> and <code>AbstractParent</code>, the types don’t overlap <strong>and</strong> <code>AbstractParent</code> doesn’t implement <code>to_str</code>. But <code>Child</code> does, which defeats the heuristic.</p>
+<p>Sorbet could both assume <code>String</code> is <code>final!</code> <strong>and</strong> check that the right operand is <code>final!</code>, and then implement the check (the last time subtyping got in our way, it was only with the left operand). Adding one more constraint makes this heuristic even less useful and more surprising than the previous.</p>
 <h1 id="a-manual-approach">A manual approach?</h1>
-<p>Maybe I’m a zealous Sorbet user who acknowledges that the problem
-can’t be solved for every class. I still want to report an error
-whenever one of my classes is compared using <code>==</code> on
-mismatched types—can I take the problem into my own hands? It’s
-technically as simple as adding a signature:</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode numberSource ruby numberLines hl-1 hl-6"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">class</span> <span class="cn">A</span> <span class="op">&lt;</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Struct</span></span>
+<p>Maybe I’m a zealous Sorbet user who acknowledges that the problem can’t be solved for every class. I still want to report an error whenever one of my classes is compared using <code>==</code> on mismatched types—can I take the problem into my own hands? It’s technically as simple as adding a signature:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines hl-1 hl-6"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">class</span> <span class="cn">A</span> <span class="op">&lt;</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Struct</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>  <span class="fu">extend</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Sig</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a></span>
 <span id="cb5-4"><a href="#cb5-4"></a>  const <span class="wa">:val</span>, <span class="dt">Integer</span></span>
@@ -243,54 +153,22 @@ class="sourceCode numberSource ruby numberLines hl-1 hl-6"><code class="sourceCo
 <span id="cb5-11"><a href="#cb5-11"></a>    <span class="cf">end</span></span>
 <span id="cb5-12"><a href="#cb5-12"></a>  <span class="cf">end</span></span>
 <span id="cb5-13"><a href="#cb5-13"></a><span class="cf">end</span></span></code></pre></div>
-<p>The signature requires that <code>other</code> has type
-<code>A</code>. Done! Well, this fixes the immediate problem
-(<code>x == y</code> reports an error if <code>y</code> is an
-<code>A</code>), but it causes two of its own.</p>
-<p>First, this is technically an incompatible override (see <a
-href="https://sorbet.org/docs/override-checking#a-note-on-variance">A
-note on variance</a> for more). As it happens, Sorbet silences the error
-because the RBI definition for <code>BasicObject#==</code> is not marked
-<code>overridable</code>.<span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="marginnote">At this point, marking it overridable would be a
-backwards incompatible change, requiring existing <code>==</code>
-signatures to start mentioning <code>override</code>, likely with no
-benefit.<br />
+<p>The signature requires that <code>other</code> has type <code>A</code>. Done! Well, this fixes the immediate problem (<code>x == y</code> reports an error if <code>y</code> is an <code>A</code>), but it causes two of its own.</p>
+<p>First, this is technically an incompatible override (see <a href="https://sorbet.org/docs/override-checking#a-note-on-variance">A note on variance</a> for more). As it happens, Sorbet silences the error because the RBI definition for <code>BasicObject#==</code> is not marked <code>overridable</code>.<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="marginnote">At this point, marking it overridable would be a backwards incompatible change, requiring existing <code>==</code> signatures to start mentioning <code>override</code>, likely with no benefit.<br />
 <br />
-</span></span> Maybe you declare “ignorance is bliss,” ignore the voice
-telling you that all incompatible overrides are bad, and blaze
-ahead.</p>
+</span></span> Maybe you declare “ignorance is bliss,” ignore the voice telling you that all incompatible overrides are bad, and blaze ahead.</p>
 <p>This leads to our second problem, heterogeneous collections.</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode numberSource ruby numberLines hl-1"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1"></a>sig <span class="op">{</span>params(<span class="wa">xs:</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Array</span><span class="kw">[</span><span class="cn">T</span><span class="at">.any</span>(<span class="dt">Integer</span>, <span class="cn">A</span>)<span class="kw">]</span><span class="op">}</span></span>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource ruby numberLines hl-1"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1"></a>sig <span class="op">{</span>params(<span class="wa">xs:</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Array</span><span class="kw">[</span><span class="cn">T</span><span class="at">.any</span>(<span class="dt">Integer</span>, <span class="cn">A</span>)<span class="kw">]</span><span class="op">}</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="cf">def</span> example(xs)</span>
 <span id="cb6-3"><a href="#cb6-3"></a>  xs<span class="at">.include?</span>(<span class="dv">0</span>) <span class="co"># 💥</span></span>
 <span id="cb6-4"><a href="#cb6-4"></a><span class="cf">end</span></span></code></pre></div>
-<p>Ruby’s <code>include?</code> method calls <code>==</code> under the
-hood. Even if the program never mentions a literal call to
-<code>==</code> with <code>A</code> and <code>Integer</code>, it still
-might happen indirectly by way of <code>include?</code> if
-<code>xs</code> has any <code>A</code> values in it. But now instead of
-returning <code>false</code>, the <code>sig</code> on our
-<code>A#==</code> method will raise an exception!</p>
-<p>That’s a problem.<span
-class="sidenote-wrapper"><label for="sn-4" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
-class="marginnote">You might be tempted to think of this as an
-indictment of <a href="/runtime-type-checking/">runtime checking</a>,
-but I don’t. In my opinion, this is the runtime type system flagging a
-real problem (incompatible override) which the static type system
-couldn’t catch because of gradual typing.<br />
+<p>Ruby’s <code>include?</code> method calls <code>==</code> under the hood. Even if the program never mentions a literal call to <code>==</code> with <code>A</code> and <code>Integer</code>, it still might happen indirectly by way of <code>include?</code> if <code>xs</code> has any <code>A</code> values in it. But now instead of returning <code>false</code>, the <code>sig</code> on our <code>A#==</code> method will raise an exception!</p>
+<p>That’s a problem.<span class="sidenote-wrapper"><label for="sn-4" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-4" class="margin-toggle"/><span class="marginnote">You might be tempted to think of this as an indictment of <a href="/runtime-type-checking/">runtime checking</a>, but I don’t. In my opinion, this is the runtime type system flagging a real problem (incompatible override) which the static type system couldn’t catch because of gradual typing.<br />
 <br />
-</span></span> To fix it, we could try marking the <code>sig</code> with
-<code>checked(:never)</code>, but then Sorbet’s dead code checking would
-prevent us from handling other types in our method body.</p>
-<p>Another attempted fix might be to use an overloaded signature. These
-aren’t allowed outside of standard library signatures, but here’s what
-would happen if they were:</p>
+</span></span> To fix it, we could try marking the <code>sig</code> with <code>checked(:never)</code>, but then Sorbet’s dead code checking would prevent us from handling other types in our method body.</p>
+<p>Another attempted fix might be to use an overloaded signature. These aren’t allowed outside of standard library signatures, but here’s what would happen if they were:</p>
 <figure class="left-align-caption">
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode numberSource ruby numberLines hl-6 hl-7 hl-16"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1"></a><span class="cf">class</span> <span class="cn">A</span> <span class="op">&lt;</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Struct</span></span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource ruby numberLines hl-6 hl-7 hl-16"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1"></a><span class="cf">class</span> <span class="cn">A</span> <span class="op">&lt;</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Struct</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>  <span class="fu">extend</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Sig</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a></span>
 <span id="cb7-4"><a href="#cb7-4"></a>  const <span class="wa">:val</span>, <span class="dt">Integer</span></span>
@@ -323,78 +201,26 @@ class="sourceCode numberSource ruby numberLines hl-6 hl-7 hl-16"><code class="so
              ^^^^^^
 Errors: 1</code></pre>
 <figcaption>
-<a
-href="https://sorbet.run/#%23%20typed%3A%20__STDLIB_INTERNAL%0Aextend%20T%3A%3ASig%0A%0Aclass%20A%20%3C%20T%3A%3AStruct%0A%20%20extend%20T%3A%3ASig%0A%0A%20%20const%20%3Aval%2C%20Integer%0A%0A%20%20sig%20%7Bparams%28other%3A%20A%29.returns%28T%3A%3ABoolean%29%7D%0A%20%20sig%20%7Bparams%28other%3A%20BasicObject%29.returns%28FalseClass%29%7D%0A%20%20def%20%3D%3D%28other%29%0A%20%20%20%20case%20other%0A%20%20%20%20when%20A%20then%20self.val%20%3D%3D%20other.val%0A%20%20%20%20else%20false%0A%20%20%20%20end%0A%20%20end%0Aend%0A%0Asig%20%7Bparams%28x%3A%20A%2C%20y%3A%20T.nilable%28A%29%29.void%7D%0Adef%20example%28x%2C%20y%29%0A%20%20if%20x%20%3D%3D%20y%0A%20%20%20%20p%28x%2C%20y%29%0A%20%20end%0Aend">View
-on sorbet.run →</a>
+<a href="https://sorbet.run/#%23%20typed%3A%20__STDLIB_INTERNAL%0Aextend%20T%3A%3ASig%0A%0Aclass%20A%20%3C%20T%3A%3AStruct%0A%20%20extend%20T%3A%3ASig%0A%0A%20%20const%20%3Aval%2C%20Integer%0A%0A%20%20sig%20%7Bparams%28other%3A%20A%29.returns%28T%3A%3ABoolean%29%7D%0A%20%20sig%20%7Bparams%28other%3A%20BasicObject%29.returns%28FalseClass%29%7D%0A%20%20def%20%3D%3D%28other%29%0A%20%20%20%20case%20other%0A%20%20%20%20when%20A%20then%20self.val%20%3D%3D%20other.val%0A%20%20%20%20else%20false%0A%20%20%20%20end%0A%20%20end%0Aend%0A%0Asig%20%7Bparams%28x%3A%20A%2C%20y%3A%20T.nilable%28A%29%29.void%7D%0Adef%20example%28x%2C%20y%29%0A%20%20if%20x%20%3D%3D%20y%0A%20%20%20%20p%28x%2C%20y%29%0A%20%20end%0Aend">View on sorbet.run →</a>
 </figcaption>
 </figure>
-<p>The overloaded signature specifies that if <code>other</code> is
-<code>A</code> the comparison happens, but if <code>other</code> is any
-other type, the method returns <code>FalseClass</code>. The resulting
-errors aren’t quite as obvious: errors now show up indirectly as dead
-code errors, rather than something descriptive at the point of the
-problem. It’s unclear whether hard-to-understand errors are better than
-no errors.</p>
-<p>However, Sorbet’s overload resolution doesn’t work well with these
-signatures.<span
-class="sidenote-wrapper"><label for="sn-5" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-5" class="margin-toggle"/><span
-class="marginnote">Writing this post made me wonder if Sorbet
-<em>should</em> do something smarter here, like try to decompose the
-argument type and combine all the overloads that apply to each
-component. But that’s getting into territory where I can’t think of any
-prior art, which sets off my ⚠️ bad idea ⚠️ radar. (For example,
-TypeScript behaves like Sorbet when porting the above example.)<br />
+<p>The overloaded signature specifies that if <code>other</code> is <code>A</code> the comparison happens, but if <code>other</code> is any other type, the method returns <code>FalseClass</code>. The resulting errors aren’t quite as obvious: errors now show up indirectly as dead code errors, rather than something descriptive at the point of the problem. It’s unclear whether hard-to-understand errors are better than no errors.</p>
+<p>However, Sorbet’s overload resolution doesn’t work well with these signatures.<span class="sidenote-wrapper"><label for="sn-5" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-5" class="margin-toggle"/><span class="marginnote">Writing this post made me wonder if Sorbet <em>should</em> do something smarter here, like try to decompose the argument type and combine all the overloads that apply to each component. But that’s getting into territory where I can’t think of any prior art, which sets off my ⚠️ bad idea ⚠️ radar. (For example, TypeScript behaves like Sorbet when porting the above example.)<br />
 <br />
-</span></span> <code>T.nilable(A)</code> is not a subtype of
-<code>A</code>, causing Sorbet to apply the <code>BasicObject</code>
-overload. This means Sorbet ascribes <code>FalseClass</code> to
-<code>res</code>, which is wrong when <code>y</code> is
-non-<code>nil</code> at runtime.</p>
-<p>All of this leads me to the conclusion that not only have we failed
-to add heuristics to Sorbet to solve this, it’s not even really
-practical for users to take the problem into their own hands.</p>
+</span></span> <code>T.nilable(A)</code> is not a subtype of <code>A</code>, causing Sorbet to apply the <code>BasicObject</code> overload. This means Sorbet ascribes <code>FalseClass</code> to <code>res</code>, which is wrong when <code>y</code> is non-<code>nil</code> at runtime.</p>
+<p>All of this leads me to the conclusion that not only have we failed to add heuristics to Sorbet to solve this, it’s not even really practical for users to take the problem into their own hands.</p>
 <p><br />
 </p>
 <p><br />
 </p>
-<p>It’s an unfortunate state of affairs, and one that we likely can’t
-fix. The best advice I can offer is just to be aware of this and try to
-write thorough tests. Like I mentioned above, the approach we’ll likely
-have to take is insert ad hoc checks for specific standard library
-classes that are subclassed infrequently in practice and that do no
-implicit conversions. It will be possible to create false positives
-errors, and we’ll have to live with that.</p>
+<p>It’s an unfortunate state of affairs, and one that we likely can’t fix. The best advice I can offer is just to be aware of this and try to write thorough tests. Like I mentioned above, the approach we’ll likely have to take is insert ad hoc checks for specific standard library classes that are subclassed infrequently in practice and that do no implicit conversions. It will be possible to create false positives errors, and we’ll have to live with that.</p>
 <hr />
-<h1 id="appendix-what-do-other-languages-do">Appendix: What do other
-languages do?</h1>
-<p>Some languages require that for two things to be equal, their types
-must always be the same. For example, in Haskell the <code>Eq</code>
-type class only provides a function of type
-<code>(Eq a) =&gt; a -&gt; a -&gt; Bool</code>. All the occurrences of
-<code>a</code> in that signature force the left and right operands of
-<code>==</code> to have matching types.</p>
-<p>Other languages say that the two operands’ types must be the same by
-default, but allow opting into comparisons between other types
-explicitly. This is how both Rust (<a
-href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html#how-can-i-compare-two-different-types">example</a>)
-and C++ work.</p>
-<p>Java has basically all the same problems as Sorbet faces with Ruby.
-<code>java.lang.Object</code> implements <code>equals</code> by default
-for all classes and its argument takes another <code>Object</code>. The
-wild thing to me is that the Java designers must have been aware of the
-way other typed languages handled equality—it’s not like Java takes this
-approach because it started from an untyped language! C++ had operator
-overloading powering <code>==</code> all the way back in the 80s, well
-before Java appeared (to say nothing of Haskell or ML languages).</p>
-<p>Mypy implements behavior like TypeScript, but it’s behind a
-<code>--strict-equality</code> flag. It suffers the <a
-href="https://github.com/python/mypy/issues/14410">same problems as
-above</a> because it has overridable <code>__eq__</code> methods and
-subtyping, but the maintainers have made the call that since individual
-projects can choose to opt in and since implicit conversions are more
-rare in Python, the problems are tolerable.</p>
-<p>Flow implements the same check that TypeScript does, but only for
-<code>==</code> not for <code>===</code> (from my limited poking).</p>
+<h1 id="appendix-what-do-other-languages-do">Appendix: What do other languages do?</h1>
+<p>Some languages require that for two things to be equal, their types must always be the same. For example, in Haskell the <code>Eq</code> type class only provides a function of type <code>(Eq a) =&gt; a -&gt; a -&gt; Bool</code>. All the occurrences of <code>a</code> in that signature force the left and right operands of <code>==</code> to have matching types.</p>
+<p>Other languages say that the two operands’ types must be the same by default, but allow opting into comparisons between other types explicitly. This is how both Rust (<a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html#how-can-i-compare-two-different-types">example</a>) and C++ work.</p>
+<p>Java has basically all the same problems as Sorbet faces with Ruby. <code>java.lang.Object</code> implements <code>equals</code> by default for all classes and its argument takes another <code>Object</code>. The wild thing to me is that the Java designers must have been aware of the way other typed languages handled equality—it’s not like Java takes this approach because it started from an untyped language! C++ had operator overloading powering <code>==</code> all the way back in the 80s, well before Java appeared (to say nothing of Haskell or ML languages).</p>
+<p>Mypy implements behavior like TypeScript, but it’s behind a <code>--strict-equality</code> flag. It suffers the <a href="https://github.com/python/mypy/issues/14410">same problems as above</a> because it has overridable <code>__eq__</code> methods and subtyping, but the maintainers have made the call that since individual projects can choose to opt in and since implicit conversions are more rare in Python, the problems are tolerable.</p>
+<p>Flow implements the same check that TypeScript does, but only for <code>==</code> not for <code>===</code> (from my limited poking).</p>
 </main>
 
 

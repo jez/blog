@@ -51,92 +51,72 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#syntax-highlighting" id="toc-syntax-highlighting">Syntax
-  Highlighting</a></li>
-  <li><a href="#better-tab-completion"
-  id="toc-better-tab-completion">Better Tab Completion</a></li>
-  <li><a href="#better-completion-support"
-  id="toc-better-completion-support">Better Completion Support</a></li>
-  <li><a href="#great-how-do-i-start"
-  id="toc-great-how-do-i-start">Great, how do I start?</a></li>
+  <li><a href="#syntax-highlighting" id="toc-syntax-highlighting">Syntax Highlighting</a></li>
+  <li><a href="#better-tab-completion" id="toc-better-tab-completion">Better Tab Completion</a></li>
+  <li><a href="#better-completion-support" id="toc-better-completion-support">Better Completion Support</a></li>
+  <li><a href="#great-how-do-i-start" id="toc-great-how-do-i-start">Great, how do I start?</a></li>
   </ul>
 </nav>
 
 <main>
-<p>People often ask me why I switched to zsh. Back when I had first
-switched, I was hesitant to answer because I was still finding my way
-around. Now that I’ve been using it, I’ve managed to distill down a few
-things zsh does well that sets it apart as my shell of choice.</p>
+<p>People often ask me why I switched to zsh. Back when I had first switched, I was
+hesitant to answer because I was still finding my way around. Now that I’ve been
+using it, I’ve managed to distill down a few things zsh does well that sets it
+apart as my shell of choice.</p>
 <!-- more -->
 <h1 id="syntax-highlighting">Syntax Highlighting</h1>
-<p>In zsh, there’s a <a
-href="https://github.com/zsh-users/zsh-syntax-highlighting">plugin that
-syntax highlights</a> the current command line as you type. It’s
-incredibly useful to receive instant feedback about whether a command
-you’re typing is valid. Turns running commands at the command line into
-nearly the same experience as typing code into your favorite text
-editor.</p>
-<p><a href="/assets/img/zsh-syntax-highlighting.png"><img
-src="/assets/img/zsh-syntax-highlighting.png" /></a></p>
-<p>The screenshot above features some of the syntax elements it
-highlights by default:</p>
+<p>In zsh, there’s a <a href="https://github.com/zsh-users/zsh-syntax-highlighting">plugin that syntax highlights</a> the
+current command line as you type. It’s incredibly useful to receive instant
+feedback about whether a command you’re typing is valid. Turns running commands
+at the command line into nearly the same experience as typing code into your
+favorite text editor.</p>
+<p><a href="/assets/img/zsh-syntax-highlighting.png"><img src="/assets/img/zsh-syntax-highlighting.png" /></a></p>
+<p>The screenshot above features some of the syntax elements it highlights by
+default:</p>
 <ul>
-<li>commands that exist (also aliases, functions, etc.) are changed to
-green</li>
+<li>commands that exist (also aliases, functions, etc.) are changed to green</li>
 <li>those that don’t are changed to red</li>
-<li>text corresponding to files and folders that exist are
-underlined</li>
+<li>text corresponding to files and folders that exist are underlined</li>
 <li>text that looks like a file was misspelled is changed to yellow</li>
-<li>text that doesn’t correspond to the name of a file nor that looks
-like a misspelling for an existing file is left unchanged</li>
+<li>text that doesn’t correspond to the name of a file nor that looks like a
+misspelling for an existing file is left unchanged</li>
 </ul>
-<p>It also highlights strings, globs, and environment variables (if
-they’re typed within strings).</p>
-<p>There’s probably no technical limitation for why this couldn’t be
-done in bash, but as of yet no one has done it.</p>
+<p>It also highlights strings, globs, and environment variables (if they’re typed
+within strings).</p>
+<p>There’s probably no technical limitation for why this couldn’t be done in bash, but
+as of yet no one has done it.</p>
 <h1 id="better-tab-completion">Better Tab Completion</h1>
-<p>In zsh when you tab complete, the matches are listed below the
-current line, whereas in bash they’re listed above it. For an example,
-check out the screenshot. I perform the same keystrokes in bash and
-zsh:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd D<span class="op">&lt;</span>TAB<span class="op">&gt;</span></span></code></pre></div>
-<p><a href="/assets/img/zsh-tab-completion.png"><img
-src="/assets/img/zsh-tab-completion.png" /></a></p>
-<p>In bash, pressing TAB prints out the completions followed by a new
-line. In zsh, they’re simply listed conveniently below the current line.
-If I continued to complete many things in that line or ran the command,
-zsh would overwrite the old completions, but bash would keep on printing
-additional lines, taking up precious screen space.</p>
+<p>In zsh when you tab complete, the matches are listed below the current line,
+whereas in bash they’re listed above it. For an example, check out the
+screenshot. I perform the same keystrokes in bash and zsh:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd D<span class="op">&lt;</span>TAB<span class="op">&gt;</span></span></code></pre></div>
+<p><a href="/assets/img/zsh-tab-completion.png"><img src="/assets/img/zsh-tab-completion.png" /></a></p>
+<p>In bash, pressing TAB prints out the completions followed by a new line. In zsh,
+they’re simply listed conveniently below the current line. If I continued to
+complete many things in that line or ran the command, zsh would overwrite the
+old completions, but bash would keep on printing additional lines, taking up
+precious screen space.</p>
 <h1 id="better-completion-support">Better Completion Support</h1>
-<p>When I used bash, I managed to have pretty wide support for tab
-completion in programs. I’m talking much more than just completing
-filenames. As such, I was pretty skeptical that there’d be much more
-that zsh could offer.</p>
-<p>While zsh’s edge wasn’t immediately apparent in this aspect, I’d like
-to declare it a winner now. I had to fight pretty hard to get my bash
-completions where they were. By comparison, zsh comes with so many more
-completions built in, and if you decide to use oh-my-zsh (a collection
-of zsh plugins) on top of zsh, adding new functionality is one line
-away.</p>
-<p>I now have things like environment variable completion, tmux
-completion, deep git command completion, and much more.</p>
+<p>When I used bash, I managed to have pretty wide support for tab completion in
+programs. I’m talking much more than just completing filenames. As such, I was
+pretty skeptical that there’d be much more that zsh could offer.</p>
+<p>While zsh’s edge wasn’t immediately apparent in this aspect, I’d like to declare
+it a winner now. I had to fight pretty hard to get my bash completions where
+they were. By comparison, zsh comes with so many more completions built in, and
+if you decide to use oh-my-zsh (a collection of zsh plugins) on top of zsh,
+adding new functionality is one line away.</p>
+<p>I now have things like environment variable completion, tmux completion, deep
+git command completion, and much more.</p>
 <h1 id="great-how-do-i-start">Great, how do I start?</h1>
-<p>The first step is to change your shell to zsh:
-<code>chsh -s $(which zsh)</code>. Once you’ve done that, you’ll need a
-<code>.zshrc</code> and <code>.zshenv</code>. If you’re looking for a
-reference, you can see my <a
-href="https://github.com/jez/dotfiles/blob/master/util/misc.zsh"><code>misc.zsh</code></a>
-file in my <a href="https://github.com/jez/dotfiles">dotfiles</a> repo
-on GitHub, a file which eventually gets sourced in my <a
-href="https://github.com/jez/dotfiles/blob/master/zshrc"><code>.zshrc</code></a>.
-It contains most of everything that you need to get started using zsh on
-OS X. Keep in mind that it’s somewhat opinionated (it heavily favors vim
-keybindings and uses oh-my-zsh among other things). You might also want
-to check out my <a
-href="/2015/03/10/noteworthy-dotfile-hacks/">Noteworthy Dotfile
-Hacks</a> post, where I talked about what I think are the most notable
-features I have in my dotfiles.</p>
+<p>The first step is to change your shell to zsh: <code>chsh -s $(which zsh)</code>. Once
+you’ve done that, you’ll need a <code>.zshrc</code> and <code>.zshenv</code>. If you’re looking for a
+reference, you can see my <a href="https://github.com/jez/dotfiles/blob/master/util/misc.zsh"><code>misc.zsh</code></a> file in my <a href="https://github.com/jez/dotfiles">dotfiles</a>
+repo on GitHub, a file which eventually gets sourced in my <a href="https://github.com/jez/dotfiles/blob/master/zshrc"><code>.zshrc</code></a>. It
+contains most of everything that you need to get started using zsh on OS X. Keep
+in mind that it’s somewhat opinionated (it heavily favors vim keybindings and
+uses oh-my-zsh among other things). You might also want to check out my
+<a href="/2015/03/10/noteworthy-dotfile-hacks/">Noteworthy Dotfile Hacks</a> post, where I talked about what I
+think are the most notable features I have in my dotfiles.</p>
 </main>
 
 

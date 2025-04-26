@@ -52,50 +52,32 @@ First let's review what `private` normally means, and then discuss what `private
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#background-the-normal-meaning-of-private"
-  id="toc-background-the-normal-meaning-of-private">Background: the
-  normal meaning of <code>private</code></a></li>
-  <li><a href="#restrictions-on-private-in-ruby"
-  id="toc-restrictions-on-private-in-ruby">Restrictions on
-  <code>private</code> in Ruby</a></li>
-  <li><a href="#why-is-ruby-like-this"
-  id="toc-why-is-ruby-like-this">Why is Ruby like this?</a></li>
-  <li><a href="#ruby-is-not-unique-protectedthis-in-scala"
-  id="toc-ruby-is-not-unique-protectedthis-in-scala">Ruby is not unique:
-  <code>protected[this]</code> in Scala</a></li>
-  <li><a href="#a-note-about-ruby-instance-variables"
-  id="toc-a-note-about-ruby-instance-variables">A note about Ruby
-  instance variables</a>
+  <li><a href="#background-the-normal-meaning-of-private" id="toc-background-the-normal-meaning-of-private">Background: the normal meaning of <code>private</code></a></li>
+  <li><a href="#restrictions-on-private-in-ruby" id="toc-restrictions-on-private-in-ruby">Restrictions on <code>private</code> in Ruby</a></li>
+  <li><a href="#why-is-ruby-like-this" id="toc-why-is-ruby-like-this">Why is Ruby like this?</a></li>
+  <li><a href="#ruby-is-not-unique-protectedthis-in-scala" id="toc-ruby-is-not-unique-protectedthis-in-scala">Ruby is not unique: <code>protected[this]</code> in Scala</a></li>
+  <li><a href="#a-note-about-ruby-instance-variables" id="toc-a-note-about-ruby-instance-variables">A note about Ruby instance variables</a>
   <ul>
   <li><a href="#pros" id="toc-pros">Pros</a></li>
   <li><a href="#cons" id="toc-cons">Cons</a></li>
   </ul></li>
-  <li><a href="#any-other-languages" id="toc-any-other-languages">Any
-  other languages?</a></li>
-  <li><a href="#appendix-some-unanswered-questions"
-  id="toc-appendix-some-unanswered-questions">Appendix: Some unanswered
-  questions</a></li>
+  <li><a href="#any-other-languages" id="toc-any-other-languages">Any other languages?</a></li>
+  <li><a href="#appendix-some-unanswered-questions" id="toc-appendix-some-unanswered-questions">Appendix: Some unanswered questions</a></li>
   </ul>
 </nav>
 
 <main>
-<p>Ruby’s <code>private</code> keyword means something different
-compared to basically all other object-oriented languages. Most other
-languages don’t even have a feature matching what Ruby calls
-<code>private</code>, but incredibly, Scala does, which it calls
-<code>protected[this]</code> (meaning “object-protected”, as opposed to
-the normal <code>protected</code> keyword which is called
+<p>Ruby’s <code>private</code> keyword means something different compared to basically all other
+object-oriented languages. Most other languages don’t even have a feature matching what
+Ruby calls <code>private</code>, but incredibly, Scala does, which it calls <code>protected[this]</code> (meaning
+“object-protected”, as opposed to the normal <code>protected</code> keyword which is called
 “class-protected”).</p>
-<p>First let’s review what <code>private</code> normally means, and then
-discuss what <code>private</code> in Ruby means (which will also amount
-to an explanation of what <code>protected[this]</code> means in
-Scala).</p>
-<h1 id="background-the-normal-meaning-of-private">Background: the normal
-meaning of <code>private</code></h1>
-<p>Conventionally, <code>private</code> means “only code contained
-inside my class’s body can access this member,” for example in Java:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode numberSource java numberLines hl-2"><code class="sourceCode java"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">class</span> Parent <span class="op">{</span></span>
+<p>First let’s review what <code>private</code> normally means, and then discuss what <code>private</code> in Ruby
+means (which will also amount to an explanation of what <code>protected[this]</code> means in Scala).</p>
+<h1 id="background-the-normal-meaning-of-private">Background: the normal meaning of <code>private</code></h1>
+<p>Conventionally, <code>private</code> means “only code contained inside my class’s body can access
+this member,” for example in Java:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource java numberLines hl-2"><code class="sourceCode java"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">class</span> Parent <span class="op">{</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>    <span class="kw">private</span> <span class="dt">int</span> x<span class="op">;</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a></span>
 <span id="cb1-4"><a href="#cb1-4"></a>    <span class="fu">Parent</span><span class="op">(</span><span class="dt">int</span> x<span class="op">)</span> <span class="op">{</span></span>
@@ -119,27 +101,20 @@ class="sourceCode numberSource java numberLines hl-2"><code class="sourceCode ja
 <span id="cb1-22"><a href="#cb1-22"></a></span>
 <span id="cb1-23"><a href="#cb1-23"></a>Parent parent <span class="op">=</span> <span class="kw">new</span> <span class="fu">Parent</span><span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
 <span id="cb1-24"><a href="#cb1-24"></a>parent<span class="op">.</span><span class="fu">x</span><span class="op">;</span> <span class="co">// (4) not allowed ⛔️</span></span></code></pre></div>
-<p>In this example we see a member <code>x</code> marked private. In
-summary:</p>
+<p>In this example we see a member <code>x</code> marked private. In summary:</p>
 <ol type="1">
-<li>✅ The member <code>x</code> can be accessed as <code>this.x</code>
-inside methods within the class body of <code>Parent</code></li>
-<li>✅ The member <code>x</code> can also be accessed on other instances
-of <code>Parent</code> within the class body of <code>Parent</code>,
-like <code>other.x</code></li>
-<li>⛔️ The member <code>x</code> cannot be accessed in subclasses of
-<code>Parent</code>, like <code>Child</code></li>
-<li>⛔️ The member <code>x</code> cannot be accessed outside of the
-inheritance hierarchy of <code>Parent</code></li>
+<li>✅ The member <code>x</code> can be accessed as <code>this.x</code> inside methods within the class body of <code>Parent</code></li>
+<li>✅ The member <code>x</code> can also be accessed on other instances of <code>Parent</code> within the class
+body of <code>Parent</code>, like <code>other.x</code></li>
+<li>⛔️ The member <code>x</code> cannot be accessed in subclasses of <code>Parent</code>, like <code>Child</code></li>
+<li>⛔️ The member <code>x</code> cannot be accessed outside of the inheritance hierarchy of <code>Parent</code></li>
 </ol>
-<p>Now let’s translate this example to Ruby to see what restrictions the
-<code>private</code> keyword in Ruby brings.</p>
-<h1 id="restrictions-on-private-in-ruby">Restrictions on
-<code>private</code> in Ruby</h1>
-<p>Here’s the same Java example, converted to Ruby. What we see is that
-points (2) and (3) flip!</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
+<p>Now let’s translate this example to Ruby to see what restrictions the <code>private</code> keyword in
+Ruby brings.</p>
+<h1 id="restrictions-on-private-in-ruby">Restrictions on <code>private</code> in Ruby</h1>
+<p>Here’s the same Java example, converted to Ruby. What we see is that points (2) and (3)
+flip!</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  <span class="ot">attr_accessor</span> <span class="wa">:x</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="at">private</span> <span class="wa">:x</span>, <span class="wa">:x=</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a></span>
@@ -165,25 +140,19 @@ class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ru
 <span id="cb2-24"><a href="#cb2-24"></a>parent<span class="at">.x</span> <span class="co"># (4) not allowed ⛔️</span></span></code></pre></div>
 <p>Here’s what Ruby’s <code>private</code> keyword allows:</p>
 <ol type="1">
-<li>✅ The member <code>x</code> can be accessed as <code>self.x</code>
-inside methods within the class body of <code>Parent</code></li>
-<li>⛔️ The member <code>x</code> cannot be accessed on other instances
-of <code>Parent</code> within the class body of <code>Parent</code>,
-like <code>other.x</code></li>
-<li>✅ The member <code>x</code> can be accessed in subclasses of
-<code>Parent</code>, like <code>Child</code></li>
-<li>⛔️ The member <code>x</code> cannot be accessed outside of the
-inheritance hierarchy of <code>Parent</code></li>
+<li>✅ The member <code>x</code> can be accessed as <code>self.x</code> inside methods within the class body of <code>Parent</code></li>
+<li>⛔️ The member <code>x</code> cannot be accessed on other instances of <code>Parent</code> within the class
+body of <code>Parent</code>, like <code>other.x</code></li>
+<li>✅ The member <code>x</code> can be accessed in subclasses of <code>Parent</code>, like <code>Child</code></li>
+<li>⛔️ The member <code>x</code> cannot be accessed outside of the inheritance hierarchy of <code>Parent</code></li>
 </ol>
 <h1 id="why-is-ruby-like-this">Why is Ruby like this?</h1>
-<p>Most other object-oriented languages rely on type checking to report
-visibility errors before the program runs. Ruby doesn’t have a type
-checker and also is quite dynamic. Classes can be reopened and extended
-basically at whim, and the notion of “within the class body” barely
-exists in Ruby because of how easy it is to dynamically define methods
+<p>Most other object-oriented languages rely on type checking to report visibility errors
+before the program runs. Ruby doesn’t have a type checker and also is quite dynamic.
+Classes can be reopened and extended basically at whim, and the notion of “within the
+class body” barely exists in Ruby because of how easy it is to dynamically define methods
 from anywhere:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">MyDSL</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">MyDSL</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> make_method</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    define_method(<span class="wa">:get_x</span>) <span class="cf">do</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">MyDSL</span><span class="at">.internal_helper</span></span>
@@ -205,22 +174,15 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extend</span> <span class="dt">MyDSL</span></span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  make_method</span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>Real-world Ruby code tends to toss away conventional notions of
-“defined inside the class body,” and even if it didn’t, it wouldn’t have
-a type checker to easily check visibility.</p>
-<p>Instead, Ruby picks a simpler way to enforce visibility: a private
-call is allowed anywhere that the receiver is either omitted or is
-<code>self</code>, <strong>syntactically</strong>.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">The receiver is the <code>x</code> in
-<code>x.foo</code>. When a method call’s receiver is omitted like
-<code>foo()</code>, Ruby implicitly assumes that it had been called like
-<code>self.foo()</code>.<br />
+<p>Real-world Ruby code tends to toss away conventional notions of “defined inside the class
+body,” and even if it didn’t, it wouldn’t have a type checker to easily check visibility.</p>
+<p>Instead, Ruby picks a simpler way to enforce visibility: a private call is allowed
+anywhere that the receiver is either omitted or is <code>self</code>, <strong>syntactically</strong>.<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="marginnote">The receiver is the <code>x</code> in <code>x.foo</code>. When a method call’s receiver is omitted like
+<code>foo()</code>, Ruby implicitly assumes that it had been called like <code>self.foo()</code>.<br />
 <br />
-</span></span> That syntactic restriction means that things like this
-are not allowed:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
+</span></span> That
+syntactic restriction means that things like this are not allowed:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">private</span> <span class="cf">def</span> foo; <span class="cf">end</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -228,47 +190,34 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>identity(<span class="dv">self</span>)<span class="at">.foo</span> <span class="co"># ⛔️ not syntactically `self.foo`</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="dv">self</span><span class="at">.itself.foo</span>    <span class="co"># ⛔️ not syntactically `self.foo`</span></span></code></pre></div>
-<p>By using local syntax to determine when it’s okay to call private
-methods, Ruby ends up allowing access via inherited classes and denying
-access via something like <code>other.x</code>. This mechanism is very
-simple to check: it just a matter of remembering a bit like
-<code>isPrivateOk</code> per method call and a bit per method def like
-<code>isPrivate</code>, which can be done without any sort of
-non-local/static analysis.</p>
-<h1 id="ruby-is-not-unique-protectedthis-in-scala">Ruby is not unique:
-<code>protected[this]</code> in Scala</h1>
-<p>For a while, I thought that Ruby was unique in having a visibility
-modifier that worked like this, but recently I learned that Scala
-actually has a similar feature: <code>protected[this]</code>. The name
-wasn’t immediately obvious to me, but it’s actually kind of
+<p>By using local syntax to determine when it’s okay to call private methods, Ruby ends up
+allowing access via inherited classes and denying access via something like <code>other.x</code>.
+This mechanism is very simple to check: it just a matter of remembering a bit like
+<code>isPrivateOk</code> per method call and a bit per method def like <code>isPrivate</code>, which can be done
+without any sort of non-local/static analysis.</p>
+<h1 id="ruby-is-not-unique-protectedthis-in-scala">Ruby is not unique: <code>protected[this]</code> in Scala</h1>
+<p>For a while, I thought that Ruby was unique in having a visibility modifier that worked
+like this, but recently I learned that Scala actually has a similar feature:
+<code>protected[this]</code>. The name wasn’t immediately obvious to me, but it’s actually kind of
 sensible:</p>
 <ul>
-<li>Like the <code>protected</code> visibility modifier,
-<code>protected[this]</code> allows (certain kinds of) member access
-from subclasses.</li>
-<li>The <code>[this]</code> portion is called an “access qualifier”
-which limits all access to happen via the <code>this</code>
-keyword.</li>
+<li>Like the <code>protected</code> visibility modifier, <code>protected[this]</code> allows (certain kinds of)
+member access from subclasses.</li>
+<li>The <code>[this]</code> portion is called an “access qualifier” which limits all access to happen via
+the <code>this</code> keyword.</li>
 </ul>
-<p>It seems that Scala allows other things to appear inside the
-<code>[...]</code>, but I stopped short of wrapping my head around what.
-I learned about this feature from this page:</p>
-<p><a
-href="https://scala-lang.org/files/archive/spec/2.13/05-classes-and-objects.html#modifiers">→
-Scala Language Specification, Version 2.13, Chapter 5 Classes and
-Objects, Section 5.2 Modifiers</a></p>
+<p>It seems that Scala allows other things to appear inside the <code>[...]</code>, but I stopped short
+of wrapping my head around what. I learned about this feature from this page:</p>
+<p><a href="https://scala-lang.org/files/archive/spec/2.13/05-classes-and-objects.html#modifiers">→ Scala Language Specification, Version 2.13, Chapter 5 Classes and Objects, Section 5.2
+Modifiers</a></p>
 <p>Maybe worth a skim if you’re more curious than I was.</p>
-<p>Scala also has <code>private[this]</code>, which excludes access via
-subclasses (leaving only access via <code>this</code> inside the parent
-class). Ruby doesn’t have a visibility level matching this, which means
-that Ruby has no means to hide a member from subclasses.</p>
-<h1 id="a-note-about-ruby-instance-variables">A note about Ruby instance
-variables</h1>
-<p>Despite not being declared with the <code>private</code> keyword,
-instance variables in Ruby behave exactly like <code>private</code>
-methods!</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
+<p>Scala also has <code>private[this]</code>, which excludes access via subclasses (leaving only access
+via <code>this</code> inside the parent class). Ruby doesn’t have a visibility level matching this,
+which means that Ruby has no means to hide a member from subclasses.</p>
+<h1 id="a-note-about-ruby-instance-variables">A note about Ruby instance variables</h1>
+<p>Despite not being declared with the <code>private</code> keyword, instance variables in Ruby behave
+exactly like <code>private</code> methods!</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>  <span class="cf">def</span> initialize(x)</span>
 <span id="cb5-3"><a href="#cb5-3"></a>    <span class="ot">@x</span> <span class="op">=</span> x</span>
 <span id="cb5-4"><a href="#cb5-4"></a>    <span class="co">#└── &quot;declares&quot; an instance variable</span></span>
@@ -290,72 +239,56 @@ class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ru
 <span id="cb5-20"><a href="#cb5-20"></a></span>
 <span id="cb5-21"><a href="#cb5-21"></a>parent <span class="op">=</span> <span class="dt">Parent</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
 <span id="cb5-22"><a href="#cb5-22"></a>parent<span class="at">.</span><span class="ot">@x</span> <span class="co"># (4) syntax error ⛔️</span></span></code></pre></div>
-<p>So you might next ask, “would it make sense to have ‘public’ instance
-variables?” I can see arguments both ways:</p>
+<p>So you might next ask, “would it make sense to have ‘public’ instance variables?” I can
+see arguments both ways:</p>
 <h3 id="pros">Pros</h3>
 <ul>
 <li>Maybe it scratches a burning itch for symmetry?</li>
-<li>It could be used to resolve problems that arise in Sorbet’s control
-flow-sensitive typing, which I <a
-href="https://blog.jez.io/syntactic-control-flow/#properties-and-attributes-in-other-languages">discussed
-in a previous post</a>.
+<li>It could be used to resolve problems that arise in Sorbet’s control flow-sensitive
+typing, which I <a href="https://blog.jez.io/syntactic-control-flow/#properties-and-attributes-in-other-languages">discussed in a previous post</a>.
 <ul>
-<li>Counter point, also raised in the post above: you could imagine
-solving this another way, by treating <code>x.foo</code> and
-<code>x.foo()</code> differently (despite both meaning the same thing in
-the Ruby VM).</li>
+<li>Counter point, also raised in the post above: you could imagine solving this another
+way, by treating <code>x.foo</code> and <code>x.foo()</code> differently (despite both meaning the same
+thing in the Ruby VM).</li>
 </ul></li>
-<li>Maybe (<em>maybe</em>) it could be optimized more easily by the Ruby
-VM?
+<li>Maybe (<em>maybe</em>) it could be optimized more easily by the Ruby VM?
 <ul>
-<li>Counter point, the VM already has a lot of special cases for
-<code>attr_reader</code>-defined methods, so I’m not actually certain
-whether this point is valid.</li>
+<li>Counter point, the VM already has a lot of special cases for <code>attr_reader</code>-defined
+methods, so I’m not actually certain whether this point is valid.</li>
 </ul></li>
 </ul>
 <h3 id="cons">Cons</h3>
 <ul>
-<li>In order to keep backwards compatibility, it wouldn’t even be all
-that symmetric.
+<li>In order to keep backwards compatibility, it wouldn’t even be all that symmetric.
 <ul>
-<li>Methods would default to public visibility and have a
-<code>private</code> keyword, but instance variables would default to
-private and have some sort of <code>public</code> keyword.</li>
+<li>Methods would default to public visibility and have a <code>private</code> keyword, but instance
+variables would default to private and have some sort of <code>public</code> keyword.</li>
 </ul></li>
-<li>Instance variables in Ruby represent encapsulated state. They
-shouldn’t leak into the public API, and should instead be exposed by
-proper methods.</li>
+<li>Instance variables in Ruby represent encapsulated state. They shouldn’t leak into the
+public API, and should instead be exposed by proper methods.</li>
 </ul>
-<p>It’s not a fight I want to start (nor one I feel strongly about). But
-I will at least point out that nearly all other languages expose a
-(syntactic) difference between calling a method and accessing an
-attribute.</p>
+<p>It’s not a fight I want to start (nor one I feel strongly about). But I will at least
+point out that nearly all other languages expose a (syntactic) difference between calling
+a method and accessing an attribute.</p>
 <h1 id="any-other-languages">Any other languages?</h1>
-<p>So far, I’m only aware of Ruby’s <code>private</code> modifier and
-Scala’s <code>protected[this]</code> which behave like this. If you know
-of any other languages, please email me! I’d love to hear about
-them.</p>
+<p>So far, I’m only aware of Ruby’s <code>private</code> modifier and Scala’s <code>protected[this]</code> which
+behave like this. If you know of any other languages, please email me! I’d love to hear
+about them.</p>
 <p><br />
 </p>
 <p><br />
 </p>
-<h1 id="appendix-some-unanswered-questions">Appendix: Some unanswered
-questions</h1>
+<h1 id="appendix-some-unanswered-questions">Appendix: Some unanswered questions</h1>
 <ul>
-<li><p>Question 1: why does Scala have both
-<code>private</code>/<code>protected</code> and
+<li><p>Question 1: why does Scala have both <code>private</code>/<code>protected</code> and
 <code>private[this]</code>/<code>protected[this]</code>?</p>
-<p>I don’t know of the history there, but I do know that the latter is
-useful especially in generic classes with covariant and/or contravariant
-type members. More on that in another post (maybe). I will say though,
-it’s actually quite lucky that Ruby works the way it does, or Sorbet
-would not be able to provide generic, co-/contravariant classes with <a
-href="https://github.com/sorbet/sorbet/pull/6721">as few changes as
-this!</a></p></li>
-<li><p>Question 2: what’s up with Ruby’s <code>protected</code>
-keyword?</p>
-<p>A great question, but one that I’ll have to save for another
-post!</p></li>
+<p>I don’t know of the history there, but I do know that the latter is useful especially in
+generic classes with covariant and/or contravariant type members. More on that in another
+post (maybe). I will say though, it’s actually quite lucky that Ruby works the way it
+does, or Sorbet would not be able to provide generic, co-/contravariant classes with <a href="https://github.com/sorbet/sorbet/pull/6721">as
+few changes as this!</a></p></li>
+<li><p>Question 2: what’s up with Ruby’s <code>protected</code> keyword?</p>
+<p>A great question, but one that I’ll have to save for another post!</p></li>
 </ul>
 </main>
 

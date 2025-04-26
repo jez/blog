@@ -51,30 +51,27 @@
 </nav>
 
 <main>
-<p>Understanding correctness of code really comes down to
-<em>proving</em> that the code does the right thing. What tools do we
-have as programmers for proving the correctness of our code?</p>
+<p>Understanding correctness of code really comes down to <em>proving</em> that
+the code does the right thing. What tools do we have as programmers for
+proving the correctness of our code?</p>
 <!-- more -->
 <ol type="1">
-<li><strong>Tests</strong> prove that the code is correct for specific
-inputs.</li>
-<li><strong>Type systems</strong> prove the absence of (certain kinds
-of) incorrectness.</li>
-<li><strong>Theorem provers</strong> prove sophisticated claims about
-our code for us.</li>
-<li><strong>Monitoring tools</strong> prove that incorrect behavior
-hasn’t occurred <em>yet</em>, or provide us with a concrete counter
-example when it happens.<a href="#fn1" class="footnote-ref" id="fnref1"
-role="doc-noteref"><sup>1</sup></a></li>
-<li><strong>Program authors</strong> can prove the correctness of their
-code (i.e., with a traditional pen-and-paper proof).</li>
+<li><strong>Tests</strong> prove that the code is correct for specific inputs.</li>
+<li><strong>Type systems</strong> prove the absence of (certain kinds of)
+incorrectness.</li>
+<li><strong>Theorem provers</strong> prove sophisticated claims about our code for
+us.</li>
+<li><strong>Monitoring tools</strong> prove that incorrect behavior hasn’t occurred
+<em>yet</em>, or provide us with a concrete counter example when it
+happens.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></li>
+<li><strong>Program authors</strong> can prove the correctness of their code (i.e.,
+with a traditional pen-and-paper proof).</li>
 </ol>
-<p>The first three are exciting because they involve a computer doing
-most of the work for us! The fourth might seem not helpful, but is often
+<p>The first three are exciting because they involve a computer doing most
+of the work for us! The fourth might seem not helpful, but is often
 better than nothing, and in many situations can be leveraged into making
 powerful claims. None of the above are as universally applicable as the
-last: doing the proof ourself, but it’s also usually the most error
-prone.</p>
+last: doing the proof ourself, but it’s also usually the most error prone.</p>
 <p>Note the double negation in (2). Type systems themselves don’t prove
 correctness, they prove that there aren’t certain kinds of
 incorrectness, namely: type errors. Meanwhile, tests are rarely (if
@@ -86,14 +83,12 @@ runs without bugs. The more tools we have in our arsenal to combat
 incorrectness, the easier it is to write code for the long term.</p>
 <!-- vim:tw=72
 -->
-<section id="footnotes" class="footnotes footnotes-end-of-document"
-role="doc-endnotes">
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Recall that raising an exception is logically the same
-as throwing a value to a continuation and carrying out a <a
-href="/continuations-notes/">proof by contradiction</a>!<a
-href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Recall that raising an exception is logically the same as throwing
+a value to a continuation and carrying out a <a href="/continuations-notes/">proof by
+contradiction</a>!<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </main>

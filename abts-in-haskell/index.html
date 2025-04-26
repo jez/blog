@@ -54,40 +54,27 @@
 <p>I’ve been learning and using Haskell on-and-off for the past couple
 of years. One of my early complaints was that I couldn’t find a good
 library for working with variables and binding that used locally
-nameless terms. Recently though, I found <a
-href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>,
-which checks all my previously unfilled boxes.</p>
+nameless terms. Recently though, I found <a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>, which
+checks all my previously unfilled boxes.</p>
 <p>Abstract binding trees (or ABTs) are abstract syntax trees (ASTs)
 augmented with the ability to capture the binding structure of a
-program. ABTs are one of the first topics we cover in <a
-href="https://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles of
-Programming Languages</a> because variables show up in every interesting
-feature of a programming language.</p>
-<p>I recently wrote at length about the various strategies for dealing
-with <a href="/variables-and-binding/">variables and binding</a> and
-their implementations. While it’s a good exercise<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">In fact, it’s hw1 for 15-312! If you’re curious, check
-out the <a
-href="https://www.cs.cmu.edu/~rwh/courses/ppl/hws/assn1.pdf">handout</a>.<br />
+program. ABTs are one of the first topics we cover in <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/">15-312 Principles
+of Programming Languages</a> because variables show up in every
+interesting feature of a programming language.</p>
+<p>I recently wrote at length about the various strategies for dealing with
+<a href="/variables-and-binding/">variables and binding</a> and their implementations. While it’s a good
+exercise<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">In fact, it’s hw1 for 15-312! If you’re curious, check out the <a href="https://www.cs.cmu.edu/~rwh/courses/ppl/hws/assn1.pdf">handout</a>.<br />
 <br />
-</span></span> to implement ABTs from scratch, in most cases I’d rather
-just use a library. In school we used <a
-href="https://github.com/robsimmons/abbot"><code>abbot</code></a>, which
-is an ABT library for Standard ML. For tinkering with Haskell, I
-recently found <a
-href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>,
-which provides a similar API.</p>
+</span></span> to implement ABTs from scratch, in most cases I’d
+rather just use a library. In school we used <a href="https://github.com/robsimmons/abbot"><code>abbot</code></a>, which is an ABT
+library for Standard ML. For tinkering with Haskell, I recently found
+<a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>, which provides a similar API.</p>
 <p>I gave it a test drive while learning how to implement type inference
 for the simply-typed lambda calculus (STLC) and was rather pleased. The
-source code for my STLC inference program is <a
-href="https://github.com/jez/stlc-infer">on GitHub</a> if you’re looking
-for an example of <a
-href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a>
-in action.</p>
+source code for my STLC inference program is <a href="https://github.com/jez/stlc-infer">on GitHub</a> if
+you’re looking for an example of <a href="https://github.com/lambdageek/unbound-generics"><code>unbound-generics</code></a> in action.</p>
 <p>To pluck a few snippets out, here’s the definition of STLC terms:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Term</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Term</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">Tvar</span> <span class="dt">Tvar</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Tlam</span> (<span class="dt">Bind</span> <span class="dt">Tvar</span> <span class="dt">Term</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Tapp</span> <span class="dt">Term</span> <span class="dt">Term</span></span>
@@ -98,14 +85,12 @@ class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a 
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Tbool</span> <span class="dt">Bool</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Tif</span> <span class="dt">Term</span> <span class="dt">Term</span> <span class="dt">Term</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Generic</span>, <span class="dt">Typeable</span>)</span></code></pre></div>
-<p><code>Bind</code> is the abstract type for locally nameless terms
-that bind a variable. It’s cool in Haskell (compared to SML) because the
-compiler can automatically derive the locally nameless representation
-from this data type definition (with help from the
-<code>unbound-generics</code> library).</p>
+<p><code>Bind</code> is the abstract type for locally nameless terms that bind a
+variable. It’s cool in Haskell (compared to SML) because the compiler
+can automatically derive the locally nameless representation from this
+data type definition (with help from the <code>unbound-generics</code> library).</p>
 <p>Here’s what it looks like in use:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- (This is a snippet from the type inference code)</span></span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- (This is a snippet from the type inference code)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>constraintsWithCon ctx (<span class="dt">Tlam</span> bnd) <span class="ot">=</span> <span class="kw">do</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- &#39;out&#39; the ABT to get a fresh variable</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- (x used to be &quot;locally nameless&quot;, but now has a globally unique name)</span></span>
@@ -115,14 +100,12 @@ class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a 
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> ctx&#39; <span class="ot">=</span> Map.insert x t1 ctx</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  t2 <span class="ot">&lt;-</span> constraintsWithCon ctx&#39; e</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="op">$</span> <span class="dt">Carrow</span> t1 t2</span></code></pre></div>
-<p>Apart from <code>out</code> being called <code>unbind</code> and
-<code>into</code> being called <code>bind</code>, the API is pretty
-similar. Also, unlike <code>abbot</code>, which required a standalone
-build step to generate SML code, <code>unbound-generics</code> uses the
-Haskell’s <code>derive Generic</code> to bake the code generation for
-capture avoiding substitution and alpha equivalence right into the
-compiler. All in all, <code>unbound-generics</code> is really pleasant
-to use!</p>
+<p>Apart from <code>out</code> being called <code>unbind</code> and <code>into</code> being called <code>bind</code>,
+the API is pretty similar. Also, unlike <code>abbot</code>, which required a
+standalone build step to generate SML code, <code>unbound-generics</code> uses the
+Haskell’s <code>derive Generic</code> to bake the code generation for capture
+avoiding substitution and alpha equivalence right into the compiler. All
+in all, <code>unbound-generics</code> is really pleasant to use!</p>
 <!-- vim:tw=72
 -->
 </main>

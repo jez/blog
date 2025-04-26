@@ -50,57 +50,28 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#quick-overview-remotes"
-  id="toc-quick-overview-remotes">Quick Overview: Remotes</a></li>
-  <li><a href="#scenario-working-with-code-in-15-150"
-  id="toc-scenario-working-with-code-in-15-150">Scenario: Working with
-  Code in 15-150</a></li>
-  <li><a href="#more-applications" id="toc-more-applications">More
-  Applications</a></li>
+  <li><a href="#quick-overview-remotes" id="toc-quick-overview-remotes">Quick Overview: Remotes</a></li>
+  <li><a href="#scenario-working-with-code-in-15-150" id="toc-scenario-working-with-code-in-15-150">Scenario: Working with Code in 15-150</a></li>
+  <li><a href="#more-applications" id="toc-more-applications">More Applications</a></li>
   </ul>
 </nav>
 
 <main>
-<p>Quite often when using git, you only need to use one remote:
-<code>origin</code>. All your pushes and pulls communicate with this one
-host. However, there are many occasions when using multiple Git remotes
-is incredibly handy.</p>
+<p>Quite often when using git, you only need to use one remote: <code>origin</code>. All your pushes and pulls communicate with this one host. However, there are many occasions when using multiple Git remotes is incredibly handy.</p>
 <!-- more -->
 <h1 id="quick-overview-remotes">Quick Overview: Remotes</h1>
-<p>If you haven’t already, I strongly recommend that you check out these
-two Git resources in your free time:</p>
+<p>If you haven’t already, I strongly recommend that you check out these two Git resources in your free time:</p>
 <ul>
-<li><a href="http://pcottle.github.io/learnGitBranching/"><strong>Learn
-Git Branching</strong></a>, an interactive walkthrough of some powerful
-Git features</li>
-<li><a
-href="https://wildlyinaccurate.com/a-hackers-guide-to-git"><strong>A
-Hacker’s Guide to Git</strong></a>, an explanation of Git by “taking a
-peek under the hood”</li>
+<li><a href="http://pcottle.github.io/learnGitBranching/"><strong>Learn Git Branching</strong></a>, an interactive walkthrough of some powerful Git features</li>
+<li><a href="https://wildlyinaccurate.com/a-hackers-guide-to-git"><strong>A Hacker’s Guide to Git</strong></a>, an explanation of Git by “taking a peek under the hood”</li>
 </ul>
-<p>In this article, I’ll only be talking about remotes. Remotes are
-basically “mirrors” of a branch that you have locally, but on a
-different computer.</p>
-<h1 id="scenario-working-with-code-in-15-150">Scenario: Working with
-Code in 15-150</h1>
-<p>At CMU, the class 15-150 distributes its starter code in a beautiful
-way: using Git! This opens up a number of things we can take advantage
-of, but there’s one thing in particular we can do using multiple git
-remotes.</p>
-<p>In 15-150, the code is distribute in a read-only Git repo. If we want
-a place where we can push and pull our changes, we’ll need to create our
-own <em>bare repo</em> (a repo that’s used just for pushing and
-pulling). You’ll note that I said push <em>and pull</em>. The reason why
-I want to be able to pull is because I want to have 2 clones of this
-repo: one on the CMU Andrew Unix servers (where the 15-150 code is
-hosted), and one on my laptop, where there’s no network latency to edit
-files in Vim.</p>
-<p>To achieve this setup, the first thing we’ll do is set up the bare
-repo. The best place to put a bare repo is on a server so that you can
-always access your code. So from Andrew, I’ll run the commands:</p>
+<p>In this article, I’ll only be talking about remotes. Remotes are basically “mirrors” of a branch that you have locally, but on a different computer.</p>
+<h1 id="scenario-working-with-code-in-15-150">Scenario: Working with Code in 15-150</h1>
+<p>At CMU, the class 15-150 distributes its starter code in a beautiful way: using Git! This opens up a number of things we can take advantage of, but there’s one thing in particular we can do using multiple git remotes.</p>
+<p>In 15-150, the code is distribute in a read-only Git repo. If we want a place where we can push and pull our changes, we’ll need to create our own <em>bare repo</em> (a repo that’s used just for pushing and pulling). You’ll note that I said push <em>and pull</em>. The reason why I want to be able to pull is because I want to have 2 clones of this repo: one on the CMU Andrew Unix servers (where the 15-150 code is hosted), and one on my laptop, where there’s no network latency to edit files in Vim.</p>
+<p>To achieve this setup, the first thing we’ll do is set up the bare repo. The best place to put a bare repo is on a server so that you can always access your code. So from Andrew, I’ll run the commands:</p>
 <figure>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (unix.andrew.cmu.edu)</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (unix.andrew.cmu.edu)</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># `git clone --bare` is basically GitHub&#39;s &quot;Fork&quot; feature,</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># if you&#39;re familiar with that</span></span>
@@ -110,12 +81,9 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="
 Initialize the Bare Repo
 </figcaption>
 </figure>
-<p>This creates a bare repo initialized with all the 15-150 content
-which I can clone in two different ways: one for if I’m on Andrew, one
-if I’m on my laptop.</p>
+<p>This creates a bare repo initialized with all the 15-150 content which I can clone in two different ways: one for if I’m on Andrew, one if I’m on my laptop.</p>
 <figure>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (unix.andrew.cmu.edu)</span></span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (unix.andrew.cmu.edu)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone over Unix file path to new folder ~/private/15150</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone ~/private/gitrepos/15150 ~/private/15150</span>
@@ -135,18 +103,11 @@ Clone New Remote
 </figcaption>
 </figure>
 <p>To throw in a few graphics, our setup looks like this right now:</p>
-<p><a href="/assets/img/multiple-remotes-1.svg"><img
-src="/assets/img/multiple-remotes-1.svg" /></a></p>
-<p>I’m representing bare repos as clouds and clones of those repos as
-squares, with arrows representing whether code can flow from one place
-to the next. As you can see, to send code back and forth between Andrew
-and my laptop, I can just push in one place and pull in the other.</p>
-<p>The one thing missing from our picture is the original handout repo.
-How will we get updates as the homeworks are released? The last piece
-involves setting this up.</p>
+<p><a href="/assets/img/multiple-remotes-1.svg"><img src="/assets/img/multiple-remotes-1.svg" /></a></p>
+<p>I’m representing bare repos as clouds and clones of those repos as squares, with arrows representing whether code can flow from one place to the next. As you can see, to send code back and forth between Andrew and my laptop, I can just push in one place and pull in the other.</p>
+<p>The one thing missing from our picture is the original handout repo. How will we get updates as the homeworks are released? The last piece involves setting this up.</p>
 <figure>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Add the 15-150 handout remote so we can get starter code, etc.</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Add the 15-150 handout remote so we can get starter code, etc.</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="co"># (unix.andrew.cmu.edu)</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="co">#</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="co"># A common name for the second remote is &quot;upstream&quot;, though you could also</span></span>
@@ -167,26 +128,13 @@ class="sourceCode numberSource bash numberLines"><code class="sourceCode bash"><
 Add Handout Remote
 </figcaption>
 </figure>
-<p>Once we run those two lines, our setup looks like this, where arrows
-point in the direction data can flow:</p>
-<p><a href="/assets/img/multiple-remotes-2.svg"><img
-src="/assets/img/multiple-remotes-2.svg" /></a></p>
-<p>After this, we’re able to run <code>git pull upstream master</code>
-to get the 15-150 starter code as it’s released. I find this model
-particularly useful for all my classes, even the ones that don’t
-distribute their code using Git. Having code both on Andrew and on my
-local machine is a generally handy configuration, and using Git to push
-the code around to the right places makes my workflow simple.</p>
-<p>As always, let me know if something was unclear or incorrect in the
-comments!</p>
+<p>Once we run those two lines, our setup looks like this, where arrows point in
+the direction data can flow:</p>
+<p><a href="/assets/img/multiple-remotes-2.svg"><img src="/assets/img/multiple-remotes-2.svg" /></a></p>
+<p>After this, we’re able to run <code>git pull upstream master</code> to get the 15-150 starter code as it’s released. I find this model particularly useful for all my classes, even the ones that don’t distribute their code using Git. Having code both on Andrew and on my local machine is a generally handy configuration, and using Git to push the code around to the right places makes my workflow simple.</p>
+<p>As always, let me know if something was unclear or incorrect in the comments!</p>
 <h1 id="more-applications">More Applications</h1>
-<p>There are plenty other applications of using multiple remotes with
-Git. Perhaps the most common is to use them with the <a
-href="https://help.github.com/articles/fork-a-repo/"><strong>GitHub
-forking model</strong></a>, which is useful when collaborating on a
-software development project with others. You can use multiple remotes
-to do things like resolve merge conflicts in pull requests and to keep
-your fork up to date with the original repo.</p>
+<p>There are plenty other applications of using multiple remotes with Git. Perhaps the most common is to use them with the <a href="https://help.github.com/articles/fork-a-repo/"><strong>GitHub forking model</strong></a>, which is useful when collaborating on a software development project with others. You can use multiple remotes to do things like resolve merge conflicts in pull requests and to keep your fork up to date with the original repo.</p>
 </main>
 
 
