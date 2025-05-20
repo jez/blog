@@ -51,137 +51,68 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#installation-and-usage" id="toc-installation-and-usage">Installation and Usage</a></li>
-  <li><a href="#background" id="toc-background">Background</a></li>
-  <li><a href="#goals" id="toc-goals">Goals</a></li>
-  <li><a href="#host-independent-files" id="toc-host-independent-files">Host-independent files</a></li>
-  <li><a href="#host-dependent-files" id="toc-host-dependent-files">Host-dependent files</a>
+  <li><a href="#installation-and-usage">Installation and Usage</a></li>
+  <li><a href="#background">Background</a></li>
+  <li><a href="#goals">Goals</a></li>
+  <li><a href="#host-independent-files">Host-independent files</a></li>
+  <li><a href="#host-dependent-files">Host-dependent files</a>
   <ul>
-  <li><a href="#just-add-water" id="toc-just-add-water">Just Add Water</a></li>
-  <li><a href="#refactor-and-profit" id="toc-refactor-and-profit">Refactor and Profit</a></li>
+  <li><a href="#just-add-water">Just Add Water</a></li>
+  <li><a href="#refactor-and-profit">Refactor and Profit</a></li>
   </ul></li>
-  <li><a href="#up-next" id="toc-up-next">Up Next</a></li>
+  <li><a href="#up-next">Up Next</a></li>
   </ul>
 </nav>
 
 <main>
-<p>I recently rewrote most of my dotfiles to clean them up and in the process
-decided to take a renewed look at using <a href="https://robots.thoughtbot.com/rcm-for-rc-files-in-dotfiles-repos">rcm</a>’s array of features to manage
-syncing my dotfiles across multiple servers and hosts.</p>
+<p>I recently rewrote most of my dotfiles to clean them up and in the process decided to take a renewed look at using <a href="https://robots.thoughtbot.com/rcm-for-rc-files-in-dotfiles-repos">rcm</a>’s array of features to manage syncing my dotfiles across multiple servers and hosts.</p>
 <!-- more -->
 <h1 id="installation-and-usage">Installation and Usage</h1>
-<p>Thoughbot has written some excellent documentation for rcm, including a whole
-set of man pages and a <a href="https://robots.thoughtbot.com/rcm-for-rc-files-in-dotfiles-repos">nice blog post</a> that runs through its core
-features. As far as <a href="https://github.com/thoughtbot/rcm#installation">installation</a> goes, there’s a package for just
-about every platform on top of the standard autotools, so you should have no
-problem getting up and running.</p>
-<p>Rather than just run through the same stuff, I’m going to walk through some of
-the places where my experience varied from the examples given in the
-documentation.</p>
+<p>Thoughbot has written some excellent documentation for rcm, including a whole set of man pages and a <a href="https://robots.thoughtbot.com/rcm-for-rc-files-in-dotfiles-repos">nice blog post</a> that runs through its core features. As far as <a href="https://github.com/thoughtbot/rcm#installation">installation</a> goes, there’s a package for just about every platform on top of the standard autotools, so you should have no problem getting up and running.</p>
+<p>Rather than just run through the same stuff, I’m going to walk through some of the places where my experience varied from the examples given in the documentation.</p>
 <h1 id="background">Background</h1>
-<p>I’ve already been using rcm for a while now, though my setup was a little
-non-standard as far as rcm installations go; instead of using the system built
-into rcm for managing host-specific configuration files, I had <a href="https://github.com/jez/dotfiles/blob/6beee7eb426a21102da174f65d1a706bedc28b57/zshrc#L135-L204">huge case
-statements</a> littering my config files. After starting to get a little
-traffic for <a href="https://github.com/jez/vim-as-an-ide">some of my other configuration work</a>, I decided it was time to
-make my config files something worth looking at.</p>
-<p>Thus, given the state of my old files, much of my effort this time around
-were spent refactoring my current setup to increase modularity and get it to
-integrate nicely with rcm. I think that this use case is a little
-under-documented and lacking in first-class support in the suite, so I’ll talk
-about how I got around this later on. That being said, if you’re coming from no
-dotfiles management software or are interested in trying out something new,
-you’ll have a much smoother experience.</p>
+<p>I’ve already been using rcm for a while now, though my setup was a little non-standard as far as rcm installations go; instead of using the system built into rcm for managing host-specific configuration files, I had <a href="https://github.com/jez/dotfiles/blob/6beee7eb426a21102da174f65d1a706bedc28b57/zshrc#L135-L204">huge case statements</a> littering my config files. After starting to get a little traffic for <a href="https://github.com/jez/vim-as-an-ide">some of my other configuration work</a>, I decided it was time to make my config files something worth looking at.</p>
+<p>Thus, given the state of my old files, much of my effort this time around were spent refactoring my current setup to increase modularity and get it to integrate nicely with rcm. I think that this use case is a little under-documented and lacking in first-class support in the suite, so I’ll talk about how I got around this later on. That being said, if you’re coming from no dotfiles management software or are interested in trying out something new, you’ll have a much smoother experience.</p>
 <h1 id="goals">Goals</h1>
 <p>My two goals for the refactor that I mentioned above were to</p>
 <ul>
-<li>make everything modular, so that people could more easily pick and choose
-pieces from my dotfiles to include in theirs, and</li>
+<li>make everything modular, so that people could more easily pick and choose pieces from my dotfiles to include in theirs, and</li>
 <li>make it easy to swap around host-specific configurations.</li>
 </ul>
-<p>While the work required to achieve this setup was a bit hairy, maintaining it
-should be straightforward from now on.</p>
-<p>If you haven’t taken a second to peruse some of the <a href="http://thoughtbot.github.io/rcm/rcm.7.html">documentation</a> yet,
-it probably wouldn’t hurt to do so now. It’s about to get technical.</p>
+<p>While the work required to achieve this setup was a bit hairy, maintaining it should be straightforward from now on.</p>
+<p>If you haven’t taken a second to peruse some of the <a href="http://thoughtbot.github.io/rcm/rcm.7.html">documentation</a> yet, it probably wouldn’t hurt to do so now. It’s about to get technical.</p>
 <h1 id="host-independent-files">Host-independent files</h1>
-<p>I started this time around with the host independent files, because they
-required no real refactoring. Linking these up was a simple matter of running
-commands that looked like</p>
+<p>I started this time around with the host independent files, because they required no real refactoring. Linking these up was a simple matter of running commands that looked like</p>
 <pre><code>$ mkrc &lt;rc-file&gt;</code></pre>
-<p>I ran this on files like my <code>.vimrc</code>, <code>.tmux.conf</code>, <code>.ackrc</code>, and other simple
-files. I also handled my <code>.vim/</code> folder in this step, but slightly differently.
-The default rcm behavior is to create symlinks when given a single file, and to
-recursively descend and create symlinks when given a folder. For folders like my
-<code>.vim/</code> folder, which can get pretty large pretty quickly, I used the <code>-S</code>
-option to force rcm to symlink the directory:</p>
+<p>I ran this on files like my <code>.vimrc</code>, <code>.tmux.conf</code>, <code>.ackrc</code>, and other simple files. I also handled my <code>.vim/</code> folder in this step, but slightly differently. The default rcm behavior is to create symlinks when given a single file, and to recursively descend and create symlinks when given a folder. For folders like my <code>.vim/</code> folder, which can get pretty large pretty quickly, I used the <code>-S</code> option to force rcm to symlink the directory:</p>
 <pre><code>$ mkrc -S .vim/</code></pre>
-<p>The first time I ran <code>mkrc</code>, it automatically created a folder called
-<code>~/.dotfiles</code>, which is where all my dotfiles files will live from now on. Then,
-every time <code>mkrc</code> is run, it moves the file into this folder and creates a
-symbolic link where it use to exist. I always thought this was a curious name
-for the program, “make rc file”, but really what I just mentioned is all there
-is to it: <code>mkrc</code> <em>moves</em> and <em>links</em> an rc file.</p>
+<p>The first time I ran <code>mkrc</code>, it automatically created a folder called <code>~/.dotfiles</code>, which is where all my dotfiles files will live from now on. Then, every time <code>mkrc</code> is run, it moves the file into this folder and creates a symbolic link where it use to exist. I always thought this was a curious name for the program, “make rc file”, but really what I just mentioned is all there is to it: <code>mkrc</code> <em>moves</em> and <em>links</em> an rc file.</p>
 <p><a href="/assets/img/mkrc-host-independent.png"><img src="/assets/img/mkrc-host-independent.png" /></a></p>
-<p>Above you can see the results of this first step on a couple files: my <code>.vimrc</code>
-and my <code>.vim/</code> folder. You can see that where there once were a file and a
-folder, there are now two symbolic links, which point to the moved files inside
-of my <code>.dotfiles/</code> directory.</p>
+<p>Above you can see the results of this first step on a couple files: my <code>.vimrc</code> and my <code>.vim/</code> folder. You can see that where there once were a file and a folder, there are now two symbolic links, which point to the moved files inside of my <code>.dotfiles/</code> directory.</p>
 <h1 id="host-dependent-files">Host-dependent files</h1>
-<p>Next up are obviously the host-dependent files, though we can split this
-category once more based on which need to be refactored.</p>
+<p>Next up are obviously the host-dependent files, though we can split this category once more based on which need to be refactored.</p>
 <h2 id="just-add-water">Just Add Water</h2>
-<p>For my host-dependent
-files that didn’t need to be refactored, like my <code>.ssh/config</code> and my
-<code>.gitconfig</code> (files which, by the way, I wasn’t tracking at all before this
-rewrite), I just ran the following command:</p>
+<p>For my host-dependent files that didn’t need to be refactored, like my <code>.ssh/config</code> and my <code>.gitconfig</code> (files which, by the way, I wasn’t tracking at all before this rewrite), I just ran the following command:</p>
 <pre><code>$ mkrc -o .gitconfig</code></pre>
-<p>When I’m on my Mac, this goes through the same move + link procedure described
-above, but it moves the file into the <code>~/.dotfiles/host-Jacobs-MacBook-Air/</code>
-subfolder.</p>
+<p>When I’m on my Mac, this goes through the same move + link procedure described above, but it moves the file into the <code>~/.dotfiles/host-Jacobs-MacBook-Air/</code> subfolder.</p>
 <h2 id="refactor-and-profit">Refactor and Profit</h2>
-<p>Finally, I dealt with the piece of my dotfiles that was sorely lacking a
-refactor: my <code>.zshrc</code>. For this, I took a cue from <a href="https://github.com/holman/dotfiles">Zach Holman’s
-dotfiles</a> organization and broke up my zshrc into it’s components, like
-<code>aliases.sh</code>, <code>colors.sh</code>, and more. Most important of these components was
-the <code>host.sh</code> file, which contained all the host-specific configurations that I
-was doing. Whenever I deploy my <code>.zshrc</code> on a new host now, rcm will put a
-<code>host.sh</code> file in a location where my <code>.zshrc</code> knows where to look, but the
-contents of that file change depending on the host. Getting the many <code>host.sh</code>
-files in place is where I think mkrc’s power can be improved.</p>
-<p>The <code>mkrc -o</code> command takes an option that lets you specify a host explicitly
-(<code>-B &lt;hostname&gt;</code>) rather than calculating it with the <code>hostname</code> command, but it doesn’t
-let you specify that you’d just like to move the file, rather than move and link
-it. As such, when I was refactoring, I created a bunch of files:
-<code>host-Jacobs-MacBook-Air.sh</code>, <code>host-ghost.zimmerman.io.sh</code>, etc., creating one
-<code>host-&lt;something&gt;.sh</code> file for each host that I needed to deploy my dotfiles to.
-Then, for each of these files, I</p>
+<p>Finally, I dealt with the piece of my dotfiles that was sorely lacking a refactor: my <code>.zshrc</code>. For this, I took a cue from <a href="https://github.com/holman/dotfiles">Zach Holman’s dotfiles</a> organization and broke up my zshrc into it’s components, like <code>aliases.sh</code>, <code>colors.sh</code>, and more. Most important of these components was the <code>host.sh</code> file, which contained all the host-specific configurations that I was doing. Whenever I deploy my <code>.zshrc</code> on a new host now, rcm will put a <code>host.sh</code> file in a location where my <code>.zshrc</code> knows where to look, but the contents of that file change depending on the host. Getting the many <code>host.sh</code> files in place is where I think mkrc’s power can be improved.</p>
+<p>The <code>mkrc -o</code> command takes an option that lets you specify a host explicitly (<code>-B &lt;hostname&gt;</code>) rather than calculating it with the <code>hostname</code> command, but it doesn’t let you specify that you’d just like to move the file, rather than move and link it. As such, when I was refactoring, I created a bunch of files: <code>host-Jacobs-MacBook-Air.sh</code>, <code>host-ghost.zimmerman.io.sh</code>, etc., creating one <code>host-&lt;something&gt;.sh</code> file for each host that I needed to deploy my dotfiles to. Then, for each of these files, I</p>
 <ul>
 <li>ran <code>mkrc -o -B &lt;hostname&gt; host-&lt;hostname&gt;.sh</code></li>
-<li>removed the link created by <code>mkrc</code> (I skipped this step the last time around,
-when I had just linked the correct <code>host.sh</code> file for the host I was working
-on)</li>
-<li>renamed the file that rcm created in the <code>.dotfiles/host-&lt;hostname&gt;/</code> folder
-to just <code>host.sh</code>.</li>
+<li>removed the link created by <code>mkrc</code> (I skipped this step the last time around, when I had just linked the correct <code>host.sh</code> file for the host I was working on)</li>
+<li>renamed the file that rcm created in the <code>.dotfiles/host-&lt;hostname&gt;/</code> folder to just <code>host.sh</code>.</li>
 </ul>
-<p>Since there were a bunch of different host-specific files in my case, this
-process was a little tedious. It’d have been nice if there was an option to
-automate my use case, but I’m not sure if it’s common enough to warrant
-the additional complexity, especially considering it’s a one-time cost.</p>
-<p>In any case, with all this in place, I had finally met my two goals: everything
-was modular, and host-specific configurations were clearly defined and easily
-deployable.</p>
+<p>Since there were a bunch of different host-specific files in my case, this process was a little tedious. It’d have been nice if there was an option to automate my use case, but I’m not sure if it’s common enough to warrant the additional complexity, especially considering it’s a one-time cost.</p>
+<p>In any case, with all this in place, I had finally met my two goals: everything was modular, and host-specific configurations were clearly defined and easily deployable.</p>
 <h1 id="up-next">Up Next</h1>
 <p>If you’re reading this and wondering where to go next, you could:</p>
 <ul>
-<li>take a dive into the rcm documentation to get started applying it to your own
-set of dotfiles</li>
+<li>take a dive into the rcm documentation to get started applying it to your own set of dotfiles</li>
 <li>browse my <a href="https://github.com/jez/dotfiles">new-and-improved dotfiles</a> repository on GitHub</li>
-<li>wait for an upcoming post where I point out some of the noteworthy things I’ve
-added in my dotfiles</li>
+<li>wait for an upcoming post where I point out some of the noteworthy things I’ve added in my dotfiles</li>
 </ul>
-<p>If you’re using rcm or trying to get started with it but are having issues, feel
-free to drop questions in the comments and I’ll see if I can’t help sort things
-out.</p>
+<p>If you’re using rcm or trying to get started with it but are having issues, feel free to drop questions in the comments and I’ll see if I can’t help sort things out.</p>
 </main>
 
 

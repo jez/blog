@@ -51,16 +51,16 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#recap-of-the-problem" id="toc-recap-of-the-problem">Recap of the problem</a></li>
-  <li><a href="#defining-a-custom-constructor" id="toc-defining-a-custom-constructor">Defining a custom constructor</a></li>
-  <li><a href="#handling-subclasses-with-t.all-and-t.attached_class" id="toc-handling-subclasses-with-t.all-and-t.attached_class">Handling subclasses with <code>T.all</code> and <code>T.attached_class</code></a></li>
+  <li><a href="#recap-of-the-problem">Recap of the problem</a></li>
+  <li><a href="#defining-a-custom-constructor">Defining a custom constructor</a></li>
+  <li><a href="#handling-subclasses-with-t.all-and-t.attached_class">Handling subclasses with <code>T.all</code> and <code>T.attached_class</code></a></li>
   </ul>
 </nav>
 
 <main>
 <p>Sorbet does not infer generic types when constructing an instance of a generic class.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>set <span class="op">=</span> <span class="dt">Set</span><span class="at">.new</span>(<span class="kw">[</span><span class="dv">1</span><span class="kw">]</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cn">T</span><span class="at">.reveal_type</span>(set) <span class="co"># =&gt; T::Set[T.untyped]</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>set <span class="kw">=</span> <span class="dt">Set</span><span class="at">.new</span>(<span class="kw">[</span><span class="dv">1</span><span class="kw">]</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>T<span class="at">.reveal_type</span>(set) <span class="co"># =&gt; T::Set[T.untyped]</span></span></code></pre></div>
 <p>You’d hope<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="marginnote">This is a bit of a longstanding bug. See <a href="https://github.com/sorbet/sorbet/issues/3768">#3768</a> and <a href="https://github.com/sorbet/sorbet/issues/4450">#4450</a>. To learn more about why this happens, see <a href="https://github.com/sorbet/sorbet/blob/master/docs/variance-defaulting.md">this Sorbet internals doc</a>.<br />
 <br />
 </span></span> that Sorbet would <strong>either</strong> report an error, requiring a type annotation instead of implicitly assuming <code>T.untyped</code> (like how other type annotations are required in <code># typed: strict</code> files), <strong>or</strong> be smart enough to infer a suitable type from the provided arguments. Some day it will.</p>
@@ -69,8 +69,8 @@
 <figure class="left-align-caption">
 <div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:Elem</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">val:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:Elem</span>))</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.all</span>(<span class="cn">T</span><span class="at">.attached_class</span>, <span class="dt">Box</span><span class="kw">[</span><span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:Elem</span>)<span class="kw">]</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">val: </span>T<span class="at">.type_parameter</span>(<span class="wa">:Elem</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.all</span>(T<span class="at">.attached_class</span>, <span class="dt">Box</span><span class="kw">[</span>T<span class="at">.type_parameter</span>(<span class="wa">:Elem</span>)<span class="kw">]</span>))</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.new</span>(val)</span></code></pre></div>
 <figcaption>
@@ -80,20 +80,20 @@
 <p>But for that to make sense, let’s build up to it.</p>
 <h1 id="recap-of-the-problem">Recap of the problem</h1>
 <div class="sourceCode" id="cb3"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-6 hl-12"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a><span class="cf">class</span> <span class="dt">Box</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a>  <span class="fu">extend</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Generic</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a>  <span class="dt">Elem</span> <span class="op">=</span> type_member</span>
+<span id="cb3-2"><a href="#cb3-2"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Generic</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="dt">Elem</span> <span class="kw">=</span> type_member</span>
 <span id="cb3-4"><a href="#cb3-4"></a></span>
-<span id="cb3-5"><a href="#cb3-5"></a>  sig <span class="op">{</span> params(<span class="wa">val:</span> <span class="dt">Elem</span>)<span class="at">.void</span> <span class="op">}</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>  sig <span class="kw">{</span> params(<span class="wa">val: </span><span class="dt">Elem</span>)<span class="at">.void</span> <span class="kw">}</span></span>
 <span id="cb3-6"><a href="#cb3-6"></a>  <span class="cf">def</span> initialize(val)</span>
-<span id="cb3-7"><a href="#cb3-7"></a>    <span class="ot">@val</span> <span class="op">=</span> val</span>
+<span id="cb3-7"><a href="#cb3-7"></a>    <span class="ot">@val</span> <span class="kw">=</span> val</span>
 <span id="cb3-8"><a href="#cb3-8"></a>  <span class="cf">end</span></span>
 <span id="cb3-9"><a href="#cb3-9"></a><span class="cf">end</span></span>
 <span id="cb3-10"><a href="#cb3-10"></a></span>
-<span id="cb3-11"><a href="#cb3-11"></a>box <span class="op">=</span> <span class="dt">Box</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
-<span id="cb3-12"><a href="#cb3-12"></a><span class="cn">T</span><span class="at">.reveal_type</span>(box) <span class="co"># =&gt; Box[T.untyped]</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>box <span class="kw">=</span> <span class="dt">Box</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
+<span id="cb3-12"><a href="#cb3-12"></a>T<span class="at">.reveal_type</span>(box) <span class="co"># =&gt; Box[T.untyped]</span></span>
 <span id="cb3-13"><a href="#cb3-13"></a></span>
-<span id="cb3-14"><a href="#cb3-14"></a>box <span class="op">=</span> <span class="dt">Box</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
-<span id="cb3-15"><a href="#cb3-15"></a><span class="cn">T</span><span class="at">.reveal_type</span>(box) <span class="co"># =&gt; Box[Integer]</span></span></code></pre></div>
+<span id="cb3-14"><a href="#cb3-14"></a>box <span class="kw">=</span> <span class="dt">Box</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
+<span id="cb3-15"><a href="#cb3-15"></a>T<span class="at">.reveal_type</span>(box) <span class="co"># =&gt; Box[Integer]</span></span></code></pre></div>
 <p>If we naively define a generic <code>Box</code> class like this, <code>Box.new(0)</code> will neither report an error nor infer the correct <code>Box[Integer]</code> type. Users of our class can correct this themselves with <code>Box[Integer].new(0)</code>, but few people know to do this.</p>
 <p>The problem here comes from Sorbet’s default implementation of <code>Class#new</code>: by default, Sorbet uses only the type of the receiver to decide the result type. We can fix the problem by defining our own constructor as a <strong>generic method</strong> whose return type is inferred from the arguments.</p>
 <h1 id="defining-a-custom-constructor">Defining a custom constructor</h1>
@@ -105,24 +105,24 @@
 <span id="cb4-3"><a href="#cb4-3"></a></span>
 <span id="cb4-4"><a href="#cb4-4"></a>  sig <span class="cf">do</span></span>
 <span id="cb4-5"><a href="#cb4-5"></a>    type_parameters(<span class="wa">:Elem</span>)</span>
-<span id="cb4-6"><a href="#cb4-6"></a>      <span class="at">.params</span>(<span class="wa">val:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:Elem</span>))</span>
-<span id="cb4-7"><a href="#cb4-7"></a>      <span class="at">.returns</span>(<span class="dt">Box</span><span class="kw">[</span><span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:Elem</span>)<span class="kw">]</span>)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>      <span class="at">.params</span>(<span class="wa">val: </span>T<span class="at">.type_parameter</span>(<span class="wa">:Elem</span>))</span>
+<span id="cb4-7"><a href="#cb4-7"></a>      <span class="at">.returns</span>(<span class="dt">Box</span><span class="kw">[</span>T<span class="at">.type_parameter</span>(<span class="wa">:Elem</span>)<span class="kw">]</span>)</span>
 <span id="cb4-8"><a href="#cb4-8"></a>  <span class="cf">end</span></span>
 <span id="cb4-9"><a href="#cb4-9"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.new</span>(val)</span>
 <span id="cb4-10"><a href="#cb4-10"></a>    <span class="dv">super</span></span>
 <span id="cb4-11"><a href="#cb4-11"></a>  <span class="cf">end</span></span>
 <span id="cb4-12"><a href="#cb4-12"></a><span class="cf">end</span></span>
 <span id="cb4-13"><a href="#cb4-13"></a></span>
-<span id="cb4-14"><a href="#cb4-14"></a>box <span class="op">=</span> <span class="dt">Box</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
-<span id="cb4-15"><a href="#cb4-15"></a><span class="cn">T</span><span class="at">.reveal_type</span>(box) <span class="co"># =&gt; Box[Integer]</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14"></a>box <span class="kw">=</span> <span class="dt">Box</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
+<span id="cb4-15"><a href="#cb4-15"></a>T<span class="at">.reveal_type</span>(box) <span class="co"># =&gt; Box[Integer]</span></span></code></pre></div>
 <p>Now the inferred type is <code>Box[Integer]</code> even though we didn’t provide an explicit type annotation like <code>Box[Integer].new(...)</code>.</p>
 <p>This signature is pretty good, but we can actually do better. This signature says that the result will <strong>always</strong> be a <code>Box</code>, even if called on subclasses of <code>Box</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines hl-6"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">class</span> <span class="dt">ChildBox</span> <span class="op">&lt;</span> <span class="dt">Box</span></span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines hl-6"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">class</span> <span class="dt">ChildBox</span> <span class="kw">&lt;</span> <span class="dt">Box</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>  <span class="co"># ...</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="cf">end</span></span>
 <span id="cb5-4"><a href="#cb5-4"></a></span>
-<span id="cb5-5"><a href="#cb5-5"></a>box <span class="op">=</span> <span class="dt">ChildBox</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
-<span id="cb5-6"><a href="#cb5-6"></a><span class="cn">T</span><span class="at">.reveal_type</span>(box) <span class="co"># =&gt; Box[Integer]</span></span></code></pre></div>
+<span id="cb5-5"><a href="#cb5-5"></a>box <span class="kw">=</span> <span class="dt">ChildBox</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
+<span id="cb5-6"><a href="#cb5-6"></a>T<span class="at">.reveal_type</span>(box) <span class="co"># =&gt; Box[Integer]</span></span></code></pre></div>
 <p>Notice that the <code>ChildBox.new</code> call produces a <code>Box</code>, because our override of <code>new</code> said “I always return <code>Box[...]</code>.” We can fix that with clever use of <code>T.all</code> and <code>T.attached_class</code>.</p>
 <h1 id="handling-subclasses-with-t.all-and-t.attached_class">Handling subclasses with <code>T.all</code> and <code>T.attached_class</code></h1>
 <figure class="left-align-caption">
@@ -131,22 +131,22 @@
 <span id="cb6-3"><a href="#cb6-3"></a></span>
 <span id="cb6-4"><a href="#cb6-4"></a>  sig <span class="cf">do</span></span>
 <span id="cb6-5"><a href="#cb6-5"></a>    type_parameters(<span class="wa">:Elem</span>)</span>
-<span id="cb6-6"><a href="#cb6-6"></a>      <span class="at">.params</span>(<span class="wa">val:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:Elem</span>))</span>
-<span id="cb6-7"><a href="#cb6-7"></a>      <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.all</span>(<span class="cn">T</span><span class="at">.attached_class</span>, <span class="dt">Box</span><span class="kw">[</span><span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:Elem</span>)<span class="kw">]</span>))</span>
+<span id="cb6-6"><a href="#cb6-6"></a>      <span class="at">.params</span>(<span class="wa">val: </span>T<span class="at">.type_parameter</span>(<span class="wa">:Elem</span>))</span>
+<span id="cb6-7"><a href="#cb6-7"></a>      <span class="at">.returns</span>(T<span class="at">.all</span>(T<span class="at">.attached_class</span>, <span class="dt">Box</span><span class="kw">[</span>T<span class="at">.type_parameter</span>(<span class="wa">:Elem</span>)<span class="kw">]</span>))</span>
 <span id="cb6-8"><a href="#cb6-8"></a>  <span class="cf">end</span></span>
 <span id="cb6-9"><a href="#cb6-9"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.new</span>(val)</span>
 <span id="cb6-10"><a href="#cb6-10"></a>    <span class="dv">super</span></span>
 <span id="cb6-11"><a href="#cb6-11"></a>  <span class="cf">end</span></span>
 <span id="cb6-12"><a href="#cb6-12"></a><span class="cf">end</span></span>
 <span id="cb6-13"><a href="#cb6-13"></a></span>
-<span id="cb6-14"><a href="#cb6-14"></a><span class="cf">class</span> <span class="dt">ChildBox</span> <span class="op">&lt;</span> <span class="dt">Box</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="cf">class</span> <span class="dt">ChildBox</span> <span class="kw">&lt;</span> <span class="dt">Box</span></span>
 <span id="cb6-15"><a href="#cb6-15"></a>  <span class="co"># ...</span></span>
 <span id="cb6-16"><a href="#cb6-16"></a><span class="cf">end</span></span>
 <span id="cb6-17"><a href="#cb6-17"></a></span>
-<span id="cb6-18"><a href="#cb6-18"></a>box <span class="op">=</span> <span class="dt">Box</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
-<span id="cb6-19"><a href="#cb6-19"></a><span class="cn">T</span><span class="at">.reveal_type</span>(box) <span class="co"># =&gt; Box[Integer]</span></span>
-<span id="cb6-20"><a href="#cb6-20"></a>box <span class="op">=</span> <span class="dt">ChildBox</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
-<span id="cb6-21"><a href="#cb6-21"></a><span class="cn">T</span><span class="at">.reveal_type</span>(box) <span class="co"># =&gt; ChildBox[Integer]</span></span></code></pre></div>
+<span id="cb6-18"><a href="#cb6-18"></a>box <span class="kw">=</span> <span class="dt">Box</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
+<span id="cb6-19"><a href="#cb6-19"></a>T<span class="at">.reveal_type</span>(box) <span class="co"># =&gt; Box[Integer]</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a>box <span class="kw">=</span> <span class="dt">ChildBox</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
+<span id="cb6-21"><a href="#cb6-21"></a>T<span class="at">.reveal_type</span>(box) <span class="co"># =&gt; ChildBox[Integer]</span></span></code></pre></div>
 <figcaption>
 <a href="https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Aclass%20Box%0A%20%20extend%20T%3A%3AGeneric%0A%20%20Elem%20%3D%20type_member%0A%0A%20%20sig%20%7B%20params%28val%3A%20Elem%29.void%20%7D%0A%20%20def%20initialize%28val%29%0A%20%20%20%20%40val%20%3D%20val%0A%20%20end%0A%0A%20%20sig%20do%0A%20%20%20%20type_parameters%28%3AElem%29%0A%20%20%20%20%20%20.params%28val%3A%20T.type_parameter%28%3AElem%29%29%0A%20%20%20%20%20%20.returns%28T.all%28T.attached_class%2C%20Box%5BT.type_parameter%28%3AElem%29%5D%29%29%0A%20%20end%0A%20%20def%20self.new%28val%29%0A%20%20%20%20super%0A%20%20end%0Aend%0A%0Aclass%20ChildBox%20%3C%20Box%0A%20%20Elem%20%3D%20type_member%0Aend%0A%0Abox%20%3D%20Box.new%280%29%0AT.reveal_type%28box%29%20%23%20%3D%3E%20Box%5BInteger%5D%0Abox%20%3D%20ChildBox.new%280%29%0AT.reveal_type%28box%29%20%23%20%3D%3E%20ChildBox%5BInteger%5D%0A">View full example on sorbet.run →</a>
 </figcaption>

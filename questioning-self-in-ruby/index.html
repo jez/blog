@@ -50,18 +50,17 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#case-1-def-qux-end" id="toc-case-1-def-qux-end">Case 1: <code>def qux; end</code></a></li>
-  <li><a href="#case-2-def-expr.qux-end" id="toc-case-2-def-expr.qux-end">Case 2: <code>def (expr).qux; end</code></a></li>
-  <li><a href="#the-file-top-level" id="toc-the-file-top-level">The file top-level</a></li>
-  <li><a href="#appendix-but-why" id="toc-appendix-but-why">Appendix: But why?</a></li>
-  <li><a href="#appendix-further-reading" id="toc-appendix-further-reading">Appendix: Further reading</a></li>
+  <li><a href="#case-1-def-qux-end">Case 1: <code>def qux; end</code></a></li>
+  <li><a href="#case-2-def-expr.qux-end">Case 2: <code>def (expr).qux; end</code></a></li>
+  <li><a href="#the-file-top-level">The file top-level</a></li>
+  <li><a href="#appendix-but-why">Appendix: But why?</a></li>
+  <li><a href="#appendix-further-reading">Appendix: Further reading</a></li>
   </ul>
 </nav>
 
 <main>
 <blockquote>
-<p><strong>Editing note</strong>: This post first appeared in a work-internal email. It was first
-cross-posted to this blog December 12, 2022.</p>
+<p><strong>Editing note</strong>: This post first appeared in a work-internal email. It was first cross-posted to this blog December 12, 2022.</p>
 </blockquote>
 <p>Have you ever wondered why this Ruby snippet runs with no errors:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -- example1.rb --</span></span>
@@ -73,63 +72,45 @@ cross-posted to this blog December 12, 2022.</p>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> </span></code></pre></div>
 <p>but this Ruby snippet raises a <code>NoMethodError</code> on the last line:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -- example2.rb --</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.bar</span>; <span class="cf">end</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> foo; <span class="cf">end</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  bar()</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  foo() <span class="co"># undefined method `foo&#39; for A:Class (NoMethodError)</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>What gives? All we did was wrap the code in a class (versus letting the code run at the
-top-level of a file). The second example should be unsurprising—we write code like this
-all the time, and we’ve come to learn that instance methods like <code>foo</code> can only be called
-on instances of <code>A</code>. Within the class body of <code>A</code> only singleton methods like <code>bar</code> can be
-called.</p>
-<p>I was pretty annoyed that this intuition didn’t translate to methods defined at the
-top-level of a file, so I asked why. Turns out: the Ruby VM uses separate algorithms for
-figuring out what class to define a method on. The two separate algorithms look like this:</p>
+<p>What gives? All we did was wrap the code in a class (versus letting the code run at the top-level of a file). The second example should be unsurprising—we write code like this all the time, and we’ve come to learn that instance methods like <code>foo</code> can only be called on instances of <code>A</code>. Within the class body of <code>A</code> only singleton methods like <code>bar</code> can be called.</p>
+<p>I was pretty annoyed that this intuition didn’t translate to methods defined at the top-level of a file, so I asked why. Turns out: the Ruby VM uses separate algorithms for figuring out what class to define a method on. The two separate algorithms look like this:</p>
 <h2 id="case-1-def-qux-end">Case 1: <code>def qux; end</code></h2>
-<p>As Ruby evaluates code, it maintains a lexical nesting scope of classes. This is the same
-nesting scope that it uses when looking up constants:</p>
+<p>As Ruby evaluates code, it maintains a lexical nesting scope of classes. This is the same nesting scope that it uses when looking up constants:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nesting scope: [Object]</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># nesting scope: [Object, A]</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">module</span> <span class="cn">X</span>; <span class="cf">end</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> <span class="cn">B</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">module</span> X; <span class="cf">end</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> B</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># nesting scope: [Object, A, B]</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> <span class="cn">X</span> <span class="co"># =&gt; A::X</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> X <span class="co"># =&gt; A::X</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>In this example, the module <code>X</code> is referenced without leading <code>::</code> like <code>::X</code>, so Ruby
-searches for constants named <code>X</code> in the nesting scope (it also searches other places, but
-those places don’t affect method definitions).</p>
-<p>For a method definition like <code>def qux; end</code>, Ruby looks up the top of the scope and enters
-a method into that class’s method table. That is, this snippet defines <code>A#foo</code> because
-it’s nested lexically in <code>A</code>:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
+<p>In this example, the module <code>X</code> is referenced without leading <code>::</code> like <code>::X</code>, so Ruby searches for constants named <code>X</code> in the nesting scope (it also searches other places, but those places don’t affect method definitions).</p>
+<p>For a method definition like <code>def qux; end</code>, Ruby looks up the top of the scope and enters a method into that class’s method table. That is, this snippet defines <code>A#foo</code> because it’s nested lexically in <code>A</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> foo; <span class="cf">end</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>This was the first thing that tripped me: when defining a method using <code>def qux; end</code>, the
-current value of <code>self</code> <strong>doesn’t matter at all</strong> (this will be important later!).</p>
+<p>This was the first thing that tripped me: when defining a method using <code>def qux; end</code>, the current value of <code>self</code> <strong>doesn’t matter at all</strong> (this will be important later!).</p>
 <h2 id="case-2-def-expr.qux-end">Case 2: <code>def (expr).qux; end</code></h2>
-<p>When a method definition has a receiver, it’s the opposite: the lexical class nesting
-scope doesn’t matter, while the value <code>expr</code> evaluates to does. The steps the Ruby VM
-follows are like this:</p>
+<p>When a method definition has a receiver, it’s the opposite: the lexical class nesting scope doesn’t matter, while the value <code>expr</code> evaluates to does. The steps the Ruby VM follows are like this:</p>
 <ol type="1">
-<li>Evaluate <code>(expr)</code> to a value. I’ll call that <code>v</code>. This can be an (almost) arbitrary
-value! It doesn’t have to result in a <code>Class</code> instance.</li>
+<li>Evaluate <code>(expr)</code> to a value. I’ll call that <code>v</code>. This can be an (almost) arbitrary value! It doesn’t have to result in a <code>Class</code> instance.</li>
 <li>Take <code>v.singleton_class</code>. Every object has a singleton class.</li>
 <li>Define the method named <code>qux</code> on that singleton class.</li>
 </ol>
-<p>It just so happens that when executing a class body, Ruby sets <code>self</code> to the current
-class:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="dv">self</span> <span class="op">==</span> <span class="cn">A</span> <span class="co"># =&gt; true</span></span>
+<p>It just so happens that when executing a class body, Ruby sets <code>self</code> to the current class:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="dv">self</span> <span class="kw">==</span> A <span class="co"># =&gt; true</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.bar</span>; <span class="cf">end</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>Looking specifically at the method definition, Ruby will evaluate <code>self</code> to the value <code>A</code>,
-then take <code>A.singleton_class</code>, and then define the <code>bar</code> on that (singleton) class.</p>
-<p>It happened that here we were calling <code>.singleton_class</code> on a class, but we can call
-<code>.singleton_class</code> on any (non-class) object! That’s how the file top-level works.</p>
+<p>Looking specifically at the method definition, Ruby will evaluate <code>self</code> to the value <code>A</code>, then take <code>A.singleton_class</code>, and then define the <code>bar</code> on that (singleton) class.</p>
+<p>It happened that here we were calling <code>.singleton_class</code> on a class, but we can call <code>.singleton_class</code> on any (non-class) object! That’s how the file top-level works.</p>
 <h2 id="the-file-top-level">The file top-level</h2>
 <p>We now can understand why <code>example1.rb</code> doesn’t raise any errors:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -- example1.rb --</span></span>
@@ -138,33 +119,20 @@ then take <code>A.singleton_class</code>, and then define the <code>bar</code> o
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> foo; <span class="cf">end</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  bar()</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  foo()</span></code></pre></div>
-<p>When Ruby starts running a program, it sets the nesting scope to <code>Object</code> like <a href="https://github.com/ruby/ruby/blob/v2_7_2/vm.c#L3269">in
-vm.c</a>. But then it sets <code>self</code> to a
-completely unrelated value. The value it chooses is one it just <a href="https://github.com/ruby/ruby/blob/v2_7_2/vm.c#L3357-L3359">makes out of thin
-air</a> at startup. In pseudo
-code, the top self is invented kind of like this:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">RubyVM</span><span class="op">::</span><span class="dt">TopSelf</span> <span class="op">=</span> <span class="dt">Object</span><span class="at">.new</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dt">RubyVM</span><span class="op">::</span><span class="dt">TopSelf</span><span class="at">.to_s</span>; <span class="st">&quot;main&quot;</span>; <span class="cf">end</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dv">self</span> <span class="op">=</span> <span class="dt">RubyVM</span><span class="op">::</span><span class="dt">TopSelf</span></span></code></pre></div>
-<p>(You can’t actually assign to <code>self</code>—the Ruby VM does by <a href="https://github.com/ruby/ruby/blob/5445e0435260b449decf2ac16f9d09bae3cafe72/vm.c#L3266">writing to a field in a C
-struct</a>.)
-Ruby calls the top self object <code>main</code>:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>❯ ruby <span class="op">-</span>e <span class="vs">&#39;puts self&#39;</span></span>
+<p>When Ruby starts running a program, it sets the nesting scope to <code>Object</code> like <a href="https://github.com/ruby/ruby/blob/v2_7_2/vm.c#L3269">in vm.c</a>. But then it sets <code>self</code> to a completely unrelated value. The value it chooses is one it just <a href="https://github.com/ruby/ruby/blob/v2_7_2/vm.c#L3357-L3359">makes out of thin air</a> at startup. In pseudo code, the top self is invented kind of like this:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">RubyVM</span><span class="kw">::</span><span class="dt">TopSelf</span> <span class="kw">=</span> <span class="dt">Object</span><span class="at">.new</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dt">RubyVM</span><span class="kw">::</span><span class="dt">TopSelf</span><span class="at">.to_s</span>; <span class="st">&quot;main&quot;</span>; <span class="cf">end</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dv">self</span> <span class="kw">=</span> <span class="dt">RubyVM</span><span class="kw">::</span><span class="dt">TopSelf</span></span></code></pre></div>
+<p>(You can’t actually assign to <code>self</code>—the Ruby VM does by <a href="https://github.com/ruby/ruby/blob/5445e0435260b449decf2ac16f9d09bae3cafe72/vm.c#L3266">writing to a field in a C struct</a>.) Ruby calls the top self object <code>main</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>❯ ruby <span class="kw">-</span>e <span class="vs">&#39;puts self&#39;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>main</span></code></pre></div>
-<p>So what happens when Ruby sees <code>def foo; end</code> at the top of a file? Well, the lexical
-class scope was set to <code>Object</code>, so it defines <code>Object#foo</code>.</p>
-<p>And what happens when Ruby sees <code>def self.bar; end</code> at the top of a file? <code>self</code> has been
-set to this magical <code>main</code> object (which happens to be an instance of <code>Object</code>). Ruby
-computes <code>.singleton_class</code> for that <code>main</code> object and defines a method on the singleton
-class of that <code>Object</code> instance directly.</p>
-<p>From there, Ruby’s method lookup algorithm takes over. To find a method on a receiver
-<code>expr</code>, Ruby looks in <code>expr.singleton_class.ancestors</code>. So for the file top-level, that
-includes both <code>self.singleton_class</code> and <code>Object</code>:</p>
+<p>So what happens when Ruby sees <code>def foo; end</code> at the top of a file? Well, the lexical class scope was set to <code>Object</code>, so it defines <code>Object#foo</code>.</p>
+<p>And what happens when Ruby sees <code>def self.bar; end</code> at the top of a file? <code>self</code> has been set to this magical <code>main</code> object (which happens to be an instance of <code>Object</code>). Ruby computes <code>.singleton_class</code> for that <code>main</code> object and defines a method on the singleton class of that <code>Object</code> instance directly.</p>
+<p>From there, Ruby’s method lookup algorithm takes over. To find a method on a receiver <code>expr</code>, Ruby looks in <code>expr.singleton_class.ancestors</code>. So for the file top-level, that includes both <code>self.singleton_class</code> and <code>Object</code>:</p>
 <pre class="plain"><code>❯ ruby -e &#39;p self.singleton_class.ancestors&#39;
 [#&lt;Class:#&lt;Object:0x00007fa7258be2b8&gt;&gt;, Object, Kernel, BasicObject]</code></pre>
-<p>but for a class body, that only includes the class’s singleton class (<code>#&lt;Class:A&gt;</code>), not
-the class itself:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>❯ ruby <span class="op">-</span>e <span class="vs">&#39;class A</span></span>
+<p>but for a class body, that only includes the class’s singleton class (<code>#&lt;Class:A&gt;</code>), not the class itself:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>❯ ruby <span class="kw">-</span>e <span class="vs">&#39;class A</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="vs">  p self.singleton_class.ancestors</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="vs">end&#39;</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="co">#&lt;Class:A&gt;, #&lt;Class:Object&gt;, #&lt;Class:BasicObject&gt;, Class, Module, Object, Kernel, BasicObject]</span></span></code></pre></div>
@@ -173,8 +141,7 @@ the class itself:</p>
 <p>There were a whole bunch of “…but why?” questions I had when I learned this.</p>
 <ul>
 <li><p><strong>Why not make it as if all files were wrapped in <code>class Object; ...; end</code>?</strong></p>
-<p>I think the Ruby authors explicitly wanted <code>def foo; end; foo</code> to work, because this
-is more convenient for people writing short scripts.</p></li>
+<p>I think the Ruby authors explicitly wanted <code>def foo; end; foo</code> to work, because this is more convenient for people writing short scripts.</p></li>
 <li><p><strong>Why not make the first lexical scope be <code>main</code> instead of <code>Object</code>?</strong></p>
 <p>You can only define constants on a class, not an object:</p>
 <pre><code>❯ ruby -e &#39;self::X = 1&#39;
@@ -184,14 +151,11 @@ Traceback (most recent call last):
 <pre><code>❯ ruby -e &#39;X = 1; p Object::X&#39;
 1</code></pre></li>
 </ul>
-<p>If you have more questions than me (or more answers) after reading this, I’m eager to hear
-😅</p>
+<p>If you have more questions than me (or more answers) after reading this, I’m eager to hear 😅</p>
 <h2 id="appendix-further-reading">Appendix: Further reading</h2>
-<p>I learned most of what I learned here by reading “Chapter 9: Metaprogramming” in <em>Ruby
-Under a Microscope</em> by Pat Shaughnessy:</p>
+<p>I learned most of what I learned here by reading “Chapter 9: Metaprogramming” in <em>Ruby Under a Microscope</em> by Pat Shaughnessy:</p>
 <p>→ <a href="http://patshaughnessy.net/ruby-under-a-microscope" class="uri">http://patshaughnessy.net/ruby-under-a-microscope</a></p>
-<p>and by reading the Ruby source code. If you want to set up really good jump-to-def on the
-Ruby source code, I wrote a guide for that:</p>
+<p>and by reading the Ruby source code. If you want to set up really good jump-to-def on the Ruby source code, I wrote a guide for that:</p>
 <p>→ <a href="https://blog.jez.io/clangd-ruby/" class="uri">https://blog.jez.io/clangd-ruby/</a></p>
 </main>
 

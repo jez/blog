@@ -51,46 +51,25 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#ugh-ruby" id="toc-ugh-ruby">Ugh, Ruby…</a></li>
-  <li><a href="#modifications" id="toc-modifications">Modifications</a></li>
-  <li><a href="#the-underlying-problem-virtualenvs-in-ruby" id="toc-the-underlying-problem-virtualenvs-in-ruby">The Underlying Problem: Virtualenv’s in Ruby</a></li>
-  <li><a href="#one-step-further" id="toc-one-step-further">One Step Further</a></li>
+  <li><a href="#ugh-ruby">Ugh, Ruby…</a></li>
+  <li><a href="#modifications">Modifications</a></li>
+  <li><a href="#the-underlying-problem-virtualenvs-in-ruby">The Underlying Problem: Virtualenv’s in Ruby</a></li>
+  <li><a href="#one-step-further">One Step Further</a></li>
   </ul>
 </nav>
 
 <main>
-<p>A while back I found a command that removes all Ruby gems installed on a system
-when you’re using rbenv. It worked great, so I decided to build on top of it.
-After a bit of research, I found a much better solution to the root of my
-problems: sandboxing Ruby gems.</p>
+<p>A while back I found a command that removes all Ruby gems installed on a system when you’re using rbenv. It worked great, so I decided to build on top of it. After a bit of research, I found a much better solution to the root of my problems: sandboxing Ruby gems.</p>
 <!-- more -->
 <h1 id="ugh-ruby">Ugh, Ruby…</h1>
-<p>If you’re anything like me, you can never do anything right on the first try
-using Ruby. At one point, I found myself needing a script to just nuke
-everything and start over… That’s when I found Ian Vaughan’s <a href="https://gist.github.com/IanVaughan/2902499">script</a> that
-magically removes all gems. I was delighted to see that it worked perfectly on
-the first try, and went about the rest of my business.</p>
+<p>If you’re anything like me, you can never do anything right on the first try using Ruby. At one point, I found myself needing a script to just nuke everything and start over… That’s when I found Ian Vaughan’s <a href="https://gist.github.com/IanVaughan/2902499">script</a> that magically removes all gems. I was delighted to see that it worked perfectly on the first try, and went about the rest of my business.</p>
 <h1 id="modifications">Modifications</h1>
-<p>There were two ways though in which this script’s functionality differed from
-what I wanted it to do: it always removed <strong>all</strong> gems, and it left behind a
-<code>.ruby_version</code> file after it was used, clobbering any file that might have been
-there before.</p>
-<p>In my updated script, you can specify a list of ruby versions as arguments, and
-it will only gems from those versions instead of all of them. Also, it saves
-and restores the value of the old <code>.ruby_version</code> file once it’s done.</p>
-<p>The new script is available <a href="https://gist.github.com/jez/cc2ba08062c6183a489c">as a fork of the original Gist</a> and also as
-a part of of <a href="https://github.com/jez/bin/blob/master/uninstall_gems">my personal bin folder</a>.</p>
+<p>There were two ways though in which this script’s functionality differed from what I wanted it to do: it always removed <strong>all</strong> gems, and it left behind a <code>.ruby_version</code> file after it was used, clobbering any file that might have been there before.</p>
+<p>In my updated script, you can specify a list of ruby versions as arguments, and it will only gems from those versions instead of all of them. Also, it saves and restores the value of the old <code>.ruby_version</code> file once it’s done.</p>
+<p>The new script is available <a href="https://gist.github.com/jez/cc2ba08062c6183a489c">as a fork of the original Gist</a> and also as a part of of <a href="https://github.com/jez/bin/blob/master/uninstall_gems">my personal bin folder</a>.</p>
 <h1 id="the-underlying-problem-virtualenvs-in-ruby">The Underlying Problem: Virtualenv’s in Ruby</h1>
-<p>After a bit of reflection, I realized I should be trying to solve the underlying
-problem: different projects had different dependencies, and gems from one
-project were bleeding into gems from another. If you’re a Python developer, you
-don’t have this issue: <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">virtualenvwrapper</a>, <code>pip</code>, and <code>requirements.txt</code>
-files make this a non-issue.</p>
-<p>After looking into if there existed a similar Ruby solution, I came up with
-<a href="http://honza.ca/2011/06/install-ruby-gems-into-virtualenv">this blog post</a> outlining how you can do the exact same thing using
-virtualenvs but with Ruby gems! Once again, it needed a little bit of
-modification so that everything works again as you’d expect when you
-<code>deactivate</code>. Add these lines to your virtualenv’s <code>postactivate</code> script:</p>
+<p>After a bit of reflection, I realized I should be trying to solve the underlying problem: different projects had different dependencies, and gems from one project were bleeding into gems from another. If you’re a Python developer, you don’t have this issue: <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">virtualenvwrapper</a>, <code>pip</code>, and <code>requirements.txt</code> files make this a non-issue.</p>
+<p>After looking into if there existed a similar Ruby solution, I came up with <a href="http://honza.ca/2011/06/install-ruby-gems-into-virtualenv">this blog post</a> outlining how you can do the exact same thing using virtualenvs but with Ruby gems! Once again, it needed a little bit of modification so that everything works again as you’d expect when you <code>deactivate</code>. Add these lines to your virtualenv’s <code>postactivate</code> script:</p>
 <figure>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python numberLines"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a>export OLD_GEMHOME<span class="op">=</span><span class="st">&quot;$GEM_HOME&quot;</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>export GEM_HOME<span class="op">=</span><span class="st">&quot;$VIRTUAL_ENV/gems&quot;</span></span>
@@ -118,23 +97,11 @@ $VIRTUAL_ENV/bin/postactivate
 $VIRTUAL_ENV/bin/predeactivate
 </figcaption>
 </figure>
-<p>Now, whenever you install gems, they’ll install to the folder
-<code>$VIRTUAL_ENV/gems/</code> instead of the system’s location, so no gems bleed into
-another project!</p>
+<p>Now, whenever you install gems, they’ll install to the folder <code>$VIRTUAL_ENV/gems/</code> instead of the system’s location, so no gems bleed into another project!</p>
 <h1 id="one-step-further">One Step Further</h1>
-<p>Bringing up this web page, copying those snippets, and pasting them in the two
-necessary files every time is a bit tedious. To automate this process, we can
-tap into virtualenvwrapper’s configurability using hooks. Instead of dropping
-those snippets into <code>$VIRTUAL_ENV/bin/{post,prede}activate,</code>, place them in
-<code>$VIRTUALENVWRAPPER_HOOK_DIR/{post,prede}activate</code>.</p>
-<p>Now every time you <code>workon</code> a virtualenv, the appropriate configuration will
-be set up. Note that this means every normal Python project you use will have
-this Ruby configuration added (not just the Ruby projects), but that shouldn’t
-matter because they interoperate nicely. If it’s really an issue, you can stick
-with the per-virtualenv solution above.</p>
-<p>Note: a side effect of this nice sandboxing is that you can normally run
-commands without prefixing them with <code>bundle exec ...</code>, which is actually really
-handy.</p>
+<p>Bringing up this web page, copying those snippets, and pasting them in the two necessary files every time is a bit tedious. To automate this process, we can tap into virtualenvwrapper’s configurability using hooks. Instead of dropping those snippets into <code>$VIRTUAL_ENV/bin/{post,prede}activate,</code>, place them in <code>$VIRTUALENVWRAPPER_HOOK_DIR/{post,prede}activate</code>.</p>
+<p>Now every time you <code>workon</code> a virtualenv, the appropriate configuration will be set up. Note that this means every normal Python project you use will have this Ruby configuration added (not just the Ruby projects), but that shouldn’t matter because they interoperate nicely. If it’s really an issue, you can stick with the per-virtualenv solution above.</p>
+<p>Note: a side effect of this nice sandboxing is that you can normally run commands without prefixing them with <code>bundle exec ...</code>, which is actually really handy.</p>
 </main>
 
 

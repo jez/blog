@@ -51,31 +51,28 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#create-vimrc-file" id="toc-create-vimrc-file">1. Create vimrc file</a></li>
-  <li><a href="#add-some-general-settings" id="toc-add-some-general-settings">2. Add some general settings</a></li>
-  <li><a href="#enable-the-mouse" id="toc-enable-the-mouse">3. Enable the mouse</a></li>
-  <li><a href="#set-up-vundle-boilerplate" id="toc-set-up-vundle-boilerplate">4. Set up Vundle boilerplate</a></li>
-  <li><a href="#make-vim-look-good" id="toc-make-vim-look-good">5. Make Vim look good</a></li>
-  <li><a href="#plugins-nerdtree-and-nerdtree-tabs" id="toc-plugins-nerdtree-and-nerdtree-tabs">6. Plugins NERDTree and NERDTree Tabs</a></li>
-  <li><a href="#plugin-syntastic" id="toc-plugin-syntastic">7. Plugin Syntastic</a></li>
-  <li><a href="#plugins-vim-easytags-and-tagbar" id="toc-plugins-vim-easytags-and-tagbar">8. Plugins vim-easytags and tagbar</a></li>
-  <li><a href="#plugin-ctrlp" id="toc-plugin-ctrlp">9. Plugin ctrlp</a></li>
-  <li><a href="#plugin-a.vim" id="toc-plugin-a.vim">10. Plugin A.vim</a></li>
-  <li><a href="#plugins-vim-gitgutter-and-vim-fugitive" id="toc-plugins-vim-gitgutter-and-vim-fugitive">11. Plugins vim-gitgutter and vim-fugitive</a></li>
-  <li><a href="#plugin-delimitmate" id="toc-plugin-delimitmate">12. Plugin delimitMate</a></li>
-  <li><a href="#plugin-vim-superman" id="toc-plugin-vim-superman">13. Plugin vim-superman</a></li>
-  <li><a href="#plugin-vim-tmux-navigator" id="toc-plugin-vim-tmux-navigator">14. Plugin vim-tmux-navigator</a></li>
-  <li><a href="#syntax-plugins" id="toc-syntax-plugins">15. Syntax plugins</a></li>
-  <li><a href="#add-all-the-extra-plugins-that-i-use" id="toc-add-all-the-extra-plugins-that-i-use">16. Add all the extra plugins that I use</a></li>
-  <li><a href="#wrap-up" id="toc-wrap-up">Wrap Up</a></li>
+  <li><a href="#create-vimrc-file">1. <span>Create vimrc file</span></a></li>
+  <li><a href="#add-some-general-settings">2. <span>Add some general settings</span></a></li>
+  <li><a href="#enable-the-mouse">3. <span>Enable the mouse</span></a></li>
+  <li><a href="#set-up-vundle-boilerplate">4. <span>Set up Vundle boilerplate</span></a></li>
+  <li><a href="#make-vim-look-good">5. <span>Make Vim look good</span></a></li>
+  <li><a href="#plugins-nerdtree-and-nerdtree-tabs">6. <span>Plugins NERDTree and NERDTree Tabs</span></a></li>
+  <li><a href="#plugin-syntastic">7. <span>Plugin Syntastic</span></a></li>
+  <li><a href="#plugins-vim-easytags-and-tagbar">8. <span>Plugins vim-easytags and tagbar</span></a></li>
+  <li><a href="#plugin-ctrlp">9. <span>Plugin ctrlp</span></a></li>
+  <li><a href="#plugin-a.vim">10. <span>Plugin A.vim</span></a></li>
+  <li><a href="#plugins-vim-gitgutter-and-vim-fugitive">11. <span>Plugins vim-gitgutter and vim-fugitive</span></a></li>
+  <li><a href="#plugin-delimitmate">12. <span>Plugin delimitMate</span></a></li>
+  <li><a href="#plugin-vim-superman">13. <span>Plugin vim-superman</span></a></li>
+  <li><a href="#plugin-vim-tmux-navigator">14. <span>Plugin vim-tmux-navigator</span></a></li>
+  <li><a href="#syntax-plugins">15. <span>Syntax plugins</span></a></li>
+  <li><a href="#add-all-the-extra-plugins-that-i-use">16. <span>Add all the extra plugins that I use</span></a></li>
+  <li><a href="#wrap-up">Wrap Up</a></li>
   </ul>
 </nav>
 
 <main>
-<p>I took some screenshots to accompany my <a href="https://github.com/jez/vim-as-an-ide">Vim as an IDE</a> repo on GitHub.
-This is by no means a complete walkthrough! It’s just a reference for those who
-are curious if they installed everything correctly. This is what my system looks
-like for me after each step.</p>
+<p>I took some screenshots to accompany my <a href="https://github.com/jez/vim-as-an-ide">Vim as an IDE</a> repo on GitHub. This is by no means a complete walkthrough! It’s just a reference for those who are curious if they installed everything correctly. This is what my system looks like for me after each step.</p>
 <!-- more -->
 <h1 id="create-vimrc-file">1. <a href="https://github.com/jez/vim-as-an-ide/commit/0673f0c">Create vimrc file</a></h1>
 <p>This is what Vim should look like immediately after opening it:</p>
@@ -83,125 +80,72 @@ like for me after each step.</p>
 <p>And right after adding the two lines:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-02.png"><img src="/assets/img/vim-as-an-ide/shot-02.png" alt="Vim as an IDE" /></a></p>
 <h1 id="add-some-general-settings">2. <a href="https://github.com/jez/vim-as-an-ide/commit/dff7da3">Add some general settings</a></h1>
-<p>After you add these settings, your <code>~/.vimrc</code> should look like this when opened
-in Vim:</p>
+<p>After you add these settings, your <code>~/.vimrc</code> should look like this when opened in Vim:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-03_1.png"><img src="/assets/img/vim-as-an-ide/shot-03_1.png" alt="Vim as an IDE" /></a></p>
 <h1 id="enable-the-mouse">3. <a href="https://github.com/jez/vim-as-an-ide/commit/fc77b04">Enable the mouse</a></h1>
-<p>To enable the mouse, you’ll have to figure out where the appropriate setting is
-in your terminal emulator. Here’s a screenshot of where it is in iTerm2 on OS X.</p>
+<p>To enable the mouse, you’ll have to figure out where the appropriate setting is in your terminal emulator. Here’s a screenshot of where it is in iTerm2 on OS X.</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-03.png"><img src="/assets/img/vim-as-an-ide/shot-03.png" alt="Vim as an IDE" /></a></p>
 <h1 id="set-up-vundle-boilerplate">4. <a href="https://github.com/jez/vim-as-an-ide/commit/1186be2">Set up Vundle boilerplate</a></h1>
-<p>If you add the changes introduced at this step before installing Vundle, you’ll
-get an error that looks like this:</p>
+<p>If you add the changes introduced at this step before installing Vundle, you’ll get an error that looks like this:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-04.png"><img src="/assets/img/vim-as-an-ide/shot-04.png" alt="Vim as an IDE" /></a></p>
-<p>Otherwise, this should be the result of running <code>vim +PluginInstall</code> to install
-Vundle for the first time:</p>
+<p>Otherwise, this should be the result of running <code>vim +PluginInstall</code> to install Vundle for the first time:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-05.png"><img src="/assets/img/vim-as-an-ide/shot-05.png" alt="Vim as an IDE" /></a></p>
 <p>Remember, you can use <code>:qall</code> to quit Vim after installing plugins.</p>
 <h1 id="make-vim-look-good">5. <a href="https://github.com/jez/vim-as-an-ide/commit/457f2e2">Make Vim look good</a></h1>
-<p>Your experience might diverge a little bit from these screenshots if you choose
-a different colorscheme because I’ll assume you’re setting everything up using
-Solarized Dark. If you’re on a Mac and you’ve imported the iTerm2 colorschemes,
-you should be able to find the Solarized Dark theme here:</p>
+<p>Your experience might diverge a little bit from these screenshots if you choose a different colorscheme because I’ll assume you’re setting everything up using Solarized Dark. If you’re on a Mac and you’ve imported the iTerm2 colorschemes, you should be able to find the Solarized Dark theme here:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-06.png"><img src="/assets/img/vim-as-an-ide/shot-06.png" alt="Vim as an IDE" /></a></p>
 <p>Making that change should make Vim turn these colors:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-07.png"><img src="/assets/img/vim-as-an-ide/shot-07.png" alt="Vim as an IDE" /></a></p>
-<p>Next up is changing your font to a Powerline patched font. If you downloaded and
-installed Menlo for Powerline correctly, you should be able to set it using this
-panel in the preferences:</p>
+<p>Next up is changing your font to a Powerline patched font. If you downloaded and installed Menlo for Powerline correctly, you should be able to set it using this panel in the preferences:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-08.png"><img src="/assets/img/vim-as-an-ide/shot-08.png" alt="Vim as an IDE" /></a></p>
-<p>Finally, running <code>vim +PluginInstall</code> to install the Solarized Vim colorscheme
-and vim-airline:</p>
+<p>Finally, running <code>vim +PluginInstall</code> to install the Solarized Vim colorscheme and vim-airline:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-09.png"><img src="/assets/img/vim-as-an-ide/shot-09.png" alt="Vim as an IDE" /></a></p>
 <p>Here’s what the Vim solarized plugind does to our <code>~/.vimrc</code>:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-10.png"><img src="/assets/img/vim-as-an-ide/shot-10.png" alt="Vim as an IDE" /></a></p>
-<p>If you chose to install a Powerline patched font, you can let vim-airline use
-cooler arrows by uncommenting the line highlighted in this screenshot above, to
-make Vim look like this:</p>
+<p>If you chose to install a Powerline patched font, you can let vim-airline use cooler arrows by uncommenting the line highlighted in this screenshot above, to make Vim look like this:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-11.png"><img src="/assets/img/vim-as-an-ide/shot-11.png" alt="Vim as an IDE" /></a></p>
 <h1 id="plugins-nerdtree-and-nerdtree-tabs">6. <a href="https://github.com/jez/vim-as-an-ide/commit/b7ff90c">Plugins NERDTree and NERDTree Tabs</a></h1>
-<p>This will be the last time that I demonstrate running <code>vim +PluginInstall</code>,
-because they’ll all basically look the same from here on out:</p>
+<p>This will be the last time that I demonstrate running <code>vim +PluginInstall</code>, because they’ll all basically look the same from here on out:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-12.png"><img src="/assets/img/vim-as-an-ide/shot-12.png" alt="Vim as an IDE" /></a></p>
-<p>Once you’ve installed NERDTree and NERDTree Tabs (and added the settings I
-listed for them), you should be able to type <code>\t</code> to bring up something that
-looks like this:</p>
+<p>Once you’ve installed NERDTree and NERDTree Tabs (and added the settings I listed for them), you should be able to type <code>\t</code> to bring up something that looks like this:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-13.png"><img src="/assets/img/vim-as-an-ide/shot-13.png" alt="Vim as an IDE" /></a></p>
 <h1 id="plugin-syntastic">7. <a href="https://github.com/jez/vim-as-an-ide/commit/144f979">Plugin Syntastic</a></h1>
-<p>Once you’ve installed Syntastic, it should syntax highlight your errors by
-displaying little marks next to the offending lines:</p>
+<p>Once you’ve installed Syntastic, it should syntax highlight your errors by displaying little marks next to the offending lines:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-14.png"><img src="/assets/img/vim-as-an-ide/shot-14.png" alt="Vim as an IDE" /></a></p>
-<p>You can see that we’ve forgotten a semi-colon, and Syntastic is pointing that
-out for us.</p>
-<p>As I was making these screenshots, I realized that I forgot to include a setting
-in the right place. It’s fine if you work through the whole workshop, but if you
-pick and choose things, namely if you don’t follow the steps for <code>vim-gitgutter</code>
-eventually, you’ll end up with this weird highlighting in the sign column. To
-disable this highlighting, you can either wait until the <code>vim-gitgutter</code> step
-(coming right up in 4 steps), or you can run this command (the one at the bottom
-of the screenshot):</p>
+<p>You can see that we’ve forgotten a semi-colon, and Syntastic is pointing that out for us.</p>
+<p>As I was making these screenshots, I realized that I forgot to include a setting in the right place. It’s fine if you work through the whole workshop, but if you pick and choose things, namely if you don’t follow the steps for <code>vim-gitgutter</code> eventually, you’ll end up with this weird highlighting in the sign column. To disable this highlighting, you can either wait until the <code>vim-gitgutter</code> step (coming right up in 4 steps), or you can run this command (the one at the bottom of the screenshot):</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-15.png"><img src="/assets/img/vim-as-an-ide/shot-15.png" alt="Vim as an IDE" /></a></p>
 <p>To make the change permanent, you’ll have to add that line (<code>:hi clear SignColumn</code>) to your <code>~/.vimrc</code>.</p>
 <h1 id="plugins-vim-easytags-and-tagbar">8. <a href="https://github.com/jez/vim-as-an-ide/commit/fd2c49c">Plugins vim-easytags and tagbar</a></h1>
-<p>After this step, you should be able to bring up a split pane view that shows
-your functions, variables, and other identifiers by pressing <code>\b</code>:</p>
+<p>After this step, you should be able to bring up a split pane view that shows your functions, variables, and other identifiers by pressing <code>\b</code>:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-16.png"><img src="/assets/img/vim-as-an-ide/shot-16.png" alt="Vim as an IDE" /></a></p>
-<p>If you enabled mouse reporting, you should be able to click on the things in the
-pane and jump to the appropriate place in the file. I’d strongly recommend that
-you read the help for all the keybindings and actions you can use with it.</p>
+<p>If you enabled mouse reporting, you should be able to click on the things in the pane and jump to the appropriate place in the file. I’d strongly recommend that you read the help for all the keybindings and actions you can use with it.</p>
 <h1 id="plugin-ctrlp">9. <a href="https://github.com/jez/vim-as-an-ide/commit/80db74f">Plugin ctrlp</a></h1>
-<p>When <code>CtrlP</code> is installed, you can press <code>Ctrl + P</code> to bring up a list of files.
-As you type, the list will be filtered to only those that “fuzzy match” what
-you’ve typed in. As you can see, I typed in <code>mc</code>, which matched <code>vimrc.vim</code> and
-<code>main.c</code>:</p>
+<p>When <code>CtrlP</code> is installed, you can press <code>Ctrl + P</code> to bring up a list of files. As you type, the list will be filtered to only those that “fuzzy match” what you’ve typed in. As you can see, I typed in <code>mc</code>, which matched <code>vimrc.vim</code> and <code>main.c</code>:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-17.png"><img src="/assets/img/vim-as-an-ide/shot-17.png" alt="Vim as an IDE" /></a></p>
 <h1 id="plugin-a.vim">10. <a href="https://github.com/jez/vim-as-an-ide/commit/8d4223f">Plugin A.vim</a></h1>
-<p>This plugin introduces a number of commands that you can read in the
-documentation that enable opening “alternate” files, like C/C++ header files,
-really quickly. I’ve run <code>:AV</code> here as an example of one of the commands it
-installs, which opens the alternate file in a vertical split pane.</p>
+<p>This plugin introduces a number of commands that you can read in the documentation that enable opening “alternate” files, like C/C++ header files, really quickly. I’ve run <code>:AV</code> here as an example of one of the commands it installs, which opens the alternate file in a vertical split pane.</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-18.png"><img src="/assets/img/vim-as-an-ide/shot-18.png" alt="Vim as an IDE" /></a></p>
 <h1 id="plugins-vim-gitgutter-and-vim-fugitive">11. <a href="https://github.com/jez/vim-as-an-ide/commit/1e5757e">Plugins vim-gitgutter and vim-fugitive</a></h1>
-<p><code>vim-gitgutter</code> is really handy: it shows you a <code>+</code>, <code>-</code>, or <code>~</code> next to lines
-that have been added, removed, or modified. This is good for both identifying
-the pieces of code that have changed while you’re working on a file as well as
-reminding yourself that you have changes that need to be commited.</p>
+<p><code>vim-gitgutter</code> is really handy: it shows you a <code>+</code>, <code>-</code>, or <code>~</code> next to lines that have been added, removed, or modified. This is good for both identifying the pieces of code that have changed while you’re working on a file as well as reminding yourself that you have changes that need to be commited.</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-19.png"><img src="/assets/img/vim-as-an-ide/shot-19.png" alt="Vim as an IDE" /></a></p>
-<p>Speaking of committing files, <code>vim-fugitive</code> lets you make Git commits from
-right within Vim. Simply run <code>:Gcommit</code> to bring up a split pane where you can
-craft your commit message:</p>
+<p>Speaking of committing files, <code>vim-fugitive</code> lets you make Git commits from right within Vim. Simply run <code>:Gcommit</code> to bring up a split pane where you can craft your commit message:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-20.png"><img src="/assets/img/vim-as-an-ide/shot-20.png" alt="Vim as an IDE" /></a></p>
-<p><code>vim-fugitive</code> can do much more than just make commits. Be sure to read the
-appropriate documentation to figure out what sorts of cool things you can do!</p>
+<p><code>vim-fugitive</code> can do much more than just make commits. Be sure to read the appropriate documentation to figure out what sorts of cool things you can do!</p>
 <h1 id="plugin-delimitmate">12. <a href="https://github.com/jez/vim-as-an-ide/commit/2fe0507">Plugin delimitMate</a></h1>
-<p>Finally, using <code>delimitMate</code> you should be able to type an opening delimiter and
-have the closing one be inserted automatically. Here’s an example on
-parentheses:</p>
+<p>Finally, using <code>delimitMate</code> you should be able to type an opening delimiter and have the closing one be inserted automatically. Here’s an example on parentheses:</p>
 <p><a href="/assets/img/vim-as-an-ide/shot-21.png"><img src="/assets/img/vim-as-an-ide/shot-21.png" alt="Vim as an IDE" /></a></p>
 <h1 id="plugin-vim-superman">13. <a href="https://github.com/jez/vim-as-an-ide/commit/b185e9f">Plugin vim-superman</a></h1>
-<p>Once you’ve added the appropriate function to your shell initialization file
-(<code>~/.bashrc</code>, etc.), you should be able to run <code>vman &lt;command&gt;</code> to open man
-pages. Here’s an example on <code>vman 3 printf</code>:</p>
+<p>Once you’ve added the appropriate function to your shell initialization file (<code>~/.bashrc</code>, etc.), you should be able to run <code>vman &lt;command&gt;</code> to open man pages. Here’s an example on <code>vman 3 printf</code>:</p>
 <p><a href="/assets/img/printf.3.png"><img src="/assets/img/printf.3.png" alt="Vim as an IDE" /></a></p>
 <h1 id="plugin-vim-tmux-navigator">14. <a href="https://github.com/jez/vim-as-an-ide/commit/44f5225">Plugin vim-tmux-navigator</a></h1>
-<p>There’s not much to show here, as this step is mostly just introducing
-keybindings. If you use <code>tmux</code>, make sure to copy the appropriate snippet into
-your <code>~/.tmux.conf</code> to be able to jump between tmux and Vim splits with no added
-effort.</p>
+<p>There’s not much to show here, as this step is mostly just introducing keybindings. If you use <code>tmux</code>, make sure to copy the appropriate snippet into your <code>~/.tmux.conf</code> to be able to jump between tmux and Vim splits with no added effort.</p>
 <h1 id="syntax-plugins">15. <a href="https://github.com/jez/vim-as-an-ide/commit/5ba534e">Syntax plugins</a></h1>
-<p>No screenshots again. What syntax highlighting plugins you end up installing is
-largely up to you.</p>
+<p>No screenshots again. What syntax highlighting plugins you end up installing is largely up to you.</p>
 <h1 id="add-all-the-extra-plugins-that-i-use">16. <a href="https://github.com/jez/vim-as-an-ide/commit/9089a95">Add all the extra plugins that I use</a></h1>
-<p>For these plugins, be sure to check the documentation. Most of them have
-screenshots that show what they look like when installed and configured
-correctly.</p>
+<p>For these plugins, be sure to check the documentation. Most of them have screenshots that show what they look like when installed and configured correctly.</p>
 <h1 id="wrap-up">Wrap Up</h1>
-<p>That’s it! I can only take you so far in making your Vim awesome. You have to
-take yourself the rest of the way by investing a little bit of effort into
-reading the documentation for the plugins you think could be useful to you so
-that you can fully utilize them. Be sure to comment on the commits with
-questions if you’re stuck or are wondering why your setup doesn’t look similar
-to one of the above!</p>
+<p>That’s it! I can only take you so far in making your Vim awesome. You have to take yourself the rest of the way by investing a little bit of effort into reading the documentation for the plugins you think could be useful to you so that you can fully utilize them. Be sure to comment on the commits with questions if you’re stuck or are wondering why your setup doesn’t look similar to one of the above!</p>
 </main>
 
 

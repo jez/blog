@@ -50,16 +50,15 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#strace-is-great-but" id="toc-strace-is-great-but"><code>strace</code> is great, but…</a></li>
-  <li><a href="#instruments.app-can-trace-arbitrary-programs" id="toc-instruments.app-can-trace-arbitrary-programs">Instruments.app can trace arbitrary programs!</a></li>
+  <li><a href="#strace-is-great-but"><code>strace</code> is great, but…</a></li>
+  <li><a href="#instruments.app-can-trace-arbitrary-programs">Instruments.app can trace arbitrary programs!</a></li>
   </ul>
 </nav>
 
 <main>
 <p>The other day I learned that Instruments.app can record file system activity on macOS!</p>
 <figure>
-<img src="/assets/img/instruments-app-strace.png" alt="Instruments.app on macOS tracing git status" />
-<figcaption aria-hidden="true">Instruments.app on macOS tracing <code>git status</code></figcaption>
+<img src="/assets/img/instruments-app-strace.png" alt="Instruments.app on macOS tracing git status" /><figcaption aria-hidden="true">Instruments.app on macOS tracing <code>git status</code></figcaption>
 </figure>
 <h2 id="strace-is-great-but"><code>strace</code> is great, but…</h2>
 <p>One of the things I <em>always</em> use <code>strace</code> on Linux for is tracing a process to see, for example, which global config files it’s reading—it’s so simple, just</p>

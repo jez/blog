@@ -51,20 +51,20 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#the-operator" id="toc-the-operator">The <code>&lt;</code> operator</a></li>
-  <li><a href="#wait-why-do-we-care-about-inheriting-both" id="toc-wait-why-do-we-care-about-inheriting-both">Wait, why do we care about inheriting both?</a>
+  <li><a href="#the-operator">The <code>&lt;</code> operator</a></li>
+  <li><a href="#wait-why-do-we-care-about-inheriting-both">Wait, why do we care about inheriting both?</a>
   <ul>
-  <li><a href="#aside-self.new-and-self.class-in-the-type-system" id="toc-aside-self.new-and-self.class-in-the-type-system">Aside: <code>self.new</code> and <code>self.class</code> in the type system</a></li>
+  <li><a href="#aside-self.new-and-self.class-in-the-type-system">Aside: <code>self.new</code> and <code>self.class</code> in the type system</a></li>
   </ul></li>
-  <li><a href="#the-include-operator" id="toc-the-include-operator">The <code>include</code> operator</a></li>
-  <li><a href="#the-extend-operator" id="toc-the-extend-operator">The <code>extend</code> operator</a></li>
-  <li><a href="#wait-why-do-we-care-if-modules-dont-work-like-classes" id="toc-wait-why-do-we-care-if-modules-dont-work-like-classes">Wait, why do we care if modules don’t work like classes?</a></li>
-  <li><a href="#the-mixes_in_class_methods-annotation" id="toc-the-mixes_in_class_methods-annotation">The <code>mixes_in_class_methods</code> annotation</a>
+  <li><a href="#the-include-operator">The <code>include</code> operator</a></li>
+  <li><a href="#the-extend-operator">The <code>extend</code> operator</a></li>
+  <li><a href="#wait-why-do-we-care-if-modules-dont-work-like-classes">Wait, why do we care if modules don’t work like classes?</a></li>
+  <li><a href="#the-mixes_in_class_methods-annotation">The <code>mixes_in_class_methods</code> annotation</a>
   <ul>
-  <li><a href="#where-mixes_in_class_methods-falls-short" id="toc-where-mixes_in_class_methods-falls-short">Where <code>mixes_in_class_methods</code> falls short</a></li>
+  <li><a href="#where-mixes_in_class_methods-falls-short">Where <code>mixes_in_class_methods</code> falls short</a></li>
   </ul></li>
-  <li><a href="#inheritance-in-ruby" id="toc-inheritance-in-ruby">Inheritance in Ruby</a></li>
-  <li><a href="#appendix-further-reading" id="toc-appendix-further-reading">Appendix: Further reading</a></li>
+  <li><a href="#inheritance-in-ruby">Inheritance in Ruby</a></li>
+  <li><a href="#appendix-further-reading">Appendix: Further reading</a></li>
   </ul>
 </nav>
 
@@ -79,7 +79,7 @@
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> on_parent; <span class="cf">end</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">Parent</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dt">Child</span><span class="at">.new.on_parent</span></span></code></pre></div>
@@ -88,8 +88,7 @@
 <p><span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="marginnote">Nerd alert: these diagrams will be ignoring multiple inheritance. To be more accurate we’d have to draw them showing that classes can have one parent class and multiple parent modules. But Ruby linearizes the hierarchy, so this conceptual model of “follow a single chain up” will be good enough. Multiple inheritance can be a future post.<br />
 <br />
 </span></span></p>
-<p><img src="/assets/img/light/inheritance-in-ruby/parent-child-class-instance.png" class="center" style="max-width:229px" />
-<img src="/assets/img/dark/inheritance-in-ruby/parent-child-class-instance.png" class="center" style="max-width:229px" /></p>
+<p><img src="/assets/img/light/inheritance-in-ruby/parent-child-class-instance.png" class="center" style="max-width:229px" /> <img src="/assets/img/dark/inheritance-in-ruby/parent-child-class-instance.png" class="center" style="max-width:229px" /></p>
 <p>In particular, I picture classes like puzzle pieces. The pieces have tabs and blanks<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="marginnote">“Tabs” and “blanks” are the <a href="https://en.wikipedia.org/wiki/Jigsaw_puzzle#Puzzle_pieces">names Wikipedia uses</a> for these spots on jigsaw puzzles.<br />
 <br />
 </span></span> which allow other classes to slot in, forming an inheritance hierarchy.</p>
@@ -101,7 +100,7 @@
 <span id="cb2-2"><a href="#cb2-2"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.on_parent</span>; <span class="cf">end</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="cf">end</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">Parent</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb2-6"><a href="#cb2-6"></a><span class="cf">end</span></span>
 <span id="cb2-7"><a href="#cb2-7"></a></span>
 <span id="cb2-8"><a href="#cb2-8"></a><span class="dt">Parent</span><span class="at">.new.on_parent</span> <span class="co"># ❌</span></span>
@@ -109,87 +108,83 @@
 <span id="cb2-10"><a href="#cb2-10"></a><span class="dt">Child</span><span class="at">.on_parent</span>      <span class="co"># ✅</span></span></code></pre></div>
 <p>Now the <code>on_parent</code> method is on the singleton class because of the <code>def self.</code> (compared with just <code>def</code> before). Since it’s defined on the singleton class, it’s only possible to call it on the class object itself, not on instances of the class. And more than that, it’s available on the singleton class of <code>Child</code>, because the <code>&lt;</code> operator <strong>also</strong> set up an inheritance relationship on the singleton classes.</p>
 <p>Which means we need a slightly more involved picture to show what the <code>&lt;</code> operator is doing, which I’ll represent as this red/blue jigsaw piece:</p>
-<p><img src="/assets/img/light/inheritance-in-ruby/parent-child-class.png" class="center" style="max-width:466px" />
-<img src="/assets/img/dark/inheritance-in-ruby/parent-child-class.png" class="center" style="max-width:465.5px" /></p>
+<p><img src="/assets/img/light/inheritance-in-ruby/parent-child-class.png" class="center" style="max-width:466px" /> <img src="/assets/img/dark/inheritance-in-ruby/parent-child-class.png" class="center" style="max-width:465.5px" /></p>
 <p>The <code>&lt;</code> operator takes a normal class and a singleton class and links them up with another normal and singleton class, so we get two inheritance relationships for the price of one <code>&lt;</code> token in our code.</p>
 <p>We’re going to work our way up to a full toolbox of these inheritance jigsaw pieces. As a sneak preview:</p>
-<p><img src="/assets/img/light/inheritance-in-ruby/inherit-include-extend.png" style="max-width:561.5px" />
-<img src="/assets/img/dark/inheritance-in-ruby/inherit-include-extend.png" style="max-width:562px" /></p>
+<p><img src="/assets/img/light/inheritance-in-ruby/inherit-include-extend.png" style="max-width:561.5px" /> <img src="/assets/img/dark/inheritance-in-ruby/inherit-include-extend.png" style="max-width:562px" /></p>
 <p>Don’t worry if that doesn’t click yet, we’ll get there. But first, a detour about why we even want the <code>&lt;</code> operator to work like this in the first place.</p>
 <p><br />
 </p>
 <h1 id="wait-why-do-we-care-about-inheriting-both">Wait, why do we care about inheriting both?</h1>
 <p>Ruby has a rich link between a class and its singleton class. The <code>&lt;</code> operator just preserves this link across inherited classes. Let’s unpack these observations.</p>
 <p>In Ruby, singleton classes are first-class objects. You can pass them around and call methods on them just like any other object:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span>; <span class="cf">end</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A; <span class="cf">end</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>foo(<span class="cn">A</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span>(<span class="cn">A</span><span class="at">.name</span>)</span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>foo(A)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span>(A<span class="at">.name</span>)</span></code></pre></div>
 <p>Not only are they first class, but it’s seamless to reflect from an instance of a class up to the object’s class:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.class</span> <span class="co"># =&gt; A</span></span></code></pre></div>
 <p>To take it a step further: objects in Ruby are instantiated by calling <code>new</code>,<span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="marginnote">In Ruby <code>new</code> is not a keyword, it’s a normal method! (It’s unlike the <code>new</code> keyword in C++ or Java.)<br />
 <br />
 </span></span> a singleton class method:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span>; <span class="cf">end</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">B</span>; <span class="cf">end</span></span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A; <span class="cf">end</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> B; <span class="cf">end</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> instantiate_me(klass)</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># instantiation is dynamic dispatch:</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  klass<span class="at">.new</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>instantiate_me(<span class="cn">A</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>instantiate_me(<span class="cn">B</span>)</span></code></pre></div>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>instantiate_me(A)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>instantiate_me(B)</span></code></pre></div>
 <p>These two methods form an intrinsic link between a class and its singleton class. They power all sorts of neat code in the wild, too. For example <a href="https://sorbet.org/docs/tenum">Sorbet’s <code>T::Enum</code></a> class looks something like this under the hood:</p>
 <p><span class="sidenote-wrapper"><label for="sn-4" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-4" class="margin-toggle"/><span class="marginnote">This <code>TypedEnum</code> class is a simplification of Sorbet’s <code>T::Enum</code>, which is more robust. But the full implementation fits in a <a href="https://github.com/sorbet/sorbet/blob/07b23e6e421d3c182023ad4c220bfd65ebf8b482/gems/sorbet-runtime/lib/types/enum.rb#L42">single file</a> if you’re curious.<br />
 <br />
 </span></span></p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-12"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1"></a><span class="cf">class</span> <span class="dt">TypedEnum</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.values</span> <span class="op">=</span> <span class="ot">@values</span> <span class="op">||=</span> <span class="op">{}</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.values</span> <span class="kw">=</span> <span class="ot">@values</span> <span class="kw">||=</span> <span class="kw">{}</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.make_value</span>(string_name)</span>
-<span id="cb6-4"><a href="#cb6-4"></a>    <span class="cf">return</span> v <span class="cf">if</span> (v <span class="op">=</span> values<span class="kw">[</span>string_name<span class="kw">]</span>)</span>
+<span id="cb6-4"><a href="#cb6-4"></a>    <span class="cf">return</span> v <span class="cf">if</span> (v <span class="kw">=</span> values<span class="kw">[</span>string_name<span class="kw">]</span>)</span>
 <span id="cb6-5"><a href="#cb6-5"></a>    <span class="dv">self</span><span class="at">.new</span>(string_name)</span>
 <span id="cb6-6"><a href="#cb6-6"></a>  <span class="cf">end</span></span>
 <span id="cb6-7"><a href="#cb6-7"></a>  <span class="at">private_class_method</span> <span class="wa">:new</span>, <span class="wa">:make_value</span></span>
 <span id="cb6-8"><a href="#cb6-8"></a></span>
-<span id="cb6-9"><a href="#cb6-9"></a>  <span class="cf">def</span> to_s <span class="op">=</span> <span class="ot">@string_name</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>  <span class="cf">def</span> to_s <span class="kw">=</span> <span class="ot">@string_name</span></span>
 <span id="cb6-10"><a href="#cb6-10"></a>  <span class="cf">def</span> initialize(string_name)</span>
-<span id="cb6-11"><a href="#cb6-11"></a>    <span class="ot">@string_name</span> <span class="op">=</span> string_name</span>
-<span id="cb6-12"><a href="#cb6-12"></a>    <span class="dv">self</span><span class="at">.class.values</span><span class="kw">[</span>string_name<span class="kw">]</span> <span class="op">=</span> <span class="dv">self</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a>    <span class="ot">@string_name</span> <span class="kw">=</span> string_name</span>
+<span id="cb6-12"><a href="#cb6-12"></a>    <span class="dv">self</span><span class="at">.class.values</span><span class="kw">[</span>string_name<span class="kw">]</span> <span class="kw">=</span> <span class="dv">self</span></span>
 <span id="cb6-13"><a href="#cb6-13"></a>  <span class="cf">end</span></span>
 <span id="cb6-14"><a href="#cb6-14"></a><span class="cf">end</span></span></code></pre></div>
 <p>This <code>TypedEnum</code> class implements the typesafe enum pattern<span class="sidenote-wrapper"><label for="sn-5" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-5" class="margin-toggle"/><span class="marginnote">Popularized by Joshua Block in Effective Java, First Edition, Item 21, in response to the observation that much Java code would use magic integers to represent enumerations. (The same thing happens in Ruby, but with magic Symbols and Strings in addition to just Integers.)<br />
 <br />
 </span></span>, which is a way of guaranteeing that there are only a fixed set of instances of a class, which can only be compared to values of the same enum (not unrelated enums).</p>
 <p>You’d define an enum using this abstraction something like this:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Suit</span> <span class="op">&lt;</span> <span class="dt">TypedEnum</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="cn">CLUBS</span>    <span class="op">=</span> make_value(<span class="st">&quot;clubs&quot;</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="cn">DIAMONDS</span> <span class="op">=</span> make_value(<span class="st">&quot;diamonds&quot;</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="cn">HEARTS</span>   <span class="op">=</span> make_value(<span class="st">&quot;hearts&quot;</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="cn">SPADES</span>   <span class="op">=</span> make_value(<span class="st">&quot;spades&quot;</span>)</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Suit</span> <span class="kw">&lt;</span> <span class="dt">TypedEnum</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="cn">CLUBS</span>    <span class="kw">=</span> make_value(<span class="st">&quot;clubs&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="cn">DIAMONDS</span> <span class="kw">=</span> make_value(<span class="st">&quot;diamonds&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="cn">HEARTS</span>   <span class="kw">=</span> make_value(<span class="st">&quot;hearts&quot;</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="cn">SPADES</span>   <span class="kw">=</span> make_value(<span class="st">&quot;spades&quot;</span>)</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>It’s so concise in Ruby<span class="sidenote-wrapper"><label for="sn-6" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-6" class="margin-toggle"/><span class="marginnote">“Concise” versus the original Java pattern. Sorbet’s <code>T::Enum</code> makes the pattern even more concise.<br />
 <br />
 </span></span> because of the special relationship between a class and its singleton class:</p>
-<p><img src="/assets/img/light/inheritance-in-ruby/self-class-self-new.png" class="center" style="max-width:563.5px" />
-<img src="/assets/img/dark/inheritance-in-ruby/self-class-self-new.png" class="center" style="max-width:563.5px" /></p>
+<p><img src="/assets/img/light/inheritance-in-ruby/self-class-self-new.png" class="center" style="max-width:563.5px" /> <img src="/assets/img/dark/inheritance-in-ruby/self-class-self-new.png" class="center" style="max-width:563.5px" /></p>
 <p>First, the implementation of <code>initialize</code> can reflect back up to the class with <code>self.class.values</code> to share information across all instances of a class.</p>
 <p>Second, the singleton class method <code>make_value</code> calls <code>self.new</code>, which uses <strong>dynamic dispatch</strong> to instantiate an instance of whatever class <code>make_value</code> was called on (like <code>Suit</code> above). This dynamic dispatch only works because the <code>&lt;</code> operator set up an inheritance relationship on the singleton class, too!</p>
-<p><img src="/assets/img/dark/inheritance-in-ruby/typed-enum-suit.png" style="max-width:738.5px" />
-<img src="/assets/img/light/inheritance-in-ruby/typed-enum-suit.png" style="max-width:739px" /></p>
+<p><img src="/assets/img/dark/inheritance-in-ruby/typed-enum-suit.png" style="max-width:738.5px" /> <img src="/assets/img/light/inheritance-in-ruby/typed-enum-suit.png" style="max-width:739px" /></p>
 <p>Third, the <code>TypedEnum</code> class encapsulates all of the logic for what it means to be a typesafe enum. The <code>Suit</code> class has no implementation of its own, relying entirely on method resolution up the inheritance chain.</p>
 <p>To recap: the cool part about attached classes and singleton classes and inheritance in Ruby is that there’s this link between instance and singleton, via <code>self.class</code> and <code>self.new</code>. <strong>This link is preserved</strong> by having the <code>&lt;</code> operator also create an inheritance relationship between singleton classes.</p>
 <h2 id="aside-self.new-and-self.class-in-the-type-system">Aside: <code>self.new</code> and <code>self.class</code> in the type system</h2>
 <p>My main focus here is to show how Ruby models inheritance, but now’s a perfect time to sneak in a note about how Sorbet works.</p>
 <p>Because this <code>self.new</code>/<code>self.class</code> link is so special, Sorbet captures it in the type level, as well:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode numberSource ruby numberLines hl-5 hl-6 hl-11 hl-12"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1"></a>sig <span class="cf">do</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a>  params(<span class="wa">n:</span> <span class="dt">String</span>)<span class="at">.returns</span>(<span class="cn">T</span><span class="at">.attached_class</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>  params(<span class="wa">n: </span><span class="dt">String</span>)<span class="at">.returns</span>(T<span class="at">.attached_class</span>)</span>
 <span id="cb8-3"><a href="#cb8-3"></a><span class="cf">end</span></span>
 <span id="cb8-4"><a href="#cb8-4"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.make_value</span>(n)</span>
 <span id="cb8-5"><a href="#cb8-5"></a>  <span class="dv">self</span><span class="at">.new</span>(n)</span>
 <span id="cb8-6"><a href="#cb8-6"></a><span class="co"># ^^^^^^^^^^^ T.attached_class (of TypedEnum)</span></span>
 <span id="cb8-7"><a href="#cb8-7"></a><span class="cf">end</span></span>
 <span id="cb8-8"><a href="#cb8-8"></a></span>
-<span id="cb8-9"><a href="#cb8-9"></a>sig <span class="op">{</span> params(<span class="wa">n:</span> <span class="dt">String</span>)<span class="at">.void</span> <span class="op">}</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a>sig <span class="kw">{</span> params(<span class="wa">n: </span><span class="dt">String</span>)<span class="at">.void</span> <span class="kw">}</span></span>
 <span id="cb8-10"><a href="#cb8-10"></a><span class="cf">def</span> initialize(n)</span>
 <span id="cb8-11"><a href="#cb8-11"></a>  <span class="dv">self</span><span class="at">.class</span></span>
 <span id="cb8-12"><a href="#cb8-12"></a><span class="co"># ^^^^^^^^^^ T.class_of(TypedEnum)</span></span>
@@ -197,13 +192,13 @@
 <p>If you call <code>self.new</code> inside of a singleton class method, the type that you get back is what’s called <code>T.attached_class</code>. It’s a weird name. People who use Ruby are very familiar with having the singleton class called the singleton class. They usually <em>don’t</em> have a name for this other class, but it’s called the attached class: it’s the name that the Ruby VM uses, and it’s also the name that Sorbet uses.</p>
 <p>Here’s how to think about what this type means: it is <em>the</em> type in Sorbet that exists to model what <code>new</code> does. It models the linkage from a singleton class back down to its attached class. And it respects dynamic dispatch:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  sig <span class="op">{</span> returns(<span class="cn">T</span><span class="at">.attached_class</span>) <span class="op">}</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span> returns(T<span class="at">.attached_class</span>) <span class="kw">}</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.make</span>; <span class="dv">self</span><span class="at">.new</span>; <span class="cf">end</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">Parent</span>; <span class="cf">end</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span>; <span class="cf">end</span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>parent <span class="op">=</span> <span class="dt">Parent</span><span class="at">.make</span>  <span class="co"># =&gt; Parent</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>child <span class="op">=</span>  <span class="dt">Child</span><span class="at">.make</span>   <span class="co"># =&gt; Child</span></span></code></pre></div>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>parent <span class="kw">=</span> <span class="dt">Parent</span><span class="at">.make</span>  <span class="co"># =&gt; Parent</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>child <span class="kw">=</span>  <span class="dt">Child</span><span class="at">.make</span>   <span class="co"># =&gt; Child</span></span></code></pre></div>
 <p>There’s only one definition of the <code>make</code> method, but the two calls to <code>make</code> above have different types. Sorbet knows that if <code>make</code> is called on <code>Parent</code>, the expression will have type <code>Parent</code>, and if called on <code>Child</code> will have type <code>Child</code>. That’s the power of <code>T.attached_class</code>, and it’s precisely the type that captures how <code>new</code> works.</p>
 <p>In the opposite direction, <code>T.class_of(...)</code> is the type that represents following the link from the attached class up to the singleton class by way of <code>self.class</code>. It says, “Whatever class you are currently in, if you call <code>self.class</code> you will get <code>T.class_of(&lt;whatever class you are currently in&gt;)</code>.”</p>
 <p>For our <code>initialize</code> method defined in the <code>TypedEnum</code> class, <code>self.class</code> has type <code>T.class_of(TypedEnum)</code>. It’s the name Sorbet uses for the singleton class—the Ruby VM would use the name <code>#&lt;Class:TypedEnum&gt;</code>, instead. Sorbet and the Ruby VM represent the concept of a singleton class with different names.</p>
@@ -230,8 +225,7 @@
 <p>If we think of classes as both “a grouping of methods” and “the ability to make instances of that class,” modules are <em>only</em> the ability to group methods. You can’t instantiate a module: you can only use them to make this little namespace for methods.</p>
 <p>But we <em>can</em> use those modules in inheritance chains. The instance method <code>foo</code> in our example above can be called on instances of <code>Child</code> because of how <code>include</code> works. But importantly: the singleton class method <code>bar</code> <strong>cannot</strong> be called on the class object <code>Child</code>, unlike with the <code>&lt;</code> operator.</p>
 <p>In picture form, <code>include</code> is a puzzle piece that only links up module instance methods with the child class:</p>
-<p><img src="/assets/img/light/inheritance-in-ruby/parent-child-include.png" style="max-width:466px" />
-<img src="/assets/img/dark/inheritance-in-ruby/parent-child-include.png" style="max-width:465.5px" /></p>
+<p><img src="/assets/img/light/inheritance-in-ruby/parent-child-include.png" style="max-width:466px" /> <img src="/assets/img/dark/inheritance-in-ruby/parent-child-include.png" style="max-width:465.5px" /></p>
 <p>There’s something shocking here: not only do we <em>not</em> have a puzzle piece that links up the singleton class of the module into the singleton class of the child, <strong>there isn’t even a tab</strong> on <code>T.class_of(IParent)</code>. It’s smooth on the bottom. It is <em>not actually possible</em> for a module’s singleton class to be inherited. If we wanted to put a term to what’s happening here: module singleton classes are <strong>final</strong>. They cannot be inherited.</p>
 <p>That comes with some interesting consequences.</p>
 <ul>
@@ -241,7 +235,7 @@
 <p><span class="sidenote-wrapper"><label for="sn-7" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-7" class="margin-toggle"/><span class="marginnote">You don’t even need to use Sorbet to show this point; you can observe the same thing by evaluating <code>p(Child &lt; IParent)</code> and see that it’s false.<br />
 <br />
 </span></span></p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sig <span class="op">{</span> params(<span class="wa">klass:</span> <span class="cn">T</span><span class="at">.class_of</span>(<span class="dt">IParent</span>))<span class="at">.void</span> <span class="op">}</span></span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span> params(<span class="wa">klass: </span>T<span class="at">.class_of</span>(<span class="dt">IParent</span>))<span class="at">.void</span> <span class="kw">}</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo(klass); <span class="cf">end</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>foo(<span class="dt">Child</span>) <span class="co"># ❌</span></span></code></pre></div>
@@ -266,14 +260,11 @@
 <span id="cb12-11"><a href="#cb12-11"></a><span class="dt">Child</span><span class="at">.foo</span>     <span class="co"># ✅</span></span>
 <span id="cb12-12"><a href="#cb12-12"></a><span class="dt">Child</span><span class="at">.bar</span>     <span class="co"># ❌ (still)</span></span></code></pre></div>
 <p><code>extend</code> does something <em>else</em>, which is: if you <code>extend</code> a module, it still takes the instance methods (because that’s the only extension point there is on modules), but it slots them into the child class’s singleton class:</p>
-<p><img src="/assets/img/light/inheritance-in-ruby/parent-child-extend.png" class="center" style="max-width:525px" />
-<img src="/assets/img/dark/inheritance-in-ruby/parent-child-extend.png" class="center" style="max-width:525px" /></p>
-<p>In picture form, there’s this weird half-red, half-blue puzzle piece that makes it so that
-<code>IParent</code> is an ancestor of <code>T.class_of(Child)</code> instead of being an ancestor of <code>Child</code>. It exposes instance methods on the module as singleton class methods on <code>Child</code>.</p>
+<p><img src="/assets/img/light/inheritance-in-ruby/parent-child-extend.png" class="center" style="max-width:525px" /> <img src="/assets/img/dark/inheritance-in-ruby/parent-child-extend.png" class="center" style="max-width:525px" /></p>
+<p>In picture form, there’s this weird half-red, half-blue puzzle piece that makes it so that <code>IParent</code> is an ancestor of <code>T.class_of(Child)</code> instead of being an ancestor of <code>Child</code>. It exposes instance methods on the module as singleton class methods on <code>Child</code>.</p>
 <p>What it definitely doesn’t do is inherit the module’s singleton class, because module singleton classes are final.</p>
 <p>So that basically wraps up inheritance in Ruby:</p>
-<p><img src="/assets/img/light/inheritance-in-ruby/inherit-include-extend.png" style="max-width:561.5px" />
-<img src="/assets/img/dark/inheritance-in-ruby/inherit-include-extend.png" style="max-width:562px" /></p>
+<p><img src="/assets/img/light/inheritance-in-ruby/inherit-include-extend.png" style="max-width:561.5px" /> <img src="/assets/img/dark/inheritance-in-ruby/inherit-include-extend.png" style="max-width:562px" /></p>
 <p>With classes, we have this puzzle piece which takes instance methods to instance methods and singleton class methods to singleton class methods. It’s cool because it preserves that link between instance and singleton.</p>
 <p>But with modules, <strong>that link breaks down</strong> and the only<span class="sidenote-wrapper"><label for="sn-8" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-8" class="margin-toggle"/><span class="marginnote">You could argue these aren’t the “only” tools because there’s also <code>prepend</code>, but it doesn’t act different from <code>include</code> with respect to this link.<br />
 <br />
@@ -299,8 +290,7 @@
 <p>By convention, we could say that <code>IParent</code> contains all the instance methods, and that <code>IParentClass</code> contains all the methods that are meant to be singleton class methods, and make sure <em>by convention</em> that <code>IParentClass</code> is extended wherever <code>IParent</code> is included. So anyone who wants to use this <code>IParent</code> abstraction has to be sure to always mention two class names, one with <code>include</code> and one with <code>extend</code>.</p>
 <p>That works—that makes both of these methods available, where <code>foo</code> is an instance method and <code>bar</code> is a singleton class method on <code>Child</code>.</p>
 <p>If we look at the puzzle pieces again, include is doing one thing to one module, extend is doing something else to some other module, and if we squint it <em>kind</em> of looks like our class inheritance puzzle piece?</p>
-<p><img src="/assets/img/light/inheritance-in-ruby/include-plus-extend.png" style="max-width:704px" />
-<img src="/assets/img/dark/inheritance-in-ruby/include-plus-extend.png" style="max-width:704PX" /></p>
+<p><img src="/assets/img/light/inheritance-in-ruby/include-plus-extend.png" style="max-width:704px" /> <img src="/assets/img/dark/inheritance-in-ruby/include-plus-extend.png" style="max-width:704PX" /></p>
 <p>But we still have two modules, and they’re kind of just floating apart, unconnected to each other. It’s clunky. It was nicer with <code>&lt;</code>, where we just had a single puzzle piece that linked the attached and singleton classes.</p>
 <h1 id="the-mixes_in_class_methods-annotation">The <code>mixes_in_class_methods</code> annotation</h1>
 <p>As it turns out, Ruby allows <em>changing</em> what <code>include</code> means.</p>
@@ -309,7 +299,7 @@
 <p><em>If you don’t use Sorbet, you probably just want to skip the rest of this post, and continue reading that one instead.</em></p>
 <p>For historical reasons that might make it into another post, Sorbet invents its own mechanism to achieve a result similar to <code>ActiveSupport::Concern</code> which it calls <a href="https://sorbet.org/docs/abstract#interfaces-and-the-included-hook"><code>mixes_in_class_methods</code></a>. The basic idea is to codify the “<code>include</code> + <code>extend</code>” convention from above:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode numberSource ruby numberLines hl-8 hl-12"><code class="sourceCode ruby"><span id="cb14-1"><a href="#cb14-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a>  <span class="fu">extend</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Helpers</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Helpers</span></span>
 <span id="cb14-3"><a href="#cb14-3"></a>  <span class="cf">def</span> foo; <span class="cf">end</span></span>
 <span id="cb14-4"><a href="#cb14-4"></a></span>
 <span id="cb14-5"><a href="#cb14-5"></a>  <span class="cf">module</span> <span class="dt">ClassMethods</span></span>
@@ -327,13 +317,12 @@
 <li><p>But then <strong>also</strong>: the <code>include</code> will find the associated <code>ClassMethods</code> module and act as though that module was <code>extend</code>’ed on line 12. So <code>T.class_of(Child)</code> will descend from <code>IParent::ClassMethods</code>.</p></li>
 </ul>
 <p>In a picture:</p>
-<p><img src="/assets/img/light/inheritance-in-ruby/mixes-in-class-methods.png" class="center" style="max-width:476.5px" />
-<img src="/assets/img/dark/inheritance-in-ruby/mixes-in-class-methods.png" class="center" style="max-width:476.5px" /></p>
+<p><img src="/assets/img/light/inheritance-in-ruby/mixes-in-class-methods.png" class="center" style="max-width:476.5px" /> <img src="/assets/img/dark/inheritance-in-ruby/mixes-in-class-methods.png" class="center" style="max-width:476.5px" /></p>
 <p>We get this really wacky-shaped puzzle piece, where our two modules are still <em>kind of</em> unrelated to each other, but they’re at least closer together. It acts like an <code>include</code> and <code>extend</code> in one, but people don’t have to mention the <code>extend</code>.</p>
 <h2 id="where-mixes_in_class_methods-falls-short">Where <code>mixes_in_class_methods</code> falls short</h2>
 <p>So far so good except… it doesn’t quite work the way you’d hope it might. The <code>mixes_in_class_methods</code> annotation is kind of dumb: it doesn’t pay attention to whether the <code>include</code> happens into a class, or into another module. And if it happens into another module, it will still act like the <code>extend</code> was written <em>right there</em>:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode numberSource ruby numberLines hl-11 hl-12"><code class="sourceCode ruby"><span id="cb15-1"><a href="#cb15-1"></a>  <span class="cf">module</span> <span class="dt">IParent</span></span>
-<span id="cb15-2"><a href="#cb15-2"></a>    <span class="fu">extend</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Helpers</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a>    <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Helpers</span></span>
 <span id="cb15-3"><a href="#cb15-3"></a>    <span class="cf">def</span> foo; <span class="cf">end</span></span>
 <span id="cb15-4"><a href="#cb15-4"></a>  </span>
 <span id="cb15-5"><a href="#cb15-5"></a>    <span class="cf">module</span> <span class="dt">ClassMethods</span></span>
@@ -347,8 +336,7 @@
 <span id="cb15-13"><a href="#cb15-13"></a>  <span class="cf">class</span> <span class="dt">Grandchild</span>; <span class="fu">include</span> <span class="dt">IChild</span>; <span class="cf">end</span></span></code></pre></div>
 <p>The implicit <code>extend</code> happens on line 11, because <code>IParent</code> is the only class that has the <code>mixes_in_class_methods</code> annotation, and that’s where <code>IParent</code> is included.</p>
 <p>But that means that <code>T.class_of(Grandchild)</code> doesn’t have <code>IParent::ClassMethods</code> as an ancestor, because <code>IChild</code> is a module, and module singleton classes are final:</p>
-<p><img src="/assets/img/light/inheritance-in-ruby/mixes-in-class-methods-into-module.png" class="center" style="max-width:469px" />
-<img src="/assets/img/dark/inheritance-in-ruby/mixes-in-class-methods-into-module.png" class="center" style="max-width:468.5px" /></p>
+<p><img src="/assets/img/light/inheritance-in-ruby/mixes-in-class-methods-into-module.png" class="center" style="max-width:469px" /> <img src="/assets/img/dark/inheritance-in-ruby/mixes-in-class-methods-into-module.png" class="center" style="max-width:468.5px" /></p>
 <p><code>T.class_of(IChild)</code> is a module’s singleton class, which means it’s final, and will never be an ancestor of anything.</p>
 <p><strong>This is the biggest sharp edge</strong> to be aware of about <code>mixes_in_class_methods</code>—modules defined this way can’t have dependencies on each other. It’s annoying.</p>
 <p>When this comes up, one way to fix it is to just <em>not mention</em> <code>mixes_in_class_methods</code> in the upstream dependencies, falling back to the explicit “<code>include</code> + <code>extend</code>” convention from before</p>
@@ -362,13 +350,13 @@
 <span id="cb16-8"><a href="#cb16-8"></a><span class="cf">end</span></span>
 <span id="cb16-9"><a href="#cb16-9"></a></span>
 <span id="cb16-10"><a href="#cb16-10"></a><span class="cf">module</span> <span class="dt">IChild</span></span>
-<span id="cb16-11"><a href="#cb16-11"></a>  <span class="fu">extend</span> <span class="cn">T</span><span class="op">:</span><span class="wa">:Helpers</span></span>
+<span id="cb16-11"><a href="#cb16-11"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Helpers</span></span>
 <span id="cb16-12"><a href="#cb16-12"></a>  <span class="fu">include</span> <span class="dt">IParent</span></span>
 <span id="cb16-13"><a href="#cb16-13"></a></span>
 <span id="cb16-14"><a href="#cb16-14"></a>  <span class="cf">module</span> <span class="dt">ClassMethods</span></span>
 <span id="cb16-15"><a href="#cb16-15"></a>    <span class="co"># IParent doesn&#39;t have mixes_in_class_methods.</span></span>
 <span id="cb16-16"><a href="#cb16-16"></a>    <span class="co"># Need to manually include here.</span></span>
-<span id="cb16-17"><a href="#cb16-17"></a>    <span class="fu">include</span> <span class="dt">IParent</span><span class="op">:</span><span class="wa">:ClassMethods</span></span>
+<span id="cb16-17"><a href="#cb16-17"></a>    <span class="fu">include</span> <span class="dt">IParent</span><span class="kw">::</span><span class="dt">ClassMethods</span></span>
 <span id="cb16-18"><a href="#cb16-18"></a>  <span class="cf">end</span></span>
 <span id="cb16-19"><a href="#cb16-19"></a>  mixes_in_class_methods(<span class="dt">IChild</span>)</span>
 <span id="cb16-20"><a href="#cb16-20"></a><span class="cf">end</span></span>
@@ -383,13 +371,12 @@
 <span id="cb16-29"><a href="#cb16-29"></a>  <span class="co"># IParent doesn&#39;t have mixes_in_class_methods.</span></span>
 <span id="cb16-30"><a href="#cb16-30"></a>  <span class="co"># Need to manually extend here.</span></span>
 <span id="cb16-31"><a href="#cb16-31"></a>  <span class="fu">include</span> <span class="dt">IParent</span></span>
-<span id="cb16-32"><a href="#cb16-32"></a>  <span class="fu">extend</span> <span class="dt">IParent</span><span class="op">:</span><span class="wa">:ClassMethods</span></span>
+<span id="cb16-32"><a href="#cb16-32"></a>  <span class="fu">extend</span> <span class="dt">IParent</span><span class="kw">::</span><span class="dt">ClassMethods</span></span>
 <span id="cb16-33"><a href="#cb16-33"></a><span class="cf">end</span></span></code></pre></div>
 <p>The <code>IParent</code> module is upstream of the <code>IChild</code> module, so <code>IParent</code> doesn’t use <code>mixes_in_class_methods</code>. Meanwhile <code>IChild</code> is not upstream of any other modules, so it’s free to use <code>mixes_in_class_methods</code> like before.</p>
 <p>Since <code>IParent</code> does not have <code>mixes_in_class_methods</code>, we have to fall back to our “convention-only” approach before. We see this on lines 17 and 32, where the <code>IParent::ClassMethods</code> have to be brought in manually.</p>
 <p>But having done that, at least <code>T.class_of(Child)</code> now has the ancestor chain we were looking for, where <code>IParent::ClassMethods</code> is an ancestor:</p>
-<p><img src="/assets/img/light/inheritance-in-ruby/mixes-in-class-methods-include-class-methods.png" class="center" style="max-width:469px" />
-<img src="/assets/img/dark/inheritance-in-ruby/mixes-in-class-methods-include-class-methods.png" class="center" style="max-width:469px" /></p>
+<p><img src="/assets/img/light/inheritance-in-ruby/mixes-in-class-methods-include-class-methods.png" class="center" style="max-width:469px" /> <img src="/assets/img/dark/inheritance-in-ruby/mixes-in-class-methods-include-class-methods.png" class="center" style="max-width:469px" /></p>
 <p>I should say: I consider this to be a wart in Sorbet’s design.<span class="sidenote-wrapper"><label for="sn-9" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-9" class="margin-toggle"/><span class="marginnote">It’s a long-term goal of mine to fix this one day, either by implementing support for <code>Concern</code> in Sorbet or even replacing <code>mixes_in_class_methods</code> with <code>Concern</code>.<br />
 <br />
 </span></span> When we look at <a href="/concern-inheritance/">how <code>ActiveSupport::Concern</code> works</a>, it’ more like what you’d expect: it’s a bit more recursive or viral about linking up the <code>ClassMethods</code> classes when stacking modules on top of modules. Hopefully simply being aware of this sharp edge in <code>mixes_in_class_methods</code> is enough for now.</p>

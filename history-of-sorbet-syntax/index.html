@@ -40,7 +40,7 @@
   <header>
     <h1 class="title">Past, Present, and Future of Sorbet Type Syntax</h1>
     <blockquote class="metadata">
-    <p class="subtitle">A lightly edited transcript of <a href="https://sorbet.run/talks/SFRubyApril2025">a talk</a> I first gave on April 23, 2025.</p>
+    <p class="subtitle">A lightly edited transcript of <a href="https://sorbet.run/talks/SFRubyApril2025">a talk</a> I first gave on April 23, 2023.</p>
     <p class="date before-toc"><time datetime="2025-04-25 01:57:00 -0400">April 25, 2025</time></p>
     </blockquote>
   </header>
@@ -51,25 +51,25 @@
   <strong>Contents</strong><label for="contents">⊕</label>
   <input type="checkbox" id="contents">
   <ul>
-  <li><a href="#the-before-times" id="toc-the-before-times">The before times</a>
+  <li><a href="#the-before-times">The before times</a>
   <ul>
-  <li><a href="#appetite-for-typing-at-stripe" id="toc-appetite-for-typing-at-stripe">Appetite for typing at Stripe</a></li>
+  <li><a href="#appetite-for-typing-at-stripe">Appetite for typing at Stripe</a></li>
   </ul></li>
-  <li><a href="#the-design-of-a-type-syntax" id="toc-the-design-of-a-type-syntax">The design of a type syntax</a>
+  <li><a href="#the-design-of-a-type-syntax">The design of a type syntax</a>
   <ul>
-  <li><a href="#the-typescript-approach-add-types-on-top-compile-them-away" id="toc-the-typescript-approach-add-types-on-top-compile-them-away">The TypeScript approach: add types on top, compile them away</a></li>
-  <li><a href="#the-header-file-approach-like-what-rbs-is-today" id="toc-the-header-file-approach-like-what-rbs-is-today">The header file approach: like what RBS is today</a></li>
-  <li><a href="#the-jsdoc-approach-types-in-comments" id="toc-the-jsdoc-approach-types-in-comments">The JSDoc approach: types in comments</a></li>
-  <li><a href="#the-dsl-approach-declare_method-becomes-sig" id="toc-the-dsl-approach-declare_method-becomes-sig">The DSL approach: <code>declare_method</code> becomes <code>sig</code></a></li>
-  <li><a href="#the-python-approach-first-party-type-hints" id="toc-the-python-approach-first-party-type-hints">The Python approach: first-party type hints</a></li>
+  <li><a href="#the-typescript-approach-add-types-on-top-compile-them-away">The TypeScript approach: add types on top, compile them away</a></li>
+  <li><a href="#the-header-file-approach-like-what-rbs-is-today">The header file approach: like what RBS is today</a></li>
+  <li><a href="#the-jsdoc-approach-types-in-comments">The JSDoc approach: types in comments</a></li>
+  <li><a href="#the-dsl-approach-declare_method-becomes-sig">The DSL approach: <code>declare_method</code> becomes <code>sig</code></a></li>
+  <li><a href="#the-python-approach-first-party-type-hints">The Python approach: first-party type hints</a></li>
   </ul></li>
-  <li><a href="#types-are-expressions" id="toc-types-are-expressions">Types are expressions</a>
+  <li><a href="#types-are-expressions">Types are expressions</a>
   <ul>
-  <li><a href="#when-the-syntax-we-want-is-taken" id="toc-when-the-syntax-we-want-is-taken">When the syntax we want is taken</a></li>
-  <li><a href="#forward-references" id="toc-forward-references">Forward references</a></li>
-  <li><a href="#sometimes-you-really-want-custom-syntax" id="toc-sometimes-you-really-want-custom-syntax">Sometimes you really want custom syntax</a></li>
+  <li><a href="#when-the-syntax-we-want-is-taken">When the syntax we want is taken</a></li>
+  <li><a href="#forward-references">Forward references</a></li>
+  <li><a href="#sometimes-you-really-want-custom-syntax">Sometimes you really want custom syntax</a></li>
   </ul></li>
-  <li><a href="#where-we-go-from-here" id="toc-where-we-go-from-here">Where we go from here</a></li>
+  <li><a href="#where-we-go-from-here">Where we go from here</a></li>
   </ul>
 </nav>
 
@@ -90,8 +90,7 @@
 <h1 id="the-before-times">The before times</h1>
 <p>Before we get too much further, I’ve forgotten to introduce myself: my name is Jake, and I’ve been working full time on Sorbet for almost 7 years.</p>
 <figure>
-<img src="/assets/img/jez-type-safety.png" style="max-width: 72px; margin-left: auto; margin-right: auto;" alt=":jez-type-safety:" />
-<figcaption aria-hidden="true"><code>:jez-type-safety:</code></figcaption>
+<img src="/assets/img/jez-type-safety.png" style="max-width: 72px; margin-left: auto; margin-right: auto;" alt=":jez-type-safety:" /><figcaption aria-hidden="true"><code>:jez-type-safety:</code></figcaption>
 </figure>
 <p>I started at Stripe a month before the Ruby type checker project kicked off, and I joined the team 1 year later. Most of what I have to say here is from direct experience, from chatting with people over lunch, or from combing old emails. That means some of the things that happened before 2017 are a little hazy, but I’m going to do my best.</p>
 <p>In mid 2017 (when I joined, and when Sorbet was starting) there were about 750 people at Stripe, of whom about 300 were engineers.</p>
@@ -124,18 +123,17 @@
 <br />
 </span></span></p>
 <figure>
-<img src="/assets/img/odin-model-2013-03-18.png" style="max-width: 896px;" alt="Documentation for Odin::Model, a precursor to Chalk::ODM, and later T::Struct" />
-<figcaption aria-hidden="true">Documentation for <code>Odin::Model</code>, a precursor to <code>Chalk::ODM</code>, and later <code>T::Struct</code></figcaption>
+<img src="/assets/img/odin-model-2013-03-18.png" style="max-width: 896px;" alt="Documentation for Odin::Model, a precursor to Chalk::ODM, and later T::Struct" /><figcaption aria-hidden="true">Documentation for <code>Odin::Model</code>, a precursor to <code>Chalk::ODM</code>, and later <code>T::Struct</code></figcaption>
 </figure>
 <p>For anyone who uses Sorbet, this should look remarkably familiar: it’s the exact same code you’d use to define a <a href="https://sorbet.org/docs/tstruct"><code>T::Struct</code></a> today. Like any good ODM (or ORM), it did type validation at runtime to ensure that database write operations don’t store bad data.</p>
 <p>Stripe also had a library for defining interfaces, circa 2013:</p>
 <p><img src="/assets/img/chalk-interface-2013-10-15.png" style="max-width: 896px;" /></p>
 <p>The idea was that an interface would expose a specific set of required methods. Then you’d box up a value of that interface, like</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>animal <span class="op">=</span> <span class="dt">Animal</span><span class="at">.from_instance</span>(<span class="dt">Dog</span><span class="at">.new</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>animal <span class="kw">=</span> <span class="dt">Animal</span><span class="at">.from_instance</span>(<span class="dt">Dog</span><span class="at">.new</span>)</span></code></pre></div>
 <p>and the library would check that you implemented all the required methods. Also, it prevented calling methods <strong>not</strong> in the interface at runtime. So for example, <code>animal.bark</code> would raise a <code>NoMethodError</code>, because <code>bark</code> isn’t in the public interface of <code>Animal</code>. If you needed to call a <code>Dog</code>-specific method, you’d have to explicitly downcast to a dog:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>animal<span class="at">.bark</span> <span class="co"># 💥</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dog <span class="op">=</span> <span class="dt">Chalk</span><span class="op">::</span><span class="dt">Interface</span><span class="at">.dynamic_cast</span>(animal, <span class="dt">Dog</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dog <span class="kw">=</span> <span class="dt">Chalk</span><span class="kw">::</span><span class="dt">Interface</span><span class="at">.dynamic_cast</span>(animal, <span class="dt">Dog</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>dog<span class="at">.bark</span>    <span class="co"># ✅</span></span></code></pre></div>
 <p>If you called <code>dynamic_cast</code> on something that was not a <code>Dog</code>, you get back <code>nil</code>, like how <code>dynamic_cast</code> works in C++.</p>
 <p>You should be seeing a pattern here: most of Stripe’s appetite for typing manifested as Ruby DSLs for runtime checking and declaring explicit interfaces. This came to an inflection point in November 2016—almost a year before Sorbet—when Stripe implemented what it called “interface constraints.”</p>
@@ -143,8 +141,7 @@
 <br />
 </span></span></p>
 <figure>
-<img src="/assets/img/interface-constraints-proposal-2016-11-08.png" style="max-width: 980px;" alt="The proposal for declare_method, the earliest predecesor of sig, c. Nov 2016" />
-<figcaption aria-hidden="true">The proposal for <code>declare_method</code>, the earliest predecesor of <code>sig</code>, c. Nov 2016</figcaption>
+<img src="/assets/img/interface-constraints-proposal-2016-11-08.png" style="max-width: 980px;" alt="The proposal for declare_method, the earliest predecesor of sig, c. Nov 2016" /><figcaption aria-hidden="true">The proposal for <code>declare_method</code>, the earliest predecesor of <code>sig</code>, c. Nov 2016</figcaption>
 </figure>
 <p>It was a library for wrapping methods with runtime type checking, mimicking a primitive form of “<a href="https://en.wikipedia.org/wiki/Design_by_contract">design by contract</a>.”<span class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span class="marginnote">In a recurring theme, there were already libraries for “design by contract” in Ruby, like <a href="https://github.com/egonSchiele/contracts.ruby">contracts.ruby</a>, that Stripe chose not to use. I can’t find mention of them influencing Stripe’s “interface constraints proposal,” but in retrospect I think it was important for Stripe to have control over the evolution of Sorbet’s type syntax.<br />
 <br />
@@ -153,8 +150,7 @@
 <p>The proposal mentions maybe one day building static checking for these annotations, but that was mostly hypothetical: runtime checking was the point from the beginning. Ruby is a language all about the neat things you can do at runtime!</p>
 <p>Later, this <code>declare_method</code> library gained support for declaring overridable and abstract methods, which let it replace the <code>Chalk::Interface</code> library (so that interfaces could talk about required signatures, not just required methods):</p>
 <figure>
-<img src="/assets/img/standard_method-2017-10-12.png" style="max-width: 857px;" alt="Email announcing declare_method → standard_method et al." />
-<figcaption aria-hidden="true">Email announcing <code>declare_method</code> → <code>standard_method</code> et al.</figcaption>
+<img src="/assets/img/standard_method-2017-10-12.png" style="max-width: 857px;" alt="Email announcing declare_method → standard_method et al." /><figcaption aria-hidden="true">Email announcing <code>declare_method</code> → <code>standard_method</code> et al.</figcaption>
 </figure>
 <p>Throw in the fact that the JavaScript codebase powering Stripe’s dashboard gained support for static typing in July 2016 (via <a href="https://flow.org">Flow</a><span class="sidenote-wrapper"><label for="sn-3" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-3" class="margin-toggle"/><span class="marginnote">While researching, I came across the <a href="https://engineering.fb.com/2014/11/18/web/flow-a-new-static-type-checker-for-javascript/">original Flow announcement</a> from 2014, which is interesting in understanding its original design goals.<br />
 <br />
@@ -195,7 +191,7 @@ will be depended on by somebody.</p>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>If <code>charge</code> is non-<code>nil</code>, we return early before checking whether <code>merchant</code> is <code>nil</code> or not. Now suppose we need to edit the method to implement a new “merchant override MCC” feature:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource ruby numberLines hl-2 hl-3"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a><span class="cf">def</span> get_mcc(charge, merchant)</span>
-<span id="cb4-2"><a href="#cb4-2"></a>  override <span class="op">=</span> merchant<span class="at">.override_mcc</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>  override <span class="kw">=</span> merchant<span class="at">.override_mcc</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a>  <span class="cf">return</span> override <span class="cf">if</span> override</span>
 <span id="cb4-4"><a href="#cb4-4"></a></span>
 <span id="cb4-5"><a href="#cb4-5"></a>  <span class="cf">return</span> charge<span class="at">.mcc</span> <span class="cf">if</span> charge</span>
@@ -203,9 +199,9 @@ will be depended on by somebody.</p>
 <span id="cb4-7"><a href="#cb4-7"></a><span class="cf">end</span></span></code></pre></div>
 <p>This new override is meant to take precedence over any “MCC” on a charge. Is this change safe? Callers were supposed to be passing in a non-<code>nil</code> merchant into this method, but maybe some weren’t? If we aren’t sure, now we have to be defensive, which is annoying and maybe causes other problems!</p>
 <p>But this problem vanishes when making a changes in methods with runtime-checked signatures.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines hl-1"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a>sig <span class="op">{</span> params(<span class="wa">charge:</span> <span class="dt">Charge</span>, <span class="wa">merchant:</span> <span class="dt">Merchant</span>)<span class="at">.returns</span>(<span class="cn">MCC</span>) <span class="op">}</span></span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource ruby numberLines hl-1"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a>sig <span class="kw">{</span> params(<span class="wa">charge: </span><span class="dt">Charge</span>, <span class="wa">merchant: </span><span class="dt">Merchant</span>)<span class="at">.returns</span>(<span class="cn">MCC</span>) <span class="kw">}</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="cf">def</span> get_mcc(charge, merchant)</span>
-<span id="cb5-3"><a href="#cb5-3"></a>  override <span class="op">=</span> merchant<span class="at">.override_mcc</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>  override <span class="kw">=</span> merchant<span class="at">.override_mcc</span></span>
 <span id="cb5-4"><a href="#cb5-4"></a>  <span class="cf">return</span> override <span class="cf">if</span> override</span>
 <span id="cb5-5"><a href="#cb5-5"></a></span>
 <span id="cb5-6"><a href="#cb5-6"></a>  <span class="cf">return</span> charge<span class="at">.mcc</span> <span class="cf">if</span> charge</span>
@@ -247,8 +243,8 @@ will be depended on by somebody.</p>
 <h2 id="when-the-syntax-we-want-is-taken">When the syntax we want is taken</h2>
 <p>When types are expressions, sometimes type syntax you want already has another meaning.</p>
 <p>It would be really nice to use <code>|</code> for union types, <code>&amp;</code> for intersection types, and <code>[]</code> for generic types, directly on class or module names:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Integer</span> <span class="op">|</span> <span class="dt">String</span>         <span class="co"># Module#|</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Runnable</span> <span class="op">&amp;</span> <span class="dt">HasOwner</span>      <span class="co"># Module#&amp;</span></span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Integer</span> <span class="kw">|</span> <span class="dt">String</span>         <span class="co"># Module#|</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Runnable</span> <span class="kw">&amp;</span> <span class="dt">HasOwner</span>      <span class="co"># Module#&amp;</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Box</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>             <span class="co"># Module#[]</span></span></code></pre></div>
 <p>There are two problems:</p>
 <ul>
@@ -264,33 +260,33 @@ will be depended on by somebody.</p>
 </span></span></p></li>
 </ul>
 <p>Something similar comes up for tuples: the <code>|</code> and <code>&amp;</code> methods already mean something for Arrays:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span><span class="kw">]</span> <span class="op">|</span> <span class="kw">[</span><span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span><span class="kw">]</span>    <span class="co"># Array#|</span></span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span><span class="kw">]</span> <span class="kw">|</span> <span class="kw">[</span><span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span><span class="kw">]</span>    <span class="co"># Array#|</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># =&gt; [1, 3, 5, 2, 4, 6]</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span><span class="kw">]</span> <span class="op">&amp;</span> <span class="kw">[</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span><span class="kw">]</span>    <span class="co"># Array#&amp;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span><span class="kw">]</span> <span class="kw">&amp;</span> <span class="kw">[</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span><span class="kw">]</span>    <span class="co"># Array#&amp;</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># =&gt; [2, 3]</span></span></code></pre></div>
 <p>In this case, it might be easier to abandon using raw <code>Array</code> literals for tuples, and instead use a syntax like <code>T[Integer, String]</code> to define a tuple, freeing up <code>|</code> and <code>&amp;</code>.</p>
 <p>While building Sorbet, our goal was to have one way to do things, for consistency. Maybe it’s time to relax that? If Ruby is okay having three names for filtering a list, maybe Sorbet can be okay having more than one way to specify union types. We could let individual codebases decide which syntax they want to use.</p>
 <h2 id="forward-references">Forward references</h2>
 <p>When types are expressions, you have to worry about forward references in type syntax. The evolution of the DSL syntax looked like this:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>declare_method(<span class="op">{</span><span class="wa">x:</span> <span class="dt">Integer</span><span class="op">}</span>, <span class="wa">returns:</span> <span class="dt">String</span>)</span>
+<div class="sourceCode" id="cb10"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>declare_method(<span class="kw">{</span><span class="wa">x: </span><span class="dt">Integer</span><span class="kw">}</span>, <span class="wa">returns: </span><span class="dt">String</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>standard_method(<span class="op">{</span><span class="wa">x:</span> <span class="dt">Integer</span><span class="op">}</span>, <span class="wa">returns:</span> <span class="dt">String</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>standard_method(<span class="kw">{</span><span class="wa">x: </span><span class="dt">Integer</span><span class="kw">}</span>, <span class="wa">returns: </span><span class="dt">String</span>)</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>sig<span class="at">.params</span>(<span class="wa">x:</span> <span class="dt">Integer</span>)<span class="at">.returns</span>(<span class="dt">String</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>sig<span class="at">.params</span>(<span class="wa">x: </span><span class="dt">Integer</span>)<span class="at">.returns</span>(<span class="dt">String</span>)</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>sig <span class="op">{</span> params(<span class="wa">x:</span> <span class="dt">Integer</span>)<span class="at">.returns</span>(<span class="dt">String</span>) <span class="op">}</span></span></code></pre></div>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span> params(<span class="wa">x: </span><span class="dt">Integer</span>)<span class="at">.returns</span>(<span class="dt">String</span>) <span class="kw">}</span></span></code></pre></div>
 <p>The most recent change switched to specifying types inside a block, which was done so that adding a <code>sig</code> wouldn’t cause load-order problems. For example:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource ruby numberLines hl-2"><code class="sourceCode ruby"><span id="cb11-1"><a href="#cb11-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
-<span id="cb11-2"><a href="#cb11-2"></a>  sig<span class="at">.params</span>(<span class="wa">x:</span> <span class="dt">MyData</span>)<span class="at">.void</span></span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource ruby numberLines hl-2"><code class="sourceCode ruby"><span id="cb11-1"><a href="#cb11-1"></a><span class="cf">class</span> A</span>
+<span id="cb11-2"><a href="#cb11-2"></a>  sig<span class="at">.params</span>(<span class="wa">x: </span><span class="dt">MyData</span>)<span class="at">.void</span></span>
 <span id="cb11-3"><a href="#cb11-3"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.example</span>(my_data)</span>
 <span id="cb11-4"><a href="#cb11-4"></a>    <span class="fu">puts</span>(my_data<span class="at">.foo</span>)</span>
 <span id="cb11-5"><a href="#cb11-5"></a>  <span class="cf">end</span></span>
 <span id="cb11-6"><a href="#cb11-6"></a></span>
-<span id="cb11-7"><a href="#cb11-7"></a>  <span class="dt">MyData</span> <span class="op">=</span> <span class="dt">Struct</span><span class="at">.new</span>(<span class="wa">:foo</span>)</span>
+<span id="cb11-7"><a href="#cb11-7"></a>  <span class="dt">MyData</span> <span class="kw">=</span> <span class="dt">Struct</span><span class="at">.new</span>(<span class="wa">:foo</span>)</span>
 <span id="cb11-8"><a href="#cb11-8"></a><span class="cf">end</span></span>
 <span id="cb11-9"><a href="#cb11-9"></a></span>
-<span id="cb11-10"><a href="#cb11-10"></a><span class="cn">A</span><span class="at">.example</span>(<span class="dt">MyData</span><span class="at">.new</span>(<span class="dv">42</span>))</span></code></pre></div>
+<span id="cb11-10"><a href="#cb11-10"></a>A<span class="at">.example</span>(<span class="dt">MyData</span><span class="at">.new</span>(<span class="dv">42</span>))</span></code></pre></div>
 <p>There’s no problem loading this file, until you add a <code>sig</code> (pictured using the old, eager syntax). Even though the <code>MyData#foo</code> method is called on line 4, above its definition on line 7, that doesn’t matter because <code>example</code> isn’t called until line 10.</p>
 <p>But adding the <code>sig</code> breaks that: there’s now a forward reference to <code>MyData</code> which the sig evaluates eagerly, causing an exception at load time. This kept causing problems as people added more <code>sig</code>’s. The problem was worse because of autoloading: in development everything might have looked fine, because you only evaluated things in a certain order, but then in CI or production things loading in a different order would bite you.</p>
 <p>Hiding all the types inside a block switches signatures from evaluating eagerly to lazily: the runtime implementation defers forcing the block until the first call of the method. These days, you basically only get a load-order issue if the code already had a load order issue.</p>
@@ -321,14 +317,14 @@ will be depended on by somebody.</p>
 <li>We can think about making some super-verbose things (like generic methods) less verbose.</li>
 </ul>
 <p>But I want to suggest one more option, which is a bit more radical: what if the Ruby VM parsed RBS comments and associated them with method definitions?</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
+<div class="sourceCode" id="cb13"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">#: (Integer) -&gt; String</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.foo</span>(x)</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>Soutaro introduced this comment-based syntax for RBS <a href="https://youtu.be/26sbpaGbU-0?t=1143">at RubyKaigi in 2024</a>. It’s a syntax that both Steep and TypeProf understand, and that Sorbet is gaining support for. Right now it’s just in comments… but what if the Ruby VM actually parsed these comments and exposed them at runtime?</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cn">A</span><span class="at">.method</span>(<span class="wa">:foo</span>)<span class="at">.rbs_annotation</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cn">A</span><span class="at">.rbs_annotation</span>(<span class="wa">:foo</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>A<span class="at">.method</span>(<span class="wa">:foo</span>)<span class="at">.rbs_annotation</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>A<span class="at">.rbs_annotation</span>(<span class="wa">:foo</span>)</span></code></pre></div>
 <p>If RBS comments were exposed by the Ruby VM like this, it wouldn’t force people to choose between Ruby’s elegant RBS syntax and Sorbet’s powerful runtime type checking.</p>
 <p>It also solves some of the problems with “types as expressions,” because types wouldn’t be expressions anymore: the Ruby VM would choose how to parse these annotations, meaning that we still get terse syntax, able to use <code>|</code> and <code>[]</code> free of other constraints. It would also fix the forward reference problem because the VM wouldn’t be evaluating these comments, just parsing them for other tools to consume. Those tools might attempt to resolve constant names, but that’s up to each tool to figure out when and how to do that.</p>
 <p>Having RBS annotations available at runtime would be useful for more than just Sorbet:</p>
