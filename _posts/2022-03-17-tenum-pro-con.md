@@ -44,14 +44,6 @@ prove that I hear you.
 
 \
 
-## 👎 `T::Enum` cannot be combined in ad hoc unions.
-
-That's a fancy way of saying we'd like to be able to write `T.any(:left, :right)` in any
-type annotation, without first having to pre-declare the new union type to the world. I
-spoke at length about how the existence of ad hoc union types make handling exceptional
-conditions [more pleasant than checked exceptions][ad-hoc-exceptions], so I'm right there
-with you in appreciating that feature.
-
 ## 👎 `T::Enum` is verbose.
 
 Even if you wanted to pre-declare the enum type. Consider:
@@ -129,6 +121,13 @@ This is a small one, but I'll mention it anyways. It's quick to search the Sorbe
 `T::Enum` and get to the right page. It's similarly easy to find examples of it being used
 in a given codebase, to learn from real code. There's no unique piece of syntax in
 `T.any(:left, :right)` that is a surefire thing to search for.
+
+\
+
+\
+
+Update 2025-09-27 to reflect that `T::Enum` now allows ad hoc unions of individual enum
+values.
 
 [because they're buggy]: https://sorbet.run/#%23%20typed%3A%20true%0Ax%20%3D%20%3Adefault%0A%0A1.times%20do%0A%20%20%23%20Sorbet%20does%20not%20report%20an%20error%20here%0A%20%20%23%20%28it%20would%20have%20to%20start%20doing%20so%29%0A%20%20x%20%3D%20%3Afirst%0Aend%0A%0AT.reveal_type%28x%29%20%23%20Sorbet%20shows%20the%20wrong%20type%20here%0A%0A%23%20Sorbet%20can't%20tell%20the%20difference%20bewteen%20a%20hash%20literal%0A%23%20with%20a%20variable%20key%20versus%20with%20a%20symbol%20literal%20key%0A%23%20at%20the%20time%20that%20inference%20happens.%0AT.reveal_type%28%7Bx%20%3D%3E%20nil%7D%29%0AT.reveal_type%28%7B%3Adefault%20%3D%3E%20nil%7D%29
 
