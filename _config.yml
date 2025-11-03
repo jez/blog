@@ -19,7 +19,7 @@ markdown: Pandoc
 pandoc:
   extensions:
     - from: 'markdown+smart+tex_math_single_backslash+emoji'
-    - filter: 'pandoc-sidenote'
+    - lua-filter: 'pandoc-sidenote.lua'
     - template: '_template'
     - katex
     - toc
