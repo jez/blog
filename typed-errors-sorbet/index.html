@@ -85,8 +85,8 @@ Matt’s post:</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns the first letter of the input,</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># or returns `HeadError` if empty</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span>params(<span class="wa">xs: </span><span class="dt">String</span>)<span class="at">.returns</span>(T<span class="at">.any</span>(<span class="dt">String</span>, <span class="dt">HeadError</span>))<span class="kw">}</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.head</span>(xs); <span class="kw">...</span>; <span class="cf">end</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sig <span class="op">{</span>params(<span class="wa">xs:</span> <span class="dt">String</span>)<span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="dt">String</span>, <span class="dt">HeadError</span>))<span class="op">}</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.head</span>(xs); <span class="op">...</span>; <span class="cf">end</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets the value for `key` in `hash`, or returns LookupError.</span></span>
@@ -97,17 +97,17 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:K</span>, <span class="wa">:V</span>)</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      <span class="wa">hash: </span>T<span class="kw">::</span><span class="dt">Hash</span><span class="kw">[</span>T<span class="at">.type_parameter</span>(<span class="wa">:K</span>), T<span class="at">.type_parameter</span>(<span class="wa">:V</span>)<span class="kw">]</span>,</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>      <span class="wa">key: </span>T<span class="at">.type_parameter</span>(<span class="wa">:K</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      <span class="wa">hash:</span> <span class="cn">T</span><span class="op">::</span><span class="dt">Hash</span><span class="kw">[</span><span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:K</span>), <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:V</span>)<span class="kw">]</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>      <span class="wa">key:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:K</span>)</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(T<span class="at">.type_parameter</span>(<span class="wa">:V</span>), <span class="dt">LookupError</span>))</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:V</span>), <span class="dt">LookupError</span>))</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.lookup</span>(hash, key); <span class="kw">...</span>; en</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.lookup</span>(hash, key); <span class="op">...</span>; en</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert a String to an integer, or return ParseError.</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span>params(<span class="wa">source: </span><span class="dt">String</span>)<span class="at">.returns</span>(T<span class="at">.any</span>(<span class="dt">Integer</span>, <span class="dt">ParseError</span>))<span class="kw">}</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.parse</span>(source); <span class="kw">...</span>; <span class="cf">end</span></span></code></pre></div>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>sig <span class="op">{</span>params(<span class="wa">source:</span> <span class="dt">String</span>)<span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="dt">Integer</span>, <span class="dt">ParseError</span>))<span class="op">}</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.parse</span>(source); <span class="op">...</span>; <span class="cf">end</span></span></code></pre></div>
 <p>Notice how in all three cases, we use a normal <a
 href="https://sorbet.org/docs/union-types">Sorbet union type</a> in the
 return, like <code>T.any(String, HeadError)</code>. All of the error
@@ -121,10 +121,10 @@ href="https://sorbet.org/docs/tstruct">typed structs</a> to approximate
 algebraic data types in other typed languages:</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">ParseError</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Helpers</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extend</span> <span class="cn">T</span><span class="op">::</span><span class="dt">Helpers</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  sealed!</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> <span class="dt">UnexpectedChar</span> <span class="kw">&lt;</span> T<span class="kw">::</span><span class="dt">Struct</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> <span class="dt">UnexpectedChar</span> <span class="op">&lt;</span> <span class="cn">T</span><span class="op">::</span><span class="dt">Struct</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">include</span> <span class="dt">ParseError</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    prop <span class="wa">:message</span>, <span class="dt">String</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
@@ -136,14 +136,14 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="
 <p>Then at the caller side, it’s simple to handle the errors:</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  params(<span class="wa">str: </span><span class="dt">String</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(<span class="dt">Integer</span>, <span class="dt">HeadError</span>, <span class="dt">LookupError</span>, <span class="dt">ParseError</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  params(<span class="wa">str:</span> <span class="dt">String</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="dt">Integer</span>, <span class="dt">HeadError</span>, <span class="dt">LookupError</span>, <span class="dt">ParseError</span>))</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.foo</span>(str)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  c <span class="kw">=</span> head(str) <span class="co"># =&gt; c : T.any(String, HeadError)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  c <span class="op">=</span> head(str) <span class="co"># =&gt; c : T.any(String, HeadError)</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c <span class="cf">unless</span> c<span class="at">.is_a?</span>(<span class="dt">String</span>)</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># =&gt; c : String</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  r <span class="kw">=</span> lookup(<span class="cn">STR_MAP</span>, str)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  r <span class="op">=</span> lookup(<span class="cn">STR_MAP</span>, str)</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> r <span class="cf">unless</span> r<span class="at">.is_a?</span>(<span class="dt">String</span>)</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  parse(<span class="st">&quot;</span><span class="sc">#{</span>c<span class="sc">}#{</span>r<span class="sc">}</span><span class="st">&quot;</span>)</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
@@ -171,12 +171,12 @@ and <code>parse</code> (but not <code>head</code>), it doesn’t have to
 mention <code>HeadError</code> in its return:</p>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  params(<span class="wa">str: </span><span class="dt">String</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  params(<span class="wa">str:</span> <span class="dt">String</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># does need to mention HeadError</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(<span class="dt">Integer</span>, <span class="dt">LookupError</span>, <span class="dt">ParseError</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="dt">Integer</span>, <span class="dt">LookupError</span>, <span class="dt">ParseError</span>))</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dv">self</span><span class="at">.bar</span>(str)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  r <span class="kw">=</span> lookup(<span class="cn">STR_MAP</span>, str)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  r <span class="op">=</span> lookup(<span class="cn">STR_MAP</span>, str)</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> r <span class="cf">unless</span> r<span class="at">.is_a?</span>(<span class="dt">String</span>)</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  parse(r)</span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
@@ -187,7 +187,7 @@ aliases. For example, maybe there are a bunch of methods that all return
 <code>LookupError</code> and <code>ParseError</code>. We can factor that
 out into a type alias:</p>
 <div class="sourceCode" id="cb6"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">MostCommonErrors</span> <span class="kw">=</span> T<span class="at">.type_alias</span> <span class="kw">{</span>T<span class="at">.any</span>(<span class="dt">LookupError</span>, <span class="dt">ParseError</span>)<span class="kw">}</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">MostCommonErrors</span> <span class="op">=</span> <span class="cn">T</span><span class="at">.type_alias</span> <span class="op">{</span><span class="cn">T</span><span class="at">.any</span>(<span class="dt">LookupError</span>, <span class="dt">ParseError</span>)<span class="op">}</span></span></code></pre></div>
 <p>That’s it! Sorbet’s union types in method returns provide a
 low-friction, high value way to model how methods can fail.</p>
 </main>

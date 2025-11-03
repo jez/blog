@@ -72,7 +72,7 @@ suggest the <code>x[y]</code> operation for hashes and arrays (the Ruby
 VM calls this operation <code>aref</code>) might be a problem:</p>
 <!-- more -->
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>xs <span class="kw">=</span> <span class="kw">[</span><span class="dv">123</span><span class="kw">]</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> <span class="kw">[</span><span class="dv">123</span><span class="kw">]</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span> xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span></code></pre></div>
 <p>To isolate for sure whether this was a problem or not, we wrote a
 benchmark. It turns out that we misinterpreted the <code>perf</code>
@@ -104,12 +104,12 @@ href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/
 </table>
 <p>Here’s the full benchmark:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>xs <span class="kw">=</span> T<span class="at">.let</span>(<span class="kw">[</span><span class="dv">123</span><span class="kw">]</span>, T<span class="kw">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>)</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> <span class="cn">T</span><span class="at">.let</span>(<span class="kw">[</span><span class="dv">123</span><span class="kw">]</span>, <span class="cn">T</span><span class="op">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="kw">&lt;</span> <span class="dv">10_000_000</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="op">&lt;</span> <span class="dv">10_000_000</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  i <span class="kw">+=</span> <span class="dv">1</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  i <span class="op">+=</span> <span class="dv">1</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span> xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span></code></pre></div>

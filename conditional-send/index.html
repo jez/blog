@@ -58,7 +58,7 @@ short circuit, because there <em>are</em> methods on <code>nil</code>,
 unlike <code>undefined</code> in JS.</p>
 <p>Let’s dive into an example. You can do this in Ruby:</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="op">&amp;</span><span class="at">.amount</span></span></code></pre></div>
 <p>which calls <code>.amount</code> if <code>invoice</code> is not
 <code>nil</code>, or else evaluates to <code>nil</code> (skipping the
 call). You can do something similar in JavaScript, just with
@@ -72,7 +72,7 @@ else, called <strong>conditional send</strong>.</p>
 <p>There’s a subtle difference, only noticeable in a longer chain:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="op">?.</span><span class="at">amount</span><span class="op">.</span><span class="fu">format</span>()</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount.format</span>()</span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="op">&amp;</span><span class="at">.amount.format</span>()</span></code></pre></div>
 <ul>
 <li><p>The JavaScript version short circuits the entire remaining
 expression. If <code>invoice</code> is falsy, the <code>.format()</code>
@@ -87,7 +87,7 @@ method is not called, and the whole expression evaluates to
 <p>To completely reproduce the JavaScript behavior in Ruby, we need to
 keep chaining the <code>&amp;</code>:</p>
 <div class="sourceCode" id="cb5"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="kw">&amp;</span><span class="at">.amount</span><span class="kw">&amp;</span><span class="at">.format</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>invoice<span class="op">&amp;</span><span class="at">.amount</span><span class="op">&amp;</span><span class="at">.format</span></span></code></pre></div>
 <p>Most Ruby linters will check for this and require programmers to put
 <code>&amp;</code> on all method calls downstream of the first
 conditional send.</p>

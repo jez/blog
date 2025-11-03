@@ -93,7 +93,7 @@ class="sourceCode numberSource ruby numberLines hl-5 hl-9"><code class="sourceCo
 <span id="cb1-9"><a href="#cb1-9"></a>  <span class="fu">include</span> <span class="dt">IChild</span></span>
 <span id="cb1-10"><a href="#cb1-10"></a><span class="cf">end</span></span>
 <span id="cb1-11"><a href="#cb1-11"></a></span>
-<span id="cb1-12"><a href="#cb1-12"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb1-13"><a href="#cb1-13"></a><span class="cf">end</span></span></code></pre></div>
 <p>We can ask Ruby to print out the ancestor hierarchy for the classes
 in this snippet:<span
@@ -152,7 +152,7 @@ class="sourceCode numberSource ruby numberLines hl-5 hl-9 hl-20"><code class="so
 <span id="cb3-2"><a href="#cb3-2"></a><span class="cf">end</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="cf">module</span> <span class="dt">IChild</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a>  <span class="fu">extend</span> <span class="dt">ActiveSupport</span><span class="kw">::</span><span class="dt">Concern</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="fu">extend</span> <span class="dt">ActiveSupport</span><span class="op">::</span><span class="dt">Concern</span></span>
 <span id="cb3-6"><a href="#cb3-6"></a></span>
 <span id="cb3-7"><a href="#cb3-7"></a>  <span class="fu">include</span> <span class="dt">IParent</span></span>
 <span id="cb3-8"><a href="#cb3-8"></a></span>
@@ -169,7 +169,7 @@ class="sourceCode numberSource ruby numberLines hl-5 hl-9 hl-20"><code class="so
 <span id="cb3-19"><a href="#cb3-19"></a></span>
 <span id="cb3-20"><a href="#cb3-20"></a><span class="dt">Parent</span><span class="at">.foo</span> <span class="co"># ✨ magic ✨</span></span>
 <span id="cb3-21"><a href="#cb3-21"></a></span>
-<span id="cb3-22"><a href="#cb3-22"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb3-23"><a href="#cb3-23"></a><span class="cf">end</span></span></code></pre></div>
 <p>In this example, let’s say that <code>IChild</code> wanted to declare
 some singleton class methods on whatever class it was eventually
@@ -196,7 +196,7 @@ to define the singleton class methods, but rather
 <code>IParent</code>?</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode numberSource ruby numberLines hl-2 hl-4 hl-17"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a>  <span class="fu">extend</span> <span class="dt">ActiveSupport</span><span class="kw">::</span><span class="dt">Concern</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="fu">extend</span> <span class="dt">ActiveSupport</span><span class="op">::</span><span class="dt">Concern</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a></span>
 <span id="cb4-4"><a href="#cb4-4"></a>  <span class="cf">module</span> <span class="dt">ClassMethods</span></span>
 <span id="cb4-5"><a href="#cb4-5"></a>    <span class="cf">def</span> bar; <span class="cf">end</span></span>
@@ -213,7 +213,7 @@ class="sourceCode numberSource ruby numberLines hl-2 hl-4 hl-17"><code class="so
 <span id="cb4-16"><a href="#cb4-16"></a></span>
 <span id="cb4-17"><a href="#cb4-17"></a><span class="dt">Parent</span><span class="at">.bar</span> <span class="co"># dang 😰</span></span>
 <span id="cb4-18"><a href="#cb4-18"></a></span>
-<span id="cb4-19"><a href="#cb4-19"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb4-20"><a href="#cb4-20"></a><span class="cf">end</span></span></code></pre></div>
 <p>Suddenly this doesn’t work: the <code>ClassMethods</code> module gets
 <code>extend</code>ed at the point where the
@@ -237,7 +237,7 @@ as a <code>Concern</code> too (even if it doesn’t have any
 <p>It’s a single-line change:</p>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode numberSource ruby numberLines hl-10 hl-19"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">module</span> <span class="dt">IParent</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a>  <span class="fu">extend</span> <span class="dt">ActiveSupport</span><span class="kw">::</span><span class="dt">Concern</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>  <span class="fu">extend</span> <span class="dt">ActiveSupport</span><span class="op">::</span><span class="dt">Concern</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a></span>
 <span id="cb5-4"><a href="#cb5-4"></a>  <span class="cf">module</span> <span class="dt">ClassMethods</span></span>
 <span id="cb5-5"><a href="#cb5-5"></a>    <span class="cf">def</span> bar; <span class="cf">end</span></span>
@@ -245,7 +245,7 @@ class="sourceCode numberSource ruby numberLines hl-10 hl-19"><code class="source
 <span id="cb5-7"><a href="#cb5-7"></a><span class="cf">end</span></span>
 <span id="cb5-8"><a href="#cb5-8"></a></span>
 <span id="cb5-9"><a href="#cb5-9"></a><span class="cf">module</span> <span class="dt">IChild</span></span>
-<span id="cb5-10"><a href="#cb5-10"></a>  <span class="fu">extend</span> <span class="dt">ActiveSupport</span><span class="kw">::</span><span class="dt">Concern</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a>  <span class="fu">extend</span> <span class="dt">ActiveSupport</span><span class="op">::</span><span class="dt">Concern</span></span>
 <span id="cb5-11"><a href="#cb5-11"></a></span>
 <span id="cb5-12"><a href="#cb5-12"></a>  <span class="fu">include</span> <span class="dt">IParent</span></span>
 <span id="cb5-13"><a href="#cb5-13"></a><span class="cf">end</span></span>
@@ -256,7 +256,7 @@ class="sourceCode numberSource ruby numberLines hl-10 hl-19"><code class="source
 <span id="cb5-18"><a href="#cb5-18"></a></span>
 <span id="cb5-19"><a href="#cb5-19"></a><span class="dt">Parent</span><span class="at">.bar</span> <span class="co"># ✨ magic restored ✨</span></span>
 <span id="cb5-20"><a href="#cb5-20"></a></span>
-<span id="cb5-21"><a href="#cb5-21"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb5-22"><a href="#cb5-22"></a><span class="cf">end</span></span></code></pre></div>
 <p>And when we look at the picture:</p>
 <p><img src="/assets/img/light/concern-4.png"
@@ -355,18 +355,18 @@ Click to show code
 class="sourceCode ruby wide"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;active_support/concern&#39;</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> interesting_ancestors(mod)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  non_self_ancestors <span class="kw">=</span> mod<span class="at">.ancestors</span><span class="kw">[</span><span class="dv">1</span><span class="kw">..]</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  interesting <span class="kw">=</span> non_self_ancestors<span class="at">.filter</span> <span class="cf">do</span> <span class="kw">|</span>ancestor<span class="kw">|</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    !<span class="kw">[</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  non_self_ancestors <span class="op">=</span> mod<span class="at">.ancestors</span><span class="kw">[</span><span class="dv">1</span><span class="op">..</span><span class="kw">]</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  interesting <span class="op">=</span> non_self_ancestors<span class="at">.filter</span> <span class="cf">do</span> <span class="op">|</span>ancestor<span class="op">|</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">!</span><span class="kw">[</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Class</span>, <span class="dt">Module</span>, <span class="dt">Object</span>, <span class="dt">Kernel</span>, <span class="dt">BasicObject</span>,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">ActiveSupport</span><span class="kw">::</span><span class="dt">Concern</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">ActiveSupport</span><span class="op">::</span><span class="dt">Concern</span>,</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">Object</span><span class="at">.singleton_class</span>, <span class="dt">BasicObject</span><span class="at">.singleton_class</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">]</span><span class="at">.include?</span>(ancestor)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span><span class="at">.map</span>(<span class="kw">&amp;</span><span class="wa">:to_s</span>)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> interesting<span class="at">.size</span> !<span class="kw">=</span> non_self_ancestors<span class="at">.size</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    interesting <span class="kw">&lt;&lt;</span> <span class="st">&quot;...&quot;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span><span class="at">.map</span>(<span class="op">&amp;</span><span class="wa">:to_s</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> interesting<span class="at">.size</span> <span class="op">!=</span> non_self_ancestors<span class="at">.size</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    interesting <span class="op">&lt;&lt;</span> <span class="st">&quot;...&quot;</span></span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  pretty_mod <span class="kw">=</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  pretty_mod <span class="op">=</span></span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> mod<span class="at">.singleton_class?</span></span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;</span><span class="sc">#{</span>mod<span class="sc">}</span><span class="st">&quot;</span></span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
@@ -375,16 +375,16 @@ class="sourceCode ruby wide"><code class="sourceCode ruby"><span id="cb6-1"><a h
 <span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span>(<span class="st">&quot;ancestors of </span><span class="sc">#{</span>pretty_mod<span class="sc">}</span><span class="st"> = [</span><span class="sc">#{</span>interesting<span class="at">.join</span>(<span class="st">&quot;, &quot;</span>)<span class="sc">}</span><span class="st">]&quot;</span>)</span>
 <span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> all_interesting_ancestors(<span class="kw">*</span>mods)</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  first <span class="kw">=</span> <span class="dv">true</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  mods<span class="at">.each</span> <span class="cf">do</span> <span class="kw">|</span>mod<span class="kw">|</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> all_interesting_ancestors(<span class="op">*</span>mods)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  first <span class="op">=</span> <span class="dv">true</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  mods<span class="at">.each</span> <span class="cf">do</span> <span class="op">|</span>mod<span class="op">|</span></span>
 <span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">unless</span> first</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">puts</span>(<span class="vs">&#39;─&#39;</span> <span class="kw">*</span> <span class="dv">72</span>)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">puts</span>(<span class="vs">&#39;─&#39;</span> <span class="op">*</span> <span class="dv">72</span>)</span>
 <span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
 <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    interesting_ancestors(mod)</span>
 <span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    interesting_ancestors(mod<span class="at">.singleton_class</span>)</span>
 <span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    first <span class="kw">=</span> <span class="dv">false</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    first <span class="op">=</span> <span class="dv">false</span></span>
 <span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>It’s not particularly pretty, but it works for the four snippets in

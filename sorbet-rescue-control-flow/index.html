@@ -67,11 +67,11 @@
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode numberSource ruby numberLines hl-11 hl-12"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">def</span> example</span>
 <span id="cb1-2"><a href="#cb1-2"></a>  <span class="cf">begin</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a>    loop_count <span class="kw">=</span> <span class="dv">0</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>    loop_count <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb1-4"><a href="#cb1-4"></a></span>
 <span id="cb1-5"><a href="#cb1-5"></a>    <span class="cf">while</span> <span class="dv">true</span></span>
 <span id="cb1-6"><a href="#cb1-6"></a>      <span class="fu">sleep</span>(<span class="dv">1</span>)</span>
-<span id="cb1-7"><a href="#cb1-7"></a>      loop_count <span class="kw">+=</span> <span class="dv">1</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>      loop_count <span class="op">+=</span> <span class="dv">1</span></span>
 <span id="cb1-8"><a href="#cb1-8"></a>    <span class="cf">end</span></span>
 <span id="cb1-9"><a href="#cb1-9"></a>  <span class="cf">rescue</span> <span class="dt">Interrupt</span></span>
 <span id="cb1-10"><a href="#cb1-10"></a>    <span class="cf">if</span> loop_count</span>
@@ -264,7 +264,7 @@ to happen? Well for starters, the original approach had an even more
 insidious bug. Consider this example:</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">begin</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span> might_raise()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  x <span class="op">=</span> might_raise()</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">rescue</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Sorbet would assume `x` was always set</span></span>

@@ -67,8 +67,8 @@ was:</p>
 <p>I want to create some config classes that can inherit from each
 other. For example:</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">BaseConfig</span>; <span class="kw">...</span>; <span class="cf">end</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">SpecialConfig</span> <span class="kw">&lt;</span> <span class="dt">BaseConfig</span>; <span class="kw">...</span>; <span class="cf">end</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">BaseConfig</span>; <span class="op">...</span>; <span class="cf">end</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">SpecialConfig</span> <span class="op">&lt;</span> <span class="dt">BaseConfig</span>; <span class="op">...</span>; <span class="cf">end</span></span></code></pre></div>
 <code>SpecialConfig</code> could override some behaviors, etc. Since
 there’s no point creating multiple instances of the same config class,
 I’m thinking about using Ruby’s <code>singleton</code> module to enforce
@@ -107,22 +107,21 @@ singletons be subclassed, we don’t really have a singleton anymore:</p>
 <figure class="left-align-caption">
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span> <span class="vs">&#39;singleton&#39;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Sig</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extend</span> <span class="cn">T</span><span class="op">::</span><span class="dt">Sig</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ParentSingleton</span>; <span class="fu">include</span> <span class="dt">Singleton</span>; <span class="cf">end</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ChildSingleton</span> <span class="kw">&lt;</span> <span class="dt">ParentSingleton</span>; <span class="cf">end</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ChildSingleton</span> <span class="op">&lt;</span> <span class="dt">ParentSingleton</span>; <span class="cf">end</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span>params(<span class="wa">x: </span><span class="dt">ParentSingleton</span>)<span class="at">.returns</span>(<span class="dt">TrueClass</span>)<span class="kw">}</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>sig <span class="op">{</span>params(<span class="wa">x:</span> <span class="dt">ParentSingleton</span>)<span class="at">.returns</span>(<span class="dt">TrueClass</span>)<span class="op">}</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> takes_parent_singleton(x)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> x <span class="kw">==</span> <span class="dt">ParentSingleton</span><span class="at">.instance</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> x <span class="op">==</span> <span class="dt">ParentSingleton</span><span class="at">.instance</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">true</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    T<span class="at">.absurd</span>(x)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="cn">T</span><span class="at">.absurd</span>(x)</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
-<a
-href="https://sorbet.run/#%23%20typed%3A%20true%0Arequire%20&#39;singleton&#39;%0Aextend%20T%3A%3ASig%0Aclass%20ParentSingleton%3B%20include%20Singleton%3B%20end%0Aclass%20ChildSingleton%20%3C%20ParentSingleton%3B%20end%0A%0Asig%20%7Bparams(x%3A%20ParentSingleton).returns(TrueClass)%7D%0Adef%20takes_parent_singleton(x)%0A%20%20if%20x%20%3D%3D%20ParentSingleton.instance%0A%20%20%20%20true%0A%20%20else%0A%20%20%20%20T.absurd(x)%0A%20%20end%0Aend">→
-View on sorbet.run</a>
+[→ View on
+sorbet.run](https://sorbet.run/#%23%20typed%3A%20true%0Arequire%20’singleton’%0Aextend%20T%3A%3ASig%0Aclass%20ParentSingleton%3B%20include%20Singleton%3B%20end%0Aclass%20ChildSingleton%20%3C%20ParentSingleton%3B%20end%0A%0Asig%20%7Bparams(x%3A%20ParentSingleton).returns(TrueClass)%7D%0Adef%20takes_parent_singleton(x)%0A%20%20if%20x%20%3D%3D%20ParentSingleton.instance%0A%20%20%20%20true%0A%20%20else%0A%20%20%20%20T.absurd(x)%0A%20%20end%0Aend)
 </figcaption>
 </figure>
 <p>In this snippet, we’ve set up a parent / child relationship between
@@ -182,11 +181,11 @@ by only one value:</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ParentSingleton</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="dt">Singleton</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Helpers</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extend</span> <span class="cn">T</span><span class="op">::</span><span class="dt">Helpers</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  final! <span class="co"># &lt;- declare that this class can&#39;t be subclassed</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ChildSingleton</span> <span class="kw">&lt;</span> <span class="dt">ParentSingleton</span>; <span class="cf">end</span> <span class="co"># static error!</span></span></code></pre></div>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">ChildSingleton</span> <span class="op">&lt;</span> <span class="dt">ParentSingleton</span>; <span class="cf">end</span> <span class="co"># static error!</span></span></code></pre></div>
 <figcaption>
 <a
 href="https://sorbet.run/#%23%20typed%3A%20true%0A%0Aclass%20ParentSingleton%0A%20%20include%20Singleton%0A%20%20extend%20T%3A%3AHelpers%0A%20%20final!%20%23%20%3C-%20declare%20that%20this%20class%20can&#39;t%20be%20subclassed%0Aend%0A%0Aclass%20ChildSingleton%20%3C%20ParentSingleton%3B%20end%20%23%20static%20error!">→

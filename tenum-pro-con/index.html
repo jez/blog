@@ -94,10 +94,10 @@ the symbol literal <code>:left</code> or <code>:right</code>, but no
 other <code>Symbol</code>s much less other types of values. The closest
 that Sorbet has to this right now is typed enums:</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">LeftOrRight</span> <span class="kw">&lt;</span> T<span class="kw">::</span><span class="dt">Enum</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">LeftOrRight</span> <span class="op">&lt;</span> <span class="cn">T</span><span class="op">::</span><span class="dt">Enum</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  enums <span class="cf">do</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> <span class="kw">=</span> new</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> <span class="kw">=</span> new</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Left</span> <span class="op">=</span> new</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Right</span> <span class="op">=</span> new</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>TypeScript, Flow, and Mypy all have literal types. You probably have
@@ -108,7 +108,7 @@ nice. But I’ll do it anyways, just to prove that I hear you.</p>
 <h2 id="tenum-is-verbose.">👎 <code>T::Enum</code> is verbose.</h2>
 <p>Even if you wanted to pre-declare the enum type. Consider:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">LeftOrRight</span> <span class="kw">=</span> T<span class="at">.type_alias</span> <span class="kw">{</span>T<span class="at">.any</span>(<span class="wa">:left</span>, <span class="wa">:right</span>)<span class="kw">}</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">LeftOrRight</span> <span class="op">=</span> <span class="cn">T</span><span class="at">.type_alias</span> <span class="op">{</span><span class="cn">T</span><span class="at">.any</span>(<span class="wa">:left</span>, <span class="wa">:right</span>)<span class="op">}</span></span></code></pre></div>
 <p>Boom. One line, no boilerplate. Wouldn’t that be nice?</p>
 <h2 id="its-hard-to-have-one-tenum-be-a-subset-of-another.">👎 It’s hard
 to have one <code>T::Enum</code> be a subset of another.</h2>
@@ -149,10 +149,10 @@ intentional.</h2>
 interpolate strings into other strings that hold meaning. I’d much
 rather deal with this:</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>direction <span class="kw">=</span> <span class="kw">[</span>left_or_right, up_or_down<span class="kw">]</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>direction <span class="op">=</span> <span class="kw">[</span>left_or_right, up_or_down<span class="kw">]</span></span></code></pre></div>
 <p>than this:</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>direction <span class="kw">=</span> <span class="st">&quot;</span><span class="sc">#{</span>left_or_right<span class="sc">}</span><span class="st">__</span><span class="sc">#{</span>up_or_down<span class="sc">}</span><span class="st">&quot;</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>direction <span class="op">=</span> <span class="st">&quot;</span><span class="sc">#{</span>left_or_right<span class="sc">}</span><span class="st">__</span><span class="sc">#{</span>up_or_down<span class="sc">}</span><span class="st">&quot;</span></span></code></pre></div>
 <p>If you try to do this with <code>T::Enum</code> you get strings that
 look like:</p>
 <div class="sourceCode" id="cb5"><pre
@@ -162,7 +162,7 @@ to do, which is a perfect opportunity to talk them down from that cliff.
 If people decide that yes, this really is the API we need, we can be
 intentional about it with <code>.serialize</code>:</p>
 <div class="sourceCode" id="cb6"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>direction <span class="kw">=</span> <span class="st">&quot;</span><span class="sc">#{</span>left_or_right<span class="at">.serialize</span><span class="sc">}</span><span class="st">__</span><span class="sc">#{</span>up_or_down<span class="at">.serialize</span><span class="sc">}</span><span class="st">&quot;</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>direction <span class="op">=</span> <span class="st">&quot;</span><span class="sc">#{</span>left_or_right<span class="at">.serialize</span><span class="sc">}</span><span class="st">__</span><span class="sc">#{</span>up_or_down<span class="at">.serialize</span><span class="sc">}</span><span class="st">&quot;</span></span></code></pre></div>
 <h2 id="its-easy-to-search-for.">🕵️ It’s easy to search for.</h2>
 <p>This is a small one, but I’ll mention it anyways. It’s quick to
 search the Sorbet docs for <code>T::Enum</code> and get to the right

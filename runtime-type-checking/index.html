@@ -106,7 +106,7 @@ in a shim method that asserts arguments and return values have the
 stated values on each call:</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode numberSource ruby numberLines hl-2 hl-10 hl-12"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Given a `sig` like this:</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a>sig <span class="kw">{</span>params(<span class="wa">x: </span><span class="dt">Integer</span>)<span class="at">.returns</span>(<span class="dt">String</span>)<span class="kw">}</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>sig <span class="op">{</span>params(<span class="wa">x:</span> <span class="dt">Integer</span>)<span class="at">.returns</span>(<span class="dt">String</span>)<span class="op">}</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="cf">def</span> integer_to_string(x)</span>
 <span id="cb1-4"><a href="#cb1-4"></a>  x<span class="at">.to_s</span></span>
 <span id="cb1-5"><a href="#cb1-5"></a><span class="cf">end</span></span>
@@ -115,7 +115,7 @@ class="sourceCode numberSource ruby numberLines hl-2 hl-10 hl-12"><code class="s
 <span id="cb1-8"><a href="#cb1-8"></a><span class="co"># making the method behave like this:</span></span>
 <span id="cb1-9"><a href="#cb1-9"></a><span class="cf">def</span> integer_to_string(x)</span>
 <span id="cb1-10"><a href="#cb1-10"></a>  <span class="fu">raise</span> <span class="dt">TypeError</span><span class="at">.new</span>(<span class="st">&quot;Wrong type&quot;</span>) <span class="cf">unless</span> x<span class="at">.is_a?</span>(<span class="dt">Integer</span>)</span>
-<span id="cb1-11"><a href="#cb1-11"></a>  result <span class="kw">=</span> x<span class="at">.to_s</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a>  result <span class="op">=</span> x<span class="at">.to_s</span></span>
 <span id="cb1-12"><a href="#cb1-12"></a>  <span class="fu">raise</span> <span class="dt">TypeError</span><span class="at">.new</span>(<span class="st">&quot;Wrong type&quot;</span>) <span class="cf">unless</span> result<span class="at">.is_a?</span>(<span class="dt">String</span>)</span>
 <span id="cb1-13"><a href="#cb1-13"></a>  result</span>
 <span id="cb1-14"><a href="#cb1-14"></a><span class="cf">end</span></span></code></pre></div>
@@ -156,7 +156,7 @@ risky, even small ones like adding this <code>if</code> condition and
 print statement:</p>
 <figure class="left-align-caption">
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode numberSource ruby numberLines hl-3 hl-4 hl-5"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="kw">{</span>params(<span class="wa">params: </span><span class="dt">Params</span>, <span class="wa">merchant: </span><span class="dt">Merchant</span>)<span class="at">.void</span><span class="kw">}</span></span>
+class="sourceCode numberSource ruby numberLines hl-3 hl-4 hl-5"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="op">{</span>params(<span class="wa">params:</span> <span class="dt">Params</span>, <span class="wa">merchant:</span> <span class="dt">Merchant</span>)<span class="at">.void</span><span class="op">}</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="cf">def</span> handle_request(params, merchant)</span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="cf">if</span> params<span class="at">.something_unlikely?</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a>    <span class="fu">puts</span>(<span class="st">&quot;Processing unlikely request for merchant=</span><span class="sc">#{</span>merchant<span class="at">.id</span><span class="sc">}</span><span class="st">&quot;</span>)</span>
@@ -300,9 +300,9 @@ checking</h2>
 <p>Sorbet flags dead code statically. For example:</p>
 <figure class="left-align-caption">
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode numberSource ruby numberLines hl-4 hl-5"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a>sig <span class="kw">{</span>params(<span class="wa">x: </span><span class="dt">Integer</span>)<span class="at">.void</span><span class="kw">}</span></span>
+class="sourceCode numberSource ruby numberLines hl-4 hl-5"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a>sig <span class="op">{</span>params(<span class="wa">x:</span> <span class="dt">Integer</span>)<span class="at">.void</span><span class="op">}</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="cf">def</span> example(x)</span>
-<span id="cb3-3"><a href="#cb3-3"></a>  <span class="cf">if</span><span class="kw"> !</span>x<span class="at">.is_a?</span>(<span class="dt">Integer</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="cf">if</span> <span class="op">!</span>x<span class="at">.is_a?</span>(<span class="dt">Integer</span>)</span>
 <span id="cb3-4"><a href="#cb3-4"></a>    <span class="fu">puts</span>(x)</span>
 <span id="cb3-5"><a href="#cb3-5"></a>  <span class="co"># ^^^^^^^ error: This code is unreachable</span></span>
 <span id="cb3-6"><a href="#cb3-6"></a>  <span class="cf">end</span></span>

@@ -194,7 +194,7 @@ data-emoji="slightly_smiling_face">🙂</span><br />
 </span></span> to improve the message for certain syntax errors.
 Specifically, it’ll try to show error messages in cases like this:</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode numberSource ruby numberLines hl-4 hl-8"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> A</span>
+class="sourceCode numberSource ruby numberLines hl-4 hl-8"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>  <span class="cf">def</span> foo</span>
 <span id="cb1-3"><a href="#cb1-3"></a>    <span class="co"># ... lots of code ...</span></span>
 <span id="cb1-4"><a href="#cb1-4"></a>  <span class="co"># ← dead_end error: missing `end` keyword</span></span>
@@ -236,7 +236,7 @@ For example:</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">def</span> foo</span>
 <span id="cb2-2"><a href="#cb2-2"></a>  <span class="co"># ... code before ...</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a>  <span class="cf">if</span> arbitrary_expression()<span class="kw">.</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>  <span class="cf">if</span> arbitrary_expression()<span class="at">.</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a>  <span class="co"># ... code after ...</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a><span class="cf">end</span></span></code></pre></div>
 <p><code>dead_end</code> could point to line 3 as the problem, but then

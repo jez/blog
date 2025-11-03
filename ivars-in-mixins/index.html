@@ -83,11 +83,11 @@ different kinds of users:</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode numberSource ruby numberLines hl-14"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> <span class="dt">User</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>  <span class="cf">def</span> initialize(user_id)</span>
-<span id="cb1-3"><a href="#cb1-3"></a>    <span class="ot">@user_id</span> <span class="kw">=</span> user_id</span>
+<span id="cb1-3"><a href="#cb1-3"></a>    <span class="ot">@user_id</span> <span class="op">=</span> user_id</span>
 <span id="cb1-4"><a href="#cb1-4"></a>  <span class="cf">end</span></span>
 <span id="cb1-5"><a href="#cb1-5"></a><span class="cf">end</span></span>
 <span id="cb1-6"><a href="#cb1-6"></a></span>
-<span id="cb1-7"><a href="#cb1-7"></a><span class="cf">class</span> <span class="dt">RegularUser</span> <span class="kw">&lt;</span> <span class="dt">User</span>; <span class="cf">end</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="cf">class</span> <span class="dt">RegularUser</span> <span class="op">&lt;</span> <span class="dt">User</span>; <span class="cf">end</span></span>
 <span id="cb1-8"><a href="#cb1-8"></a><span class="cf">class</span> <span class="dt">AdminUser</span></span>
 <span id="cb1-9"><a href="#cb1-9"></a>  <span class="fu">include</span> <span class="dt">Auditable</span></span>
 <span id="cb1-10"><a href="#cb1-10"></a><span class="cf">end</span></span>
@@ -124,10 +124,10 @@ present every time we include the module somewhere.</p>
 <figure class="left-align-caption">
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode numberSource ruby numberLines hl-5 hl-6 hl-9 hl-16"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">module</span> <span class="dt">Auditable</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>  <span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Helpers</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>  <span class="fu">extend</span> <span class="cn">T</span><span class="op">::</span><span class="dt">Helpers</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a>  abstract!</span>
 <span id="cb2-4"><a href="#cb2-4"></a></span>
-<span id="cb2-5"><a href="#cb2-5"></a>  sig <span class="kw">{</span> abstract<span class="at">.returns</span>(<span class="dt">UserID</span>) <span class="kw">}</span>  <span class="co"># (1)</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>  sig <span class="op">{</span> abstract<span class="at">.returns</span>(<span class="dt">UserID</span>) <span class="op">}</span>  <span class="co"># (1)</span></span>
 <span id="cb2-6"><a href="#cb2-6"></a>  <span class="at">private</span> <span class="cf">def</span> user_id; <span class="cf">end</span></span>
 <span id="cb2-7"><a href="#cb2-7"></a></span>
 <span id="cb2-8"><a href="#cb2-8"></a>  <span class="cf">def</span> with_audit_log(action)</span>
@@ -171,10 +171,10 @@ instance variable’s type with T.let</h2>
 <p>Something like this can be tempting:</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">Auditable</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span> returns(<span class="dt">UserID</span>) <span class="kw">}</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  sig <span class="op">{</span> returns(<span class="dt">UserID</span>) <span class="op">}</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">private</span> <span class="cf">def</span> user_id</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@user_id</span> <span class="kw">||=</span> T<span class="at">.let</span>(<span class="ot">@user_id</span>, T<span class="at">.nilable</span>(<span class="dt">UserID</span>))</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    T<span class="at">.must</span>(<span class="ot">@user_id</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="ot">@user_id</span> <span class="op">||=</span> <span class="cn">T</span><span class="at">.let</span>(<span class="ot">@user_id</span>, <span class="cn">T</span><span class="at">.nilable</span>(<span class="dt">UserID</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cn">T</span><span class="at">.must</span>(<span class="ot">@user_id</span>)</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> with_audit_log(action)</span>
@@ -216,9 +216,9 @@ What about “self-contained” instance variables?</h1>
 purpose of caching some sort of state, there should be no problem. Just
 use <code>||=</code> like normal:</p>
 <div class="sourceCode" id="cb5"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sig <span class="kw">{</span> returns(<span class="dt">Integer</span>) <span class="kw">}</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sig <span class="op">{</span> returns(<span class="dt">Integer</span>) <span class="op">}</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="ot">@foo</span> <span class="kw">||=</span> T<span class="at">.let</span>(compute_foo, T<span class="at">.nilable</span>(<span class="dt">Integer</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="ot">@foo</span> <span class="op">||=</span> <span class="cn">T</span><span class="at">.let</span>(compute_foo, <span class="cn">T</span><span class="at">.nilable</span>(<span class="dt">Integer</span>))</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>(Things only get problematic when a module expects an instance
 variable to have already been set outside of its own logic.)</p>

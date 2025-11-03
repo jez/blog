@@ -185,10 +185,10 @@ only works if the method receiver (<code>xs</code> in this case) is
 <p>In other words, it’s easy to defeat this optimization by subclassing
 <code>Array</code>:</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">MyArray</span> <span class="kw">&lt;</span> <span class="dt">Array</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">MyArray</span> <span class="op">&lt;</span> <span class="dt">Array</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>xs <span class="kw">=</span> <span class="dt">MyArray</span><span class="at">.new</span>(<span class="kw">[</span><span class="dv">2</span><span class="kw">]</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> <span class="dt">MyArray</span><span class="at">.new</span>(<span class="kw">[</span><span class="dv">2</span><span class="kw">]</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span></code></pre></div>
 <p>In this case, since <code>xs</code> is not exactly <code>Array</code>
 or <code>Hash</code> anymore, the optimization won’t apply, and <a

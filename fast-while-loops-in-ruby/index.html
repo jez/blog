@@ -87,9 +87,9 @@ speed up not only heavily typed code but also certain kinds of untyped
 code. One of the snippets we had compared was this <code>while</code>
 loop:</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="kw">&lt;</span> <span class="dv">10_000_000</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  i <span class="kw">+=</span> <span class="dv">1</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="op">&lt;</span> <span class="dv">10_000_000</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  i <span class="op">+=</span> <span class="dv">1</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>which showed these timings:</p>
 <table style="width:71%;">
@@ -245,7 +245,7 @@ class="sourceCode gnuassembler tight-code"><code class="sourceCode gnuassembler"
 <span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="fu">9b9:</span>    <span class="cf">je</span>     <span class="dv">960</span> <span class="op">&lt;</span>func_Object<span class="co">#jez+0xa0&gt;    # ─┘ jump to slow path `+` if not int</span></span>
 <span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>                                             <span class="co"># ─┐ i += 1          (fast path)</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="fu">9bb:</span>    add    <span class="dv">$0</span>x2<span class="op">,%</span><span class="kw">rbp</span>                     <span class="co">#  │ (LSB of Ruby ints are always 1,</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="fu">9bb:</span>    <span class="kw">add</span>    <span class="dv">$0</span>x2<span class="op">,%</span><span class="kw">rbp</span>                     <span class="co">#  │ (LSB of Ruby ints are always 1,</span></span>
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>                                             <span class="co"># ─┘  thus adding 0x2 adds 1)</span></span>
 <span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="fu">9bf:</span>    <span class="cf">jno</span>    <span class="dv">97</span>f <span class="op">&lt;</span>func_Object<span class="co">#jez+0xbf&gt;    # ─┐</span></span>

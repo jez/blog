@@ -144,24 +144,24 @@ class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ru
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="at">private</span> <span class="wa">:x</span>, <span class="wa">:x=</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a></span>
 <span id="cb2-5"><a href="#cb2-5"></a>  <span class="cf">def</span> initialize(x)</span>
-<span id="cb2-6"><a href="#cb2-6"></a>    <span class="dv">self</span><span class="at">.x</span> <span class="kw">=</span> x</span>
+<span id="cb2-6"><a href="#cb2-6"></a>    <span class="dv">self</span><span class="at">.x</span> <span class="op">=</span> x</span>
 <span id="cb2-7"><a href="#cb2-7"></a>    <span class="co">#    └── (1) allowed ✅</span></span>
 <span id="cb2-8"><a href="#cb2-8"></a>  <span class="cf">end</span></span>
 <span id="cb2-9"><a href="#cb2-9"></a></span>
-<span id="cb2-10"><a href="#cb2-10"></a>  <span class="cf">def</span> <span class="kw">==</span>(other)</span>
-<span id="cb2-11"><a href="#cb2-11"></a>    <span class="dv">self</span><span class="at">.x</span> <span class="kw">==</span> other<span class="at">.x</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>  <span class="cf">def</span> <span class="op">==</span>(other)</span>
+<span id="cb2-11"><a href="#cb2-11"></a>    <span class="dv">self</span><span class="at">.x</span> <span class="op">==</span> other<span class="at">.x</span></span>
 <span id="cb2-12"><a href="#cb2-12"></a>    <span class="co">#    │         └── (2) not allowed ⛔️</span></span>
 <span id="cb2-13"><a href="#cb2-13"></a>    <span class="co">#    └── (1) allowed ✅</span></span>
 <span id="cb2-14"><a href="#cb2-14"></a>  <span class="cf">end</span></span>
 <span id="cb2-15"><a href="#cb2-15"></a><span class="cf">end</span></span>
 <span id="cb2-16"><a href="#cb2-16"></a></span>
-<span id="cb2-17"><a href="#cb2-17"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb2-18"><a href="#cb2-18"></a>  <span class="cf">def</span> example</span>
 <span id="cb2-19"><a href="#cb2-19"></a>    <span class="dv">self</span><span class="at">.x</span> <span class="co"># (3) allowed ✅</span></span>
 <span id="cb2-20"><a href="#cb2-20"></a>  <span class="cf">end</span></span>
 <span id="cb2-21"><a href="#cb2-21"></a><span class="cf">end</span></span>
 <span id="cb2-22"><a href="#cb2-22"></a></span>
-<span id="cb2-23"><a href="#cb2-23"></a>parent <span class="kw">=</span> <span class="dt">Parent</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
+<span id="cb2-23"><a href="#cb2-23"></a>parent <span class="op">=</span> <span class="dt">Parent</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
 <span id="cb2-24"><a href="#cb2-24"></a>parent<span class="at">.x</span> <span class="co"># (4) not allowed ⛔️</span></span></code></pre></div>
 <p>Here’s what Ruby’s <code>private</code> keyword allows:</p>
 <ol type="1">
@@ -220,7 +220,7 @@ class="marginnote">The receiver is the <code>x</code> in
 </span></span> That syntactic restriction means that things like this
 are not allowed:</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">private</span> <span class="cf">def</span> foo; <span class="cf">end</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -270,26 +270,26 @@ methods!</p>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode numberSource ruby numberLines hl-3"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1"></a><span class="cf">class</span> <span class="dt">Parent</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>  <span class="cf">def</span> initialize(x)</span>
-<span id="cb5-3"><a href="#cb5-3"></a>    <span class="ot">@x</span> <span class="kw">=</span> x</span>
+<span id="cb5-3"><a href="#cb5-3"></a>    <span class="ot">@x</span> <span class="op">=</span> x</span>
 <span id="cb5-4"><a href="#cb5-4"></a>    <span class="co">#└── &quot;declares&quot; an instance variable</span></span>
 <span id="cb5-5"><a href="#cb5-5"></a>    <span class="co">#    (automatically private)</span></span>
 <span id="cb5-6"><a href="#cb5-6"></a>  <span class="cf">end</span></span>
 <span id="cb5-7"><a href="#cb5-7"></a></span>
-<span id="cb5-8"><a href="#cb5-8"></a>  <span class="cf">def</span> <span class="kw">==</span>(other)</span>
-<span id="cb5-9"><a href="#cb5-9"></a>    <span class="ot">@x</span> <span class="kw">==</span> other<span class="kw">.</span><span class="ot">@x</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>  <span class="cf">def</span> <span class="op">==</span>(other)</span>
+<span id="cb5-9"><a href="#cb5-9"></a>    <span class="ot">@x</span> <span class="op">==</span> other<span class="at">.</span><span class="ot">@x</span></span>
 <span id="cb5-10"><a href="#cb5-10"></a>    <span class="co">#│           └── (2) syntax error ⛔️</span></span>
 <span id="cb5-11"><a href="#cb5-11"></a>    <span class="co">#└── (1) allowed ✅</span></span>
 <span id="cb5-12"><a href="#cb5-12"></a>  <span class="cf">end</span></span>
 <span id="cb5-13"><a href="#cb5-13"></a><span class="cf">end</span></span>
 <span id="cb5-14"><a href="#cb5-14"></a></span>
-<span id="cb5-15"><a href="#cb5-15"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="op">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb5-16"><a href="#cb5-16"></a>  <span class="cf">def</span> example</span>
 <span id="cb5-17"><a href="#cb5-17"></a>    <span class="ot">@x</span> <span class="co"># (3) allowed ✅</span></span>
 <span id="cb5-18"><a href="#cb5-18"></a>  <span class="cf">end</span></span>
 <span id="cb5-19"><a href="#cb5-19"></a><span class="cf">end</span></span>
 <span id="cb5-20"><a href="#cb5-20"></a></span>
-<span id="cb5-21"><a href="#cb5-21"></a>parent <span class="kw">=</span> <span class="dt">Parent</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
-<span id="cb5-22"><a href="#cb5-22"></a>parent<span class="kw">.</span><span class="ot">@x</span> <span class="co"># (4) syntax error ⛔️</span></span></code></pre></div>
+<span id="cb5-21"><a href="#cb5-21"></a>parent <span class="op">=</span> <span class="dt">Parent</span><span class="at">.new</span>(<span class="dv">0</span>)</span>
+<span id="cb5-22"><a href="#cb5-22"></a>parent<span class="at">.</span><span class="ot">@x</span> <span class="co"># (4) syntax error ⛔️</span></span></code></pre></div>
 <p>So you might next ask, “would it make sense to have ‘public’ instance
 variables?” I can see arguments both ways:</p>
 <h3 id="pros">Pros</h3>
