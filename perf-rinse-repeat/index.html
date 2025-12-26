@@ -95,10 +95,10 @@ at (yet!).</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> returns_nilclass; <span class="dv">nil</span>; <span class="cf">end</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="op">&lt;</span> <span class="dv">10_000_000</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="kw">&lt;</span> <span class="dv">10_000_000</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">self</span><span class="at">.returns_nilclass</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  i <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  i <span class="kw">+=</span> <span class="dv">1</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <figcaption>
 <a
@@ -118,26 +118,26 @@ at benchmarks:</p>
 <col style="width: 14%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">benchmark</th>
 <th style="text-align: right;">interpreted</th>
 <th style="text-align: right;">compiled</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><a
 href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
 <td style="text-align: right;">0.186s</td>
 <td style="text-align: right;">0.067s</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><a
 href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/returns_nilclass/no_sig.rb">returns_nilclass/no_sig.rb</a></td>
 <td style="text-align: right;">0.264s</td>
 <td style="text-align: right;">0.206s</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;">returns_nilclass/no_sig.rb −
 while_10_000_000.rb</td>
 <td style="text-align: right;">0.078s</td>
@@ -302,20 +302,20 @@ again:</p>
 <col style="width: 14%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">benchmark</th>
 <th style="text-align: right;">interpreted</th>
 <th style="text-align: right;">compiled</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;">returns_nilclass/no_sig.rb - baseline,
 before</td>
 <td style="text-align: right;">0.078s</td>
 <td style="text-align: right;">0.139s</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;">returns_nilclass/no_sig.rb - baseline,
 after</td>
 <td style="text-align: right;">0.079s</td>

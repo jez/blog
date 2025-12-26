@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+
+<meta name="dcterms.date" content="2025-12-23 15:46:34 -0500">
+<meta name="description" content="Lower bounds expand the list of ways to create a value of that type. They behave similar to union types in that regard, but they fill a particular niche that only they can fill, relating to subtyping.
+">
+<title>Why have lower bounds on generics? – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+  <script src="/assets/libs/KaTeX/0.11.1/katex.min.js"></script>
+  <script src="/assets/js/enable_katex.js"></script>
+  <link rel="stylesheet" href="/assets/libs/KaTeX/0.11.1/katex.min.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+    <link rel="stylesheet" href="/assets/css/extra.css">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">Why have lower bounds on generics?</h1>
+    <blockquote class="metadata">
+    
+    <p class="date before-toc"><time datetime="2025-12-23 15:46:34 -0500">December 23, 2025</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#lower-bounds-let-you-create"
+  id="toc-lower-bounds-let-you-create">Lower bounds let you
+  create</a></li>
+  <li><a href="#union-types-approximate-lower-bounds"
+  id="toc-union-types-approximate-lower-bounds">Union types approximate
+  lower bounds</a></li>
+  <li><a href="#lower-bounds-have-richer-subtyping"
+  id="toc-lower-bounds-have-richer-subtyping">Lower bounds have richer
+  subtyping</a></li>
+  <li><a href="#lower-bounds-are-common-because-of-fixed"
+  id="toc-lower-bounds-are-common-because-of-fixed">Lower bounds are
+  common because of <code>fixed</code></a></li>
+  <li><a href="#what-about-lower-bounds-on-generic-methods"
+  id="toc-what-about-lower-bounds-on-generic-methods">What about lower
+  bounds on generic methods?</a></li>
+  <li><a href="#references" id="toc-references">References</a></li>
+  </ul>
+</nav>
+
+<main>
+<p>What’s the point of lower bounds on generic types? For a while, I
+took for granted that you may as well have lower bounds if you have
+upper bounds, but that otherwise they’re mostly for academic symmetry,
+not something practical. After looking further, this is the best answer
+I can come up with:</p>
+<ul>
+<li><p>Lower bounds expand the list of <strong>ways to create</strong> a
+value of that type (like how upper bounds expand the list of things to
+do with a value of that type).</p></li>
+<li><p>Lower bounds are similar to <strong>union types</strong> in the
+same way that upper bounds are similar to intersection types. Thus, if a
+language has union+intersection types, it almost doesn’t need bounds at
+all.</p></li>
+<li><p>Lower bounds allow for <strong>richer subtyping
+relationships</strong> than union types, while being more verbose in
+some cases.</p></li>
+</ul>
+<h1 id="lower-bounds-let-you-create">Lower bounds let you create</h1>
+<p>Here’s a generic box that holds values that might be
+uninitialized:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode numberSource ruby numberLines hl-2 hl-11"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> <span class="dt">MaybeUninitBox</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>  <span class="dt">Elem</span> <span class="kw">=</span> type_member <span class="kw">{</span> <span class="kw">{</span><span class="wa">lower: </span><span class="dt">NilClass</span><span class="kw">}</span> <span class="kw">}</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a>  sig <span class="kw">{</span> params(<span class="wa">val: </span><span class="dt">Elem</span>)<span class="at">.void</span> <span class="kw">}</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>  <span class="cf">def</span> initialize(val <span class="kw">=</span> <span class="dv">nil</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="ot">@val</span> <span class="kw">=</span> val</span>
+<span id="cb1-7"><a href="#cb1-7"></a>  <span class="cf">end</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a>  sig <span class="kw">{</span> void <span class="kw">}</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>  <span class="cf">def</span> unset!</span>
+<span id="cb1-11"><a href="#cb1-11"></a>    <span class="ot">@val</span> <span class="kw">=</span> <span class="dv">nil</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a>  <span class="cf">end</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a></span>
+<span id="cb1-14"><a href="#cb1-14"></a>  sig <span class="kw">{</span> returns(<span class="dt">Elem</span>) <span class="kw">}</span></span>
+<span id="cb1-15"><a href="#cb1-15"></a>  <span class="cf">def</span> val <span class="kw">=</span> <span class="ot">@val</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="cf">end</span></span></code></pre></div>
+<p>The lower bound allows implementing the <code>unset!</code> method by
+writing <code>nil</code> into <code>@val</code>. Without the lower
+bound, Sorbet would report an error on line 11, saying that
+<code>NilClass</code> is not a subtype of <code>Elem</code>.</p>
+<p>I’ve written in the past how <a href="/intro-elim/">every type is
+defined by its intro and elim forms</a>, namely that every type is
+defined by how you create values of a certain type (introduction forms),
+and which operations use those values (elimination forms). There’s a
+satisfying duality, and I regret that people over index on defining a
+type’s elim forms, forgetting to think about the intro forms.</p>
+<p>The lower bound on <code>Elem</code> lets the implementation of
+<code>MaybeUninitBox</code> introduce a value of type <code>Elem</code>
+out of thin air. Without the lower bound, there would be no way for the
+implementation to create one if it were not explicitly given one by the
+caller.</p>
+<p><br />
+</p>
+<p><code>MaybeUninitBox</code> as implemented is kind of clunky. The
+fact that the box might be uninitialized leaks through to the element
+type itself: users must declare it nilable:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode numberSource ruby numberLines hl-7"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># What we want to write, but can&#39;t:</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>box <span class="kw">=</span> <span class="dt">MaybeUninitBox</span><span class="kw">[</span><span class="dt">String</span><span class="kw">]</span><span class="at">.new</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#                    ^^^^^^ ⛔️</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># error: `String` is not a supertype of lower bound of `Elem`</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co"># What we have to write instead:</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>box <span class="kw">=</span> <span class="dt">MaybeUninitBox</span><span class="kw">[</span>T<span class="at">.nilable</span>(<span class="dt">String</span>)<span class="kw">]</span><span class="at">.new</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>box<span class="at">.val</span> <span class="co"># =&gt; T.nilable(String)</span></span></code></pre></div>
+<p>The <code>T.nilable(...)</code> on line 7 is redundant from the
+user’s perspective: shouldn’t <code>MaybeUninitBox</code> hide that as
+an implementation detail? We’d like to only say what the box stores when
+it’s initialized.</p>
+<p>This consequence is downstream of the fact that <code>nil</code> is
+not a member of all reference types in Sorbet. In a language like Scala,
+where <code>null</code> is a value of all reference types, things are a
+little cleaner at the call site:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode scala hl-4"><code class="sourceCode scala"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MaybeUninitBox<span class="op">[</span>Elem <span class="op">&gt;:</span> Null<span class="op">](</span><span class="kw">var</span> value<span class="op">:</span> Elem <span class="op">=</span> <span class="kw">null</span><span class="op">):</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> <span class="fu">unset</span><span class="op">():</span> <span class="bu">Unit</span> <span class="op">=</span> value <span class="op">=</span> <span class="kw">null</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> box <span class="op">=</span> MaybeUninitBox<span class="op">[</span><span class="ex">String</span><span class="op">]()</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span><span class="op">(</span>box<span class="op">.</span>value<span class="op">)</span></span></code></pre></div>
+<p>Of course, this terseness comes at the expense of the <a
+href="https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/">billion
+dollar mistake</a>.</p>
+<p>Sorbet can achieve the same terseness using union types, without
+needing to treat <code>nil</code> as a value of every type.</p>
+<h1 id="union-types-approximate-lower-bounds">Union types approximate
+lower bounds</h1>
+<p>The Sorbet docs call out how to <a
+href="https://sorbet.org/docs/generics#placing-bounds-on-generic-methods">achieve
+something similar to upper bounds</a> on generic methods using
+intersection types, despite Sorbet not having syntax for bounds on
+generic methods. It works the other way too: you can approximate lower
+bounds with union types:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode numberSource ruby numberLines hl-2 hl-6 hl-11 hl-18"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a><span class="cf">class</span> <span class="dt">MaybeUninitBox2</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="dt">Elem</span> <span class="kw">=</span> type_member   <span class="co"># ← no bound</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a>  sig <span class="kw">{</span> params(<span class="wa">val: </span>T<span class="at">.nilable</span>(<span class="dt">Elem</span>))<span class="at">.void</span> <span class="kw">}</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="cf">def</span> initialize(val <span class="kw">=</span> <span class="dv">nil</span>)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>    <span class="ot">@val</span> <span class="kw">=</span> val</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="cf">end</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a></span>
+<span id="cb4-9"><a href="#cb4-9"></a>  sig <span class="kw">{</span> void <span class="kw">}</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a>  <span class="cf">def</span> unset!</span>
+<span id="cb4-11"><a href="#cb4-11"></a>    <span class="ot">@val</span> <span class="kw">=</span> <span class="dv">nil</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a>  <span class="cf">end</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a></span>
+<span id="cb4-14"><a href="#cb4-14"></a>  sig <span class="kw">{</span> returns(T<span class="at">.nilable</span>(<span class="dt">Elem</span>)) <span class="kw">}</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>  <span class="cf">def</span> val <span class="kw">=</span> <span class="ot">@val</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="cf">end</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a></span>
+<span id="cb4-18"><a href="#cb4-18"></a>box <span class="kw">=</span> <span class="dt">MaybeUninitBox2</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span><span class="at">.new</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#                     ^^^^^^^ ✅</span></span></code></pre></div>
+<p>In this example, there are no bounds on <code>Elem</code>, and the
+(inferred) type of <code>@val</code> is <code>T.nilable(Elem)</code> (or
+explicitly: <code>T.any(NilClass, Elem)</code>, a union type). The
+implementation can still store <code>nil</code> into <code>@val</code>
+directly in the <code>unset!</code> method, like when we were using a
+lower bound. But unlike before, the constructor call omits the
+<code>T.nilable(...)</code> when providing the element typ.</p>
+<p>We might then ask: what’s the point of <code>lower</code> bounds at
+all? If we can always approximate them with union types, and it seems
+like they’re actually <em>better</em> in terms of usability, why would
+we ever want a lower bound?</p>
+<p><br />
+</p>
+<h1 id="lower-bounds-have-richer-subtyping">Lower bounds have richer
+subtyping</h1>
+<p>Lower bounds are more powerful than union types when it comes to
+subtyping. Let’s see how that plays out if we tried to make this
+<code>MaybeUninitBox</code> ascribe to some <code>IBox</code>
+interface:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">IBox</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  interface!</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Elem</span> <span class="kw">=</span> type_member</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span> abstract<span class="at">.returns</span>(<span class="dt">Elem</span>) <span class="kw">}</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> val; <span class="cf">end</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p><code>MaybeUninitBox</code>, the version that uses a lower bound,
+ascribes to this interface.</p>
+<p><code>MaybeUninitBox2</code>, the version that uses
+<code>T.nilable(Elem)</code> instead of a lower bound, has an
+incompatible override error if we try to implement this interface:</p>
+<figure class="left-align-caption">
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">MaybeUninitBox2</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">include</span> <span class="dt">IBox</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ...</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span> override<span class="at">.returns</span>(T<span class="at">.nilable</span>(<span class="dt">Elem</span>)) <span class="kw">}</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#                   ⛔️ ^^^^^^^^^^^^^^^</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#    Return type `T.nilable(Elem)` does not match</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#    return type of abstract method `IBox#val`</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#    Super method defined with return type `Elem`</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> val <span class="kw">=</span> <span class="ot">@val</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<figcaption>
+<a
+href="https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20Module%3B%20include%20T%3A%3ASig%2C%20T%3A%3AHelpers%3B%20end%0A%0Amodule%20IBox%0A%20%20extend%20T%3A%3AGeneric%0A%20%20interface!%0A%20%20Elem%20%3D%20type_member%0A%0A%20%20sig%20%7B%20abstract.returns%28Elem%29%20%7D%0A%20%20def%20val%3B%20end%0Aend%0A%0Aclass%20MaybeUninitBox2%0A%20%20extend%20T%3A%3AGeneric%0A%20%20Elem%20%3D%20type_member%0A%20%20include%20IBox%0A%0A%20%20sig%20%7B%20params%28val%3A%20T.nilable%28Elem%29%29.void%20%7D%0A%20%20def%20initialize%28val%20%3D%20nil%29%0A%20%20%20%20%40val%20%3D%20val%0A%20%20end%0A%0A%20%20sig%20%7B%20void%20%7D%0A%20%20def%20unset!%0A%20%20%20%20%40val%20%3D%20nil%0A%20%20end%0A%0A%20%20sig%20%7B%20override.returns%28T.nilable%28Elem%29%29%20%7D%0A%20%20def%20val%20%3D%20%40val%0Aend%0A%0Abox%20%3D%20MaybeUninitBox2%5BInteger%5D.new%20%23%20%E2%9C%85%0A">View
+full example on sorbet.run →</a>
+</figcaption>
+</figure>
+<p>The return type in the implementation is <strong>wider</strong> than
+the return type of the interface, and that causes an error. Methods must
+have a return type that’s the same or narrower to be a compatible
+override.</p>
+<p>Thus you might be forced to use lower bounds instead of union types
+if you want both to create values of a type without having been given
+one first, and you want the thing you’re building to fit into a
+pre-existing subtyping relationship.</p>
+<p><br />
+</p>
+<h1 id="lower-bounds-are-common-because-of-fixed">Lower bounds are
+common because of <code>fixed</code></h1>
+<p>“I don’t think I really care about that subtyping thing in practice,
+so I don’t need lower bounds.” Are you sure? Where I work, I see a lot
+of code that looks like this:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">AbstractMutator</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">ModelType</span> <span class="kw">=</span> type_member</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span> abstract<span class="at">.returns</span>(T<span class="kw">::</span><span class="dt">Class</span><span class="kw">[</span><span class="dt">ModelType</span><span class="kw">]</span>) <span class="kw">}</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.model_class</span>; <span class="cf">end</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">MyMutator</span> <span class="kw">&lt;</span> <span class="dt">AbstractMutator</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">ModelType</span> <span class="kw">=</span> type_member <span class="kw">{</span> <span class="kw">{</span><span class="wa">fixed: </span><span class="dt">MyModel</span><span class="kw">}</span> <span class="kw">}</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  sig <span class="kw">{</span> override<span class="at">.returns</span>(T<span class="kw">::</span><span class="dt">Class</span><span class="kw">[</span><span class="dt">ModelType</span><span class="kw">]</span>) <span class="kw">}</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.model_class</span> <span class="kw">=</span> <span class="dt">MyModel</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<p>This is a trick Sorbet encourages for anyone who needs to <a
+href="https://sorbet.org/docs/generics#reifying-generics-at-runtime">reify
+generic types at runtime</a>, and it’s powered by lower bounds (though
+you can be forgiven for failing to notice at first).</p>
+<p>The <code>fixed</code> bound on <code>ModelType</code> implicitly
+specifies an <code>upper</code> and <code>lower</code> bound, but it’s
+the <code>lower</code> bound that allows returning <code>MyModel</code>
+from <code>model_class</code>. Without the lower bound, we wouldn’t be
+able to introduce values of type <code>ModelType</code> (or in this
+case, <code>T::Class[ModelType]</code>), and thus we wouldn’t be able to
+safely implement <code>model_class</code>.</p>
+<p><br />
+</p>
+<h1 id="what-about-lower-bounds-on-generic-methods">What about lower
+bounds on generic methods?</h1>
+<p>Here’s the type of the <code>Array#+</code> method in Sorbet’s
+RBIs:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:U</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">arg0: </span>T<span class="kw">::</span><span class="dt">Enumerable</span><span class="kw">[</span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>)<span class="kw">]</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="kw">::</span><span class="dt">Array</span><span class="kw">[</span>T<span class="at">.any</span>(<span class="dt">Elem</span>, T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))<span class="kw">]</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="kw">+</span>(arg0); <span class="cf">end</span></span></code></pre></div>
+<p>The idea is that the <code>Enumerable</code> to append to the current
+<code>Array</code> doesn’t have to have a matching element type: Sorbet
+knows that the resulting element type will be the union of the old and
+the new.</p>
+<p>Spiritually, this is the same as a type like this in Scala, which has
+syntax for lower bounds on generic methods:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode scala"><code class="sourceCode scala"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> <span class="op">+[</span>U <span class="op">&gt;:</span> Elem<span class="op">](</span>arg0<span class="op">:</span> Enumerable<span class="op">[</span>U<span class="op">]):</span> <span class="ex">Array</span><span class="op">[</span>U<span class="op">]</span></span></code></pre></div>
+<p>Union types are more intuitive, in my opinion. To understand the
+Scala example, you have to know that if <code>arg0</code> is passed a
+type unrelated to <code>Elem</code>, the inferred type for
+<code>U</code> <strong>will be</strong> the union type, by nature of how
+the inference constraint is solved. Scala 2 didn’t have union types
+though, which is likely why it’s so common to see lower bounds on
+methods there. With Scala’s emphasis on immutable collection libraries,
+you’d never be able to widen the type with an immutable operation. That
+is, if you started with a <code>List[Nothing]</code> i.e. the empty
+list, you’d never be able to append <code>List[Int]</code> to it.</p>
+<p>Note that even for method lower bounds, they’re still defining an
+intro form. A type-correct implementation of the <code>+</code> method
+would be to return <code>this</code> (Scala’s <code>self</code>), which
+has type <code>Array[Elem]</code>. The <code>[U &gt;: Elem]</code> lower
+bound allows using <code>Array[Elem]</code> in a place where need
+<code>Array[U]</code> is required.</p>
+<p><br />
+</p>
+<p>I have a more robust understanding of generic lower bounds now.
+They’re the dual to upper bounds, so they’re nice to have from a
+theoretical standpoint, but they also enable certain programming
+patterns, like being able to introduce values of a certain type, while
+retaining subtyping relationships via inheritance. If there’s no
+inheritance at play, they’ve very similar to union types (just like how
+upper bounds are similar to intersection types), and they’re virtually
+essential if you have subtyping but no union types.</p>
+<p><br />
+</p>
+<p><br />
+</p>
+<h1 id="references">References</h1>
+<p>I first learned about the idea that union types approximate lower
+bounds in a footnote in <a href="https://arxiv.org/pdf/2306.06391">The
+Design Principles of the Elixir Type System</a>, by Castagna, et
+al.:</p>
+<blockquote>
+<p>We did not specify lower bounds since they are not frequently used
+and they can be encoded by union types, e.g., <span
+class="math inline">\forall(s \leq \alpha). \alpha \rightarrow \alpha \,
+\stackrel{\textrm{def}}{=} \, \forall(\alpha). (s \vee \alpha)
+\rightarrow (s \vee \alpha)</span>; upper bounds can be encoded, too,
+this time by intersections (e.g., <span class="math inline">\forall(s
+\leq \alpha \leq t). \alpha \rightarrow \alpha \,
+\stackrel{\textrm{def}}{=} \, \forall(\alpha). ((s \vee \alpha) \wedge
+t) \rightarrow ((s \vee \alpha) \wedge t)</span>, but their frequency
+justifies the introduction of a specific syntax.</p>
+</blockquote>
+<p>I first learned about the limitation of using union and intersection
+types to approximate bounds from <a
+href="https://www.irif.fr/~gc/papers/set-theoretic-types-2022.pdf"><em>Programming
+with Union, Intersection, and Negation Types</em></a>, by Castagna:</p>
+<blockquote>
+<p>Notice however that the form of bounded polymorphism we obtain by
+this encoding is limited, insofar as two bounded types maybe in a
+subtyping relation only if they have the same bounds, yielding a
+second-class polymorphism more akin to <a
+href="https://doi.org/10.1145/6041.6042">Fun</a> (where [subtyping] is
+possible only for <span class="math inline">s_1 = s_2</span>) than to <a
+href="https://doi.org/10.1006/inco.1994.1013"><span
+class="math inline">F_{\lt:}</span></a> (which allows [subtyping] even
+for <span class="math inline">s_1 \neq s_2</span>).</p>
+</blockquote>
+<p>I learned about the prevalence of lower bounds in Scala from <a
+href="https://www.artima.com/shop/programming_in_scala_5ed"><em>Programming
+in Scala</em></a>, by Odersky et al., which is honestly an incredible
+book for learning more about Sorbet, despite being entirely focused on
+Scala (which makes sense, given Sorbet’s lineage, but also is a
+testament to how long the Scala community has been thinking about
+type-focused object-oriented programming).</p>
+<blockquote>
+<p>This shows that variance annotations and lower bounds play well
+together. They are a good example of type-driven design, where the types
+of an interface guide its detailed design and implementation. In the
+case of queues, it’s likely you would not have thought of the refined
+implementation of enqueue with a lower bound. But you might have decided
+to make queues covariant, in which case, the compiler would have pointed
+out the variance error for enqueue. Correcting the variance error by
+adding a lower bound makes enqueue more general and queues as a whole
+more usable.</p>
+</blockquote>
+<p>The example of lower bounds in the <em>Programming in Scala</em> book
+includes this snippet, which elucidates a previous point I had <a
+href="https://blog.jez.io/invariant-type-member-trick/">discovered
+myself</a>, attributing the conclusion to <em>type-driven design</em>
+leading to a design that is more general than it otherwise might have
+been.</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#sorbet">sorbet</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#ruby">ruby</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#plt">plt</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#types">types</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script src="/assets/js/enable_checkboxes.js"></script>
+
+  
+
+
+
+</body>
+</html>
+

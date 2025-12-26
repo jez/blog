@@ -108,9 +108,9 @@ methods!) a given call site resolves to is <strong>not</strong> a
 syntactic property. Consider this snippet:</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[</span><span class="dv">true</span>, <span class="dv">false</span><span class="kw">]</span><span class="at">.sample</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  x <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span> <span class="dv">0</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  x <span class="op">=</span> <span class="dv">nil</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span> <span class="dv">nil</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>x<span class="at">.even?</span></span></code></pre></div>
@@ -128,27 +128,27 @@ it has to assume the worst.</p>
 <figure class="left-align-caption">
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode numberSource ruby numberLines hl-25 hl-26 hl-27"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a><span class="cf">class</span> <span class="dt">FooIsAttr</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>  sig <span class="op">{</span>returns(<span class="cn">T</span><span class="at">.nilable</span>(<span class="dt">Integer</span>))<span class="op">}</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>  sig <span class="kw">{</span>returns(T<span class="at">.nilable</span>(<span class="dt">Integer</span>))<span class="kw">}</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="ot">attr_accessor</span> <span class="wa">:foo</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="cf">end</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a></span>
 <span id="cb2-6"><a href="#cb2-6"></a><span class="cf">class</span> <span class="dt">FooIsMethod</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a>  sig <span class="op">{</span>returns(<span class="cn">T</span><span class="at">.nilable</span>(<span class="dt">Integer</span>))<span class="op">}</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>  sig <span class="kw">{</span>returns(T<span class="at">.nilable</span>(<span class="dt">Integer</span>))<span class="kw">}</span></span>
 <span id="cb2-8"><a href="#cb2-8"></a>  <span class="cf">def</span> foo</span>
 <span id="cb2-9"><a href="#cb2-9"></a>    <span class="co"># Returns something different every call</span></span>
 <span id="cb2-10"><a href="#cb2-10"></a>    <span class="kw">[</span><span class="dv">0</span>, <span class="dv">nil</span><span class="kw">]</span><span class="at">.sample</span></span>
 <span id="cb2-11"><a href="#cb2-11"></a>  <span class="cf">end</span></span>
 <span id="cb2-12"><a href="#cb2-12"></a><span class="cf">end</span></span>
 <span id="cb2-13"><a href="#cb2-13"></a></span>
-<span id="cb2-14"><a href="#cb2-14"></a>sig <span class="op">{</span>params(<span class="wa">x:</span> <span class="dt">Integer</span>)<span class="at">.void</span><span class="op">}</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a>sig <span class="kw">{</span>params(<span class="wa">x: </span><span class="dt">Integer</span>)<span class="at">.void</span><span class="kw">}</span></span>
 <span id="cb2-15"><a href="#cb2-15"></a><span class="cf">def</span> takes_integer(x); <span class="cf">end</span></span>
 <span id="cb2-16"><a href="#cb2-16"></a></span>
 <span id="cb2-17"><a href="#cb2-17"></a><span class="co"># Have to run inference to get type of `x`</span></span>
 <span id="cb2-18"><a href="#cb2-18"></a><span class="co"># (running inference requires control flow)</span></span>
 <span id="cb2-19"><a href="#cb2-19"></a><span class="cf">if</span> <span class="kw">[</span><span class="dv">true</span>, <span class="dv">false</span><span class="kw">]</span><span class="at">.sample</span></span>
-<span id="cb2-20"><a href="#cb2-20"></a>  x <span class="op">=</span> <span class="dt">FooIsAttr</span><span class="at">.new</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a>  x <span class="kw">=</span> <span class="dt">FooIsAttr</span><span class="at">.new</span></span>
 <span id="cb2-21"><a href="#cb2-21"></a><span class="cf">else</span></span>
-<span id="cb2-22"><a href="#cb2-22"></a>  x <span class="op">=</span> <span class="dt">FooIsMethod</span><span class="at">.new</span></span>
+<span id="cb2-22"><a href="#cb2-22"></a>  x <span class="kw">=</span> <span class="dt">FooIsMethod</span><span class="at">.new</span></span>
 <span id="cb2-23"><a href="#cb2-23"></a><span class="cf">end</span></span>
 <span id="cb2-24"><a href="#cb2-24"></a></span>
 <span id="cb2-25"><a href="#cb2-25"></a><span class="co"># x.foo returns the same thing only if x is `FooIsAttr`</span></span>

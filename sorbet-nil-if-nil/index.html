@@ -81,9 +81,9 @@ so is the output.”</p>
 class="sourceCode numberSource ruby numberLines hl-4"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a>sig <span class="cf">do</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>  type_parameters(<span class="wa">:U</span>)</span>
 <span id="cb1-3"><a href="#cb1-3"></a>    <span class="at">.params</span>(</span>
-<span id="cb1-4"><a href="#cb1-4"></a>      <span class="wa">amount:</span> <span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.all</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>), <span class="dt">Amount</span>)</span>
+<span id="cb1-4"><a href="#cb1-4"></a>      <span class="wa">amount: </span>T<span class="at">.any</span>(T<span class="at">.all</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>), <span class="dt">Amount</span>)</span>
 <span id="cb1-5"><a href="#cb1-5"></a>    )</span>
-<span id="cb1-6"><a href="#cb1-6"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.all</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>), <span class="dt">String</span>))</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(T<span class="at">.all</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>), <span class="dt">String</span>))</span>
 <span id="cb1-7"><a href="#cb1-7"></a><span class="cf">end</span></span>
 <span id="cb1-8"><a href="#cb1-8"></a><span class="cf">def</span> get_currency(amount)</span>
 <span id="cb1-9"><a href="#cb1-9"></a>  <span class="cf">if</span> amount<span class="at">.nil?</span></span>
@@ -102,21 +102,21 @@ example on sorbet.run →</a>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode numberSource ruby numberLines hl-10"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="cf">do</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>  params(</span>
-<span id="cb2-3"><a href="#cb2-3"></a>    <span class="wa">amount:</span> <span class="dt">Amount</span>,</span>
-<span id="cb2-4"><a href="#cb2-4"></a>    <span class="wa">maybe_amount:</span> <span class="cn">T</span><span class="at">.nilable</span>(<span class="dt">Amount</span>),</span>
-<span id="cb2-5"><a href="#cb2-5"></a>    <span class="wa">nil_class:</span> <span class="dt">NilClass</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>    <span class="wa">amount: </span><span class="dt">Amount</span>,</span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="wa">maybe_amount: </span>T<span class="at">.nilable</span>(<span class="dt">Amount</span>),</span>
+<span id="cb2-5"><a href="#cb2-5"></a>    <span class="wa">nil_class: </span><span class="dt">NilClass</span></span>
 <span id="cb2-6"><a href="#cb2-6"></a>  )</span>
 <span id="cb2-7"><a href="#cb2-7"></a>  <span class="at">.void</span></span>
 <span id="cb2-8"><a href="#cb2-8"></a><span class="cf">end</span></span>
 <span id="cb2-9"><a href="#cb2-9"></a><span class="cf">def</span> example(amount, maybe_amount, nil_class)</span>
-<span id="cb2-10"><a href="#cb2-10"></a>  res <span class="op">=</span> get_currency(amount)</span>
-<span id="cb2-11"><a href="#cb2-11"></a>  <span class="cn">T</span><span class="at">.reveal_type</span>(res) <span class="co"># =&gt; String</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>  res <span class="kw">=</span> get_currency(amount)</span>
+<span id="cb2-11"><a href="#cb2-11"></a>  T<span class="at">.reveal_type</span>(res) <span class="co"># =&gt; String</span></span>
 <span id="cb2-12"><a href="#cb2-12"></a></span>
-<span id="cb2-13"><a href="#cb2-13"></a>  res <span class="op">=</span> get_currency(maybe_amount)</span>
-<span id="cb2-14"><a href="#cb2-14"></a>  <span class="cn">T</span><span class="at">.reveal_type</span>(res) <span class="co"># =&gt; T.nilable(String)</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a>  res <span class="kw">=</span> get_currency(maybe_amount)</span>
+<span id="cb2-14"><a href="#cb2-14"></a>  T<span class="at">.reveal_type</span>(res) <span class="co"># =&gt; T.nilable(String)</span></span>
 <span id="cb2-15"><a href="#cb2-15"></a></span>
-<span id="cb2-16"><a href="#cb2-16"></a>  res <span class="op">=</span> get_currency(nil_class)</span>
-<span id="cb2-17"><a href="#cb2-17"></a>  <span class="cn">T</span><span class="at">.reveal_type</span>(res) <span class="co"># =&gt; T.nilable(String)</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a>  res <span class="kw">=</span> get_currency(nil_class)</span>
+<span id="cb2-17"><a href="#cb2-17"></a>  T<span class="at">.reveal_type</span>(res) <span class="co"># =&gt; T.nilable(String)</span></span>
 <span id="cb2-18"><a href="#cb2-18"></a><span class="cf">end</span></span></code></pre></div>
 <p>Some things to note about how it works:</p>
 <h3 id="its-using-sorbets-support-for-generic-methods.">It’s using
@@ -143,7 +143,7 @@ is <code>NilClass</code>, not <code>T.nilable(Amount)</code>!</h3>
 we wanted (in our case, <code>String</code>), or <em>the input</em> if
 the input is <code>nil</code>.</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cn">T</span><span class="at">.all</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>)</span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>T<span class="at">.all</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>)</span></code></pre></div>
 <p>Returning something with a generic type means returning the exact
 input,<span
 class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
@@ -175,9 +175,9 @@ were to support some sort of syntax for placing bounds on generic
 methods’ type parameters. For example using a hypothetical syntax:</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode numberSource ruby numberLines hl-2"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1"></a>sig <span class="cf">do</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a>  type_parameters(<span class="wa">U:</span> <span class="dt">NilClass</span>)</span>
-<span id="cb4-3"><a href="#cb4-3"></a>    <span class="at">.params</span>(<span class="wa">amount:</span> <span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">Amount</span>))</span>
-<span id="cb4-4"><a href="#cb4-4"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">String</span>))</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  type_parameters(<span class="wa">U: </span><span class="dt">NilClass</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a>    <span class="at">.params</span>(<span class="wa">amount: </span>T<span class="at">.any</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">Amount</span>))</span>
+<span id="cb4-4"><a href="#cb4-4"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">String</span>))</span>
 <span id="cb4-5"><a href="#cb4-5"></a><span class="cf">end</span></span>
 <span id="cb4-6"><a href="#cb4-6"></a><span class="cf">def</span> get_currency(amount)</span>
 <span id="cb4-7"><a href="#cb4-7"></a>  <span class="cf">if</span> amount<span class="at">.nil?</span></span>

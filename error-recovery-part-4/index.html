@@ -179,14 +179,14 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   x.</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># end</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>stack <span class="op">=</span> <span class="kw">[</span><span class="vs">&#39;def&#39;</span>, identifier, <span class="ch">&#39;\n&#39;</span>, expression, <span class="ch">&#39;.&#39;</span><span class="kw">]</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>lookahead <span class="op">=</span> <span class="vs">&#39;end&#39;</span></span></code></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>stack <span class="kw">=</span> <span class="kw">[</span><span class="vs">&#39;def&#39;</span>, identifier, <span class="ch">&#39;\n&#39;</span>, expression, <span class="ch">&#39;.&#39;</span><span class="kw">]</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>lookahead <span class="kw">=</span> <span class="vs">&#39;end&#39;</span></span></code></pre></div>
 <p>and Bison found no matching error production rule, it would throw
 away the <code>'.'</code> token that it had already shifted onto the
 parser stack:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>stack <span class="op">=</span> <span class="kw">[</span><span class="vs">&#39;def&#39;</span>, identifier, <span class="ch">&#39;\n&#39;</span>, expression<span class="kw">]</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>lookahead <span class="op">=</span> <span class="vs">&#39;end&#39;</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>stack <span class="kw">=</span> <span class="kw">[</span><span class="vs">&#39;def&#39;</span>, identifier, <span class="ch">&#39;\n&#39;</span>, expression<span class="kw">]</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>lookahead <span class="kw">=</span> <span class="vs">&#39;end&#39;</span></span></code></pre></div>
 <p>and then loop back to the previous step, checking to see whether it’s
 now possible to shift the <code>error</code> token. This process repeats
 until Bison has gobbled up the whole stack or some production rule
@@ -242,11 +242,11 @@ get good parse results, you can get good bang for your buck by figuring
 out the most common edit paths. For example, here’s every intermediate
 edit when the user adds a keyword argument to a Ruby method:</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x:</span> x) <span class="co"># contents before edit</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x:</span> x,)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x:</span> x, y)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x:</span> x, <span class="wa">y:</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x:</span> x, <span class="wa">y:</span> y) <span class="co"># edit finished</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x: </span>x) <span class="co"># contents before edit</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x: </span>x,)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x: </span>x, y)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x: </span>x, y:)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>foo(a, <span class="wa">x: </span>x, <span class="wa">y: </span>y) <span class="co"># edit finished</span></span></code></pre></div>
 <p>Ideally there’s an <code>error</code> production for every
 intermediate state, because adding a keyword argument to a method call
 is common. On the other hand, you can likely get away not adding rules
@@ -333,7 +333,7 @@ for errors</h1>
 <p>Consider this parse error:</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> foo</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  x <span class="op">=</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  x <span class="kw">=</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>The rule for parsing an assignment with no error looks like this, and
 produces an <code>assign</code> node in the AST:</p>

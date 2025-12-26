@@ -85,7 +85,7 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="
 line:</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -- example2.rb --</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.bar</span>; <span class="cf">end</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> foo; <span class="cf">end</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  bar()</span>
@@ -107,12 +107,12 @@ classes. This is the same nesting scope that it uses when looking up
 constants:</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nesting scope: [Object]</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># nesting scope: [Object, A]</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">module</span> <span class="cn">X</span>; <span class="cf">end</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> <span class="cn">B</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">module</span> X; <span class="cf">end</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">class</span> B</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># nesting scope: [Object, A, B]</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> <span class="cn">X</span> <span class="co"># =&gt; A::X</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">puts</span> X <span class="co"># =&gt; A::X</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>In this example, the module <code>X</code> is referenced without
@@ -124,7 +124,7 @@ the top of the scope and enters a method into that class’s method table.
 That is, this snippet defines <code>A#foo</code> because it’s nested
 lexically in <code>A</code>:</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> foo; <span class="cf">end</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>This was the first thing that tripped me: when defining a method
@@ -149,8 +149,8 @@ class.</li>
 <p>It just so happens that when executing a class body, Ruby sets
 <code>self</code> to the current class:</p>
 <div class="sourceCode" id="cb5"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="cn">A</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="dv">self</span> <span class="op">==</span> <span class="cn">A</span> <span class="co"># =&gt; true</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span> <span class="dv">self</span> <span class="kw">==</span> A <span class="co"># =&gt; true</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">def</span> <span class="dv">self</span><span class="at">.bar</span>; <span class="cf">end</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>Looking specifically at the method definition, Ruby will evaluate
@@ -179,16 +179,16 @@ href="https://github.com/ruby/ruby/blob/v2_7_2/vm.c#L3357-L3359">makes
 out of thin air</a> at startup. In pseudo code, the top self is invented
 kind of like this:</p>
 <div class="sourceCode" id="cb7"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">RubyVM</span><span class="op">::</span><span class="dt">TopSelf</span> <span class="op">=</span> <span class="dt">Object</span><span class="at">.new</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dt">RubyVM</span><span class="op">::</span><span class="dt">TopSelf</span><span class="at">.to_s</span>; <span class="st">&quot;main&quot;</span>; <span class="cf">end</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dv">self</span> <span class="op">=</span> <span class="dt">RubyVM</span><span class="op">::</span><span class="dt">TopSelf</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">RubyVM</span><span class="kw">::</span><span class="dt">TopSelf</span> <span class="kw">=</span> <span class="dt">Object</span><span class="at">.new</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">def</span> <span class="dt">RubyVM</span><span class="kw">::</span><span class="dt">TopSelf</span><span class="at">.to_s</span>; <span class="st">&quot;main&quot;</span>; <span class="cf">end</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dv">self</span> <span class="kw">=</span> <span class="dt">RubyVM</span><span class="kw">::</span><span class="dt">TopSelf</span></span></code></pre></div>
 <p>(You can’t actually assign to <code>self</code>—the Ruby VM does by
 <a
 href="https://github.com/ruby/ruby/blob/5445e0435260b449decf2ac16f9d09bae3cafe72/vm.c#L3266">writing
 to a field in a C struct</a>.) Ruby calls the top self object
 <code>main</code>:</p>
 <div class="sourceCode" id="cb8"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>❯ ruby <span class="op">-</span>e <span class="vs">&#39;puts self&#39;</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>❯ ruby <span class="kw">-</span>e <span class="vs">&#39;puts self&#39;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>main</span></code></pre></div>
 <p>So what happens when Ruby sees <code>def foo; end</code> at the top
 of a file? Well, the lexical class scope was set to <code>Object</code>,
@@ -209,7 +209,7 @@ that includes both <code>self.singleton_class</code> and
 <p>but for a class body, that only includes the class’s singleton class
 (<code>#&lt;Class:A&gt;</code>), not the class itself:</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>❯ ruby <span class="op">-</span>e <span class="vs">&#39;class A</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>❯ ruby <span class="kw">-</span>e <span class="vs">&#39;class A</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="vs">  p self.singleton_class.ancestors</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="vs">end&#39;</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="co">#&lt;Class:A&gt;, #&lt;Class:Object&gt;, #&lt;Class:BasicObject&gt;, Class, Module, Object, Kernel, BasicObject]</span></span></code></pre></div>

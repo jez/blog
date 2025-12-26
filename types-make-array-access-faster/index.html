@@ -74,7 +74,7 @@ suggest the <code>x[y]</code> operation for hashes and arrays (the Ruby
 VM calls this operation <code>aref</code>) might be a problem:</p>
 <!-- more -->
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> <span class="kw">[</span><span class="dv">123</span><span class="kw">]</span></span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>xs <span class="kw">=</span> <span class="kw">[</span><span class="dv">123</span><span class="kw">]</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span> xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span></code></pre></div>
 <p>To isolate for sure whether this was a problem or not, we wrote a
 benchmark. It turns out that we misinterpreted the <code>perf</code>
@@ -87,7 +87,7 @@ profile! Array access is much faster in Sorbet:</p>
 <col style="width: 25%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">benchmark</th>
 <th style="text-align: right;">interpreted</th>
 <th style="text-align: right;">compiled</th>
@@ -95,7 +95,7 @@ profile! Array access is much faster in Sorbet:</p>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><a
 href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/typed_array_aref.rb">typed_array_aref.rb</a></td>
 <td style="text-align: right;">0.282s</td>
@@ -106,12 +106,12 @@ href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/
 </table>
 <p>Here’s the full benchmark:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> <span class="cn">T</span><span class="at">.let</span>(<span class="kw">[</span><span class="dv">123</span><span class="kw">]</span>, <span class="cn">T</span><span class="op">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>)</span>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>xs <span class="kw">=</span> T<span class="at">.let</span>(<span class="kw">[</span><span class="dv">123</span><span class="kw">]</span>, T<span class="kw">::</span><span class="dt">Array</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="op">&lt;</span> <span class="dv">10_000_000</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>i <span class="kw">=</span> <span class="dv">0</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> i <span class="kw">&lt;</span> <span class="dv">10_000_000</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  i <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  i <span class="kw">+=</span> <span class="dv">1</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">puts</span> xs<span class="kw">[</span><span class="dv">0</span><span class="kw">]</span></span></code></pre></div>
@@ -137,7 +137,7 @@ is explained by knowing a type statically:</p>
 <col style="width: 20%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">benchmark</th>
 <th style="text-align: right;">interpreted</th>
 <th style="text-align: right;">compiled</th>
@@ -150,7 +150,7 @@ w/o while</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><a
 href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/while_10_000_000.rb">while_10_000_000.rb</a></td>
 <td style="text-align: right;">0.205s</td>
@@ -159,7 +159,7 @@ href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/
 <td style="text-align: right;">—</td>
 <td style="text-align: right;">—</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><a
 href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/untyped_array_aref.rb">untyped_array_aref.rb</a></td>
 <td style="text-align: right;">0.282s</td>
@@ -168,7 +168,7 @@ href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/
 <td style="text-align: right;">0.126s</td>
 <td style="text-align: right;">0.61x</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><a
 href="https://github.com/sorbet/sorbet/blob/master/test/testdata/ruby_benchmark/stripe/typed_array_aref.rb">typed_array_aref.rb</a></td>
 <td style="text-align: right;">0.282s</td>

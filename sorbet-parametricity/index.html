@@ -57,12 +57,12 @@
 <figure class="left-align-caption">
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode numberSource ruby numberLines hl-11"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># typed: true</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">extend</span> <span class="cn">T</span><span class="op">::</span><span class="dt">Sig</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Sig</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a></span>
 <span id="cb1-4"><a href="#cb1-4"></a>sig <span class="cf">do</span></span>
 <span id="cb1-5"><a href="#cb1-5"></a>  type_parameters(<span class="wa">:U</span>)</span>
-<span id="cb1-6"><a href="#cb1-6"></a>    <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb1-7"><a href="#cb1-7"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb1-7"><a href="#cb1-7"></a>    <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
 <span id="cb1-8"><a href="#cb1-8"></a><span class="cf">end</span></span>
 <span id="cb1-9"><a href="#cb1-9"></a><span class="cf">def</span> fake_identity_function(x)</span>
 <span id="cb1-10"><a href="#cb1-10"></a>  <span class="cf">case</span> x</span>
@@ -102,8 +102,8 @@ example:</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sig <span class="cf">do</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  type_parameters(<span class="wa">:U</span>, <span class="wa">:V</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="wa">y:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:V</span>))</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.any</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:V</span>)))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="wa">y: </span>T<span class="at">.type_parameter</span>(<span class="wa">:V</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.returns</span>(T<span class="at">.any</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), T<span class="at">.type_parameter</span>(<span class="wa">:V</span>)))</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>From this signature we’re guaranteed that the method has to return
 exactly one of the arguments we provided (<code>x</code> or
@@ -119,12 +119,12 @@ from earlier:</p>
 <figure class="left-align-caption">
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode numberSource ruby numberLines hl-12 hl-15"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># typed: true</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">extend</span> <span class="cn">T</span><span class="op">::</span><span class="dt">Sig</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">extend</span> T<span class="kw">::</span><span class="dt">Sig</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a></span>
 <span id="cb3-4"><a href="#cb3-4"></a>sig <span class="cf">do</span></span>
 <span id="cb3-5"><a href="#cb3-5"></a>  type_parameters(<span class="wa">:U</span>)</span>
-<span id="cb3-6"><a href="#cb3-6"></a>    <span class="at">.params</span>(<span class="wa">x:</span> <span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
-<span id="cb3-7"><a href="#cb3-7"></a>    <span class="at">.returns</span>(<span class="cn">T</span><span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb3-6"><a href="#cb3-6"></a>    <span class="at">.params</span>(<span class="wa">x: </span>T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
+<span id="cb3-7"><a href="#cb3-7"></a>    <span class="at">.returns</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>))</span>
 <span id="cb3-8"><a href="#cb3-8"></a><span class="cf">end</span></span>
 <span id="cb3-9"><a href="#cb3-9"></a><span class="cf">def</span> fake_identity_function(x)</span>
 <span id="cb3-10"><a href="#cb3-10"></a>  <span class="cf">case</span> x</span>

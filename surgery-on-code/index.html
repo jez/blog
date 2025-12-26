@@ -182,7 +182,7 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="
 <p>To tell Sorbet to silence the errors on these lines, we’ll need to
 wrap the variable in a call to <code>T.unsafe(...)</code>:</p>
 <div class="sourceCode" id="cb6"><pre
-class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cn">T</span><span class="at">.unsafe</span>(foo)<span class="kw">[</span><span class="vs">&#39;bar&#39;</span><span class="kw">]</span></span></code></pre></div>
+class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>T<span class="at">.unsafe</span>(foo)<span class="kw">[</span><span class="vs">&#39;bar&#39;</span><span class="kw">]</span></span></code></pre></div>
 <p>This instructs to Sorbet to <a
 href="https://sorbet.org/docs/troubleshooting#escape-hatches">forget all
 static type information</a> about the variable, thus silencing the
