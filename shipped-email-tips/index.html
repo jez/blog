@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+  <meta name="generator" content="pandoc-markdown-css-theme" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="author" content="Jake Zimmerman">
+
+<meta name="dcterms.date" content="2025-12-29 16:53:35 -0500">
+<meta name="description" content="I end up giving the same mechanical feedback on ~every shipped email draft I read. These are some simple tips for making a shipped email useful to busy readers.
+">
+<title>Mechcanical tips to improve shipped emails – Jake Zimmerman</title>
+
+  <link rel="stylesheet" href="/assets/css/theme.css">
+<link rel="stylesheet" href="/assets/css/skylighting-solarized-theme.css">
+
+
+
+
+  
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/touch-icon.png">
+  
+    <link rel="icon" sizes="32x32" href="/assets/img/favicon@2x.png">
+  
+    <link rel="icon" sizes="16x16" href="/assets/img/favicon.png">
+  
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml">
+  
+    <link rel="stylesheet" href="/assets/css/extra.css">
+  
+
+
+
+
+</head>
+<body>
+  
+
+
+
+
+  <header>
+    <h1 class="title">Mechcanical tips to improve shipped emails</h1>
+    <blockquote class="metadata">
+    
+    <p class="date before-toc"><time datetime="2025-12-29 16:53:35 -0500">December 29, 2025</time></p>
+    </blockquote>
+  </header>
+
+
+  <nav id="TOC" role="doc-toc">
+  <a href="/">Home</a><br>
+  <strong>Contents</strong><label for="contents">⊕</label>
+  <input type="checkbox" id="contents">
+  <ul>
+  <li><a href="#make-the-subject-line-a-statement"
+  id="toc-make-the-subject-line-a-statement">Make the subject line a
+  statement</a></li>
+  <li><a href="#dont-be-afraid-of-bullets-for-the-tldr"
+  id="toc-dont-be-afraid-of-bullets-for-the-tldr">Don’t be afraid of
+  bullets for the TL;DR</a></li>
+  <li><a href="#follow-the-tldr-with-a-visual"
+  id="toc-follow-the-tldr-with-a-visual">Follow the TL;DR with a
+  visual</a></li>
+  <li><a href="#make-headings-statements-too"
+  id="toc-make-headings-statements-too">Make headings statements,
+  too</a></li>
+  <li><a href="#consider-what-we-did-ahead-of-background"
+  id="toc-consider-what-we-did-ahead-of-background">Consider “what we
+  did” ahead of “background”</a></li>
+  <li><a href="#hoist-the-last-sentence-first"
+  id="toc-hoist-the-last-sentence-first">Hoist the last sentence
+  first</a></li>
+  <li><a href="#use-fewer-leading-dependent-clauses"
+  id="toc-use-fewer-leading-dependent-clauses">Use fewer leading
+  dependent clauses</a></li>
+  <li><a href="#strengthen-verbs-to-active-alternatives"
+  id="toc-strengthen-verbs-to-active-alternatives">Strengthen verbs to
+  active alternatives</a></li>
+  </ul>
+</nav>
+
+<main>
+<p>I end up giving the same mechanical feedback on ~every shipped
+email<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="marginnote">A <strong>shipped email</strong> is company-internal
+email sent to announce when some unit of work has wrapped up. To my
+knowledge, it’s <a
+href="https://buttondown.com/blog/shipped-at">predominantly a
+Stripe-ism</a>, so the ideas in this post may not be relevant to all
+writers.<br />
+<br />
+</span></span> draft I read. These are some simple tips for making a
+shipped email useful to busy readers.</p>
+<p>I want to stress <strong>mechanical</strong>. Software engineers
+spend time getting better at writing code, problem solving, and
+“software engineering” more generally. Technical writing is a skill just
+like writing code, but for some reason software engineers tend to view
+writing well as something intangible. For sure, truly great writing
+tends to have a <em>je ne sais quoi</em> quality to it, but we can
+settle for good writing with a short list of mechanical
+transformations.</p>
+<p>Here I focus mostly on shipped emails, but many of these suggestions
+apply to all forms of technical writing. I should say: I am not an
+expert nor even a professional writer. I’ve never been paid to write,
+never trained with a professional editor. The closest thing I have to a
+credential is a cardboard star which says “most likely to become a
+writer” awarded by my high school graduating class. You’re welcome to
+disagree, but I stand by these suggestions.</p>
+<h1 id="make-the-subject-line-a-statement">Make the subject line a
+statement</h1>
+<p>The subject should read as a statement about what is now possible or
+what was done. Avoid repeating the name of the project.</p>
+<p>A subject should appeal to the <strong>marginal reader</strong>:
+someone who wasn’t aware that the work was happening, but who benefits
+from knowing about it. The subject needs to convince the marginal reader
+to read on.<span
+class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
+class="marginnote">The opposite is also true: a subject can assure
+readers that an email is skippable because they already know its
+contents or that they’re not the intended audience.<br />
+<br />
+</span></span> An unknown project codename in the subject line won’t do
+that.</p>
+<p>I shipped a Sorbet feature recently. Here are two example subject
+lines:</p>
+<blockquote>
+<p>[shipped] T::Module</p>
+</blockquote>
+<p>vs</p>
+<blockquote>
+<p>[shipped] Sorbet supports functions that are generic over Ruby module
+objects</p>
+</blockquote>
+<p>The first subject names what shipped. The second contextualizes what
+shipped. A reader need not know what <code>T::Module</code> means
+beforehand: the email is going to lay that out. The second subject is
+rich with clues for the marginal reader:</p>
+<ul>
+<li>It includes keywords Sorbet and Ruby. Programmers who predominantly
+work in JavaScript or Go know that they don’t have to bother clicking
+in.</li>
+<li>It frames the ship in terms familiar to the ideal audience: those
+familiar with generic functions and module objects in Sorbet (or at
+least, those who want to learn more about them).</li>
+</ul>
+<h1 id="dont-be-afraid-of-bullets-for-the-tldr">Don’t be afraid of
+bullets for the TL;DR</h1>
+<p>A TL;DR or BLUF<span
+class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
+class="marginnote">“too long; didn’t read” and “bottom line up
+front”<br />
+<br />
+</span></span> section offers skimmable takeaways at the top of an
+email. Something can be skimmable yet longer than one sentence. By
+contrast, single sentences often sacrifice salience for brevity. A TL;DR
+must have both.</p>
+<p>Double check whether a single-sentence TL;DR delivers substance.
+Here’s an example:</p>
+<blockquote>
+<p><strong>TL;DR</strong>: We shipped some improvements to how Sorbet
+flags untyped code in editors.</p>
+</blockquote>
+<p>vs</p>
+<blockquote>
+<p><strong>TL;DR</strong>:</p>
+<ul>
+<li>Our default VS Code settings will now <a
+href="https://sorbet.org/docs/highlight-untyped">highlight untyped
+code</a> in non-test files.</li>
+<li>This setting remains configurable: you can opt to highlight untyped
+nowhere, everywhere, or only in non-test files (instructions
+below).</li>
+</ul>
+</blockquote>
+<p>Rewriting with bullet points leaves the summary skimmable while
+making space for substance. The first example lacks the sort of takeaway
+that a good TL;DR needs.<span
+class="sidenote-wrapper"><label for="sn-3" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
+class="marginnote">Oddly enough, this TL;DR could be lightly edited into
+a decent subject line.<br />
+<br />
+</span></span> “Some improvements” weasels out of actually stating those
+improvements. The second example states the two improvements (a default
+has been changed, but the default has not be fixed in place).</p>
+<p>I don’t want to imply there <em>must</em> be bullets. Use the length
+as an indicator: if the TL;DR has one sentence ask whether it lacks
+substance. Bullets are a quick remedy in those cases.</p>
+<h1 id="follow-the-tldr-with-a-visual">Follow the TL;DR with a
+visual</h1>
+<p>If at all possible, grab attention after the TL;DR with a visual.
+Examples:</p>
+<ul>
+<li><strong>Plots</strong> or <strong>charts</strong> of the metric the
+initiative was tracking</li>
+<li>A <strong>code block</strong> showing how to use the new API library
+you built</li>
+<li>Quotes of <strong>testimonials</strong> from early users of the
+thing you shipped</li>
+</ul>
+<p>There’s almost always a visual you can add.</p>
+<p>Especially for ships where the thing built is a new API, new library,
+new way of writing code, etc., having a code block between the TL;DR and
+the rest of the email that shows the new, desirable code first before
+all other examples anchors the email. The alternative is showing the
+old, bad code first, saying something about how it’s bad, then showing
+the new, good code. We want to hoist the main point, (e.g., the good
+code that people should copy) to be the first thing readers see.</p>
+<h1 id="make-headings-statements-too">Make headings statements, too</h1>
+<p>Most shipped emails end up following a template, using the following
+section headings verbatim:</p>
+<ul>
+<li>TL;DR</li>
+<li>Background</li>
+<li>What we did</li>
+<li>Impact</li>
+<li>What’s next</li>
+</ul>
+<p>Leaving these templated headings untouched wastes prime real estate.
+Templates like these are useful reminders of what to include, but
+readers <em>already expect</em> to find that information. Use the
+headings to answer the questions they’re looking for.</p>
+<p>Better headings state what the background is, what we did, what the
+impact was, etc. For example:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Templated</th>
+<th style="text-align: left;">Revised</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Background</td>
+<td style="text-align: left;">A primer on constant literal
+references</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">What we did</td>
+<td style="text-align: left;">Fitting 32 bytes of data in a 16-byte
+bag</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Future work</td>
+<td style="text-align: left;">The memory usage is still too high</td>
+</tr>
+</tbody>
+</table>
+<p>The headings on the left convey more information. A busy reader gains
+more from headings that state the answers, not the questions. These
+revised headings signal where individual readers might want to dive into
+the main content, or at least lend context for readers who skim ahead
+then read from the top.</p>
+<h1 id="consider-what-we-did-ahead-of-background">Consider “what we did”
+ahead of “background”</h1>
+<p>Many shipped email templates encourage <a
+href="/dont-bury-the-lede/">burying the lede</a> by listing “Background”
+before “What we did.” That’s often backwards. When sitting down to
+outline an email, sketch things out with the background section towards
+the bottom.</p>
+<p>“Background” before “what we did” lends narrative structure. For
+example, a short story is going to have the inciting action build up to
+the climax. But in technical writing, you often <strong>don’t want
+narrative structure</strong>. Technical writing emphasizes efficiency
+and clarity.</p>
+<p>There’s a concept in journalism called the <a
+href="https://en.wikipedia.org/wiki/Inverted_pyramid_(journalism)">inverted
+pyramid</a>: journalists want the most “newsworthy” information at the
+top of the article, with background and additional information at the
+end. Inverting the narrative structure so the big surprise is first
+leads to efficient and clear writing.</p>
+<p>I am guilty of this myself <em>all the time</em>, but fixing it is
+surprisingly mechanical. I’ll realize that what I actually want to say
+is the third paragraph, or the second section, or maybe way at the
+bottom of the email. Then I’ll just hoist it up to the top, wholesale.
+More often than not it already stands on its own, and the paragraphs or
+sentences that follow lend supporting evidence to the main point. I
+found myself doing this more than a handful of times while writing this
+post.</p>
+<p>Sure, there are times when the background is truly the most important
+thing and should be first. For example, retrospectives and incident
+reviews. I’ll leave this one as a “consider” instead of “do,” because
+there are great emails that leave background first.</p>
+<p><br />
+</p>
+<p>That’s mostly it for the structural suggestions. They’re mechanical
+and unambiguous: they apply nearly all the time, so it’s easy to get in
+a habit of checking them as soon as there’s a rough draft.</p>
+<p>Up next are the harder-to-spot tips about sentences and paragraphs
+themselves.</p>
+<p><br />
+</p>
+<h1 id="hoist-the-last-sentence-first">Hoist the last sentence
+first</h1>
+<p>The same way our email should state the important thing at the top,
+and then provide supporting evidence, so should our sentences.</p>
+<blockquote>
+<p>I find I have a habit while drafting to write the thing that I really
+want to say only once I’m three or four sentences in. I’m sure that’s in
+no small part because I don’t know what I’m trying to say when staring
+down a blank page, but just because it’s the last sentence I typed
+doesn’t mean it best fits at the bottom. Having found what to say, hoist
+it to the top of the paragraph.</p>
+</blockquote>
+<p>vs</p>
+<blockquote>
+<p>Having found what to say, hoist it to the top of the paragraph. I
+find I have a habit while drafting to write the thing that I really want
+to say only once I’m three or four sentences in. I’m sure that’s in no
+small part because I don’t know what I’m trying to say when staring down
+a blank page, but just because it’s the last sentence I typed doesn’t
+mean it best fits at the bottom.</p>
+</blockquote>
+<p>It’s the same paragraph, but with the last sentence first.</p>
+<p>The second version lets readers evaluate all the evidence against the
+initial claim, one piece at a time. It states the topic of the paragraph
+first, recasting all subsequent sentences as supporting evidence. The
+first version doesn’t make it clear what point I’m about to make. It
+begins as a meandering personal anecdote, with a payoff only at the end
+of the paragraph. That forces readers to guess where it’s going, or hold
+all the claims in mind until the end.</p>
+<p>With the way I personally write drafts, I find that my stream of
+consciousness typing tends to leave the main point somewhere at the
+bottom of each paragraph. It’s a pretty mechanical improvement to hoist
+it to the top.</p>
+<h1 id="use-fewer-leading-dependent-clauses">Use fewer leading dependent
+clauses</h1>
+<p>There’s a time and a place for leading dependent clauses, but overuse
+makes prose hard to skim. Consider pushing them from the start back to
+the end of a sentence. Dependent clauses deal in suspense, echoing the
+narrative structure discussed previously but on a sentence level. A
+well-placed leading dependent clause can break up monotonous sentences
+and bring intrigue, but when overused they lead to clunky technical
+writing.</p>
+<blockquote>
+<p>For those who don’t know, this sentence starts with a dependent
+clause. Rather than being understandable on its own, it modifies the
+independent clause that comes after. Having read the first part, and
+sometimes the second part, readers must push dependent clauses onto a
+“stack” in their mind. Upon reaching a sentence end, the stack resolves
+itself, and the reader’s head space is free again.</p>
+</blockquote>
+<p>We can invert dependent clauses at the sentence level the same way we
+can invert our narrative structure at the document level or our
+sentences at the paragraph level.</p>
+<blockquote>
+<p>This sentence ends with a dependent clause, which modifies what came
+before. There’s no more complex stack of modifications because each
+trailing clause modifies the top of the stack in place, rather than
+pushing temporary context. Skimming becomes easier: our eyes are good at
+finding sentence breaks, which now host the core idea of each
+sentence.</p>
+</blockquote>
+<p>Just spotting the leading dependent clauses is mechanical. Sometimes
+I’ll invert the sentence; sometimes the clauses survive scrutiny.
+Sometimes I might realize the clause itself was fluff and omit it
+entirely, but it’s the mechanical act of checking that tends to make the
+writing better.</p>
+<h1 id="strengthen-verbs-to-active-alternatives">Strengthen verbs to
+active alternatives</h1>
+<blockquote>
+<p>Verbs are the most important of all your tools. They push the
+sentence forward and give it momentum.</p>
+<p>— <em>On Writing Well</em>, William Zinsser</p>
+</blockquote>
+<p>Some examples from this post:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Bland</th>
+<th style="text-align: left;">Active</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>There is</strong> more information
+in the headings on the left.</td>
+<td style="text-align: left;">The headings on the left
+<strong>convey</strong> more information.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Leaving these templated headings untouched
+<strong>is a waste of</strong> prime real estate.</td>
+<td style="text-align: left;">Leaving these templated headings untouched
+<strong>wastes</strong> prime real estate.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">By contrast, single sentences
+<strong>are</strong> short but often not salient.</td>
+<td style="text-align: left;">By contrast, single sentences often
+<strong>sacrifice</strong> salience for brevity.</td>
+</tr>
+</tbody>
+</table>
+<p>This one is harder to be mechanical about, because there are weak
+verbs everywhere, and realistically we don’t have time to audit all of
+them before sending an email. That being said, something to watch out
+for: verbs like <em>is</em>, <em>does</em>, or <em>has</em> paired with
+an adjective or adverb often simplify to the verb form of the adjective
+or adverb.</p>
+<p>For more mechanical tips to improve writing, I recommend the whole of
+Chapter 10, “Bits &amp; Pieces” from <em>On Writing Well</em> (quoted
+above). The whole book is worth a read, but much of it avoids
+prescribing a solution, in favor of outlining principles. (In fact I’ve
+avoided focusing on the principles because I think it does a much better
+job of that than I’d ever do.) But if you’re just looking for quick
+tips, “Bits &amp; Pieces” the place to start.</p>
+</main>
+
+
+    <footer class="signoff">
+      <p>
+        More like this:
+        
+          <span class="smallcaps"><strong><a href="/categories/#writing">writing</a></strong></span>, 
+        
+          <span class="smallcaps"><strong><a href="/categories/#practices">practices</a></strong></span>
+        
+      </p>
+      <p><a href="/">← Return home</a></p>
+    </footer>
+  
+    <script src="/assets/js/enable_checkboxes.js"></script>
+
+  
+
+
+
+</body>
+</html>
+
