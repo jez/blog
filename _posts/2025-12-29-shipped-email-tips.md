@@ -1,7 +1,7 @@
 ---
 # vim:tw=90 fo-=tc
 layout: post
-title: "Mechcanical tips to improve shipped emails"
+title: "Mechanical tips to improve shipped emails"
 date: 2025-12-29T16:53:35-05:00
 description: >
   I end up giving the same mechanical feedback on ~every shipped email draft I read. These are some simple tips for making a shipped email useful to busy readers.
@@ -15,7 +15,7 @@ categories: ['writing', 'practices']
 I end up giving the same mechanical feedback on ~every shipped email[^shipped-email] draft I read. These are some simple tips for making a shipped email useful to busy readers.
 
 [^shipped-email]:
-  {-} A **shipped email** is company-internal email sent to announce when some unit of work has wrapped up. To my knowledge, it's [predominantly a Stripe-ism][jmduke], so the ideas in this post may not be relevant to all writers.
+  {-} A **shipped email** is a company-internal email sent to announce when some unit of work has wrapped up. To my knowledge, it's [predominantly a Stripe-ism][jmduke], so the ideas in this post may not be relevant to all writers.
 
 [jmduke]: https://buttondown.com/blog/shipped-at
 
@@ -64,7 +64,7 @@ vs
 
 [highlight untyped code]: https://sorbet.org/docs/highlight-untyped
 
-Rewriting with bullet points leaves the summary skimmable while making space for substance. The first example lacks the sort of takeaway that a good TL;DR needs.[^tldr-subject] "Some improvements" weasels out of actually stating those improvements. The second example states the two improvements (a default has been changed, but the default has not be fixed in place).
+Rewriting with bullet points leaves the summary skimmable while making space for substance. The first example lacks the sort of takeaway that a good TL;DR needs.[^tldr-subject] "Some improvements" weasels out of actually stating those improvements. The second example states the two improvements (a default has been changed, but the default has not been fixed in place).
 
 [^tldr-subject]:
   {-} Oddly enough, this TL;DR could be lightly edited into a decent subject line.
@@ -123,7 +123,7 @@ Sure, there are times when the background is truly the most important thing and 
 
 \
 
-That's mostly it for the structural suggestions. They're mechanical and unambiguous: they apply nearly all the time, so it's easy to get in a habit of checking them as soon as there's a rough draft.
+That's mostly it for the structural suggestions. They're mechanical and unambiguous: they apply nearly all the time, so it's easy to get in the habit of checking them as soon as there's a rough draft.
 
 Up next are the harder-to-spot tips about sentences and paragraphs themselves.
 
@@ -175,5 +175,5 @@ Some examples from this post:
 
 This one is harder to be mechanical about, because there are weak verbs everywhere, and realistically we don't have time to audit all of them before sending an email. That being said, something to watch out for: verbs like _is_, _does_, or _has_ paired with an adjective or adverb often simplify to the verb form of the adjective or adverb.
 
-For more mechanical tips to improve writing, I recommend the whole of Chapter 10, "Bits & Pieces" from _On Writing Well_ (quoted above). The whole book is worth a read, but much of it avoids prescribing a solution, in favor of outlining principles. (In fact I've avoided focusing on the principles because I think it does a much better job of that than I'd ever do.) But if you're just looking for quick tips, "Bits & Pieces" the place to start.
+For more mechanical tips to improve writing, I recommend the whole of Chapter 10, "Bits & Pieces" from _On Writing Well_ (quoted above). The whole book is worth a read, but much of it avoids prescribing a solution, in favor of outlining principles. (In fact I've avoided focusing on the principles because I think it does a much better job of that than I'd ever do.) But if you're just looking for quick tips, "Bits & Pieces" is the place to start.
 
