@@ -52,7 +52,7 @@ But when the goals are flipped—it has to work for exactly one language, and th
 the parser is paramount—tree-sitter becomes less attractive. There are two questions I
 would pose to anyone curious about using tree-sitter for their parser:
 
-1.  Is serving autocompletion requests a key use cases?
+1.  Is serving autocompletion requests a key use case?
 
     Serving autocompletion requests requires an unnaturally high parse fidelity, even when
     the buffer is ridiculed with syntax errors.
