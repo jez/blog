@@ -569,15 +569,6 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Runnable</span> <span class="kw">&amp;</span> <span class="dt">HasOwner</span>      <span class="co"># Module#&amp;</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Box</span><span class="kw">[</span><span class="dt">Integer</span><span class="kw">]</span>             <span class="co"># Module#[]</span></span></code></pre></div>
 <p>There are two problems:</p>
-<div class="sidenote-wrapper">
-<input type="checkbox" id="sn-5" class="margin-toggle"/>
-<div class="sidenote">
-<p>While we’re in the realm of the wacky, we could have “block-scoped”
-monkey patches where we replace the meaning of certain methods when
-evaluating the <code>sig</code> block to make this work, but the earlier
-point stands: some people won’t want that.</p>
-</div>
-</div>
 <ul>
 <li><p>It would involve monkey patching <code>Module</code>, which would
 be controversial, and thus need to be opt-in: this syntax could not be
@@ -591,6 +582,15 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb8-1"><a href="
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Set</span><span class="kw">[</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span><span class="kw">]</span>             <span class="co"># Set.[]</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># =&gt; #&lt;Set: {1, 2, 3}&gt;</span></span></code></pre></div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-5" class="margin-toggle"/>
+<div class="sidenote">
+<p>While we’re in the realm of the wacky, we could have “block-scoped”
+monkey patches where we replace the meaning of certain methods when
+evaluating the <code>sig</code> block to make this work, but the earlier
+point stands: some people won’t want that.</p>
+</div>
+</div>
 <p>So <code>Array[Integer]</code> would not make a generic type, but
 rather a length 1 array:
 <code>[Integer]</code>.<label for="sn-5" class="margin-toggle sidenote-number"></label></p></li>
