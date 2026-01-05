@@ -144,16 +144,17 @@ we wanted (in our case, <code>String</code>), or <em>the input</em> if
 the input is <code>nil</code>.</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>T<span class="at">.all</span>(T<span class="at">.type_parameter</span>(<span class="wa">:U</span>), <span class="dt">NilClass</span>)</span></code></pre></div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="marginnote">
+<p>This constraint about returning the input unchanged is an example of
+<a href="https://blog.jez.io/sorbet-parametricity/">parametricity in
+action</a>.</p>
+</div>
+</div>
 <p>Returning something with a generic type means returning the exact
-input,<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">This constraint about returning the input unchanged
-is an example of <a
-href="https://blog.jez.io/sorbet-parametricity/">parametricity in
-action</a>.<br />
-<br />
-</span></span> not merely “something with the same type as the
-input.”</p>
+input,<label for="sn-0" class="margin-toggle">&#8853;</label> not merely
+“something with the same type as the input.”</p>
 <p>So instead of having <code>return nil</code> on line 10, we have to
 write <code>return amount</code>.</p>
 <p><br />
@@ -216,6 +217,8 @@ bound of <code>T.noreturn</code>, and
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

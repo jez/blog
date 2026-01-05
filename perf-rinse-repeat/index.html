@@ -172,14 +172,16 @@ to make it faster.</p>
 > I wrote it for "people working on the Sorbet compiler," but you'll find tips that apply
 > in general if you look hard enough.
 -->
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="marginnote">
+<p><strong>Editor’s note</strong>: “7 lines of code” is a <a
+href="https://stripe.com/blog/payment-api-design">Stripe meme</a>.</p>
+</div>
+</div>
 <p>Our first step once the program is already this small—a mere 7 lines
-of code 😎<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote"><strong>Editor’s note</strong>: “7 lines of code” is a
-<a href="https://stripe.com/blog/payment-api-design">Stripe
-meme</a>.<br />
-<br />
-</span></span>—is to profile it with <a
+of code 😎<label for="sn-0" class="margin-toggle">&#8853;</label>—is to
+profile it with <a
 href="http://www.brendangregg.com/perf.html"><code>perf</code></a>:</p>
 <figure>
 <img src="/assets/img/perf-rinse-repeat-01.png"
@@ -192,18 +194,20 @@ alt="Largest self time: func_Object#returns_nilclass" />
 compiler emitted containing the code for our Ruby-level
 <code>returns_nilclass</code> method above.</p>
 <!-- TODO(jez) "by Self time" used to link to the relevant section in Diagnosing Compiler Performance -->
-<p>Perf lets us dig into an individual method’s assembly to see where
-the time is spent. Here’s the hot instructions:<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="sidenote">You’ll notice: we even emit debug info, mapping which
-Ruby-level line these instructions came from!<br />
-<br />
-It means that if you run Ruby under <code>gdb</code> and print a
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-1" class="margin-toggle"/>
+<div class="sidenote">
+<p>You’ll notice: we even emit debug info, mapping which Ruby-level line
+these instructions came from!</p>
+<p>It means that if you run Ruby under <code>gdb</code> and print a
 backtrace, sometimes you’ll see C files in the backtrace (from inside
 the Ruby VM), and sometimes you’ll see Ruby files (for C functions
-emitted by the Sorbet compiler).<br />
-<br />
-</span></span></p>
+emitted by the Sorbet compiler).</p>
+</div>
+</div>
+<p>Perf lets us dig into an individual method’s assembly to see where
+the time is spent. Here’s the hot
+instructions:<label for="sn-1" class="margin-toggle sidenote-number"></label></p>
 <figure>
 <img src="/assets/img/perf-rinse-repeat-02.png"
 alt="body of returns_nilclass when compiled" />
@@ -216,15 +220,18 @@ In particular, you’ll notice these <code>mov</code> instructions all
 look like:</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode gnuassembler"><code class="sourceCode gnuassembler"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mov smallNumber<span class="op">(%</span>register1<span class="op">),%</span>register2</span></code></pre></div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-2" class="margin-toggle"/>
+<div class="sidenote">
+<p>Comment from Nathan: “<code>perf report -M intel ...</code> ought to
+use a more reasonable disassembly syntax.”</p>
+</div>
+</div>
 <p>It’s super esoteric (thanks, <a
 href="https://elronnd.net/writ/2021-02-13_att-asm.html">AT&amp;T
-assembly syntax</a>),<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="sidenote">Comment from Nathan:
-“<code>perf report -M intel ...</code> ought to use a more reasonable
-disassembly syntax.”<br />
-<br />
-</span></span> but this means: take <code>%register1</code>, add
+assembly
+syntax</a>),<label for="sn-2" class="margin-toggle sidenote-number"></label>
+but this means: take <code>%register1</code>, add
 <code>smallNumber</code> to it, assume the result is an address, get the
 value stored there and put it in <code>%register2</code>.</p>
 <p>Sound familiar? That’s basically the <strong>assembly equivalent of
@@ -386,6 +393,8 @@ compiler in production.</p>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

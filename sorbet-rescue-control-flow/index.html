@@ -127,20 +127,23 @@ alt="An example CFG with a rescue block" />
 block</figcaption>
 </figure>
 </div>
-<p>This is a simplified view of a CFG in Sorbet.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">If you have <a
-href="https://graphviz.org/">Graphviz</a> installed, you can get Sorbet
-to dump its internal CFG for a given file with the
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="sidenote">
+<p>If you have <a href="https://graphviz.org/">Graphviz</a> installed,
+you can get Sorbet to dump its internal CFG for a given file with the
 <code>cfg-view.sh</code> script in the Sorbet repo. The CFG for the
 example above looks like <a
-href="/assets/img/rescue-example-01.svg">like this</a>.<br />
-<br />
-</span></span> The boxes contain hunks of straight-line code (code
-without control flow), and all control flow is made explicit by
-branching on a specified variable at the end of each block. For the case
-of <code>rescue</code>, the branches read from a magical
-<code>&lt;exn-value&gt;</code> variable, which Sorbet treats as <span
+href="/assets/img/rescue-example-01.svg">like this</a>.</p>
+</div>
+</div>
+<p>This is a simplified view of a CFG in
+Sorbet.<label for="sn-0" class="margin-toggle sidenote-number"></label>
+The boxes contain hunks of straight-line code (code without control
+flow), and all control flow is made explicit by branching on a specified
+variable at the end of each block. For the case of <code>rescue</code>,
+the branches read from a magical <code>&lt;exn-value&gt;</code>
+variable, which Sorbet treats as <span
 class="smallcaps"><strong>unanalyzable</strong></span>: Sorbet doesn’t
 attempt to track how the value is initialized nor how control flow
 affects it.</p>
@@ -168,16 +171,20 @@ CFG</a> for the above example.<br />
 <code>begin</code>, only the <code>NilClass</code> branch is live in the
 <code>rescue</code> block.</li>
 </ul>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-2" class="margin-toggle"/>
+<div class="sidenote">
+<p>Of course, easier said than done.</p>
+</div>
+</div>
 <p>That second point about <code>while true</code> is <a
 href="https://github.com/sorbet/sorbet/issues/4108">simply a bug</a>.
 Sorbet should be smart enough to suspend the normal flow-sensitivity
 rules for infinite loops while checking code in a <code>begin</code>
-block that has a <code>rescue</code>.<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="sidenote">Of course, easier said than done.<br />
-<br />
-</span></span> But still, fixing that bug would only fix half the
-problem: Sorbet would think that <code>loop_count</code> has type
+block that has a
+<code>rescue</code>.<label for="sn-2" class="margin-toggle sidenote-number"></label>
+But still, fixing that bug would only fix half the problem: Sorbet would
+think that <code>loop_count</code> has type
 <code>T.nilable(Integer)</code> in the <code>rescue</code> body, but we
 said the best outcome would be for Sorbet to know that
 <code>loop_count</code> is <strong>always</strong> initialized, having
@@ -201,16 +208,19 @@ more instructions from the first block will execute then one of the
 <code>rescue</code>s could match and then if none do the
 <code>else</code> will match.</p>
 </blockquote>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-3" class="margin-toggle"/>
+<div class="sidenote">
+<p>This is not quite true: <code>x = 0</code> doesn’t raise, and Sorbet
+can <a href="/syntactic-control-flow/">see that syntactically</a>. This
+might be something to take advantage of in the future.</p>
+</div>
+</div>
 <p>The approach it’s describing is what most people might do
-intuitively: any instruction in a <code>begin</code> might raise,<span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="sidenote">This is not quite true: <code>x = 0</code> doesn’t
-raise, and Sorbet can <a href="/syntactic-control-flow/">see that
-syntactically</a>. This might be something to take advantage of in the
-future.<br />
-<br />
-</span></span> so let’s record an unanalyzable jump after each
-instruction, into the <code>rescue</code> block. In picture form:</p>
+intuitively: any instruction in a <code>begin</code> might
+raise,<label for="sn-3" class="margin-toggle sidenote-number"></label>
+so let’s record an unanalyzable jump after each instruction, into the
+<code>rescue</code> block. In picture form:</p>
 <div class="only-light-mode">
 <figure>
 <img src="/assets/img/rescue-cfg-multi-block-light-mode.png"
@@ -235,15 +245,18 @@ a jump after the <code>loop_count = 0</code> assignment into the
 <code>rescue</code> block, which would have been enough for Sorbet to
 infer a type of <code>Integer</code> (regardless of whether that
 <code>while true</code> bug were fixed method).</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-4" class="margin-toggle"/>
+<div class="sidenote">
+<p>And only two days after I joined the team 😅</p>
+</div>
+</div>
 <p>But importantly, this original approach was thrown out, <a
 href="https://github.com/sorbet/sorbet/commit/a6ed41e0b8deee28ff592063934b28676ac77927#diff-c9b037996e9c16464e031136abe5d9df567c72f283d572b070d108228b733127R335-R342">almost
-exactly 9 months later</a><span
-class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
-class="sidenote">And only two days after I joined the team 😅<br />
-<br />
-</span></span>, when the shortcut we’ve been discussing arrived. In
-fact, a comment from that commit persists unchanged in the codebase
-today:</p>
+exactly 9 months
+later</a><label for="sn-4" class="margin-toggle sidenote-number"></label>,
+when the shortcut we’ve been discussing arrived. In fact, a comment from
+that commit persists unchanged in the codebase today:</p>
 <blockquote>
 <figure class="left-align-caption">
 <p>We have a simplified view of the control flow here but in practise it
@@ -272,6 +285,13 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Sorbet would assume `x` was always set</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">puts</span>(x)</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-5" class="margin-toggle"/>
+<div class="sidenote">
+<p>There’s an easy workaround: use <code>T.let</code> to pin the type of
+the variable outside the <code>begin</code> block.</p>
+</div>
+</div>
 <p>In this example, the first instruction in the block is an assignment
 (<code>x = ...</code>). But Sorbet would only record the jump after the
 assignment entirely, not between the method call and the assignment.
@@ -281,12 +301,9 @@ set, but in fact it’s <strong>not</strong> set when
 tripped this bug all the time on real-world code—there were beta users
 of Sorbet chiming in on the PR eagerly waiting for the bug to be fixed.
 Meanwhile, code that looked like our <code>loop_count</code> example
-either did not exist or was simply rewritten<span
-class="sidenote-wrapper"><label for="sn-5" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-5" class="margin-toggle"/><span
-class="sidenote">There’s an easy workaround: use <code>T.let</code> to
-pin the type of the variable outside the <code>begin</code> block.<br />
-<br />
-</span></span> to avoid the bug.</p>
+either did not exist or was simply
+rewritten<label for="sn-5" class="margin-toggle sidenote-number"></label>
+to avoid the bug.</p>
 <p>But this still doesn’t quite paint the full picture. I’ve told you,
 “There was a bug, and Sorbet fixed it by introducing another bug.” Which
 leads us to out second point: having a lot of tiny, jumpy basic blocks
@@ -377,6 +394,8 @@ href="https://github.com/sorbet/sorbet/issues/4108">that
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

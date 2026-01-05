@@ -81,18 +81,20 @@
 </nav>
 
 <main>
-<p>I end up giving the same mechanical feedback on ~every shipped
-email<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">A <strong>shipped email</strong> is a
-company-internal email sent to announce when some unit of work has
-wrapped up. To my knowledge, it’s <a
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="sidenote">
+<p>A <strong>shipped email</strong> is a company-internal email sent to
+announce when some unit of work has wrapped up. To my knowledge, it’s <a
 href="https://buttondown.com/blog/shipped-at">predominantly a
 Stripe-ism</a>, so the ideas in this post may not be relevant to all
-writers.<br />
-<br />
-</span></span> draft I read. These are some simple tips for making a
-shipped email useful to busy readers.</p>
+writers.</p>
+</div>
+</div>
+<p>I end up giving the same mechanical feedback on ~every shipped
+email<label for="sn-0" class="margin-toggle sidenote-number"></label>
+draft I read. These are some simple tips for making a shipped email
+useful to busy readers.</p>
 <p>I want to stress <strong>mechanical</strong>. Software engineers
 spend time getting better at writing code, problem solving, and
 “software engineering” more generally. Technical writing is a skill just
@@ -112,17 +114,20 @@ disagree, but I stand by these suggestions.</p>
 statement</h1>
 <p>The subject should read as a statement about what is now possible or
 what was done. Avoid stating only the project’s name.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-1" class="margin-toggle"/>
+<div class="sidenote">
+<p>The opposite is also true: a subject can assure readers that an email
+is skippable because they already know its contents or that they’re not
+the intended audience.</p>
+</div>
+</div>
 <p>A subject should appeal to the <strong>marginal reader</strong>:
 someone who wasn’t aware that the work was happening, but who benefits
 from knowing about it. The subject needs to convince the marginal reader
-to read on.<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="marginnote">The opposite is also true: a subject can assure
-readers that an email is skippable because they already know its
-contents or that they’re not the intended audience.<br />
-<br />
-</span></span> An unknown project codename in the subject line won’t do
-that.</p>
+to read
+on.<label for="sn-1" class="margin-toggle sidenote-number"></label> An
+unknown project codename in the subject line won’t do that.</p>
 <p>I shipped a Sorbet feature recently. Here are two example subject
 lines:</p>
 <blockquote>
@@ -147,15 +152,17 @@ least, those who want to learn more about them).</li>
 </ul>
 <h1 id="dont-be-afraid-of-bullets-for-the-tldr">Don’t be afraid of
 bullets for the TL;DR</h1>
-<p>A TL;DR or BLUF<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="marginnote">“too long; didn’t read” and “bottom line up
-front”<br />
-<br />
-</span></span> section offers skimmable takeaways at the top of an
-email. Something can be skimmable yet longer than one sentence. By
-contrast, single sentences often sacrifice salience for brevity. A TL;DR
-must have both.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-2" class="margin-toggle"/>
+<div class="sidenote">
+<p>“too long; didn’t read” and “bottom line up front”</p>
+</div>
+</div>
+<p>A TL;DR or
+BLUF<label for="sn-2" class="margin-toggle sidenote-number"></label>
+section offers skimmable takeaways at the top of an email. Something can
+be skimmable yet longer than one sentence. By contrast, single sentences
+often sacrifice salience for brevity. A TL;DR must have both.</p>
 <p>Double check whether a single-sentence TL;DR delivers substance.
 Here’s an example:</p>
 <blockquote>
@@ -174,16 +181,20 @@ nowhere, everywhere, or only in non-test files (instructions
 below).</li>
 </ul>
 </blockquote>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-3" class="margin-toggle"/>
+<div class="sidenote">
+<p>Oddly enough, this TL;DR could be lightly edited into a decent
+subject line.</p>
+</div>
+</div>
 <p>Rewriting with bullet points leaves the summary skimmable while
 making space for substance. The first example lacks the sort of takeaway
-that a good TL;DR needs.<span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="marginnote">Oddly enough, this TL;DR could be lightly edited into
-a decent subject line.<br />
-<br />
-</span></span> “Some improvements” weasels out of actually stating those
-improvements. The second example states the two improvements (a default
-has been changed, but the default has not been fixed in place).</p>
+that a good TL;DR
+needs.<label for="sn-3" class="margin-toggle sidenote-number"></label>
+“Some improvements” weasels out of actually stating those improvements.
+The second example states the two improvements (a default has been
+changed, but the default has not been fixed in place).</p>
 <p>I don’t want to imply there <em>must</em> be bullets. Use the length
 as an indicator: if the TL;DR has one sentence ask whether it lacks
 substance. Bullets are a quick remedy in those cases.</p>
@@ -426,6 +437,8 @@ tips, “Bits &amp; Pieces” is the place to start.</p>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

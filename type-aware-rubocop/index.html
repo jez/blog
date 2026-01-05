@@ -106,16 +106,19 @@ types, then subsequently keeps refining the AST until it only has about
 15. The thing Sorbet type checks looks nothing like the AST that you’d
 want if you were trying to write a linter, because so much of it has
 been desugared, rewritten, or simplified.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="sidenote">
+<p>It’s a graph, where nodes are basic blocks and edges are control flow
+jumps between those blocks.</p>
+</div>
+</div>
 <p>Then finally right before type checking, Sorbet actually abandons the
 (tree-based) AST, preferring to use a <strong>control flow
 graph</strong> (CFG) for type checking! A CFG is no longer
-tree-based<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote">It’s a graph, where nodes are basic blocks and edges
-are control flow jumps between those blocks.<br />
-<br />
-</span></span>, which breaks a lot of the assumptions people make about
-what’s easy and hard to build in a linter rule.</p>
+tree-based<label for="sn-0" class="margin-toggle sidenote-number"></label>,
+which breaks a lot of the assumptions people make about what’s easy and
+hard to build in a linter rule.</p>
 <p>Because Sorbet type checks a CFG only, there’s no tree-based
 structure inside Sorbet that has types. <em>Maybe</em> it’s possible to
 take the type-annotated CFG and use it to reconstruct some sort of typed
@@ -128,20 +131,24 @@ variable and then only dealing with variables from then on.</p>
 variables is enough?</h3>
 <p>This would likely be somewhat easier to implement, because Sorbet
 already does maintain environments mapping variables to their types.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-1" class="margin-toggle"/>
+<div class="sidenote">
+<p>Sorbet’s LSP editor integration gets around this by re-typechecking
+an entire method every time the user hovers over a variable. When these
+hover requests come as (infrequent) requests from the user, this is fine
+because Sorbet is already initialized. Powering a linter this way would
+either require that the Sorbet server be initialized for variable type
+every request (crazy slow), or somehow kept around persistently
+(brittle).</p>
+</div>
+</div>
 <p>However, these data structures are expensive to maintain and
-therefore not long-lived.<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="sidenote">Sorbet’s LSP editor integration gets around this by
-re-typechecking an entire method every time the user hovers over a
-variable. When these hover requests come as (infrequent) requests from
-the user, this is fine because Sorbet is already initialized. Powering a
-linter this way would either require that the Sorbet server be
-initialized for variable type every request (crazy slow), or somehow
-kept around persistently (brittle).<br />
-<br />
-</span></span> Unlike Sorbet’s symbol table, which exists indefinitely
-after creation, the environments that track variable types only last as
-long as is required to type check a single method.</p>
+therefore not
+long-lived.<label for="sn-1" class="margin-toggle sidenote-number"></label>
+Unlike Sorbet’s symbol table, which exists indefinitely after creation,
+the environments that track variable types only last as long as is
+required to type check a single method.</p>
 <p>Maybe there could be an API like “please give me the type of the
 variable with this name,” but again this would be tricky, because
 chances are the lint rule author wants to build the lint rule on some
@@ -278,26 +285,33 @@ share!</del><br />
 </span></span> Not having any sort of frame of reference makes it hard
 to gauge expectations people have when asking for a tool like
 this.</del></p>
-<p><strong>Update, 2022-05-18</strong><span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="sidenote">Thanks to Steve Dignam for pointing out that not only
-does C# have static analysis APIs, but that TypeScript does as well,
-along with an ecosystem of type-aware lint rules.<br />
-<br />
-</span></span> There <em>are</em> type-aware static analysis tools for
-C# and TypeScript. Both languages were designed by the <a
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-3" class="margin-toggle"/>
+<div class="sidenote">
+<p>Thanks to Steve Dignam for pointing out that not only does C# have
+static analysis APIs, but that TypeScript does as well, along with an
+ecosystem of type-aware lint rules.</p>
+</div>
+</div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-4" class="margin-toggle"/>
+<div class="sidenote">
+<p>All things considered, it’s actually quite good at this.</p>
+</div>
+</div>
+<p><strong>Update,
+2022-05-18</strong><label for="sn-3" class="margin-toggle sidenote-number"></label>
+There <em>are</em> type-aware static analysis tools for C# and
+TypeScript. Both languages were designed by the <a
 href="https://en.wikipedia.org/wiki/Anders_Hejlsberg">same person</a>,
 so maybe this isn’t surprising. Unfortunately for Sorbet, they were
 architected to support static analysis tooling <a
 href="https://en.wikipedia.org/wiki/Roslyn_%28compiler%29#:~:text=Roslyn%20was%20designed%20with%20that%20intent%20from%20the%20beginning.">from
 the beginning</a>. Sorbet’s current architecture was instead designed
-for batch type checking performance on large monorepos,<span
-class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
-class="sidenote">All things considered, it’s actually quite good at
-this.<br />
-<br />
-</span></span> and IDE support was grafted on later. Exposing hackable
-APIs has so far not been considered.</p>
+for batch type checking performance on large
+monorepos,<label for="sn-4" class="margin-toggle sidenote-number"></label>
+and IDE support was grafted on later. Exposing hackable APIs has so far
+not been considered.</p>
 <p>For example, TypeScript offers a <a
 href="https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API">compiler
 API</a>, which is then used by the TypeScript ESLint project, which
@@ -380,6 +394,8 @@ currently exist.</p>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

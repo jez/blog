@@ -69,19 +69,20 @@ command-line fuzzy finder, which means you can use it to replace tab
 completion at the command line with a fuzzy drop-down picker. It’s
 straight magic, it’s quick to set up, and you’re in for a treat.</p>
 <p><a href="https://github.com/junegunn/fzf">Install fzf →</a></p>
-<p>One of the best parts of fzf is that you can script it.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">Fun fzf tip: the <code>kill</code> command is already
-configured using this completion API: try typing
-<code>kill -p **&lt;TAB&gt;</code> and you’ll never see
-<code>kill</code> the same way again 🙂<br />
-<br />
-</span></span> In the screen cast above, you see how I’m using
-<code>**&lt;TAB&gt;</code> to trigger fzf to list all bazel targets. It
-uses the <a
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="marginnote">
+<p>Fun fzf tip: the <code>kill</code> command is already configured
+using this completion API: try typing <code>kill -p **&lt;TAB&gt;</code>
+and you’ll never see <code>kill</code> the same way again 🙂</p>
+</div>
+</div>
+<p>One of the best parts of fzf is that you can script it. In the screen
+cast above, you see how I’m using <code>**&lt;TAB&gt;</code> to trigger
+fzf to list all bazel targets. It uses the <a
 href="https://github.com/junegunn/fzf#custom-fuzzy-completion">Custom
 fuzzy completion</a> API to register a shell function to run on
-<code>TAB</code>.</p>
+<code>TAB</code>.<label for="sn-0" class="margin-toggle">&#8853;</label></p>
 <p>Here’s the code you can add to your config files (like your
 <code>~/.zshrc</code>):</p>
 <p><span
@@ -131,18 +132,20 @@ can be filtered.</p>
 <code>bazel build</code>) as well as <code>bazel test</code> (which
 limits the output to only <code>test</code> and <code>test_suite</code>
 targets).</p>
-<p>You can see one caveat in the comment there:<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="marginnote">If you have a solution to this, please let me
-know!<br />
-<br />
-</span></span> it doesn’t do all that well at finding every external
-target. For example, the Sorbet repo has a bunch of
-<code>:ruby.tar.gz</code> defined in various external
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-2" class="margin-toggle"/>
+<div class="sidenote">
+<p>If you have a solution to this, please let me know!</p>
+</div>
+</div>
+<p>You can see one caveat in the comment there: it doesn’t do all that
+well at finding every external target. For example, the Sorbet repo has
+a bunch of <code>:ruby.tar.gz</code> defined in various external
 (<code>@</code>-prefixed) repository rules, but since Bazel doesn’t have
 an easy way to list all those external repos, and because they’re not
 transitive deps of anything in <code>//...</code>, they don’t show up in
-the output.</p>
+the
+output.<label for="sn-2" class="margin-toggle sidenote-number"></label></p>
 <p>One last trick: I have a <em>ton</em> of <a
 href="https://github.com/jez/dotfiles/blob/20dfe3da792a78c8fdc11756ed2c9c7dce8ac74f/host-jez-pc-01/util/host.sh#L116-L125">bazel
 shell aliases</a>. Because of how zsh auto-discovers these two
@@ -189,6 +192,8 @@ these functions, please let me know!</p>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

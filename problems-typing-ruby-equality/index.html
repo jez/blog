@@ -155,22 +155,24 @@ class="sourceCode numberSource ruby numberLines hl-2 hl-3 hl-9"><code class="sou
 <span id="cb3-10"><a href="#cb3-10"></a>    <span class="fu">p</span>(x, y)</span>
 <span id="cb3-11"><a href="#cb3-11"></a>  <span class="cf">end</span></span>
 <span id="cb3-12"><a href="#cb3-12"></a><span class="cf">end</span></span></code></pre></div>
-<p>In this case, <code>Foo</code> and <code>Bar</code> do not
-overlap<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="marginnote">Note that <code>Foo</code> and <code>Bar</code> do
-not overlap because they are classes. If one of them had been a module,
-<a
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-1" class="margin-toggle"/>
+<div class="marginnote">
+<p>Note that <code>Foo</code> and <code>Bar</code> do not overlap
+because they are classes. If one of them had been a module, <a
 href="https://sorbet.org/docs/intersection-types#understanding-how-intersection-types-collapse">they
-would overlap</a>, also defeating the equality check.<br />
-<br />
-</span></span> <code>Foo</code> does not override <code>==</code>.
-Unfortunately that says nothing about what subclasses of
-<code>Foo</code> might do. In this example, <code>Foo</code> has a
-subclass called <code>FooChild</code> with a custom override that
-misbehaves. (I’ve made it always return <code>true</code> for
-simplicity, but you can just as well imagine it doing some sort of
-implicit conversion.) Thus, subtyping has defeated our heuristic.</p>
+would overlap</a>, also defeating the equality check.</p>
+</div>
+</div>
+<p>In this case, <code>Foo</code> and <code>Bar</code> do not
+overlap<label for="sn-1" class="margin-toggle">&#8853;</label>
+<code>Foo</code> does not override <code>==</code>. Unfortunately that
+says nothing about what subclasses of <code>Foo</code> might do. In this
+example, <code>Foo</code> has a subclass called <code>FooChild</code>
+with a custom override that misbehaves. (I’ve made it always return
+<code>true</code> for simplicity, but you can just as well imagine it
+doing some sort of implicit conversion.) Thus, subtyping has defeated
+our heuristic.</p>
 <p>If the left operand had been <a
 href="https://sorbet.org/docs/final"><code>final!</code></a> Sorbet
 could rule out caveats like this, but then our heuristic would be so
@@ -187,15 +189,17 @@ conversions specific standard library classes do.</p>
 <p>Maybe trying to be as general as possible is the wrong approach? We
 could try picking only a few important classes in the standard library
 and special case the check for those types.</p>
-<p>For example,<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="marginnote">This is not merely an example—this is the approach
-we’ve implemented it <a
-href="https://github.com/sorbet/sorbet/pull/6649">here</a>.<br />
-<br />
-</span></span> if we pretend that <code>Symbol</code> is final (it’s not
-but maybe we pretend anyways), we could require that the right operand’s
-type overlaps with <code>Symbol</code>, catching attempts to compare for
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-2" class="margin-toggle"/>
+<div class="marginnote">
+<p>This is not merely an example—this is the approach we’ve implemented
+it <a href="https://github.com/sorbet/sorbet/pull/6649">here</a>.</p>
+</div>
+</div>
+<p>For example,<label for="sn-2" class="margin-toggle">&#8853;</label>
+if we pretend that <code>Symbol</code> is final (it’s not but maybe we
+pretend anyways), we could require that the right operand’s type
+overlaps with <code>Symbol</code>, catching attempts to compare for
 equality against <code>String</code> (super common).</p>
 <p>This only gets us as far as types that don’t do implicit conversions.
 For a type like <code>String</code>, even though we know it allows
@@ -249,20 +253,21 @@ class="sourceCode numberSource ruby numberLines hl-1 hl-6"><code class="sourceCo
 <code>A</code>. Done! Well, this fixes the immediate problem
 (<code>x == y</code> reports an error if <code>y</code> is an
 <code>A</code>), but it causes two of its own.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-3" class="margin-toggle"/>
+<div class="marginnote">
+<p>At this point, marking it overridable would be a backwards
+incompatible change, requiring existing <code>==</code> signatures to
+start mentioning <code>override</code>, likely with no benefit.</p>
+</div>
+</div>
 <p>First, this is technically an incompatible override (see <a
 href="https://sorbet.org/docs/override-checking#a-note-on-variance">A
 note on variance</a> for more). As it happens, Sorbet silences the error
 because the RBI definition for <code>BasicObject#==</code> is not marked
-<code>overridable</code>.<span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="marginnote">At this point, marking it overridable would be a
-backwards incompatible change, requiring existing <code>==</code>
-signatures to start mentioning <code>override</code>, likely with no
-benefit.<br />
-<br />
-</span></span> Maybe you declare “ignorance is bliss,” ignore the voice
-telling you that all incompatible overrides are bad, and blaze
-ahead.</p>
+<code>overridable</code>.<label for="sn-3" class="margin-toggle">&#8853;</label>
+Maybe you declare “ignorance is bliss,” ignore the voice telling you
+that all incompatible overrides are bad, and blaze ahead.</p>
 <p>This leads to our second problem, heterogeneous collections.</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode numberSource ruby numberLines hl-1"><code class="sourceCode ruby"><span id="cb6-1"><a href="#cb6-1"></a>sig <span class="kw">{</span>params(<span class="wa">xs: </span>T<span class="kw">::</span><span class="dt">Array</span><span class="kw">[</span>T<span class="at">.any</span>(<span class="dt">Integer</span>, A)<span class="kw">]}</span></span>
@@ -276,15 +281,19 @@ might happen indirectly by way of <code>include?</code> if
 <code>xs</code> has any <code>A</code> values in it. But now instead of
 returning <code>false</code>, the <code>sig</code> on our
 <code>A#==</code> method will raise an exception!</p>
-<p>That’s a problem.<span
-class="sidenote-wrapper"><label for="sn-4" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
-class="marginnote">You might be tempted to think of this as an
-indictment of <a href="/runtime-type-checking/">runtime checking</a>,
-but I don’t. In my opinion, this is the runtime type system flagging a
-real problem (incompatible override) which the static type system
-couldn’t catch because of gradual typing.<br />
-<br />
-</span></span> To fix it, we could try marking the <code>sig</code> with
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-4" class="margin-toggle"/>
+<div class="marginnote">
+<p>You might be tempted to think of this as an indictment of <a
+href="/runtime-type-checking/">runtime checking</a>, but I don’t. In my
+opinion, this is the runtime type system flagging a real problem
+(incompatible override) which the static type system couldn’t catch
+because of gradual typing.</p>
+</div>
+</div>
+<p>That’s a
+problem.<label for="sn-4" class="margin-toggle">&#8853;</label> To fix
+it, we could try marking the <code>sig</code> with
 <code>checked(:never)</code>, but then Sorbet’s dead code checking would
 prevent us from handling other types in our method body.</p>
 <p>Another attempted fix might be to use an overloaded signature. These
@@ -337,21 +346,23 @@ errors aren’t quite as obvious: errors now show up indirectly as dead
 code errors, rather than something descriptive at the point of the
 problem. It’s unclear whether hard-to-understand errors are better than
 no errors.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-5" class="margin-toggle"/>
+<div class="marginnote">
+<p>Writing this post made me wonder if Sorbet <em>should</em> do
+something smarter here, like try to decompose the argument type and
+combine all the overloads that apply to each component. But that’s
+getting into territory where I can’t think of any prior art, which sets
+off my ⚠️ bad idea ⚠️ radar. (For example, TypeScript behaves like
+Sorbet when porting the above example.)</p>
+</div>
+</div>
 <p>However, Sorbet’s overload resolution doesn’t work well with these
-signatures.<span
-class="sidenote-wrapper"><label for="sn-5" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-5" class="margin-toggle"/><span
-class="marginnote">Writing this post made me wonder if Sorbet
-<em>should</em> do something smarter here, like try to decompose the
-argument type and combine all the overloads that apply to each
-component. But that’s getting into territory where I can’t think of any
-prior art, which sets off my ⚠️ bad idea ⚠️ radar. (For example,
-TypeScript behaves like Sorbet when porting the above example.)<br />
-<br />
-</span></span> <code>T.nilable(A)</code> is not a subtype of
-<code>A</code>, causing Sorbet to apply the <code>BasicObject</code>
-overload. This means Sorbet ascribes <code>FalseClass</code> to
-<code>res</code>, which is wrong when <code>y</code> is
-non-<code>nil</code> at runtime.</p>
+signatures.<label for="sn-5" class="margin-toggle">&#8853;</label>
+<code>T.nilable(A)</code> is not a subtype of <code>A</code>, causing
+Sorbet to apply the <code>BasicObject</code> overload. This means Sorbet
+ascribes <code>FalseClass</code> to <code>res</code>, which is wrong
+when <code>y</code> is non-<code>nil</code> at runtime.</p>
 <p>All of this leads me to the conclusion that not only have we failed
 to add heuristics to Sorbet to solve this, it’s not even really
 practical for users to take the problem into their own hands.</p>
@@ -415,6 +426,8 @@ rare in Python, the problems are tolerable.</p>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

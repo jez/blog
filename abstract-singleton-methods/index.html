@@ -100,16 +100,20 @@ class="sourceCode numberSource ruby numberLines hl-3 hl-14 hl-18"><code class="s
 <span id="cb1-16"><a href="#cb1-16"></a></span>
 <span id="cb1-17"><a href="#cb1-17"></a>example(<span class="dt">ConcreteChild</span>)  <span class="co"># ✅</span></span>
 <span id="cb1-18"><a href="#cb1-18"></a>example(<span class="dt">AbstractParent</span>) <span class="co"># 💥 call to abstract method foo</span></span></code></pre></div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="sidenote">
+<p>Specifically: it’s the singleton instance of a singleton class which
+Sorbet allowed defining abstract methods on.</p>
+</div>
+</div>
 <p>The call to <code>foo</code> on line 14 expects <code>klass</code> to
 be an instance of a concrete class, so all its methods (including
 <code>foo</code>) have implementations. But at runtime, the object
 <code>AbstractParent</code> is <strong>not</strong> an instance of a
-concrete class.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">Specifically: it’s the singleton instance of a
-singleton class which Sorbet allowed defining abstract methods on.<br />
-<br />
-</span></span> The method <code>foo</code> is not implemented on the
+concrete
+class.<label for="sn-0" class="margin-toggle sidenote-number"></label>
+The method <code>foo</code> is not implemented on the
 <code>AbstractParent</code> object, so the call raises unexpectedly at
 runtime despite Sorbet reporting no static error.</p>
 <p>In every sane language, making a type abstract is
@@ -118,15 +122,17 @@ runtime despite Sorbet reporting no static error.</p>
 <code>A</code> should necessarily imply that whatever <code>x</code> is
 bound to at runtime is an instance of a concrete subclass of
 <code>A</code>. Abstract classes should not be instantiable!</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-1" class="margin-toggle"/>
+<div class="sidenote">
+<p>… ignoring Ruby trickery which well-behaved programs won’t use.</p>
+</div>
+</div>
 <p>For non-singleton classes, Sorbet enforces this guarantee: marking a
 class <code>abstract!</code> hijacks the <code>self.new</code> method at
 runtime to make it raise an exception, which prevents instantiating
-abstract classes.<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="marginnote">… ignoring Ruby trickery which well-behaved programs
-won’t use.<br />
-<br />
-</span></span></p>
+abstract
+classes.<label for="sn-1" class="margin-toggle sidenote-number"></label></p>
 <p>But for <em>singleton classes</em>, there’s no way to prevent a
 class’s singleton class from being created—the act of declaring a class
 automatically creates the singleton class. Knowing this, Sorbet should
@@ -299,6 +305,8 @@ For some high level thoughts on type-driven code organization.</p></li>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

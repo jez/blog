@@ -143,19 +143,20 @@ riskier, because a types-only change might break the code”</h2>
 <p>Absent runtime-checked types, the code would have worked—why should
 adding a type annotation make the code break?</p>
 </blockquote>
-<p>My claim: it’s just as risky to program against types that are subtly
-wrong.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">Remember: in a <a
-href="https://sorbet.org/docs/gradual">gradual type system</a>, the
-existence of types like <a
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="marginnote">
+<p>Remember: in a <a href="https://sorbet.org/docs/gradual">gradual type
+system</a>, the existence of types like <a
 href="https://sorbet.org/docs/untyped"><code>T.untyped</code></a> mean
-that the static types can lie at any point in the program.<br />
-<br />
-</span></span> Runtime-checked type annotations incur the risk early and
-sharply, sure. But when the types are subtly wrong, every change is
-risky, even small ones like adding this <code>if</code> condition and
-print statement:</p>
+that the static types can lie at any point in the program.</p>
+</div>
+</div>
+<p>My claim: it’s just as risky to program against types that are subtly
+wrong.<label for="sn-0" class="margin-toggle">&#8853;</label>
+Runtime-checked type annotations incur the risk early and sharply, sure.
+But when the types are subtly wrong, every change is risky, even small
+ones like adding this <code>if</code> condition and print statement:</p>
 <figure class="left-align-caption">
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode numberSource ruby numberLines hl-3 hl-4 hl-5"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1"></a>sig <span class="kw">{</span>params(<span class="wa">params: </span><span class="dt">Params</span>, <span class="wa">merchant: </span><span class="dt">Merchant</span>)<span class="at">.void</span><span class="kw">}</span></span>
@@ -212,21 +213,24 @@ alt="How much effort it takes to change a piece of code, over time" />
 piece of code, over time</figcaption>
 </figure>
 </div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-1" class="margin-toggle"/>
+<div class="marginnote">
+<p>It’s not <em>always</em> a lot—sometimes it’s only marginally more
+work, and sometimes the runtime checks pay for themselves in the change
+they’re added if they happen to help as a debugging aide to get the
+tests passing.</p>
+</div>
+</div>
 <p>Getting the runtime type checks to pass for the first time adds a
-lot<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="marginnote">It’s not <em>always</em> a lot—sometimes it’s only
-marginally more work, and sometimes the runtime checks pay for
-themselves in the change they’re added if they happen to help as a
-debugging aide to get the tests passing.<br />
-<br />
-</span></span> of extra effort, but that extra effort makes the next
-change and the change after that a lot easier. Even well into the
-future, legacy code with runtime-checked types remains easier and less
-scary to change. Locking in the runtime-checked annotations early means
-that when going back to change 3-year-old code, these types are almost
-<em>guaranteed</em> to be trustworthy, making for far less work hunting
-down the <em>truly correct</em> types when modifying legacy code.</p>
+lot<label for="sn-1" class="margin-toggle">&#8853;</label> of extra
+effort, but that extra effort makes the next change and the change after
+that a lot easier. Even well into the future, legacy code with
+runtime-checked types remains easier and less scary to change. Locking
+in the runtime-checked annotations early means that when going back to
+change 3-year-old code, these types are almost <em>guaranteed</em> to be
+trustworthy, making for far less work hunting down the <em>truly
+correct</em> types when modifying legacy code.</p>
 <h2 id="runtime-checks-slow-the-code-down">“Runtime checks slow the code
 down”</h2>
 <blockquote>
@@ -399,6 +403,8 @@ I’m happy to hear them.)</p>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

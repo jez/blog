@@ -87,16 +87,19 @@
 </nav>
 
 <main>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="marginnote">
+<p>Especially Ruby code typed with Sorbet where inheritance underlies
+things like abstract methods, interfaces, and generic types.</p>
+</div>
+</div>
 <p>A solid grasp of the tools Ruby has for inheritance helps with
-writing better code.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">Especially Ruby code typed with Sorbet where
-inheritance underlies things like abstract methods, interfaces, and
-generic types.<br />
-<br />
-</span></span> On the other hand, when most people learn Ruby they learn
-just enough of what <code>include</code> and <code>extend</code> mean to
-get their job done (sometimes even less 🫣).</p>
+writing better
+code.<label for="sn-0" class="margin-toggle">&#8853;</label> On the
+other hand, when most people learn Ruby they learn just enough of what
+<code>include</code> and <code>extend</code> mean to get their job done
+(sometimes even less 🫣).</p>
 <p>I’d like to walk through some examples of inheritance in Ruby and
 draw little diagrams to drive their meaning home. The goal is to have
 inheritance in Ruby “click.”</p>
@@ -136,15 +139,18 @@ src="/assets/img/light/inheritance-in-ruby/parent-child-class-instance.png"
 class="center" style="max-width:229px" /> <img
 src="/assets/img/dark/inheritance-in-ruby/parent-child-class-instance.png"
 class="center" style="max-width:229px" /></p>
-<p>In particular, I picture classes like puzzle pieces. The pieces have
-tabs and blanks<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="marginnote">“Tabs” and “blanks” are the <a
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-2" class="margin-toggle"/>
+<div class="marginnote">
+<p>“Tabs” and “blanks” are the <a
 href="https://en.wikipedia.org/wiki/Jigsaw_puzzle#Puzzle_pieces">names
-Wikipedia uses</a> for these spots on jigsaw puzzles.<br />
-<br />
-</span></span> which allow other classes to slot in, forming an
-inheritance hierarchy.</p>
+Wikipedia uses</a> for these spots on jigsaw puzzles.</p>
+</div>
+</div>
+<p>In particular, I picture classes like puzzle pieces. The pieces have
+tabs and blanks<label for="sn-2" class="margin-toggle">&#8853;</label>
+which allow other classes to slot in, forming an inheritance
+hierarchy.</p>
 <p>Checking whether a class is a subclass of another amounts to
 following the chain upwards. If you can reach <code>ClassB</code> from
 <code>ClassA</code>, then <code>a.is_a?(ClassB)</code>.</p>
@@ -218,14 +224,17 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="
 instance of a class up to the object’s class:</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a<span class="at">.class</span> <span class="co"># =&gt; A</span></span></code></pre></div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-3" class="margin-toggle"/>
+<div class="marginnote">
+<p>In Ruby <code>new</code> is not a keyword, it’s a normal method!
+(It’s unlike the <code>new</code> keyword in C++ or Java.)</p>
+</div>
+</div>
 <p>To take it a step further: objects in Ruby are instantiated by
-calling <code>new</code>,<span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="marginnote">In Ruby <code>new</code> is not a keyword, it’s a
-normal method! (It’s unlike the <code>new</code> keyword in C++ or
-Java.)<br />
-<br />
-</span></span> a singleton class method:</p>
+calling
+<code>new</code>,<label for="sn-3" class="margin-toggle">&#8853;</label>
+a singleton class method:</p>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A; <span class="cf">end</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> B; <span class="cf">end</span></span>
@@ -265,18 +274,20 @@ class="sourceCode numberSource ruby numberLines hl-5 hl-12"><code class="sourceC
 <span id="cb6-12"><a href="#cb6-12"></a>    <span class="dv">self</span><span class="at">.class.values</span><span class="kw">[</span>string_name<span class="kw">]</span> <span class="kw">=</span> <span class="dv">self</span></span>
 <span id="cb6-13"><a href="#cb6-13"></a>  <span class="cf">end</span></span>
 <span id="cb6-14"><a href="#cb6-14"></a><span class="cf">end</span></span></code></pre></div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-5" class="margin-toggle"/>
+<div class="marginnote">
+<p>Popularized by Joshua Block in Effective Java, First Edition, Item
+21, in response to the observation that much Java code would use magic
+integers to represent enumerations. (The same thing happens in Ruby, but
+with magic Symbols and Strings in addition to just Integers.)</p>
+</div>
+</div>
 <p>This <code>TypedEnum</code> class implements the typesafe enum
-pattern<span
-class="sidenote-wrapper"><label for="sn-5" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-5" class="margin-toggle"/><span
-class="marginnote">Popularized by Joshua Block in Effective Java, First
-Edition, Item 21, in response to the observation that much Java code
-would use magic integers to represent enumerations. (The same thing
-happens in Ruby, but with magic Symbols and Strings in addition to just
-Integers.)<br />
-<br />
-</span></span>, which is a way of guaranteeing that there are only a
-fixed set of instances of a class, which can only be compared to values
-of the same enum (not unrelated enums).</p>
+pattern<label for="sn-5" class="margin-toggle">&#8853;</label>, which is
+a way of guaranteeing that there are only a fixed set of instances of a
+class, which can only be compared to values of the same enum (not
+unrelated enums).</p>
 <p>You’d define an enum using this abstraction something like this:</p>
 <div class="sourceCode" id="cb7"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> <span class="dt">Suit</span> <span class="kw">&lt;</span> <span class="dt">TypedEnum</span></span>
@@ -285,13 +296,16 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb7-1"><a href="
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="cn">HEARTS</span>   <span class="kw">=</span> make_value(<span class="st">&quot;hearts&quot;</span>)</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="cn">SPADES</span>   <span class="kw">=</span> make_value(<span class="st">&quot;spades&quot;</span>)</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
-<p>It’s so concise in Ruby<span
-class="sidenote-wrapper"><label for="sn-6" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-6" class="margin-toggle"/><span
-class="marginnote">“Concise” versus the original Java pattern. Sorbet’s
-<code>T::Enum</code> makes the pattern even more concise.<br />
-<br />
-</span></span> because of the special relationship between a class and
-its singleton class:</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-6" class="margin-toggle"/>
+<div class="marginnote">
+<p>“Concise” versus the original Java pattern. Sorbet’s
+<code>T::Enum</code> makes the pattern even more concise.</p>
+</div>
+</div>
+<p>It’s so concise in
+Ruby<label for="sn-6" class="margin-toggle">&#8853;</label> because of
+the special relationship between a class and its singleton class:</p>
 <p><img
 src="/assets/img/light/inheritance-in-ruby/self-class-self-new.png"
 class="center" style="max-width:563.5px" /> <img
@@ -523,16 +537,18 @@ style="max-width:562px" /></p>
 to instance methods and singleton class methods to singleton class
 methods. It’s cool because it preserves that link between instance and
 singleton.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-8" class="margin-toggle"/>
+<div class="marginnote">
+<p>You could argue these aren’t the “only” tools because there’s also
+<code>prepend</code>, but it doesn’t act different from
+<code>include</code> with respect to this link.</p>
+</div>
+</div>
 <p>But with modules, <strong>that link breaks down</strong> and the
-only<span
-class="sidenote-wrapper"><label for="sn-8" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-8" class="margin-toggle"/><span
-class="marginnote">You could argue these aren’t the “only” tools because
-there’s also <code>prepend</code>, but it doesn’t act different from
-<code>include</code> with respect to this link.<br />
-<br />
-</span></span> tools that we really have are <code>include</code> and
-<code>extend</code>, which only affect instance methods in the
-module.</p>
+only<label for="sn-8" class="margin-toggle">&#8853;</label> tools that
+we really have are <code>include</code> and <code>extend</code>, which
+only affect instance methods in the module.</p>
 <h1 id="wait-why-do-we-care-if-modules-dont-work-like-classes">Wait, why
 do we care if modules don’t work like classes?</h1>
 <p>It matters because sometimes a class already has a superclass. For
@@ -736,14 +752,18 @@ src="/assets/img/light/inheritance-in-ruby/mixes-in-class-methods-include-class-
 class="center" style="max-width:469px" /> <img
 src="/assets/img/dark/inheritance-in-ruby/mixes-in-class-methods-include-class-methods.png"
 class="center" style="max-width:469px" /></p>
-<p>I should say: I consider this to be a wart in Sorbet’s design.<span
-class="sidenote-wrapper"><label for="sn-9" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-9" class="margin-toggle"/><span
-class="marginnote">It’s a long-term goal of mine to fix this one day,
-either by implementing support for <code>Concern</code> in Sorbet or
-even replacing <code>mixes_in_class_methods</code> with
-<code>Concern</code>.<br />
-<br />
-</span></span> When we look at <a href="/concern-inheritance/">how
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-9" class="margin-toggle"/>
+<div class="marginnote">
+<p>It’s a long-term goal of mine to fix this one day, either by
+implementing support for <code>Concern</code> in Sorbet or even
+replacing <code>mixes_in_class_methods</code> with
+<code>Concern</code>.</p>
+</div>
+</div>
+<p>I should say: I consider this to be a wart in Sorbet’s
+design.<label for="sn-9" class="margin-toggle">&#8853;</label> When we
+look at <a href="/concern-inheritance/">how
 <code>ActiveSupport::Concern</code> works</a>, it’ more like what you’d
 expect: it’s a bit more recursive or viral about linking up the
 <code>ClassMethods</code> classes when stacking modules on top of
@@ -847,6 +867,8 @@ and wonder …”</p></li>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

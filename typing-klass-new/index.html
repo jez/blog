@@ -114,16 +114,18 @@ design in Sorbet:</p>
 </tbody>
 </table>
 </div>
-<p>In this post, we’ll take a quick look<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">If you’re short on time or don’t care for
-explanations, here’s the <a
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="sidenote">
+<p>If you’re short on time or don’t care for explanations, here’s the <a
 href="https://sorbet.run/#%23%20typed%3A%20strict%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Amodule%20Thing%0A%20%20extend%20T%3A%3AHelpers%0A%20%20interface!%0A%20%20%0A%20%20sig%20%7Babstract.returns%28Integer%29%7D%0A%20%20def%20foo%3B%20end%0A%0A%20%20module%20Factory%0A%20%20%20%20extend%20T%3A%3AGeneric%0A%20%20%20%20interface!%0A%0A%20%20%20%20has_attached_class!%28%3Aout%29%20%7B%20%7Bupper%3A%20Thing%7D%20%7D%0A%0A%20%20%20%20sig%20%7Babstract.returns%28T.attached_class%29%7D%0A%20%20%20%20def%20make_thing%3B%20end%0A%20%20end%0A%20%20mixes_in_class_methods%28Factory%29%0Aend%0A%0Asig%20do%0A%20%20type_parameters%28%3AInstance%29%0A%20%20%20%20.params%28%0A%20%20%20%20%20%20klass%3A%20Thing%3A%3AFactory%5BT.all%28Thing%2C%20T.type_parameter%28%3AInstance%29%29%5D%0A%20%20%20%20%29%0A%20%20%20%20.returns%28T.type_parameter%28%3AInstance%29%29%0Aend%0Adef%20instantiate_class%28klass%29%0A%20%20instance%20%3D%20klass.make_thing%0A%20%20instance.foo%0A%20%20instance%0Aend%0A%0Aclass%20GoodThing%0A%20%20extend%20T%3A%3AGeneric%0A%20%20include%20Thing%0A%0A%20%20sig%20%7Boverride.returns%28Integer%29%7D%0A%20%20def%20foo%3B%200%3B%20end%0A%0A%20%20sig%20%7Boverride.returns%28T.attached_class%29%7D%0A%20%20def%20self.make_thing%20%23%20%E2%9C%85%0A%20%20%20%20new%0A%20%20end%0Aend">final
-code</a> we’ll build towards.<br />
-<br />
-</span></span> at the most common incorrect approach to annotate this
-method, discuss why that approach doesn’t work, then circle back and see
-how to use abstract methods to type this method.</p>
+code</a> we’ll build towards.</p>
+</div>
+</div>
+<p>In this post, we’ll take a quick look at the most common incorrect
+approach to annotate this method, discuss why that approach doesn’t
+work, then circle back and see how to use abstract methods to type this
+method.<label for="sn-0" class="margin-toggle sidenote-number"></label></p>
 <h1 id="what-people-try-t.class_of">⛔️ What people try:
 <code>T.class_of</code></h1>
 <p>This is the method signature people try to write:</p>
@@ -139,18 +141,21 @@ class="sourceCode numberSource ruby numberLines hl-4"><code class="sourceCode ru
 <span id="cb2-9"><a href="#cb2-9"></a>  <span class="co"># ...</span></span>
 <span id="cb2-10"><a href="#cb2-10"></a>  instance</span>
 <span id="cb2-11"><a href="#cb2-11"></a><span class="cf">end</span></span></code></pre></div>
-<p>This type <strong>does not work</strong>.<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="marginnote">Sometimes I wish Sorbet had used the syntax
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-1" class="margin-toggle"/>
+<div class="sidenote">
+<p>Sometimes I wish Sorbet had used the syntax
 <code>A.singleton_class</code> instead of <code>T.class_of(A)</code>,
 because I think it might have made it more clear that you can’t do this
 on arbitrary types. Then again, maybe people would have just done
-<code>T.any(A,   B).singleton_class</code><br />
-<br />
-</span></span> Even though I can see why people might expect it to work,
-there are reasons why it should not work, and the Sorbet docs <a
+<code>T.any(A,   B).singleton_class</code></p>
+</div>
+</div>
+<p>This type <strong>does not work</strong>. Even though I can see why
+people might expect it to work, there are reasons why it should not
+work, and the Sorbet docs <a
 href="https://sorbet.org/docs/class-of#tclass-vs-tclass_of">elaborate
-why</a>.</p>
+why</a>.<label for="sn-1" class="margin-toggle sidenote-number"></label></p>
 <p>In short, <code>T.type_parameter(:U)</code> doesn’t stand for “some
 unknown class,” it stands for “some unknown type.” It could mean any of
 <code>T.any(Integer, String)</code>, <code>T::Array[Integer]</code>,
@@ -548,6 +553,8 @@ design.</p>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

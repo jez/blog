@@ -97,13 +97,15 @@ class="sourceCode numberSource ruby numberLines hl-5 hl-9"><code class="sourceCo
 <span id="cb1-11"><a href="#cb1-11"></a></span>
 <span id="cb1-12"><a href="#cb1-12"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb1-13"><a href="#cb1-13"></a><span class="cf">end</span></span></code></pre></div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="marginnote">
+<p>See the appendix for the code I used to generate these printouts</p>
+</div>
+</div>
 <p>We can ask Ruby to print out the ancestor hierarchy for the classes
-in this snippet:<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">See the appendix for the code I used to generate
-these printouts<br />
-<br />
-</span></span></p>
+in this
+snippet:<label for="sn-0" class="margin-toggle">&#8853;</label></p>
 <pre class="wide"><code>ancestors of IChild          = [IParent]
 ancestors of #&lt;Class:IChild&gt; = [...]
 ────────────────────────────────────────────────────────────────────────
@@ -173,20 +175,23 @@ class="sourceCode numberSource ruby numberLines hl-5 hl-9 hl-20"><code class="so
 <span id="cb3-21"><a href="#cb3-21"></a></span>
 <span id="cb3-22"><a href="#cb3-22"></a><span class="cf">class</span> <span class="dt">Child</span> <span class="kw">&lt;</span> <span class="dt">Parent</span></span>
 <span id="cb3-23"><a href="#cb3-23"></a><span class="cf">end</span></span></code></pre></div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-1" class="margin-toggle"/>
+<div class="marginnote">
+<p>The <code>ClassMethods</code> name is special to
+<code>ActiveSupport::Concern</code>, not Ruby. It also allows defining a
+<code>class_methods do ... end</code> block, but that does nothing more
+than define this module and then run the block inside it.</p>
+</div>
+</div>
 <p>In this example, let’s say that <code>IChild</code> wanted to declare
 some singleton class methods on whatever class it was eventually
 <code>include</code>’d into. All it has to do is
 <code>extend ActiveSupport::Concern</code> and then define
-<code>module ClassMethods</code><span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="marginnote">The <code>ClassMethods</code> name is special to
-<code>ActiveSupport::Concern</code>, not Ruby. It also allows defining a
-<code>class_methods do ... end</code> block, but that does nothing more
-than define this module and then run the block inside it.<br />
-<br />
-</span></span> inside itself. The library will make sure that this
-module gets <code>extend</code>’ed into whichever class eventually
-writes <code>include IChild</code>.</p>
+<code>module ClassMethods</code><label for="sn-1" class="margin-toggle">&#8853;</label>
+inside itself. The library will make sure that this module gets
+<code>extend</code>’ed into whichever class eventually writes
+<code>include IChild</code>.</p>
 <p>And to drive the point home, here’s a picture:</p>
 <p><img src="/assets/img/light/concern-2.png"
 style="max-width: 532px;" /></p>
@@ -288,16 +293,19 @@ class body, <code>IParent</code> is <em>not</em> an ancestor of
 two lines coming out of <code>Parent</code>: one directly to
 <code>IChild</code> (makes sense), and then one that skips directly from
 <code>Parent</code> to <code>IParent</code>.</p>
-<p>This is kind of wild to me,<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="marginnote">Even more wild is that it’s done all <a
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-2" class="margin-toggle"/>
+<div class="sidenote">
+<p>Even more wild is that it’s done all <a
 href="https://github.com/rails/rails/blob/55412cd9257dc27a8a9175529857ce5f2d81f92f/activesupport/lib/active_support/concern.rb#L112">in
 plain Ruby</a>, using <a
-href="https://docs.ruby-lang.org/en/master/Module.html#method-i-append_features">append_features</a>.<br />
-<br />
-</span></span> because it literally changes the meaning of
-<code>include</code> inside an <code>ActiveSupport::Concern</code>
-module.</p>
+href="https://docs.ruby-lang.org/en/master/Module.html#method-i-append_features">append_features</a>.</p>
+</div>
+</div>
+<p>This is kind of wild to
+me,<label for="sn-2" class="margin-toggle sidenote-number"></label>
+because it literally changes the meaning of <code>include</code> inside
+an <code>ActiveSupport::Concern</code> module.</p>
 <p>Full disclosure: I don’t know why this is. If you’ll allow me to
 guess, I’d say because <code>ActiveSupport::Concern</code> is not only
 designed to let you mix singleton class methods into the right place,
@@ -457,6 +465,8 @@ ancestors of #&lt;Class:Child&gt; = [#&lt;Class:Parent&gt;, IParent::ClassMethod
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

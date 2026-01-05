@@ -128,15 +128,17 @@ which we went about in two steps:</p>
 each kind of edit</li>
 </ul>
 <h1 id="step-1-list-all-the-edits">Step 1: List all the edits</h1>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="marginnote">
+<p>One of the cool things about Sorbet is how easy it is to <a
+href="https://sorbet.org/docs/metrics">get metrics out of it</a>.</p>
+</div>
+</div>
 <p>Whenever Sorbet gives up on handling an edit incrementally, it emits
-a metric with the reason.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">One of the cool things about Sorbet is how easy it is
-to <a href="https://sorbet.org/docs/metrics">get metrics out of
-it</a>.<br />
-<br />
-</span></span> In June 2022, the breakdown looked something like this on
-Stripe’s codebase:</p>
+a metric with the
+reason.<label for="sn-0" class="margin-toggle">&#8853;</label> In June
+2022, the breakdown looked something like this on Stripe’s codebase:</p>
 <p><img src="/assets/img/slow-path-reason.png" /></p>
 <p>This chart shows that the most common reason was “changed
 definition,” accounting for 50% of edits that ended in a full type
@@ -180,6 +182,13 @@ Sorbet chokes on, and figured out the order we should tackle them.</p>
 update its knowledge in response to each one of these edits.</p>
 <h1 id="step-2-a-poor-mans-incrementality">Step 2: A poor man’s
 incrementality</h1>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-2" class="margin-toggle"/>
+<div class="sidenote">
+<p>TypeScript is an exception, but that’s because it was written by the
+same person who had done the C# rewrite.</p>
+</div>
+</div>
 <p>There are all sorts of principled ways to build an incremental
 compiler. Anders Hejlsberg describes <a
 href="https://learn.microsoft.com/en-us/shows/Seth-Juarez/Anders-Hejlsberg-on-Modern-Compiler-Construction">one
@@ -187,12 +196,9 @@ approach here</a>, used by C# and TypeScript. Alex Kladov describes <a
 href="https://rust-analyzer.github.io/blog/2020/07/20/three-architectures-for-responsive-ide.html#query-based-compiler">another
 approach here</a>, used by rust-analyzer. The problem with every
 principled approach I’ve seen is that in practice, it involved a full or
-near-full rewrite of the codebase.<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="marginnote">TypeScript is an exception, but that’s because it was
-written by the same person who had done the C# rewrite.<br />
-<br />
-</span></span> From what I can tell, that took <a
+near-full rewrite of the
+codebase.<label for="sn-2" class="margin-toggle sidenote-number"></label>
+From what I can tell, that took <a
 href="https://en.wikipedia.org/wiki/Roslyn_(compiler)#History">about 3
 years for C#</a>, and <a
 href="https://blog.rust-lang.org/2022/02/21/rust-analyzer-joins-rust-org.html#history-and-future">about
@@ -397,6 +403,8 @@ to process an edit incrementally</strong>.</p>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

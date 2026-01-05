@@ -251,20 +251,24 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="
 intermediate state, because adding a keyword argument to a method call
 is common. On the other hand, you can likely get away not adding rules
 for uncommon syntax errors.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-4" class="margin-toggle"/>
+<div class="sidenote">
+<p>For example, we gather usage metrics from every Sorbet user at
+Stripe.</p>
+</div>
+</div>
 <p>If you want, you can take the guesswork out of what’s common and
 what’s not by measuring, assuming you have a corpus of syntax errors you
-can sample from.<span
-class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
-class="sidenote">For example, we gather usage metrics from every Sorbet
-user at Stripe.<br />
-<br />
-</span></span> The semi-automated approach to measurement, which is what
-I’ve personally used: when there’s a syntax error and the parse result
-is “bad” according to some heuristic (like: the parse is completely
-empty, or there was a partial parse result but it was too bad to find
-any completion suggestions at the user’s cursor), log the bad source
-buffer to a file, and then go triage the logged files, fixing the most
-common errors first.</p>
+can sample
+from.<label for="sn-4" class="margin-toggle sidenote-number"></label>
+The semi-automated approach to measurement, which is what I’ve
+personally used: when there’s a syntax error and the parse result is
+“bad” according to some heuristic (like: the parse is completely empty,
+or there was a partial parse result but it was too bad to find any
+completion suggestions at the user’s cursor), log the bad source buffer
+to a file, and then go triage the logged files, fixing the most common
+errors first.</p>
 <p>The annoying part about that approach is the manual triage work of
 opening up the logged buffers, identifying which part of the file had
 the parse error, and blaming it to some section of the parser. An idea
@@ -315,15 +319,19 @@ worked, which will be the topic of a future post.
 <p>After recovering from a parse error using the <code>error</code>
 token, the lookahead token will still be set to whatever it was that
 caused the error to happen in the first place.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-5" class="margin-toggle"/>
+<div class="sidenote">
+<p>In the C++ skeleton, this is available using
+<code>yyla.clear()</code> instead.</p>
+</div>
+</div>
 <p>If for whatever reason you think that attempting to continue the
 parse with that token would just screw things up again, you can use the
-<code>yyclearin</code> macro<span
-class="sidenote-wrapper"><label for="sn-5" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-5" class="margin-toggle"/><span
-class="sidenote">In the C++ skeleton, this is available using
-<code>yyla.clear()</code> instead.<br />
-<br />
-</span></span> to clear out the lookahead token, which will cause Bison
-to request another token from the lexer.</p>
+<code>yyclearin</code>
+macro<label for="sn-5" class="margin-toggle sidenote-number"></label> to
+clear out the lookahead token, which will cause Bison to request another
+token from the lexer.</p>
 <p>We’re not currently using this in Sorbet because I’ve replaced most
 places where it might have been useful with some even more powerful
 techniques (discussed in a future part), but I figured I may as well
@@ -364,19 +372,19 @@ class="sourceCode numberSource yacc numberLines hl-5 hl-7"><code class="sourceCo
 <span id="cb8-7"><a href="#cb8-7"></a>         $$ = driver.build.assign(self, $1, $2, <span class="co">/* ... ? ... */</span>);</span>
 <span id="cb8-8"><a href="#cb8-8"></a>       }</span>
 <span id="cb8-9"><a href="#cb8-9"></a>   | ...</span></code></pre></div>
-<p>It’s unclear what to use in place of <code>$3</code>, because
-<code>error</code> doesn’t have an associated semantic value. To fill
-the void, we can invent a special AST <code>error_node</code> type.<span
-class="sidenote-wrapper"><label for="sn-6" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-6" class="margin-toggle"/><span
-class="sidenote">Slight fib; Sorbet actually creates a <a
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-6" class="margin-toggle"/>
+<div class="sidenote">
+<p>Slight fib; Sorbet actually creates a <a
 href="https://github.com/sorbet/sorbet/blob/e961ac4ee7c4e425e5b5f14a03b7ce20c3bdbbc2/parser/Builder.cc#L911-L913">constant
 literal node</a> with a magic name for backwards compatibility
-reasons.<br />
-<br />
-“What’s up with that <code>endPos</code> stuff?”<br />
-There’s some discussion in the full source on GitHub.<br />
-<br />
-</span></span></p>
+reasons.</p>
+</div>
+</div>
+<p>It’s unclear what to use in place of <code>$3</code>, because
+<code>error</code> doesn’t have an associated semantic value. To fill
+the void, we can invent a special AST <code>error_node</code>
+type.<label for="sn-6" class="margin-toggle sidenote-number"></label></p>
 <figure class="left-align-caption">
 <div class="sourceCode" id="cb9"><pre
 class="sourceCode numberSource yacc numberLines hl-7 hl-8"><code class="sourceCode yacc"><span id="cb9-1"><a href="#cb9-1"></a>arg: lhs &#39;=&#39; arg_rhs</span>
@@ -395,6 +403,8 @@ href="https://github.com/sorbet/sorbet/blob/e961ac4ee7c4e425e5b5f14a03b7ce20c3bd
 on GitHub →</a>
 </figcaption>
 </figure>
+<p>“What’s up with that <code>endPos</code> stuff?”<br />
+There’s some discussion in the full source on GitHub.</p>
 <p>This special AST node allows phases downstream of the parser to
 pretend the parse succeeded. In particular, it’s easy to detect where
 the syntax error occurred when responding to completion requests (which
@@ -456,6 +466,8 @@ Debugging a (Bison) Parser</a>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

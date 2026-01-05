@@ -210,17 +210,21 @@ class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb3-1"><a href="
 <p>Real-world Ruby code tends to toss away conventional notions of
 “defined inside the class body,” and even if it didn’t, it wouldn’t have
 a type checker to easily check visibility.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="sidenote">
+<p>The receiver is the <code>x</code> in <code>x.foo</code>. When a
+method call’s receiver is omitted like <code>foo()</code>, Ruby
+implicitly assumes that it had been called like
+<code>self.foo()</code>.</p>
+</div>
+</div>
 <p>Instead, Ruby picks a simpler way to enforce visibility: a private
 call is allowed anywhere that the receiver is either omitted or is
-<code>self</code>, <strong>syntactically</strong>.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">The receiver is the <code>x</code> in
-<code>x.foo</code>. When a method call’s receiver is omitted like
-<code>foo()</code>, Ruby implicitly assumes that it had been called like
-<code>self.foo()</code>.<br />
-<br />
-</span></span> That syntactic restriction means that things like this
-are not allowed:</p>
+<code>self</code>,
+<strong>syntactically</strong>.<label for="sn-0" class="margin-toggle sidenote-number"></label>
+That syntactic restriction means that things like this are not
+allowed:</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">class</span> A</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">private</span> <span class="cf">def</span> foo; <span class="cf">end</span></span>
@@ -375,6 +379,8 @@ post!</p></li>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

@@ -111,15 +111,18 @@ by a call to <code>do_thing_with</code>. What used to be a default
 argument (<code>= 0</code>) is now an explicit argument inside the
 implementation of <code>do_thing</code>
 (<code>do_thing_with(0)</code>).</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="sidenote">
+<p>Attempting to set a non-generic default argument invalidates this
+<em>for all</em> property, as we’ll see below.</p>
+</div>
+</div>
 <p>The contract of a method with a signature including
 <code>type_parameters(:U)</code> means “this method holds <strong>for
 all</strong> arguments you could choose to call this method with.”
-Choosing <code>0</code> at the call site is a valid choice.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">Attempting to set a non-generic default argument
-invalidates this <em>for all</em> property, as we’ll see below.<br />
-<br />
-</span></span></p>
+Choosing <code>0</code> at the call site is a valid
+choice.<label for="sn-0" class="margin-toggle sidenote-number"></label></p>
 <p>Another way of saying this: a method’s parameter types form a public
 API, and choosing the type <code>T.type_parameter(:U)</code> makes the
 method’s public API “you can give me anything”</p>
@@ -379,6 +382,8 @@ they want to add a default to, and is not typically a workaround.</p>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

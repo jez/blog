@@ -79,20 +79,21 @@ class="emoji" data-emoji="upside_down_face">🙃</span> Take my
 experiences with as many or as few grains of salt as you’d like. This
 also means that if you want to suggest other alternatives or otherwise
 teach me something new, I’m all ears!</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="sidenote">
+<p><a href="https://github.com/typedruby/typedruby">TypedRuby</a> was an
+aspirational Ruby type checker implemented in Rust that predated Sorbet.
+It is now abandoned.</p>
+</div>
+</div>
 <p>First, a little bit of history. Sorbet’s parser was originally a part
 of the <a href="https://github.com/typedruby/typedruby">TypedRuby</a>
-project.<span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="sidenote"><a
-href="https://github.com/typedruby/typedruby">TypedRuby</a> was an
-aspirational Ruby type checker implemented in Rust that predated Sorbet.
-It is now abandoned.<br />
-<br />
-</span></span> In turn, TypedRuby sourced its parser by porting the
-grammar file in the <a
-href="https://github.com/whitequark/parser">whitequark parser</a> from
-<a href="https://rubygems.org/gems/racc">Racc</a> (a Yacc-like parser
-generator for Ruby) to <a
+project.<label for="sn-0" class="margin-toggle sidenote-number"></label>
+In turn, TypedRuby sourced its parser by porting the grammar file in the
+<a href="https://github.com/whitequark/parser">whitequark parser</a>
+from <a href="https://rubygems.org/gems/racc">Racc</a> (a Yacc-like
+parser generator for Ruby) to <a
 href="https://www.gnu.org/software/bison/">Bison</a> (a Yacc-like parser
 generator for C/C++). Sorbet imported the source code of the TypedRuby
 parser and continued to modify it over time as Ruby syntax evolved. The
@@ -181,20 +182,23 @@ even if I had to stop working on the parser sooner than expected. It’s
 possible that someone with more time or more patience will want to
 revisit one of these approaches in the future, and if you do I’d love to
 hear about it!</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-3" class="margin-toggle"/>
+<div class="sidenote">
+<p>It turns out, all (“all”) you have to do is is monkey patch
+<code>require</code> to <code>rescue   SyntaxError</code>. Thanks Ruby
+<span class="emoji" data-emoji="slightly_smiling_face">🙂</span></p>
+</div>
+</div>
 <p>Anyways, that rules out the most common refrains from onlookers. But
 there was another, more unconventional approach I considered and decided
 against: using <a
 href="https://github.com/zombocom/dead_end">dead_end</a>.
 <code>dead_end</code> isn’t a Ruby parser but rather a tool that hijacks
-Ruby’s syntax error reporting mechanism<span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="sidenote">It turns out, all (“all”) you have to do is is monkey
-patch <code>require</code> to <code>rescue   SyntaxError</code>. Thanks
-Ruby <span class="emoji"
-data-emoji="slightly_smiling_face">🙂</span><br />
-<br />
-</span></span> to improve the message for certain syntax errors.
-Specifically, it’ll try to show error messages in cases like this:</p>
+Ruby’s syntax error reporting
+mechanism<label for="sn-3" class="margin-toggle sidenote-number"></label>
+to improve the message for certain syntax errors. Specifically, it’ll
+try to show error messages in cases like this:</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode numberSource ruby numberLines hl-4 hl-8"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">class</span> A</span>
 <span id="cb1-2"><a href="#cb1-2"></a>  <span class="cf">def</span> foo</span>
@@ -204,11 +208,11 @@ class="sourceCode numberSource ruby numberLines hl-4 hl-8"><code class="sourceCo
 <span id="cb1-6"><a href="#cb1-6"></a>  <span class="cf">def</span> bar</span>
 <span id="cb1-7"><a href="#cb1-7"></a>  <span class="cf">end</span></span>
 <span id="cb1-8"><a href="#cb1-8"></a><span class="cf">end</span> <span class="co"># ← ruby default error: unexpected token &quot;end of file&quot;</span></span></code></pre></div>
-<p>Missing an <code>end</code> keyword is a super common class of Ruby
-syntax errors,<span
-class="sidenote-wrapper"><label for="sn-4" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-4" class="margin-toggle"/><span
-class="sidenote">One of my biggest Ruby syntax gripes is that it isn’t a
-curly brace language like C or JavaScript. Any sensibly editor will
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-4" class="margin-toggle"/>
+<div class="sidenote">
+<p>One of my biggest Ruby syntax gripes is that it isn’t a curly brace
+language like C or JavaScript. Any sensibly editor will
 <strong>immediately</strong> insert the matching <code>}</code> after
 first typing <code>{</code>. But most Ruby editors will only insert the
 <code>end</code> matching some statement after a full line has been
@@ -217,11 +221,14 @@ means that unclosed
 <code>if</code>/<code>while</code>/<code>do</code>/<code>def</code>/<code>class</code>
 statements are <strong>abundantly</strong> common in Ruby, and this
 class of error (mismatched pairs) is trickier than the average
-error.<br />
-<br />
-</span></span> and <code>dead_end</code> already works particularly well
+error.</p>
+</div>
+</div>
+<p>Missing an <code>end</code> keyword is a super common class of Ruby
+syntax errors, and <code>dead_end</code> already works particularly well
 at reporting them, so it was tempting to <del>steal</del> reuse either
-the code or the ideas.</p>
+the code or the
+ideas.<label for="sn-4" class="margin-toggle sidenote-number"></label></p>
 <p>Early on I had decided not to use the code directly (it’s written in
 Ruby, and I didn’t want to add a runtime dependency on Ruby to Sorbet).
 But in the end, I decided not to use its recovery algorithm either.</p>
@@ -280,6 +287,8 @@ Debugging a (Bison) Parser →</a>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 

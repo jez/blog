@@ -125,15 +125,16 @@ class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#c
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> z<span class="op">;</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
 <p>and suddenly you’ve got all these options for instantiating it:</p>
-<p><span
-class="sidenote-wrapper"><label for="sn-0" class="margin-toggle">&#8853;</label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
-class="marginnote">It’s even worse in Go, where there’s nothing you can
-do to turn this “everything can be zero-initialized” behavior off.<br />
-<br />
-By contrast, Rust allows writing <code>#[derive(Default)]</code> above a
-struct to opt into zero-initialization.<br />
-<br />
-</span></span></p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-0" class="margin-toggle"/>
+<div class="marginnote">
+<p>It’s even worse in Go, where there’s nothing you can do to turn this
+“everything can be zero-initialized” behavior off.</p>
+<p>By contrast, Rust allows writing <code>#[derive(Default)]</code>
+above a struct to opt into zero-initialization.</p>
+</div>
+</div>
+<p><label for="sn-0" class="margin-toggle">&#8853;</label></p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Initialize all the fields to their default/zero value.</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>A a<span class="op">;</span></span>
@@ -162,37 +163,47 @@ syntactic conveniences for commonly-defined operations.</p>
 <em>all</em> types. For example, in Ruby every value descends from
 <code>BasicObject</code>, which defines the <code>==</code> method. But
 there are a couple problems with this method.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-1" class="margin-toggle"/>
+<div class="sidenote">
+<p>This can happen for very accidental reasons. Given
+<code>def ex; -&gt;{1}; end</code> then <code>ex() ==   ex()</code> is
+<code>false</code>.</p>
+</div>
+</div>
 <p>First, not every value wants to allow equality comparisons! The
 classic example of this is function values—since we can’t solve the
 halting problem, the only real way of defining <code>==</code> for
 lambda values is reference equality. But then if a lambda is ever
-duplicated for some reason,<span
-class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span
-class="sidenote">This can happen for very accidental reasons. Given
-<code>def ex; -&gt;{1}; end</code> then <code>ex() ==   ex()</code> is
-<code>false</code>.<br />
-<br />
-</span></span> suddenly two things which are conceptually equal are not,
-which is likely to cause a logic error.</p>
+duplicated for some
+reason,<label for="sn-1" class="margin-toggle sidenote-number"></label>
+suddenly two things which are conceptually equal are not, which is
+likely to cause a logic error.</p>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-2" class="margin-toggle"/>
+<div class="sidenote">
+<p>I wrote about the difficulty this causes for Sorbet in <a
+href="/problems-typing-ruby-equality/">this post</a>.</p>
+</div>
+</div>
+<div class="sidenote-wrapper">
+<input type="checkbox" id="sn-3" class="margin-toggle"/>
+<div class="sidenote">
+<p>Some languages, like Rust and Haskell, do not define <code>==</code>
+by default but can generate a default implementation easily, on
+request.</p>
+</div>
+</div>
 <p>Second, the contract of this <code>==</code> method is that <em>any
 value</em> can be compared for equality to <em>any other value</em>,
-even of a different class!<span
-class="sidenote-wrapper"><label for="sn-2" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-2" class="margin-toggle"/><span
-class="sidenote">I wrote about the difficulty this causes for Sorbet in
-<a href="/problems-typing-ruby-equality/">this post</a>.<br />
-<br />
-</span></span> For many people, that amounts to a sloppy, bug-inducing
-definition of <code>==</code>: they’d rather know that they’re comparing
-two completely incompatible things, instead of having the comparison
-quietly evaluate to <code>false</code>. But the language has made this
-choice, and now all our types must inherit this possibly-unwanted elim
-form.<span
-class="sidenote-wrapper"><label for="sn-3" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-3" class="margin-toggle"/><span
-class="sidenote">Some languages, like Rust and Haskell, do not define
-<code>==</code> by default but can generate a default implementation
-easily, on request.<br />
-<br />
-</span></span></p>
+even of a different
+class!<label for="sn-2" class="margin-toggle sidenote-number"></label>
+For many people, that amounts to a sloppy, bug-inducing definition of
+<code>==</code>: they’d rather know that they’re comparing two
+completely incompatible things, instead of having the comparison quietly
+evaluate to <code>false</code>. But the language has made this choice,
+and now all our types must inherit this possibly-unwanted elim
+form.<label for="sn-3" class="margin-toggle sidenote-number"></label></p>
 <h3 id="types-are-not-their-elim-forms">Types are not their elim
 forms</h3>
 <p>Some languages equate “defining a type” with “defining an interface.”
@@ -328,6 +339,8 @@ too, but that’ll have to be some other post.</p>
     </footer>
   
     <script src="/assets/js/enable_checkboxes.js"></script>
+
+    <script src="/assets/js/block_based_side_notes.js"></script>
 
   
 
