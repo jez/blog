@@ -96,11 +96,11 @@ down after defining a new type. It would be better if we could start from nothin
 build up what's allowed, offering syntactic conveniences for commonly-defined operations.
 
 [^go-rust-contrast]:
-  {-} It's even worse in Go, where there's nothing you can do to turn this "everything can
-  be zero-initialized" behavior off.\
-  \
-  By contrast, Rust allows writing `#[derive(Default)]` above a struct to opt into
-  zero-initialization.
+    {^-} It's even worse in Go, where there's nothing you can do to turn this "everything
+    can be zero-initialized" behavior off.
+
+    By contrast, Rust allows writing `#[derive(Default)]` above a struct to opt into
+    zero-initialization.
 
 
 ### Too many common methods
@@ -123,14 +123,14 @@ quietly evaluate to `false`. But the language has made this choice, and now all 
 must inherit this possibly-unwanted elim form.[^rust-eq]
 
 [^dup]:
-  This can happen for very accidental reasons. Given `def ex; ->{1}; end` then `ex() ==
+  {^} This can happen for very accidental reasons. Given `def ex; ->{1}; end` then `ex() ==
   ex()` is `false`.
 
 [^sorbet-eq]:
-  I wrote about the difficulty this causes for Sorbet in [this post][sorbet-eq-post].
+  {^} I wrote about the difficulty this causes for Sorbet in [this post][sorbet-eq-post].
 
 [^rust-eq]:
-  Some languages, like Rust and Haskell, do not define `==` by default but can generate a
+  {^} Some languages, like Rust and Haskell, do not define `==` by default but can generate a
   default implementation easily, on request.
 
 ### Types are not their elim forms

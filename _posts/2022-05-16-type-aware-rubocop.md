@@ -44,7 +44,7 @@ tree-based[^graph], which breaks a lot of the assumptions people make about what
 easy and hard to build in a linter rule.
 
 [^graph]:
-  It's a graph, where nodes are basic blocks and edges are control flow jumps between
+  {^} It's a graph, where nodes are basic blocks and edges are control flow jumps between
   those blocks.
 
 Because Sorbet type checks a CFG only, there's no tree-based structure inside Sorbet that
@@ -66,7 +66,7 @@ that track variable types only last as long as is required to type check a singl
 method.
 
 [^lsp]:
-  Sorbet's LSP editor integration gets around this by re-typechecking an entire method
+  {^} Sorbet's LSP editor integration gets around this by re-typechecking an entire method
   every time the user hovers over a variable. When these hover requests come as
   (infrequent) requests from the user, this is fine because Sorbet is already initialized.
   Powering a linter this way would either require that the Sorbet server be
@@ -206,12 +206,12 @@ large monorepos,[^perf] and IDE support was grafted on later. Exposing hackable 
 so far not been considered.
 
 [^steved]:
-  Thanks to Steve Dignam for pointing out that not only does C# have static
+  {^} Thanks to Steve Dignam for pointing out that not only does C# have static
   analysis APIs, but that TypeScript does as well, along with an ecosystem of type-aware
   lint rules.
 
 [^perf]:
-  All things considered, it's actually quite good at this.
+  {^} All things considered, it's actually quite good at this.
 
 For example, TypeScript offers a [compiler API][tsc-api], which is then used by the
 TypeScript ESLint project, which allows defining [custom type-aware lint rules]. What can

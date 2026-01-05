@@ -52,7 +52,7 @@ We can ask Ruby to print out the ancestor hierarchy for the classes in this
 snippet:[^appendix]
 
 [^appendix]:
-  {-} See the appendix for the code I used to generate these printouts
+  {^-} See the appendix for the code I used to generate these printouts
 
 ```{.wide}
 ancestors of IChild          = [IParent]
@@ -134,7 +134,7 @@ library will make sure that this module gets `extend`'ed into whichever class ev
 writes `include IChild`.
 
 [^name]:
-  {-} The `ClassMethods` name is special to `ActiveSupport::Concern`, not Ruby. It also
+  {^-} The `ClassMethods` name is special to `ActiveSupport::Concern`, not Ruby. It also
   allows defining a `class_methods do ... end` block, but that does nothing more than
   define this module and then run the block inside it.
 
@@ -243,7 +243,7 @@ This is kind of wild to me,[^wild] because it literally changes the meaning of `
 inside an `ActiveSupport::Concern` module.
 
 [^wild]:
-  {-} Even more wild is that it's done all [in plain Ruby], using [append_features].
+  {^} Even more wild is that it's done all [in plain Ruby], using [append_features].
 
 [in plain Ruby]: https://github.com/rails/rails/blob/55412cd9257dc27a8a9175529857ce5f2d81f92f/activesupport/lib/active_support/concern.rb#L112
 [append_features]: https://docs.ruby-lang.org/en/master/Module.html#method-i-append_features

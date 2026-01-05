@@ -15,7 +15,7 @@ categories: ['writing', 'practices']
 I end up giving the same mechanical feedback on ~every shipped email[^shipped-email] draft I read. These are some simple tips for making a shipped email useful to busy readers.
 
 [^shipped-email]:
-  {-} A **shipped email** is a company-internal email sent to announce when some unit of work has wrapped up. To my knowledge, it's [predominantly a Stripe-ism][jmduke], so the ideas in this post may not be relevant to all writers.
+  {^} A **shipped email** is a company-internal email sent to announce when some unit of work has wrapped up. To my knowledge, it's [predominantly a Stripe-ism][jmduke], so the ideas in this post may not be relevant to all writers.
 
 [jmduke]: https://buttondown.com/blog/shipped-at
 
@@ -30,7 +30,7 @@ The subject should read as a statement about what is now possible or what was do
 A subject should appeal to the **marginal reader**: someone who wasn't aware that the work was happening, but who benefits from knowing about it. The subject needs to convince the marginal reader to read on.[^unneeded] An unknown project codename in the subject line won't do that.
 
 [^unneeded]:
-  {-} The opposite is also true: a subject can assure readers that an email is skippable because they already know its contents or that they're not the intended audience.
+  {^} The opposite is also true: a subject can assure readers that an email is skippable because they already know its contents or that they're not the intended audience.
 
 I shipped a Sorbet feature recently. Here are two example subject lines:
 
@@ -49,7 +49,7 @@ The first subject names what shipped. The second contextualizes what shipped. A 
 
 A TL;DR or BLUF[^bluf] section offers skimmable takeaways at the top of an email. Something can be skimmable yet longer than one sentence. By contrast, single sentences often sacrifice salience for brevity. A TL;DR must have both.
 
-[^bluf]: {-} "too long; didn't read" and "bottom line up front"
+[^bluf]: {^} "too long; didn't read" and "bottom line up front"
 
 Double check whether a single-sentence TL;DR delivers substance. Here's an example:
 
@@ -67,7 +67,7 @@ vs
 Rewriting with bullet points leaves the summary skimmable while making space for substance. The first example lacks the sort of takeaway that a good TL;DR needs.[^tldr-subject] "Some improvements" weasels out of actually stating those improvements. The second example states the two improvements (a default has been changed, but the default has not been fixed in place).
 
 [^tldr-subject]:
-  {-} Oddly enough, this TL;DR could be lightly edited into a decent subject line.
+  {^} Oddly enough, this TL;DR could be lightly edited into a decent subject line.
 
 I don't want to imply there _must_ be bullets. Use the length as an indicator: if the TL;DR has one sentence ask whether it lacks substance. Bullets are a quick remedy in those cases.
 

@@ -23,7 +23,7 @@ The problem I'm trying to solve:
 The solution is to change the parameter type from `Box[Numeric]` to the more generic `Box[T.all(T.type_parameter(:Elem), Numeric)]`.[^bounds]
 
 [^bounds]:
-  {-} You'll recognize this type (rather verbose) type as typical of a method which wants to [place bounds on generic methods].
+  {^} You'll recognize this type (rather verbose) type as typical of a method which wants to [place bounds on generic methods].
 
 At this point, let's just look at code.
 
@@ -143,7 +143,7 @@ radius = complex_box.val.polar.fetch(0)          # ✅
 The only real tradeoff with this approach is that the generic signature with `type_parameters` is quite verbose.[^verbose] Verbosity aside, the tradeoffs which limit what kinds of method implementations are allowed are not typically show-stopping limitations in real-world code.
 
 [^verbose]:
-  {-} I have some ideas for what the new syntax should be, it's mostly just an open question of whether the feature should be more or less syntactic sugar for the current syntax with `T.all` and have bad error messages, or whether we should expand Sorbet's type system to track bounds on type parameters, possibly introducing uncaught bugs.
+  {^} I have some ideas for what the new syntax should be, it's mostly just an open question of whether the feature should be more or less syntactic sugar for the current syntax with `T.all` and have bad error messages, or whether we should expand Sorbet's type system to track bounds on type parameters, possibly introducing uncaught bugs.
 
 - For more information on variance and generics in Sorbet, see the docs:\
   [Generic Classes and Methods →](https://sorbet.org/docs/generics)

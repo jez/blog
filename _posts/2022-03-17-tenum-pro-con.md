@@ -12,21 +12,21 @@ categories: ['fragment', 'sorbet']
 # author_url:
 ---
 
-One feature that Sorbet doesn't have[^yet][^but-actually] but gets requested frequently
+One feature that Sorbet doesn't have[^yet] but gets requested frequently
 is support for literal string and symbol types. Something like `T.any(:left, :right)`,
 which is a type that allows either the symbol literal `:left` or `:right`, but no other
 `Symbol`s much less other types of values. The closest that Sorbet has to this right now
 is typed enums:
 
 [^yet]:
-  Yet. The biggest limitation is just that Sorbet's approach to type inference is designed
-  to run fast and be simple to understand, sometimes sacrificing power.
+    {^} Yet. The biggest limitation is just that Sorbet's approach to type inference is
+    designed to run fast and be simple to understand, sometimes sacrificing power.
 
-[^but-actually]:
-  ... but actually Sorbet already has these types internally 😅 It's just that it doesn't
-  have syntax for people to write them in type annotations. And lo, it's [because they're
-  buggy], but for the things where Sorbet needs to use them internally we can
-  intentionally work around the known bugs, so it hasn't been worth the pain to fix.
+    ... but actually Sorbet already has these types internally 😅 It's just that it
+    doesn't have syntax for people to write them in type annotations. And lo, it's
+    [because they're buggy], but for the things where Sorbet needs to use them internally
+    we can intentionally work around the known bugs, so it hasn't been worth the pain to
+    fix.
 
 
 ```ruby

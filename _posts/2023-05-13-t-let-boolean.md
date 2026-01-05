@@ -61,7 +61,7 @@ It's not possible to strictly sort code in a Sorbet CFG from start to finish. Co
 this program:
 
 [^cfg]:
-  {-} For more idiosyncrasies of Sorbet's CFGs, see [Sorbet's weird approach to exception
+  {^-} For more idiosyncrasies of Sorbet's CFGs, see [Sorbet's weird approach to exception
   handling] or [Control Flow in Sorbet is Syntactic].
 
 
@@ -78,7 +78,7 @@ end
 The CFG for this snippet looks something like this:[^real-cfg]
 
 [^real-cfg]:
-  {-} If you really want to dive into Sorbet's internals, you can get it to print
+  {^-} If you really want to dive into Sorbet's internals, you can get it to print
   the exact CFG for a piece of code. See [docs/internals.md: CFG].
 
 ![](/assets/img/light/t-let-boolean-cfg.png){style="max-width: 575px;"}
@@ -127,7 +127,7 @@ one variable being truthy implies some _other_ variable has a particular type.[^
 example:
 
 [^neat]:
-  {-} I'm told this is one of the particularly novel parts of Sorbet's inference
+  {^-} I'm told this is one of the particularly novel parts of Sorbet's inference
   algorithms—[Dmitry], who built it, speaks highly of it. It's probably worth writing
   about more in the future.
 

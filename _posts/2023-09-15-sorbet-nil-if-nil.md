@@ -91,7 +91,7 @@ Returning something with a generic type means returning the exact input,[^parame
 not merely "something with the same type as the input."
 
 [^parametricity]:
-  {-} This constraint about returning the input unchanged is an example of [parametricity
+  {^-} This constraint about returning the input unchanged is an example of [parametricity
   in action][parametricity].
 
 So instead of having `return nil` on line 10, we have to write `return amount`.

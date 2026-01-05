@@ -55,7 +55,7 @@ There are now two methods, `do_thing` and `do_thing_with`, where `do_thing` is i
 The contract of a method with a signature including `type_parameters(:U)` means "this method holds **for all** arguments you could choose to call this method with." Choosing `0` at the call site is a valid choice.[^for-all]
 
 [^for-all]:
-  {-} Attempting to set a non-generic default argument invalidates this _for all_ property, as we'll see below.
+  {^} Attempting to set a non-generic default argument invalidates this _for all_ property, as we'll see below.
 
 Another way of saying this: a method's parameter types form a public API, and choosing the type `T.type_parameter(:U)` makes the method's public API "you can give me anything"
 

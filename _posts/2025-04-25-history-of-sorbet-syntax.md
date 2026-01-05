@@ -74,7 +74,7 @@ Which is also the reason it's hard for me to give advice to people adopting Sorb
 We can dig a little deeper and see where this appetite for typing came from. As early as 2013, Stripe had developed its own object-database mapper for defining database models:[^mongoid]
 
 [^mongoid]:
-  {-} Why didn't Stripe use mongoid, the official MongoDB ODM? I have no clue. The first mongoid commit predates the first Odin commit by about 4 years, so it's not like there was no alternative.
+  {^} Why didn't Stripe use mongoid, the official MongoDB ODM? I have no clue. The first mongoid commit predates the first Odin commit by about 4 years, so it's not like there was no alternative.
 
 ![Documentation for `Odin::Model`, a precursor to `Chalk::ODM`, and later `T::Struct`](/assets/img/odin-model-2013-03-18.png){style="max-width: 896px;"}
 
@@ -241,7 +241,7 @@ At the same time that `declare_method` shortened to `sig`, type syntax shortened
 The specific syntax that `sig` uses evolved a handful of times[^handful] and I want to talk about those changes, but not before considering one final approach.
 
 [^handful]:
-  {-} Truly, while I was researching this topic, I found so many wacky old syntaxes, far too many for this post. If you want the details feel free to ask me.
+  {^} Truly, while I was researching this topic, I found so many wacky old syntaxes, far too many for this post. If you want the details feel free to ask me.
 
 ## The Python approach: first-party type hints
 
@@ -317,7 +317,7 @@ There are two problems:
   So `Array[Integer]` would not make a generic type, but rather a length 1 array: `[Integer]`.[^local-monkey-patch]
 
 [^local-monkey-patch]:
-  {-} While we're in the realm of the wacky, we could have "block-scoped" monkey patches where we replace the meaning of certain methods when evaluating the `sig` block to make this work, but the earlier point stands: some people won't want that.
+  {^} While we're in the realm of the wacky, we could have "block-scoped" monkey patches where we replace the meaning of certain methods when evaluating the `sig` block to make this work, but the earlier point stands: some people won't want that.
 
 Something similar comes up for tuples: the `|` and `&` methods already mean something for Arrays:
 

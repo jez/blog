@@ -197,7 +197,7 @@ completion suggestions at the user's cursor), log the bad source buffer to a fil
 then go triage the logged files, fixing the most common errors first.
 
 [^corpus]:
-  For example, we gather usage metrics from every Sorbet user at Stripe.
+  {^} For example, we gather usage metrics from every Sorbet user at Stripe.
 
 The annoying part about that approach is the manual triage work of opening up the logged
 buffers, identifying which part of the file had the parse error, and blaming it to some
@@ -251,7 +251,7 @@ would just screw things up again, you can use the `yyclearin` macro[^yyclearin] 
 out the lookahead token, which will cause Bison to request another token from the lexer.
 
 [^yyclearin]:
-  In the C++ skeleton, this is available using `yyla.clear()` instead.
+  {^} In the C++ skeleton, this is available using `yyla.clear()` instead.
 
 We're not currently using this in Sorbet because I've replaced most places where it might
 have been useful with some even more powerful techniques (discussed in a future part), but
@@ -323,9 +323,9 @@ Snippet of Sorbet's parser. [View on GitHub →](https://github.com/sorbet/sorbe
 </figure>
 
 [^error_node]:
-  Slight fib; Sorbet actually creates a [constant literal node] with a magic name for
-  backwards compatibility reasons.\
-  \
+  {^} Slight fib; Sorbet actually creates a [constant literal node] with a magic name for
+  backwards compatibility reasons.
+
   "What's up with that `endPos` stuff?"\
   There's some discussion in the full source on GitHub.
 

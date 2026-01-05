@@ -25,7 +25,7 @@ I picked up this [wireless folding keyboard][keyboard] for \$25 on Amazon. It's 
 For many of my personal trips, bringing a full-sized laptop or even an iPad is overkill, especially if there's only a 10% chance that I'll end up using it. When I do wish I had a laptop, it's usually because I want to do a little blogging or light programming.[^chance] Now, all I have to do is tuck this keyboard somewhere in a carry-on.
 
 [^chance]:
-  For example, the trip calls for nothing but day hiking, but one day we get rained out. Or the trip calls for nothing but skiing, but the first day I get injured.
+  {^} For example, the trip calls for nothing but day hiking, but one day we get rained out. Or the trip calls for nothing but skiing, but the first day I get injured.
 
 It's the software that makes this setup workable as a short-term laptop replacement:
 

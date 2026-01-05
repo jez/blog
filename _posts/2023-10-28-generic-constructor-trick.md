@@ -19,10 +19,10 @@ set = Set.new([1])
 T.reveal_type(set) # => T::Set[T.untyped]
 ```
 
-You'd hope[^bug] that Sorbet would **either** report an error, requiring a type annotation instead of implicitly assuming `T.untyped` (like how other type annotations are required in `# typed: strict` files), **or** be smart enough to infer a suitable type from the provided arguments. Some day it will.
+You'd hope that Sorbet would **either** report an error, requiring a type annotation instead of implicitly assuming `T.untyped` (like how other type annotations are required in `# typed: strict` files), **or** be smart enough to infer a suitable type from the provided arguments. Some day it will.[^bug]
 
 [^bug]:
-  {-} This is a bit of a longstanding bug. See [#3768] and [#4450]. To learn more about why this happens, see [this Sorbet internals doc][variance-defaulting].
+  {^} This is a bit of a longstanding bug. See [#3768] and [#4450]. To learn more about why this happens, see [this Sorbet internals doc][variance-defaulting].
 
 [#3768]: https://github.com/sorbet/sorbet/issues/3768
 [#4450]: https://github.com/sorbet/sorbet/issues/4450
@@ -77,7 +77,7 @@ The problem here comes from Sorbet's default implementation of `Class#new`: by d
 To fix, we can define our own constructor:[^new]
 
 [^new]:
-  {-} If you don't like overriding `Class#new`, the same tricks work with a custom constructor like `def self.make` which calls `self.new`. If you do this, you likely also want `private_class_method :new`.
+  {^-} If you don't like overriding `Class#new`, the same tricks work with a custom constructor like `def self.make` which calls `self.new`. If you do this, you likely also want `private_class_method :new`.
 
 ```{.ruby .numberLines .hl-5 .hl-6 .hl-7 .hl-15}
 class Box
@@ -151,7 +151,7 @@ How this works is that `T.attached_class` acts a little bit like `T.attached_cla
 Combining everything with `T.all` asks Sorbet to collapse all the parts pairwise: pick the most specific class to apply arguments to, and pick the most specific of all the supplied type arguments.
 
 [^syntax]:
-  {-} This `[_]` syntax doesn't exist, but hopefully it's suggestive that in this case, `T.attached_class` actually stands for some generic type, because the attached class of `Box` **is** generic.
+  {^-} This `[_]` syntax doesn't exist, but hopefully it's suggestive that in this case, `T.attached_class` actually stands for some generic type, because the attached class of `Box` **is** generic.
 
 [final-example]: https://sorbet.run/#%23%20typed%3A%20true%0Aclass%20Module%3B%20include%20T%3A%3ASig%3B%20end%0A%0Aclass%20Box%0A%20%20extend%20T%3A%3AGeneric%0A%20%20Elem%20%3D%20type_member%0A%0A%20%20sig%20%7B%20params%28val%3A%20Elem%29.void%20%7D%0A%20%20def%20initialize%28val%29%0A%20%20%20%20%40val%20%3D%20val%0A%20%20end%0A%0A%20%20sig%20do%0A%20%20%20%20type_parameters%28%3AElem%29%0A%20%20%20%20%20%20.params%28val%3A%20T.type_parameter%28%3AElem%29%29%0A%20%20%20%20%20%20.returns%28T.all%28T.attached_class%2C%20Box%5BT.type_parameter%28%3AElem%29%5D%29%29%0A%20%20end%0A%20%20def%20self.new%28val%29%0A%20%20%20%20super%0A%20%20end%0Aend%0A%0Aclass%20ChildBox%20%3C%20Box%0A%20%20Elem%20%3D%20type_member%0Aend%0A%0Abox%20%3D%20Box.new%280%29%0AT.reveal_type%28box%29%20%23%20%3D%3E%20Box%5BInteger%5D%0Abox%20%3D%20ChildBox.new%280%29%0AT.reveal_type%28box%29%20%23%20%3D%3E%20ChildBox%5BInteger%5D%0A
 

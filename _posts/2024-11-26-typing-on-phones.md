@@ -19,7 +19,7 @@ With a little practice, anyone can get to 100 wpm typing on a computer keyboard.
 By contrast, text input on phones is sluggish. Innovations like autocorrect, swiping, and predictive text input help, but even the fastest, mobile-native users struggle to get faster than 70 wpm.[^palin2019typing] I top out around 50 wpm despite consistently beating 130 wpm on a desktop keyboard.
 
 [^palin2019typing]:
-  Two standard deviation of users aged 10--19 as of 2019 (the fastest age group) were under 68 wpm in a study by [Palin, et al]. (Table 4.)
+  {^} Two standard deviation of users aged 10--19 as of 2019 (the fastest age group) were under 68 wpm in a study by [Palin, et al]. (Table 4.)
 
 [Palin, et al]: https://userinterfaces.aalto.fi/typing37k/
 

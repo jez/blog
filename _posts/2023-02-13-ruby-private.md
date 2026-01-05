@@ -153,7 +153,7 @@ anywhere that the receiver is either omitted or is `self`, **syntactically**.[^o
 syntactic restriction means that things like this are not allowed:
 
 [^omit]:
-  {-} The receiver is the `x` in `x.foo`. When a method call's receiver is omitted like
+  {^} The receiver is the `x` in `x.foo`. When a method call's receiver is omitted like
   `foo()`, Ruby implicitly assumes that it had been called like `self.foo()`.
 
 ```ruby

@@ -113,7 +113,7 @@ spread, other teammates will start to help out with the evangelism as the benefi
 outward.
 
 [^quick]:
-  Like, actually quick. "Notify for new Slack every message" quick. If you queue questions
+  {^} Like, actually quick. "Notify for new Slack every message" quick. If you queue questions
   into some ticketing system and respond tomorrow, people will lose patience with _types
   overall_ not just with you.
 

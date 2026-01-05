@@ -53,12 +53,12 @@ most-offered tips for type-level design in Sorbet:
 
 :::
 
-In this post, we'll take a quick look[^quick] at the most common incorrect approach to
+In this post, we'll take a quick look at the most common incorrect approach to
 annotate this method, discuss why that approach doesn't work, then circle back and see how
-to use abstract methods to type this method.
+to use abstract methods to type this method.[^quick]
 
 [^quick]:
-  {-} If you're short on time or don't care for explanations, here's the [final
+  {^} If you're short on time or don't care for explanations, here's the [final
   code][final-example] we'll build towards.
 
 # ⛔️ What people try: `T.class_of`
@@ -79,12 +79,12 @@ def instantiate_class(klass)
 end
 ```
 
-This type **does not work**.[^syntax] Even though I can see why people might expect it to
+This type **does not work**. Even though I can see why people might expect it to
 work, there are reasons why it should not work, and the Sorbet docs [elaborate
-why](https://sorbet.org/docs/class-of#tclass-vs-tclass_of).
+why](https://sorbet.org/docs/class-of#tclass-vs-tclass_of).[^syntax]
 
 [^syntax]:
-  {-} Sometimes I wish Sorbet had used the syntax `A.singleton_class` instead of
+  {^} Sometimes I wish Sorbet had used the syntax `A.singleton_class` instead of
   `T.class_of(A)`, because I think it might have made it more clear that you can't do this
   on arbitrary types. Then again, maybe people would have just done `T.any(A,
   B).singleton_class`

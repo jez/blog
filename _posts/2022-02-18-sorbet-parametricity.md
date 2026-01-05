@@ -102,7 +102,7 @@ In this example, the side effect of calling `puts(x.even?)` only happens if the 
 If Sorbet wanted,[^1] it could prevent this particular form of anti-uniformity by not allowing any [control-flow-sensitive] type updates. But it wouldn't change the fact that, for example, one implementation of `fake_identity_function` could always print one log line, while another implementation could always print two log lines. The only uniformity guarantees we get are about specifically what's captured in the input and output types.
 
 [^1]:
-  Unlike everything we've discussed so far, I'm not actually sure whether that was a conscious decision or an accident. But it is a pretty useful feature in practice.
+  {^} Unlike everything we've discussed so far, I'm not actually sure whether that was a conscious decision or an accident. But it is a pretty useful feature in practice.
 
 [control-flow-sensitive]: <https://sorbet.org/docs/flow-sensitive>
 

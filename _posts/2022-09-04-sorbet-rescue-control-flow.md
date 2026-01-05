@@ -75,7 +75,7 @@ magical `<exn-value>` variable, which Sorbet treats as [**unanalyzable**]{.small
 doesn't attempt to track how the value is initialized nor how control flow affects it.
 
 [^mostly]:
-  If you have [Graphviz] installed, you can get Sorbet to dump its internal CFG for a given
+  {^} If you have [Graphviz] installed, you can get Sorbet to dump its internal CFG for a given
   file with the `cfg-view.sh` script in the Sorbet repo. The CFG for the example above looks
   like [like this](/assets/img/rescue-example-01.svg).
 
@@ -103,7 +103,7 @@ body, but we said the best outcome would be for Sorbet to know that `loop_count`
 initialized, having type `Integer`.
 
 [^said]:
-  Of course, easier said than done.
+  {^} Of course, easier said than done.
 
 Before we can see what it would take for Sorbet to infer `Integer`, some history.
 
@@ -124,7 +124,7 @@ The approach it's describing is what most people might do intuitively: any instr
 into the `rescue` block. In picture form:
 
 [^not-quite]:
-  This is not quite true: `x = 0` doesn't raise, and Sorbet can [see that syntactically][my
+  {^} This is not quite true: `x = 0` doesn't raise, and Sorbet can [see that syntactically][my
   last post]. This might be something to take advantage of in the future.
 
 :::{.only-light-mode}
@@ -146,7 +146,7 @@ later][a6ed41e0][^2018], when the shortcut we've been discussing arrived. In fac
 comment from that commit persists unchanged in the codebase today:
 
 [^2018]:
-  And only two days after I joined the team 😅
+  {^} And only two days after I joined the team 😅
 
 > <figure class="left-align-caption">
 >
@@ -183,8 +183,8 @@ waiting for the bug to be fixed. Meanwhile, code that looked like our `loop_coun
 either did not exist or was simply rewritten[^unconditional] to avoid the bug.
 
 [^unconditional]:
-  There's an easy workaround: use `T.let` to pin the type of the variable outside the `begin`
-  block.
+  {^} There's an easy workaround: use `T.let` to pin the type of the variable outside the
+  `begin` block.
 
 But this still doesn't quite paint the full picture. I've told you, "There was a bug, and Sorbet
 fixed it by introducing another bug." Which leads us to out second point: having a lot of tiny,

@@ -74,7 +74,7 @@ reason.[^coolmetrics]  In June 2022, the breakdown looked something like this on
 codebase:
 
 [^coolmetrics]:
-  {-} One of the cool things about Sorbet is how easy it is to [get metrics out of
+  {^-} One of the cool things about Sorbet is how easy it is to [get metrics out of
   it][metrics].
 
 [metrics]: https://sorbet.org/docs/metrics
@@ -140,7 +140,7 @@ and [about 3 years][rust-analyzer] for rust-analyzer.
 [rust-analyzer]: https://blog.rust-lang.org/2022/02/21/rust-analyzer-joins-rust-org.html#history-and-future
 
 [^years]:
-  {-} TypeScript is an exception, but that's because it was written by the same person who
+  {^} TypeScript is an exception, but that's because it was written by the same person who
   had done the C# rewrite.
 
 I don't have that kind of time, so we came up with a different approach: when a file

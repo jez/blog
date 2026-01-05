@@ -15,7 +15,7 @@ categories: ['ruby', 'sorbet', 'types', 'in-pictures']
 A solid grasp of the tools Ruby has for inheritance helps with writing better code.[^esp]  On the other hand, when most people learn Ruby they learn just enough of what `include` and `extend` mean to get their job done (sometimes even less 🫣).
 
 [^esp]:
-  {-} Especially Ruby code typed with Sorbet where inheritance underlies things like abstract methods, interfaces, and generic types.
+  {^-} Especially Ruby code typed with Sorbet where inheritance underlies things like abstract methods, interfaces, and generic types.
 
 I'd like to walk through some examples of inheritance in Ruby and draw little diagrams to drive their meaning home. The goal is to have inheritance in Ruby "click."
 
@@ -49,7 +49,7 @@ I picture Ruby's `<` operator as working something like this:
 In particular, I picture classes like puzzle pieces. The pieces have tabs and blanks[^jigsaw] which allow other classes to slot in, forming an inheritance hierarchy.
 
 [^jigsaw]:
-  {-} "Tabs" and "blanks" are the [names Wikipedia uses] for these spots on jigsaw puzzles.
+  {^-} "Tabs" and "blanks" are the [names Wikipedia uses] for these spots on jigsaw puzzles.
 
 [names Wikipedia uses]: https://en.wikipedia.org/wiki/Jigsaw_puzzle#Puzzle_pieces
 
@@ -114,7 +114,7 @@ a.class # => A
 To take it a step further: objects in Ruby are instantiated by calling `new`,[^new] a singleton class method:
 
 [^new]:
-  {-} In Ruby `new` is not a keyword, it's a normal method! (It's unlike the `new` keyword in C++ or Java.)
+  {^-} In Ruby `new` is not a keyword, it's a normal method! (It's unlike the `new` keyword in C++ or Java.)
 
 ```ruby
 class A; end
@@ -159,7 +159,7 @@ end
 This `TypedEnum` class implements the typesafe enum pattern[^typedenum], which is a way of guaranteeing that there are only a fixed set of instances of a class, which can only be compared to values of the same enum (not unrelated enums).
 
 [^typedenum]:
-  {-} Popularized by Joshua Block in Effective Java, First Edition, Item 21, in response to the observation that much Java code would use magic integers to represent enumerations. (The same thing happens in Ruby, but with magic Symbols and Strings in addition to just Integers.)
+  {^-} Popularized by Joshua Block in Effective Java, First Edition, Item 21, in response to the observation that much Java code would use magic integers to represent enumerations. (The same thing happens in Ruby, but with magic Symbols and Strings in addition to just Integers.)
 
 You'd define an enum using this abstraction something like this:
 
@@ -172,10 +172,10 @@ class Suit < TypedEnum
 end
 ```
 
-It's so concise in Ruby[^concise]  because of the special relationship between a class and its singleton class:
+It's so concise in Ruby[^concise] because of the special relationship between a class and its singleton class:
 
 [^concise]:
-  {-} "Concise" versus the original Java pattern. Sorbet's `T::Enum` makes the pattern even more concise.
+  {^-} "Concise" versus the original Java pattern. Sorbet's `T::Enum` makes the pattern even more concise.
 
 ![](/assets/img/light/inheritance-in-ruby/self-class-self-new.png){.center style="max-width:563.5px"}
 ![](/assets/img/dark/inheritance-in-ruby/self-class-self-new.png){.center style="max-width:563.5px"}
@@ -345,7 +345,7 @@ With classes, we have this puzzle piece which takes instance methods to instance
 But with modules, **that link breaks down** and the only[^prepend] tools that we really have are `include` and `extend`, which only affect instance methods in the module.
 
 [^prepend]:
-  {-} You could argue these aren't the "only" tools because there's also `prepend`, but it doesn't act different from `include` with respect to this link.
+  {^-} You could argue these aren't the "only" tools because there's also `prepend`, but it doesn't act different from `include` with respect to this link.
 
 # Wait, why do we care if modules don't work like classes?
 
@@ -507,7 +507,7 @@ But having done that, at least `T.class_of(Child)` now has the ancestor chain we
 I should say: I consider this to be a wart in Sorbet's design.[^wart] When we look at [how `ActiveSupport::Concern` works](/concern-inheritance/), it' more like what you'd expect: it's a bit more recursive or viral about linking up the `ClassMethods` classes when stacking modules on top of modules. Hopefully simply being aware of this sharp edge in `mixes_in_class_methods` is enough for now.
 
 [^wart]:
-  {-} It's a long-term goal of mine to fix this one day, either by implementing support for `Concern` in Sorbet or even replacing `mixes_in_class_methods` with `Concern`.
+  {^-} It's a long-term goal of mine to fix this one day, either by implementing support for `Concern` in Sorbet or even replacing `mixes_in_class_methods` with `Concern`.
 
 \
 

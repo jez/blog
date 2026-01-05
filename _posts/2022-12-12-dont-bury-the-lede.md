@@ -38,7 +38,7 @@ are strong claims. This doc isn't long enough for section headers, but I still d
 for the title itself.[^1]
 
 [^1]:
-  I learned this technique from one of my college professor's "[Tips for Giving Clear
+  {^} I learned this technique from one of my college professor's "[Tips for Giving Clear
   Talks](https://graphics.stanford.edu/~kayvonf/misc/cleartalktips.pdf)" presentation.
   It's worth a read, as a lot of the tips work for long-form writing as well as
   presentations. (I have a local recording of the talk I can share if you'd like more than

@@ -27,8 +27,8 @@ about it outside of Stripe. It's basically just the above blog post and this tal
 Trevor Elliott and I presented at RubyConf 2021:
 
 [^logistics]:
-  ... not so much because it was ready for widespread adoption but largely because it made
-  some internal logistics easier!
+  {^} ... not so much because it was ready for widespread adoption but largely because it
+  made some internal logistics easier!
 
 <!-- https://stackoverflow.com/a/38149485 -->
 <div style="position:relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
@@ -54,8 +54,8 @@ the date they were published internally to reflect that, which means you'll have
 them in the archives.
 
 [^gaps]:
-  Before reposting these Sorbet Compiler posts, I only posted publicly five times in 2020
-  and twice in 2021 😞
+  {^} Before reposting these Sorbet Compiler posts, I only posted publicly five times in
+  2020 and twice in 2021 😞
 
 Note that the compiler is **still** not a project that we would encourage anyone to use.
 At this point, it [hasn't seen active development][compiler-history] for the better part

@@ -200,7 +200,7 @@ class Child extends Parent {
 The answer is: they don't, because they don't function like other instance methods. In fact, they're almost entirely like static methods, except for the fact that they have `this` bound, via the fancy `invokespecial` instruction.[^special] Just like static methods, these special `<init>` methods aren't inherited, can't be called via `super`, and don't get override checking.
 
 [^special]:
-  {-} In fact they're called "instance initialization methods," and they're [defined here][init].
+  {^-} In fact they're called "instance initialization methods," and they're [defined here][init].
 
 [init]: https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-2.html#jvms-2.9
 
@@ -213,7 +213,7 @@ Ruby is not the only language that has first-class objects... How do other langu
 Python and Flow ignore the problem. Hack at least has an annotation that lets you opt into the checks. Sorbet also has such an annotation (either `abstract`[^abstract] or `overridable`), but people aren't required to annotate them so it doesn't catch as many bugs as it should and I find that pretty unsatisfying.
 
 [^abstract]:
-  {-} By the way, allowing `abstract` constructors already breaks with tradition: constructors are not normally allowed to be abstract. But that's kind of a side-effect of how constructors act like static methods, and in Java/Scala/C++ static methods are not allowed to be abstract either. Since they're not inherited nor called polymorphically, what would be the point of an abstract constructor in those languages? This is why the [Abstract Factory pattern] is so notorious, because it's the only way to get polymorphic constructors in those languages.
+  {^-} By the way, allowing `abstract` constructors already breaks with tradition: constructors are not normally allowed to be abstract. But that's kind of a side-effect of how constructors act like static methods, and in Java/Scala/C++ static methods are not allowed to be abstract either. Since they're not inherited nor called polymorphically, what would be the point of an abstract constructor in those languages? This is why the [Abstract Factory pattern] is so notorious, because it's the only way to get polymorphic constructors in those languages.
 
 [Abstract Factory pattern]: https://en.wikipedia.org/wiki/Abstract_factory_pattern
 

@@ -89,7 +89,7 @@ end
 In this case, `Foo` and `Bar` do not overlap[^interface] `Foo` does not override `==`. Unfortunately that says nothing about what subclasses of `Foo` might do. In this example, `Foo` has a subclass called `FooChild` with a custom override that misbehaves. (I've made it always return `true` for simplicity, but you can just as well imagine it doing some sort of implicit conversion.) Thus, subtyping has defeated our heuristic.
 
 [^interface]:
-  {-} Note that `Foo` and `Bar` do not overlap because they are classes. If one of them had been a module, [they would overlap], also defeating the equality check.
+  {^-} Note that `Foo` and `Bar` do not overlap because they are classes. If one of them had been a module, [they would overlap], also defeating the equality check.
 
 [they would overlap]: https://sorbet.org/docs/intersection-types#understanding-how-intersection-types-collapse
 
@@ -106,7 +106,7 @@ Maybe trying to be as general as possible is the wrong approach? We could try pi
 For example,[^symbol] if we pretend that `Symbol` is final (it's not but maybe we pretend anyways), we could require that the right operand's type overlaps with `Symbol`, catching attempts to compare for equality against `String` (super common).
 
 [^symbol]:
-  {-} This is not merely an example—this is the approach we've implemented it [here][6649].
+  {^-} This is not merely an example—this is the approach we've implemented it [here][6649].
 
 [6649]: https://github.com/sorbet/sorbet/pull/6649
 
@@ -157,7 +157,7 @@ First, this is technically an incompatible override (see [A note on variance] fo
 [A note on variance]: https://sorbet.org/docs/override-checking#a-note-on-variance
 
 [^overridable]:
-  {-} At this point, marking it overridable would be a backwards incompatible change, requiring existing `==` signatures to start mentioning `override`, likely with no benefit.
+  {^-} At this point, marking it overridable would be a backwards incompatible change, requiring existing `==` signatures to start mentioning `override`, likely with no benefit.
 
 This leads to our second problem, heterogeneous collections.
 
@@ -173,7 +173,7 @@ Ruby's `include?` method calls `==` under the hood. Even if the program never me
 That's a problem.[^runtime] To fix it, we could try marking the `sig` with `checked(:never)`, but then Sorbet's dead code checking would prevent us from handling other types in our method body.
 
 [^runtime]:
-  {-} You might be tempted to think of this as an indictment of [runtime checking], but I don't. In my opinion, this is the runtime type system flagging a real problem (incompatible override) which the static type system couldn't catch because of gradual typing.
+  {^-} You might be tempted to think of this as an indictment of [runtime checking], but I don't. In my opinion, this is the runtime type system flagging a real problem (incompatible override) which the static type system couldn't catch because of gradual typing.
 
 [runtime checking]: /runtime-type-checking/
 
@@ -230,7 +230,7 @@ The overloaded signature specifies that if `other` is `A` the comparison happens
 However, Sorbet's overload resolution doesn't work well with these signatures.[^decompose] `T.nilable(A)` is not a subtype of `A`, causing Sorbet to apply the `BasicObject` overload. This means Sorbet ascribes `FalseClass` to `res`, which is wrong when `y` is non-`nil` at runtime.
 
 [^decompose]:
-  {-} Writing this post made me wonder if Sorbet _should_ do something smarter here, like try to decompose the argument type and combine all the overloads that apply to each component. But that's getting into territory where I can't think of any prior art, which sets off my ⚠️ bad idea ⚠️  radar. (For example, TypeScript behaves like Sorbet when porting the above example.)
+  {^-} Writing this post made me wonder if Sorbet _should_ do something smarter here, like try to decompose the argument type and combine all the overloads that apply to each component. But that's getting into territory where I can't think of any prior art, which sets off my ⚠️ bad idea ⚠️  radar. (For example, TypeScript behaves like Sorbet when porting the above example.)
 
 All of this leads me to the conclusion that not only have we failed to add heuristics to Sorbet to solve this, it's not even really practical for users to take the problem into their own hands.
 

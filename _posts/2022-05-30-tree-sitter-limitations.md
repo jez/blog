@@ -27,11 +27,11 @@ were for the use cases I have, because it would save me a lot of work.)
 > GitHub.[^semantic]
 
 [^new]:
-  Is it still new? The GitHub repo has commits dating back to 2013, though I only
+  {^} Is it still new? The GitHub repo has commits dating back to 2013, though I only
   first heard about it in 2017. It still has a feeling of newness about it, but I digress.
 
 [^semantic]:
-  The semantic repo actually has a [short overview][why-tree-sitter] of why they chose
+  {^} The semantic repo actually has a [short overview][why-tree-sitter] of why they chose
   tree-sitter, along with some drawbacks.
 
 For a lot of projects, tree-sitter is really nice! _Especially_ for projects where the
@@ -44,7 +44,7 @@ these applications it's actually _completely fine_ if there's a flagrant bug in 
 grammars, because the project is still so useful in all the other languages.
 
 [^approval]:
-  Another neat use case, from work: every time a commit is pushed to an approved PR, the
+  {^} Another neat use case, from work: every time a commit is pushed to an approved PR, the
   approval is dismissed, unless (using tree-sitter) the CI system detects that the parse
   tree hasn't changed. This spares comment and formatting changes the toil of a re-review.
 
@@ -73,7 +73,7 @@ programs that people type in their editors, but which tree-sitter doesn't parse 
 enough. You can follow along on the [tree-sitter online playground].
 
 [^bugs]:
-  It's entirely possible that I've just been _really_ unlucky, and that the problems I've
+  {^} It's entirely possible that I've just been _really_ unlucky, and that the problems I've
   found are all fixable with a few bug reports and a little ingenuity. But if it's
   going to take ingenuity anyways, isn't that the same as writing a parser myself?
 
@@ -224,7 +224,7 @@ The best behavior here would be to point out that the curly braces are mismatche
 and then recover assuming that the user fixed that mismatch, preserving the `bar` method.
 
 [^rust]:
-  Indeed, that's [exactly the error](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=872bd946a8789aba9d49e07aef614819)
+  {^} Indeed, that's [exactly the error](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=872bd946a8789aba9d49e07aef614819)
   on a comparable Rust example. (Rust's parser is hand-written.)
 
 \

@@ -77,7 +77,7 @@ types are subtly wrong, every change is risky, even small ones like adding this 
 condition and print statement:
 
 [^wrong]:
-  {-} Remember: in a [gradual type system], the existence of types like [`T.untyped`] mean
+  {^-} Remember: in a [gradual type system], the existence of types like [`T.untyped`] mean
   that the static types can lie at any point in the program.
 
 [gradual type system]: https://sorbet.org/docs/gradual
@@ -143,7 +143,7 @@ trustworthy, making for far less work hunting down the _truly correct_ types whe
 modifying legacy code.
 
 [^alot]:
-  {-} It's not _always_ a lot—sometimes it's only marginally more work, and sometimes
+  {^-} It's not _always_ a lot—sometimes it's only marginally more work, and sometimes
   the runtime checks pay for themselves in the change they're added if they happen to help
   as a debugging aide to get the tests passing.
 

@@ -19,7 +19,7 @@ News, so I'm not in the "nostalgic for an earlier internet" camp of people, and 
 really used RSS for longer than a few minutes prior to this week.
 
 [^rss]:
-  {-} I'm using "RSS" and "Atom" and "feed" interchangeably in this post.
+  {^-} I'm using "RSS" and "Atom" and "feed" interchangeably in this post.
 
 [This is the year of the RSS Reader]: https://www.niemanlab.org/2022/12/this-is-the-year-of-the-rss-reader-really/
 
@@ -44,7 +44,7 @@ But browsers won't surface that to you. Sometimes people have links to their RSS
 directly in the page, but quite a few don't, not even on the home page.[^understand]
 
 [^understand]:
-  {-} I think this is somewhat understandable. Maybe you're going for a minimal aesthetic
+  {^-} I think this is somewhat understandable. Maybe you're going for a minimal aesthetic
   on the page and don't want to slap a "subscribe" button everywhere, or maybe you just
   don't want to self-promote your blog on every page.
 
@@ -56,7 +56,7 @@ example: every Substack has a feed and a `<link>` in the `<head>`, but no mentio
 the page.[^substack]
 
 [^substack]:
-  {-} There's certainly no end to the pop-ups attempting to collect your email address,
+  {^-} There's certainly no end to the pop-ups attempting to collect your email address,
   though.
 
 Subreddits have RSS feeds, but don't even mention it as `<link>`: you just have to search
@@ -64,7 +64,7 @@ the web for "how to get subreddit as RSS."[^reddit] Funnily enough, the `old.red
 view **does** have a `<link>` to the RSS feed.
 
 [^reddit]:
-  {-} The trick: change `/r/subreddit/` to `/r/subreddit.rss`
+  {^-} The trick: change `/r/subreddit/` to `/r/subreddit.rss`
 
 And then lots of small bloggers make no mention of RSS in the page, despite publishing RSS
 feeds (likely only because their blog software makes one by default, not because they're
@@ -97,7 +97,7 @@ individual articles. I just want a list of links that open as browser tabs, plus
 of unread articles.
 
 [^app]:
-  {-} Or, short of that, to have it be a mobile-friendly web app with a mobile client for
+  {^-} Or, short of that, to have it be a mobile-friendly web app with a mobile client for
   badges.
 
 I installed [NetNewsWire] on iOS after ~10 minutes of research and started filling up my
@@ -106,7 +106,7 @@ something else.[^oss] The rest of the client was plain and simple, which I reall
 think if it weren't for this one problem I would have had no complaints here.
 
 [^oss]:
-  {-} I will say, it was neat that I could file an issue in the first place.
+  {^-} I will say, it was neat that I could file an issue in the first place.
 
 [NetNewsWire]: https://netnewswire.com/
 [filed an issue]: https://github.com/Ranchero-Software/NetNewsWire/issues/3791

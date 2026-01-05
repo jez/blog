@@ -147,10 +147,10 @@ models them as such. But in TypeScript, Flow, and Mypy,[^others] that small, syn
 difference is enough to allow treating properties and attributes different from methods.
 
 [^methods]:
-  This is true even if `foo` was defined with `attr_reader :foo`!
+  {^} This is true even if `foo` was defined with `attr_reader :foo`!
 
 [^others]:
-  And maybe other control-flow sensitive type systems, too. Feel free to send me more
+  {^} And maybe other control-flow sensitive type systems, too. Feel free to send me more
   examples.
 
 [→ View example in TypeScript
@@ -170,7 +170,7 @@ call site to be any arbitrary expression like `x.property`. In Ruby, you can't w
 `x.@property`.[^ivar_get]
 
 [^ivar_get]:
-  You can do something similar: `x.instance_variable_get(:@property)`, but again this is a
+  {^} You can do something similar: `x.instance_variable_get(:@property)`, but again this is a
   method, not a property access—someone could have overridden the `.instance_variable_get`
   method!
 
@@ -178,7 +178,7 @@ If you **do** use instance variables in Ruby with Sorbet, they behave
 comparably[^ivar_bug] to their counterparts in other languages:
 
 [^ivar_bug]:
-  There's a [known bug](https://github.com/sorbet/sorbet/issues/1374) in the
+  {^} There's a [known bug](https://github.com/sorbet/sorbet/issues/1374) in the
   implementation at the time of writing, but it occurs somewhat rarely in practice so we
   haven't prioritized fixing it.
 

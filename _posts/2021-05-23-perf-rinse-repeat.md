@@ -112,7 +112,7 @@ Our first step once the program is already this small—a mere 7 lines of code �
 profile it with [`perf`](http://www.brendangregg.com/perf.html):
 
 [^meme]:
-  **Editor's note**: "7 lines of code" is a [Stripe meme].
+  {^-} **Editor's note**: "7 lines of code" is a [Stripe meme].
 
 [Stripe meme]: https://stripe.com/blog/payment-api-design
 
@@ -128,12 +128,12 @@ Perf lets us dig into an individual method's assembly to see where the time is s
 Here's the hot instructions:[^debug]
 
 [^debug]:
-  You’ll notice: we even emit debug info, mapping which Ruby-level line these instructions
-  came from!\
-  \
-  It means that if you run Ruby under `gdb` and print a backtrace, sometimes you’ll see C
-  files in the backtrace (from inside the Ruby VM), and sometimes you’ll see Ruby files
-  (for C functions emitted by the Sorbet compiler).
+    {^} You’ll notice: we even emit debug info, mapping which Ruby-level line these
+    instructions came from!
+
+    It means that if you run Ruby under `gdb` and print a backtrace, sometimes you’ll see
+    C files in the backtrace (from inside the Ruby VM), and sometimes you’ll see Ruby
+    files (for C functions emitted by the Sorbet compiler).
 
 ![body of `returns_nilclass` when compiled](/assets/img/perf-rinse-repeat-02.png)
 
@@ -152,7 +152,7 @@ stored there and put it in `%register2`.
 [AT&T assembly syntax]: https://elronnd.net/writ/2021-02-13_att-asm.html
 
 [^intel]:
-  Comment from Nathan: "`perf report -M intel ...` ought to use a more reasonable
+  {^} Comment from Nathan: "`perf report -M intel ...` ought to use a more reasonable
   disassembly syntax."
 
 Sound familiar? That's basically the **assembly equivalent of `foo->bar` in C**. Start

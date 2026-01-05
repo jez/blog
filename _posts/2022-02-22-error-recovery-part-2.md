@@ -49,7 +49,7 @@ parser and continued to modify it over time as Ruby syntax evolved. The lexer us
 compared to other lexers I've seen—a point which we'll come back to in future posts.
 
 [^typedruby]:
-  [TypedRuby] was an aspirational Ruby type checker implemented in Rust that predated
+  {^} [TypedRuby] was an aspirational Ruby type checker implemented in Rust that predated
   Sorbet. It is now abandoned.
 
 Importantly...
@@ -130,7 +130,7 @@ reporting mechanism[^hijack] to improve the message for certain syntax errors.
 Specifically, it'll try to show error messages in cases like this:
 
 [^hijack]:
-  It turns out, all ("all") you have to do is is monkey patch `require` to `rescue
+  {^} It turns out, all ("all") you have to do is is monkey patch `require` to `rescue
   SyntaxError`. Thanks Ruby :slightly_smiling_face:
 
 ```{.ruby .numberLines .hl-4 .hl-8}
@@ -144,12 +144,12 @@ class A
 end # ← ruby default error: unexpected token "end of file"
 ```
 
-Missing an `end` keyword is a super common class of Ruby syntax errors,[^curly] and
+Missing an `end` keyword is a super common class of Ruby syntax errors, and
 `dead_end` already works particularly well at reporting them, so it was tempting to
-~~steal~~ reuse either the code or the ideas.
+~~steal~~ reuse either the code or the ideas.[^curly]
 
 [^curly]:
-  One of my biggest Ruby syntax gripes is that it isn't a curly brace language like C or
+  {^} One of my biggest Ruby syntax gripes is that it isn't a curly brace language like C or
   JavaScript. Any sensibly editor will **immediately** insert the matching `}` after first
   typing `{`. But most Ruby editors will only insert the `end` matching some statement
   after a full line has been typed and `<Enter>` has been pressed, if anything. This means

@@ -44,14 +44,14 @@ example(AbstractParent) # 💥 call to abstract method foo
 The call to `foo` on line 14 expects `klass` to be an instance of a concrete class, so all its methods (including `foo`) have implementations. But at runtime, the object `AbstractParent` is **not** an instance of a concrete class.[^specifically] The method `foo` is not implemented on the `AbstractParent` object, so the call raises unexpectedly at runtime despite Sorbet reporting no static error.
 
 [^specifically]:
-  {-} Specifically: it's the singleton instance of a singleton class which Sorbet allowed defining abstract methods on.
+  {^} Specifically: it's the singleton instance of a singleton class which Sorbet allowed defining abstract methods on.
 
 In every sane language, making a type abstract is **supposed** to prevent this problem! That is, if `A` is abstract, then having `x` with type `A` should necessarily imply that whatever `x` is bound to at runtime is an instance of a concrete subclass of `A`. Abstract classes should not be instantiable!
 
 For non-singleton classes, Sorbet enforces this guarantee: marking a class `abstract!` hijacks the `self.new` method at runtime to make it raise an exception, which prevents instantiating abstract classes.[^trickery]
 
 [^trickery]:
-  {-} ... ignoring Ruby trickery which well-behaved programs won't use.
+  {^} ... ignoring Ruby trickery which well-behaved programs won't use.
 
 But for _singleton classes_, there's no way to prevent a class's singleton class from being created—the act of declaring a class automatically creates the singleton class. Knowing this, Sorbet should never consider a singleton class to be abstract, preventing the declaration of abstract singleton class methods. **It does anyway**, which is how we ended up with this mess.
 
