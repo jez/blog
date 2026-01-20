@@ -72,7 +72,7 @@ The `T.nilable(...)` on line 7 is redundant from the user's perspective: shouldn
 
 This consequence is downstream of the fact that `nil` is not a member of all reference types in Sorbet. In a language like Scala, where `null` is a value of all reference types, things are a little cleaner at the call site:
 
-```{.scala .hl-4}
+```{.scala .numberLines .hl-4}
 class MaybeUninitBox[Elem >: Null](var value: Elem = null):
   def unset(): Unit = value = null
 
@@ -121,7 +121,7 @@ We might then ask: what's the point of `lower` bounds at all? If we can always a
 
 Lower bounds are more powerful than union types when it comes to subtyping. Let's see how that plays out if we tried to make this `MaybeUninitBox` ascribe to some `IBox` interface:
 
-```ruby
+```{.ruby .numberLines}
 module IBox
   interface!
   Elem = type_member
@@ -137,7 +137,7 @@ end
 
 <figure class="left-align-caption">
 
-```ruby
+```{.ruby .numberLines}
 class MaybeUninitBox2
   include IBox
   # ...
@@ -166,7 +166,7 @@ Thus you might be forced to use lower bounds instead of union types if you want 
 
 "I don't think I really care about that subtyping thing in practice, so I don't need lower bounds." Are you sure? Where I work, I see a lot of code that looks like this:
 
-```{.ruby}
+```{.ruby .numberLines}
 class AbstractMutator
   ModelType = type_member
 
@@ -192,7 +192,7 @@ The `fixed` bound on `ModelType` implicitly specifies an `upper` and `lower` bou
 
 Here's the type of the `Array#+` method in Sorbet's RBIs:
 
-```ruby
+```{.ruby .numberLines}
 sig do
   type_parameters(:U)
     .params(arg0: T::Enumerable[T.type_parameter(:U)])
@@ -205,7 +205,7 @@ The idea is that the `Enumerable` to append to the current `Array` doesn't have 
 
 Spiritually, this is the same as a type like this in Scala, which has syntax for lower bounds on generic methods:
 
-```scala
+```{.scala .numberLines}
 def +[U >: Elem](arg0: Enumerable[U]): Array[U]
 ```
 
