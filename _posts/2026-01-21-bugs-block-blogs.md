@@ -3,7 +3,7 @@
 layout: post
 title: "Bugs Block Blogs"
 date: 2026-01-21T17:37:55-05:00
-description: TODO
+description: When writer's block is actually the weight of the bugs you're papering over.
 math: false
 categories: ['fragment', 'meta']
 # subtitle:
